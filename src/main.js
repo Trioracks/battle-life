@@ -14,6 +14,7 @@ import { completeShift, getJob, jobIds } from './jobs.js';
 import { buyFood, cookMeal, eatMeal, sleep, washDishes } from './household.js';
 import { MAKAREWITCH_VI, registerForTournament, researchTournament } from './tournament.js';
 import { chooseBeat, masterTrack, mixTrack, polishDraft, recordTrack, startDraft, submitTrack } from './track-project.js';
+import { scoreSelection } from './selection.js';
 
 const canvas = document.querySelector('#game');
 const status = document.querySelector('#status');
@@ -118,7 +119,7 @@ function renderDesktop(view = 'home') {
     : view === 'market'
       ? `<p>Холодильник: ингредиенты — ${campaign.inventory.ingredients}, готовые порции — ${campaign.inventory.cookedMeals}.</p><div class="desktop-grid"><button class="desktop-icon" data-market="groceries"><b>▣</b><span>Продукты</span><small>380 ₽ · +3 ингредиента</small></button></div>`
       : view === 'battles'
-        ? `<p>${MAKAREWITCH_VI.description}</p><p><strong>Дедлайн: 20 сентября, 23:59.</strong> ${campaign.tournament.researchHints.length ? `Найдено: ${campaign.tournament.researchHints.join(', ')}.` : ''}</p><div class="desktop-grid">${campaign.tournament.registered ? `<button class="desktop-icon" data-battle="research"><b>⌕</b><span>Изучить архив</span><small>1 ч · комментарии и скрытые предпочтения</small></button><button class="desktop-icon" data-battle="track"><b>♫</b><span>Моя заявка</span><small>Сделать и сдать трек</small></button>` : `<button class="desktop-icon" data-battle="register"><b>◈</b><span>Участвовать</span><small>Зарегистрироваться на MAKAREWITCH VI</small></button>`}</div><p>${MAKAREWITCH_VI.comments.join('<br>')}</p>`
+        ? `<p>${MAKAREWITCH_VI.description}</p><p><strong>Дедлайн: 20 сентября, 23:59.</strong> ${campaign.tournament.researchHints.length ? `Найдено: ${campaign.tournament.researchHints.join(', ')}.` : ''}</p><div class="desktop-grid">${campaign.tournament.registered ? `<button class="desktop-icon" data-battle="research"><b>⌕</b><span>Изучить архив</span><small>1 ч · комментарии и скрытые предпочтения</small></button><button class="desktop-icon" data-battle="track"><b>♫</b><span>Моя заявка</span><small>Сделать и сдать трек</small></button>${campaign.tournament.submitted && !campaign.tournament.selection ? `<button class="desktop-icon" data-battle="results"><b>!</b><span>Судьи отсудили</span><small>Открыть комментарии и баллы</small></button>` : ''}` : `<button class="desktop-icon" data-battle="register"><b>◈</b><span>Участвовать</span><small>Зарегистрироваться на MAKAREWITCH VI</small></button>`}</div>${campaign.tournament.selection ? `<p><strong>${campaign.tournament.selection.passed ? 'Ты прошёл отбор.' : 'Ты не прошёл отбор.'}</strong> ${campaign.tournament.selection.total}/30<br>${campaign.tournament.selection.scores.map((score) => `${score.judge}: ${score.value}/10 — ${score.comment}`).join('<br>')}</p>` : `<p>${MAKAREWITCH_VI.comments.join('<br>')}</p>`}`
       : `<p>${opened.app.description}. Этот раздел готов к игровому действию.</p>`;
   desktopContent.innerHTML = `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>${opened.app.label}</h2>${body}<div id="desktop-page-actions"></div></section>`;
 }
@@ -159,6 +160,14 @@ desktopContent.addEventListener('click', (event) => {
   }
   const battleButton = event.target.closest('[data-battle]');
   if (battleButton) {
+    if (battleButton.dataset.battle === 'results') {
+      const selection = scoreSelection(campaign.track, MAKAREWITCH_VI);
+      campaign = { ...campaign, tournament: { ...campaign.tournament, selection } };
+      saveCampaign(campaign);
+      selection.scores.forEach((score) => notify(score.judge, `${score.value}/10. ${score.comment}`));
+      renderDesktop('battles');
+      return;
+    }
     if (battleButton.dataset.battle === 'track') {
       renderDesktop('track');
       return;
