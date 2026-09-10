@@ -9,6 +9,8 @@ import { canStartApartmentAction, getApartmentAction } from './apartment-actions
 import { playSoundCue } from './sound-cues.js';
 import { desktopApps, openDesktopApp } from './desktop-apps.js';
 import { dequeueNotification, enqueueNotification } from './phone-notifications.js';
+import { districts, travelTo } from './calikfornia.js';
+import { completeShift, getJob, jobIds } from './jobs.js';
 
 const canvas = document.querySelector('#game');
 const status = document.querySelector('#status');
@@ -33,6 +35,9 @@ const desktopScreen = document.querySelector('#desktop-screen');
 const desktopContent = document.querySelector('#desktop-content');
 const desktopClose = document.querySelector('#desktop-close');
 const phonePanel = document.querySelector('#phone-panel');
+const mapScreen = document.querySelector('#map-screen');
+const mapDistricts = document.querySelector('#map-districts');
+const mapClose = document.querySelector('#map-close');
 let campaign = loadCampaign() ?? createCampaign();
 saveCampaign(campaign);
 let creatorAllocations = Object.fromEntries(STAT_KEYS.map((key) => [key, 0]));
@@ -90,7 +95,10 @@ function renderDesktop(view = 'home') {
   }
   const opened = openDesktopApp(view);
   if (!opened) return renderDesktop();
-  desktopContent.innerHTML = `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>${opened.app.label}</h2><p>${opened.app.description}. Этот раздел готов к игровому действию.</p><div id="desktop-page-actions"></div></section>`;
+  const body = view === 'jobs'
+    ? `<p>Выбери смену. Деньги выдают наличными после работы; нагрузка различается.</p><div class="desktop-grid">${jobIds.map((id) => { const job = getJob(id); return `<button class="desktop-icon" data-job="${id}"><b>₽</b><span>${job.label}</span><small>${job.duration / 60} ч · ${job.pay} ₽</small></button>`; }).join('')}</div>`
+    : `<p>${opened.app.description}. Этот раздел готов к игровому действию.</p>`;
+  desktopContent.innerHTML = `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>${opened.app.label}</h2>${body}<div id="desktop-page-actions"></div></section>`;
 }
 
 function openDesktop() {
@@ -109,6 +117,15 @@ desktopContent.addEventListener('click', (event) => {
   const app = event.target.closest('[data-desktop-app]');
   if (app) renderDesktop(app.dataset.desktopApp);
   if (event.target.closest('[data-desktop-back]')) renderDesktop();
+  const jobButton = event.target.closest('[data-job]');
+  if (jobButton) {
+    const result = completeShift(campaign, jobButton.dataset.job);
+    campaign = result.state;
+    saveCampaign(campaign);
+    renderCampaignHud();
+    notify('РАБОТА', result.message);
+    renderDesktop('jobs');
+  }
 });
 desktopClose.addEventListener('click', closeDesktop);
 phonePanel.addEventListener('click', () => {
@@ -116,6 +133,23 @@ phonePanel.addEventListener('click', () => {
   saveCampaign(campaign);
   renderPhone();
 });
+
+function openMap() {
+  mapDistricts.innerHTML = districts.map((district) => `<button class="district-card" data-district="${district.id}"><strong>${district.name}</strong><span>${district.role}</span><small>${district.minutes ? `${district.minutes} мин в пути` : 'Ты дома'}</small></button>`).join('');
+  mapScreen.classList.remove('is-hidden');
+}
+
+mapDistricts.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-district]');
+  if (!button) return;
+  const result = travelTo(campaign, button.dataset.district);
+  campaign = result.state;
+  saveCampaign(campaign);
+  renderCampaignHud();
+  notify('КАРТА', result.message);
+  mapScreen.classList.add('is-hidden');
+});
+mapClose.addEventListener('click', () => mapScreen.classList.add('is-hidden'));
 
 function cue(id) {
   audioContext ??= new AudioContext();
@@ -791,6 +825,7 @@ function completeApartmentAction(action) {
   }
   const suffix = action.minutes ? ` · ${action.minutes} мин` : '';
   renderInteractionDock(`<strong>${action.label}</strong><span class="interaction-dock__hint">Анимация завершена${suffix}</span>`);
+  if (action.id === 'door') openMap();
 }
 
 function applyApartmentActionPose(action, elapsed) {
