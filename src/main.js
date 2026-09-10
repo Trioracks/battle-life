@@ -3,8 +3,10 @@ import { easeInOut, keyboardArmPose, seatPose, turnAngle } from './animation-tim
 import { GESTURE_STYLES, PERFORMANCE_SECONDS, performanceStyleAt, shuffledStyles } from './battle-director.js';
 import { clickIntent } from './click-intent.js';
 import { stepCharacter } from './character-motion.js';
-import { createCampaign, loadCampaign, saveCampaign } from './game-state.js';
+import { advanceCampaign, createCampaign, loadCampaign, saveCampaign } from './game-state.js';
 import { createRapper, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
+import { canStartApartmentAction, getApartmentAction } from './apartment-actions.js';
+import { playSoundCue } from './sound-cues.js';
 
 const canvas = document.querySelector('#game');
 const status = document.querySelector('#status');
@@ -24,9 +26,11 @@ const creatorForm = document.querySelector('#creator-form');
 const creatorStats = document.querySelector('#creator-stats');
 const creatorPoints = document.querySelector('#creator-points');
 const creatorError = document.querySelector('#creator-error');
+const interactionDock = document.querySelector('#interaction-dock');
 let campaign = loadCampaign() ?? createCampaign();
 saveCampaign(campaign);
 let creatorAllocations = Object.fromEntries(STAT_KEYS.map((key) => [key, 0]));
+let audioContext = null;
 const room = { left: -5.15, right: 5.15 };
 const deskX = 2.25;
 const exitZoneX = 4.62;
@@ -49,6 +53,15 @@ function renderCampaignHud() {
   for (const [name, element] of Object.entries(needElements)) {
     element.style.width = `${campaign.needs[name]}%`;
   }
+}
+
+function renderInteractionDock(content = '<span class="interaction-dock__hint">Подойди к предмету</span>') {
+  interactionDock.innerHTML = content;
+}
+
+function cue(id) {
+  audioContext ??= new AudioContext();
+  playSoundCue(id, audioContext);
 }
 
 function renderCreator() {
@@ -189,6 +202,18 @@ function roundedContour(parent, width, height, position, corner = .08) {
 function addRoom() {
   const roomGroup = new THREE.Group();
   scene.add(roomGroup);
+  const actionHitAreas = [];
+  const actionHit = (id, position, size) => {
+    const hit = new THREE.Mesh(
+      new THREE.BoxGeometry(...size),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
+    );
+    hit.position.set(...position);
+    hit.userData.actionId = id;
+    roomGroup.add(hit);
+    actionHitAreas.push(hit);
+    return hit;
+  };
 
   box(roomGroup, [13.2, .24, 3.1], colors.floor, [0, -.12, 0]);
   box(roomGroup, [13.2, 6.7, .18], colors.wall, [0, 3.25, -1.35]);
@@ -234,7 +259,9 @@ function addRoom() {
   );
   computerHitArea.position.set(.02, 1.7, .08);
   computerHitArea.name = 'computerHitArea';
+  computerHitArea.userData.actionId = 'computer';
   desk.add(computerHitArea);
+  actionHitAreas.push(computerHitArea);
 
   const computerHighlight = new THREE.Group();
   roundedContour(computerHighlight, 1.03, .77, [.27, 1.78, .11], .09);
@@ -267,6 +294,42 @@ function addRoom() {
   box(roomGroup, [.62, .18, .62], colors.amber, [-.85, 4.55, .78], { emissive: 0x8c5520, emissiveIntensity: 1.8 });
   box(roomGroup, [.035, 1.18, .035], colors.black, [-.85, 5.12, .78]);
 
+  // Everyday objects use simple geometry deliberately: their interaction state, not visual complexity, drives the MVP.
+  const fridge = new THREE.Group();
+  fridge.position.set(-1.55, 0, -.4);
+  roomGroup.add(fridge);
+  box(fridge, [.82, 1.75, .66], 0x2b3937, [0, .9, 0]);
+  box(fridge, [.72, .7, .04], 0x49615f, [0, 1.22, .36], { emissive: 0x16302d, emissiveIntensity: .18 });
+  box(fridge, [.72, .02, .05], colors.black, [0, .88, .38]);
+  box(fridge, [.04, .52, .05], colors.tealLight, [.26, 1.22, .4]);
+
+  const kitchen = new THREE.Group();
+  kitchen.position.set(-.18, 0, -.72);
+  roomGroup.add(kitchen);
+  box(kitchen, [1.95, .74, .68], 0x42504c, [0, .38, 0]);
+  box(kitchen, [1.95, .12, .72], colors.wood, [0, .78, .02]);
+  cylinder(kitchen, .18, .18, .03, 0x202427, [-.54, .86, .04]);
+  cylinder(kitchen, .18, .18, .03, 0x202427, [-.22, .86, .04]);
+  box(kitchen, [.48, .04, .3], 0x25454a, [.56, .85, .03], { emissive: 0x0d3135, emissiveIntensity: .38 });
+  box(kitchen, [.04, .2, .04], 0xa7b2a2, [.55, .98, -.12]);
+
+  const mic = new THREE.Group();
+  mic.position.set(1.12, .08, .54);
+  roomGroup.add(mic);
+  cylinder(mic, .03, .05, 1.46, 0x161d1e, [0, .73, 0]);
+  cylinder(mic, .11, .08, .22, 0x8ba19e, [0, 1.52, 0]);
+  cylinder(mic, .3, .04, .05, 0x161d1e, [0, .03, 0]);
+
+  box(roomGroup, [.82, 3.25, .12], 0x49362e, [5.44, 1.63, -.76]);
+  box(roomGroup, [.66, 2.98, .05], 0x263332, [5.44, 1.63, -.67]);
+
+  actionHit('bed', [-3.7, .8, .1], [2.9, 1.25, 1.1]);
+  actionHit('fridge', [-1.55, .95, .02], [.98, 1.9, .95]);
+  actionHit('stove', [-.72, .9, .02], [.5, .64, .92]);
+  actionHit('sink', [.35, .9, .02], [.62, .64, .92]);
+  actionHit('microphone', [1.12, .92, .28], [.72, 1.9, .9]);
+  actionHit('door', [5.44, 1.63, .04], [.95, 3.45, .8]);
+
   // The exit sits above and beside the shelf so it remains readable at every viewport width.
   const exitArrow = new THREE.ArrowHelper(
     new THREE.Vector3(1, 0, 0),
@@ -279,7 +342,7 @@ function addRoom() {
   roomGroup.add(exitArrow);
   plane(roomGroup, [1.34, .42], 0x5d4727, [5.2, 3.88, .23], { emissive: 0x3e2808, emissiveIntensity: .7 });
   box(roomGroup, [.12, 4.2, .34], 0x313936, [5.92, 2.08, -.12]);
-  return { roomGroup, computerHitArea, computerHighlight };
+  return { roomGroup, computerHitArea, computerHighlight, actionHitAreas };
 }
 
 function makeLimb(parent, name, z, color, upperLength, lowerLength) {
@@ -516,8 +579,8 @@ function createBattleScene() {
   };
 }
 
-const { roomGroup, computerHitArea, computerHighlight } = addRoom();
-const interactiveObjects = [computerHitArea];
+const { roomGroup, computerHitArea, computerHighlight, actionHitAreas } = addRoom();
+const interactiveObjects = actionHitAreas;
 const actor = createCharacter();
 applyAvatarLook(actor, campaign.player?.look);
 const battle = createBattleScene();
@@ -545,6 +608,10 @@ function setStatus() {
   }
   if (actor.mode === 'standingUp') {
     status.textContent = 'Встаёт от компьютера.';
+    return;
+  }
+  if (actor.mode === 'apartmentAction') {
+    status.textContent = actor.activeApartmentAction.label;
     return;
   }
   status.textContent = 'Кликни по комнате, чтобы отправить героя в нужную точку.';
@@ -631,6 +698,76 @@ function beginStandingSequence() {
   actor.actionElapsed = 0;
 }
 
+function beginApartmentAction(actionId) {
+  const action = getApartmentAction(actionId);
+  const availability = canStartApartmentAction(actionId, campaign.needs);
+  if (!action || !availability.allowed) {
+    renderInteractionDock(`<span class="interaction-dock__hint">${availability.reason}</span>`);
+    return;
+  }
+  if (actionId === 'computer') {
+    beginSeatSequence();
+    return;
+  }
+  if (actionId === 'door') {
+    renderInteractionDock('<strong>Дверь</strong><span class="interaction-dock__hint">Карта Каликфорнии откроется после короткой анимации.</span>');
+  }
+  actor.activeApartmentAction = action;
+  actor.mode = 'apartmentAction';
+  actor.actionElapsed = 0;
+  actor.state = { ...actor.state, moving: false };
+  startTurn(Math.PI / 2, .22);
+  cue(action.cue);
+}
+
+function completeApartmentAction(action) {
+  if (action.minutes > 0) {
+    const effects = {
+      bed: { energy: 8, health: .5 },
+      stove: { energy: -2 },
+      microphone: { energy: -8, leisure: -1 },
+    }[action.id] ?? {};
+    campaign = advanceCampaign(campaign, { ...action, effects }).state;
+    saveCampaign(campaign);
+    renderCampaignHud();
+  }
+  const suffix = action.minutes ? ` · ${action.minutes} мин` : '';
+  renderInteractionDock(`<strong>${action.label}</strong><span class="interaction-dock__hint">Анимация завершена${suffix}</span>`);
+}
+
+function applyApartmentActionPose(action, elapsed) {
+  actor.model.position.y = 0;
+  actor.frontLeg.pivot.rotation.z = 0;
+  actor.backLeg.pivot.rotation.z = 0;
+  actor.frontLeg.lowerPivot.rotation.z = 0;
+  actor.backLeg.lowerPivot.rotation.z = 0;
+  actor.frontArm.lowerPivot.rotation.z = 0;
+  actor.backArm.lowerPivot.rotation.z = 0;
+  const beat = Math.sin(elapsed * 7);
+  if (action.animation === 'sleep') {
+    applySeatPose(1, elapsed);
+    actor.model.rotation.z = -.38;
+    return;
+  }
+  if (action.animation === 'record') {
+    actor.frontArm.pivot.rotation.z = .86 + beat * .24;
+    actor.backArm.pivot.rotation.z = -.52 - beat * .12;
+    actor.frontArm.lowerPivot.rotation.z = -.64;
+    actor.backArm.lowerPivot.rotation.z = .35;
+    actor.model.position.y = Math.abs(beat) * .035;
+    return;
+  }
+  if (action.animation === 'cook' || action.animation === 'wash') {
+    actor.frontArm.pivot.rotation.z = .88 + beat * .15;
+    actor.backArm.pivot.rotation.z = .74 - beat * .12;
+    actor.frontArm.lowerPivot.rotation.z = -.92;
+    actor.backArm.lowerPivot.rotation.z = -.8;
+    return;
+  }
+  actor.frontArm.pivot.rotation.z = .4 + beat * .1;
+  actor.backArm.pivot.rotation.z = -.2 - beat * .08;
+}
+
 function requestMove(targetX, interaction = null) {
   if (actor.mode === 'typing') {
     actor.pendingIntent = { type: 'walk', targetX, interaction };
@@ -656,6 +793,11 @@ function requestFaceCamera() {
 }
 
 function applyIntent(intent) {
+  if (intent.type === 'apartment-action') {
+    const action = getApartmentAction(intent.actionId);
+    if (action) requestMove(action.targetX, `action:${action.id}`);
+    return;
+  }
   if (intent.type === 'computer') {
     requestMove(actor.seatTargetX, 'computer');
     return;
@@ -711,6 +853,18 @@ function updateAction(delta, elapsed) {
     updatePose(0, elapsed);
     return true;
   }
+  if (actor.mode === 'apartmentAction') {
+    applyApartmentActionPose(actor.activeApartmentAction, elapsed);
+    if (actor.actionElapsed >= 1.7) {
+      const action = actor.activeApartmentAction;
+      actor.activeApartmentAction = null;
+      actor.mode = 'walking';
+      actor.actionElapsed = 0;
+      actor.model.rotation.z = 0;
+      completeApartmentAction(action);
+    }
+    return true;
+  }
 
   return true;
 }
@@ -732,6 +886,7 @@ function updateApartment(delta, elapsed) {
       const interaction = actor.interaction;
       actor.interaction = null;
       if (interaction === 'computer') beginSeatSequence();
+      if (interaction?.startsWith('action:')) beginApartmentAction(interaction.slice(7));
     } else {
       const direction = Math.sign(difference);
       const previousFacing = actor.state.facing;
@@ -741,10 +896,6 @@ function updateApartment(delta, elapsed) {
       }
       actor.group.position.x = actor.state.x;
     }
-  }
-  if (actor.state.x >= exitZoneX) {
-    enterBattle();
-    return;
   }
   updatePose(delta, elapsed);
   setStatus();
@@ -969,7 +1120,8 @@ function pointFromPointerEvent(event) {
   const intersections = raycaster.intersectObjects(interactiveObjects, false);
   const worldPoint = new THREE.Vector3();
   raycaster.ray.intersectPlane(walkPlane, worldPoint);
-  return { hitComputer: intersections.length > 0, worldPoint };
+  const hitAction = intersections[0]?.object.userData.actionId ?? null;
+  return { hitComputer: hitAction === 'computer', hitAction, worldPoint };
 }
 
 canvas.addEventListener('pointermove', (event) => {
@@ -978,9 +1130,9 @@ canvas.addEventListener('pointermove', (event) => {
     canvas.style.cursor = 'default';
     return;
   }
-  const { hitComputer } = pointFromPointerEvent(event);
+  const { hitComputer, hitAction } = pointFromPointerEvent(event);
   computerHighlight.visible = hitComputer;
-  canvas.style.cursor = hitComputer ? 'pointer' : 'crosshair';
+  canvas.style.cursor = hitAction ? 'pointer' : 'crosshair';
 });
 
 canvas.addEventListener('pointerleave', () => {
@@ -990,8 +1142,9 @@ canvas.addEventListener('pointerleave', () => {
 
 canvas.addEventListener('pointerdown', (event) => {
   if (event.button !== 0 || gameMode !== 'apartment') return;
-  const { hitComputer, worldPoint } = pointFromPointerEvent(event);
+  const { hitComputer, hitAction, worldPoint } = pointFromPointerEvent(event);
   const intent = clickIntent({
+    hitAction,
     hitComputer,
     worldX: worldPoint.x,
     worldY: worldPoint.y,

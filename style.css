@@ -31,6 +31,11 @@ body { margin: 0; min-width: 320px; min-height: 100vh; overflow: hidden; }
 .hud--top { top: clamp(18px, 4vw, 44px); }
 .hud--bottom { bottom: clamp(18px, 4vw, 38px); }
 
+.interaction-dock { position: absolute; z-index: 5; left: 50%; bottom: clamp(25px, 3.2vw, 40px); transform: translateX(-50%); display: flex; align-items: center; gap: 10px; max-width: min(560px, calc(100vw - 36px)); min-height: 38px; padding: 8px 12px; border: 1px solid rgba(226, 193, 100, .42); background: rgba(9, 15, 16, .78); box-shadow: 0 10px 30px rgba(0, 0, 0, .28); backdrop-filter: blur(5px); }
+.interaction-dock__hint { color: #c6d0c1; font-size: 12px; }
+.interaction-dock strong { color: #f0d270; font-size: 13px; }
+.interaction-dock button { min-height: 28px; border: 1px solid #d9ba61; color: #fff4cd; background: #35423a; cursor: pointer; font: inherit; font-size: 12px; font-weight: 700; }
+
 .campaign-hud {
   position: absolute;
   z-index: 4;
@@ -125,6 +130,7 @@ kbd {
   .hud--top { right: 18px; }
   .hud--bottom { max-width: calc(100vw - 36px); }
   .controls { display: none; }
+  .interaction-dock { bottom: 18px; }
   .modal { padding: 14px; }
   .creator-identity, .creator-split { grid-template-columns: 1fr; }
 }

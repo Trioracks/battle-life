@@ -9,6 +9,13 @@ test('a computer hit takes priority over the floor position', () => {
   );
 });
 
+test('a named apartment object creates a generic interaction intent', () => {
+  assert.deepEqual(
+    clickIntent({ hitAction: 'sink', hitComputer: false, worldX: 2, worldY: .2, actorX: 1 }),
+    { type: 'apartment-action', actionId: 'sink' },
+  );
+});
+
 test('a click directly below the actor asks them to face the camera', () => {
   assert.deepEqual(
     clickIntent({ hitComputer: false, worldX: 1.2, worldY: .35, actorX: 1 }),
