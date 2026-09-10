@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Battle Life — visual spike</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <canvas id="game" aria-label="3D apartment visual prototype"></canvas>
+      <section class="hud hud--top" aria-label="Game status">
+        <p class="eyebrow">BATTLE LIFE / VISUAL SPIKE 01</p>
+        <h1 id="scene-title">КВАРТИРА · 02:17</h1>
+      </section>
+      <section class="hud hud--bottom">
+        <p id="status">Кликни по комнате, чтобы отправить героя в нужную точку.</p>
+        <p class="controls">Клик слева или справа — идти · под героем — посмотреть в камеру · по компьютеру — работать</p>
+      </section>
+      <div class="scanlines" aria-hidden="true"></div>
+    </main>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

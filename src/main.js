@@ -1,0 +1,901 @@
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
+import { easeInOut, keyboardArmPose, seatPose, turnAngle } from './animation-timing.js';
+import { GESTURE_STYLES, PERFORMANCE_SECONDS, performanceStyleAt, shuffledStyles } from './battle-director.js';
+import { clickIntent } from './click-intent.js';
+import { stepCharacter } from './character-motion.js';
+
+const canvas = document.querySelector('#game');
+const status = document.querySelector('#status');
+const sceneTitle = document.querySelector('#scene-title');
+const controls = document.querySelector('.controls');
+const room = { left: -5.15, right: 5.15 };
+const deskX = 2.25;
+const exitZoneX = 4.62;
+const clock = new THREE.Clock();
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+const walkPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x121a1b, 10, 20);
+
+const camera = new THREE.OrthographicCamera(-8, 8, 4.6, -4.6, 0.1, 30);
+camera.position.set(0, 3.35, 11.5);
+camera.lookAt(0, 2.7, 0);
+
+const colors = {
+  wall: 0x40504b,
+  wallDark: 0x263430,
+  floor: 0x202b2d,
+  floorLine: 0x788067,
+  wood: 0x76513b,
+  woodDark: 0x38271f,
+  teal: 0x2d6470,
+  tealLight: 0x65a6a4,
+  amber: 0xd6a549,
+  red: 0xb94d3d,
+  black: 0x172020,
+  hoodie: 0x29343d,
+  pants: 0x42504b,
+  skin: 0xb97d5d,
+  shoe: 0xe7dcca,
+};
+
+const gestureLabels = {
+  'open-hands': 'разводит руки',
+  'shoulder-rock': 'качает плечами',
+  'crowd-turn': 'поворачивается к залу',
+  point: 'выдаёт панч в зал',
+};
+
+function material(color, options = {}) {
+  const { castShadow: _castShadow, receiveShadow: _receiveShadow, ...materialOptions } = options;
+  return new THREE.MeshStandardMaterial({ color, roughness: .83, metalness: 0, ...materialOptions });
+}
+
+function box(parent, size, color, position, options = {}) {
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material(color, options));
+  mesh.position.set(...position);
+  mesh.castShadow = options.castShadow ?? true;
+  mesh.receiveShadow = options.receiveShadow ?? true;
+  parent.add(mesh);
+  return mesh;
+}
+
+function plane(parent, size, color, position, options = {}) {
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(...size), material(color, options));
+  mesh.position.set(...position);
+  mesh.receiveShadow = false;
+  parent.add(mesh);
+  return mesh;
+}
+
+function roundedContour(parent, width, height, position, corner = .08) {
+  const halfWidth = width / 2;
+  const halfHeight = height / 2;
+  const points = [
+    new THREE.Vector3(-halfWidth + corner, -halfHeight, 0),
+    new THREE.Vector3(halfWidth - corner, -halfHeight, 0),
+    new THREE.Vector3(halfWidth, -halfHeight + corner, 0),
+    new THREE.Vector3(halfWidth, halfHeight - corner, 0),
+    new THREE.Vector3(halfWidth - corner, halfHeight, 0),
+    new THREE.Vector3(-halfWidth + corner, halfHeight, 0),
+    new THREE.Vector3(-halfWidth, halfHeight - corner, 0),
+    new THREE.Vector3(-halfWidth, -halfHeight + corner, 0),
+  ];
+  const curve = new THREE.CatmullRomCurve3(points, true, 'centripetal');
+  const contour = new THREE.Mesh(
+    new THREE.TubeGeometry(curve, 48, .027, 6, true),
+    new THREE.MeshBasicMaterial({ color: 0xf09a35, transparent: true, opacity: .98 }),
+  );
+  contour.position.set(...position);
+  parent.add(contour);
+}
+
+function addRoom() {
+  const roomGroup = new THREE.Group();
+  scene.add(roomGroup);
+
+  box(roomGroup, [13.2, .24, 3.1], colors.floor, [0, -.12, 0]);
+  box(roomGroup, [13.2, 6.7, .18], colors.wall, [0, 3.25, -1.35]);
+  box(roomGroup, [13.2, .13, .22], colors.floorLine, [0, .08, -1.12]);
+
+  for (let x = -5.5; x < 6; x += 1.1) {
+    box(roomGroup, [.035, 6.2, .04], 0x738070, [x, 3.15, -1.23], { castShadow: false });
+  }
+
+  const windowGroup = new THREE.Group();
+  windowGroup.position.set(-3.75, 3.75, -1.19);
+  roomGroup.add(windowGroup);
+  box(windowGroup, [2.1, 2.3, .14], colors.woodDark, [0, 0, 0]);
+  plane(windowGroup, [1.75, 1.92], 0x7aa0a3, [0, 0, .09], { emissive: 0x183c3d, emissiveIntensity: .7 });
+  box(windowGroup, [.12, 2.12, .1], colors.wood, [0, 0, .14]);
+  box(windowGroup, [1.9, .11, .1], colors.wood, [0, 0, .14]);
+  box(roomGroup, [2.55, .7, .85], 0x343e3a, [-3.7, .47, -.15]);
+  box(roomGroup, [2.72, .22, .95], 0x27302e, [-3.7, .9, -.16]);
+  box(roomGroup, [.2, .85, .8], colors.wood, [-5.1, .45, -.15]);
+  box(roomGroup, [.2, .85, .8], colors.wood, [-2.3, .45, -.15]);
+  box(roomGroup, [.35, .11, .88], colors.red, [-3.7, 1.05, -.16]);
+
+  const desk = new THREE.Group();
+  desk.position.set(deskX, 0, -.25);
+  roomGroup.add(desk);
+  box(desk, [2.35, .18, .78], colors.wood, [0, 1.32, 0]);
+  box(desk, [.13, 1.3, .15], colors.woodDark, [-.95, .65, 0]);
+  box(desk, [.13, 1.3, .15], colors.woodDark, [.95, .65, 0]);
+  box(desk, [.92, .65, .12], colors.black, [.27, 1.78, -.04]);
+  box(desk, [.74, .48, .04], 0x476f72, [.27, 1.78, .04], { emissive: 0x14383a, emissiveIntensity: .65 });
+  box(desk, [.78, .08, .34], 0xb7a98a, [-.38, 1.46, .12]);
+  box(desk, [.1, .32, .1], colors.black, [.27, 1.39, -.04]);
+  box(desk, [.9, .72, .72], 0x2b3534, [-.92, .4, .02]);
+  box(desk, [.62, .12, .54], colors.teal, [-.92, .82, .02]);
+  box(desk, [.68, .12, .62], 0x293332, [-.45, .72, .42]);
+  box(desk, [.68, .62, .12], 0x293332, [-.45, 1.03, .69]);
+  box(desk, [.1, .67, .1], colors.black, [-.7, .36, .42]);
+  box(desk, [.1, .67, .1], colors.black, [-.2, .36, .42]);
+
+  const computerHitArea = new THREE.Mesh(
+    new THREE.BoxGeometry(1.92, 1.08, .82),
+    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
+  );
+  computerHitArea.position.set(.02, 1.7, .08);
+  computerHitArea.name = 'computerHitArea';
+  desk.add(computerHitArea);
+
+  const computerHighlight = new THREE.Group();
+  roundedContour(computerHighlight, 1.03, .77, [.27, 1.78, .11], .09);
+  roundedContour(computerHighlight, .92, .19, [-.38, 1.46, .32], .04);
+  computerHighlight.visible = false;
+  desk.add(computerHighlight);
+
+  const shelf = new THREE.Group();
+  shelf.position.set(4.28, 1.65, -1.08);
+  roomGroup.add(shelf);
+  box(shelf, [1.28, 3.3, .31], colors.woodDark, [0, 0, 0]);
+  for (const y of [-1.1, -.25, .6, 1.45]) {
+    box(shelf, [1.08, .09, .37], colors.wood, [0, y, .1]);
+  }
+  for (const [x, y, color] of [[-.38, -.75, colors.red], [-.12, -.75, colors.amber], [.18, -.75, colors.teal], [-.22, .1, colors.teal], [.1, .1, colors.red], [.38, .1, colors.amber], [-.35, .94, colors.amber]]) {
+    box(shelf, [.15, .48, .17], color, [x, y, .24]);
+  }
+
+  const poster = new THREE.Group();
+  poster.position.set(.15, 3.7, -1.19);
+  roomGroup.add(poster);
+  plane(poster, [1.28, 1.85], colors.red, [0, 0, 0], { emissive: 0x220404, emissiveIntensity: .45 });
+  plane(poster, [.86, .23], colors.amber, [0, .38, .018], { emissive: 0x3e2204, emissiveIntensity: .6 });
+  plane(poster, [.44, .72], colors.black, [0, -.35, .018]);
+
+  const lamp = new THREE.PointLight(0xe6bd6d, 18, 6.5, 2);
+  lamp.position.set(-.85, 4.85, 1.05);
+  lamp.castShadow = true;
+  roomGroup.add(lamp);
+  box(roomGroup, [.62, .18, .62], colors.amber, [-.85, 4.55, .78], { emissive: 0x8c5520, emissiveIntensity: 1.8 });
+  box(roomGroup, [.035, 1.18, .035], colors.black, [-.85, 5.12, .78]);
+
+  // The exit sits above and beside the shelf so it remains readable at every viewport width.
+  const exitArrow = new THREE.ArrowHelper(
+    new THREE.Vector3(1, 0, 0),
+    new THREE.Vector3(4.82, 3.88, .42),
+    .92,
+    0xe6bd58,
+    .28,
+    .18,
+  );
+  roomGroup.add(exitArrow);
+  plane(roomGroup, [1.34, .42], 0x5d4727, [5.2, 3.88, .23], { emissive: 0x3e2808, emissiveIntensity: .7 });
+  box(roomGroup, [.12, 4.2, .34], 0x313936, [5.92, 2.08, -.12]);
+  return { roomGroup, computerHitArea, computerHighlight };
+}
+
+function makeLimb(parent, name, z, color, upperLength, lowerLength) {
+  const pivot = new THREE.Group();
+  pivot.name = `${name}Pivot`;
+  parent.add(pivot);
+  const upper = box(pivot, [.28, upperLength, .28], color, [0, -upperLength / 2, z]);
+  const lowerPivot = new THREE.Group();
+  lowerPivot.position.set(0, -upperLength, z);
+  pivot.add(lowerPivot);
+  box(lowerPivot, [.25, lowerLength, .25], color, [0, -lowerLength / 2, 0]);
+  return { pivot, lowerPivot, upper };
+}
+
+function createCharacter(parent = scene, { x = -1.75, hoodie = colors.hoodie, pants = colors.pants, cap = colors.red } = {}) {
+  const actor = {
+    group: new THREE.Group(),
+    model: new THREE.Group(),
+    state: { x, facing: 1, moving: false },
+    mode: 'walking',
+    phase: 0,
+    turn: null,
+    actionElapsed: 0,
+    seatStartX: 0,
+    seatTargetX: deskX - .45,
+    destinationX: null,
+    interaction: null,
+    pendingIntent: null,
+  };
+  actor.group.position.x = actor.state.x;
+  actor.group.add(actor.model);
+  parent.add(actor.group);
+
+  const shadow = new THREE.Mesh(new THREE.CircleGeometry(.62, 24), new THREE.MeshBasicMaterial({ color: 0x0a0e0e, transparent: true, opacity: .42 }));
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.scale.y = .4;
+  shadow.position.y = .012;
+  actor.group.add(shadow);
+  actor.shadow = shadow;
+
+  box(actor.model, [.72, .96, .48], hoodie, [0, 1.48, 0]);
+  box(actor.model, [.8, .21, .52], 0x1c252b, [0, 1.98, 0]);
+  box(actor.model, [.25, .18, .2], colors.skin, [.42, 2.32, 0]);
+  box(actor.model, [.53, .57, .48], colors.skin, [0, 2.32, 0]);
+  box(actor.model, [.64, .16, .56], 0x262b31, [-.03, 2.66, 0]);
+  box(actor.model, [.32, .06, .62], cap, [.16, 2.62, 0]);
+  box(actor.model, [.11, .07, .34], 0x171c20, [.28, 2.38, .25]);
+
+  actor.backArm = makeLimb(actor.model, 'backArm', -.31, 0x1f2930, .62, .52);
+  actor.frontArm = makeLimb(actor.model, 'frontArm', .31, 0x34444d, .62, .52);
+  actor.backArm.pivot.position.set(0, 1.83, 0);
+  actor.frontArm.pivot.position.set(0, 1.83, 0);
+  box(actor.backArm.lowerPivot, [.22, .21, .22], colors.skin, [0, -.6, 0]);
+  box(actor.frontArm.lowerPivot, [.22, .21, .22], colors.skin, [0, -.6, 0]);
+
+  actor.backLeg = makeLimb(actor.model, 'backLeg', -.19, 0x33423f, .68, .6);
+  actor.frontLeg = makeLimb(actor.model, 'frontLeg', .19, pants, .68, .6);
+  actor.backLeg.pivot.position.set(0, 1.03, 0);
+  actor.frontLeg.pivot.position.set(0, 1.03, 0);
+  box(actor.backLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
+  box(actor.frontLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
+
+  actor.model.rotation.y = 0;
+  return actor;
+}
+
+function createEggOpponent(parent, x = 3.75) {
+  const opponent = {
+    group: new THREE.Group(),
+    model: new THREE.Group(),
+    state: { x, facing: -1, moving: false },
+    phase: 0,
+  };
+  opponent.group.position.x = x;
+  opponent.group.add(opponent.model);
+  parent.add(opponent.group);
+
+  const shadow = new THREE.Mesh(new THREE.CircleGeometry(.65, 24), new THREE.MeshBasicMaterial({ color: 0x0a0e0e, transparent: true, opacity: .42 }));
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.scale.y = .4;
+  shadow.position.y = .012;
+  opponent.group.add(shadow);
+  opponent.shadow = shadow;
+
+  const egg = new THREE.Mesh(new THREE.SphereGeometry(.57, 14, 12), material(0xd7cfb5));
+  egg.position.set(0, 1.62, 0);
+  egg.scale.set(.94, 1.38, .78);
+  egg.castShadow = true;
+  egg.receiveShadow = true;
+  opponent.model.add(egg);
+  box(opponent.model, [.92, .15, .58], 0x713444, [0, 1.44, .03]);
+  box(opponent.model, [.17, .13, .06], 0x182123, [-.2, 1.88, .43]);
+  box(opponent.model, [.17, .13, .06], 0x182123, [.2, 1.88, .43]);
+  box(opponent.model, [.43, .06, .06], 0x9b504e, [0, 1.63, .43]);
+  box(opponent.model, [.72, .14, .52], 0xd49a3a, [.04, 2.39, 0]);
+
+  opponent.backArm = makeLimb(opponent.model, 'eggBackArm', -.31, 0x713444, .56, .47);
+  opponent.frontArm = makeLimb(opponent.model, 'eggFrontArm', .31, 0x854052, .56, .47);
+  opponent.backArm.pivot.position.set(0, 1.85, 0);
+  opponent.frontArm.pivot.position.set(0, 1.85, 0);
+  box(opponent.backArm.lowerPivot, [.2, .2, .2], 0xd7cfb5, [0, -.54, 0]);
+  box(opponent.frontArm.lowerPivot, [.2, .2, .2], 0xd7cfb5, [0, -.54, 0]);
+
+  opponent.backLeg = makeLimb(opponent.model, 'eggBackLeg', -.18, 0x4a454b, .58, .48);
+  opponent.frontLeg = makeLimb(opponent.model, 'eggFrontLeg', .18, 0x4a454b, .58, .48);
+  opponent.backLeg.pivot.position.set(0, .98, 0);
+  opponent.frontLeg.pivot.position.set(0, .98, 0);
+  box(opponent.backLeg.lowerPivot, [.36, .14, .3], colors.shoe, [.1, -.52, .01]);
+  box(opponent.frontLeg.lowerPivot, [.36, .14, .3], colors.shoe, [.1, -.52, .01]);
+  opponent.model.rotation.y = -Math.PI;
+  return opponent;
+}
+
+function cylinder(parent, radiusTop, radiusBottom, height, color, position, options = {}) {
+  const mesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(radiusTop, radiusBottom, height, 10),
+    material(color, options),
+  );
+  mesh.position.set(...position);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  parent.add(mesh);
+  return mesh;
+}
+
+function createAudienceMember(parent, x, z, shirt, phase, scale = 1) {
+  const group = new THREE.Group();
+  group.position.set(x, 0, z);
+  group.scale.setScalar(scale);
+  parent.add(group);
+  cylinder(group, .18, .22, .62, shirt, [0, .52, 0]);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(.18, 10, 8), material(0xc78866));
+  head.position.set(0, .98, 0);
+  group.add(head);
+  const leftArm = new THREE.Group();
+  const rightArm = new THREE.Group();
+  leftArm.position.set(-.18, .75, 0);
+  rightArm.position.set(.18, .75, 0);
+  box(leftArm, [.12, .49, .12], shirt, [0, -.245, 0]);
+  box(rightArm, [.12, .49, .12], shirt, [0, -.245, 0]);
+  group.add(leftArm, rightArm);
+  return { group, leftArm, rightArm, phase };
+}
+
+function createJudge(parent, x, phase) {
+  const group = new THREE.Group();
+  group.position.set(x, 1.48, -.76);
+  parent.add(group);
+  box(group, [.58, .66, .38], 0x293236, [0, .33, 0]);
+  box(group, [.68, .11, .42], 0x76513b, [0, .64, .03]);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(.22, 10, 8), material(0xc78866));
+  head.position.set(0, .98, 0);
+  group.add(head);
+  box(group, [.45, .09, .4], phase % 2 === 0 ? colors.red : colors.teal, [0, 1.17, 0]);
+  const arm = new THREE.Group();
+  arm.position.set(.32, .56, .07);
+  box(arm, [.14, .42, .14], 0x293236, [0, -.21, 0]);
+  group.add(arm);
+  return { group, arm, phase };
+}
+
+function createBattleScene() {
+  const group = new THREE.Group();
+  group.visible = false;
+  scene.add(group);
+
+  box(group, [13.2, .3, 3.8], 0x28252a, [0, -.15, 0]);
+  box(group, [12.8, 5.9, .18], 0x251d27, [0, 2.85, -1.58]);
+  box(group, [11.6, .24, 2.78], 0x5a363e, [0, .2, -.12]);
+  box(group, [9.5, .08, 2.2], 0x8d4a3e, [0, .36, -.08]);
+  box(group, [5.8, 1.22, .08], 0x17363c, [0, 4.43, -1.42], { emissive: 0x0c262c, emissiveIntensity: .55 });
+  box(group, [3.5, .16, .12], colors.amber, [0, 4.42, -1.33], { emissive: 0x5c3a05, emissiveIntensity: 1.1 });
+
+  const stageLightLeft = new THREE.PointLight(0xd44b55, 16, 7.5, 2);
+  stageLightLeft.position.set(-4.4, 4.65, 1.3);
+  group.add(stageLightLeft);
+  const stageLightRight = new THREE.PointLight(0x4aa1a2, 16, 7.5, 2);
+  stageLightRight.position.set(4.4, 4.65, 1.3);
+  group.add(stageLightRight);
+  box(group, [.42, .16, .42], colors.red, [-4.4, 4.35, 1.3], { emissive: 0x641019, emissiveIntensity: 1.1 });
+  box(group, [.42, .16, .42], colors.tealLight, [4.4, 4.35, 1.3], { emissive: 0x0b3838, emissiveIntensity: 1.1 });
+
+  const judgeDesk = new THREE.Group();
+  judgeDesk.position.set(0, 0, -1.23);
+  group.add(judgeDesk);
+  box(judgeDesk, [5.05, .3, .55], 0x252224, [0, 1.22, 0]);
+  box(judgeDesk, [4.6, .72, .46], 0x1a2022, [0, .72, .06]);
+  const judges = [-1.55, 0, 1.55].map((x, index) => createJudge(group, x, index));
+
+  const crowd = [];
+  const crowdColors = [0x56665b, 0x704550, 0x3d5962, 0x725f45, 0x4c4b64];
+  for (let index = 0; index < 13; index += 1) {
+    const x = -5.6 + index * .94;
+    crowd.push(createAudienceMember(group, x, -1.34, crowdColors[index % crowdColors.length], index * .83, .78));
+  }
+  for (let index = 0; index < 8; index += 1) {
+    const x = -4.8 + index * 1.35;
+    crowd.push(createAudienceMember(group, x, .94, crowdColors[(index + 2) % crowdColors.length], index * 1.13 + .4, .64));
+  }
+
+  const microphone = new THREE.Group();
+  microphone.position.set(-.42, .12, -.05);
+  group.add(microphone);
+  cylinder(microphone, .035, .055, 1.96, 0x1b2022, [0, .98, 0]);
+  cylinder(microphone, .12, .09, .24, 0x5f7372, [0, 2.06, 0]);
+  cylinder(microphone, .38, .04, .06, 0x1a2022, [0, .04, 0]);
+
+  const opponent = createEggOpponent(group);
+  return {
+    group,
+    opponent,
+    crowd,
+    judges,
+    micX: -.42,
+    phase: 'idle',
+    elapsed: 0,
+    playerOrder: GESTURE_STYLES,
+    opponentOrder: shuffledStyles(),
+  };
+}
+
+const { roomGroup, computerHitArea, computerHighlight } = addRoom();
+const interactiveObjects = [computerHitArea];
+const actor = createCharacter();
+const battle = createBattleScene();
+let gameMode = 'apartment';
+
+scene.add(new THREE.HemisphereLight(0x97c7cf, 0x1d211a, 1.55));
+const keyLight = new THREE.DirectionalLight(0xefe0b4, 2.1);
+keyLight.position.set(-3.5, 6, 5);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(1024, 1024);
+scene.add(keyLight);
+
+function setStatus() {
+  if (actor.mode === 'typing') {
+    status.textContent = 'Пишет текст. Кликни по комнате, чтобы встать.';
+    return;
+  }
+  if (actor.mode === 'turningToDesk') {
+    status.textContent = 'Разворачивается к монитору.';
+    return;
+  }
+  if (actor.mode === 'sittingDown') {
+    status.textContent = 'Садится за компьютер.';
+    return;
+  }
+  if (actor.mode === 'standingUp') {
+    status.textContent = 'Встаёт от компьютера.';
+    return;
+  }
+  status.textContent = 'Кликни по комнате, чтобы отправить героя в нужную точку.';
+}
+
+function updatePose(delta, elapsed) {
+  if (actor.mode === 'typing') {
+    applySeatPose(1, elapsed);
+    return;
+  }
+
+  actor.model.position.y = 0;
+  if (!actor.state.moving) {
+    const breath = Math.sin(elapsed * 2.4) * .035;
+    actor.model.position.y = breath;
+    actor.frontArm.pivot.rotation.z = -.06 + breath;
+    actor.backArm.pivot.rotation.z = .04 - breath;
+    actor.frontArm.lowerPivot.rotation.z = 0;
+    actor.backArm.lowerPivot.rotation.z = 0;
+    actor.frontLeg.pivot.rotation.z = 0;
+    actor.backLeg.pivot.rotation.z = 0;
+    actor.frontLeg.lowerPivot.rotation.z = 0;
+    actor.backLeg.lowerPivot.rotation.z = 0;
+    actor.shadow.scale.set(1, 1, 1);
+    return;
+  }
+
+  actor.phase += delta * 13;
+  const stride = Math.sin(actor.phase) * .66;
+  actor.frontLeg.pivot.rotation.z = stride;
+  actor.backLeg.pivot.rotation.z = -stride;
+  actor.frontLeg.lowerPivot.rotation.z = Math.max(0, -stride) * .74;
+  actor.backLeg.lowerPivot.rotation.z = Math.max(0, stride) * .74;
+  actor.frontArm.pivot.rotation.z = -stride * .73;
+  actor.backArm.pivot.rotation.z = stride * .73;
+  actor.frontArm.lowerPivot.rotation.z = 0;
+  actor.backArm.lowerPivot.rotation.z = 0;
+  actor.model.position.y = Math.abs(Math.sin(actor.phase * 2)) * .055;
+  actor.shadow.scale.set(.96 + Math.abs(stride) * .16, .86, 1);
+}
+
+function startTurn(targetAngle, duration = .28) {
+  actor.turn = {
+    from: actor.model.rotation.y,
+    target: targetAngle,
+    elapsed: 0,
+    duration,
+  };
+}
+
+function updateTurn(delta) {
+  if (!actor.turn) return;
+  actor.turn.elapsed = Math.min(actor.turn.elapsed + delta, actor.turn.duration);
+  const progress = actor.turn.elapsed / actor.turn.duration;
+  actor.model.rotation.y = turnAngle(actor.turn.from, actor.turn.target, progress);
+  if (progress === 1) actor.turn = null;
+}
+
+function applySeatPose(progress, elapsed) {
+  const pose = seatPose(progress);
+  const arms = keyboardArmPose(progress, elapsed * 11);
+  actor.model.position.y = pose.bodyY;
+  actor.frontLeg.pivot.rotation.z = pose.thighAngle;
+  actor.backLeg.pivot.rotation.z = pose.thighAngle * .92;
+  actor.frontLeg.lowerPivot.rotation.z = pose.shinAngle;
+  actor.backLeg.lowerPivot.rotation.z = pose.shinAngle;
+  actor.frontArm.pivot.rotation.z = arms.frontShoulder;
+  actor.backArm.pivot.rotation.z = arms.backShoulder;
+  actor.frontArm.lowerPivot.rotation.z = arms.frontElbow;
+  actor.backArm.lowerPivot.rotation.z = arms.backElbow;
+  actor.shadow.scale.set(1 + progress * .2, 1 - progress * .45, 1);
+}
+
+function beginSeatSequence() {
+  actor.mode = 'turningToDesk';
+  actor.actionElapsed = 0;
+  actor.seatStartX = actor.state.x;
+  actor.state = { ...actor.state, moving: false };
+  startTurn(Math.PI / 2, .34);
+}
+
+function beginStandingSequence() {
+  actor.mode = 'standingUp';
+  actor.actionElapsed = 0;
+}
+
+function requestMove(targetX, interaction = null) {
+  if (actor.mode === 'typing') {
+    actor.pendingIntent = { type: 'walk', targetX, interaction };
+    beginStandingSequence();
+    return;
+  }
+  if (actor.mode !== 'walking') return;
+  actor.destinationX = THREE.MathUtils.clamp(targetX, room.left, room.right);
+  actor.interaction = interaction;
+}
+
+function requestFaceCamera() {
+  if (actor.mode === 'typing') {
+    actor.pendingIntent = { type: 'face-camera' };
+    beginStandingSequence();
+    return;
+  }
+  if (actor.mode !== 'walking') return;
+  actor.destinationX = null;
+  actor.interaction = null;
+  actor.state = { ...actor.state, moving: false };
+  startTurn(-Math.PI / 2, .28);
+}
+
+function applyIntent(intent) {
+  if (intent.type === 'computer') {
+    requestMove(actor.seatTargetX, 'computer');
+    return;
+  }
+  if (intent.type === 'face-camera') {
+    requestFaceCamera();
+    return;
+  }
+  requestMove(intent.targetX);
+}
+
+function updateAction(delta, elapsed) {
+  if (actor.mode === 'walking') return false;
+
+  actor.actionElapsed += delta;
+  if (actor.mode === 'turningToDesk') {
+    const progress = Math.min(actor.actionElapsed / .34, 1);
+    actor.state = { ...actor.state, x: THREE.MathUtils.lerp(actor.seatStartX, actor.seatTargetX, easeInOut(progress)), moving: false };
+    actor.group.position.x = actor.state.x;
+    updatePose(0, elapsed);
+    if (progress === 1) {
+      actor.mode = 'sittingDown';
+      actor.actionElapsed = 0;
+    }
+    return true;
+  }
+
+  if (actor.mode === 'sittingDown') {
+    const progress = Math.min(actor.actionElapsed / .48, 1);
+    applySeatPose(progress, elapsed);
+    if (progress === 1) {
+      actor.mode = 'typing';
+      actor.actionElapsed = 0;
+    }
+    return true;
+  }
+
+  if (actor.mode === 'standingUp') {
+    const progress = 1 - Math.min(actor.actionElapsed / .4, 1);
+    applySeatPose(progress, elapsed);
+    if (progress === 0) {
+      actor.mode = 'walking';
+      actor.actionElapsed = 0;
+      startTurn(actor.state.facing === 1 ? 0 : -Math.PI, .24);
+      const pendingIntent = actor.pendingIntent;
+      actor.pendingIntent = null;
+      if (pendingIntent) applyIntent(pendingIntent);
+    }
+    return true;
+  }
+
+  if (actor.mode === 'typing') {
+    updatePose(0, elapsed);
+    return true;
+  }
+
+  return true;
+}
+
+function updateApartment(delta, elapsed) {
+  updateTurn(delta);
+  if (updateAction(delta, elapsed)) {
+    setStatus();
+    return;
+  }
+  if (actor.destinationX === null) {
+    actor.state = { ...actor.state, moving: false };
+  } else {
+    const difference = actor.destinationX - actor.state.x;
+    if (Math.abs(difference) < .04) {
+      actor.state = { ...actor.state, x: actor.destinationX, moving: false };
+      actor.group.position.x = actor.state.x;
+      actor.destinationX = null;
+      const interaction = actor.interaction;
+      actor.interaction = null;
+      if (interaction === 'computer') beginSeatSequence();
+    } else {
+      const direction = Math.sign(difference);
+      const previousFacing = actor.state.facing;
+      actor.state = stepCharacter(actor.state, { left: direction < 0, right: direction > 0 }, delta, room);
+      if (actor.state.facing !== previousFacing) {
+        startTurn(actor.state.facing === 1 ? 0 : -Math.PI);
+      }
+      actor.group.position.x = actor.state.x;
+    }
+  }
+  if (actor.state.x >= exitZoneX) {
+    enterBattle();
+    return;
+  }
+  updatePose(delta, elapsed);
+  setStatus();
+}
+
+function resetStagePose(performer, facing) {
+  performer.model.position.set(0, 0, 0);
+  performer.model.rotation.set(0, facing === 1 ? 0 : -Math.PI, 0);
+  performer.frontArm.pivot.rotation.z = 0;
+  performer.backArm.pivot.rotation.z = 0;
+  performer.frontArm.lowerPivot.rotation.z = 0;
+  performer.backArm.lowerPivot.rotation.z = 0;
+  performer.frontLeg.pivot.rotation.z = 0;
+  performer.backLeg.pivot.rotation.z = 0;
+  performer.frontLeg.lowerPivot.rotation.z = 0;
+  performer.backLeg.lowerPivot.rotation.z = 0;
+  performer.shadow.scale.set(1, 1, 1);
+}
+
+function applyStageWalk(performer, delta, direction) {
+  performer.phase += delta * 13;
+  const stride = Math.sin(performer.phase) * .66;
+  performer.model.rotation.y = direction > 0 ? 0 : -Math.PI;
+  performer.frontLeg.pivot.rotation.z = stride;
+  performer.backLeg.pivot.rotation.z = -stride;
+  performer.frontLeg.lowerPivot.rotation.z = Math.max(0, -stride) * .74;
+  performer.backLeg.lowerPivot.rotation.z = Math.max(0, stride) * .74;
+  performer.frontArm.pivot.rotation.z = -stride * .73;
+  performer.backArm.pivot.rotation.z = stride * .73;
+  performer.frontArm.lowerPivot.rotation.z = 0;
+  performer.backArm.lowerPivot.rotation.z = 0;
+  performer.model.position.y = Math.abs(Math.sin(performer.phase * 2)) * .055;
+}
+
+function moveStageActor(performer, targetX, delta) {
+  const difference = targetX - performer.group.position.x;
+  if (Math.abs(difference) < .04) {
+    performer.group.position.x = targetX;
+    performer.state = { ...performer.state, x: targetX, moving: false };
+    return true;
+  }
+  const direction = Math.sign(difference);
+  performer.group.position.x += direction * Math.min(Math.abs(difference), delta * 2.25);
+  performer.state = { ...performer.state, x: performer.group.position.x, facing: direction, moving: true };
+  applyStageWalk(performer, delta, direction);
+  return false;
+}
+
+function applyRapGesture(performer, gesture, elapsed, facing) {
+  const beat = Math.sin(elapsed * 5.5);
+  const secondaryBeat = Math.sin(elapsed * 2.7);
+  const baseYaw = facing === 1 ? 0 : -Math.PI;
+  resetStagePose(performer, facing);
+  performer.model.position.y = Math.abs(secondaryBeat) * .045;
+
+  if (gesture === 'open-hands') {
+    performer.frontArm.pivot.rotation.z = 1.05 + beat * .18;
+    performer.backArm.pivot.rotation.z = .92 - beat * .14;
+    performer.frontArm.lowerPivot.rotation.z = -.58;
+    performer.backArm.lowerPivot.rotation.z = -.48;
+    return;
+  }
+  if (gesture === 'shoulder-rock') {
+    performer.model.rotation.z = secondaryBeat * .12;
+    performer.frontArm.pivot.rotation.z = .35 + beat * .5;
+    performer.backArm.pivot.rotation.z = -.22 - beat * .42;
+    performer.frontLeg.pivot.rotation.z = secondaryBeat * .08;
+    performer.backLeg.pivot.rotation.z = -secondaryBeat * .08;
+    return;
+  }
+  if (gesture === 'crowd-turn') {
+    performer.model.rotation.y = baseYaw - facing * (.42 + secondaryBeat * .08);
+    performer.frontArm.pivot.rotation.z = .78;
+    performer.backArm.pivot.rotation.z = -.42;
+    performer.frontArm.lowerPivot.rotation.z = -.42;
+    return;
+  }
+  performer.frontArm.pivot.rotation.z = 1.38 + beat * .08;
+  performer.frontArm.lowerPivot.rotation.z = -.72;
+  performer.backArm.pivot.rotation.z = -.28 + beat * .18;
+  performer.backArm.lowerPivot.rotation.z = .36;
+  performer.model.rotation.z = -.045;
+}
+
+function updateStageAudience(elapsed) {
+  for (const spectator of battle.crowd) {
+    const cheer = Math.max(0, Math.sin(elapsed * 2.15 + spectator.phase));
+    spectator.group.position.y = cheer * .055;
+    spectator.leftArm.rotation.z = -.2 - cheer * 1.35;
+    spectator.rightArm.rotation.z = .2 + cheer * 1.35;
+  }
+  for (const judge of battle.judges) {
+    judge.group.position.y = Math.sin(elapsed * 1.15 + judge.phase) * .03;
+    judge.arm.rotation.z = -.28 + Math.sin(elapsed * 1.8 + judge.phase) * .16;
+  }
+}
+
+function beginBattlePhase(phase) {
+  battle.phase = phase;
+  battle.elapsed = 0;
+}
+
+function enterBattle() {
+  if (gameMode === 'battle') return;
+  gameMode = 'battle';
+  roomGroup.visible = false;
+  computerHighlight.visible = false;
+  battle.group.visible = true;
+  battle.group.add(actor.group);
+  actor.group.position.set(-3.85, 0, 0);
+  actor.state = { ...actor.state, x: -3.85, facing: 1, moving: false };
+  actor.destinationX = null;
+  actor.interaction = null;
+  actor.mode = 'walking';
+  resetStagePose(actor, 1);
+  battle.opponent.group.position.set(3.75, 0, 0);
+  battle.opponent.state = { ...battle.opponent.state, x: 3.75, facing: -1, moving: false };
+  resetStagePose(battle.opponent, -1);
+  battle.playerOrder = GESTURE_STYLES;
+  battle.opponentOrder = shuffledStyles();
+  sceneTitle.textContent = 'БАТТЛ · РАУНД 1';
+  controls.textContent = 'Два раунда по 20 секунд · четыре рэп-жеста на каждого · зрители и судьи реагируют';
+  beginBattlePhase('player-approach');
+}
+
+function updateBattle(delta, elapsed) {
+  updateStageAudience(elapsed);
+  battle.elapsed += delta;
+  const opponent = battle.opponent;
+
+  if (battle.phase === 'player-approach') {
+    status.textContent = 'Ты выходишь к микрофону.';
+    if (moveStageActor(actor, battle.micX - .08, delta)) {
+      beginBattlePhase('player-settle');
+    }
+    return;
+  }
+  if (battle.phase === 'player-settle') {
+    status.textContent = 'Занимаешь позицию у микрофона.';
+    const progress = Math.min(battle.elapsed / .55, 1);
+    actor.group.position.x = THREE.MathUtils.lerp(battle.micX - .08, battle.micX - .6, easeInOut(progress));
+    resetStagePose(actor, 1);
+    if (progress === 1) beginBattlePhase('player-performance');
+    return;
+  }
+  if (battle.phase === 'player-performance') {
+    const gesture = performanceStyleAt(battle.elapsed, battle.playerOrder);
+    applyRapGesture(actor, gesture, battle.elapsed, 1);
+    status.textContent = `Твой раунд · ${Math.max(0, PERFORMANCE_SECONDS - battle.elapsed).toFixed(1)} сек · ${gestureLabels[gesture]}`;
+    if (battle.elapsed >= PERFORMANCE_SECONDS) beginBattlePhase('player-exit');
+    return;
+  }
+  if (battle.phase === 'player-exit') {
+    status.textContent = 'Ты заканчиваешь раунд и отходишь от микрофона.';
+    if (moveStageActor(actor, -3.85, delta)) {
+      resetStagePose(actor, 1);
+      beginBattlePhase('opponent-approach');
+    }
+    return;
+  }
+  if (battle.phase === 'opponent-approach') {
+    status.textContent = 'Соперник выходит к микрофону.';
+    if (moveStageActor(opponent, battle.micX + .08, delta)) {
+      beginBattlePhase('opponent-settle');
+    }
+    return;
+  }
+  if (battle.phase === 'opponent-settle') {
+    status.textContent = 'Соперник занимает позицию.';
+    const progress = Math.min(battle.elapsed / .55, 1);
+    opponent.group.position.x = THREE.MathUtils.lerp(battle.micX + .08, battle.micX + .6, easeInOut(progress));
+    resetStagePose(opponent, -1);
+    if (progress === 1) beginBattlePhase('opponent-performance');
+    return;
+  }
+  if (battle.phase === 'opponent-performance') {
+    const gesture = performanceStyleAt(battle.elapsed, battle.opponentOrder);
+    applyRapGesture(opponent, gesture, battle.elapsed, -1);
+    status.textContent = `Раунд соперника · ${Math.max(0, PERFORMANCE_SECONDS - battle.elapsed).toFixed(1)} сек · ${gestureLabels[gesture]}`;
+    if (battle.elapsed >= PERFORMANCE_SECONDS) beginBattlePhase('opponent-exit');
+    return;
+  }
+  if (battle.phase === 'opponent-exit') {
+    status.textContent = 'Соперник заканчивает раунд.';
+    if (moveStageActor(opponent, 3.75, delta)) {
+      resetStagePose(opponent, -1);
+      beginBattlePhase('complete');
+    }
+    return;
+  }
+  status.textContent = 'Раунд окончен. Судьи обсуждают выступления.';
+}
+
+function render() {
+  const delta = Math.min(clock.getDelta(), .05);
+  if (gameMode === 'apartment') updateApartment(delta, clock.elapsedTime);
+  else updateBattle(delta, clock.elapsedTime);
+  renderer.render(scene, camera);
+  requestAnimationFrame(render);
+}
+
+function resize() {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const aspect = width / height;
+  const viewHeight = Math.max(6.9, 13.4 / aspect);
+  camera.left = -viewHeight * aspect / 2;
+  camera.right = viewHeight * aspect / 2;
+  camera.top = viewHeight / 2;
+  camera.bottom = -viewHeight / 2;
+  camera.updateProjectionMatrix();
+  renderer.setSize(width, height, false);
+}
+
+window.addEventListener('resize', resize);
+
+function pointFromPointerEvent(event) {
+  const rect = canvas.getBoundingClientRect();
+  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const intersections = raycaster.intersectObjects(interactiveObjects, false);
+  const worldPoint = new THREE.Vector3();
+  raycaster.ray.intersectPlane(walkPlane, worldPoint);
+  return { hitComputer: intersections.length > 0, worldPoint };
+}
+
+canvas.addEventListener('pointermove', (event) => {
+  if (gameMode !== 'apartment') {
+    computerHighlight.visible = false;
+    canvas.style.cursor = 'default';
+    return;
+  }
+  const { hitComputer } = pointFromPointerEvent(event);
+  computerHighlight.visible = hitComputer;
+  canvas.style.cursor = hitComputer ? 'pointer' : 'crosshair';
+});
+
+canvas.addEventListener('pointerleave', () => {
+  computerHighlight.visible = false;
+  canvas.style.cursor = 'crosshair';
+});
+
+canvas.addEventListener('pointerdown', (event) => {
+  if (event.button !== 0 || gameMode !== 'apartment') return;
+  const { hitComputer, worldPoint } = pointFromPointerEvent(event);
+  const intent = clickIntent({
+    hitComputer,
+    worldX: worldPoint.x,
+    worldY: worldPoint.y,
+    actorX: actor.state.x,
+  });
+  applyIntent(intent);
+});
+
+resize();
+setStatus();
+render();
