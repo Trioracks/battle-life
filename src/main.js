@@ -4,6 +4,7 @@ import { GESTURE_STYLES, PERFORMANCE_SECONDS, performanceStyleAt, shuffledStyles
 import { clickIntent } from './click-intent.js';
 import { stepCharacter } from './character-motion.js';
 import { createCampaign, loadCampaign, saveCampaign } from './game-state.js';
+import { createRapper, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
 
 const canvas = document.querySelector('#game');
 const status = document.querySelector('#status');
@@ -18,8 +19,14 @@ const needElements = {
   health: document.querySelector('#need-health'),
   leisure: document.querySelector('#need-leisure'),
 };
+const creatorModal = document.querySelector('#creator-modal');
+const creatorForm = document.querySelector('#creator-form');
+const creatorStats = document.querySelector('#creator-stats');
+const creatorPoints = document.querySelector('#creator-points');
+const creatorError = document.querySelector('#creator-error');
 let campaign = loadCampaign() ?? createCampaign();
 saveCampaign(campaign);
+let creatorAllocations = Object.fromEntries(STAT_KEYS.map((key) => [key, 0]));
 const room = { left: -5.15, right: 5.15 };
 const deskX = 2.25;
 const exitZoneX = 4.62;
@@ -43,6 +50,59 @@ function renderCampaignHud() {
     element.style.width = `${campaign.needs[name]}%`;
   }
 }
+
+function renderCreator() {
+  const validation = validateAllocations(creatorAllocations);
+  const total = STAT_KEYS.reduce((sum, key) => sum + creatorAllocations[key], 0);
+  creatorPoints.textContent = `${10 - total} очков`;
+  creatorStats.innerHTML = STAT_KEYS.map((key) => {
+    const allocation = creatorAllocations[key];
+    const value = 10 + allocation * 10;
+    return `<div class="creator-stat"><span>${statLabels[key]}</span><strong>${value}</strong><span><button class="creator-control" type="button" data-stat="${key}" data-delta="-1" ${allocation === 0 ? 'disabled' : ''}>−</button><button class="creator-control" type="button" data-stat="${key}" data-delta="1" ${allocation === 4 || total === 10 ? 'disabled' : ''}>+</button></span></div>`;
+  }).join('');
+  creatorError.textContent = validation.valid ? '' : validation.message;
+}
+
+function selectedLook() {
+  return Object.fromEntries(['hair', 'top', 'pants', 'cap'].map((name) => [name, creatorForm.elements[name].value]));
+}
+
+creatorStats.addEventListener('click', (event) => {
+  const button = event.target.closest('button[data-stat]');
+  if (!button) return;
+  const key = button.dataset.stat;
+  const next = creatorAllocations[key] + Number(button.dataset.delta);
+  if (next < 0 || next > 4) return;
+  const total = STAT_KEYS.reduce((sum, stat) => sum + creatorAllocations[stat], 0);
+  if (next > creatorAllocations[key] && total >= 10) return;
+  creatorAllocations = { ...creatorAllocations, [key]: next };
+  renderCreator();
+});
+
+creatorForm.addEventListener('change', () => {
+  if (campaign.player) applyAvatarLook(actor, selectedLook());
+});
+
+creatorForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  try {
+    const form = new FormData(creatorForm);
+    const player = createRapper({
+      name: form.get('name'),
+      nickname: form.get('nickname'),
+      allocations: creatorAllocations,
+      look: selectedLook(),
+    });
+    campaign = { ...campaign, player };
+    saveCampaign(campaign);
+    applyAvatarLook(actor, player.look);
+    sceneTitle.textContent = `КВАРТИРА · ${player.nickname.toUpperCase()}`;
+    creatorModal.classList.add('is-hidden');
+    setStatus();
+  } catch (error) {
+    creatorError.textContent = error.message;
+  }
+});
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -260,12 +320,12 @@ function createCharacter(parent = scene, { x = -1.75, hoodie = colors.hoodie, pa
   actor.group.add(shadow);
   actor.shadow = shadow;
 
-  box(actor.model, [.72, .96, .48], hoodie, [0, 1.48, 0]);
+  const torso = box(actor.model, [.72, .96, .48], hoodie, [0, 1.48, 0]);
   box(actor.model, [.8, .21, .52], 0x1c252b, [0, 1.98, 0]);
   box(actor.model, [.25, .18, .2], colors.skin, [.42, 2.32, 0]);
   box(actor.model, [.53, .57, .48], colors.skin, [0, 2.32, 0]);
-  box(actor.model, [.64, .16, .56], 0x262b31, [-.03, 2.66, 0]);
-  box(actor.model, [.32, .06, .62], cap, [.16, 2.62, 0]);
+  const hair = box(actor.model, [.55, .09, .51], 0x17151b, [0, 2.64, 0]);
+  const capMesh = box(actor.model, [.32, .06, .62], cap, [.16, 2.62, 0]);
   box(actor.model, [.11, .07, .34], 0x171c20, [.28, 2.38, .25]);
 
   actor.backArm = makeLimb(actor.model, 'backArm', -.31, 0x1f2930, .62, .52);
@@ -283,7 +343,22 @@ function createCharacter(parent = scene, { x = -1.75, hoodie = colors.hoodie, pa
   box(actor.frontLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
 
   actor.model.rotation.y = 0;
+  actor.lookParts = { torso, hair, cap: capMesh, frontLeg: actor.frontLeg.upper, backLeg: actor.backLeg.upper };
   return actor;
+}
+
+function applyAvatarLook(target, look = {}) {
+  const topColors = { hoodie: colors.hoodie, bomber: 0x5d4035, jacket: 0x2e5361 };
+  const pantsColors = { cargo: colors.pants, jeans: 0x303d63 };
+  const capColors = { red: colors.red, teal: colors.tealLight };
+  target.lookParts.torso.material.color.setHex(topColors[look.top] ?? topColors.hoodie);
+  target.lookParts.frontLeg.material.color.setHex(pantsColors[look.pants] ?? pantsColors.cargo);
+  target.lookParts.backLeg.material.color.setHex(pantsColors[look.pants] ?? pantsColors.cargo);
+  target.lookParts.hair.visible = look.hair !== 'bald';
+  target.lookParts.hair.scale.set(1, look.hair === 'mohawk' ? 2.2 : 1, look.hair === 'mohawk' ? .38 : 1);
+  target.lookParts.hair.position.y = look.hair === 'mohawk' ? 2.72 : 2.64;
+  target.lookParts.cap.visible = look.cap && look.cap !== 'none';
+  target.lookParts.cap.material.color.setHex(capColors[look.cap] ?? capColors.red);
 }
 
 function createEggOpponent(parent, x = 3.75) {
@@ -444,6 +519,7 @@ function createBattleScene() {
 const { roomGroup, computerHitArea, computerHighlight } = addRoom();
 const interactiveObjects = [computerHitArea];
 const actor = createCharacter();
+applyAvatarLook(actor, campaign.player?.look);
 const battle = createBattleScene();
 let gameMode = 'apartment';
 
@@ -926,5 +1002,10 @@ canvas.addEventListener('pointerdown', (event) => {
 
 resize();
 renderCampaignHud();
+renderCreator();
+if (campaign.player) {
+  creatorModal.classList.add('is-hidden');
+  sceneTitle.textContent = `КВАРТИРА · ${campaign.player.nickname.toUpperCase()}`;
+}
 setStatus();
 render();
