@@ -14,7 +14,7 @@ import { districts, travelTo } from './calikfornia.js';
 import { completeShift, getJob, jobIds } from './jobs.js';
 import { buyFood, cookMeal, eatMeal, sleep, washDishes } from './household.js';
 import { MAKAREWITCH_VI, registerForTournament, researchTournament } from './tournament.js';
-import { chooseBeat, masterTrack, mixTrack, polishDraft, recordTrack, startDraft, submitTrack } from './track-project.js';
+import { chooseBeat, getTrackStepStatus, masterTrack, mixTrack, polishDraft, recordTrack, startDraft, submitTrack } from './track-project.js';
 import { scoreSelection } from './selection.js';
 
 const canvas = document.querySelector('#game');
@@ -166,18 +166,25 @@ function notify(sender, text) {
 
 function renderDesktop(view = 'home') {
   if (view === 'track') {
+    const steps = getTrackStepStatus(campaign);
     const track = campaign.track;
-    const stage = track?.stage ?? 'brief';
-    const next = {
-      brief: `<p>Выбери фокус: 1 — тема, 2 — лирика, 3 — баланс, 4 — панчи, 5 — дисс.</p><div class="desktop-grid">${[1, 2, 3, 4, 5].map((focus) => `<button class="desktop-icon" data-track-step="draft" data-focus="${focus}"><b>${focus}</b><span>${['Тема', 'Лирика', 'Баланс', 'Панчи', 'Дисс'][focus - 1]}</span><small>Черновик · 2 ч</small></button>`).join('')}</div>`,
-      draft: `<p>Черновик готов. Самооценка: ${track.confidence}/10; реальное качество скрыто.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="polish"><b>✎</b><span>Доработать</span><small>1 ч · небольшое улучшение</small></button><button class="desktop-icon" data-track-step="beat"><b>♫</b><span>Выбрать бум-бэп</span><small>20 мин</small></button></div>`,
-      'beat-ready': `<p>Бит выбран. Запиши вокал перед микрофоном.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="record"><b>●</b><span>Несколько дублей</span><small>2 ч 30 мин</small></button></div>`,
-      recorded: `<p>Демка записана. Можно сдать сырой вариант позднее, но сейчас доступно сведение.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="mix"><b>≋</b><span>Свести</span><small>2 ч</small></button></div>`,
-      mixed: `<p>Сведение готово. Остался мастеринг.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="master"><b>◆</b><span>Мастерить</span><small>2 ч</small></button></div>`,
-      mastered: `<p>Трек готов. После отправки изменить его нельзя.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="submit"><b>↥</b><span>Сдать заявку</span><small>10 мин</small></button></div>`,
-      submitted: `<p>Заявка уже отправлена. Ожидай судейство в уведомлениях телефона.</p>`,
-    }[stage];
-    desktopContent.innerHTML = `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>Трек для MAKAREWITCH VI</h2>${next}</section>`;
+    const ready = steps.find((step) => step.state === 'ready' && step.id !== 'register');
+    const controls = ready?.id === 'draft'
+      ? `<p>Выбери фокус черновика.</p><div class="desktop-grid">${[1, 2, 3, 4, 5].map((focus) => `<button class="desktop-icon" data-track-step="draft" data-focus="${focus}"><b>${focus}</b><span>${['Тема', 'Лирика', 'Баланс', 'Панчи', 'Дисс'][focus - 1]}</span><small>Черновик · 2 ч</small></button>`).join('')}</div>`
+      : ready?.id === 'research'
+        ? `<p>Архив поможет не промахнуться по формату баттла.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="research"><b>⌕</b><span>Изучить архив</span><small>1 ч · открыть скрытый тег</small></button></div>`
+        : ready?.id === 'beat'
+        ? `<p>Черновик готов. Самооценка: ${track.confidence}/10; реальное качество пока скрыто.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="polish"><b>✎</b><span>Доработать</span><small>1 ч · небольшое улучшение</small></button><button class="desktop-icon" data-track-step="beat"><b>♫</b><span>Выбрать бум-бэп</span><small>20 мин</small></button></div>`
+        : ready?.id === 'record'
+          ? `<p>Бит выбран. Компьютер больше не нужен: встань и запиши вокал у микрофона.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="record"><b>●</b><span>Идти к микрофону</span><small>Несколько дублей · 2 ч 30 мин</small></button></div>`
+          : ready?.id === 'mix'
+            ? `<p>Демка записана. Теперь доступно сведение.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="mix"><b>≋</b><span>Свести</span><small>2 ч</small></button></div>`
+            : ready?.id === 'master'
+              ? `<p>Сведение готово. Остался мастеринг.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="master"><b>◆</b><span>Смастерить</span><small>2 ч</small></button></div>`
+              : ready?.id === 'submit'
+                ? `<p>Трек готов. После отправки изменить его нельзя.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="submit"><b>↥</b><span>Сдать заявку</span><small>10 мин</small></button></div>`
+                : `<p>Заявка уже отправлена. Ожидай судейство в уведомлениях телефона.</p>`;
+    desktopContent.innerHTML = `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>Трек для MAKAREWITCH VI</h2><ol class="track-steps">${steps.map((step) => `<li class="track-steps__item track-steps__item--${step.state}"><strong>${step.label}</strong><span>${step.minutes ? `${step.minutes} мин` : 'сразу'}</span><small>${step.state === 'done' ? 'готово' : step.reason || 'следующий шаг'}</small></li>`).join('')}</ol>${controls}</section>`;
     return;
   }
   if (view === 'home') {
@@ -283,11 +290,19 @@ desktopContent.addEventListener('click', (event) => {
   const trackButton = event.target.closest('[data-track-step]');
   if (trackButton) {
     const step = trackButton.dataset.trackStep;
+    if (step === 'research') {
+      startDesktopAction('research-archive', () => researchTournament(campaign));
+      return;
+    }
+    if (step === 'record') {
+      closeDesktop();
+      actor.pendingIntent = { type: 'apartment-action', actionId: 'microphone' };
+      return;
+    }
     const result = {
       draft: () => startDraft(campaign, { focus: Number(trackButton.dataset.focus), useResearch: campaign.tournament.researchHints.length > 0 }),
       polish: () => polishDraft(campaign),
       beat: () => chooseBeat(campaign, 'boom-bap'),
-      record: () => recordTrack(campaign, 'takes'),
       mix: () => mixTrack(campaign),
       master: () => masterTrack(campaign),
       submit: () => submitTrack(campaign),
@@ -1071,6 +1086,18 @@ function beginApartmentAction(actionId) {
 }
 
 function completeApartmentAction(action) {
+  const trackRecording = action.id === 'microphone' && campaign.track?.stage === 'beat-ready'
+    ? recordTrack(campaign, 'takes')
+    : null;
+  if (trackRecording) {
+    campaign = trackRecording.state;
+    saveCampaign(campaign);
+    renderCampaignHud();
+    renderInteractionDock(`<strong>${action.label}</strong><span class="interaction-dock__hint">${trackRecording.message}. Демка готова.</span>`);
+    actor.bubble = { title: action.label, message: 'Демка готова — можно вернуться к ПК.', expiresAt: performance.now() + 3000 };
+    notify('СТУДИЯ', 'Вокал записан: демка ждёт сведения.');
+    return;
+  }
   const householdResult = {
     stove: () => cookMeal(campaign),
     sink: () => washDishes(campaign),

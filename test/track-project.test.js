@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { chooseBeat, masterTrack, mixTrack, polishDraft, recordTrack, startDraft, submitTrack } from '../src/track-project.js';
+import { chooseBeat, getTrackStepStatus, masterTrack, mixTrack, polishDraft, recordTrack, startDraft, submitTrack } from '../src/track-project.js';
 import { createCampaign } from '../src/game-state.js';
 
 test('track moves through brief, draft, beat, recording, mix and master in order', () => {
@@ -27,4 +27,16 @@ test('submission refuses an unfinished track and locks a mastered release', () =
   assert.equal(submitted.completed, true);
   assert.equal(submitted.state.track.stage, 'submitted');
   assert.equal(submitted.state.tournament.submitted, true);
+});
+
+test('track checklist makes the next step and microphone handoff explicit', () => {
+  const start = createCampaign();
+  const beforeRegistration = getTrackStepStatus(start);
+  assert.deepEqual(beforeRegistration[0], { id: 'register', label: 'Зарегистрироваться', minutes: 0, state: 'ready', reason: '' });
+  assert.equal(beforeRegistration.find((step) => step.id === 'record').reason, 'Сначала выбери бит.');
+
+  const registered = { ...start, tournament: { ...start.tournament, registered: true } };
+  const beatReady = chooseBeat(startDraft(registered, { focus: 2, useResearch: false }).state, 'boom-bap').state;
+  const recording = getTrackStepStatus(beatReady).find((step) => step.id === 'record');
+  assert.deepEqual(recording, { id: 'record', label: 'Записать у микрофона', minutes: 150, state: 'ready', reason: 'Подойди к микрофону в квартире.' });
 });
