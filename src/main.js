@@ -13,6 +13,7 @@ import { districts, travelTo } from './calikfornia.js';
 import { completeShift, getJob, jobIds } from './jobs.js';
 import { buyFood, cookMeal, eatMeal, sleep, washDishes } from './household.js';
 import { MAKAREWITCH_VI, registerForTournament, researchTournament } from './tournament.js';
+import { chooseBeat, masterTrack, mixTrack, polishDraft, recordTrack, startDraft, submitTrack } from './track-project.js';
 
 const canvas = document.querySelector('#game');
 const status = document.querySelector('#status');
@@ -91,6 +92,21 @@ function notify(sender, text) {
 }
 
 function renderDesktop(view = 'home') {
+  if (view === 'track') {
+    const track = campaign.track;
+    const stage = track?.stage ?? 'brief';
+    const next = {
+      brief: `<p>Выбери фокус: 1 — тема, 2 — лирика, 3 — баланс, 4 — панчи, 5 — дисс.</p><div class="desktop-grid">${[1, 2, 3, 4, 5].map((focus) => `<button class="desktop-icon" data-track-step="draft" data-focus="${focus}"><b>${focus}</b><span>${['Тема', 'Лирика', 'Баланс', 'Панчи', 'Дисс'][focus - 1]}</span><small>Черновик · 2 ч</small></button>`).join('')}</div>`,
+      draft: `<p>Черновик готов. Самооценка: ${track.confidence}/10; реальное качество скрыто.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="polish"><b>✎</b><span>Доработать</span><small>1 ч · небольшое улучшение</small></button><button class="desktop-icon" data-track-step="beat"><b>♫</b><span>Выбрать бум-бэп</span><small>20 мин</small></button></div>`,
+      'beat-ready': `<p>Бит выбран. Запиши вокал перед микрофоном.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="record"><b>●</b><span>Несколько дублей</span><small>2 ч 30 мин</small></button></div>`,
+      recorded: `<p>Демка записана. Можно сдать сырой вариант позднее, но сейчас доступно сведение.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="mix"><b>≋</b><span>Свести</span><small>2 ч</small></button></div>`,
+      mixed: `<p>Сведение готово. Остался мастеринг.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="master"><b>◆</b><span>Мастерить</span><small>2 ч</small></button></div>`,
+      mastered: `<p>Трек готов. После отправки изменить его нельзя.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="submit"><b>↥</b><span>Сдать заявку</span><small>10 мин</small></button></div>`,
+      submitted: `<p>Заявка уже отправлена. Ожидай судейство в уведомлениях телефона.</p>`,
+    }[stage];
+    desktopContent.innerHTML = `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>Трек для MAKAREWITCH VI</h2>${next}</section>`;
+    return;
+  }
   if (view === 'home') {
     desktopContent.innerHTML = `<div class="desktop-grid">${desktopApps.map((app) => `<button class="desktop-icon" data-desktop-app="${app.id}"><b>${app.icon}</b><span>${app.label}</span><small>${app.description}</small></button>`).join('')}</div>`;
     return;
@@ -102,7 +118,7 @@ function renderDesktop(view = 'home') {
     : view === 'market'
       ? `<p>Холодильник: ингредиенты — ${campaign.inventory.ingredients}, готовые порции — ${campaign.inventory.cookedMeals}.</p><div class="desktop-grid"><button class="desktop-icon" data-market="groceries"><b>▣</b><span>Продукты</span><small>380 ₽ · +3 ингредиента</small></button></div>`
       : view === 'battles'
-        ? `<p>${MAKAREWITCH_VI.description}</p><p><strong>Дедлайн: 20 сентября, 23:59.</strong> ${campaign.tournament.researchHints.length ? `Найдено: ${campaign.tournament.researchHints.join(', ')}.` : ''}</p><div class="desktop-grid">${campaign.tournament.registered ? `<button class="desktop-icon" data-battle="research"><b>⌕</b><span>Изучить архив</span><small>1 ч · комментарии и скрытые предпочтения</small></button>` : `<button class="desktop-icon" data-battle="register"><b>◈</b><span>Участвовать</span><small>Зарегистрироваться на MAKAREWITCH VI</small></button>`}</div><p>${MAKAREWITCH_VI.comments.join('<br>')}</p>`
+        ? `<p>${MAKAREWITCH_VI.description}</p><p><strong>Дедлайн: 20 сентября, 23:59.</strong> ${campaign.tournament.researchHints.length ? `Найдено: ${campaign.tournament.researchHints.join(', ')}.` : ''}</p><div class="desktop-grid">${campaign.tournament.registered ? `<button class="desktop-icon" data-battle="research"><b>⌕</b><span>Изучить архив</span><small>1 ч · комментарии и скрытые предпочтения</small></button><button class="desktop-icon" data-battle="track"><b>♫</b><span>Моя заявка</span><small>Сделать и сдать трек</small></button>` : `<button class="desktop-icon" data-battle="register"><b>◈</b><span>Участвовать</span><small>Зарегистрироваться на MAKAREWITCH VI</small></button>`}</div><p>${MAKAREWITCH_VI.comments.join('<br>')}</p>`
       : `<p>${opened.app.description}. Этот раздел готов к игровому действию.</p>`;
   desktopContent.innerHTML = `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>${opened.app.label}</h2>${body}<div id="desktop-page-actions"></div></section>`;
 }
@@ -143,6 +159,10 @@ desktopContent.addEventListener('click', (event) => {
   }
   const battleButton = event.target.closest('[data-battle]');
   if (battleButton) {
+    if (battleButton.dataset.battle === 'track') {
+      renderDesktop('track');
+      return;
+    }
     const result = battleButton.dataset.battle === 'register'
       ? registerForTournament(campaign, MAKAREWITCH_VI.id)
       : researchTournament(campaign);
@@ -151,6 +171,24 @@ desktopContent.addEventListener('click', (event) => {
     renderCampaignHud();
     notify('MAKAREWITCH VI', result.message);
     renderDesktop('battles');
+  }
+  const trackButton = event.target.closest('[data-track-step]');
+  if (trackButton) {
+    const step = trackButton.dataset.trackStep;
+    const result = {
+      draft: () => startDraft(campaign, { focus: Number(trackButton.dataset.focus), useResearch: campaign.tournament.researchHints.length > 0 }),
+      polish: () => polishDraft(campaign),
+      beat: () => chooseBeat(campaign, 'boom-bap'),
+      record: () => recordTrack(campaign, 'takes'),
+      mix: () => mixTrack(campaign),
+      master: () => masterTrack(campaign),
+      submit: () => submitTrack(campaign),
+    }[step]();
+    campaign = result.state;
+    saveCampaign(campaign);
+    renderCampaignHud();
+    notify('СТУДИЯ', result.message);
+    renderDesktop('track');
   }
 });
 desktopClose.addEventListener('click', closeDesktop);
