@@ -12,6 +12,7 @@ import { dequeueNotification, enqueueNotification } from './phone-notifications.
 import { districts, travelTo } from './calikfornia.js';
 import { completeShift, getJob, jobIds } from './jobs.js';
 import { buyFood, cookMeal, eatMeal, sleep, washDishes } from './household.js';
+import { MAKAREWITCH_VI, registerForTournament, researchTournament } from './tournament.js';
 
 const canvas = document.querySelector('#game');
 const status = document.querySelector('#status');
@@ -100,7 +101,9 @@ function renderDesktop(view = 'home') {
     ? `<p>Выбери смену. Деньги выдают наличными после работы; нагрузка различается.</p><div class="desktop-grid">${jobIds.map((id) => { const job = getJob(id); return `<button class="desktop-icon" data-job="${id}"><b>₽</b><span>${job.label}</span><small>${job.duration / 60} ч · ${job.pay} ₽</small></button>`; }).join('')}</div>`
     : view === 'market'
       ? `<p>Холодильник: ингредиенты — ${campaign.inventory.ingredients}, готовые порции — ${campaign.inventory.cookedMeals}.</p><div class="desktop-grid"><button class="desktop-icon" data-market="groceries"><b>▣</b><span>Продукты</span><small>380 ₽ · +3 ингредиента</small></button></div>`
-    : `<p>${opened.app.description}. Этот раздел готов к игровому действию.</p>`;
+      : view === 'battles'
+        ? `<p>${MAKAREWITCH_VI.description}</p><p><strong>Дедлайн: 20 сентября, 23:59.</strong> ${campaign.tournament.researchHints.length ? `Найдено: ${campaign.tournament.researchHints.join(', ')}.` : ''}</p><div class="desktop-grid">${campaign.tournament.registered ? `<button class="desktop-icon" data-battle="research"><b>⌕</b><span>Изучить архив</span><small>1 ч · комментарии и скрытые предпочтения</small></button>` : `<button class="desktop-icon" data-battle="register"><b>◈</b><span>Участвовать</span><small>Зарегистрироваться на MAKAREWITCH VI</small></button>`}</div><p>${MAKAREWITCH_VI.comments.join('<br>')}</p>`
+      : `<p>${opened.app.description}. Этот раздел готов к игровому действию.</p>`;
   desktopContent.innerHTML = `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>${opened.app.label}</h2>${body}<div id="desktop-page-actions"></div></section>`;
 }
 
@@ -137,6 +140,17 @@ desktopContent.addEventListener('click', (event) => {
     renderCampaignHud();
     notify('МАРКЕТ', result.message);
     renderDesktop('market');
+  }
+  const battleButton = event.target.closest('[data-battle]');
+  if (battleButton) {
+    const result = battleButton.dataset.battle === 'register'
+      ? registerForTournament(campaign, MAKAREWITCH_VI.id)
+      : researchTournament(campaign);
+    campaign = result.state;
+    saveCampaign(campaign);
+    renderCampaignHud();
+    notify('MAKAREWITCH VI', result.message);
+    renderDesktop('battles');
   }
 });
 desktopClose.addEventListener('click', closeDesktop);
