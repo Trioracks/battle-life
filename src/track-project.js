@@ -11,6 +11,45 @@ function update(campaign, action, track) {
   return { state: { ...result.state, track }, completed: true, message: action.label };
 }
 
+const stageOrder = Object.freeze({
+  draft: 1,
+  'beat-ready': 2,
+  recorded: 3,
+  mixed: 4,
+  mastered: 5,
+  submitted: 6,
+});
+
+function atLeast(track, stage) {
+  return (stageOrder[track?.stage] ?? 0) >= stageOrder[stage];
+}
+
+function step(id, label, minutes, state, reason = '') {
+  return { id, label, minutes, state, reason };
+}
+
+export function getTrackStepStatus(campaign) {
+  const registered = campaign.tournament.registered;
+  const researched = campaign.tournament.researchHints.length > 0;
+  const track = campaign.track;
+  const drafted = atLeast(track, 'draft');
+  const beatReady = atLeast(track, 'beat-ready');
+  const recorded = atLeast(track, 'recorded');
+  const mixed = atLeast(track, 'mixed');
+  const mastered = atLeast(track, 'mastered');
+  const submitted = atLeast(track, 'submitted');
+  return [
+    step('register', 'Зарегистрироваться', 0, registered ? 'done' : 'ready'),
+    step('research', 'Изучить архив', 60, researched ? 'done' : registered ? 'ready' : 'locked', registered ? '' : 'Сначала зарегистрируйся.'),
+    step('draft', 'Сделать черновик', 120, drafted ? 'done' : registered ? 'ready' : 'locked', registered ? '' : 'Сначала зарегистрируйся.'),
+    step('beat', 'Выбрать бит', 20, beatReady ? 'done' : drafted ? 'ready' : 'locked', drafted ? '' : 'Сначала сделай черновик.'),
+    step('record', 'Записать у микрофона', 150, recorded ? 'done' : beatReady ? 'ready' : 'locked', beatReady ? 'Подойди к микрофону в квартире.' : 'Сначала выбери бит.'),
+    step('mix', 'Свести трек', 120, mixed ? 'done' : recorded ? 'ready' : 'locked', recorded ? '' : 'Сначала запиши вокал.'),
+    step('master', 'Смастерить трек', 120, mastered ? 'done' : mixed ? 'ready' : 'locked', mixed ? '' : 'Сначала сведи трек.'),
+    step('submit', 'Сдать трек', 10, submitted ? 'done' : mastered ? 'ready' : 'locked', mastered ? '' : 'Для отправки нужен готовый мастер.'),
+  ];
+}
+
 export function startDraft(campaign, brief) {
   const quality = trackQuality(campaign) + (brief.useResearch ? .35 : 0) + (brief.focus === 2 ? .2 : 0);
   return update(campaign, { id: 'write-draft', label: 'Пишет черновик', minutes: 120, effects: { energy: -5, leisure: -2 } }, { stage: 'draft', focus: brief.focus, useResearch: Boolean(brief.useResearch), genre: null, take: null, quality, confidence: Math.round((quality + .8) * 10) / 10 });
