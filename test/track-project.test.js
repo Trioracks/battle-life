@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { chooseBeat, getTrackStepStatus, masterTrack, mixTrack, polishDraft, recordTrack, startDraft, submitTrack } from '../src/track-project.js';
+import { chooseBeat, getTrackStepStatus, masterTrack, mixTrack, polishDraft, recordAtMicrophone, recordTrack, startDraft, submitTrack } from '../src/track-project.js';
 import { createCampaign } from '../src/game-state.js';
 
 test('track moves through brief, draft, beat, recording, mix and master in order', () => {
@@ -39,4 +39,13 @@ test('track checklist makes the next step and microphone handoff explicit', () =
   const beatReady = chooseBeat(startDraft(registered, { focus: 2, useResearch: false }).state, 'boom-bap').state;
   const recording = getTrackStepStatus(beatReady).find((step) => step.id === 'record');
   assert.deepEqual(recording, { id: 'record', label: 'Записать у микрофона', minutes: 150, state: 'ready', reason: 'Подойди к микрофону в квартире.' });
+});
+
+test('home microphone recording records the real location on a ready track', () => {
+  const campaign = chooseBeat(startDraft({ ...createCampaign(), tournament: { ...createCampaign().tournament, registered: true } }, { focus: 2, useResearch: false }).state, 'boom-bap').state;
+  const result = recordAtMicrophone(campaign, 'takes');
+
+  assert.equal(result.completed, true);
+  assert.equal(result.state.track.stage, 'recorded');
+  assert.equal(result.state.track.recordedAt, 'home-microphone');
 });
