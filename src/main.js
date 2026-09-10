@@ -10,7 +10,7 @@ import { canStartApartmentAction, describeApartmentAction, getApartmentAction } 
 import { playSoundCue } from './sound-cues.js';
 import { desktopApps, getDesktopAction, openDesktopApp } from './desktop-apps.js';
 import { dequeueNotification, enqueueNotification } from './phone-notifications.js';
-import { districts, travelTo } from './calikfornia.js';
+import { districts, getDistrictLocations, startLocationAction, travelTo } from './calikfornia.js';
 import { completeShift, getJob, jobIds } from './jobs.js';
 import { buyFood, cookMeal, eatMeal, sleep, washDishes } from './household.js';
 import { MAKAREWITCH_VI, registerForTournament, researchTournament } from './tournament.js';
@@ -46,6 +46,7 @@ const desktopClose = document.querySelector('#desktop-close');
 const phonePanel = document.querySelector('#phone-panel');
 const mapScreen = document.querySelector('#map-screen');
 const mapDistricts = document.querySelector('#map-districts');
+const mapLocationPanel = document.querySelector('#map-location-panel');
 const mapClose = document.querySelector('#map-close');
 let campaign = loadCampaign() ?? createCampaign();
 saveCampaign(campaign);
@@ -321,8 +322,16 @@ phonePanel.addEventListener('click', () => {
   renderPhone();
 });
 
+function renderMap(selectedDistrictId) {
+  const selectedDistrict = districts.find((district) => district.id === selectedDistrictId) ?? districts[0];
+  mapDistricts.innerHTML = districts.map((district) => `<button class="map-zone map-zone--${district.id} ${district.id === selectedDistrict.id ? 'is-selected' : ''}" data-district="${district.id}"><strong>${district.name}</strong><span>${district.role}</span><small>${district.minutes ? `${district.minutes} мин` : 'дом'}</small></button>`).join('');
+  const locations = getDistrictLocations(selectedDistrict.id);
+  mapLocationPanel.innerHTML = `<p class="map-location-panel__eyebrow">${selectedDistrict.name}</p><h2>${selectedDistrict.role}</h2><p>${selectedDistrict.minutes ? `Дорога заняла ${selectedDistrict.minutes} мин.` : 'Ты в домашнем районе.'}</p>${locations.map((location) => `<button class="map-location" data-location="${location.id}"><b>${location.kind === 'job' ? '₽' : location.kind === 'market' ? '▣' : '◌'}</b><span><strong>${location.label}</strong><small>${location.description}</small></span><em>${location.kind === 'job' ? 'Начать смену' : location.kind === 'market' ? 'Заказать' : 'Осмотреть'}</em></button>`).join('')}`;
+}
+
 function openMap() {
-  mapDistricts.innerHTML = districts.map((district) => `<button class="district-card" data-district="${district.id}"><strong>${district.name}</strong><span>${district.role}</span><small>${district.minutes ? `${district.minutes} мин в пути` : 'Ты дома'}</small></button>`).join('');
+  const location = campaign.location === 'north-sloboda-home' ? 'north-sloboda' : campaign.location;
+  renderMap(location);
   mapScreen.classList.remove('is-hidden');
 }
 
@@ -334,7 +343,18 @@ mapDistricts.addEventListener('click', (event) => {
   saveCampaign(campaign);
   renderCampaignHud();
   notify('КАРТА', result.message);
-  mapScreen.classList.add('is-hidden');
+  renderMap(button.dataset.district);
+});
+mapLocationPanel.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-location]');
+  if (!button) return;
+  const result = startLocationAction(campaign, button.dataset.location);
+  campaign = result.state;
+  saveCampaign(campaign);
+  renderCampaignHud();
+  notify('КАРТА', result.message);
+  const location = campaign.location === 'north-sloboda-home' ? 'north-sloboda' : campaign.location;
+  renderMap(location);
 });
 mapClose.addEventListener('click', () => mapScreen.classList.add('is-hidden'));
 
