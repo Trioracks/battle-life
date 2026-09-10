@@ -11,6 +11,7 @@ import { desktopApps, openDesktopApp } from './desktop-apps.js';
 import { dequeueNotification, enqueueNotification } from './phone-notifications.js';
 import { districts, travelTo } from './calikfornia.js';
 import { completeShift, getJob, jobIds } from './jobs.js';
+import { buyFood, cookMeal, eatMeal, sleep, washDishes } from './household.js';
 
 const canvas = document.querySelector('#game');
 const status = document.querySelector('#status');
@@ -97,6 +98,8 @@ function renderDesktop(view = 'home') {
   if (!opened) return renderDesktop();
   const body = view === 'jobs'
     ? `<p>Выбери смену. Деньги выдают наличными после работы; нагрузка различается.</p><div class="desktop-grid">${jobIds.map((id) => { const job = getJob(id); return `<button class="desktop-icon" data-job="${id}"><b>₽</b><span>${job.label}</span><small>${job.duration / 60} ч · ${job.pay} ₽</small></button>`; }).join('')}</div>`
+    : view === 'market'
+      ? `<p>Холодильник: ингредиенты — ${campaign.inventory.ingredients}, готовые порции — ${campaign.inventory.cookedMeals}.</p><div class="desktop-grid"><button class="desktop-icon" data-market="groceries"><b>▣</b><span>Продукты</span><small>380 ₽ · +3 ингредиента</small></button></div>`
     : `<p>${opened.app.description}. Этот раздел готов к игровому действию.</p>`;
   desktopContent.innerHTML = `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>${opened.app.label}</h2>${body}<div id="desktop-page-actions"></div></section>`;
 }
@@ -125,6 +128,15 @@ desktopContent.addEventListener('click', (event) => {
     renderCampaignHud();
     notify('РАБОТА', result.message);
     renderDesktop('jobs');
+  }
+  const marketButton = event.target.closest('[data-market]');
+  if (marketButton) {
+    const result = buyFood(campaign, marketButton.dataset.market);
+    campaign = result.state;
+    saveCampaign(campaign);
+    renderCampaignHud();
+    notify('МАРКЕТ', result.message);
+    renderDesktop('market');
   }
 });
 desktopClose.addEventListener('click', closeDesktop);
@@ -813,6 +825,19 @@ function beginApartmentAction(actionId) {
 }
 
 function completeApartmentAction(action) {
+  const householdResult = {
+    stove: () => cookMeal(campaign),
+    sink: () => washDishes(campaign),
+    fridge: () => eatMeal(campaign),
+    bed: () => sleep(campaign, 7),
+  }[action.id]?.();
+  if (householdResult) {
+    campaign = householdResult.state;
+    saveCampaign(campaign);
+    renderCampaignHud();
+    renderInteractionDock(`<strong>${action.label}</strong><span class="interaction-dock__hint">${householdResult.message}</span>`);
+    return;
+  }
   if (action.minutes > 0) {
     const effects = {
       bed: { energy: 8, health: .5 },
