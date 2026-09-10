@@ -5,7 +5,7 @@ import { clickIntent } from './click-intent.js';
 import { stepCharacter } from './character-motion.js';
 import { advanceCampaign, createCampaign, loadCampaign, saveCampaign } from './game-state.js';
 import { createRapper, cycleLookPart, LOOK_PART_LABELS, lookPartAtPreviewHeight, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
-import { canStartApartmentAction, getApartmentAction } from './apartment-actions.js';
+import { canStartApartmentAction, describeApartmentAction, getApartmentAction } from './apartment-actions.js';
 import { playSoundCue } from './sound-cues.js';
 import { desktopApps, openDesktopApp } from './desktop-apps.js';
 import { dequeueNotification, enqueueNotification } from './phone-notifications.js';
@@ -37,6 +37,7 @@ const creatorError = document.querySelector('#creator-error');
 const creatorPreviewCanvas = document.querySelector('#creator-preview');
 const creatorLookControls = document.querySelector('#creator-look-controls');
 const interactionDock = document.querySelector('#interaction-dock');
+const worldTooltip = document.querySelector('#world-tooltip');
 const desktopScreen = document.querySelector('#desktop-screen');
 const desktopContent = document.querySelector('#desktop-content');
 const desktopClose = document.querySelector('#desktop-close');
@@ -51,7 +52,7 @@ let creatorLook = campaign.player?.look ?? { hair: 'bald', face: 'clean', top: '
 let audioContext = null;
 let desktopOpen = false;
 const room = { left: -5.15, right: 5.15 };
-const deskX = 2.25;
+const deskX = 3.18;
 const exitZoneX = 4.62;
 const clock = new THREE.Clock();
 const raycaster = new THREE.Raycaster();
@@ -76,6 +77,21 @@ function renderCampaignHud() {
 
 function renderInteractionDock(content = '<span class="interaction-dock__hint">Подойди к предмету</span>') {
   interactionDock.innerHTML = content;
+}
+
+function clearWorldTooltip() {
+  worldTooltip.classList.add('is-hidden');
+}
+
+function showWorldTooltip(actionId, event) {
+  const action = getApartmentAction(actionId);
+  const description = describeApartmentAction(action, campaign.needs);
+  if (!action) return clearWorldTooltip();
+  worldTooltip.innerHTML = `<strong>${description.title}</strong><span>${description.detail}</span>${description.allowed ? '' : `<small>${description.reason}</small>`}`;
+  worldTooltip.classList.toggle('is-blocked', !description.allowed);
+  worldTooltip.style.left = `${Math.min(window.innerWidth - 242, Math.max(14, event.clientX + 16))}px`;
+  worldTooltip.style.top = `${Math.min(window.innerHeight - 98, Math.max(14, event.clientY - 12))}px`;
+  worldTooltip.classList.remove('is-hidden');
 }
 
 function renderPhone() {
@@ -397,6 +413,7 @@ function addRoom() {
   const roomGroup = new THREE.Group();
   scene.add(roomGroup);
   const actionHitAreas = [];
+  const actionHighlights = {};
   const actionHit = (id, position, size) => {
     const hit = new THREE.Mesh(
       new THREE.BoxGeometry(...size),
@@ -406,6 +423,15 @@ function addRoom() {
     hit.userData.actionId = id;
     roomGroup.add(hit);
     actionHitAreas.push(hit);
+    const highlight = new THREE.Mesh(
+      new THREE.BoxGeometry(...size),
+      new THREE.MeshBasicMaterial({ color: 0xf0bd59, transparent: true, opacity: .2, depthWrite: false }),
+    );
+    highlight.position.set(...position);
+    highlight.scale.set(1.06, 1.05, 1.08);
+    highlight.visible = false;
+    roomGroup.add(highlight);
+    actionHighlights[id] = highlight;
     return hit;
   };
 
@@ -418,17 +444,33 @@ function addRoom() {
   }
 
   const windowGroup = new THREE.Group();
-  windowGroup.position.set(-3.75, 3.75, -1.19);
+  windowGroup.position.set(1.25, 3.75, -1.19);
   roomGroup.add(windowGroup);
-  box(windowGroup, [2.1, 2.3, .14], colors.woodDark, [0, 0, 0]);
-  plane(windowGroup, [1.75, 1.92], 0x7aa0a3, [0, 0, .09], { emissive: 0x183c3d, emissiveIntensity: .7 });
-  box(windowGroup, [.12, 2.12, .1], colors.wood, [0, 0, .14]);
-  box(windowGroup, [1.9, .11, .1], colors.wood, [0, 0, .14]);
-  box(roomGroup, [2.55, .7, .85], 0x343e3a, [-3.7, .47, -.15]);
-  box(roomGroup, [2.72, .22, .95], 0x27302e, [-3.7, .9, -.16]);
-  box(roomGroup, [.2, .85, .8], colors.wood, [-5.1, .45, -.15]);
-  box(roomGroup, [.2, .85, .8], colors.wood, [-2.3, .45, -.15]);
-  box(roomGroup, [.35, .11, .88], colors.red, [-3.7, 1.05, -.16]);
+  box(windowGroup, [3.9, 2.36, .14], colors.woodDark, [0, 0, 0]);
+  plane(windowGroup, [3.54, 2.04], 0x263b4b, [0, 0, .09], { emissive: 0x132937, emissiveIntensity: .8 });
+  for (const [x, width, height, y] of [[-1.35, .72, 1.15, -.46], [-.52, .63, 1.42, -.33], [.22, .83, .98, -.52], [1.14, .66, 1.58, -.25]]) {
+    box(windowGroup, [width, height, .025], 0x9b443d, [x, y, .12], { emissive: 0x3b100c, emissiveIntensity: .45 });
+    for (let floor = y - height / 2 + .18; floor < y + height / 2; floor += .24) box(windowGroup, [width * .72, .045, .03], 0xe0aa58, [x, floor, .14], { emissive: 0x5c3213, emissiveIntensity: 1.2 });
+  }
+  box(windowGroup, [.12, 2.16, .1], colors.wood, [0, 0, .14]);
+  box(windowGroup, [3.68, .11, .1], colors.wood, [0, 0, .14]);
+
+  const divider = new THREE.Group();
+  divider.position.set(-1.12, 1.55, -.72);
+  roomGroup.add(divider);
+  box(divider, [.22, 3.1, .35], 0x34413d, [0, 0, 0]);
+  box(divider, [.31, .14, .4], colors.wood, [0, 1.48, .02]);
+  for (const y of [-.9, -.35, .2, .75]) box(divider, [.06, .08, .42], 0xb95947, [.15, y, .05]);
+
+  const bedFrame = new THREE.Group();
+  bedFrame.position.set(.15, 0, -.12);
+  roomGroup.add(bedFrame);
+  box(bedFrame, [2.18, .65, .92], 0x303b3a, [0, .4, 0]);
+  box(bedFrame, [2.3, .2, 1.02], 0x23302f, [0, .79, 0]);
+  box(bedFrame, [.72, .12, .82], 0xe0d6bd, [-.65, .95, .02]);
+  box(bedFrame, [1.22, .12, .9], 0xa34d43, [.42, .96, .02]);
+  box(bedFrame, [.16, .95, .9], colors.wood, [-1.01, .48, 0]);
+  box(bedFrame, [.16, .95, .9], colors.wood, [1.01, .48, 0]);
 
   const desk = new THREE.Group();
   desk.position.set(deskX, 0, -.25);
@@ -462,6 +504,7 @@ function addRoom() {
   roundedContour(computerHighlight, .92, .19, [-.38, 1.46, .32], .04);
   computerHighlight.visible = false;
   desk.add(computerHighlight);
+  actionHighlights.computer = computerHighlight;
 
   const shelf = new THREE.Group();
   shelf.position.set(4.28, 1.65, -1.08);
@@ -490,25 +533,34 @@ function addRoom() {
 
   // Everyday objects use simple geometry deliberately: their interaction state, not visual complexity, drives the MVP.
   const fridge = new THREE.Group();
-  fridge.position.set(-1.55, 0, -.4);
+  fridge.position.set(-4.72, 0, -.4);
   roomGroup.add(fridge);
-  box(fridge, [.82, 1.75, .66], 0x2b3937, [0, .9, 0]);
-  box(fridge, [.72, .7, .04], 0x49615f, [0, 1.22, .36], { emissive: 0x16302d, emissiveIntensity: .18 });
-  box(fridge, [.72, .02, .05], colors.black, [0, .88, .38]);
-  box(fridge, [.04, .52, .05], colors.tealLight, [.26, 1.22, .4]);
+  box(fridge, [1.05, 2.28, .72], 0x2b3937, [0, 1.14, 0]);
+  box(fridge, [.9, .93, .06], 0x49615f, [0, 1.59, .4], { emissive: 0x16302d, emissiveIntensity: .18 });
+  box(fridge, [.9, .02, .05], colors.black, [0, 1.08, .43]);
+  box(fridge, [.06, .68, .06], colors.tealLight, [.33, 1.6, .45]);
+  box(fridge, [.54, .16, .06], colors.amber, [-.12, 2.16, .44], { emissive: 0x432b11, emissiveIntensity: .8 });
 
   const kitchen = new THREE.Group();
-  kitchen.position.set(-.18, 0, -.72);
+  kitchen.position.set(-3.12, 0, -.72);
   roomGroup.add(kitchen);
-  box(kitchen, [1.95, .74, .68], 0x42504c, [0, .38, 0]);
-  box(kitchen, [1.95, .12, .72], colors.wood, [0, .78, .02]);
-  cylinder(kitchen, .18, .18, .03, 0x202427, [-.54, .86, .04]);
-  cylinder(kitchen, .18, .18, .03, 0x202427, [-.22, .86, .04]);
-  box(kitchen, [.48, .04, .3], 0x25454a, [.56, .85, .03], { emissive: 0x0d3135, emissiveIntensity: .38 });
-  box(kitchen, [.04, .2, .04], 0xa7b2a2, [.55, .98, -.12]);
+  box(kitchen, [2.12, .86, .72], 0x42504c, [0, .43, 0]);
+  box(kitchen, [2.18, .13, .77], colors.wood, [0, .88, .02]);
+  box(kitchen, [.94, .16, .74], 0x313432, [-.53, .98, .04]);
+  for (const [x, y] of [[-.75, .8], [-.35, .8], [-.75, 1.12], [-.35, 1.12]]) cylinder(kitchen, .13, .13, .035, 0x15191b, [x, y, .08]);
+  box(kitchen, [.62, .06, .5], 0x31565a, [.63, .95, .04], { emissive: 0x10373a, emissiveIntensity: .5 });
+  box(kitchen, [.05, .31, .05], 0xbcc4bb, [.62, 1.13, -.12]);
+  box(kitchen, [.26, .04, .04], 0xbcc4bb, [.72, 1.25, -.08]);
+
+  const kitchenTable = new THREE.Group();
+  kitchenTable.position.set(-2.15, 0, .12);
+  roomGroup.add(kitchenTable);
+  box(kitchenTable, [1.05, .12, .72], 0x79533c, [0, 1.05, 0]);
+  for (const x of [-.4, .4]) box(kitchenTable, [.08, 1.05, .08], colors.woodDark, [x, .5, 0]);
+  box(kitchenTable, [.52, .1, .5], 0x52392c, [-.65, .5, .07]);
 
   const mic = new THREE.Group();
-  mic.position.set(1.12, .08, .54);
+  mic.position.set(2.23, .08, .54);
   roomGroup.add(mic);
   cylinder(mic, .03, .05, 1.46, 0x161d1e, [0, .73, 0]);
   cylinder(mic, .11, .08, .22, 0x8ba19e, [0, 1.52, 0]);
@@ -517,11 +569,11 @@ function addRoom() {
   box(roomGroup, [.82, 3.25, .12], 0x49362e, [5.44, 1.63, -.76]);
   box(roomGroup, [.66, 2.98, .05], 0x263332, [5.44, 1.63, -.67]);
 
-  actionHit('bed', [-3.7, .8, .1], [2.9, 1.25, 1.1]);
-  actionHit('fridge', [-1.55, .95, .02], [.98, 1.9, .95]);
-  actionHit('stove', [-.72, .9, .02], [.5, .64, .92]);
-  actionHit('sink', [.35, .9, .02], [.62, .64, .92]);
-  actionHit('microphone', [1.12, .92, .28], [.72, 1.9, .9]);
+  actionHit('bed', [.15, .82, .1], [2.5, 1.2, 1.15]);
+  actionHit('fridge', [-4.72, 1.12, .02], [1.2, 2.42, .95]);
+  actionHit('stove', [-3.66, .95, .02], [.95, .75, .98]);
+  actionHit('sink', [-2.49, .98, .02], [.84, .78, .98]);
+  actionHit('microphone', [2.23, .92, .28], [.72, 1.9, .9]);
   actionHit('door', [5.44, 1.63, .04], [.95, 3.45, .8]);
 
   // The exit sits above and beside the shelf so it remains readable at every viewport width.
@@ -536,7 +588,7 @@ function addRoom() {
   roomGroup.add(exitArrow);
   plane(roomGroup, [1.34, .42], 0x5d4727, [5.2, 3.88, .23], { emissive: 0x3e2808, emissiveIntensity: .7 });
   box(roomGroup, [.12, 4.2, .34], 0x313936, [5.92, 2.08, -.12]);
-  return { roomGroup, computerHitArea, computerHighlight, actionHitAreas };
+  return { roomGroup, computerHitArea, computerHighlight, actionHitAreas, actionHighlights };
 }
 
 function makeLimb(parent, name, z, color, upperLength, lowerLength) {
@@ -780,7 +832,7 @@ function createBattleScene() {
   };
 }
 
-const { roomGroup, computerHitArea, computerHighlight, actionHitAreas } = addRoom();
+const { roomGroup, computerHitArea, computerHighlight, actionHitAreas, actionHighlights } = addRoom();
 const interactiveObjects = actionHitAreas;
 const actor = createCharacter();
 applyAvatarLook(actor, campaign.player?.look);
@@ -1366,17 +1418,21 @@ function pointFromPointerEvent(event) {
 
 canvas.addEventListener('pointermove', (event) => {
   if (gameMode !== 'apartment') {
-    computerHighlight.visible = false;
+    Object.values(actionHighlights).forEach((highlight) => { highlight.visible = false; });
+    clearWorldTooltip();
     canvas.style.cursor = 'default';
     return;
   }
   const { hitComputer, hitAction } = pointFromPointerEvent(event);
-  computerHighlight.visible = hitComputer;
+  Object.values(actionHighlights).forEach((highlight) => { highlight.visible = false; });
+  if (hitAction) actionHighlights[hitAction].visible = true;
+  showWorldTooltip(hitAction, event);
   canvas.style.cursor = hitAction ? 'pointer' : 'crosshair';
 });
 
 canvas.addEventListener('pointerleave', () => {
-  computerHighlight.visible = false;
+  Object.values(actionHighlights).forEach((highlight) => { highlight.visible = false; });
+  clearWorldTooltip();
   canvas.style.cursor = 'crosshair';
 });
 
