@@ -31,6 +31,30 @@
         <p id="status">Кликни по комнате, чтобы отправить героя в нужную точку.</p>
         <p class="controls">Клик слева или справа — идти · под героем — посмотреть в камеру · по компьютеру — работать</p>
       </section>
+      <section id="creator-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="creator-title">
+        <form id="creator-form" class="creator-card">
+          <div class="creator-card__heading">
+            <p class="eyebrow">ПЕРВЫЙ ВЕЧЕР · КАЛИКФОРНИЯ</p>
+            <h2 id="creator-title">Собери своего MC</h2>
+            <p>Все статы начинают с 10. Распредели 10 очков; один стат нельзя поднять выше 50.</p>
+          </div>
+          <div class="creator-identity">
+            <label>Имя<input id="creator-name" name="name" maxlength="24" value="Миша" required /></label>
+            <label>Никнейм<input id="creator-nickname" name="nickname" maxlength="32" placeholder="Например, Ночной Маяк" required /></label>
+          </div>
+          <div class="creator-split">
+            <section><div class="creator-section-title"><span>Стартовые навыки</span><strong id="creator-points">10 очков</strong></div><div id="creator-stats" class="creator-stats"></div></section>
+            <section class="creator-look"><div class="creator-section-title"><span>Внешность</span></div>
+              <label>Волосы<select name="hair"><option value="bald">Лысый</option><option value="crop">Короткие</option><option value="mohawk">Ирокез</option></select></label>
+              <label>Верх<select name="top"><option value="hoodie">Худи</option><option value="bomber">Бомбер</option><option value="jacket">Куртка</option></select></label>
+              <label>Штаны<select name="pants"><option value="cargo">Карго</option><option value="jeans">Джинсы</option></select></label>
+              <label>Кепка<select name="cap"><option value="none">Без кепки</option><option value="red">Красная</option><option value="teal">Бирюзовая</option></select></label>
+            </section>
+          </div>
+          <p id="creator-error" class="creator-error" role="alert"></p>
+          <button class="primary-button" type="submit">Начать вечер →</button>
+        </form>
+      </section>
       <div class="scanlines" aria-hidden="true"></div>
     </main>
     <script type="module" src="./src/main.js"></script>
