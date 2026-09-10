@@ -4,11 +4,11 @@ import { GESTURE_STYLES, PERFORMANCE_SECONDS, performanceStyleAt, shuffledStyles
 import { clickIntent } from './click-intent.js';
 import { stepCharacter } from './character-motion.js';
 import { presentActionProgress } from './action-progress.js';
-import { advanceCampaign, createCampaign, loadCampaign, saveCampaign } from './game-state.js';
+import { advanceCampaign, createCampaign, getInventorySummary, loadCampaign, saveCampaign } from './game-state.js';
 import { createRapper, cycleLookPart, LOOK_PART_LABELS, lookPartAtPreviewHeight, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
 import { canStartApartmentAction, describeApartmentAction, getApartmentAction } from './apartment-actions.js';
 import { playSoundCue } from './sound-cues.js';
-import { desktopApps, openDesktopApp } from './desktop-apps.js';
+import { desktopApps, getDesktopAction, openDesktopApp } from './desktop-apps.js';
 import { dequeueNotification, enqueueNotification } from './phone-notifications.js';
 import { districts, travelTo } from './calikfornia.js';
 import { completeShift, getJob, jobIds } from './jobs.js';
@@ -53,6 +53,7 @@ let creatorAllocations = Object.fromEntries(STAT_KEYS.map((key) => [key, 0]));
 let creatorLook = campaign.player?.look ?? { hair: 'bald', face: 'clean', top: 'hoodie', pants: 'cargo' };
 let audioContext = null;
 let desktopOpen = false;
+let desktopBootTimer = null;
 const room = { left: -5.15, right: 5.15 };
 const deskX = 3.18;
 const exitZoneX = 4.62;
@@ -122,6 +123,14 @@ function renderActorBubble(content) {
 
 function updateActorBubble() {
   if (gameMode !== 'apartment') return renderActorBubble(null);
+  if (actor.computerTask) {
+    const task = actor.computerTask;
+    const progress = presentActionProgress(task, actor.actionElapsed, 2.45);
+    const previewMinutes = Math.max(1, Math.round(task.minutes * progress.ratio));
+    const preview = advanceCampaign(campaign, { id: 'preview', label: task.label, minutes: previewMinutes }).state;
+    renderCampaignHud(preview.clock);
+    return renderActorBubble(`<strong>${task.label}</strong><span>${progress.percent}% · анализирует прошлые раунды</span><i><b style="width:${progress.percent}%"></b></i>`);
+  }
   if (actor.mode === 'apartmentAction' && actor.activeApartmentAction) {
     const action = actor.activeApartmentAction;
     const progress = presentActionProgress({ ...action, minutes: actionMinutesForProgress(action) }, actor.actionElapsed, actionVisualDuration(action));
@@ -177,26 +186,49 @@ function renderDesktop(view = 'home') {
   }
   const opened = openDesktopApp(view);
   if (!opened) return renderDesktop();
+  const inventory = getInventorySummary(campaign);
   const body = view === 'jobs'
     ? `<p>Выбери смену. Деньги выдают наличными после работы; нагрузка различается.</p><div class="desktop-grid">${jobIds.map((id) => { const job = getJob(id); return `<button class="desktop-icon" data-job="${id}"><b>₽</b><span>${job.label}</span><small>${job.duration / 60} ч · ${job.pay} ₽</small></button>`; }).join('')}</div>`
     : view === 'market'
-      ? `<p>Холодильник: ингредиенты — ${campaign.inventory.ingredients}, готовые порции — ${campaign.inventory.cookedMeals}.</p><div class="desktop-grid"><button class="desktop-icon" data-market="groceries"><b>▣</b><span>Продукты</span><small>380 ₽ · +3 ингредиента</small></button></div>`
+      ? `<p><strong>Наличные: ${campaign.cash.toLocaleString('ru-RU')} ₽.</strong> В холодильнике: ${inventory.ingredients} ингредиентов, ${inventory.cookedMeals} готовых порций, грязной посуды — ${inventory.dirtyDishes}.</p><p>Заказ оплачивается сразу; курьер привезёт продукты домой за 40 минут игрового времени.</p><div class="desktop-grid"><button class="desktop-icon" data-market="groceries"><b>▣</b><span>Заказать продукты</span><small>380 ₽ · +3 ингредиента · доставка 40 мин</small></button></div>`
       : view === 'battles'
         ? `<p>${MAKAREWITCH_VI.description}</p><p><strong>Дедлайн: 20 сентября, 23:59.</strong> ${campaign.tournament.researchHints.length ? `Найдено: ${campaign.tournament.researchHints.join(', ')}.` : ''}</p><div class="desktop-grid">${campaign.tournament.registered ? `<button class="desktop-icon" data-battle="research"><b>⌕</b><span>Изучить архив</span><small>1 ч · комментарии и скрытые предпочтения</small></button><button class="desktop-icon" data-battle="track"><b>♫</b><span>Моя заявка</span><small>Сделать и сдать трек</small></button>${campaign.tournament.submitted && !campaign.tournament.selection ? `<button class="desktop-icon" data-battle="results"><b>!</b><span>Судьи отсудили</span><small>Открыть комментарии и баллы</small></button>` : ''}` : `<button class="desktop-icon" data-battle="register"><b>◈</b><span>Участвовать</span><small>Зарегистрироваться на MAKAREWITCH VI</small></button>`}</div>${campaign.tournament.selection ? `<p><strong>${campaign.tournament.selection.passed ? 'Ты прошёл отбор.' : 'Ты не прошёл отбор.'}</strong> ${campaign.tournament.selection.total}/30<br>${campaign.tournament.selection.scores.map((score) => `${score.judge}: ${score.value}/10 — ${score.comment}`).join('<br>')}</p>` : `<p>${MAKAREWITCH_VI.comments.join('<br>')}</p>`}`
-      : `<p>${opened.app.description}. Этот раздел готов к игровому действию.</p>`;
+      : view === 'bills'
+        ? `<p><strong>Наличные: ${campaign.cash.toLocaleString('ru-RU')} ₽</strong><br>Аренда: ${campaign.rent.amount.toLocaleString('ru-RU')} ₽ · 1 октября<br>Долг: ${campaign.rent.debt.toLocaleString('ru-RU')} ₽ · статус: ${campaign.rent.status === 'due' ? 'к оплате' : 'ещё не наступил'}.</p><p>При просрочке все доходы будут уходить в счёт общего долга.</p>`
+        : `<p>${opened.app.description}. Этот раздел готов к игровому действию.</p>`;
   desktopContent.innerHTML = `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>${opened.app.label}</h2>${body}<div id="desktop-page-actions"></div></section>`;
 }
 
 function openDesktop() {
   desktopOpen = true;
   desktopScreen.classList.remove('is-hidden');
-  renderDesktop();
+  desktopScreen.classList.add('is-booting');
+  desktopContent.innerHTML = '<section class="desktop-boot"><b>КАЛИКФОРНИЯ OS</b><span>Включение рабочего стола…</span><i><em></em></i></section>';
+  clearTimeout(desktopBootTimer);
+  desktopBootTimer = setTimeout(() => {
+    if (!desktopOpen) return;
+    desktopScreen.classList.remove('is-booting');
+    renderDesktop();
+  }, 460);
 }
 
 function closeDesktop() {
+  clearTimeout(desktopBootTimer);
   desktopOpen = false;
   desktopScreen.classList.add('is-hidden');
+  desktopScreen.classList.remove('is-booting');
   if (actor.mode === 'typing') beginStandingSequence();
+}
+
+function startDesktopAction(actionId, complete) {
+  const action = getDesktopAction(actionId);
+  if (!action) return;
+  clearTimeout(desktopBootTimer);
+  desktopOpen = false;
+  desktopScreen.classList.add('is-hidden');
+  actor.computerTask = { ...action, complete };
+  actor.actionElapsed = 0;
+  actor.bubble = null;
 }
 
 desktopContent.addEventListener('click', (event) => {
@@ -233,6 +265,10 @@ desktopContent.addEventListener('click', (event) => {
     }
     if (battleButton.dataset.battle === 'track') {
       renderDesktop('track');
+      return;
+    }
+    if (battleButton.dataset.battle === 'research') {
+      startDesktopAction('research-archive', () => researchTournament(campaign));
       return;
     }
     const result = battleButton.dataset.battle === 'register'
@@ -662,6 +698,7 @@ function createCharacter(parent = scene, { x = -1.75, hoodie = colors.hoodie, pa
     interaction: null,
     pendingIntent: null,
     bubble: null,
+    computerTask: null,
   };
   actor.group.position.x = actor.state.x;
   actor.group.add(actor.model);
@@ -1181,6 +1218,25 @@ function updateAction(delta, elapsed) {
   }
 
   if (actor.mode === 'typing') {
+    if (actor.computerTask) {
+      updatePose(0, elapsed);
+      if (actor.actionElapsed >= 2.45) {
+        const task = actor.computerTask;
+        const result = task.complete();
+        campaign = result.state;
+        saveCampaign(campaign);
+        renderCampaignHud();
+        notify('РЭП-СЕТЬ', result.message);
+        actor.computerTask = null;
+        actor.actionElapsed = 0;
+        actor.bubble = { title: 'Архив изучен', message: result.message, expiresAt: performance.now() + 2600 };
+        desktopOpen = true;
+        desktopScreen.classList.remove('is-hidden');
+        desktopScreen.classList.remove('is-booting');
+        renderDesktop(task.returnView);
+      }
+      return true;
+    }
     if (!desktopOpen) openDesktop();
     updatePose(0, elapsed);
     return true;

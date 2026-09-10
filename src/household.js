@@ -7,9 +7,9 @@ function nextInventory(campaign, change) {
 export function buyFood(campaign, item) {
   if (item !== 'groceries') throw new Error('Такого продукта в MVP нет.');
   if (campaign.cash < 380) return { state: campaign, inventory: nextInventory(campaign, {}), message: 'Не хватает денег на продукты.', completed: false };
-  const result = advanceCampaign(campaign, { id: 'buy-groceries', label: 'Покупает продукты', minutes: 5, effects: { cash: -380 } });
+  const result = advanceCampaign(campaign, { id: 'buy-groceries', label: 'Ждёт доставку продуктов', minutes: 40, effects: { cash: -380 } });
   const state = { ...result.state, inventory: nextInventory(campaign, { ingredients: campaign.inventory.ingredients + 3 }) };
-  return { state, inventory: state.inventory, message: 'Продукты в холодильнике.', completed: true };
+  return { state, inventory: state.inventory, message: 'Курьер привёз продукты: они в холодильнике.', completed: true };
 }
 
 export function cookMeal(campaign) {
