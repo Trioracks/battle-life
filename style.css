@@ -41,14 +41,17 @@ body { margin: 0; min-width: 320px; min-height: 100vh; overflow: hidden; }
 .world-tooltip span { color: #d3ddd1; font-size: 11px; }
 .world-tooltip small { color: #ef9a76; font-size: 10px; line-height: 1.3; }
 .world-tooltip.is-blocked { border-color: rgba(222, 112, 76, .84); }
+.actor-bubble { position: fixed; z-index: 8; width: 184px; transform: translate(-50%, -100%); display: grid; gap: 3px; padding: 8px 10px; border: 1px solid rgba(238, 194, 86, .76); color: #f6edce; background: rgba(10, 20, 20, .93); box-shadow: 0 12px 28px rgba(0, 0, 0, .34); pointer-events: none; }
+.actor-bubble.is-hidden { display: none; }
+.actor-bubble strong { color: #efd170; font-size: 11px; }.actor-bubble span { color: #d0ddd0; font-size: 10px; }.actor-bubble i { display: block; height: 4px; overflow: hidden; border-radius: 6px; background: #263331; }.actor-bubble b { display: block; height: 100%; background: #e1ba58; }
 
 .campaign-hud {
   position: absolute;
   z-index: 4;
   top: clamp(18px, 4vw, 44px);
   right: clamp(18px, 4vw, 62px);
-  width: min(330px, calc(100vw - 36px));
-  padding: 14px 16px 13px;
+  width: min(272px, calc(100vw - 36px));
+  padding: 10px 12px 11px;
   border: 1px solid rgba(225, 207, 154, .54);
   border-radius: 4px;
   background: rgba(13, 22, 23, .82);
@@ -64,12 +67,12 @@ body { margin: 0; min-width: 320px; min-height: 100vh; overflow: hidden; }
   letter-spacing: .14em;
   text-transform: uppercase;
 }
-.campaign-hud__time strong { font-size: 17px; letter-spacing: .04em; }
+.campaign-hud__time strong { font-size: 15px; letter-spacing: .04em; }
 .campaign-hud__time span:last-child { color: #b8c4b7; font-size: 11px; }
-.campaign-hud__cash { margin-top: 11px; grid-template-columns: 1fr auto; align-items: end; }
-.campaign-hud__cash strong { color: #f2d26e; font-size: 19px; }
-.needs { display: grid; gap: 8px; margin-top: 13px; }
-.need { display: grid; grid-template-columns: 76px 1fr; gap: 8px; align-items: center; }
+.campaign-hud__cash { margin-top: 8px; grid-template-columns: 1fr auto; align-items: end; }
+.campaign-hud__cash strong { color: #f2d26e; font-size: 17px; }
+.needs { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 11px; margin-top: 10px; }
+.need { display: grid; grid-template-columns: 1fr; gap: 4px; align-items: center; }
 .need i { display: block; height: 6px; overflow: hidden; border-radius: 9px; background: #273231; }
 .need b { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #d45a42, #d9b54b 52%, #74ae83); transition: width .28s ease; }
 

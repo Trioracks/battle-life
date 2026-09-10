@@ -16,7 +16,9 @@ test('cooking creates stored portions and washing dishes takes fifteen minutes',
 
   assert.equal(cooked.state.inventory.cookedMeals, 2);
   assert.equal(cooked.state.inventory.dirtyDishes, 1);
+  assert.deepEqual(cooked.inventory, cooked.state.inventory);
   assert.equal(washed.state.inventory.dirtyDishes, 0);
+  assert.deepEqual(washed.inventory, washed.state.inventory);
   assert.equal(washed.state.clock.minutes, 1190);
 });
 

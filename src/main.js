@@ -3,6 +3,7 @@ import { easeInOut, keyboardArmPose, seatPose, turnAngle } from './animation-tim
 import { GESTURE_STYLES, PERFORMANCE_SECONDS, performanceStyleAt, shuffledStyles } from './battle-director.js';
 import { clickIntent } from './click-intent.js';
 import { stepCharacter } from './character-motion.js';
+import { presentActionProgress } from './action-progress.js';
 import { advanceCampaign, createCampaign, loadCampaign, saveCampaign } from './game-state.js';
 import { createRapper, cycleLookPart, LOOK_PART_LABELS, lookPartAtPreviewHeight, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
 import { canStartApartmentAction, describeApartmentAction, getApartmentAction } from './apartment-actions.js';
@@ -38,6 +39,7 @@ const creatorPreviewCanvas = document.querySelector('#creator-preview');
 const creatorLookControls = document.querySelector('#creator-look-controls');
 const interactionDock = document.querySelector('#interaction-dock');
 const worldTooltip = document.querySelector('#world-tooltip');
+const actorBubble = document.querySelector('#actor-bubble');
 const desktopScreen = document.querySelector('#desktop-screen');
 const desktopContent = document.querySelector('#desktop-content');
 const desktopClose = document.querySelector('#desktop-close');
@@ -64,8 +66,8 @@ function formatGameClock(clock) {
   return `${clock.day} ${months[clock.month - 1]} · ${String(Math.floor(clock.minutes / 60)).padStart(2, '0')}:${String(clock.minutes % 60).padStart(2, '0')}`;
 }
 
-function renderCampaignHud() {
-  campaignClock.textContent = formatGameClock(campaign.clock).toUpperCase();
+function renderCampaignHud(displayClock = campaign.clock) {
+  campaignClock.textContent = formatGameClock(displayClock).toUpperCase();
   campaignCash.textContent = `${campaign.cash.toLocaleString('ru-RU')} ₽`;
   campaignRent.textContent = campaign.rent.status === 'due'
     ? `Аренда к оплате · ${campaign.rent.amount.toLocaleString('ru-RU')} ₽`
@@ -92,6 +94,48 @@ function showWorldTooltip(actionId, event) {
   worldTooltip.style.left = `${Math.min(window.innerWidth - 242, Math.max(14, event.clientX + 16))}px`;
   worldTooltip.style.top = `${Math.min(window.innerHeight - 98, Math.max(14, event.clientY - 12))}px`;
   worldTooltip.classList.remove('is-hidden');
+}
+
+function actionMinutesForProgress(action) {
+  if (action.id === 'bed') return 7 * 60;
+  if (action.id === 'fridge') return 15;
+  return action.minutes;
+}
+
+function actionVisualDuration(action) {
+  return actionMinutesForProgress(action) >= 30 ? 2.8 : 1.25;
+}
+
+function renderActorBubble(content) {
+  if (!content) {
+    actorBubble.classList.add('is-hidden');
+    return;
+  }
+  const position = actor.group.getWorldPosition(new THREE.Vector3());
+  position.y += 3.12;
+  position.project(camera);
+  actorBubble.style.left = `${(position.x * .5 + .5) * window.innerWidth}px`;
+  actorBubble.style.top = `${(-position.y * .5 + .5) * window.innerHeight}px`;
+  actorBubble.innerHTML = content;
+  actorBubble.classList.remove('is-hidden');
+}
+
+function updateActorBubble() {
+  if (gameMode !== 'apartment') return renderActorBubble(null);
+  if (actor.mode === 'apartmentAction' && actor.activeApartmentAction) {
+    const action = actor.activeApartmentAction;
+    const progress = presentActionProgress({ ...action, minutes: actionMinutesForProgress(action) }, actor.actionElapsed, actionVisualDuration(action));
+    if (progress.observed) {
+      const previewMinutes = Math.max(1, Math.round(progress.minutes * progress.ratio));
+      const preview = advanceCampaign(campaign, { id: 'preview', label: action.label, minutes: previewMinutes }).state;
+      renderCampaignHud(preview.clock);
+      return renderActorBubble(`<strong>${progress.label}</strong><span>${progress.percent}% · время идёт</span><i><b style="width:${progress.percent}%"></b></i>`);
+    }
+    return renderActorBubble(`<strong>${progress.label}</strong><span>${action.tooltip}</span>`);
+  }
+  if (actor.bubble?.expiresAt > performance.now()) return renderActorBubble(`<strong>${actor.bubble.title}</strong><span>${actor.bubble.message}</span>`);
+  actor.bubble = null;
+  return renderActorBubble(null);
 }
 
 function renderPhone() {
@@ -617,6 +661,7 @@ function createCharacter(parent = scene, { x = -1.75, hoodie = colors.hoodie, pa
     destinationX: null,
     interaction: null,
     pendingIntent: null,
+    bubble: null,
   };
   actor.group.position.x = actor.state.x;
   actor.group.add(actor.model);
@@ -889,7 +934,8 @@ function updatePose(delta, elapsed) {
     return;
   }
 
-  actor.model.position.y = 0;
+  actor.model.position.set(0, 0, 0);
+  actor.model.rotation.z = 0;
   if (!actor.state.moving) {
     const breath = Math.sin(elapsed * 2.4) * .035;
     actor.model.position.y = breath;
@@ -979,6 +1025,7 @@ function beginApartmentAction(actionId) {
     renderInteractionDock('<strong>Дверь</strong><span class="interaction-dock__hint">Карта Каликфорнии откроется после короткой анимации.</span>');
   }
   actor.activeApartmentAction = action;
+  actor.bubble = null;
   actor.mode = 'apartmentAction';
   actor.actionElapsed = 0;
   actor.state = { ...actor.state, moving: false };
@@ -998,6 +1045,7 @@ function completeApartmentAction(action) {
     saveCampaign(campaign);
     renderCampaignHud();
     renderInteractionDock(`<strong>${action.label}</strong><span class="interaction-dock__hint">${householdResult.message}</span>`);
+    actor.bubble = { title: action.label, message: householdResult.message, expiresAt: performance.now() + 2600 };
     return;
   }
   if (action.minutes > 0) {
@@ -1012,6 +1060,7 @@ function completeApartmentAction(action) {
   }
   const suffix = action.minutes ? ` · ${action.minutes} мин` : '';
   renderInteractionDock(`<strong>${action.label}</strong><span class="interaction-dock__hint">Анимация завершена${suffix}</span>`);
+  actor.bubble = { title: action.label, message: `Готово${suffix}`, expiresAt: performance.now() + 2600 };
   if (action.id === 'door') openMap();
 }
 
@@ -1025,8 +1074,10 @@ function applyApartmentActionPose(action, elapsed) {
   actor.backArm.lowerPivot.rotation.z = 0;
   const beat = Math.sin(elapsed * 7);
   if (action.animation === 'sleep') {
-    applySeatPose(1, elapsed);
-    actor.model.rotation.z = -.38;
+    applySeatPose(.22, elapsed);
+    actor.model.position.set(.04, .38, .24);
+    actor.model.rotation.z = -Math.PI / 2;
+    actor.shadow.scale.set(1.58, .62, 1);
     return;
   }
   if (action.animation === 'record') {
@@ -1136,7 +1187,7 @@ function updateAction(delta, elapsed) {
   }
   if (actor.mode === 'apartmentAction') {
     applyApartmentActionPose(actor.activeApartmentAction, elapsed);
-    if (actor.actionElapsed >= 1.7) {
+    if (actor.actionElapsed >= actionVisualDuration(actor.activeApartmentAction)) {
       const action = actor.activeApartmentAction;
       actor.activeApartmentAction = null;
       actor.mode = 'walking';
@@ -1374,6 +1425,7 @@ function render() {
   const delta = Math.min(clock.getDelta(), .05);
   if (gameMode === 'apartment') updateApartment(delta, clock.elapsedTime);
   else updateBattle(delta, clock.elapsedTime);
+  updateActorBubble();
   if (!creatorModal.classList.contains('is-hidden')) {
     creatorPreviewActor.model.rotation.y = -.28 + Math.sin(clock.elapsedTime * .65) * .08;
     creatorPreviewRenderer.render(creatorPreviewScene, creatorPreviewCamera);
