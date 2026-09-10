@@ -53,11 +53,11 @@
           </div>
           <div class="creator-split">
             <section><div class="creator-section-title"><span>Стартовые навыки</span><strong id="creator-points">10 очков</strong></div><div id="creator-stats" class="creator-stats"></div></section>
-            <section class="creator-look"><div class="creator-section-title"><span>Внешность</span></div>
-              <label>Волосы<select name="hair"><option value="bald">Лысый</option><option value="crop">Короткие</option><option value="mohawk">Ирокез</option></select></label>
-              <label>Верх<select name="top"><option value="hoodie">Худи</option><option value="bomber">Бомбер</option><option value="jacket">Куртка</option></select></label>
-              <label>Штаны<select name="pants"><option value="cargo">Карго</option><option value="jeans">Джинсы</option></select></label>
-              <label>Кепка<select name="cap"><option value="none">Без кепки</option><option value="red">Красная</option><option value="teal">Бирюзовая</option></select></label>
+            <section class="creator-look"><div class="creator-section-title"><span>Внешность MC</span><small>Нажми на зону модели</small></div>
+              <div class="creator-avatar-frame">
+                <canvas id="creator-preview" aria-label="Предпросмотр внешности персонажа"></canvas>
+                <div id="creator-look-controls" class="creator-look-controls" aria-label="Настройка внешности"></div>
+              </div>
             </section>
           </div>
           <p id="creator-error" class="creator-error" role="alert"></p>
