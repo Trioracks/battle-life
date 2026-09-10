@@ -53,6 +53,15 @@ export function createCampaign() {
   };
 }
 
+export function getInventorySummary(campaign) {
+  const inventory = campaign?.inventory ?? {};
+  return {
+    ingredients: Number(inventory.ingredients) || 0,
+    cookedMeals: Number(inventory.cookedMeals) || 0,
+    dirtyDishes: Number(inventory.dirtyDishes) || 0,
+  };
+}
+
 export function advanceCampaign(campaign, action) {
   if (!Number.isFinite(action?.minutes) || action.minutes <= 0) {
     throw new Error('A confirmed action needs a positive duration.');

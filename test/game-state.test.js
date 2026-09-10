@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { advanceCampaign, createCampaign, loadCampaign, saveCampaign } from '../src/game-state.js';
+import { advanceCampaign, createCampaign, getInventorySummary, loadCampaign, saveCampaign } from '../src/game-state.js';
 
 test('new campaign starts after work on 17 September with cash and four visible needs', () => {
   const campaign = createCampaign();
@@ -59,4 +59,15 @@ test('saved campaigns round-trip through the supplied storage without exposing i
   saveCampaign(campaign, storage);
 
   assert.deepEqual(loadCampaign(storage), campaign);
+});
+
+test('inventory summary exposes only the home food state without mutating campaign', () => {
+  const campaign = createCampaign();
+  campaign.inventory = { ingredients: 4, cookedMeals: 2, dirtyDishes: 1 };
+
+  const summary = getInventorySummary(campaign);
+
+  assert.deepEqual(summary, { ingredients: 4, cookedMeals: 2, dirtyDishes: 1 });
+  assert.notEqual(summary, campaign.inventory);
+  assert.deepEqual(campaign.inventory, { ingredients: 4, cookedMeals: 2, dirtyDishes: 1 });
 });
