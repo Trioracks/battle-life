@@ -31,5 +31,5 @@ test('first four days can create a rapper, survive, work and submit a Makarewitc
   assert.equal(submitted.completed, true);
   assert.equal(submitted.state.tournament.submitted, true);
   assert.equal(submitted.state.track.stage, 'submitted');
-  assert.deepEqual(submitted.state.clock, { year: 2026, month: 9, day: 18, minutes: 895 });
+  assert.deepEqual(submitted.state.clock, { year: 2026, month: 9, day: 18, minutes: 930 });
 });

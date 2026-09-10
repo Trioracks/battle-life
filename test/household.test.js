@@ -8,6 +8,8 @@ test('buying groceries spends cash and creates ingredients for cooking', () => {
 
   assert.equal(result.state.cash, 4620);
   assert.equal(result.state.inventory.ingredients, 5);
+  assert.equal(result.state.clock.minutes, 1180);
+  assert.match(result.message, /холодильник/i);
 });
 
 test('cooking creates stored portions and washing dishes takes fifteen minutes', () => {

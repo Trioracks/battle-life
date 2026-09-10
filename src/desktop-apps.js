@@ -1,5 +1,5 @@
 const apps = Object.freeze({
-  battles: { id: 'battles', label: 'BattleNet', icon: '◈', view: 'battles', description: 'Баттлы и архив' },
+  battles: { id: 'battles', label: 'Рэп-Сеть', icon: '◈', view: 'battles', description: 'Баттлы и архив' },
   jobs: { id: 'jobs', label: 'Вакансии', icon: '▦', view: 'jobs', description: 'Работа и смены' },
   market: { id: 'market', label: 'Маркет', icon: '▣', view: 'market', description: 'Продукты и техника' },
   bills: { id: 'bills', label: 'Счета', icon: '₽', view: 'bills', description: 'Аренда и платежи' },
@@ -12,6 +12,14 @@ export function getDesktopApp(id) {
 export function openDesktopApp(id) {
   const app = getDesktopApp(id);
   return app ? { view: app.view, app } : null;
+}
+
+const desktopActions = Object.freeze({
+  'research-archive': { id: 'research-archive', label: 'Изучает архив MAKAREWITCH VI', minutes: 60, returnView: 'battles' },
+});
+
+export function getDesktopAction(id) {
+  return desktopActions[id] ? { ...desktopActions[id] } : null;
 }
 
 export const desktopApps = Object.freeze(Object.values(apps));
