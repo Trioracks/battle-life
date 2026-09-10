@@ -74,6 +74,15 @@ export function recordTrack(campaign, take) {
   return update(campaign, { id: 'record-track', label: 'Записывает вокал', minutes: take === 'takes' ? 150 : 120, effects: { energy: -8, leisure: -1 } }, track);
 }
 
+export function recordAtMicrophone(campaign, take) {
+  const result = recordTrack(campaign, take);
+  if (!result.completed) return result;
+  return {
+    ...result,
+    state: { ...result.state, track: { ...result.state.track, recordedAt: 'home-microphone' } },
+  };
+}
+
 export function mixTrack(campaign) {
   if (campaign.track?.stage !== 'recorded') return { state: campaign, completed: false, message: 'Сначала запиши вокал.' };
   const track = { ...campaign.track, stage: 'mixed', quality: Math.round((campaign.track.quality + .8) * 10) / 10 };

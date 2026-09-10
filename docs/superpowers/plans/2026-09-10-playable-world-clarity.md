@@ -10,6 +10,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-10-playable-world-clarity-design.md`
 
+**Status (10 September 2026):** Tasks 1–8 completed, verified and pushed to `master`. The individual checklist items remain as the implementation audit trail.
+
 ## Global Constraints
 
 - Work only in `D:\Project\Battle` and keep third-party caches on `D:`.

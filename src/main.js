@@ -14,7 +14,7 @@ import { districts, getDistrictLocations, startLocationAction, travelTo } from '
 import { completeShift, getJob, jobIds } from './jobs.js';
 import { buyFood, cookMeal, eatMeal, sleep, washDishes } from './household.js';
 import { MAKAREWITCH_VI, registerForTournament, researchTournament } from './tournament.js';
-import { chooseBeat, getTrackStepStatus, masterTrack, mixTrack, polishDraft, recordTrack, startDraft, submitTrack } from './track-project.js';
+import { chooseBeat, getTrackStepStatus, masterTrack, mixTrack, polishDraft, recordAtMicrophone, startDraft, submitTrack } from './track-project.js';
 import { scoreSelection } from './selection.js';
 
 const canvas = document.querySelector('#game');
@@ -1107,7 +1107,7 @@ function beginApartmentAction(actionId) {
 
 function completeApartmentAction(action) {
   const trackRecording = action.id === 'microphone' && campaign.track?.stage === 'beat-ready'
-    ? recordTrack(campaign, 'takes')
+    ? recordAtMicrophone(campaign, 'takes')
     : null;
   if (trackRecording) {
     campaign = trackRecording.state;
