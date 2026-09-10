@@ -4,7 +4,7 @@ import { GESTURE_STYLES, PERFORMANCE_SECONDS, performanceStyleAt, shuffledStyles
 import { clickIntent } from './click-intent.js';
 import { stepCharacter } from './character-motion.js';
 import { advanceCampaign, createCampaign, loadCampaign, saveCampaign } from './game-state.js';
-import { createRapper, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
+import { createRapper, cycleLookPart, LOOK_PART_LABELS, lookPartAtPreviewHeight, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
 import { canStartApartmentAction, getApartmentAction } from './apartment-actions.js';
 import { playSoundCue } from './sound-cues.js';
 import { desktopApps, openDesktopApp } from './desktop-apps.js';
@@ -34,6 +34,8 @@ const creatorForm = document.querySelector('#creator-form');
 const creatorStats = document.querySelector('#creator-stats');
 const creatorPoints = document.querySelector('#creator-points');
 const creatorError = document.querySelector('#creator-error');
+const creatorPreviewCanvas = document.querySelector('#creator-preview');
+const creatorLookControls = document.querySelector('#creator-look-controls');
 const interactionDock = document.querySelector('#interaction-dock');
 const desktopScreen = document.querySelector('#desktop-screen');
 const desktopContent = document.querySelector('#desktop-content');
@@ -45,6 +47,7 @@ const mapClose = document.querySelector('#map-close');
 let campaign = loadCampaign() ?? createCampaign();
 saveCampaign(campaign);
 let creatorAllocations = Object.fromEntries(STAT_KEYS.map((key) => [key, 0]));
+let creatorLook = campaign.player?.look ?? { hair: 'bald', face: 'clean', top: 'hoodie', pants: 'cargo' };
 let audioContext = null;
 let desktopOpen = false;
 const room = { left: -5.15, right: 5.15 };
@@ -239,10 +242,22 @@ function renderCreator() {
     return `<div class="creator-stat"><span>${statLabels[key]}</span><strong>${value}</strong><span><button class="creator-control" type="button" data-stat="${key}" data-delta="-1" ${allocation === 0 ? 'disabled' : ''}>−</button><button class="creator-control" type="button" data-stat="${key}" data-delta="1" ${allocation === 4 || total === 10 ? 'disabled' : ''}>+</button></span></div>`;
   }).join('');
   creatorError.textContent = validation.valid ? '' : validation.message;
+  creatorLookControls.innerHTML = Object.entries(LOOK_PART_LABELS).map(([part, label]) => `<div class="creator-zone creator-zone--${part}" data-look-zone="${part}"><button type="button" aria-label="Предыдущий вариант: ${label}" data-look-part="${part}" data-direction="-1">‹</button><span>${label}<strong>${lookValueLabel(part, creatorLook[part])}</strong></span><button type="button" aria-label="Следующий вариант: ${label}" data-look-part="${part}" data-direction="1">›</button></div>`).join('');
+  if (creatorPreviewActor) applyAvatarLook(creatorPreviewActor, creatorLook);
 }
 
 function selectedLook() {
-  return Object.fromEntries(['hair', 'top', 'pants', 'cap'].map((name) => [name, creatorForm.elements[name].value]));
+  return { ...creatorLook };
+}
+
+function lookValueLabel(part, value) {
+  const labels = {
+    hair: { bald: 'Лысый', crop: 'Короткие', mohawk: 'Ирокез' },
+    face: { clean: 'Без бороды', mustache: 'Усы', beard: 'Борода' },
+    top: { hoodie: 'Худи', bomber: 'Бомбер', jacket: 'Куртка' },
+    pants: { cargo: 'Карго', jeans: 'Джинсы', shorts: 'Шорты' },
+  };
+  return labels[part]?.[value] ?? value;
 }
 
 creatorStats.addEventListener('click', (event) => {
@@ -257,8 +272,22 @@ creatorStats.addEventListener('click', (event) => {
   renderCreator();
 });
 
-creatorForm.addEventListener('change', () => {
-  if (campaign.player) applyAvatarLook(actor, selectedLook());
+creatorLookControls.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-look-part]');
+  const zone = event.target.closest('[data-look-zone]');
+  const part = button?.dataset.lookPart ?? zone?.dataset.lookZone;
+  if (!part) return;
+  creatorLook = cycleLookPart(creatorLook, part, Number(button?.dataset.direction ?? 1));
+  applyAvatarLook(actor, creatorLook);
+  renderCreator();
+});
+
+creatorPreviewCanvas.addEventListener('click', (event) => {
+  const rect = creatorPreviewCanvas.getBoundingClientRect();
+  const part = lookPartAtPreviewHeight((event.clientY - rect.top) / rect.height);
+  creatorLook = cycleLookPart(creatorLook, part, 1);
+  applyAvatarLook(actor, creatorLook);
+  renderCreator();
 });
 
 creatorForm.addEventListener('submit', (event) => {
@@ -553,7 +582,12 @@ function createCharacter(parent = scene, { x = -1.75, hoodie = colors.hoodie, pa
   box(actor.model, [.25, .18, .2], colors.skin, [.42, 2.32, 0]);
   box(actor.model, [.53, .57, .48], colors.skin, [0, 2.32, 0]);
   const hair = box(actor.model, [.55, .09, .51], 0x17151b, [0, 2.64, 0]);
-  const capMesh = box(actor.model, [.32, .06, .62], cap, [.16, 2.62, 0]);
+  const faceHair = new THREE.Group();
+  actor.model.add(faceHair);
+  const mustache = box(faceHair, [.26, .055, .05], 0x1b1718, [0, 2.31, .27]);
+  const beard = box(faceHair, [.37, .2, .055], 0x1b1718, [0, 2.13, .27]);
+  mustache.visible = false;
+  beard.visible = false;
   box(actor.model, [.11, .07, .34], 0x171c20, [.28, 2.38, .25]);
 
   actor.backArm = makeLimb(actor.model, 'backArm', -.31, 0x1f2930, .62, .52);
@@ -571,22 +605,24 @@ function createCharacter(parent = scene, { x = -1.75, hoodie = colors.hoodie, pa
   box(actor.frontLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
 
   actor.model.rotation.y = 0;
-  actor.lookParts = { torso, hair, cap: capMesh, frontLeg: actor.frontLeg.upper, backLeg: actor.backLeg.upper };
+  actor.lookParts = { torso, hair, mustache, beard, frontLeg: actor.frontLeg.upper, backLeg: actor.backLeg.upper, frontArm: actor.frontArm.upper, backArm: actor.backArm.upper };
   return actor;
 }
 
 function applyAvatarLook(target, look = {}) {
   const topColors = { hoodie: colors.hoodie, bomber: 0x5d4035, jacket: 0x2e5361 };
-  const pantsColors = { cargo: colors.pants, jeans: 0x303d63 };
-  const capColors = { red: colors.red, teal: colors.tealLight };
-  target.lookParts.torso.material.color.setHex(topColors[look.top] ?? topColors.hoodie);
+  const pantsColors = { cargo: colors.pants, jeans: 0x303d63, shorts: 0x77715b };
+  const topColor = topColors[look.top] ?? topColors.hoodie;
+  target.lookParts.torso.material.color.setHex(topColor);
+  target.lookParts.frontArm.material.color.setHex(topColor);
+  target.lookParts.backArm.material.color.setHex(topColor);
   target.lookParts.frontLeg.material.color.setHex(pantsColors[look.pants] ?? pantsColors.cargo);
   target.lookParts.backLeg.material.color.setHex(pantsColors[look.pants] ?? pantsColors.cargo);
   target.lookParts.hair.visible = look.hair !== 'bald';
   target.lookParts.hair.scale.set(1, look.hair === 'mohawk' ? 2.2 : 1, look.hair === 'mohawk' ? .38 : 1);
   target.lookParts.hair.position.y = look.hair === 'mohawk' ? 2.72 : 2.64;
-  target.lookParts.cap.visible = look.cap && look.cap !== 'none';
-  target.lookParts.cap.material.color.setHex(capColors[look.cap] ?? capColors.red);
+  target.lookParts.mustache.visible = look.face === 'mustache';
+  target.lookParts.beard.visible = look.face === 'beard';
 }
 
 function createEggOpponent(parent, x = 3.75) {
@@ -748,6 +784,19 @@ const { roomGroup, computerHitArea, computerHighlight, actionHitAreas } = addRoo
 const interactiveObjects = actionHitAreas;
 const actor = createCharacter();
 applyAvatarLook(actor, campaign.player?.look);
+const creatorPreviewRenderer = new THREE.WebGLRenderer({ canvas: creatorPreviewCanvas, antialias: true, alpha: true });
+creatorPreviewRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+const creatorPreviewScene = new THREE.Scene();
+const creatorPreviewCamera = new THREE.OrthographicCamera(-2.1, 2.1, 2.7, -1.2, .1, 20);
+creatorPreviewCamera.position.set(0, 1.8, 8);
+creatorPreviewCamera.lookAt(0, 1.4, 0);
+creatorPreviewScene.add(new THREE.HemisphereLight(0xa7d0c9, 0x1c201c, 2.1));
+const creatorPreviewLight = new THREE.DirectionalLight(0xf2d9ab, 2.2);
+creatorPreviewLight.position.set(-2, 5, 4);
+creatorPreviewScene.add(creatorPreviewLight);
+const creatorPreviewActor = createCharacter(creatorPreviewScene, { x: 0 });
+creatorPreviewActor.model.rotation.y = -.28;
+applyAvatarLook(creatorPreviewActor, creatorLook);
 const battle = createBattleScene();
 let gameMode = 'apartment';
 
@@ -1273,8 +1322,18 @@ function render() {
   const delta = Math.min(clock.getDelta(), .05);
   if (gameMode === 'apartment') updateApartment(delta, clock.elapsedTime);
   else updateBattle(delta, clock.elapsedTime);
+  if (!creatorModal.classList.contains('is-hidden')) {
+    creatorPreviewActor.model.rotation.y = -.28 + Math.sin(clock.elapsedTime * .65) * .08;
+    creatorPreviewRenderer.render(creatorPreviewScene, creatorPreviewCamera);
+  }
   renderer.render(scene, camera);
   requestAnimationFrame(render);
+}
+
+function resizeCreatorPreview() {
+  const width = Math.max(1, creatorPreviewCanvas.clientWidth);
+  const height = Math.max(1, creatorPreviewCanvas.clientHeight);
+  creatorPreviewRenderer.setSize(width, height, false);
 }
 
 function resize() {
@@ -1288,6 +1347,7 @@ function resize() {
   camera.bottom = -viewHeight / 2;
   camera.updateProjectionMatrix();
   renderer.setSize(width, height, false);
+  resizeCreatorPreview();
 }
 
 window.addEventListener('resize', resize);

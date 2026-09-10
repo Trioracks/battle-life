@@ -2,6 +2,20 @@ export const STAT_KEYS = Object.freeze([
   'intelligence', 'writing', 'musicality', 'flow', 'beatmaking', 'sound', 'charisma', 'confidence', 'resilience',
 ]);
 
+export const LOOK_OPTIONS = Object.freeze({
+  hair: Object.freeze(['bald', 'crop', 'mohawk']),
+  face: Object.freeze(['clean', 'beard', 'mustache']),
+  top: Object.freeze(['hoodie', 'bomber', 'jacket']),
+  pants: Object.freeze(['cargo', 'jeans', 'shorts']),
+});
+
+export const LOOK_PART_LABELS = Object.freeze({
+  hair: 'Волосы',
+  face: 'Лицо',
+  top: 'Верх',
+  pants: 'Низ',
+});
+
 const labels = Object.freeze({
   intelligence: 'Интеллект',
   writing: 'Письмо',
@@ -16,6 +30,32 @@ const labels = Object.freeze({
 
 function allocationValue(allocations, key) {
   return Number.isInteger(allocations?.[key]) ? allocations[key] : 0;
+}
+
+function normalLookPart(part, value) {
+  const options = LOOK_OPTIONS[part];
+  return options?.includes(value) ? value : options?.[0];
+}
+
+export function normalizeLook(look = {}) {
+  return Object.fromEntries(Object.keys(LOOK_OPTIONS).map((part) => [part, normalLookPart(part, look[part])]));
+}
+
+export function cycleLookPart(look, part, direction) {
+  const options = LOOK_OPTIONS[part];
+  if (!options) throw new Error('Неизвестная часть внешности.');
+  const normalized = normalizeLook(look);
+  const current = options.indexOf(normalized[part]);
+  const step = Number(direction) < 0 ? -1 : 1;
+  return { ...normalized, [part]: options[(current + step + options.length) % options.length] };
+}
+
+export function lookPartAtPreviewHeight(relativeY) {
+  const y = Math.max(0, Math.min(1, Number(relativeY) || 0));
+  if (y < .33) return 'hair';
+  if (y < .51) return 'face';
+  if (y < .73) return 'top';
+  return 'pants';
 }
 
 export function validateAllocations(allocations) {
@@ -40,12 +80,7 @@ export function createRapper({ name, nickname, allocations, look }) {
     name: name.trim(),
     nickname: nickname.trim(),
     skills: Object.fromEntries(STAT_KEYS.map((key) => [key, 10 + allocationValue(allocations, key) * 10])),
-    look: {
-      hair: look?.hair ?? 'bald',
-      top: look?.top ?? 'hoodie',
-      pants: look?.pants ?? 'cargo',
-      cap: look?.cap ?? 'none',
-    },
+    look: normalizeLook(look),
   };
 }
 

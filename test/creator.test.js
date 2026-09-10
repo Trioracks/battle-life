@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createRapper, validateAllocations } from '../src/creator.js';
+import { createRapper, cycleLookPart, lookPartAtPreviewHeight, validateAllocations } from '../src/creator.js';
 
 test('creator turns ten allocated points into visible 10–50 skills', () => {
   const rapper = createRapper({
@@ -17,14 +17,31 @@ test('creator turns ten allocated points into visible 10–50 skills', () => {
       confidence: 1,
       resilience: 0,
     },
-    look: { hair: 'mohawk', top: 'bomber', pants: 'jeans', cap: 'teal' },
+    look: { hair: 'mohawk', face: 'mustache', top: 'bomber', pants: 'jeans', cap: 'teal' },
   });
 
   assert.equal(rapper.name, 'Миша');
   assert.equal(rapper.nickname, 'Ночной Маяк');
   assert.equal(rapper.skills.intelligence, 30);
   assert.equal(rapper.skills.resilience, 10);
-  assert.deepEqual(rapper.look, { hair: 'mohawk', top: 'bomber', pants: 'jeans', cap: 'teal' });
+  assert.deepEqual(rapper.look, { hair: 'mohawk', face: 'mustache', top: 'bomber', pants: 'jeans' });
+});
+
+test('creator cycles body-zone appearance without adding a cap back into saved look', () => {
+  const base = { hair: 'bald', face: 'clean', top: 'hoodie', pants: 'cargo' };
+
+  assert.deepEqual(cycleLookPart(base, 'hair', 1), { ...base, hair: 'crop' });
+  assert.deepEqual(cycleLookPart(base, 'face', -1), { ...base, face: 'mustache' });
+  assert.deepEqual(cycleLookPart(base, 'top', -1), { ...base, top: 'jacket' });
+  assert.deepEqual(cycleLookPart(base, 'pants', 1), { ...base, pants: 'jeans' });
+  assert.equal(Object.hasOwn(cycleLookPart({ ...base, cap: 'red' }, 'hair', 1), 'cap'), false);
+});
+
+test('creator maps a click on the preview body to the closest appearance zone', () => {
+  assert.equal(lookPartAtPreviewHeight(.2), 'hair');
+  assert.equal(lookPartAtPreviewHeight(.42), 'face');
+  assert.equal(lookPartAtPreviewHeight(.61), 'top');
+  assert.equal(lookPartAtPreviewHeight(.86), 'pants');
 });
 
 test('creator refuses an allocation above the 50-point per-stat ceiling', () => {
