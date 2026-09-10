@@ -3,15 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Battle Life — visual spike</title>
+    <title>Battle Life — Каликфорния</title>
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <main class="game-shell">
       <canvas id="game" aria-label="3D apartment visual prototype"></canvas>
       <section class="hud hud--top" aria-label="Game status">
-        <p class="eyebrow">BATTLE LIFE / VISUAL SPIKE 01</p>
-        <h1 id="scene-title">КВАРТИРА · 02:17</h1>
+        <p class="eyebrow">BATTLE LIFE / КАЛИКФОРНИЯ</p>
+        <h1 id="scene-title">КВАРТИРА · 17 СЕНТЯБРЯ</h1>
+      </section>
+      <section class="campaign-hud" aria-label="Состояние кампании">
+        <div class="campaign-hud__time">
+          <span class="campaign-hud__label">СЕЙЧАС</span>
+          <strong id="campaign-clock">17 СЕН · 19:00</strong>
+          <span id="campaign-rent">Аренда 3 500 ₽ · 1 окт</span>
+        </div>
+        <div class="campaign-hud__cash"><span>НАЛИЧНЫЕ</span><strong id="campaign-cash">5 000 ₽</strong></div>
+        <div class="needs" aria-label="Потребности">
+          <div class="need"><span>Бодрость</span><i><b id="need-energy"></b></i></div>
+          <div class="need"><span>Сытость</span><i><b id="need-hunger"></b></i></div>
+          <div class="need"><span>Здоровье</span><i><b id="need-health"></b></i></div>
+          <div class="need"><span>Досуг</span><i><b id="need-leisure"></b></i></div>
+        </div>
       </section>
       <section class="hud hud--bottom">
         <p id="status">Кликни по комнате, чтобы отправить героя в нужную точку.</p>
