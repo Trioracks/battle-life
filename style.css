@@ -105,6 +105,17 @@ kbd {
 
 .modal { position: absolute; z-index: 8; inset: 0; display: grid; place-items: center; padding: 28px; background: rgba(5, 10, 12, .68); backdrop-filter: blur(5px); }
 .modal.is-hidden { display: none; }
+.desktop-screen { position: absolute; z-index: 7; inset: 5vh 7vw; display: grid; grid-template-rows: 38px 1fr; overflow: hidden; border: 1px solid #849a81; background: #152224; box-shadow: 0 26px 80px rgba(0, 0, 0, .64); }
+.desktop-screen.is-hidden, .phone-panel.is-hidden { display: none; }
+.desktop-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 12px; color: #e5d799; background: #293c39; font-size: 11px; font-weight: 900; letter-spacing: .13em; }
+.desktop-bar button { border: 0; color: #e8e5d3; background: transparent; cursor: pointer; font: inherit; }
+.desktop-content { overflow: auto; padding: clamp(18px, 4vw, 45px); background: radial-gradient(circle at 75% 15%, #34504b, #111c20 57%); }
+.desktop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 16px; max-width: 670px; }
+.desktop-icon { min-height: 122px; padding: 16px; border: 1px solid rgba(211, 221, 182, .3); color: #f4ead3; background: rgba(12, 25, 25, .5); text-align: left; cursor: pointer; }
+.desktop-icon b { display: block; margin-bottom: 8px; color: #e6bf59; font-size: 26px; }.desktop-icon span { display: block; font-size: 14px; font-weight: 800; }.desktop-icon small { display: block; margin-top: 4px; color: #aebbad; }
+.desktop-page { max-width: 780px; color: #eae6d6; }.desktop-page h2 { margin-top: 0; }.desktop-page p { color: #bfd0bd; line-height: 1.5; }.desktop-back { margin-bottom: 18px; border: 1px solid #bfa45d; color: #f0dea4; background: transparent; cursor: pointer; padding: 7px 10px; }
+.phone-panel { position: absolute; z-index: 9; left: 18px; bottom: 105px; width: min(260px, calc(100vw - 36px)); padding: 13px; border: 1px solid #b4c6ae; border-left: 4px solid #d9bc5c; color: #eceddc; background: rgba(18, 31, 31, .94); box-shadow: 0 12px 38px rgba(0, 0, 0, .42); animation: phone-in .28s ease-out; }.phone-panel strong { display: block; color: #e8cb6e; font-size: 11px; letter-spacing: .12em; }.phone-panel p { margin: 6px 0 0; font-size: 13px; }.phone-panel button { float: right; border: 0; color: #c3d2c2; background: transparent; cursor: pointer; }
+@keyframes phone-in { from { transform: translateX(-115%); } to { transform: translateX(0); } }
 .creator-card { width: min(820px, 100%); max-height: calc(100vh - 56px); overflow: auto; padding: clamp(20px, 4vw, 38px); border: 1px solid rgba(230, 189, 88, .55); background: linear-gradient(135deg, rgba(27, 43, 41, .98), rgba(13, 21, 24, .98)); box-shadow: 0 28px 80px rgba(0, 0, 0, .55); }
 .creator-card h2 { margin: 0; font-size: clamp(28px, 4vw, 48px); letter-spacing: -.035em; }
 .creator-card p { color: #c9d0c2; line-height: 1.45; }

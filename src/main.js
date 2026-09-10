@@ -7,6 +7,8 @@ import { advanceCampaign, createCampaign, loadCampaign, saveCampaign } from './g
 import { createRapper, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
 import { canStartApartmentAction, getApartmentAction } from './apartment-actions.js';
 import { playSoundCue } from './sound-cues.js';
+import { desktopApps, openDesktopApp } from './desktop-apps.js';
+import { dequeueNotification, enqueueNotification } from './phone-notifications.js';
 
 const canvas = document.querySelector('#game');
 const status = document.querySelector('#status');
@@ -27,10 +29,15 @@ const creatorStats = document.querySelector('#creator-stats');
 const creatorPoints = document.querySelector('#creator-points');
 const creatorError = document.querySelector('#creator-error');
 const interactionDock = document.querySelector('#interaction-dock');
+const desktopScreen = document.querySelector('#desktop-screen');
+const desktopContent = document.querySelector('#desktop-content');
+const desktopClose = document.querySelector('#desktop-close');
+const phonePanel = document.querySelector('#phone-panel');
 let campaign = loadCampaign() ?? createCampaign();
 saveCampaign(campaign);
 let creatorAllocations = Object.fromEntries(STAT_KEYS.map((key) => [key, 0]));
 let audioContext = null;
+let desktopOpen = false;
 const room = { left: -5.15, right: 5.15 };
 const deskX = 2.25;
 const exitZoneX = 4.62;
@@ -58,6 +65,57 @@ function renderCampaignHud() {
 function renderInteractionDock(content = '<span class="interaction-dock__hint">Подойди к предмету</span>') {
   interactionDock.innerHTML = content;
 }
+
+function renderPhone() {
+  const notification = campaign.notifications[0];
+  if (!notification) {
+    phonePanel.classList.add('is-hidden');
+    return;
+  }
+  phonePanel.innerHTML = `<button type="button" aria-label="Закрыть уведомление">×</button><strong>${notification.sender}</strong><p>${notification.text}</p>`;
+  phonePanel.classList.remove('is-hidden');
+}
+
+function notify(sender, text) {
+  campaign = { ...campaign, notifications: enqueueNotification(campaign.notifications, { sender, text }) };
+  saveCampaign(campaign);
+  cue('notification');
+  renderPhone();
+}
+
+function renderDesktop(view = 'home') {
+  if (view === 'home') {
+    desktopContent.innerHTML = `<div class="desktop-grid">${desktopApps.map((app) => `<button class="desktop-icon" data-desktop-app="${app.id}"><b>${app.icon}</b><span>${app.label}</span><small>${app.description}</small></button>`).join('')}</div>`;
+    return;
+  }
+  const opened = openDesktopApp(view);
+  if (!opened) return renderDesktop();
+  desktopContent.innerHTML = `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>${opened.app.label}</h2><p>${opened.app.description}. Этот раздел готов к игровому действию.</p><div id="desktop-page-actions"></div></section>`;
+}
+
+function openDesktop() {
+  desktopOpen = true;
+  desktopScreen.classList.remove('is-hidden');
+  renderDesktop();
+}
+
+function closeDesktop() {
+  desktopOpen = false;
+  desktopScreen.classList.add('is-hidden');
+  if (actor.mode === 'typing') beginStandingSequence();
+}
+
+desktopContent.addEventListener('click', (event) => {
+  const app = event.target.closest('[data-desktop-app]');
+  if (app) renderDesktop(app.dataset.desktopApp);
+  if (event.target.closest('[data-desktop-back]')) renderDesktop();
+});
+desktopClose.addEventListener('click', closeDesktop);
+phonePanel.addEventListener('click', () => {
+  campaign = { ...campaign, notifications: dequeueNotification(campaign.notifications).queue };
+  saveCampaign(campaign);
+  renderPhone();
+});
 
 function cue(id) {
   audioContext ??= new AudioContext();
@@ -850,6 +908,7 @@ function updateAction(delta, elapsed) {
   }
 
   if (actor.mode === 'typing') {
+    if (!desktopOpen) openDesktop();
     updatePose(0, elapsed);
     return true;
   }
