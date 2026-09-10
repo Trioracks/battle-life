@@ -3,11 +3,23 @@ import { easeInOut, keyboardArmPose, seatPose, turnAngle } from './animation-tim
 import { GESTURE_STYLES, PERFORMANCE_SECONDS, performanceStyleAt, shuffledStyles } from './battle-director.js';
 import { clickIntent } from './click-intent.js';
 import { stepCharacter } from './character-motion.js';
+import { createCampaign, loadCampaign, saveCampaign } from './game-state.js';
 
 const canvas = document.querySelector('#game');
 const status = document.querySelector('#status');
 const sceneTitle = document.querySelector('#scene-title');
 const controls = document.querySelector('.controls');
+const campaignClock = document.querySelector('#campaign-clock');
+const campaignCash = document.querySelector('#campaign-cash');
+const campaignRent = document.querySelector('#campaign-rent');
+const needElements = {
+  energy: document.querySelector('#need-energy'),
+  hunger: document.querySelector('#need-hunger'),
+  health: document.querySelector('#need-health'),
+  leisure: document.querySelector('#need-leisure'),
+};
+let campaign = loadCampaign() ?? createCampaign();
+saveCampaign(campaign);
 const room = { left: -5.15, right: 5.15 };
 const deskX = 2.25;
 const exitZoneX = 4.62;
@@ -15,6 +27,22 @@ const clock = new THREE.Clock();
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 const walkPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+
+function formatGameClock(clock) {
+  const months = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+  return `${clock.day} ${months[clock.month - 1]} · ${String(Math.floor(clock.minutes / 60)).padStart(2, '0')}:${String(clock.minutes % 60).padStart(2, '0')}`;
+}
+
+function renderCampaignHud() {
+  campaignClock.textContent = formatGameClock(campaign.clock).toUpperCase();
+  campaignCash.textContent = `${campaign.cash.toLocaleString('ru-RU')} ₽`;
+  campaignRent.textContent = campaign.rent.status === 'due'
+    ? `Аренда к оплате · ${campaign.rent.amount.toLocaleString('ru-RU')} ₽`
+    : `Аренда ${campaign.rent.amount.toLocaleString('ru-RU')} ₽ · 1 окт`;
+  for (const [name, element] of Object.entries(needElements)) {
+    element.style.width = `${campaign.needs[name]}%`;
+  }
+}
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -897,5 +925,6 @@ canvas.addEventListener('pointerdown', (event) => {
 });
 
 resize();
+renderCampaignHud();
 setStatus();
 render();
