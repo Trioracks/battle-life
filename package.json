@@ -1,0 +1,8 @@
+{
+  "name": "battle-rapper-visual-spike",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}
