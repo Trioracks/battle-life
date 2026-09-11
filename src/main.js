@@ -5,8 +5,10 @@ import { clickIntent } from './click-intent.js';
 import { stepCharacter } from './character-motion.js';
 import { presentActionProgress } from './action-progress.js';
 import { advanceCampaign, createCampaign, getInventorySummary, loadCampaign, saveCampaign } from './game-state.js';
-import { appearanceGeometry, createRapper, cycleLookPart, frontFacingFaceLayout, LOOK_PART_LABELS, lookPartAtPreviewHeight, normalizeLook, selectAppearancePart, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
+import { appearanceGeometry, createRapper, cycleLookPart, LOOK_PART_LABELS, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
 import { canStartApartmentAction, describeApartmentAction, getApartmentAction } from './apartment-actions.js';
+import { APARTMENT_DESK, APARTMENT_FLOOR_Y, APARTMENT_MICROPHONE, APARTMENT_ROOMS, APARTMENT_SPAWN, apartmentWalkTargets, cameraTargetX, getApartmentRoom } from './apartment-layout.js';
+import { createActionTransition, phaseAfterApproach } from './action-transitions.js';
 import { playSoundCue } from './sound-cues.js';
 import { desktopApps, getDesktopAction, openDesktopApp } from './desktop-apps.js';
 import { dequeueNotification, enqueueNotification } from './phone-notifications.js';
@@ -56,9 +58,11 @@ let creatorSelectedPart = 'hair';
 let audioContext = null;
 let desktopOpen = false;
 let desktopBootTimer = null;
-const room = { left: -5.15, right: 5.15 };
-const deskX = 3.18;
-const exitZoneX = 4.62;
+const room = { left: APARTMENT_ROOMS.kitchen.left, right: APARTMENT_ROOMS.living.right };
+const livingRoomOffset = 2.2;
+const kitchenRoomOffset = -1;
+const deskX = APARTMENT_DESK.x;
+const exitZoneX = 7.64;
 const clock = new THREE.Clock();
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
@@ -452,8 +456,8 @@ const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0x121a1b, 10, 20);
 
 const camera = new THREE.OrthographicCamera(-8, 8, 4.6, -4.6, 0.1, 30);
-camera.position.set(0, 3.35, 11.5);
-camera.lookAt(0, 2.7, 0);
+camera.position.set(0, 2.75, 11.5);
+camera.lookAt(0, 2.15, 0);
 
 const colors = {
   wall: 0x40504b,
@@ -527,16 +531,24 @@ function roundedContour(parent, width, height, position, corner = .08) {
 function addRoom() {
   const roomGroup = new THREE.Group();
   scene.add(roomGroup);
+  const livingRoom = new THREE.Group();
+  livingRoom.name = 'living-room';
+  livingRoom.position.x = livingRoomOffset;
+  roomGroup.add(livingRoom);
+  const kitchenRoom = new THREE.Group();
+  kitchenRoom.name = 'kitchen-room';
+  kitchenRoom.position.x = kitchenRoomOffset;
+  roomGroup.add(kitchenRoom);
   const actionHitAreas = [];
   const actionHighlights = {};
-  const actionHit = (id, position, size) => {
+  const actionHit = (id, parent, position, size) => {
     const hit = new THREE.Mesh(
       new THREE.BoxGeometry(...size),
       new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
     );
     hit.position.set(...position);
     hit.userData.actionId = id;
-    roomGroup.add(hit);
+    parent.add(hit);
     actionHitAreas.push(hit);
     const highlight = new THREE.Mesh(
       new THREE.BoxGeometry(...size),
@@ -545,22 +557,26 @@ function addRoom() {
     highlight.position.set(...position);
     highlight.scale.set(1.06, 1.05, 1.08);
     highlight.visible = false;
-    roomGroup.add(highlight);
+    parent.add(highlight);
     actionHighlights[id] = highlight;
     return hit;
   };
 
-  box(roomGroup, [13.2, .24, 3.1], colors.floor, [0, -.12, 0]);
-  box(roomGroup, [13.2, 6.7, .18], colors.wall, [0, 3.25, -1.35]);
-  box(roomGroup, [13.2, .13, .22], colors.floorLine, [0, .08, -1.12]);
+  box(roomGroup, [16, .24, 3.1], colors.floor, [1, -.12, 0]);
+  box(roomGroup, [16, 6.7, .18], colors.wall, [1, 3.25, -1.35]);
+  box(roomGroup, [16, .13, .22], colors.floorLine, [1, .08, -1.12]);
 
-  for (let x = -5.5; x < 6; x += 1.1) {
+  plane(kitchenRoom, [5.25, 6.3], 0x485342, [-2.6, 3.2, -1.24], { emissive: 0x182016, emissiveIntensity: .34 });
+  plane(livingRoom, [8.95, 6.3], 0x3c5053, [1.5, 3.2, -1.24], { emissive: 0x122428, emissiveIntensity: .32 });
+
+  for (let x = -6.7; x < 8.6; x += 1.1) {
     box(roomGroup, [.035, 6.2, .04], 0x738070, [x, 3.15, -1.23], { castShadow: false });
   }
 
   const windowGroup = new THREE.Group();
   windowGroup.position.set(1.25, 3.75, -1.19);
-  roomGroup.add(windowGroup);
+  windowGroup.scale.set(.64, .82, 1);
+  livingRoom.add(windowGroup);
   box(windowGroup, [3.9, 2.36, .14], colors.woodDark, [0, 0, 0]);
   plane(windowGroup, [3.54, 2.04], 0x263b4b, [0, 0, .09], { emissive: 0x132937, emissiveIntensity: .8 });
   for (const [x, width, height, y] of [[-1.35, .72, 1.15, -.46], [-.52, .63, 1.42, -.33], [.22, .83, .98, -.52], [1.14, .66, 1.58, -.25]]) {
@@ -571,25 +587,32 @@ function addRoom() {
   box(windowGroup, [3.68, .11, .1], colors.wood, [0, 0, .14]);
 
   const divider = new THREE.Group();
-  divider.position.set(-1.12, 1.55, -.72);
+  divider.name = 'kitchen-doorway';
+  divider.position.set(-.93, 1.55, -.72);
   roomGroup.add(divider);
-  box(divider, [.22, 3.1, .35], 0x34413d, [0, 0, 0]);
-  box(divider, [.31, .14, .4], colors.wood, [0, 1.48, .02]);
-  for (const y of [-.9, -.35, .2, .75]) box(divider, [.06, .08, .42], 0xb95947, [.15, y, .05]);
+  box(divider, [.16, 3.24, .35], 0x34413d, [0, 0, 0]);
+  box(divider, [1.16, .14, .4], colors.wood, [-.5, 1.54, .02]);
+  const interiorDoor = new THREE.Group();
+  interiorDoor.name = 'interior-door-panel';
+  interiorDoor.position.set(.08, 0, .02);
+  divider.add(interiorDoor);
+  box(interiorDoor, [.92, 2.48, .13], 0x6b4935, [-.46, -.28, 0]);
+  box(interiorDoor, [.72, 2.24, .04], 0x2f403a, [-.46, -.27, .09]);
+  box(interiorDoor, [.06, .06, .07], colors.amber, [-.08, -.25, .15], { emissive: 0x6c3e09, emissiveIntensity: .85 });
 
   const bedFrame = new THREE.Group();
-  bedFrame.position.set(.15, 0, -.12);
-  roomGroup.add(bedFrame);
-  box(bedFrame, [2.18, .65, .92], 0x303b3a, [0, .4, 0]);
-  box(bedFrame, [2.3, .2, 1.02], 0x23302f, [0, .79, 0]);
-  box(bedFrame, [.72, .12, .82], 0xe0d6bd, [-.65, .95, .02]);
-  box(bedFrame, [1.22, .12, .9], 0xa34d43, [.42, .96, .02]);
-  box(bedFrame, [.16, .95, .9], colors.wood, [-1.01, .48, 0]);
-  box(bedFrame, [.16, .95, .9], colors.wood, [1.01, .48, 0]);
+  bedFrame.position.set(-.95, 0, -.12);
+  livingRoom.add(bedFrame);
+  box(bedFrame, [3.05, .65, .92], 0x303b3a, [0, .4, 0]);
+  box(bedFrame, [3.15, .2, 1.02], 0x23302f, [0, .79, 0]);
+  box(bedFrame, [.82, .12, .82], 0xe0d6bd, [-1.05, .95, .02]);
+  box(bedFrame, [1.92, .12, .9], 0xa34d43, [.3, .96, .02]);
+  box(bedFrame, [.16, .95, .9], colors.wood, [-1.45, .48, 0]);
+  box(bedFrame, [.16, .95, .9], colors.wood, [1.45, .48, 0]);
 
   const desk = new THREE.Group();
-  desk.position.set(deskX, 0, -.25);
-  roomGroup.add(desk);
+  desk.position.set(deskX - livingRoomOffset, 0, -.25);
+  livingRoom.add(desk);
   box(desk, [2.35, .18, .78], colors.wood, [0, 1.32, 0]);
   box(desk, [.13, 1.3, .15], colors.woodDark, [-.95, .65, 0]);
   box(desk, [.13, 1.3, .15], colors.woodDark, [.95, .65, 0]);
@@ -623,7 +646,7 @@ function addRoom() {
 
   const shelf = new THREE.Group();
   shelf.position.set(4.28, 1.65, -1.08);
-  roomGroup.add(shelf);
+  livingRoom.add(shelf);
   box(shelf, [1.28, 3.3, .31], colors.woodDark, [0, 0, 0]);
   for (const y of [-1.1, -.25, .6, 1.45]) {
     box(shelf, [1.08, .09, .37], colors.wood, [0, y, .1]);
@@ -634,7 +657,7 @@ function addRoom() {
 
   const poster = new THREE.Group();
   poster.position.set(.15, 3.7, -1.19);
-  roomGroup.add(poster);
+  livingRoom.add(poster);
   plane(poster, [1.28, 1.85], colors.red, [0, 0, 0], { emissive: 0x220404, emissiveIntensity: .45 });
   plane(poster, [.86, .23], colors.amber, [0, .38, .018], { emissive: 0x3e2204, emissiveIntensity: .6 });
   plane(poster, [.44, .72], colors.black, [0, -.35, .018]);
@@ -642,14 +665,14 @@ function addRoom() {
   const lamp = new THREE.PointLight(0xe6bd6d, 18, 6.5, 2);
   lamp.position.set(-.85, 4.85, 1.05);
   lamp.castShadow = true;
-  roomGroup.add(lamp);
-  box(roomGroup, [.62, .18, .62], colors.amber, [-.85, 4.55, .78], { emissive: 0x8c5520, emissiveIntensity: 1.8 });
-  box(roomGroup, [.035, 1.18, .035], colors.black, [-.85, 5.12, .78]);
+  livingRoom.add(lamp);
+  box(livingRoom, [.62, .18, .62], colors.amber, [-.85, 4.55, .78], { emissive: 0x8c5520, emissiveIntensity: 1.8 });
+  box(livingRoom, [.035, 1.18, .035], colors.black, [-.85, 5.12, .78]);
 
   // Everyday objects use simple geometry deliberately: their interaction state, not visual complexity, drives the MVP.
   const fridge = new THREE.Group();
   fridge.position.set(-4.72, 0, -.4);
-  roomGroup.add(fridge);
+  kitchenRoom.add(fridge);
   box(fridge, [1.05, 2.28, .72], 0x2b3937, [0, 1.14, 0]);
   box(fridge, [.9, .93, .06], 0x49615f, [0, 1.59, .4], { emissive: 0x16302d, emissiveIntensity: .18 });
   box(fridge, [.9, .02, .05], colors.black, [0, 1.08, .43]);
@@ -658,7 +681,7 @@ function addRoom() {
 
   const kitchen = new THREE.Group();
   kitchen.position.set(-3.12, 0, -.72);
-  roomGroup.add(kitchen);
+  kitchenRoom.add(kitchen);
   box(kitchen, [2.12, .86, .72], 0x42504c, [0, .43, 0]);
   box(kitchen, [2.18, .13, .77], colors.wood, [0, .88, .02]);
   box(kitchen, [.94, .16, .74], 0x313432, [-.53, .98, .04]);
@@ -669,41 +692,42 @@ function addRoom() {
 
   const kitchenTable = new THREE.Group();
   kitchenTable.position.set(-2.15, 0, .12);
-  roomGroup.add(kitchenTable);
+  kitchenRoom.add(kitchenTable);
   box(kitchenTable, [1.05, .12, .72], 0x79533c, [0, 1.05, 0]);
   for (const x of [-.4, .4]) box(kitchenTable, [.08, 1.05, .08], colors.woodDark, [x, .5, 0]);
   box(kitchenTable, [.52, .1, .5], 0x52392c, [-.65, .5, .07]);
 
   const mic = new THREE.Group();
-  mic.position.set(2.23, .08, .54);
-  roomGroup.add(mic);
-  cylinder(mic, .03, .05, 1.46, 0x161d1e, [0, .73, 0]);
-  cylinder(mic, .11, .08, .22, 0x8ba19e, [0, 1.52, 0]);
-  cylinder(mic, .3, .04, .05, 0x161d1e, [0, .03, 0]);
+  mic.position.set(APARTMENT_MICROPHONE.x - livingRoomOffset, APARTMENT_MICROPHONE.baseY, .54);
+  livingRoom.add(mic);
+  box(mic, [.42, .07, .28], 0x1a2223, [0, .08, 0]);
+  box(mic, [.035, .34, .035], 0x161d1e, [0, .24, 0]);
+  cylinder(mic, .075, .065, .24, 0x8ba19e, [0, .49, 0]);
+  box(mic, [.23, .035, .035], 0x33433f, [0, .55, .03]);
 
-  box(roomGroup, [.82, 3.25, .12], 0x49362e, [5.44, 1.63, -.76]);
-  box(roomGroup, [.66, 2.98, .05], 0x263332, [5.44, 1.63, -.67]);
+  box(livingRoom, [.82, 3.25, .12], 0x49362e, [5.44, 1.63, -.76]);
+  box(livingRoom, [.66, 2.98, .05], 0x263332, [5.44, 1.63, -.67]);
 
-  actionHit('bed', [.15, .82, .1], [2.5, 1.2, 1.15]);
-  actionHit('fridge', [-4.72, 1.12, .02], [1.2, 2.42, .95]);
-  actionHit('stove', [-3.66, .95, .02], [.95, .75, .98]);
-  actionHit('sink', [-2.49, .98, .02], [.84, .78, .98]);
-  actionHit('microphone', [2.23, .92, .28], [.72, 1.9, .9]);
-  actionHit('door', [5.44, 1.63, .04], [.95, 3.45, .8]);
+  actionHit('bed', livingRoom, [.15, .82, .1], [3.3, 1.2, 1.15]);
+  actionHit('fridge', kitchenRoom, [-4.72, 1.12, .02], [1.2, 2.42, .95]);
+  actionHit('stove', kitchenRoom, [-3.66, .95, .02], [.95, .75, .98]);
+  actionHit('sink', kitchenRoom, [-2.49, .98, .02], [.84, .78, .98]);
+  actionHit('microphone', livingRoom, [APARTMENT_MICROPHONE.x - livingRoomOffset, APARTMENT_MICROPHONE.baseY + .3, .28], [.72, .86, .9]);
+  actionHit('door', livingRoom, [5.44, 1.63, .04], [.95, 3.45, .8]);
 
   // The exit sits above and beside the shelf so it remains readable at every viewport width.
   const exitArrow = new THREE.ArrowHelper(
     new THREE.Vector3(1, 0, 0),
-    new THREE.Vector3(4.82, 3.88, .42),
+    new THREE.Vector3(5.12, 3.88, .42),
     .92,
     0xe6bd58,
     .28,
     .18,
   );
-  roomGroup.add(exitArrow);
-  plane(roomGroup, [1.34, .42], 0x5d4727, [5.2, 3.88, .23], { emissive: 0x3e2808, emissiveIntensity: .7 });
-  box(roomGroup, [.12, 4.2, .34], 0x313936, [5.92, 2.08, -.12]);
-  return { roomGroup, computerHitArea, computerHighlight, actionHitAreas, actionHighlights };
+  livingRoom.add(exitArrow);
+  plane(livingRoom, [1.34, .42], 0x5d4727, [5.2, 3.88, .23], { emissive: 0x3e2808, emissiveIntensity: .7 });
+  box(livingRoom, [.12, 4.2, .34], 0x313936, [5.92, 2.08, -.12]);
+  return { roomGroup, livingRoom, kitchenRoom, interiorDoor, computerHitArea, computerHighlight, actionHitAreas, actionHighlights };
 }
 
 function makeLimb(parent, name, z, color, upperLength, lowerLength) {
@@ -718,7 +742,7 @@ function makeLimb(parent, name, z, color, upperLength, lowerLength) {
   return { pivot, lowerPivot, upper, lower };
 }
 
-function createCharacter(parent = scene, { x = -1.75 } = {}) {
+function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   const actor = {
     group: new THREE.Group(),
     model: new THREE.Group(),
@@ -732,6 +756,11 @@ function createCharacter(parent = scene, { x = -1.75 } = {}) {
     destinationX: null,
     interaction: null,
     pendingIntent: null,
+    pendingActionSourceRoom: null,
+    routePoints: [],
+    usesInteriorDoor: false,
+    actionTransition: null,
+    actionCuePlayed: false,
     bubble: null,
     computerTask: null,
   };
@@ -780,27 +809,32 @@ function createCharacter(parent = scene, { x = -1.75 } = {}) {
 
   box(actor.model, [.53, .57, .48], colors.skin, [0, 2.32, 0]);
   const hair = box(actor.model, [.55, .09, .51], 0x17151b, [0, 2.64, 0]);
-  const faceHair = new THREE.Group();
-  actor.model.add(faceHair);
-  const mustache = box(faceHair, [.26, .055, .05], 0x1b1718, [0, 2.31, .27]);
-  const beard = box(faceHair, [.37, .2, .055], 0x1b1718, [0, 2.13, .27]);
+  const mustache = new THREE.Group();
+  mustache.name = 'avatar-profile-mustache';
+  actor.model.add(mustache);
+  const beard = new THREE.Group();
+  beard.name = 'avatar-profile-beard';
+  actor.model.add(beard);
+  for (const side of [-1, 1]) {
+    box(mustache, [.045, .055, .19], 0x1b1718, [side * .3, 2.31, .16]);
+    box(beard, [.055, .2, .3], 0x1b1718, [side * .3, 2.13, .12]);
+  }
   mustache.visible = false;
   beard.visible = false;
   const face = new THREE.Group();
   face.name = 'avatar-face';
   actor.model.add(face);
-  const faceLayout = frontFacingFaceLayout();
-  faceLayout.earXs.forEach((x) => box(face, [.12, .18, .17], colors.skin, [x, 2.32, .01]));
+  for (const side of [-1, 1]) box(face, [.12, .18, .17], colors.skin, [side * .34, 2.32, .01]);
   const eyeMaterial = material(0xe9eadf, { emissive: 0x6b6d60, emissiveIntensity: .16 });
-  faceLayout.eyeXs.forEach((x) => {
-    const eye = new THREE.Mesh(new THREE.BoxGeometry(.1, .09, .04), eyeMaterial);
-    eye.position.set(x, 2.43, faceLayout.faceZ);
+  for (const side of [-1, 1]) {
+    const eye = new THREE.Mesh(new THREE.BoxGeometry(.045, .09, .1), eyeMaterial);
+    eye.position.set(side * .285, 2.43, .08);
     face.add(eye);
-    const brow = box(face, [.15, .035, .045], 0x2a2020, [x, 2.52, faceLayout.faceZ]);
-    brow.rotation.z = x < 0 ? .1 : -.1;
-  });
-  box(face, [.055, .12, .05], 0xc48769, [0, 2.34, faceLayout.faceZ]);
-  box(face, [.2, .035, .045], 0x994f4b, [0, 2.2, faceLayout.faceZ]);
+    const brow = box(face, [.045, .035, .15], 0x2a2020, [side * .29, 2.52, .08]);
+    brow.rotation.x = side < 0 ? .1 : -.1;
+    box(face, [.055, .12, .08], 0xc48769, [side * .29, 2.34, .29]);
+    box(face, [.045, .035, .17], 0x994f4b, [side * .295, 2.2, .14]);
+  }
 
   actor.backArm = makeLimb(actor.model, 'backArm', -.31, 0x1f2930, .62, .52);
   actor.frontArm = makeLimb(actor.model, 'frontArm', .31, 0x34444d, .62, .52);
@@ -816,7 +850,7 @@ function createCharacter(parent = scene, { x = -1.75 } = {}) {
   box(actor.backLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
   box(actor.frontLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
 
-  actor.model.rotation.y = 0;
+  actor.model.rotation.y = profileFaceLayout().rightYaw;
   actor.lookParts = {
     topStyles,
     hair,
@@ -1010,9 +1044,17 @@ function createBattleScene() {
   };
 }
 
-const { roomGroup, computerHitArea, computerHighlight, actionHitAreas, actionHighlights } = addRoom();
+const { roomGroup, interiorDoor, computerHitArea, computerHighlight, actionHitAreas, actionHighlights } = addRoom();
 const interactiveObjects = actionHitAreas;
 const actor = createCharacter();
+const actorFootOffset = .37;
+
+function anchorActorToFloor(target, floorY = APARTMENT_FLOOR_Y) {
+  target.group.position.y = floorY + actorFootOffset;
+  target.shadow.position.y = floorY - target.group.position.y + .012;
+}
+
+anchorActorToFloor(actor);
 applyAvatarLook(actor, campaign.player?.look);
 const creatorPreviewRenderer = new THREE.WebGLRenderer({ canvas: creatorPreviewCanvas, antialias: true, alpha: true });
 creatorPreviewRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -1025,7 +1067,8 @@ const creatorPreviewLight = new THREE.DirectionalLight(0xf2d9ab, 2.2);
 creatorPreviewLight.position.set(-2, 5, 4);
 creatorPreviewScene.add(creatorPreviewLight);
 const creatorPreviewActor = createCharacter(creatorPreviewScene, { x: 0 });
-creatorPreviewActor.model.rotation.y = frontFacingFaceLayout().previewYaw;
+anchorActorToFloor(creatorPreviewActor);
+creatorPreviewActor.model.rotation.y = profileFaceLayout().previewYaw;
 applyAvatarLook(creatorPreviewActor, creatorLook);
 const battle = createBattleScene();
 let gameMode = 'apartment';
@@ -1158,12 +1201,19 @@ function beginApartmentAction(actionId) {
     renderInteractionDock('<strong>Дверь</strong><span class="interaction-dock__hint">Карта Каликфорнии откроется после короткой анимации.</span>');
   }
   actor.activeApartmentAction = action;
+  const targetRoom = getApartmentRoom(action.id);
+  actor.actionTransition = createActionTransition({
+    actionId: action.id,
+    fromRoom: actor.pendingActionSourceRoom ?? targetRoom,
+    toRoom: targetRoom,
+  });
+  actor.pendingActionSourceRoom = null;
+  actor.actionCuePlayed = false;
   actor.bubble = null;
   actor.mode = 'apartmentAction';
   actor.actionElapsed = 0;
   actor.state = { ...actor.state, moving: false };
   startTurn(Math.PI / 2, .22);
-  cue(action.cue);
 }
 
 function completeApartmentAction(action) {
@@ -1244,6 +1294,23 @@ function applyApartmentActionPose(action, elapsed) {
   actor.backArm.pivot.rotation.z = -.2 - beat * .08;
 }
 
+function applyApartmentActionStartPose(action, elapsed) {
+  updatePose(0, elapsed);
+  if (action.animation === 'sleep') {
+    applySeatPose(.18, elapsed);
+    return;
+  }
+  if (action.animation === 'record') {
+    actor.frontArm.pivot.rotation.z = .22;
+    actor.backArm.pivot.rotation.z = -.16;
+    return;
+  }
+  if (action.animation === 'cook' || action.animation === 'wash') {
+    actor.frontArm.pivot.rotation.z = .24;
+    actor.backArm.pivot.rotation.z = .18;
+  }
+}
+
 function requestMove(targetX, interaction = null) {
   if (actor.mode === 'typing') {
     actor.pendingIntent = { type: 'walk', targetX, interaction };
@@ -1251,7 +1318,12 @@ function requestMove(targetX, interaction = null) {
     return;
   }
   if (actor.mode !== 'walking') return;
-  actor.destinationX = THREE.MathUtils.clamp(targetX, room.left, room.right);
+  const clampedTarget = THREE.MathUtils.clamp(targetX, room.left, room.right);
+  const sourceRoom = actor.state.x <= APARTMENT_ROOMS.kitchen.right ? 'kitchen' : 'living';
+  const targetRoom = clampedTarget <= APARTMENT_ROOMS.kitchen.right ? 'kitchen' : 'living';
+  actor.routePoints = apartmentWalkTargets(sourceRoom, targetRoom, clampedTarget);
+  actor.destinationX = actor.routePoints.shift() ?? null;
+  actor.usesInteriorDoor = sourceRoom !== targetRoom;
   actor.interaction = interaction;
 }
 
@@ -1265,13 +1337,29 @@ function requestFaceCamera() {
   actor.destinationX = null;
   actor.interaction = null;
   actor.state = { ...actor.state, moving: false };
-  startTurn(-Math.PI / 2, .28);
+  startTurn(profileFaceLayout().faceCameraYaw, .28);
+}
+
+function updateApartmentCamera() {
+  const targetX = cameraTargetX(actor.state.x);
+  camera.position.x = targetX;
+  camera.lookAt(targetX, 2.15, 0);
+}
+
+function updateInteriorDoor(delta) {
+  const doorCentreX = (APARTMENT_ROOMS.kitchen.right + APARTMENT_ROOMS.living.left) / 2;
+  const shouldOpen = actor.usesInteriorDoor || (actor.state.moving && Math.abs(actor.state.x - doorCentreX) < .78);
+  const targetYaw = shouldOpen ? -Math.PI / 2 : 0;
+  interiorDoor.rotation.y = THREE.MathUtils.lerp(interiorDoor.rotation.y, targetYaw, 1 - Math.exp(-delta * 10));
 }
 
 function applyIntent(intent) {
   if (intent.type === 'apartment-action') {
     const action = getApartmentAction(intent.actionId);
-    if (action) requestMove(action.targetX, `action:${action.id}`);
+    if (action) {
+      actor.pendingActionSourceRoom = actor.state.x <= APARTMENT_ROOMS.kitchen.right ? 'kitchen' : 'living';
+      requestMove(action.targetX, `action:${action.id}`);
+    }
     return;
   }
   if (intent.type === 'computer') {
@@ -1317,7 +1405,7 @@ function updateAction(delta, elapsed) {
     if (progress === 0) {
       actor.mode = 'walking';
       actor.actionElapsed = 0;
-      startTurn(actor.state.facing === 1 ? 0 : -Math.PI, .24);
+      startTurn(actor.state.facing === 1 ? profileFaceLayout().rightYaw : profileFaceLayout().leftYaw, .24);
       const pendingIntent = actor.pendingIntent;
       actor.pendingIntent = null;
       if (pendingIntent) applyIntent(pendingIntent);
@@ -1350,10 +1438,21 @@ function updateAction(delta, elapsed) {
     return true;
   }
   if (actor.mode === 'apartmentAction') {
-    applyApartmentActionPose(actor.activeApartmentAction, elapsed);
-    if (actor.actionElapsed >= actionVisualDuration(actor.activeApartmentAction)) {
+    const phase = phaseAfterApproach(actor.actionTransition, actor.actionElapsed);
+    if (phase.id === 'turn') updatePose(0, elapsed);
+    if (phase.id === 'start') applyApartmentActionStartPose(actor.activeApartmentAction, elapsed);
+    if (phase.id === 'perform') {
+      if (!actor.actionCuePlayed) {
+        cue(actor.activeApartmentAction.cue);
+        actor.actionCuePlayed = true;
+      }
+      applyApartmentActionPose(actor.activeApartmentAction, elapsed);
+    }
+    const actionStartSeconds = .64;
+    if (actor.actionElapsed >= actionStartSeconds + actionVisualDuration(actor.activeApartmentAction)) {
       const action = actor.activeApartmentAction;
       actor.activeApartmentAction = null;
+      actor.actionTransition = null;
       actor.mode = 'walking';
       actor.actionElapsed = 0;
       actor.model.rotation.z = 0;
@@ -1368,6 +1467,8 @@ function updateAction(delta, elapsed) {
 function updateApartment(delta, elapsed) {
   updateTurn(delta);
   if (updateAction(delta, elapsed)) {
+    updateInteriorDoor(delta);
+    updateApartmentCamera(delta);
     setStatus();
     return;
   }
@@ -1378,7 +1479,15 @@ function updateApartment(delta, elapsed) {
     if (Math.abs(difference) < .04) {
       actor.state = { ...actor.state, x: actor.destinationX, moving: false };
       actor.group.position.x = actor.state.x;
-      actor.destinationX = null;
+      actor.destinationX = actor.routePoints.shift() ?? null;
+      if (actor.destinationX !== null) {
+        updatePose(0, elapsed);
+        updateInteriorDoor(delta);
+        updateApartmentCamera(delta);
+        setStatus();
+        return;
+      }
+      actor.usesInteriorDoor = false;
       const interaction = actor.interaction;
       actor.interaction = null;
       if (interaction === 'computer') beginSeatSequence();
@@ -1388,12 +1497,14 @@ function updateApartment(delta, elapsed) {
       const previousFacing = actor.state.facing;
       actor.state = stepCharacter(actor.state, { left: direction < 0, right: direction > 0 }, delta, room);
       if (actor.state.facing !== previousFacing) {
-        startTurn(actor.state.facing === 1 ? 0 : -Math.PI);
+        startTurn(actor.state.facing === 1 ? profileFaceLayout().rightYaw : profileFaceLayout().leftYaw);
       }
       actor.group.position.x = actor.state.x;
     }
   }
   updatePose(delta, elapsed);
+  updateInteriorDoor(delta);
+  updateApartmentCamera(delta);
   setStatus();
 }
 
@@ -1591,7 +1702,7 @@ function render() {
   else updateBattle(delta, clock.elapsedTime);
   updateActorBubble();
   if (!creatorModal.classList.contains('is-hidden')) {
-    creatorPreviewActor.model.rotation.y = frontFacingFaceLayout().previewYaw;
+    creatorPreviewActor.model.rotation.y = profileFaceLayout().previewYaw;
     creatorPreviewActor.model.position.y = Math.sin(clock.elapsedTime * .65) * .025;
     creatorPreviewRenderer.render(creatorPreviewScene, creatorPreviewCamera);
   }
@@ -1609,12 +1720,13 @@ function resize() {
   const width = window.innerWidth;
   const height = window.innerHeight;
   const aspect = width / height;
-  const viewHeight = Math.max(6.9, 13.4 / aspect);
+  const viewHeight = Math.max(5.3, 8.8 / aspect);
   camera.left = -viewHeight * aspect / 2;
   camera.right = viewHeight * aspect / 2;
   camera.top = viewHeight / 2;
   camera.bottom = -viewHeight / 2;
   camera.updateProjectionMatrix();
+  camera.lookAt(camera.position.x, 2.15, 0);
   renderer.setSize(width, height, false);
   resizeCreatorPreview();
 }

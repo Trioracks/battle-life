@@ -23,3 +23,8 @@ export function transitionPhaseAt(transition, elapsedSeconds) {
   }
   return Object.freeze({ id: 'complete', seconds: 0 });
 }
+
+export function phaseAfterApproach(transition, elapsedSeconds) {
+  const approach = transition.phases.find((phase) => phase.id === 'walk');
+  return transitionPhaseAt(transition, (approach?.seconds ?? 0) + Math.max(0, Number(elapsedSeconds) || 0));
+}

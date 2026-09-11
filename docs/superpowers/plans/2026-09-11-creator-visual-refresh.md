@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Сделать образ MC читаемым до старта игры: фронтальное лицо, отдельные силуэты одежды и управляющие стрелки вне модели.
+**Goal:** Сделать образ MC читаемым до старта игры: профильное лицо на стороне взгляда, отдельные силуэты одежды и управляющие стрелки вне модели.
 
 **Architecture:** `src/creator.js` остаётся единственным местом нормализации и смены значений образа. `src/main.js` рисует все три варианта одежды как реально разные группы Three.js и синхронизирует модель предпросмотра с квартирным актёром. `index.html` и `style.css` переносят управление по краям кадра, не накрывая модель.
 
@@ -80,7 +80,7 @@ git commit -m "feat: define creator clothing silhouettes"
 git push origin master
 ```
 
-### Task 2: Фронтальная модель с различимой одеждой
+### Task 2: Профильная модель с различимой одеждой
 
 **Files:**
 - Modify: `src/main.js:721-796,956-1005`
@@ -129,7 +129,7 @@ const faceGroup = new THREE.Group();
 faceGroup.name = 'avatar-face';
 ```
 
-Create two eyes, brows, nose and mouth on the camera-facing side of `faceGroup`. Build distinct meshes: a short-sleeve shirt, a hooded torso with hood, and a jacket with open lapels. Make shorts end above the knee and toggle `avatar-legs` visible only for shorts. Keep the actor and the creator preview both front-facing.
+Create profile eyes, brow, nose and mouth on the actual side of the face, while ears remain on the head's lateral surface. Build distinct meshes: a short-sleeve shirt, a hooded torso with hood, and a jacket with open lapels. Make shorts end above the knee and toggle `avatar-legs` visible only for shorts. Keep the actor and the creator preview in the same sideways orientation; a back-facing actor does not display facial details.
 
 - [ ] **Step 4: Run tests and manual visual check**
 

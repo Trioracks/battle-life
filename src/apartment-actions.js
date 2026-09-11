@@ -1,11 +1,11 @@
 const actions = Object.freeze({
-  computer: { id: 'computer', label: 'Сесть за компьютер', tooltip: 'Сесть за компьютер', targetX: 2.73, minutes: 0, animation: 'computer', cue: 'computer', requiresEnergy: 0 },
-  bed: { id: 'bed', label: 'Лечь спать', tooltip: 'Лечь спать · 1–12 ч', targetX: .15, minutes: 60, animation: 'sleep', cue: 'sleep', requiresEnergy: 0 },
-  fridge: { id: 'fridge', label: 'Открыть холодильник', tooltip: 'Открыть холодильник · 5 мин', targetX: -4.72, minutes: 5, animation: 'fridge', cue: 'fridge', requiresEnergy: 0 },
-  stove: { id: 'stove', label: 'Приготовить 2 порции', tooltip: 'Приготовить 2 порции · 35 мин', targetX: -3.66, minutes: 35, animation: 'cook', cue: 'cook', requiresEnergy: 8 },
-  sink: { id: 'sink', label: 'Помыть посуду', tooltip: 'Помыть посуду · 15 мин', targetX: -2.49, minutes: 15, animation: 'wash', cue: 'dishes', requiresEnergy: 0 },
-  microphone: { id: 'microphone', label: 'Записать вокал', tooltip: 'Записать вокал · 2 ч', targetX: 2.23, minutes: 120, animation: 'record', cue: 'mic', requiresEnergy: 20 },
-  door: { id: 'door', label: 'Выйти на карту', tooltip: 'Выйти на карту · 5 мин', targetX: 4.8, minutes: 5, animation: 'door', cue: 'door', requiresEnergy: 0 },
+  computer: { id: 'computer', label: 'Сесть за компьютер', tooltip: 'Сесть за компьютер', targetX: 4.93, minutes: 0, animation: 'computer', cue: 'computer', requiresEnergy: 0 },
+  bed: { id: 'bed', label: 'Лечь спать', tooltip: 'Лечь спать · 1–12 ч', targetX: 1.25, minutes: 60, animation: 'sleep', cue: 'sleep', requiresEnergy: 0 },
+  fridge: { id: 'fridge', label: 'Открыть холодильник', tooltip: 'Открыть холодильник · 5 мин', targetX: -5.72, minutes: 5, animation: 'fridge', cue: 'fridge', requiresEnergy: 0 },
+  stove: { id: 'stove', label: 'Приготовить 2 порции', tooltip: 'Приготовить 2 порции · 35 мин', targetX: -4.66, minutes: 35, animation: 'cook', cue: 'cook', requiresEnergy: 8 },
+  sink: { id: 'sink', label: 'Помыть посуду', tooltip: 'Помыть посуду · 15 мин', targetX: -3.49, minutes: 15, animation: 'wash', cue: 'dishes', requiresEnergy: 0 },
+  microphone: { id: 'microphone', label: 'Записать вокал', tooltip: 'Записать вокал · 2 ч', targetX: 4.43, minutes: 120, animation: 'record', cue: 'mic', requiresEnergy: 20 },
+  door: { id: 'door', label: 'Выйти на карту', tooltip: 'Выйти на карту · 5 мин', targetX: 7.64, minutes: 5, animation: 'door', cue: 'door', requiresEnergy: 0 },
 });
 
 export function getApartmentAction(id) {
