@@ -11,6 +11,7 @@ import { APARTMENT_DESK, APARTMENT_FLOOR_Y, APARTMENT_MICROPHONE, APARTMENT_ROOM
 import { createActionTransition, phaseAfterApproach } from './action-transitions.js';
 import { playSoundCue } from './sound-cues.js';
 import { desktopApps, getDesktopAction, openDesktopApp } from './desktop-apps.js';
+import { closeDesktopWindow, desktopShellLabels, desktopTaskbarLabel, finishDesktopBoot, openDesktopWindow, resumeDesktopWindow, shutdownDesktopSession, startDesktopSession } from './desktop-session.js';
 import { dequeueNotification, enqueueNotification } from './phone-notifications.js';
 import { districts, getDistrictLocations, startLocationAction, travelTo } from './calikfornia.js';
 import { completeShift, getJob, jobIds } from './jobs.js';
@@ -45,6 +46,8 @@ const actorBubble = document.querySelector('#actor-bubble');
 const desktopScreen = document.querySelector('#desktop-screen');
 const desktopContent = document.querySelector('#desktop-content');
 const desktopClose = document.querySelector('#desktop-close');
+const desktopSystem = document.querySelector('#desktop-system');
+const desktopTaskbar = document.querySelector('#desktop-taskbar');
 const phonePanel = document.querySelector('#phone-panel');
 const mapScreen = document.querySelector('#map-screen');
 const mapDistricts = document.querySelector('#map-districts');
@@ -58,6 +61,9 @@ let creatorSelectedPart = 'hair';
 let audioContext = null;
 let desktopOpen = false;
 let desktopBootTimer = null;
+let desktopSession = shutdownDesktopSession();
+let desktopSubView = 'home';
+let desktopStartMenuOpen = false;
 const room = { left: APARTMENT_ROOMS.kitchen.left, right: APARTMENT_ROOMS.living.right };
 const livingRoomOffset = 2.2;
 const kitchenRoomOffset = -1;
@@ -170,7 +176,35 @@ function notify(sender, text) {
   renderPhone();
 }
 
+function desktopStartMenuMarkup() {
+  if (!desktopStartMenuOpen) return '';
+  return `<aside class="desktop-start-menu"><p>${desktopShellLabels.start.toUpperCase()}</p>${desktopApps.map((app) => `<button type="button" data-desktop-start-app="${app.id}"><b>${app.icon}</b><span>${app.label}</span></button>`).join('')}</aside>`;
+}
+
+function renderDesktopTaskbar() {
+  desktopSystem.textContent = `${desktopShellLabels.system.toUpperCase()} / ДОМАШНИЙ ПК`;
+  desktopClose.textContent = `${desktopShellLabels.shutdown} ×`;
+  const now = new Date();
+  desktopTaskbar.innerHTML = `<button type="button" data-desktop-start>${desktopShellLabels.start}</button><span>${desktopTaskbarLabel(desktopSession)}</span><time>${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}</time>`;
+}
+
+function desktopWindowMarkup(title, body) {
+  return `<section class="desktop-window"><header class="desktop-window__bar"><span>${title}</span><button type="button" data-desktop-window-close aria-label="Закрыть окно">×</button></header><div class="desktop-window__body">${body}</div></section>${desktopStartMenuMarkup()}`;
+}
+
 function renderDesktop(view = 'home') {
+  if (desktopSession.state !== 'ready') return;
+  if (view === 'home') {
+    desktopSession = closeDesktopWindow(desktopSession);
+    desktopSubView = 'home';
+  } else if (view === 'track') {
+    desktopSession = openDesktopWindow(desktopSession, 'battles');
+    desktopSubView = 'track';
+  } else {
+    desktopSession = openDesktopWindow(desktopSession, view);
+    desktopSubView = view;
+  }
+  renderDesktopTaskbar();
   if (view === 'track') {
     const steps = getTrackStepStatus(campaign);
     const track = campaign.track;
@@ -190,14 +224,14 @@ function renderDesktop(view = 'home') {
               : ready?.id === 'submit'
                 ? `<p>Трек готов. После отправки изменить его нельзя.</p><div class="desktop-grid"><button class="desktop-icon" data-track-step="submit"><b>↥</b><span>Сдать заявку</span><small>10 мин</small></button></div>`
                 : `<p>Заявка уже отправлена. Ожидай судейство в уведомлениях телефона.</p>`;
-    desktopContent.innerHTML = `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>Трек для MAKAREWITCH VI</h2><ol class="track-steps">${steps.map((step) => `<li class="track-steps__item track-steps__item--${step.state}"><strong>${step.label}</strong><span>${step.minutes ? `${step.minutes} мин` : 'сразу'}</span><small>${step.state === 'done' ? 'готово' : step.reason || 'следующий шаг'}</small></li>`).join('')}</ol>${controls}</section>`;
+    desktopContent.innerHTML = desktopWindowMarkup('Рэп-Сеть / МОЯ ЗАЯВКА', `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>Трек для MAKAREWITCH VI</h2><ol class="track-steps">${steps.map((step) => `<li class="track-steps__item track-steps__item--${step.state}"><strong>${step.label}</strong><span>${step.minutes ? `${step.minutes} мин` : 'сразу'}</span><small>${step.state === 'done' ? 'готово' : step.reason || 'следующий шаг'}</small></li>`).join('')}</ol>${controls}</section>`);
     return;
   }
   if (view === 'home') {
-    desktopContent.innerHTML = `<div class="desktop-grid">${desktopApps.map((app) => `<button class="desktop-icon" data-desktop-app="${app.id}"><b>${app.icon}</b><span>${app.label}</span><small>${app.description}</small></button>`).join('')}</div>`;
+    desktopContent.innerHTML = `<div class="desktop-grid">${desktopApps.map((app) => `<button class="desktop-icon" data-desktop-app="${app.id}"><b>${app.icon}</b><span>${app.label}</span><small>${app.description}</small></button>`).join('')}</div>${desktopStartMenuMarkup()}`;
     return;
   }
-  const opened = openDesktopApp(view);
+  const opened = openDesktopApp(desktopSession.window);
   if (!opened) return renderDesktop();
   const inventory = getInventorySummary(campaign);
   const body = view === 'jobs'
@@ -209,17 +243,21 @@ function renderDesktop(view = 'home') {
       : view === 'bills'
         ? `<p><strong>Наличные: ${campaign.cash.toLocaleString('ru-RU')} ₽</strong><br>Аренда: ${campaign.rent.amount.toLocaleString('ru-RU')} ₽ · 1 октября<br>Долг: ${campaign.rent.debt.toLocaleString('ru-RU')} ₽ · статус: ${campaign.rent.status === 'due' ? 'к оплате' : 'ещё не наступил'}.</p><p>При просрочке все доходы будут уходить в счёт общего долга.</p>`
         : `<p>${opened.app.description}. Этот раздел готов к игровому действию.</p>`;
-  desktopContent.innerHTML = `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>${opened.app.label}</h2>${body}<div id="desktop-page-actions"></div></section>`;
+  desktopContent.innerHTML = desktopWindowMarkup(opened.app.label, `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>${opened.app.label}</h2>${body}<div id="desktop-page-actions"></div></section>`);
 }
 
 function openDesktop() {
   desktopOpen = true;
+  desktopSession = startDesktopSession();
+  desktopSubView = 'home';
+  desktopStartMenuOpen = false;
   desktopScreen.classList.remove('is-hidden');
   desktopScreen.classList.add('is-booting');
   desktopContent.innerHTML = '<section class="desktop-boot"><b>КАЛИКФОРНИЯ OS</b><span>Включение рабочего стола…</span><i><em></em></i></section>';
   clearTimeout(desktopBootTimer);
   desktopBootTimer = setTimeout(() => {
     if (!desktopOpen) return;
+    desktopSession = finishDesktopBoot(desktopSession);
     desktopScreen.classList.remove('is-booting');
     renderDesktop();
   }, 460);
@@ -228,6 +266,9 @@ function openDesktop() {
 function closeDesktop() {
   clearTimeout(desktopBootTimer);
   desktopOpen = false;
+  desktopSession = shutdownDesktopSession();
+  desktopSubView = 'home';
+  desktopStartMenuOpen = false;
   desktopScreen.classList.add('is-hidden');
   desktopScreen.classList.remove('is-booting');
   if (actor.mode === 'typing') beginStandingSequence();
@@ -238,6 +279,8 @@ function startDesktopAction(actionId, complete) {
   if (!action) return;
   clearTimeout(desktopBootTimer);
   desktopOpen = false;
+  desktopSession = closeDesktopWindow(desktopSession);
+  desktopStartMenuOpen = false;
   desktopScreen.classList.add('is-hidden');
   actor.computerTask = { ...action, complete };
   actor.actionElapsed = 0;
@@ -246,8 +289,22 @@ function startDesktopAction(actionId, complete) {
 
 desktopContent.addEventListener('click', (event) => {
   const app = event.target.closest('[data-desktop-app]');
-  if (app) renderDesktop(app.dataset.desktopApp);
-  if (event.target.closest('[data-desktop-back]')) renderDesktop();
+  if (app) {
+    desktopStartMenuOpen = false;
+    renderDesktop(app.dataset.desktopApp);
+    return;
+  }
+  const startApp = event.target.closest('[data-desktop-start-app]');
+  if (startApp) {
+    desktopStartMenuOpen = false;
+    renderDesktop(startApp.dataset.desktopStartApp);
+    return;
+  }
+  if (event.target.closest('[data-desktop-back]') || event.target.closest('[data-desktop-window-close]')) {
+    desktopStartMenuOpen = false;
+    renderDesktop();
+    return;
+  }
   const jobButton = event.target.closest('[data-job]');
   if (jobButton) {
     const result = completeShift(campaign, jobButton.dataset.job);
@@ -319,6 +376,11 @@ desktopContent.addEventListener('click', (event) => {
     notify('СТУДИЯ', result.message);
     renderDesktop('track');
   }
+});
+desktopTaskbar.addEventListener('click', (event) => {
+  if (!event.target.closest('[data-desktop-start]') || desktopSession.state !== 'ready') return;
+  desktopStartMenuOpen = !desktopStartMenuOpen;
+  renderDesktop(desktopSubView);
 });
 desktopClose.addEventListener('click', closeDesktop);
 phonePanel.addEventListener('click', () => {
@@ -1427,6 +1489,9 @@ function updateAction(delta, elapsed) {
         actor.actionElapsed = 0;
         actor.bubble = { title: 'Архив изучен', message: result.message, expiresAt: performance.now() + 2600 };
         desktopOpen = true;
+        desktopSession = resumeDesktopWindow(desktopSession, task.returnView);
+        desktopSubView = task.returnView;
+        desktopStartMenuOpen = false;
         desktopScreen.classList.remove('is-hidden');
         desktopScreen.classList.remove('is-booting');
         renderDesktop(task.returnView);
