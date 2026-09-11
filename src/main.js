@@ -5,10 +5,11 @@ import { clickIntent } from './click-intent.js';
 import { stepCharacter } from './character-motion.js';
 import { presentActionProgress } from './action-progress.js';
 import { advanceCampaign, createCampaign, loadCampaign, saveCampaign } from './game-state.js';
-import { appearanceGeometry, createRapper, cycleLookPart, LOOK_PART_LABELS, lookOptionLabel, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
+import { allocationsFromSkills, appearanceGeometry, createRapper, cycleLookPart, frontFacingFaceLayout, LOOK_PART_LABELS, lookOptionLabel, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
 import { canStartApartmentAction, describeApartmentAction, getApartmentAction } from './apartment-actions.js';
-import { APARTMENT_ACTOR_FOREGROUND_Z, APARTMENT_DESK, APARTMENT_FLOOR_Y, APARTMENT_INTERIOR_DOOR, APARTMENT_MICROPHONE, APARTMENT_ROOMS, APARTMENT_SPAWN, apartmentWalkTargets, cameraTargetX, getApartmentRoom } from './apartment-layout.js';
+import { APARTMENT_ACTOR_FOREGROUND_Z, APARTMENT_DESK, APARTMENT_ENTRY_DOOR, APARTMENT_FLOOR_Y, APARTMENT_INTERIOR_DOOR, APARTMENT_MICROPHONE, APARTMENT_ROOMS, APARTMENT_SPAWN, apartmentWalkTargets, cameraTargetX, getApartmentRoom } from './apartment-layout.js';
 import { actionUsesDeskSeat, createActionTransition, phaseAfterApproach } from './action-transitions.js';
+import { actionYaw, cameraYaw, walkYaw } from './apartment-orientation.js';
 import { playSoundCue } from './sound-cues.js';
 import { desktopApps, getDesktopAction, openDesktopApp } from './desktop-apps.js';
 import { closeDesktopWindow, desktopShellLabels, desktopTaskbarLabel, finishDesktopBoot, openDesktopWindow, resumeDesktopWindow, shutdownDesktopSession, startDesktopSession } from './desktop-session.js';
@@ -41,6 +42,7 @@ const creatorPoints = document.querySelector('#creator-points');
 const creatorError = document.querySelector('#creator-error');
 const creatorPreviewCanvas = document.querySelector('#creator-preview');
 const creatorLookControls = document.querySelector('#creator-look-controls');
+const creatorOpen = document.querySelector('#creator-open');
 const interactionDock = document.querySelector('#interaction-dock');
 const worldTooltip = document.querySelector('#world-tooltip');
 const actorBubble = document.querySelector('#actor-bubble');
@@ -56,7 +58,7 @@ const mapLocationPanel = document.querySelector('#map-location-panel');
 const mapClose = document.querySelector('#map-close');
 let campaign = loadCampaign() ?? createCampaign();
 saveCampaign(campaign);
-let creatorAllocations = Object.fromEntries(STAT_KEYS.map((key) => [key, 0]));
+let creatorAllocations = campaign.player ? allocationsFromSkills(campaign.player.skills) : Object.fromEntries(STAT_KEYS.map((key) => [key, 0]));
 let creatorLook = campaign.player?.look ?? { hair: 'bald', face: 'clean', top: 'hoodie', pants: 'cargo' };
 let creatorSelectedPart = 'hair';
 let audioContext = null;
@@ -552,6 +554,20 @@ function lookValueLabel(part, value) {
   return lookOptionLabel(part, value);
 }
 
+function openCreator() {
+  const player = campaign.player;
+  if (player) {
+    creatorForm.elements.name.value = player.name;
+    creatorForm.elements.nickname.value = player.nickname;
+    creatorAllocations = allocationsFromSkills(player.skills);
+    creatorLook = normalizeLook(player.look);
+  }
+  creatorError.textContent = '';
+  renderCreator();
+  creatorModal.classList.remove('is-hidden');
+  resizeCreatorPreview();
+}
+
 creatorStats.addEventListener('click', (event) => {
   const button = event.target.closest('button[data-stat]');
   if (!button) return;
@@ -580,6 +596,8 @@ creatorPreviewCanvas.addEventListener('click', (event) => {
   renderCreator();
 });
 
+creatorOpen.addEventListener('click', openCreator);
+
 creatorForm.addEventListener('submit', (event) => {
   event.preventDefault();
   try {
@@ -603,8 +621,8 @@ creatorForm.addEventListener('submit', (event) => {
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+// Apartment is presented as a flat 2.5D diorama: no context-dependent real-time shadows.
+renderer.shadowMap.enabled = false;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const scene = new THREE.Scene();
@@ -737,22 +755,21 @@ function addRoom() {
   }
   plane(livingRoom, [8.95, 6.3], 0x3c5053, [1.5, 3.2, -1.24], { emissive: 0x122428, emissiveIntensity: .32 });
 
-  for (let x = -6.7; x < 8.6; x += 1.1) {
-    box(roomGroup, [.035, 6.2, .04], 0x738070, [x, 3.15, -1.23], { castShadow: false });
+  for (let x = -2.8; x < 6.5; x += 1.1) {
+    box(livingRoom, [.035, 6.2, .04], 0x738070, [x, 3.15, -1.23], { castShadow: false });
   }
 
   const windowGroup = new THREE.Group();
-  windowGroup.position.set(1.25, 3.75, -1.19);
-  windowGroup.scale.set(.64, .82, 1);
+  windowGroup.position.set(1.15, 3.08, -1.19);
+  windowGroup.scale.set(.72, .76, 1);
   livingRoom.add(windowGroup);
-  box(windowGroup, [3.9, 2.36, .14], colors.woodDark, [0, 0, 0]);
-  plane(windowGroup, [3.54, 2.04], 0x263b4b, [0, 0, .09], { emissive: 0x132937, emissiveIntensity: .8 });
-  for (const [x, width, height, y] of [[-1.35, .72, 1.15, -.46], [-.52, .63, 1.42, -.33], [.22, .83, .98, -.52], [1.14, .66, 1.58, -.25]]) {
-    box(windowGroup, [width, height, .025], 0x9b443d, [x, y, .12], { emissive: 0x3b100c, emissiveIntensity: .45 });
-    for (let floor = y - height / 2 + .18; floor < y + height / 2; floor += .24) box(windowGroup, [width * .72, .045, .03], 0xe0aa58, [x, floor, .14], { emissive: 0x5c3213, emissiveIntensity: 1.2 });
-  }
-  box(windowGroup, [.12, 2.16, .1], colors.wood, [0, 0, .14]);
-  box(windowGroup, [3.68, .11, .1], colors.wood, [0, 0, .14]);
+  box(windowGroup, [4.1, 2.48, .14], colors.woodDark, [0, 0, 0], { castShadow: false, receiveShadow: false });
+  plane(windowGroup, [3.74, 2.12], 0x273c4c, [0, 0, .09], { emissive: 0x122a3a, emissiveIntensity: .75 });
+  box(windowGroup, [3.58, .52, .018], 0x9a4841, [0, -.8, .11], { castShadow: false, receiveShadow: false });
+  box(windowGroup, [1.12, .84, .018], 0x7c403d, [-1.08, -.36, .115], { castShadow: false, receiveShadow: false });
+  box(windowGroup, [.12, 2.26, .1], colors.wood, [0, 0, .14], { castShadow: false, receiveShadow: false });
+  box(windowGroup, [3.86, .11, .1], colors.wood, [0, 0, .14], { castShadow: false, receiveShadow: false });
+  box(windowGroup, [4.26, .16, .24], 0x8a694b, [0, -1.3, .16], { castShadow: false, receiveShadow: false });
 
   const divider = new THREE.Group();
   divider.name = 'kitchen-doorway';
@@ -882,23 +899,29 @@ function addRoom() {
   exitDoor.name = 'apartment-entry-door';
   exitDoor.position.set(5.44, 0, -.76);
   livingRoom.add(exitDoor);
-  box(exitDoor, [1.34, 3.5, .2], 0x2b231f, [0, 1.75, 0]);
-  box(exitDoor, [1.1, 3.23, .09], 0x714b37, [0, 1.71, .14]);
-  box(exitDoor, [.88, 1.22, .035], 0x4d3027, [0, 2.3, .2]);
-  box(exitDoor, [.88, 1.22, .035], 0x4d3027, [0, .94, .2]);
-  box(exitDoor, [.11, .11, .07], 0xe0ae50, [.37, 1.66, .24], { emissive: 0x6a4009, emissiveIntensity: .85 });
-  box(exitDoor, [.06, .06, .07], 0x1b1c1b, [0, 2.98, .24]);
-  box(exitDoor, [1.22, .12, .46], 0x1d2221, [0, .07, .1]);
-  plane(exitDoor, [.62, .22], 0x3b5f46, [0, 3.47, .22], { emissive: 0x143821, emissiveIntensity: .9 });
+  const entryDoorWidth = APARTMENT_ENTRY_DOOR.width;
+  const entryDoorHeight = APARTMENT_ENTRY_DOOR.height;
+  box(exitDoor, [entryDoorWidth + .24, entryDoorHeight + .04, .2], 0x2b231f, [0, entryDoorHeight / 2, 0]);
+  const entryDoorPanel = new THREE.Group();
+  entryDoorPanel.name = 'apartment-entry-door-panel';
+  entryDoorPanel.position.set(entryDoorWidth / 2 - .11, 0, .14);
+  exitDoor.add(entryDoorPanel);
+  box(entryDoorPanel, [entryDoorWidth, entryDoorHeight - .23, .09], 0x714b37, [-entryDoorWidth / 2, (entryDoorHeight - .23) / 2, 0]);
+  box(entryDoorPanel, [entryDoorWidth - .42, 1.2, .035], 0x4d3027, [-entryDoorWidth / 2, entryDoorHeight * .67, .06]);
+  box(entryDoorPanel, [entryDoorWidth - .42, 1.2, .035], 0x4d3027, [-entryDoorWidth / 2, entryDoorHeight * .28, .06]);
+  box(entryDoorPanel, [.11, .11, .07], 0xe0ae50, [-entryDoorWidth * .23, entryDoorHeight * .47, .1], { emissive: 0x6a4009, emissiveIntensity: .85 });
+  box(entryDoorPanel, [.06, .06, .07], 0x1b1c1b, [-entryDoorWidth / 2, entryDoorHeight * .84, .1]);
+  box(exitDoor, [entryDoorWidth + .08, .12, .46], 0x1d2221, [0, .07, .1]);
+  plane(exitDoor, [.74, .22], 0x3b5f46, [0, entryDoorHeight + .02, .22], { emissive: 0x143821, emissiveIntensity: .9 });
 
   actionHit('bed', livingRoom, [.15, .82, .1], [3.3, 1.2, 1.15]);
   actionHit('fridge', kitchenRoom, [-4.72, 1.12, .02], [1.2, 2.42, .95]);
   actionHit('stove', kitchenRoom, [-3.66, .95, .02], [.95, .75, .98]);
   actionHit('sink', kitchenRoom, [-2.49, .98, .02], [.84, .78, .98]);
   actionHit('microphone', livingRoom, [APARTMENT_MICROPHONE.x - livingRoomOffset, APARTMENT_MICROPHONE.baseY + .3, .28], [.72, .86, .9]);
-  actionHit('door', livingRoom, [5.44, 1.68, .04], [1.48, 3.62, .8]);
-  box(livingRoom, [.12, 4.2, .34], 0x313936, [6.18, 2.08, -.12]);
-  return { roomGroup, livingRoom, kitchenRoom, interiorDoor, computerHitArea, computerHighlight, actionHitAreas, actionHighlights };
+  actionHit('door', livingRoom, [5.44, entryDoorHeight / 2, .04], [entryDoorWidth + .35, entryDoorHeight + .2, .8]);
+  box(livingRoom, [.12, 4.2, .34], 0x313936, [6.62, 2.08, -.12]);
+  return { roomGroup, livingRoom, kitchenRoom, interiorDoor, entryDoorPanel, computerHitArea, computerHighlight, actionHitAreas, actionHighlights };
 }
 
 function makeLimb(parent, name, z, color, upperLength, lowerLength) {
@@ -913,26 +936,6 @@ function makeLimb(parent, name, z, color, upperLength, lowerLength) {
   return { pivot, lowerPivot, upper, lower };
 }
 
-function setApartmentSilhouette(target, facing = target.state?.facing ?? 1) {
-  const layout = profileFaceLayout();
-  target.model.rotation.y = layout.neutralYaw;
-  target.model.scale.x = facing >= 0 ? layout.rightScaleX : layout.leftScaleX;
-  target.backArm.pivot.visible = false;
-  target.backLeg.pivot.visible = false;
-  Object.values(target.lookParts?.topStyles ?? {}).forEach((style) => {
-    style.profileOnly?.forEach((mesh) => { mesh.visible = false; });
-  });
-}
-
-function setStageBody(target) {
-  target.model.scale.x = 1;
-  target.backArm.pivot.visible = true;
-  target.backLeg.pivot.visible = true;
-  Object.values(target.lookParts?.topStyles ?? {}).forEach((style) => {
-    style.profileOnly?.forEach((mesh) => { mesh.visible = true; });
-  });
-}
-
 function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   const actor = {
     group: new THREE.Group(),
@@ -943,7 +946,12 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
     turn: null,
     actionElapsed: 0,
     seatStartX: 0,
+    seatStartZ: APARTMENT_ACTOR_FOREGROUND_Z,
     seatTargetX: deskX - .45,
+    seatTargetZ: .02,
+    standStartZ: APARTMENT_ACTOR_FOREGROUND_Z,
+    actionStartZ: APARTMENT_ACTOR_FOREGROUND_Z,
+    actionTargetZ: APARTMENT_ACTOR_FOREGROUND_Z,
     destinationX: null,
     interaction: null,
     pendingIntent: null,
@@ -973,7 +981,7 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   const teeTorso = box(tee, [.72, .84, .48], 0x6e7c74, [0, 1.48, 0]);
   const teeSleeveLeft = box(tee, [.24, .28, .5], 0x6e7c74, [-.47, 1.79, 0]);
   const teeSleeveRight = box(tee, [.24, .28, .5], 0x6e7c74, [.47, 1.79, 0]);
-  topStyles.tee = { group: tee, meshes: [teeTorso, teeSleeveLeft, teeSleeveRight], profileOnly: [teeSleeveRight] };
+  topStyles.tee = { group: tee, meshes: [teeTorso, teeSleeveLeft, teeSleeveRight] };
 
   const hoodie = new THREE.Group();
   hoodie.name = 'avatar-top-hoodie';
@@ -984,7 +992,7 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   hood.rotation.x = Math.PI / 2;
   hood.position.set(0, 1.95, -.27);
   hoodie.add(hood);
-  topStyles.hoodie = { group: hoodie, meshes: [hoodieTorso, hoodiePouch, hood], profileOnly: [] };
+  topStyles.hoodie = { group: hoodie, meshes: [hoodieTorso, hoodiePouch, hood] };
 
   const jacket = new THREE.Group();
   jacket.name = 'avatar-top-jacket';
@@ -996,32 +1004,31 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   ];
   jacketLapels[0].rotation.z = -.3;
   jacketLapels[1].rotation.z = .3;
-  topStyles.jacket = { group: jacket, meshes: [jacketTorso, ...jacketLapels], profileOnly: [jacketLapels[1]] };
+  topStyles.jacket = { group: jacket, meshes: [jacketTorso, ...jacketLapels] };
 
   box(actor.model, [.53, .57, .48], colors.skin, [0, 2.32, 0]);
   const hair = box(actor.model, [.55, .09, .51], 0x17151b, [0, 2.64, 0]);
-  const mustache = new THREE.Group();
-  mustache.name = 'avatar-profile-mustache';
-  actor.model.add(mustache);
-  const beard = new THREE.Group();
-  beard.name = 'avatar-profile-beard';
-  actor.model.add(beard);
-  box(mustache, [.22, .055, .06], 0x1b1718, [.22, 2.31, .28]);
-  box(beard, [.26, .2, .12], 0x1b1718, [.17, 2.13, .18]);
+  const faceHair = new THREE.Group();
+  actor.model.add(faceHair);
+  const mustache = box(faceHair, [.26, .055, .05], 0x1b1718, [0, 2.31, .27]);
+  const beard = box(faceHair, [.37, .2, .055], 0x1b1718, [0, 2.13, .27]);
   mustache.visible = false;
   beard.visible = false;
   const face = new THREE.Group();
   face.name = 'avatar-face';
   actor.model.add(face);
-  // Apartment view is a true side silhouette: one ear behind, one eye and one nose ahead.
-  box(face, [.1, .17, .14], colors.skin, [-.31, 2.33, .01]);
+  const faceLayout = frontFacingFaceLayout();
+  faceLayout.earXs.forEach((x) => box(face, [.12, .18, .17], colors.skin, [x, 2.32, .01]));
   const eyeMaterial = material(0xe9eadf, { emissive: 0x6b6d60, emissiveIntensity: .16 });
-  const eye = new THREE.Mesh(new THREE.BoxGeometry(.08, .09, .05), eyeMaterial);
-  eye.position.set(.18, 2.43, .27);
-  face.add(eye);
-  box(face, [.19, .035, .06], 0x2a2020, [.18, 2.52, .27]);
-  box(face, [.14, .12, .12], 0xc48769, [.34, 2.34, .12]);
-  box(face, [.17, .035, .06], 0x994f4b, [.22, 2.2, .28]);
+  faceLayout.eyeXs.forEach((x) => {
+    const eye = new THREE.Mesh(new THREE.BoxGeometry(.1, .09, .04), eyeMaterial);
+    eye.position.set(x, 2.43, faceLayout.faceZ);
+    face.add(eye);
+    const brow = box(face, [.15, .035, .045], 0x2a2020, [x, 2.52, faceLayout.faceZ]);
+    brow.rotation.z = x < 0 ? .1 : -.1;
+  });
+  box(face, [.055, .12, .05], 0xc48769, [0, 2.34, faceLayout.faceZ]);
+  box(face, [.2, .035, .045], 0x994f4b, [0, 2.2, faceLayout.faceZ]);
 
   actor.backArm = makeLimb(actor.model, 'backArm', -.31, 0x1f2930, .62, .52);
   actor.frontArm = makeLimb(actor.model, 'frontArm', .31, 0x34444d, .62, .52);
@@ -1037,7 +1044,7 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   box(actor.backLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
   box(actor.frontLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
 
-  actor.model.rotation.y = profileFaceLayout().neutralYaw;
+  actor.model.rotation.y = profileFaceLayout().rightYaw;
   actor.lookParts = {
     topStyles,
     hair,
@@ -1050,7 +1057,6 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
     frontArm: actor.frontArm.upper,
     backArm: actor.backArm.upper,
   };
-  setApartmentSilhouette(actor);
   return actor;
 }
 
@@ -1063,7 +1069,6 @@ function applyAvatarLook(target, look = {}) {
   Object.entries(target.lookParts.topStyles).forEach(([id, style]) => {
     style.group.visible = id === normalizedLook.top;
     style.meshes.forEach((mesh) => mesh.material.color.setHex(topColor));
-    style.profileOnly.forEach((mesh) => { mesh.visible = false; });
   });
   target.lookParts.frontArm.material.color.setHex(topColor);
   target.lookParts.backArm.material.color.setHex(topColor);
@@ -1233,7 +1238,7 @@ function createBattleScene() {
   };
 }
 
-const { roomGroup, interiorDoor, computerHitArea, computerHighlight, actionHitAreas, actionHighlights } = addRoom();
+const { roomGroup, interiorDoor, entryDoorPanel, computerHitArea, computerHighlight, actionHitAreas, actionHighlights } = addRoom();
 const interactiveObjects = actionHitAreas;
 const actor = createCharacter();
 actor.group.position.z = APARTMENT_ACTOR_FOREGROUND_Z;
@@ -1258,7 +1263,7 @@ creatorPreviewLight.position.set(-2, 5, 4);
 creatorPreviewScene.add(creatorPreviewLight);
 const creatorPreviewActor = createCharacter(creatorPreviewScene, { x: 0 });
 anchorActorToFloor(creatorPreviewActor);
-setApartmentSilhouette(creatorPreviewActor, 1);
+creatorPreviewActor.model.rotation.y = profileFaceLayout().previewYaw;
 applyAvatarLook(creatorPreviewActor, creatorLook);
 const battle = createBattleScene();
 let gameMode = 'apartment';
@@ -1371,14 +1376,15 @@ function beginSeatSequence() {
   actor.mode = 'turningToDesk';
   actor.actionElapsed = 0;
   actor.seatStartX = actor.state.x;
+  actor.seatStartZ = actor.group.position.z;
   actor.state = { ...actor.state, moving: false };
-  setApartmentSilhouette(actor, actor.state.facing);
-  startTurn(profileFaceLayout().neutralYaw, .34);
+  startTurn(actionYaw('computer'), .34);
 }
 
 function beginStandingSequence() {
   actor.mode = 'standingUp';
   actor.actionElapsed = 0;
+  actor.standStartZ = actor.group.position.z;
 }
 
 function beginApartmentAction(actionId) {
@@ -1398,10 +1404,10 @@ function beginApartmentAction(actionId) {
     actor.actionCuePlayed = false;
     actor.actionElapsed = 0;
     actor.seatStartX = actor.state.x;
+    actor.seatStartZ = actor.group.position.z;
     actor.state = { ...actor.state, moving: false };
     actor.mode = 'turningToRecordDesk';
-    setApartmentSilhouette(actor, actor.state.facing);
-    startTurn(profileFaceLayout().neutralYaw, .24);
+    startTurn(actionYaw(actionId), .24);
     return;
   }
   if (actionId === 'door') {
@@ -1420,8 +1426,9 @@ function beginApartmentAction(actionId) {
   actor.mode = 'apartmentAction';
   actor.actionElapsed = 0;
   actor.state = { ...actor.state, moving: false };
-  setApartmentSilhouette(actor, actor.state.facing);
-  startTurn(profileFaceLayout().neutralYaw, .22);
+  actor.actionStartZ = actor.group.position.z;
+  actor.actionTargetZ = action.id === 'bed' ? .14 : .02;
+  startTurn(actionYaw(actionId), .22);
 }
 
 function completeApartmentAction(action) {
@@ -1478,7 +1485,8 @@ function applyApartmentActionPose(action, elapsed) {
   const beat = Math.sin(elapsed * 7);
   if (action.animation === 'sleep') {
     applySeatPose(.22, elapsed);
-    actor.model.position.set(.04, .38, .24);
+    // Rotation happens around the feet; shift the sleeping body back onto the mattress first.
+    actor.model.position.set(-1.08, .64, -.04);
     actor.model.rotation.z = -Math.PI / 2;
     actor.shadow.scale.set(1.58, .62, 1);
     return;
@@ -1486,18 +1494,18 @@ function applyApartmentActionPose(action, elapsed) {
   if (action.animation === 'record') {
     // Домашний микрофон стоит на столе: запись идёт из сидячей позы, не стоя перед стойкой.
     applySeatPose(1, elapsed);
-    actor.frontArm.pivot.rotation.z = .64 + beat * .08;
-    actor.frontArm.lowerPivot.rotation.z = -.72 + beat * .05;
-    actor.backArm.pivot.rotation.z = .52 - beat * .05;
-    actor.backArm.lowerPivot.rotation.z = -.62;
+    actor.frontArm.pivot.rotation.z = .36 + beat * .05;
+    actor.frontArm.lowerPivot.rotation.z = -.46 + beat * .04;
+    actor.backArm.pivot.rotation.z = .3 - beat * .04;
+    actor.backArm.lowerPivot.rotation.z = -.42;
     actor.model.position.y += Math.abs(beat) * .018;
     return;
   }
   if (action.animation === 'cook' || action.animation === 'wash') {
-    actor.frontArm.pivot.rotation.z = .88 + beat * .15;
-    actor.backArm.pivot.rotation.z = .74 - beat * .12;
-    actor.frontArm.lowerPivot.rotation.z = -.92;
-    actor.backArm.lowerPivot.rotation.z = -.8;
+    actor.frontArm.pivot.rotation.z = .44 + beat * .08;
+    actor.backArm.pivot.rotation.z = .34 - beat * .06;
+    actor.frontArm.lowerPivot.rotation.z = -.48;
+    actor.backArm.lowerPivot.rotation.z = -.43;
     return;
   }
   actor.frontArm.pivot.rotation.z = .4 + beat * .1;
@@ -1515,8 +1523,8 @@ function applyApartmentActionStartPose(action, elapsed) {
     return;
   }
   if (action.animation === 'cook' || action.animation === 'wash') {
-    actor.frontArm.pivot.rotation.z = .24;
-    actor.backArm.pivot.rotation.z = .18;
+    actor.frontArm.pivot.rotation.z = .18;
+    actor.backArm.pivot.rotation.z = .14;
   }
 }
 
@@ -1546,8 +1554,7 @@ function requestFaceCamera() {
   actor.destinationX = null;
   actor.interaction = null;
   actor.state = { ...actor.state, moving: false };
-  setApartmentSilhouette(actor, actor.state.facing);
-  startTurn(profileFaceLayout().neutralYaw, .28);
+  startTurn(cameraYaw(), .28);
 }
 
 function updateApartmentCamera() {
@@ -1559,8 +1566,11 @@ function updateApartmentCamera() {
 function updateInteriorDoor(delta) {
   const doorCentreX = (APARTMENT_ROOMS.kitchen.right + APARTMENT_ROOMS.living.left) / 2;
   const shouldOpen = actor.usesInteriorDoor || (actor.state.moving && Math.abs(actor.state.x - doorCentreX) < .78);
-  const targetYaw = shouldOpen ? -Math.PI / 2 : 0;
-  interiorDoor.rotation.y = THREE.MathUtils.lerp(interiorDoor.rotation.y, targetYaw, 1 - Math.exp(-delta * 10));
+  const interiorTargetYaw = shouldOpen ? -Math.PI / 2 : 0;
+  interiorDoor.rotation.y = THREE.MathUtils.lerp(interiorDoor.rotation.y, interiorTargetYaw, 1 - Math.exp(-delta * 10));
+  const isLeaving = actor.interaction === 'action:door' || actor.activeApartmentAction?.id === 'door';
+  const entryTargetYaw = isLeaving ? Math.PI / 2 : 0;
+  entryDoorPanel.rotation.y = THREE.MathUtils.lerp(entryDoorPanel.rotation.y, entryTargetYaw, 1 - Math.exp(-delta * 10));
 }
 
 function applyIntent(intent) {
@@ -1591,6 +1601,7 @@ function updateAction(delta, elapsed) {
     const progress = Math.min(actor.actionElapsed / .34, 1);
     actor.state = { ...actor.state, x: THREE.MathUtils.lerp(actor.seatStartX, actor.seatTargetX, easeInOut(progress)), moving: false };
     actor.group.position.x = actor.state.x;
+    actor.group.position.z = THREE.MathUtils.lerp(actor.seatStartZ, actor.seatTargetZ, easeInOut(progress));
     updatePose(0, elapsed);
     if (progress === 1) {
       actor.mode = 'sittingDown';
@@ -1613,6 +1624,7 @@ function updateAction(delta, elapsed) {
     const progress = Math.min(actor.actionElapsed / .34, 1);
     actor.state = { ...actor.state, x: THREE.MathUtils.lerp(actor.seatStartX, actor.seatTargetX, easeInOut(progress)), moving: false };
     actor.group.position.x = actor.state.x;
+    actor.group.position.z = THREE.MathUtils.lerp(actor.seatStartZ, actor.seatTargetZ, easeInOut(progress));
     updatePose(0, elapsed);
     if (progress === 1) {
       actor.mode = 'sittingToRecord';
@@ -1634,11 +1646,11 @@ function updateAction(delta, elapsed) {
   if (actor.mode === 'standingUp') {
     const progress = 1 - Math.min(actor.actionElapsed / .4, 1);
     applySeatPose(progress, elapsed);
+    actor.group.position.z = THREE.MathUtils.lerp(APARTMENT_ACTOR_FOREGROUND_Z, actor.standStartZ, progress);
     if (progress === 0) {
       actor.mode = 'walking';
       actor.actionElapsed = 0;
-      setApartmentSilhouette(actor, actor.state.facing);
-      startTurn(profileFaceLayout().neutralYaw, .24);
+      startTurn(walkYaw(actor.state.facing), .24);
       const pendingIntent = actor.pendingIntent;
       actor.pendingIntent = null;
       if (pendingIntent) applyIntent(pendingIntent);
@@ -1674,6 +1686,8 @@ function updateAction(delta, elapsed) {
     return true;
   }
   if (actor.mode === 'apartmentAction') {
+    const depthProgress = Math.min(actor.actionElapsed / .28, 1);
+    actor.group.position.z = THREE.MathUtils.lerp(actor.actionStartZ, actor.actionTargetZ, easeInOut(depthProgress));
     const phase = phaseAfterApproach(actor.actionTransition, actor.actionElapsed);
     if (phase.id === 'turn') updatePose(0, elapsed);
     if (phase.id === 'start') applyApartmentActionStartPose(actor.activeApartmentAction, elapsed);
@@ -1689,9 +1703,11 @@ function updateAction(delta, elapsed) {
       const action = actor.activeApartmentAction;
       actor.activeApartmentAction = null;
       actor.actionTransition = null;
+      actor.standStartZ = actor.group.position.z;
       actor.mode = actionUsesDeskSeat(action.id) ? 'standingUp' : 'walking';
       actor.actionElapsed = 0;
       actor.model.rotation.z = 0;
+      if (!actionUsesDeskSeat(action.id)) actor.group.position.z = APARTMENT_ACTOR_FOREGROUND_Z;
       completeApartmentAction(action);
     }
     return true;
@@ -1733,8 +1749,7 @@ function updateApartment(delta, elapsed) {
       const previousFacing = actor.state.facing;
       actor.state = stepCharacter(actor.state, { left: direction < 0, right: direction > 0 }, delta, room);
       if (actor.state.facing !== previousFacing) {
-        setApartmentSilhouette(actor, actor.state.facing);
-        startTurn(profileFaceLayout().neutralYaw);
+        startTurn(walkYaw(actor.state.facing));
       }
       actor.group.position.x = actor.state.x;
     }
@@ -1746,7 +1761,6 @@ function updateApartment(delta, elapsed) {
 }
 
 function resetStagePose(performer, facing) {
-  if (performer === actor) setStageBody(performer);
   performer.model.position.set(0, 0, 0);
   performer.model.rotation.set(0, facing === 1 ? 0 : -Math.PI, 0);
   performer.frontArm.pivot.rotation.z = 0;
@@ -1855,7 +1869,6 @@ function enterBattle() {
   actor.destinationX = null;
   actor.interaction = null;
   actor.mode = 'walking';
-  setStageBody(actor);
   resetStagePose(actor, 1);
   battle.opponent.group.position.set(3.75, 0, 0);
   battle.opponent.state = { ...battle.opponent.state, x: 3.75, facing: -1, moving: false };
@@ -1941,8 +1954,8 @@ function render() {
   else updateBattle(delta, clock.elapsedTime);
   updateActorBubble();
   if (!creatorModal.classList.contains('is-hidden')) {
-    creatorPreviewActor.model.rotation.y = profileFaceLayout().neutralYaw;
-    creatorPreviewActor.model.scale.x = profileFaceLayout().previewScaleX;
+    creatorPreviewActor.model.rotation.y = profileFaceLayout().previewYaw;
+    creatorPreviewActor.model.scale.x = 1;
     creatorPreviewActor.model.position.y = Math.sin(clock.elapsedTime * .65) * .025;
     creatorPreviewRenderer.render(creatorPreviewScene, creatorPreviewCamera);
   }

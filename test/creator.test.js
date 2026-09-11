@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { appearanceGeometry, createRapper, cycleLookPart, lookOptionLabel, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, validateAllocations } from '../src/creator.js';
+import { allocationsFromSkills, appearanceGeometry, createRapper, cycleLookPart, frontFacingFaceLayout, lookOptionLabel, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, validateAllocations } from '../src/creator.js';
 
 test('creator turns ten allocated points into visible 10–50 skills', () => {
   const rapper = createRapper({
@@ -66,12 +66,35 @@ test('creator selection changes only to a known clicked appearance part', () => 
   assert.equal(selectAppearancePart('top', 'missing'), 'top');
 });
 
-test('creator profile is a single sideways silhouette mirrored for leftward walking', () => {
+test('creator and apartment retain front, back and smooth sideways-facing yaws', () => {
   assert.deepEqual(profileFaceLayout(), {
-    previewScaleX: 1,
-    rightScaleX: 1,
-    leftScaleX: -1,
-    neutralYaw: 0,
+    previewYaw: 0,
+    rightYaw: Math.PI / 2,
+    leftYaw: -Math.PI / 2,
+    faceCameraYaw: 0,
+    backYaw: Math.PI,
+  });
+});
+
+test('front-facing character has two eyes but a single central nose', () => {
+  assert.deepEqual(frontFacingFaceLayout(), {
+    earXs: [-.34, .34],
+    eyeXs: [-.17, .17],
+    faceZ: .27,
+  });
+});
+
+test('existing MC profile reopens with its original distributed points', () => {
+  assert.deepEqual(allocationsFromSkills({ intelligence: 30, writing: 20, musicality: 10 }), {
+    intelligence: 2,
+    writing: 1,
+    musicality: 0,
+    flow: 0,
+    beatmaking: 0,
+    sound: 0,
+    charisma: 0,
+    confidence: 0,
+    resilience: 0,
   });
 });
 

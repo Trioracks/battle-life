@@ -72,6 +72,8 @@ body { margin: 0; min-width: 320px; min-height: 100vh; overflow: hidden; }
 .campaign-hud__cash { margin-top: 8px; grid-template-columns: 1fr auto; align-items: end; }
 .campaign-hud__cash strong { color: #f2d26e; font-size: 17px; }
 .needs { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 11px; margin-top: 10px; }
+.campaign-hud__profile { width: 100%; margin-top: 10px; min-height: 28px; border: 1px solid rgba(220, 190, 101, .58); color: #f0dfab; background: rgba(37, 58, 53, .86); cursor: pointer; font: inherit; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.campaign-hud__profile:hover { border-color: #edcb64; background: rgba(67, 81, 49, .92); }
 .need { display: grid; grid-template-columns: 1fr; gap: 4px; align-items: center; }
 .need i { display: block; height: 6px; overflow: hidden; border-radius: 9px; background: #273231; }
 .need b { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #d45a42, #d9b54b 52%, #74ae83); transition: width .28s ease; }

@@ -76,11 +76,28 @@ export function lookOptionLabel(part, value) {
 
 export function profileFaceLayout() {
   return {
-    previewScaleX: 1,
-    rightScaleX: 1,
-    leftScaleX: -1,
-    neutralYaw: 0,
+    previewYaw: 0,
+    rightYaw: Math.PI / 2,
+    leftYaw: -Math.PI / 2,
+    faceCameraYaw: 0,
+    backYaw: Math.PI,
   };
+}
+
+export function frontFacingFaceLayout() {
+  return {
+    earXs: [-.34, .34],
+    eyeXs: [-.17, .17],
+    faceZ: .27,
+  };
+}
+
+export function allocationsFromSkills(skills = {}) {
+  return Object.fromEntries(STAT_KEYS.map((key) => {
+    const visibleValue = Number(skills[key]);
+    const allocation = Number.isFinite(visibleValue) ? Math.round((visibleValue - 10) / 10) : 0;
+    return [key, Math.max(0, Math.min(4, allocation))];
+  }));
 }
 
 export function lookPartAtPreviewHeight(relativeY) {
