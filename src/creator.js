@@ -5,7 +5,7 @@ export const STAT_KEYS = Object.freeze([
 export const LOOK_OPTIONS = Object.freeze({
   hair: Object.freeze(['bald', 'crop', 'mohawk']),
   face: Object.freeze(['clean', 'beard', 'mustache']),
-  top: Object.freeze(['hoodie', 'bomber', 'jacket']),
+  top: Object.freeze(['tee', 'hoodie', 'jacket']),
   pants: Object.freeze(['cargo', 'jeans', 'shorts']),
 });
 

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createRapper, cycleLookPart, lookPartAtPreviewHeight, validateAllocations } from '../src/creator.js';
+import { createRapper, cycleLookPart, lookPartAtPreviewHeight, normalizeLook, validateAllocations } from '../src/creator.js';
 
 test('creator turns ten allocated points into visible 10–50 skills', () => {
   const rapper = createRapper({
@@ -17,14 +17,14 @@ test('creator turns ten allocated points into visible 10–50 skills', () => {
       confidence: 1,
       resilience: 0,
     },
-    look: { hair: 'mohawk', face: 'mustache', top: 'bomber', pants: 'jeans', cap: 'teal' },
+    look: { hair: 'mohawk', face: 'mustache', top: 'tee', pants: 'jeans', cap: 'teal' },
   });
 
   assert.equal(rapper.name, 'Миша');
   assert.equal(rapper.nickname, 'Ночной Маяк');
   assert.equal(rapper.skills.intelligence, 30);
   assert.equal(rapper.skills.resilience, 10);
-  assert.deepEqual(rapper.look, { hair: 'mohawk', face: 'mustache', top: 'bomber', pants: 'jeans' });
+  assert.deepEqual(rapper.look, { hair: 'mohawk', face: 'mustache', top: 'tee', pants: 'jeans' });
 });
 
 test('creator cycles body-zone appearance without adding a cap back into saved look', () => {
@@ -32,9 +32,18 @@ test('creator cycles body-zone appearance without adding a cap back into saved l
 
   assert.deepEqual(cycleLookPart(base, 'hair', 1), { ...base, hair: 'crop' });
   assert.deepEqual(cycleLookPart(base, 'face', -1), { ...base, face: 'mustache' });
-  assert.deepEqual(cycleLookPart(base, 'top', -1), { ...base, top: 'jacket' });
+  assert.deepEqual(cycleLookPart(base, 'top', -1), { ...base, top: 'tee' });
   assert.deepEqual(cycleLookPart(base, 'pants', 1), { ...base, pants: 'jeans' });
   assert.equal(Object.hasOwn(cycleLookPart({ ...base, cap: 'red' }, 'hair', 1), 'cap'), false);
+});
+
+test('creator keeps a shirt option and defaults an unknown top to it', () => {
+  const normalized = normalizeLook({ hair: 'crop', face: 'beard', top: 'missing', pants: 'shorts', cap: 'teal' });
+  const next = cycleLookPart({ hair: 'bald', face: 'clean', top: 'tee', pants: 'shorts' }, 'top', 1);
+
+  assert.equal(normalized.top, 'tee');
+  assert.equal(next.top, 'hoodie');
+  assert.equal(Object.hasOwn(normalized, 'cap'), false);
 });
 
 test('creator maps a click on the preview body to the closest appearance zone', () => {
