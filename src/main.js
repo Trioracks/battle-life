@@ -9,7 +9,7 @@ import { allocationsFromSkills, appearanceGeometry, createRapper, cycleLookPart,
 import { canStartApartmentAction, describeApartmentAction, getApartmentAction } from './apartment-actions.js';
 import { APARTMENT_ACTOR_FOREGROUND_Z, APARTMENT_DESK, APARTMENT_ENTRY_DOOR, APARTMENT_FLOOR_Y, APARTMENT_INTERIOR_DOOR, APARTMENT_MICROPHONE, APARTMENT_ROOMS, APARTMENT_SPAWN, apartmentWalkTargets, cameraTargetX, getApartmentRoom } from './apartment-layout.js';
 import { actionUsesDeskSeat, createActionTransition, phaseAfterApproach } from './action-transitions.js';
-import { actionYaw, cameraYaw, walkYaw } from './apartment-orientation.js';
+import { actionYaw, cameraYaw, facePresentationForYaw, profileMirrorScale, walkYaw } from './apartment-orientation.js';
 import { playSoundCue } from './sound-cues.js';
 import { desktopApps, getDesktopAction, openDesktopApp } from './desktop-apps.js';
 import { closeDesktopWindow, desktopShellLabels, desktopTaskbarLabel, finishDesktopBoot, openDesktopWindow, resumeDesktopWindow, shutdownDesktopSession, startDesktopSession } from './desktop-session.js';
@@ -901,7 +901,10 @@ function addRoom() {
   livingRoom.add(exitDoor);
   const entryDoorWidth = APARTMENT_ENTRY_DOOR.width;
   const entryDoorHeight = APARTMENT_ENTRY_DOOR.height;
-  box(exitDoor, [entryDoorWidth + .24, entryDoorHeight + .04, .2], 0x2b231f, [0, entryDoorHeight / 2, 0]);
+  // The frame stays in the wall; only this panel is allowed to rotate from its hinge.
+  box(exitDoor, [.16, entryDoorHeight, .2], 0x2b231f, [-entryDoorWidth / 2, entryDoorHeight / 2, 0]);
+  box(exitDoor, [.16, entryDoorHeight, .2], 0x2b231f, [entryDoorWidth / 2, entryDoorHeight / 2, 0]);
+  box(exitDoor, [entryDoorWidth + .16, .16, .2], 0x2b231f, [0, entryDoorHeight - .08, 0]);
   const entryDoorPanel = new THREE.Group();
   entryDoorPanel.name = 'apartment-entry-door-panel';
   entryDoorPanel.position.set(entryDoorWidth / 2 - .11, 0, .14);
@@ -1008,27 +1011,44 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
 
   box(actor.model, [.53, .57, .48], colors.skin, [0, 2.32, 0]);
   const hair = box(actor.model, [.55, .09, .51], 0x17151b, [0, 2.64, 0]);
-  const faceHair = new THREE.Group();
-  actor.model.add(faceHair);
-  const mustache = box(faceHair, [.26, .055, .05], 0x1b1718, [0, 2.31, .27]);
-  const beard = box(faceHair, [.37, .2, .055], 0x1b1718, [0, 2.13, .27]);
+  const frontFaceHair = new THREE.Group();
+  actor.model.add(frontFaceHair);
+  const mustache = box(frontFaceHair, [.26, .055, .05], 0x1b1718, [0, 2.31, .27]);
+  const beard = box(frontFaceHair, [.37, .2, .055], 0x1b1718, [0, 2.13, .27]);
   mustache.visible = false;
   beard.visible = false;
-  const face = new THREE.Group();
-  face.name = 'avatar-face';
-  actor.model.add(face);
+  const frontFace = new THREE.Group();
+  frontFace.name = 'avatar-front-face';
+  actor.model.add(frontFace);
   const faceLayout = frontFacingFaceLayout();
-  faceLayout.earXs.forEach((x) => box(face, [.12, .18, .17], colors.skin, [x, 2.32, .01]));
+  faceLayout.earXs.forEach((x) => box(frontFace, [.12, .18, .17], colors.skin, [x, 2.32, .01]));
   const eyeMaterial = material(0xe9eadf, { emissive: 0x6b6d60, emissiveIntensity: .16 });
   faceLayout.eyeXs.forEach((x) => {
     const eye = new THREE.Mesh(new THREE.BoxGeometry(.1, .09, .04), eyeMaterial);
     eye.position.set(x, 2.43, faceLayout.faceZ);
-    face.add(eye);
-    const brow = box(face, [.15, .035, .045], 0x2a2020, [x, 2.52, faceLayout.faceZ]);
+    frontFace.add(eye);
+    const brow = box(frontFace, [.15, .035, .045], 0x2a2020, [x, 2.52, faceLayout.faceZ]);
     brow.rotation.z = x < 0 ? .1 : -.1;
   });
-  box(face, [.055, .12, .05], 0xc48769, [0, 2.34, faceLayout.faceZ]);
-  box(face, [.2, .035, .045], 0x994f4b, [0, 2.2, faceLayout.faceZ]);
+  box(frontFace, [.055, .12, .05], 0xc48769, [0, 2.34, faceLayout.faceZ]);
+  box(frontFace, [.2, .035, .045], 0x994f4b, [0, 2.2, faceLayout.faceZ]);
+
+  // This is intentionally a separate, camera-facing 2.5D profile. Rotating a
+  // pair of front eyes and ears into a side view was the source of the "two
+  // faces" artefact: in profile there must be one eye, one nose and one ear.
+  const profileFace = new THREE.Group();
+  profileFace.name = 'avatar-profile-face';
+  profileFace.position.set(0, 2.32, .267);
+  actor.model.add(profileFace);
+  box(profileFace, [.09, .17, .05], colors.skin, [-.22, 0, .02]);
+  box(profileFace, [.1, .09, .045], 0xe9eadf, [.065, .11, .04], { emissive: 0x6b6d60, emissiveIntensity: .16 });
+  box(profileFace, [.16, .035, .045], 0x2a2020, [.055, .205, .045]);
+  box(profileFace, [.18, .11, .055], 0xc48769, [.22, .015, .055]);
+  box(profileFace, [.14, .035, .045], 0x994f4b, [.05, -.13, .05]);
+  const profileMustache = box(profileFace, [.19, .055, .05], 0x1b1718, [.095, -.015, .065]);
+  const profileBeard = box(profileFace, [.25, .18, .055], 0x1b1718, [.015, -.19, .06]);
+  profileMustache.visible = false;
+  profileBeard.visible = false;
 
   actor.backArm = makeLimb(actor.model, 'backArm', -.31, 0x1f2930, .62, .52);
   actor.frontArm = makeLimb(actor.model, 'frontArm', .31, 0x34444d, .62, .52);
@@ -1050,6 +1070,11 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
     hair,
     mustache,
     beard,
+    profileMustache,
+    profileBeard,
+    frontFace,
+    frontFaceHair,
+    profileFace,
     frontLeg: actor.frontLeg.upper,
     backLeg: actor.backLeg.upper,
     frontShin: actor.frontLeg.lower,
@@ -1057,6 +1082,7 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
     frontArm: actor.frontArm.upper,
     backArm: actor.backArm.upper,
   };
+  updateFacePresentation(actor);
   return actor;
 }
 
@@ -1081,6 +1107,22 @@ function applyAvatarLook(target, look = {}) {
   target.lookParts.hair.position.y = normalizedLook.hair === 'mohawk' ? 2.72 : 2.64;
   target.lookParts.mustache.visible = normalizedLook.face === 'mustache';
   target.lookParts.beard.visible = normalizedLook.face === 'beard';
+  target.lookParts.profileMustache.visible = normalizedLook.face === 'mustache';
+  target.lookParts.profileBeard.visible = normalizedLook.face === 'beard';
+  updateFacePresentation(target);
+}
+
+function updateFacePresentation(target) {
+  const parts = target.lookParts;
+  if (!parts?.frontFace || !parts.profileFace) return;
+  const presentation = facePresentationForYaw(target.model.rotation.y);
+  parts.frontFace.visible = presentation === 'front';
+  parts.frontFaceHair.visible = presentation === 'front';
+  parts.profileFace.visible = presentation === 'profile';
+  if (presentation === 'profile') {
+    parts.profileFace.rotation.y = -target.model.rotation.y;
+    parts.profileFace.scale.set(profileMirrorScale(target.model.rotation.y), 1, 1);
+  }
 }
 
 function createEggOpponent(parent, x = 3.75) {
@@ -1354,6 +1396,7 @@ function updateTurn(delta) {
   actor.turn.elapsed = Math.min(actor.turn.elapsed + delta, actor.turn.duration);
   const progress = actor.turn.elapsed / actor.turn.duration;
   actor.model.rotation.y = turnAngle(actor.turn.from, actor.turn.target, progress);
+  updateFacePresentation(actor);
   if (progress === 1) actor.turn = null;
 }
 
@@ -1569,7 +1612,7 @@ function updateInteriorDoor(delta) {
   const interiorTargetYaw = shouldOpen ? -Math.PI / 2 : 0;
   interiorDoor.rotation.y = THREE.MathUtils.lerp(interiorDoor.rotation.y, interiorTargetYaw, 1 - Math.exp(-delta * 10));
   const isLeaving = actor.interaction === 'action:door' || actor.activeApartmentAction?.id === 'door';
-  const entryTargetYaw = isLeaving ? Math.PI / 2 : 0;
+  const entryTargetYaw = isLeaving ? -Math.PI / 2 : 0;
   entryDoorPanel.rotation.y = THREE.MathUtils.lerp(entryDoorPanel.rotation.y, entryTargetYaw, 1 - Math.exp(-delta * 10));
 }
 
@@ -1957,6 +2000,7 @@ function render() {
     creatorPreviewActor.model.rotation.y = profileFaceLayout().previewYaw;
     creatorPreviewActor.model.scale.x = 1;
     creatorPreviewActor.model.position.y = Math.sin(clock.elapsedTime * .65) * .025;
+    updateFacePresentation(creatorPreviewActor);
     creatorPreviewRenderer.render(creatorPreviewScene, creatorPreviewCamera);
   }
   renderer.render(scene, camera);
