@@ -5,7 +5,7 @@ import { clickIntent } from './click-intent.js';
 import { stepCharacter } from './character-motion.js';
 import { presentActionProgress } from './action-progress.js';
 import { advanceCampaign, createCampaign, loadCampaign, saveCampaign } from './game-state.js';
-import { appearanceGeometry, createRapper, cycleLookPart, LOOK_PART_LABELS, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
+import { appearanceGeometry, createRapper, cycleLookPart, LOOK_PART_LABELS, lookOptionLabel, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
 import { canStartApartmentAction, describeApartmentAction, getApartmentAction } from './apartment-actions.js';
 import { APARTMENT_DESK, APARTMENT_FLOOR_Y, APARTMENT_MICROPHONE, APARTMENT_ROOMS, APARTMENT_SPAWN, apartmentWalkTargets, cameraTargetX, getApartmentRoom } from './apartment-layout.js';
 import { createActionTransition, phaseAfterApproach } from './action-transitions.js';
@@ -394,9 +394,10 @@ desktopContent.addEventListener('click', (event) => {
   }
   const jobMap = event.target.closest('[data-job-map]');
   if (jobMap) {
-    notify('РАБОТА', `Вакансия «${getJobListing(jobMap.dataset.jobMap).label}» отмечена на карте.`);
+    const job = getJobListing(jobMap.dataset.jobMap);
+    notify('РАБОТА', `Вакансия «${job.label}» отмечена на карте.`);
     closeDesktop();
-    openMap();
+    openMap(job.district);
     return;
   }
   const marketStore = event.target.closest('[data-market-store]');
@@ -494,8 +495,8 @@ function renderMap(selectedDistrictId) {
   mapLocationPanel.innerHTML = `<p class="map-location-panel__eyebrow">${selectedDistrict.name}</p><h2>${selectedDistrict.role}</h2><p>${selectedDistrict.minutes ? `Дорога заняла ${selectedDistrict.minutes} мин.` : 'Ты в домашнем районе.'}</p>${locations.map((location) => `<button class="map-location" data-location="${location.id}"><b>${location.kind === 'job' ? '₽' : location.kind === 'market' ? '▣' : '◌'}</b><span><strong>${location.label}</strong><small>${location.description}</small></span><em>${location.kind === 'job' ? 'Начать смену' : location.kind === 'market' ? 'Заказать' : 'Осмотреть'}</em></button>`).join('')}`;
 }
 
-function openMap() {
-  const location = campaign.location === 'north-sloboda-home' ? 'north-sloboda' : campaign.location;
+function openMap(selectedDistrictId) {
+  const location = selectedDistrictId ?? (campaign.location === 'north-sloboda-home' ? 'north-sloboda' : campaign.location);
   renderMap(location);
   mapScreen.classList.remove('is-hidden');
 }
@@ -548,13 +549,7 @@ function selectedLook() {
 }
 
 function lookValueLabel(part, value) {
-  const labels = {
-    hair: { bald: 'Лысый', crop: 'Короткие', mohawk: 'Ирокез' },
-    face: { clean: 'Без бороды', mustache: 'Усы', beard: 'Борода' },
-    top: { hoodie: 'Худи', bomber: 'Бомбер', jacket: 'Куртка' },
-    pants: { cargo: 'Карго', jeans: 'Джинсы', shorts: 'Шорты' },
-  };
-  return labels[part]?.[value] ?? value;
+  return lookOptionLabel(part, value);
 }
 
 creatorStats.addEventListener('click', (event) => {

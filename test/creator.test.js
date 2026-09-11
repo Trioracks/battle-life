@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { appearanceGeometry, createRapper, cycleLookPart, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, validateAllocations } from '../src/creator.js';
+import { appearanceGeometry, createRapper, cycleLookPart, lookOptionLabel, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, validateAllocations } from '../src/creator.js';
 
 test('creator turns ten allocated points into visible 10–50 skills', () => {
   const rapper = createRapper({
@@ -44,6 +44,12 @@ test('creator keeps a shirt option and defaults an unknown top to it', () => {
   assert.equal(normalized.top, 'tee');
   assert.equal(next.top, 'hoodie');
   assert.equal(Object.hasOwn(normalized, 'cap'), false);
+});
+
+test('creator presents every persisted appearance value with a Russian label', () => {
+  assert.equal(lookOptionLabel('top', 'tee'), 'Футболка');
+  assert.equal(lookOptionLabel('top', 'jacket'), 'Куртка');
+  assert.equal(lookOptionLabel('pants', 'shorts'), 'Шорты');
 });
 
 test('creator appearance geometry reveals calves only for shorts', () => {

@@ -16,6 +16,13 @@ export const LOOK_PART_LABELS = Object.freeze({
   pants: 'Низ',
 });
 
+const lookValueLabels = Object.freeze({
+  hair: Object.freeze({ bald: 'Лысый', crop: 'Короткие', mohawk: 'Ирокез' }),
+  face: Object.freeze({ clean: 'Без бороды', mustache: 'Усы', beard: 'Борода' }),
+  top: Object.freeze({ tee: 'Футболка', hoodie: 'Худи', jacket: 'Куртка' }),
+  pants: Object.freeze({ cargo: 'Карго', jeans: 'Джинсы', shorts: 'Шорты' }),
+});
+
 const labels = Object.freeze({
   intelligence: 'Интеллект',
   writing: 'Письмо',
@@ -61,6 +68,10 @@ export function appearanceGeometry(look) {
 
 export function selectAppearancePart(currentPart, clickedPart) {
   return Object.hasOwn(LOOK_OPTIONS, clickedPart) ? clickedPart : currentPart;
+}
+
+export function lookOptionLabel(part, value) {
+  return lookValueLabels[part]?.[value] ?? value;
 }
 
 export function profileFaceLayout() {
