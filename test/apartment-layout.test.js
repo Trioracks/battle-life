@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { APARTMENT_DESK, APARTMENT_FLOOR_Y, APARTMENT_MICROPHONE, APARTMENT_ROOMS, APARTMENT_SPAWN, apartmentWalkTargets, cameraTargetX, getApartmentRoom, routeBetweenRooms } from '../src/apartment-layout.js';
+import { APARTMENT_ACTOR_FOREGROUND_Z, APARTMENT_DESK, APARTMENT_FLOOR_Y, APARTMENT_INTERIOR_DOOR, APARTMENT_MICROPHONE, APARTMENT_ROOMS, APARTMENT_SPAWN, apartmentWalkTargets, cameraTargetX, getApartmentRoom, routeBetweenRooms } from '../src/apartment-layout.js';
 
 test('kitchen actions route through the internal door and actor floor is explicit', () => {
   assert.equal(getApartmentRoom('computer'), 'living');
@@ -28,6 +28,12 @@ test('default apartment spawn is in open living-room floor space', () => {
 test('desk microphone is positioned on the desktop instead of on the floor', () => {
   assert.equal(APARTMENT_MICROPHONE.x, 4.43);
   assert.ok(APARTMENT_MICROPHONE.baseY > APARTMENT_DESK.surfaceY);
+});
+
+test('apartment actor has a dedicated foreground layer and a walkable kitchen doorway', () => {
+  assert.ok(APARTMENT_ACTOR_FOREGROUND_Z > 0);
+  assert.ok(APARTMENT_INTERIOR_DOOR.width >= 2);
+  assert.ok(APARTMENT_INTERIOR_DOOR.height >= 3.3);
 });
 
 test('camera stays horizontally centred on the actor on both sides of the doorway', () => {

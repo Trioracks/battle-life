@@ -66,12 +66,12 @@ test('creator selection changes only to a known clicked appearance part', () => 
   assert.equal(selectAppearancePart('top', 'missing'), 'top');
 });
 
-test('creator profile face follows the same sideways orientation as the apartment actor', () => {
+test('creator profile is a single sideways silhouette mirrored for leftward walking', () => {
   assert.deepEqual(profileFaceLayout(), {
-    previewYaw: Math.PI / 2,
-    rightYaw: Math.PI / 2,
-    leftYaw: -Math.PI / 2,
-    faceCameraYaw: 0,
+    previewScaleX: 1,
+    rightScaleX: 1,
+    leftScaleX: -1,
+    neutralYaw: 0,
   });
 });
 

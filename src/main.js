@@ -7,8 +7,8 @@ import { presentActionProgress } from './action-progress.js';
 import { advanceCampaign, createCampaign, loadCampaign, saveCampaign } from './game-state.js';
 import { appearanceGeometry, createRapper, cycleLookPart, LOOK_PART_LABELS, lookOptionLabel, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
 import { canStartApartmentAction, describeApartmentAction, getApartmentAction } from './apartment-actions.js';
-import { APARTMENT_DESK, APARTMENT_FLOOR_Y, APARTMENT_MICROPHONE, APARTMENT_ROOMS, APARTMENT_SPAWN, apartmentWalkTargets, cameraTargetX, getApartmentRoom } from './apartment-layout.js';
-import { createActionTransition, phaseAfterApproach } from './action-transitions.js';
+import { APARTMENT_ACTOR_FOREGROUND_Z, APARTMENT_DESK, APARTMENT_FLOOR_Y, APARTMENT_INTERIOR_DOOR, APARTMENT_MICROPHONE, APARTMENT_ROOMS, APARTMENT_SPAWN, apartmentWalkTargets, cameraTargetX, getApartmentRoom } from './apartment-layout.js';
+import { actionUsesDeskSeat, createActionTransition, phaseAfterApproach } from './action-transitions.js';
 import { playSoundCue } from './sound-cues.js';
 import { desktopApps, getDesktopAction, openDesktopApp } from './desktop-apps.js';
 import { closeDesktopWindow, desktopShellLabels, desktopTaskbarLabel, finishDesktopBoot, openDesktopWindow, resumeDesktopWindow, shutdownDesktopSession, startDesktopSession } from './desktop-session.js';
@@ -721,7 +721,20 @@ function addRoom() {
   box(roomGroup, [16, 6.7, .18], colors.wall, [1, 3.25, -1.35]);
   box(roomGroup, [16, .13, .22], colors.floorLine, [1, .08, -1.12]);
 
-  plane(kitchenRoom, [5.25, 6.3], 0x485342, [-2.6, 3.2, -1.24], { emissive: 0x182016, emissiveIntensity: .34 });
+  // Кухня читается как отдельная зона: бело-чёрные обои крупной клеткой и светлый кафель.
+  plane(kitchenRoom, [5.25, 6.3], 0xefeee6, [-2.6, 3.2, -1.24], { emissive: 0x44443d, emissiveIntensity: .18 });
+  for (let column = 0; column < 4; column += 1) {
+    for (let row = 0; row < 5; row += 1) {
+      if ((column + row) % 2 !== 0) continue;
+      plane(kitchenRoom, [1.3, 1.26], 0x222825, [-4.55 + column * 1.3, .64 + row * 1.26, -1.225], { emissive: 0x070908, emissiveIntensity: .28 });
+    }
+  }
+  for (let tileX = -5.0; tileX < .3; tileX += .72) {
+    for (let tileZ = -1.0; tileZ <= 1.02; tileZ += .68) {
+      const alternate = (Math.round((tileX + 5) / .72) + Math.round((tileZ + 1) / .68)) % 2 === 0;
+      box(kitchenRoom, [.68, .035, .64], alternate ? 0xf4f2e9 : 0xd9dad2, [tileX, .025, tileZ], { castShadow: false });
+    }
+  }
   plane(livingRoom, [8.95, 6.3], 0x3c5053, [1.5, 3.2, -1.24], { emissive: 0x122428, emissiveIntensity: .32 });
 
   for (let x = -6.7; x < 8.6; x += 1.1) {
@@ -743,17 +756,21 @@ function addRoom() {
 
   const divider = new THREE.Group();
   divider.name = 'kitchen-doorway';
-  divider.position.set(-.93, 1.55, -.72);
+  divider.position.set(-.93, 0, -.72);
   roomGroup.add(divider);
-  box(divider, [.16, 3.24, .35], 0x34413d, [0, 0, 0]);
-  box(divider, [1.16, .14, .4], colors.wood, [-.5, 1.54, .02]);
+  const doorwayWidth = APARTMENT_INTERIOR_DOOR.width;
+  const doorwayHeight = APARTMENT_INTERIOR_DOOR.height;
+  box(divider, [.18, doorwayHeight, .35], 0x392d27, [-doorwayWidth / 2, doorwayHeight / 2, 0]);
+  box(divider, [.18, doorwayHeight, .35], 0x392d27, [doorwayWidth / 2, doorwayHeight / 2, 0]);
+  box(divider, [doorwayWidth + .36, .2, .4], colors.woodDark, [0, doorwayHeight, .02]);
+  box(divider, [doorwayWidth + .16, .1, .32], 0xb69c70, [0, doorwayHeight - .17, .12], { emissive: 0x3c270d, emissiveIntensity: .4 });
   const interiorDoor = new THREE.Group();
   interiorDoor.name = 'interior-door-panel';
-  interiorDoor.position.set(.08, 0, .02);
+  interiorDoor.position.set(doorwayWidth / 2 - .08, 0, .02);
   divider.add(interiorDoor);
-  box(interiorDoor, [.92, 2.48, .13], 0x6b4935, [-.46, -.28, 0]);
-  box(interiorDoor, [.72, 2.24, .04], 0x2f403a, [-.46, -.27, .09]);
-  box(interiorDoor, [.06, .06, .07], colors.amber, [-.08, -.25, .15], { emissive: 0x6c3e09, emissiveIntensity: .85 });
+  box(interiorDoor, [doorwayWidth - .16, doorwayHeight - .24, .13], 0x79533c, [-(doorwayWidth - .16) / 2, (doorwayHeight - .24) / 2, 0]);
+  box(interiorDoor, [doorwayWidth - .48, doorwayHeight - .58, .04], 0x25312e, [-(doorwayWidth - .16) / 2, (doorwayHeight - .24) / 2, .09]);
+  box(interiorDoor, [.08, .08, .08], colors.amber, [-.18, doorwayHeight * .48, .15], { emissive: 0x6c3e09, emissiveIntensity: .85 });
 
   const bedFrame = new THREE.Group();
   bedFrame.position.set(-.95, 0, -.12);
@@ -860,28 +877,27 @@ function addRoom() {
   cylinder(mic, .075, .065, .24, 0x8ba19e, [0, .49, 0]);
   box(mic, [.23, .035, .035], 0x33433f, [0, .55, .03]);
 
-  box(livingRoom, [.82, 3.25, .12], 0x49362e, [5.44, 1.63, -.76]);
-  box(livingRoom, [.66, 2.98, .05], 0x263332, [5.44, 1.63, -.67]);
+  // Входная дверь — самостоятельный объект, а не тёмная полоса у края кадра.
+  const exitDoor = new THREE.Group();
+  exitDoor.name = 'apartment-entry-door';
+  exitDoor.position.set(5.44, 0, -.76);
+  livingRoom.add(exitDoor);
+  box(exitDoor, [1.34, 3.5, .2], 0x2b231f, [0, 1.75, 0]);
+  box(exitDoor, [1.1, 3.23, .09], 0x714b37, [0, 1.71, .14]);
+  box(exitDoor, [.88, 1.22, .035], 0x4d3027, [0, 2.3, .2]);
+  box(exitDoor, [.88, 1.22, .035], 0x4d3027, [0, .94, .2]);
+  box(exitDoor, [.11, .11, .07], 0xe0ae50, [.37, 1.66, .24], { emissive: 0x6a4009, emissiveIntensity: .85 });
+  box(exitDoor, [.06, .06, .07], 0x1b1c1b, [0, 2.98, .24]);
+  box(exitDoor, [1.22, .12, .46], 0x1d2221, [0, .07, .1]);
+  plane(exitDoor, [.62, .22], 0x3b5f46, [0, 3.47, .22], { emissive: 0x143821, emissiveIntensity: .9 });
 
   actionHit('bed', livingRoom, [.15, .82, .1], [3.3, 1.2, 1.15]);
   actionHit('fridge', kitchenRoom, [-4.72, 1.12, .02], [1.2, 2.42, .95]);
   actionHit('stove', kitchenRoom, [-3.66, .95, .02], [.95, .75, .98]);
   actionHit('sink', kitchenRoom, [-2.49, .98, .02], [.84, .78, .98]);
   actionHit('microphone', livingRoom, [APARTMENT_MICROPHONE.x - livingRoomOffset, APARTMENT_MICROPHONE.baseY + .3, .28], [.72, .86, .9]);
-  actionHit('door', livingRoom, [5.44, 1.63, .04], [.95, 3.45, .8]);
-
-  // The exit sits above and beside the shelf so it remains readable at every viewport width.
-  const exitArrow = new THREE.ArrowHelper(
-    new THREE.Vector3(1, 0, 0),
-    new THREE.Vector3(5.12, 3.88, .42),
-    .92,
-    0xe6bd58,
-    .28,
-    .18,
-  );
-  livingRoom.add(exitArrow);
-  plane(livingRoom, [1.34, .42], 0x5d4727, [5.2, 3.88, .23], { emissive: 0x3e2808, emissiveIntensity: .7 });
-  box(livingRoom, [.12, 4.2, .34], 0x313936, [5.92, 2.08, -.12]);
+  actionHit('door', livingRoom, [5.44, 1.68, .04], [1.48, 3.62, .8]);
+  box(livingRoom, [.12, 4.2, .34], 0x313936, [6.18, 2.08, -.12]);
   return { roomGroup, livingRoom, kitchenRoom, interiorDoor, computerHitArea, computerHighlight, actionHitAreas, actionHighlights };
 }
 
@@ -895,6 +911,26 @@ function makeLimb(parent, name, z, color, upperLength, lowerLength) {
   pivot.add(lowerPivot);
   const lower = box(lowerPivot, [.25, lowerLength, .25], color, [0, -lowerLength / 2, 0]);
   return { pivot, lowerPivot, upper, lower };
+}
+
+function setApartmentSilhouette(target, facing = target.state?.facing ?? 1) {
+  const layout = profileFaceLayout();
+  target.model.rotation.y = layout.neutralYaw;
+  target.model.scale.x = facing >= 0 ? layout.rightScaleX : layout.leftScaleX;
+  target.backArm.pivot.visible = false;
+  target.backLeg.pivot.visible = false;
+  Object.values(target.lookParts?.topStyles ?? {}).forEach((style) => {
+    style.profileOnly?.forEach((mesh) => { mesh.visible = false; });
+  });
+}
+
+function setStageBody(target) {
+  target.model.scale.x = 1;
+  target.backArm.pivot.visible = true;
+  target.backLeg.pivot.visible = true;
+  Object.values(target.lookParts?.topStyles ?? {}).forEach((style) => {
+    style.profileOnly?.forEach((mesh) => { mesh.visible = true; });
+  });
 }
 
 function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
@@ -937,7 +973,7 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   const teeTorso = box(tee, [.72, .84, .48], 0x6e7c74, [0, 1.48, 0]);
   const teeSleeveLeft = box(tee, [.24, .28, .5], 0x6e7c74, [-.47, 1.79, 0]);
   const teeSleeveRight = box(tee, [.24, .28, .5], 0x6e7c74, [.47, 1.79, 0]);
-  topStyles.tee = { group: tee, meshes: [teeTorso, teeSleeveLeft, teeSleeveRight] };
+  topStyles.tee = { group: tee, meshes: [teeTorso, teeSleeveLeft, teeSleeveRight], profileOnly: [teeSleeveRight] };
 
   const hoodie = new THREE.Group();
   hoodie.name = 'avatar-top-hoodie';
@@ -948,7 +984,7 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   hood.rotation.x = Math.PI / 2;
   hood.position.set(0, 1.95, -.27);
   hoodie.add(hood);
-  topStyles.hoodie = { group: hoodie, meshes: [hoodieTorso, hoodiePouch, hood] };
+  topStyles.hoodie = { group: hoodie, meshes: [hoodieTorso, hoodiePouch, hood], profileOnly: [] };
 
   const jacket = new THREE.Group();
   jacket.name = 'avatar-top-jacket';
@@ -960,7 +996,7 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   ];
   jacketLapels[0].rotation.z = -.3;
   jacketLapels[1].rotation.z = .3;
-  topStyles.jacket = { group: jacket, meshes: [jacketTorso, ...jacketLapels] };
+  topStyles.jacket = { group: jacket, meshes: [jacketTorso, ...jacketLapels], profileOnly: [jacketLapels[1]] };
 
   box(actor.model, [.53, .57, .48], colors.skin, [0, 2.32, 0]);
   const hair = box(actor.model, [.55, .09, .51], 0x17151b, [0, 2.64, 0]);
@@ -970,26 +1006,22 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   const beard = new THREE.Group();
   beard.name = 'avatar-profile-beard';
   actor.model.add(beard);
-  for (const side of [-1, 1]) {
-    box(mustache, [.045, .055, .19], 0x1b1718, [side * .3, 2.31, .16]);
-    box(beard, [.055, .2, .3], 0x1b1718, [side * .3, 2.13, .12]);
-  }
+  box(mustache, [.22, .055, .06], 0x1b1718, [.22, 2.31, .28]);
+  box(beard, [.26, .2, .12], 0x1b1718, [.17, 2.13, .18]);
   mustache.visible = false;
   beard.visible = false;
   const face = new THREE.Group();
   face.name = 'avatar-face';
   actor.model.add(face);
-  for (const side of [-1, 1]) box(face, [.12, .18, .17], colors.skin, [side * .34, 2.32, .01]);
+  // Apartment view is a true side silhouette: one ear behind, one eye and one nose ahead.
+  box(face, [.1, .17, .14], colors.skin, [-.31, 2.33, .01]);
   const eyeMaterial = material(0xe9eadf, { emissive: 0x6b6d60, emissiveIntensity: .16 });
-  for (const side of [-1, 1]) {
-    const eye = new THREE.Mesh(new THREE.BoxGeometry(.045, .09, .1), eyeMaterial);
-    eye.position.set(side * .285, 2.43, .08);
-    face.add(eye);
-    const brow = box(face, [.045, .035, .15], 0x2a2020, [side * .29, 2.52, .08]);
-    brow.rotation.x = side < 0 ? .1 : -.1;
-    box(face, [.055, .12, .08], 0xc48769, [side * .29, 2.34, .29]);
-    box(face, [.045, .035, .17], 0x994f4b, [side * .295, 2.2, .14]);
-  }
+  const eye = new THREE.Mesh(new THREE.BoxGeometry(.08, .09, .05), eyeMaterial);
+  eye.position.set(.18, 2.43, .27);
+  face.add(eye);
+  box(face, [.19, .035, .06], 0x2a2020, [.18, 2.52, .27]);
+  box(face, [.14, .12, .12], 0xc48769, [.34, 2.34, .12]);
+  box(face, [.17, .035, .06], 0x994f4b, [.22, 2.2, .28]);
 
   actor.backArm = makeLimb(actor.model, 'backArm', -.31, 0x1f2930, .62, .52);
   actor.frontArm = makeLimb(actor.model, 'frontArm', .31, 0x34444d, .62, .52);
@@ -1005,7 +1037,7 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   box(actor.backLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
   box(actor.frontLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
 
-  actor.model.rotation.y = profileFaceLayout().rightYaw;
+  actor.model.rotation.y = profileFaceLayout().neutralYaw;
   actor.lookParts = {
     topStyles,
     hair,
@@ -1018,6 +1050,7 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
     frontArm: actor.frontArm.upper,
     backArm: actor.backArm.upper,
   };
+  setApartmentSilhouette(actor);
   return actor;
 }
 
@@ -1030,6 +1063,7 @@ function applyAvatarLook(target, look = {}) {
   Object.entries(target.lookParts.topStyles).forEach(([id, style]) => {
     style.group.visible = id === normalizedLook.top;
     style.meshes.forEach((mesh) => mesh.material.color.setHex(topColor));
+    style.profileOnly.forEach((mesh) => { mesh.visible = false; });
   });
   target.lookParts.frontArm.material.color.setHex(topColor);
   target.lookParts.backArm.material.color.setHex(topColor);
@@ -1202,6 +1236,7 @@ function createBattleScene() {
 const { roomGroup, interiorDoor, computerHitArea, computerHighlight, actionHitAreas, actionHighlights } = addRoom();
 const interactiveObjects = actionHitAreas;
 const actor = createCharacter();
+actor.group.position.z = APARTMENT_ACTOR_FOREGROUND_Z;
 const actorFootOffset = .37;
 
 function anchorActorToFloor(target, floorY = APARTMENT_FLOOR_Y) {
@@ -1223,7 +1258,7 @@ creatorPreviewLight.position.set(-2, 5, 4);
 creatorPreviewScene.add(creatorPreviewLight);
 const creatorPreviewActor = createCharacter(creatorPreviewScene, { x: 0 });
 anchorActorToFloor(creatorPreviewActor);
-creatorPreviewActor.model.rotation.y = profileFaceLayout().previewYaw;
+setApartmentSilhouette(creatorPreviewActor, 1);
 applyAvatarLook(creatorPreviewActor, creatorLook);
 const battle = createBattleScene();
 let gameMode = 'apartment';
@@ -1246,6 +1281,10 @@ function setStatus() {
   }
   if (actor.mode === 'sittingDown') {
     status.textContent = 'Садится за компьютер.';
+    return;
+  }
+  if (actor.mode === 'turningToRecordDesk' || actor.mode === 'sittingToRecord') {
+    status.textContent = 'Садится к настольному микрофону.';
     return;
   }
   if (actor.mode === 'standingUp') {
@@ -1333,7 +1372,8 @@ function beginSeatSequence() {
   actor.actionElapsed = 0;
   actor.seatStartX = actor.state.x;
   actor.state = { ...actor.state, moving: false };
-  startTurn(Math.PI / 2, .34);
+  setApartmentSilhouette(actor, actor.state.facing);
+  startTurn(profileFaceLayout().neutralYaw, .34);
 }
 
 function beginStandingSequence() {
@@ -1352,6 +1392,18 @@ function beginApartmentAction(actionId) {
     beginSeatSequence();
     return;
   }
+  if (actionUsesDeskSeat(actionId)) {
+    actor.activeApartmentAction = action;
+    actor.actionTransition = createActionTransition({ actionId, fromRoom: 'living', toRoom: 'living' });
+    actor.actionCuePlayed = false;
+    actor.actionElapsed = 0;
+    actor.seatStartX = actor.state.x;
+    actor.state = { ...actor.state, moving: false };
+    actor.mode = 'turningToRecordDesk';
+    setApartmentSilhouette(actor, actor.state.facing);
+    startTurn(profileFaceLayout().neutralYaw, .24);
+    return;
+  }
   if (actionId === 'door') {
     renderInteractionDock('<strong>Дверь</strong><span class="interaction-dock__hint">Карта Каликфорнии откроется после короткой анимации.</span>');
   }
@@ -1368,7 +1420,8 @@ function beginApartmentAction(actionId) {
   actor.mode = 'apartmentAction';
   actor.actionElapsed = 0;
   actor.state = { ...actor.state, moving: false };
-  startTurn(Math.PI / 2, .22);
+  setApartmentSilhouette(actor, actor.state.facing);
+  startTurn(profileFaceLayout().neutralYaw, .22);
 }
 
 function completeApartmentAction(action) {
@@ -1431,11 +1484,13 @@ function applyApartmentActionPose(action, elapsed) {
     return;
   }
   if (action.animation === 'record') {
-    actor.frontArm.pivot.rotation.z = .86 + beat * .24;
-    actor.backArm.pivot.rotation.z = -.52 - beat * .12;
-    actor.frontArm.lowerPivot.rotation.z = -.64;
-    actor.backArm.lowerPivot.rotation.z = .35;
-    actor.model.position.y = Math.abs(beat) * .035;
+    // Домашний микрофон стоит на столе: запись идёт из сидячей позы, не стоя перед стойкой.
+    applySeatPose(1, elapsed);
+    actor.frontArm.pivot.rotation.z = .64 + beat * .08;
+    actor.frontArm.lowerPivot.rotation.z = -.72 + beat * .05;
+    actor.backArm.pivot.rotation.z = .52 - beat * .05;
+    actor.backArm.lowerPivot.rotation.z = -.62;
+    actor.model.position.y += Math.abs(beat) * .018;
     return;
   }
   if (action.animation === 'cook' || action.animation === 'wash') {
@@ -1456,8 +1511,7 @@ function applyApartmentActionStartPose(action, elapsed) {
     return;
   }
   if (action.animation === 'record') {
-    actor.frontArm.pivot.rotation.z = .22;
-    actor.backArm.pivot.rotation.z = -.16;
+    applySeatPose(.82, elapsed);
     return;
   }
   if (action.animation === 'cook' || action.animation === 'wash') {
@@ -1492,7 +1546,8 @@ function requestFaceCamera() {
   actor.destinationX = null;
   actor.interaction = null;
   actor.state = { ...actor.state, moving: false };
-  startTurn(profileFaceLayout().faceCameraYaw, .28);
+  setApartmentSilhouette(actor, actor.state.facing);
+  startTurn(profileFaceLayout().neutralYaw, .28);
 }
 
 function updateApartmentCamera() {
@@ -1554,13 +1609,36 @@ function updateAction(delta, elapsed) {
     return true;
   }
 
+  if (actor.mode === 'turningToRecordDesk') {
+    const progress = Math.min(actor.actionElapsed / .34, 1);
+    actor.state = { ...actor.state, x: THREE.MathUtils.lerp(actor.seatStartX, actor.seatTargetX, easeInOut(progress)), moving: false };
+    actor.group.position.x = actor.state.x;
+    updatePose(0, elapsed);
+    if (progress === 1) {
+      actor.mode = 'sittingToRecord';
+      actor.actionElapsed = 0;
+    }
+    return true;
+  }
+
+  if (actor.mode === 'sittingToRecord') {
+    const progress = Math.min(actor.actionElapsed / .48, 1);
+    applySeatPose(progress, elapsed);
+    if (progress === 1) {
+      actor.mode = 'apartmentAction';
+      actor.actionElapsed = .64;
+    }
+    return true;
+  }
+
   if (actor.mode === 'standingUp') {
     const progress = 1 - Math.min(actor.actionElapsed / .4, 1);
     applySeatPose(progress, elapsed);
     if (progress === 0) {
       actor.mode = 'walking';
       actor.actionElapsed = 0;
-      startTurn(actor.state.facing === 1 ? profileFaceLayout().rightYaw : profileFaceLayout().leftYaw, .24);
+      setApartmentSilhouette(actor, actor.state.facing);
+      startTurn(profileFaceLayout().neutralYaw, .24);
       const pendingIntent = actor.pendingIntent;
       actor.pendingIntent = null;
       if (pendingIntent) applyIntent(pendingIntent);
@@ -1611,7 +1689,7 @@ function updateAction(delta, elapsed) {
       const action = actor.activeApartmentAction;
       actor.activeApartmentAction = null;
       actor.actionTransition = null;
-      actor.mode = 'walking';
+      actor.mode = actionUsesDeskSeat(action.id) ? 'standingUp' : 'walking';
       actor.actionElapsed = 0;
       actor.model.rotation.z = 0;
       completeApartmentAction(action);
@@ -1655,7 +1733,8 @@ function updateApartment(delta, elapsed) {
       const previousFacing = actor.state.facing;
       actor.state = stepCharacter(actor.state, { left: direction < 0, right: direction > 0 }, delta, room);
       if (actor.state.facing !== previousFacing) {
-        startTurn(actor.state.facing === 1 ? profileFaceLayout().rightYaw : profileFaceLayout().leftYaw);
+        setApartmentSilhouette(actor, actor.state.facing);
+        startTurn(profileFaceLayout().neutralYaw);
       }
       actor.group.position.x = actor.state.x;
     }
@@ -1667,6 +1746,7 @@ function updateApartment(delta, elapsed) {
 }
 
 function resetStagePose(performer, facing) {
+  if (performer === actor) setStageBody(performer);
   performer.model.position.set(0, 0, 0);
   performer.model.rotation.set(0, facing === 1 ? 0 : -Math.PI, 0);
   performer.frontArm.pivot.rotation.z = 0;
@@ -1775,6 +1855,7 @@ function enterBattle() {
   actor.destinationX = null;
   actor.interaction = null;
   actor.mode = 'walking';
+  setStageBody(actor);
   resetStagePose(actor, 1);
   battle.opponent.group.position.set(3.75, 0, 0);
   battle.opponent.state = { ...battle.opponent.state, x: 3.75, facing: -1, moving: false };
@@ -1860,7 +1941,8 @@ function render() {
   else updateBattle(delta, clock.elapsedTime);
   updateActorBubble();
   if (!creatorModal.classList.contains('is-hidden')) {
-    creatorPreviewActor.model.rotation.y = profileFaceLayout().previewYaw;
+    creatorPreviewActor.model.rotation.y = profileFaceLayout().neutralYaw;
+    creatorPreviewActor.model.scale.x = profileFaceLayout().previewScaleX;
     creatorPreviewActor.model.position.y = Math.sin(clock.elapsedTime * .65) * .025;
     creatorPreviewRenderer.render(creatorPreviewScene, creatorPreviewCamera);
   }

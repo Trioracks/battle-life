@@ -76,10 +76,10 @@ export function lookOptionLabel(part, value) {
 
 export function profileFaceLayout() {
   return {
-    previewYaw: Math.PI / 2,
-    rightYaw: Math.PI / 2,
-    leftYaw: -Math.PI / 2,
-    faceCameraYaw: 0,
+    previewScaleX: 1,
+    rightScaleX: 1,
+    leftScaleX: -1,
+    neutralYaw: 0,
   };
 }
 

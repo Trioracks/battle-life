@@ -1,7 +1,9 @@
 export const APARTMENT_FLOOR_Y = 0;
+export const APARTMENT_ACTOR_FOREGROUND_Z = .72;
 export const APARTMENT_SPAWN = Object.freeze({ room: 'living', x: 3.5 });
 export const APARTMENT_DESK = Object.freeze({ x: 5.38, surfaceY: 1.32 });
 export const APARTMENT_MICROPHONE = Object.freeze({ x: 4.43, baseY: 1.39 });
+export const APARTMENT_INTERIOR_DOOR = Object.freeze({ width: 2.15, height: 3.46 });
 
 export const APARTMENT_ROOMS = Object.freeze({
   living: Object.freeze({ id: 'living', left: -.8, right: 8.2, doorX: -.8 }),

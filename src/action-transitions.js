@@ -7,6 +7,10 @@ const actionPhases = Object.freeze([
   Object.freeze({ id: 'perform', seconds: Infinity }),
 ]);
 
+export function actionUsesDeskSeat(actionId) {
+  return actionId === 'microphone';
+}
+
 export function createActionTransition({ actionId, fromRoom, toRoom }) {
   return Object.freeze({
     actionId,
