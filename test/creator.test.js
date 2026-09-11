@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createRapper, cycleLookPart, lookPartAtPreviewHeight, normalizeLook, validateAllocations } from '../src/creator.js';
+import { appearanceGeometry, createRapper, cycleLookPart, frontFacingFaceLayout, lookPartAtPreviewHeight, normalizeLook, selectAppearancePart, validateAllocations } from '../src/creator.js';
 
 test('creator turns ten allocated points into visible 10–50 skills', () => {
   const rapper = createRapper({
@@ -44,6 +44,29 @@ test('creator keeps a shirt option and defaults an unknown top to it', () => {
   assert.equal(normalized.top, 'tee');
   assert.equal(next.top, 'hoodie');
   assert.equal(Object.hasOwn(normalized, 'cap'), false);
+});
+
+test('creator appearance geometry reveals calves only for shorts', () => {
+  assert.deepEqual(appearanceGeometry({ top: 'tee', pants: 'shorts', face: 'beard' }), {
+    top: 'short-sleeve',
+    lowerLegsVisible: true,
+    facialHair: 'beard',
+  });
+  assert.equal(appearanceGeometry({ top: 'jacket', pants: 'jeans' }).lowerLegsVisible, false);
+});
+
+test('creator selection changes only to a known clicked appearance part', () => {
+  assert.equal(selectAppearancePart('hair', 'pants'), 'pants');
+  assert.equal(selectAppearancePart('top', 'missing'), 'top');
+});
+
+test('creator face layout is symmetric and points straight at the preview camera', () => {
+  assert.deepEqual(frontFacingFaceLayout(), {
+    previewYaw: 0,
+    earXs: [-.34, .34],
+    eyeXs: [-.16, .16],
+    faceZ: .285,
+  });
 });
 
 test('creator maps a click on the preview body to the closest appearance zone', () => {

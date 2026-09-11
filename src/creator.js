@@ -50,6 +50,28 @@ export function cycleLookPart(look, part, direction) {
   return { ...normalized, [part]: options[(current + step + options.length) % options.length] };
 }
 
+export function appearanceGeometry(look) {
+  const normalized = normalizeLook(look);
+  return {
+    top: normalized.top === 'tee' ? 'short-sleeve' : normalized.top,
+    lowerLegsVisible: normalized.pants === 'shorts',
+    facialHair: normalized.face,
+  };
+}
+
+export function selectAppearancePart(currentPart, clickedPart) {
+  return Object.hasOwn(LOOK_OPTIONS, clickedPart) ? clickedPart : currentPart;
+}
+
+export function frontFacingFaceLayout() {
+  return {
+    previewYaw: 0,
+    earXs: [-.34, .34],
+    eyeXs: [-.16, .16],
+    faceZ: .285,
+  };
+}
+
 export function lookPartAtPreviewHeight(relativeY) {
   const y = Math.max(0, Math.min(1, Number(relativeY) || 0));
   if (y < .33) return 'hair';
