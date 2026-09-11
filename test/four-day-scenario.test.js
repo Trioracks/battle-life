@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRapper } from '../src/creator.js';
-import { cookMeal, eatMeal } from '../src/household.js';
+import { buyFood, cookMeal, eatMeal } from '../src/household.js';
 import { createCampaign } from '../src/game-state.js';
+import { getBankOverview } from '../src/desktop-view-models.js';
 import { getDistrictLocations, startLocationAction, travelTo } from '../src/calikfornia.js';
 import { chooseBeat, masterTrack, mixTrack, polishDraft, recordAtMicrophone, startDraft, submitTrack } from '../src/track-project.js';
 import { MAKAREWITCH_VI, registerForTournament, researchTournament } from '../src/tournament.js';
@@ -37,4 +38,15 @@ test('first four days can create a rapper, survive, work and submit a Makarewitc
   assert.equal(submitted.state.track.stage, 'submitted');
   assert.equal(submitted.state.track.recordedAt, 'home-microphone');
   assert.deepEqual(submitted.state.clock, { year: 2026, month: 9, day: 18, minutes: 956 });
+});
+
+test('desktop market and bills derive their figures from the same campaign economy', () => {
+  const campaign = createCampaign();
+  const before = getBankOverview(campaign);
+  const purchase = buyFood(campaign, 'groceries');
+  const after = getBankOverview(purchase.state);
+
+  assert.equal(before.balance - after.balance, 380);
+  assert.equal(purchase.state.inventory.ingredients, campaign.inventory.ingredients + 3);
+  assert.equal(after.bills[0].amount, campaign.rent.amount);
 });

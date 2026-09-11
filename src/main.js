@@ -4,7 +4,7 @@ import { GESTURE_STYLES, PERFORMANCE_SECONDS, performanceStyleAt, shuffledStyles
 import { clickIntent } from './click-intent.js';
 import { stepCharacter } from './character-motion.js';
 import { presentActionProgress } from './action-progress.js';
-import { advanceCampaign, createCampaign, getInventorySummary, loadCampaign, saveCampaign } from './game-state.js';
+import { advanceCampaign, createCampaign, loadCampaign, saveCampaign } from './game-state.js';
 import { appearanceGeometry, createRapper, cycleLookPart, LOOK_PART_LABELS, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
 import { canStartApartmentAction, describeApartmentAction, getApartmentAction } from './apartment-actions.js';
 import { APARTMENT_DESK, APARTMENT_FLOOR_Y, APARTMENT_MICROPHONE, APARTMENT_ROOMS, APARTMENT_SPAWN, apartmentWalkTargets, cameraTargetX, getApartmentRoom } from './apartment-layout.js';
@@ -12,9 +12,10 @@ import { createActionTransition, phaseAfterApproach } from './action-transitions
 import { playSoundCue } from './sound-cues.js';
 import { desktopApps, getDesktopAction, openDesktopApp } from './desktop-apps.js';
 import { closeDesktopWindow, desktopShellLabels, desktopTaskbarLabel, finishDesktopBoot, openDesktopWindow, resumeDesktopWindow, shutdownDesktopSession, startDesktopSession } from './desktop-session.js';
+import { getBankOverview, getBattleDetail, getBattleList, getJobListing, getMarketCatalog } from './desktop-view-models.js';
 import { dequeueNotification, enqueueNotification } from './phone-notifications.js';
 import { districts, getDistrictLocations, startLocationAction, travelTo } from './calikfornia.js';
-import { completeShift, getJob, jobIds } from './jobs.js';
+import { jobIds } from './jobs.js';
 import { buyFood, cookMeal, eatMeal, sleep, washDishes } from './household.js';
 import { MAKAREWITCH_VI, registerForTournament, researchTournament } from './tournament.js';
 import { chooseBeat, getTrackStepStatus, masterTrack, mixTrack, polishDraft, recordAtMicrophone, startDraft, submitTrack } from './track-project.js';
@@ -64,6 +65,11 @@ let desktopBootTimer = null;
 let desktopSession = shutdownDesktopSession();
 let desktopSubView = 'home';
 let desktopStartMenuOpen = false;
+let desktopBattleId = null;
+let desktopJobId = null;
+let desktopMarketStore = 'shesterochka';
+let desktopCartItem = null;
+let desktopBankTab = 'overview';
 const room = { left: APARTMENT_ROOMS.kitchen.left, right: APARTMENT_ROOMS.living.right };
 const livingRoomOffset = 2.2;
 const kitchenRoomOffset = -1;
@@ -192,6 +198,56 @@ function desktopWindowMarkup(title, body) {
   return `<section class="desktop-window"><header class="desktop-window__bar"><span>${title}</span><button type="button" data-desktop-window-close aria-label="Закрыть окно">×</button></header><div class="desktop-window__body">${body}</div></section>${desktopStartMenuMarkup()}`;
 }
 
+function desktopProfileMarkup() {
+  const player = campaign.player;
+  return `<aside class="repset-profile"><b>${player?.nickname?.slice(0, 2).toUpperCase() ?? 'MC'}</b><strong>${player?.nickname ?? 'Новый MC'}</strong><span>${campaign.tournament.registered ? 'Участник MAKAREWITCH VI' : 'Ищет первый баттл'}</span><small>Письмо ${player?.skills?.writing ?? 10} · Флоу ${player?.skills?.flow ?? 10}</small></aside>`;
+}
+
+function renderBattlesBody() {
+  if (!desktopBattleId) {
+    const battles = getBattleList(campaign);
+    return `<section class="desktop-page repset-layout">${desktopProfileMarkup()}<div><p>Доступные баттлы и следы прошлых раундов. Открой карточку, чтобы увидеть тему и подать заявку.</p><div class="battle-list">${battles.map((battle) => `<button type="button" class="desktop-card" data-battle-detail="${battle.id}"><small>${battle.registered ? 'ЗАЯВКА ПРИНЯТА' : 'ПРИЁМ ОТКРЫТ'}</small><strong>${battle.title}</strong><span>${battle.description}</span><em>Дедлайн: ${battle.deadline}</em></button>`).join('')}</div></div></section>`;
+  }
+  const detail = getBattleDetail(campaign, desktopBattleId);
+  if (!detail) {
+    desktopBattleId = null;
+    return renderBattlesBody();
+  }
+  const registeredActions = !detail.canApply
+    ? `<div class="desktop-grid"><button class="desktop-icon" data-battle="research"><b>⌕</b><span>Изучить архив</span><small>1 ч · комментарии и скрытые предпочтения</small></button><button class="desktop-icon" data-battle="track"><b>♫</b><span>Моя заявка</span><small>Сделать и сдать трек</small></button>${campaign.tournament.submitted && !campaign.tournament.selection ? '<button class="desktop-icon" data-battle="results"><b>!</b><span>Судьи отсудили</span><small>Открыть комментарии и баллы</small></button>' : ''}</div>`
+    : `<button class="primary-button desktop-primary" type="button" data-battle-apply="${detail.id}">${detail.applyLabel}</button>`;
+  return `<section class="desktop-page"><button class="desktop-back" data-battle-detail-back>← К списку баттлов</button><div class="battle-detail"><div><small>ОНЛАЙН-ОТБОР · ЛОКАЛЬНЫЙ ДИВИЗИОН</small><h2>${detail.title}</h2><p>${detail.description}</p><p><strong>Тема:</strong> ${detail.theme}<br><strong>Дедлайн:</strong> ${detail.deadline}</p></div><aside><strong>Участники</strong>${detail.participants.map((name) => `<span>${name}</span>`).join('')}</aside></div><section class="archive-panel"><strong>Архив и комментарии</strong>${detail.archiveComments.map((comment) => `<p>${comment}</p>`).join('')}${detail.visibleHints.length ? `<small>Открыто анализом: ${detail.visibleHints.join(', ')}</small>` : '<small>Изучи архив после регистрации, чтобы открыть скрытый фокус.</small>'}</section>${registeredActions}${campaign.tournament.selection ? `<p class="selection-result"><strong>${campaign.tournament.selection.passed ? 'Ты прошёл отбор.' : 'Ты не прошёл отбор.'}</strong> ${campaign.tournament.selection.total}/30</p>` : ''}</section>`;
+}
+
+function renderJobsBody() {
+  if (desktopJobId) {
+    const job = getJobListing(desktopJobId);
+    if (!job) {
+      desktopJobId = null;
+      return renderJobsBody();
+    }
+    return `<section class="desktop-page"><button class="desktop-back" data-job-detail-back>← Все вакансии</button><div class="job-detail"><b>${job.employer.avatar}</b><div><small>РАБОТОДАТЕЛЬ</small><h2>${job.label}</h2><p>${job.employer.name}</p></div></div><dl class="desktop-facts"><div><dt>Район</dt><dd>${job.district}</dd></div><div><dt>График</dt><dd>${job.schedule}</dd></div><div><dt>Оплата</dt><dd>${job.payLabel}</dd></div><div><dt>Нужно бодрости</dt><dd>${job.minEnergy}</dd></div></dl><blockquote>${job.employer.review}</blockquote><button type="button" class="primary-button desktop-primary" data-job-map="${job.id}">Показать на карте</button></section>`;
+  }
+  return `<section class="desktop-page"><p>Выбери вакансию и прочитай условия. Смена начинается только после поездки к месту на карте.</p><div class="desktop-grid">${jobIds.map((id) => { const job = getJobListing(id); return `<button class="desktop-icon" data-job-detail="${id}"><b>${job.employer.avatar}</b><span>${job.label}</span><small>${job.schedule} · ${job.payLabel}</small></button>`; }).join('')}</div></section>`;
+}
+
+function renderMarketBody() {
+  const catalog = getMarketCatalog(campaign);
+  const store = catalog.stores.find((item) => item.id === desktopMarketStore) ?? catalog.stores[0];
+  const product = desktopCartItem ? store.products.find((item) => item.id === desktopCartItem) : null;
+  const cart = product ? `<aside class="market-cart"><strong>Корзина</strong><span>${product.label} · ${product.price} ₽</span><small>После оплаты: ${catalog.balanceAfter(product.id).toLocaleString('ru-RU')} ₽ · курьер через ${product.deliveryMinutes} мин</small><button type="button" class="primary-button desktop-primary" data-market-checkout="${product.id}">Оформить заказ</button></aside>` : '<aside class="market-cart"><strong>Корзина пуста</strong><small>Добавь продукт, чтобы увидеть точную сумму и время доставки.</small></aside>';
+  return `<section class="desktop-page"><p><strong>Наличные: ${catalog.cash.toLocaleString('ru-RU')} ₽.</strong> В холодильнике: ${catalog.inventory.ingredients} ингредиентов, ${catalog.inventory.cookedMeals} готовых порций; посуды: ${catalog.inventory.dirtyDishes}.</p><div class="desktop-tabs">${catalog.stores.map((item) => `<button type="button" class="${item.id === store.id ? 'is-active' : ''}" data-market-store="${item.id}">${item.name}</button>`).join('')}</div><div class="market-layout"><div class="desktop-grid">${store.products.map((item) => `<button class="desktop-icon" data-market-add="${item.id}"><b>▣</b><span>${item.label}</span><small>${item.price} ₽ · +${item.ingredients} ингредиента · ${item.deliveryMinutes} мин</small></button>`).join('')}</div>${cart}</div></section>`;
+}
+
+function renderBillsBody() {
+  const bank = getBankOverview(campaign);
+  const bill = bank.bills[0];
+  const panel = desktopBankTab === 'bills'
+    ? `<div class="bank-bill"><strong>${bill.label}</strong><span>${bill.amount.toLocaleString('ru-RU')} ₽ · ${bill.status === 'due' ? 'к оплате' : 'ещё не наступил'}</span><small>Общий долг: ${bill.debt.toLocaleString('ru-RU')} ₽. При просрочке доходы гасят его автоматически.</small></div>`
+    : `<div class="bank-bill"><strong>Переводы</strong><span>В первом срезе переводы недоступны.</span><small>Этот раздел появится вместе с платежами знакомым и услугами звукарей.</small></div>`;
+  return `<section class="desktop-page"><h2>Карта и счета</h2><p class="bank-balance">${bank.balance.toLocaleString('ru-RU')} ₽</p><div class="desktop-tabs"><button type="button" class="${desktopBankTab === 'overview' ? 'is-active' : ''}" data-bank-tab="overview">Переводы</button><button type="button" class="${desktopBankTab === 'bills' ? 'is-active' : ''}" data-bank-tab="bills">Счета</button></div>${panel}</section>`;
+}
+
 function renderDesktop(view = 'home') {
   if (desktopSession.state !== 'ready') return;
   if (view === 'home') {
@@ -233,15 +289,14 @@ function renderDesktop(view = 'home') {
   }
   const opened = openDesktopApp(desktopSession.window);
   if (!opened) return renderDesktop();
-  const inventory = getInventorySummary(campaign);
   const body = view === 'jobs'
-    ? `<p>Выбери смену. Деньги выдают наличными после работы; нагрузка различается.</p><div class="desktop-grid">${jobIds.map((id) => { const job = getJob(id); return `<button class="desktop-icon" data-job="${id}"><b>₽</b><span>${job.label}</span><small>${job.duration / 60} ч · ${job.pay} ₽</small></button>`; }).join('')}</div>`
+    ? renderJobsBody()
     : view === 'market'
-      ? `<p><strong>Наличные: ${campaign.cash.toLocaleString('ru-RU')} ₽.</strong> В холодильнике: ${inventory.ingredients} ингредиентов, ${inventory.cookedMeals} готовых порций, грязной посуды — ${inventory.dirtyDishes}.</p><p>Заказ оплачивается сразу; курьер привезёт продукты домой за 40 минут игрового времени.</p><div class="desktop-grid"><button class="desktop-icon" data-market="groceries"><b>▣</b><span>Заказать продукты</span><small>380 ₽ · +3 ингредиента · доставка 40 мин</small></button></div>`
+      ? renderMarketBody()
       : view === 'battles'
-        ? `<p>${MAKAREWITCH_VI.description}</p><p><strong>Дедлайн: 20 сентября, 23:59.</strong> ${campaign.tournament.researchHints.length ? `Найдено: ${campaign.tournament.researchHints.join(', ')}.` : ''}</p><div class="desktop-grid">${campaign.tournament.registered ? `<button class="desktop-icon" data-battle="research"><b>⌕</b><span>Изучить архив</span><small>1 ч · комментарии и скрытые предпочтения</small></button><button class="desktop-icon" data-battle="track"><b>♫</b><span>Моя заявка</span><small>Сделать и сдать трек</small></button>${campaign.tournament.submitted && !campaign.tournament.selection ? `<button class="desktop-icon" data-battle="results"><b>!</b><span>Судьи отсудили</span><small>Открыть комментарии и баллы</small></button>` : ''}` : `<button class="desktop-icon" data-battle="register"><b>◈</b><span>Участвовать</span><small>Зарегистрироваться на MAKAREWITCH VI</small></button>`}</div>${campaign.tournament.selection ? `<p><strong>${campaign.tournament.selection.passed ? 'Ты прошёл отбор.' : 'Ты не прошёл отбор.'}</strong> ${campaign.tournament.selection.total}/30<br>${campaign.tournament.selection.scores.map((score) => `${score.judge}: ${score.value}/10 — ${score.comment}`).join('<br>')}</p>` : `<p>${MAKAREWITCH_VI.comments.join('<br>')}</p>`}`
-      : view === 'bills'
-        ? `<p><strong>Наличные: ${campaign.cash.toLocaleString('ru-RU')} ₽</strong><br>Аренда: ${campaign.rent.amount.toLocaleString('ru-RU')} ₽ · 1 октября<br>Долг: ${campaign.rent.debt.toLocaleString('ru-RU')} ₽ · статус: ${campaign.rent.status === 'due' ? 'к оплате' : 'ещё не наступил'}.</p><p>При просрочке все доходы будут уходить в счёт общего долга.</p>`
+        ? renderBattlesBody()
+        : view === 'bills'
+        ? renderBillsBody()
         : `<p>${opened.app.description}. Этот раздел готов к игровому действию.</p>`;
   desktopContent.innerHTML = desktopWindowMarkup(opened.app.label, `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>${opened.app.label}</h2>${body}<div id="desktop-page-actions"></div></section>`);
 }
@@ -305,23 +360,73 @@ desktopContent.addEventListener('click', (event) => {
     renderDesktop();
     return;
   }
-  const jobButton = event.target.closest('[data-job]');
-  if (jobButton) {
-    const result = completeShift(campaign, jobButton.dataset.job);
+  const battleDetail = event.target.closest('[data-battle-detail]');
+  if (battleDetail) {
+    desktopBattleId = battleDetail.dataset.battleDetail;
+    renderDesktop('battles');
+    return;
+  }
+  if (event.target.closest('[data-battle-detail-back]')) {
+    desktopBattleId = null;
+    renderDesktop('battles');
+    return;
+  }
+  const battleApply = event.target.closest('[data-battle-apply]');
+  if (battleApply) {
+    const result = registerForTournament(campaign, battleApply.dataset.battleApply);
     campaign = result.state;
     saveCampaign(campaign);
     renderCampaignHud();
-    notify('РАБОТА', result.message);
-    renderDesktop('jobs');
+    notify('MAKAREWITCH VI', result.message);
+    renderDesktop('battles');
+    return;
   }
-  const marketButton = event.target.closest('[data-market]');
-  if (marketButton) {
-    const result = buyFood(campaign, marketButton.dataset.market);
+  const jobDetail = event.target.closest('[data-job-detail]');
+  if (jobDetail) {
+    desktopJobId = jobDetail.dataset.jobDetail;
+    renderDesktop('jobs');
+    return;
+  }
+  if (event.target.closest('[data-job-detail-back]')) {
+    desktopJobId = null;
+    renderDesktop('jobs');
+    return;
+  }
+  const jobMap = event.target.closest('[data-job-map]');
+  if (jobMap) {
+    notify('РАБОТА', `Вакансия «${getJobListing(jobMap.dataset.jobMap).label}» отмечена на карте.`);
+    closeDesktop();
+    openMap();
+    return;
+  }
+  const marketStore = event.target.closest('[data-market-store]');
+  if (marketStore) {
+    desktopMarketStore = marketStore.dataset.marketStore;
+    renderDesktop('market');
+    return;
+  }
+  const marketAdd = event.target.closest('[data-market-add]');
+  if (marketAdd) {
+    desktopCartItem = marketAdd.dataset.marketAdd;
+    renderDesktop('market');
+    return;
+  }
+  const marketCheckout = event.target.closest('[data-market-checkout]');
+  if (marketCheckout) {
+    const result = buyFood(campaign, marketCheckout.dataset.marketCheckout);
     campaign = result.state;
     saveCampaign(campaign);
     renderCampaignHud();
     notify('МАРКЕТ', result.message);
+    desktopCartItem = null;
     renderDesktop('market');
+    return;
+  }
+  const bankTab = event.target.closest('[data-bank-tab]');
+  if (bankTab) {
+    desktopBankTab = bankTab.dataset.bankTab;
+    renderDesktop('bills');
+    return;
   }
   const battleButton = event.target.closest('[data-battle]');
   if (battleButton) {
@@ -341,14 +446,7 @@ desktopContent.addEventListener('click', (event) => {
       startDesktopAction('research-archive', () => researchTournament(campaign));
       return;
     }
-    const result = battleButton.dataset.battle === 'register'
-      ? registerForTournament(campaign, MAKAREWITCH_VI.id)
-      : researchTournament(campaign);
-    campaign = result.state;
-    saveCampaign(campaign);
-    renderCampaignHud();
-    notify('MAKAREWITCH VI', result.message);
-    renderDesktop('battles');
+    return;
   }
   const trackButton = event.target.closest('[data-track-step]');
   if (trackButton) {
