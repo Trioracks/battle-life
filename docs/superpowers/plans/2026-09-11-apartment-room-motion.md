@@ -153,7 +153,7 @@ git push origin master
 
 **Interfaces:**
 - Consumes: `APARTMENT_ROOMS`, `APARTMENT_FLOOR_Y`, `getApartmentRoom`, `createActionTransition` and existing `getApartmentAction`.
-- Produces: `apartmentGroups.living`, `apartmentGroups.kitchen`, `actor.transition`, clamped `cameraTargetX`.
+- Produces: `apartmentGroups.living`, `apartmentGroups.kitchen`, `actor.transition`, actor-centred `cameraTargetX`.
 
 - [ ] **Step 1: Add a visual regression check list before changing the scene**
 
@@ -170,7 +170,7 @@ Add this exact manual scenario under a new `## Apartment visual regression` sect
 
 Create `living` and `kitchen` Three.js groups. Add a full-height partition and a hinged inter-room door at `x ≈ -0.3`; apply visibly different wall materials to each group. Move fridge, stove, sink and eating table into `kitchen`; keep bed, desk, microphone, exit door and compact framed window in `living`.
 
-Set every actor mesh group at `y = APARTMENT_FLOOR_Y`; calculate body offsets upward from the foot mesh rather than shifting the actor below zero. Use a smoothed `camera.position.x` toward `actor.group.position.x`, clamped to the active room width, so the hero stays near the centre but scene limits never reveal empty space.
+Set every actor mesh group at `y = APARTMENT_FLOOR_Y`; calculate body offsets upward from the foot mesh rather than shifting the actor below zero. Set `camera.position.x` directly from `actor.group.position.x` on both sides of the interior doorway, so the hero stays centred and the camera never jumps to the centre of a room. Place the vocal-recording microphone on the desktop beside the PC, never on the floor.
 
 - [ ] **Step 3: Run automated tests**
 

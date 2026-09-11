@@ -63,12 +63,12 @@ export function selectAppearancePart(currentPart, clickedPart) {
   return Object.hasOwn(LOOK_OPTIONS, clickedPart) ? clickedPart : currentPart;
 }
 
-export function frontFacingFaceLayout() {
+export function profileFaceLayout() {
   return {
-    previewYaw: 0,
-    earXs: [-.34, .34],
-    eyeXs: [-.16, .16],
-    faceZ: .285,
+    previewYaw: Math.PI / 2,
+    rightYaw: Math.PI / 2,
+    leftYaw: -Math.PI / 2,
+    faceCameraYaw: 0,
   };
 }
 

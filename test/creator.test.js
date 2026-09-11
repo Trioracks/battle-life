@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { appearanceGeometry, createRapper, cycleLookPart, frontFacingFaceLayout, lookPartAtPreviewHeight, normalizeLook, selectAppearancePart, validateAllocations } from '../src/creator.js';
+import { appearanceGeometry, createRapper, cycleLookPart, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, validateAllocations } from '../src/creator.js';
 
 test('creator turns ten allocated points into visible 10–50 skills', () => {
   const rapper = createRapper({
@@ -60,12 +60,12 @@ test('creator selection changes only to a known clicked appearance part', () => 
   assert.equal(selectAppearancePart('top', 'missing'), 'top');
 });
 
-test('creator face layout is symmetric and points straight at the preview camera', () => {
-  assert.deepEqual(frontFacingFaceLayout(), {
-    previewYaw: 0,
-    earXs: [-.34, .34],
-    eyeXs: [-.16, .16],
-    faceZ: .285,
+test('creator profile face follows the same sideways orientation as the apartment actor', () => {
+  assert.deepEqual(profileFaceLayout(), {
+    previewYaw: Math.PI / 2,
+    rightYaw: Math.PI / 2,
+    leftYaw: -Math.PI / 2,
+    faceCameraYaw: 0,
   });
 });
 
