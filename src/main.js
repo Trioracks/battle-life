@@ -5,7 +5,7 @@ import { clickIntent } from './click-intent.js';
 import { stepCharacter } from './character-motion.js';
 import { presentActionProgress } from './action-progress.js';
 import { advanceCampaign, createCampaign, getInventorySummary, loadCampaign, saveCampaign } from './game-state.js';
-import { createRapper, cycleLookPart, LOOK_PART_LABELS, lookPartAtPreviewHeight, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
+import { appearanceGeometry, createRapper, cycleLookPart, frontFacingFaceLayout, LOOK_PART_LABELS, lookPartAtPreviewHeight, normalizeLook, selectAppearancePart, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
 import { canStartApartmentAction, describeApartmentAction, getApartmentAction } from './apartment-actions.js';
 import { playSoundCue } from './sound-cues.js';
 import { desktopApps, getDesktopAction, openDesktopApp } from './desktop-apps.js';
@@ -52,6 +52,7 @@ let campaign = loadCampaign() ?? createCampaign();
 saveCampaign(campaign);
 let creatorAllocations = Object.fromEntries(STAT_KEYS.map((key) => [key, 0]));
 let creatorLook = campaign.player?.look ?? { hair: 'bald', face: 'clean', top: 'hoodie', pants: 'cargo' };
+let creatorSelectedPart = 'hair';
 let audioContext = null;
 let desktopOpen = false;
 let desktopBootTimer = null;
@@ -373,7 +374,8 @@ function renderCreator() {
     return `<div class="creator-stat"><span>${statLabels[key]}</span><strong>${value}</strong><span><button class="creator-control" type="button" data-stat="${key}" data-delta="-1" ${allocation === 0 ? 'disabled' : ''}>−</button><button class="creator-control" type="button" data-stat="${key}" data-delta="1" ${allocation === 4 || total === 10 ? 'disabled' : ''}>+</button></span></div>`;
   }).join('');
   creatorError.textContent = validation.valid ? '' : validation.message;
-  creatorLookControls.innerHTML = Object.entries(LOOK_PART_LABELS).map(([part, label]) => `<div class="creator-zone creator-zone--${part}" data-look-zone="${part}"><button type="button" aria-label="Предыдущий вариант: ${label}" data-look-part="${part}" data-direction="-1">‹</button><span>${label}<strong>${lookValueLabel(part, creatorLook[part])}</strong></span><button type="button" aria-label="Следующий вариант: ${label}" data-look-part="${part}" data-direction="1">›</button></div>`).join('');
+  const selectedLabel = LOOK_PART_LABELS[creatorSelectedPart];
+  creatorLookControls.innerHTML = `<p>Кликни по части модели, затем выбери вариант.</p><div class="creator-selector"><button type="button" aria-label="Предыдущий вариант: ${selectedLabel}" data-look-part="${creatorSelectedPart}" data-direction="-1">‹</button><span><small>${selectedLabel}</small><strong>${lookValueLabel(creatorSelectedPart, creatorLook[creatorSelectedPart])}</strong></span><button type="button" aria-label="Следующий вариант: ${selectedLabel}" data-look-part="${creatorSelectedPart}" data-direction="1">›</button></div>`;
   if (creatorPreviewActor) applyAvatarLook(creatorPreviewActor, creatorLook);
 }
 
@@ -405,8 +407,7 @@ creatorStats.addEventListener('click', (event) => {
 
 creatorLookControls.addEventListener('click', (event) => {
   const button = event.target.closest('[data-look-part]');
-  const zone = event.target.closest('[data-look-zone]');
-  const part = button?.dataset.lookPart ?? zone?.dataset.lookZone;
+  const part = button?.dataset.lookPart;
   if (!part) return;
   creatorLook = cycleLookPart(creatorLook, part, Number(button?.dataset.direction ?? 1));
   applyAvatarLook(actor, creatorLook);
@@ -415,9 +416,8 @@ creatorLookControls.addEventListener('click', (event) => {
 
 creatorPreviewCanvas.addEventListener('click', (event) => {
   const rect = creatorPreviewCanvas.getBoundingClientRect();
-  const part = lookPartAtPreviewHeight((event.clientY - rect.top) / rect.height);
-  creatorLook = cycleLookPart(creatorLook, part, 1);
-  applyAvatarLook(actor, creatorLook);
+  const clickedPart = lookPartAtPreviewHeight((event.clientY - rect.top) / rect.height);
+  creatorSelectedPart = selectAppearancePart(creatorSelectedPart, clickedPart);
   renderCreator();
 });
 
@@ -714,11 +714,11 @@ function makeLimb(parent, name, z, color, upperLength, lowerLength) {
   const lowerPivot = new THREE.Group();
   lowerPivot.position.set(0, -upperLength, z);
   pivot.add(lowerPivot);
-  box(lowerPivot, [.25, lowerLength, .25], color, [0, -lowerLength / 2, 0]);
-  return { pivot, lowerPivot, upper };
+  const lower = box(lowerPivot, [.25, lowerLength, .25], color, [0, -lowerLength / 2, 0]);
+  return { pivot, lowerPivot, upper, lower };
 }
 
-function createCharacter(parent = scene, { x = -1.75, hoodie = colors.hoodie, pants = colors.pants, cap = colors.red } = {}) {
+function createCharacter(parent = scene, { x = -1.75 } = {}) {
   const actor = {
     group: new THREE.Group(),
     model: new THREE.Group(),
@@ -746,9 +746,38 @@ function createCharacter(parent = scene, { x = -1.75, hoodie = colors.hoodie, pa
   actor.group.add(shadow);
   actor.shadow = shadow;
 
-  const torso = box(actor.model, [.72, .96, .48], hoodie, [0, 1.48, 0]);
-  box(actor.model, [.8, .21, .52], 0x1c252b, [0, 1.98, 0]);
-  box(actor.model, [.25, .18, .2], colors.skin, [.42, 2.32, 0]);
+  const topStyles = {};
+  const tee = new THREE.Group();
+  tee.name = 'avatar-top-tee';
+  actor.model.add(tee);
+  const teeTorso = box(tee, [.72, .84, .48], 0x6e7c74, [0, 1.48, 0]);
+  const teeSleeveLeft = box(tee, [.24, .28, .5], 0x6e7c74, [-.47, 1.79, 0]);
+  const teeSleeveRight = box(tee, [.24, .28, .5], 0x6e7c74, [.47, 1.79, 0]);
+  topStyles.tee = { group: tee, meshes: [teeTorso, teeSleeveLeft, teeSleeveRight] };
+
+  const hoodie = new THREE.Group();
+  hoodie.name = 'avatar-top-hoodie';
+  actor.model.add(hoodie);
+  const hoodieTorso = box(hoodie, [.76, .98, .52], colors.hoodie, [0, 1.48, 0]);
+  const hoodiePouch = box(hoodie, [.54, .22, .08], colors.hoodie, [0, 1.21, .3]);
+  const hood = new THREE.Mesh(new THREE.TorusGeometry(.31, .09, 8, 12, Math.PI), material(colors.hoodie));
+  hood.rotation.x = Math.PI / 2;
+  hood.position.set(0, 1.95, -.27);
+  hoodie.add(hood);
+  topStyles.hoodie = { group: hoodie, meshes: [hoodieTorso, hoodiePouch, hood] };
+
+  const jacket = new THREE.Group();
+  jacket.name = 'avatar-top-jacket';
+  actor.model.add(jacket);
+  const jacketTorso = box(jacket, [.78, .96, .54], 0x2e5361, [0, 1.48, 0]);
+  const jacketLapels = [
+    box(jacket, [.2, .6, .09], 0x6b8b92, [-.2, 1.6, .32]),
+    box(jacket, [.2, .6, .09], 0x6b8b92, [.2, 1.6, .32]),
+  ];
+  jacketLapels[0].rotation.z = -.3;
+  jacketLapels[1].rotation.z = .3;
+  topStyles.jacket = { group: jacket, meshes: [jacketTorso, ...jacketLapels] };
+
   box(actor.model, [.53, .57, .48], colors.skin, [0, 2.32, 0]);
   const hair = box(actor.model, [.55, .09, .51], 0x17151b, [0, 2.64, 0]);
   const faceHair = new THREE.Group();
@@ -757,7 +786,21 @@ function createCharacter(parent = scene, { x = -1.75, hoodie = colors.hoodie, pa
   const beard = box(faceHair, [.37, .2, .055], 0x1b1718, [0, 2.13, .27]);
   mustache.visible = false;
   beard.visible = false;
-  box(actor.model, [.11, .07, .34], 0x171c20, [.28, 2.38, .25]);
+  const face = new THREE.Group();
+  face.name = 'avatar-face';
+  actor.model.add(face);
+  const faceLayout = frontFacingFaceLayout();
+  faceLayout.earXs.forEach((x) => box(face, [.12, .18, .17], colors.skin, [x, 2.32, .01]));
+  const eyeMaterial = material(0xe9eadf, { emissive: 0x6b6d60, emissiveIntensity: .16 });
+  faceLayout.eyeXs.forEach((x) => {
+    const eye = new THREE.Mesh(new THREE.BoxGeometry(.1, .09, .04), eyeMaterial);
+    eye.position.set(x, 2.43, faceLayout.faceZ);
+    face.add(eye);
+    const brow = box(face, [.15, .035, .045], 0x2a2020, [x, 2.52, faceLayout.faceZ]);
+    brow.rotation.z = x < 0 ? .1 : -.1;
+  });
+  box(face, [.055, .12, .05], 0xc48769, [0, 2.34, faceLayout.faceZ]);
+  box(face, [.2, .035, .045], 0x994f4b, [0, 2.2, faceLayout.faceZ]);
 
   actor.backArm = makeLimb(actor.model, 'backArm', -.31, 0x1f2930, .62, .52);
   actor.frontArm = makeLimb(actor.model, 'frontArm', .31, 0x34444d, .62, .52);
@@ -767,31 +810,49 @@ function createCharacter(parent = scene, { x = -1.75, hoodie = colors.hoodie, pa
   box(actor.frontArm.lowerPivot, [.22, .21, .22], colors.skin, [0, -.6, 0]);
 
   actor.backLeg = makeLimb(actor.model, 'backLeg', -.19, 0x33423f, .68, .6);
-  actor.frontLeg = makeLimb(actor.model, 'frontLeg', .19, pants, .68, .6);
+  actor.frontLeg = makeLimb(actor.model, 'frontLeg', .19, colors.pants, .68, .6);
   actor.backLeg.pivot.position.set(0, 1.03, 0);
   actor.frontLeg.pivot.position.set(0, 1.03, 0);
   box(actor.backLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
   box(actor.frontLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
 
   actor.model.rotation.y = 0;
-  actor.lookParts = { torso, hair, mustache, beard, frontLeg: actor.frontLeg.upper, backLeg: actor.backLeg.upper, frontArm: actor.frontArm.upper, backArm: actor.backArm.upper };
+  actor.lookParts = {
+    topStyles,
+    hair,
+    mustache,
+    beard,
+    frontLeg: actor.frontLeg.upper,
+    backLeg: actor.backLeg.upper,
+    frontShin: actor.frontLeg.lower,
+    backShin: actor.backLeg.lower,
+    frontArm: actor.frontArm.upper,
+    backArm: actor.backArm.upper,
+  };
   return actor;
 }
 
 function applyAvatarLook(target, look = {}) {
-  const topColors = { hoodie: colors.hoodie, bomber: 0x5d4035, jacket: 0x2e5361 };
+  const normalizedLook = normalizeLook(look);
+  const geometry = appearanceGeometry(normalizedLook);
+  const topColors = { tee: 0x6e7c74, hoodie: colors.hoodie, jacket: 0x2e5361 };
   const pantsColors = { cargo: colors.pants, jeans: 0x303d63, shorts: 0x77715b };
-  const topColor = topColors[look.top] ?? topColors.hoodie;
-  target.lookParts.torso.material.color.setHex(topColor);
+  const topColor = topColors[normalizedLook.top];
+  Object.entries(target.lookParts.topStyles).forEach(([id, style]) => {
+    style.group.visible = id === normalizedLook.top;
+    style.meshes.forEach((mesh) => mesh.material.color.setHex(topColor));
+  });
   target.lookParts.frontArm.material.color.setHex(topColor);
   target.lookParts.backArm.material.color.setHex(topColor);
-  target.lookParts.frontLeg.material.color.setHex(pantsColors[look.pants] ?? pantsColors.cargo);
-  target.lookParts.backLeg.material.color.setHex(pantsColors[look.pants] ?? pantsColors.cargo);
-  target.lookParts.hair.visible = look.hair !== 'bald';
-  target.lookParts.hair.scale.set(1, look.hair === 'mohawk' ? 2.2 : 1, look.hair === 'mohawk' ? .38 : 1);
-  target.lookParts.hair.position.y = look.hair === 'mohawk' ? 2.72 : 2.64;
-  target.lookParts.mustache.visible = look.face === 'mustache';
-  target.lookParts.beard.visible = look.face === 'beard';
+  target.lookParts.frontLeg.material.color.setHex(pantsColors[normalizedLook.pants]);
+  target.lookParts.backLeg.material.color.setHex(pantsColors[normalizedLook.pants]);
+  target.lookParts.frontShin.material.color.setHex(geometry.lowerLegsVisible ? colors.skin : pantsColors[normalizedLook.pants]);
+  target.lookParts.backShin.material.color.setHex(geometry.lowerLegsVisible ? colors.skin : pantsColors[normalizedLook.pants]);
+  target.lookParts.hair.visible = normalizedLook.hair !== 'bald';
+  target.lookParts.hair.scale.set(1, normalizedLook.hair === 'mohawk' ? 2.2 : 1, normalizedLook.hair === 'mohawk' ? .38 : 1);
+  target.lookParts.hair.position.y = normalizedLook.hair === 'mohawk' ? 2.72 : 2.64;
+  target.lookParts.mustache.visible = normalizedLook.face === 'mustache';
+  target.lookParts.beard.visible = normalizedLook.face === 'beard';
 }
 
 function createEggOpponent(parent, x = 3.75) {
@@ -964,7 +1025,7 @@ const creatorPreviewLight = new THREE.DirectionalLight(0xf2d9ab, 2.2);
 creatorPreviewLight.position.set(-2, 5, 4);
 creatorPreviewScene.add(creatorPreviewLight);
 const creatorPreviewActor = createCharacter(creatorPreviewScene, { x: 0 });
-creatorPreviewActor.model.rotation.y = -.28;
+creatorPreviewActor.model.rotation.y = frontFacingFaceLayout().previewYaw;
 applyAvatarLook(creatorPreviewActor, creatorLook);
 const battle = createBattleScene();
 let gameMode = 'apartment';
@@ -1530,7 +1591,8 @@ function render() {
   else updateBattle(delta, clock.elapsedTime);
   updateActorBubble();
   if (!creatorModal.classList.contains('is-hidden')) {
-    creatorPreviewActor.model.rotation.y = -.28 + Math.sin(clock.elapsedTime * .65) * .08;
+    creatorPreviewActor.model.rotation.y = frontFacingFaceLayout().previewYaw;
+    creatorPreviewActor.model.position.y = Math.sin(clock.elapsedTime * .65) * .025;
     creatorPreviewRenderer.render(creatorPreviewScene, creatorPreviewCamera);
   }
   renderer.render(scene, camera);
