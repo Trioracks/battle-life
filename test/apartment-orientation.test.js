@@ -21,6 +21,7 @@ test('sideways movement keeps the head with the torso and exposes one arm', () =
     profileLocalYaw: 0,
     billboardYaw: 0,
     bodyWidth: 1,
+    rig: { headWidth: 1, torsoWidth: 1, armXs: [-.42, .42], legXs: [-.19, .19], frontDetails: true },
   });
   assert.deepEqual(avatarFacingForYaw(Math.PI / 2), {
     face: 'profile-right',
@@ -28,6 +29,7 @@ test('sideways movement keeps the head with the torso and exposes one arm', () =
     profileLocalYaw: 0,
     billboardYaw: -Math.PI / 2,
     bodyWidth: .72,
+    rig: { headWidth: .78, torsoWidth: .72, armXs: [-.32], legXs: [-.14, .14], frontDetails: false },
   });
   assert.deepEqual(avatarFacingForYaw(-Math.PI / 2), {
     face: 'profile-left',
@@ -35,6 +37,7 @@ test('sideways movement keeps the head with the torso and exposes one arm', () =
     profileLocalYaw: 0,
     billboardYaw: Math.PI / 2,
     bodyWidth: .72,
+    rig: { headWidth: .78, torsoWidth: .72, armXs: [.32], legXs: [-.14, .14], frontDetails: false },
   });
   assert.deepEqual(avatarFacingForYaw(Math.PI), {
     face: 'back',
@@ -42,6 +45,7 @@ test('sideways movement keeps the head with the torso and exposes one arm', () =
     profileLocalYaw: 0,
     billboardYaw: -Math.PI,
     bodyWidth: 1,
+    rig: { headWidth: 1, torsoWidth: 1, armXs: [-.42, .42], legXs: [-.19, .19], frontDetails: false },
   });
 });
 

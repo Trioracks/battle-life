@@ -992,7 +992,7 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   const teeTorso = box(tee, [.72, .84, .48], 0x6e7c74, [0, 1.48, 0]);
   const teeSleeveLeft = box(tee, [.24, .28, .5], 0x6e7c74, [-.47, 1.79, 0]);
   const teeSleeveRight = box(tee, [.24, .28, .5], 0x6e7c74, [.47, 1.79, 0]);
-  topStyles.tee = { group: tee, meshes: [teeTorso, teeSleeveLeft, teeSleeveRight] };
+  topStyles.tee = { group: tee, meshes: [teeTorso, teeSleeveLeft, teeSleeveRight], torso: teeTorso, sleeves: [teeSleeveLeft, teeSleeveRight] };
 
   const hoodie = new THREE.Group();
   hoodie.name = 'avatar-top-hoodie';
@@ -1003,7 +1003,7 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   hood.rotation.x = Math.PI / 2;
   hood.position.set(0, 1.95, -.27);
   hoodie.add(hood);
-  topStyles.hoodie = { group: hoodie, meshes: [hoodieTorso, hoodiePouch, hood], frontDetails: [hoodiePouch] };
+  topStyles.hoodie = { group: hoodie, meshes: [hoodieTorso, hoodiePouch, hood], torso: hoodieTorso, frontDetails: [hoodiePouch] };
 
   const jacket = new THREE.Group();
   jacket.name = 'avatar-top-jacket';
@@ -1015,9 +1015,9 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   ];
   jacketLapels[0].rotation.z = -.3;
   jacketLapels[1].rotation.z = .3;
-  topStyles.jacket = { group: jacket, meshes: [jacketTorso, ...jacketLapels], frontDetails: jacketLapels };
+  topStyles.jacket = { group: jacket, meshes: [jacketTorso, ...jacketLapels], torso: jacketTorso, frontDetails: jacketLapels };
 
-  box(visual, [.53, .57, .48], colors.skin, [0, 2.32, 0]);
+  const head = box(visual, [.53, .57, .48], colors.skin, [0, 2.32, 0]);
   const hair = box(visual, [.55, .09, .51], 0x17151b, [0, 2.64, 0]);
   const frontFaceHair = new THREE.Group();
   visual.add(frontFaceHair);
@@ -1086,6 +1086,7 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   actor.model.rotation.y = profileFaceLayout().rightYaw;
   actor.lookParts = {
     topStyles,
+    head,
     hair,
     mustache,
     beard,
@@ -1140,19 +1141,36 @@ function updateFacePresentation(target) {
   const parts = target.lookParts;
   if (!parts?.frontFace || !parts.profileRightFace || !parts.profileLeftFace) return;
   const presentation = avatarFacingForYaw(target.model.rotation.y);
+  const rig = presentation.rig;
   if (target.visual) {
     target.visual.rotation.y = presentation.billboardYaw;
-    target.visual.scale.x = presentation.bodyWidth;
+    target.visual.scale.x = 1;
   }
+  parts.head.scale.x = rig.headWidth;
+  parts.hair.scale.x = rig.headWidth;
   parts.frontFace.visible = presentation.face === 'front';
   parts.frontFaceHair.visible = presentation.face === 'front';
   parts.profileRightFace.visible = presentation.face === 'profile-right';
   parts.profileLeftFace.visible = presentation.face === 'profile-left';
   Object.values(parts.topStyles).forEach((style) => {
+    style.torso.scale.x = rig.torsoWidth;
+    style.sleeves?.forEach((sleeve) => {
+      sleeve.visible = presentation.face === 'front' || presentation.face === 'back';
+    });
     style.frontDetails?.forEach((detail) => {
-      detail.visible = presentation.face === 'front';
+      detail.visible = rig.frontDetails;
     });
   });
+  target.backLeg.pivot.position.x = rig.legXs[0];
+  target.frontLeg.pivot.position.x = rig.legXs[1];
+  if (presentation.visibleArm === 'front') {
+    target.frontArm.pivot.position.x = rig.armXs[0];
+  } else if (presentation.visibleArm === 'back') {
+    target.backArm.pivot.position.x = rig.armXs[0];
+  } else {
+    target.backArm.pivot.position.x = rig.armXs[0];
+    target.frontArm.pivot.position.x = rig.armXs[1];
+  }
   target.backArm.pivot.visible = presentation.visibleArm !== 'front';
   target.frontArm.pivot.visible = presentation.visibleArm !== 'back';
 }
