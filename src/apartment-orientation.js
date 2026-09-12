@@ -25,16 +25,21 @@ function normalizedYaw(yaw) {
   return ((yaw + Math.PI) % fullTurn + fullTurn) % fullTurn - Math.PI;
 }
 
-// A side-facing body needs its own one-eye profile instead of a rotated copy
-// of the front face. Keeping the choice here makes the presentation stable
-// for every turn angle.
-export function facePresentationForYaw(yaw) {
+// The profile is drawn on the actual side plane of the head. It therefore
+// inherits the body's yaw instead of counter-rotating towards the camera.
+export function avatarFacingForYaw(yaw) {
   const angle = Math.abs(normalizedYaw(yaw));
-  if (angle <= Math.PI / 4) return 'front';
-  if (angle >= Math.PI * 3 / 4) return 'back';
-  return 'profile';
+  if (angle <= Math.PI / 4) {
+    return { face: 'front', visibleArm: 'both', profileLocalYaw: 0 };
+  }
+  if (angle >= Math.PI * 3 / 4) {
+    return { face: 'back', visibleArm: 'both', profileLocalYaw: 0 };
+  }
+  return normalizedYaw(yaw) >= 0
+    ? { face: 'profile-right', visibleArm: 'back', profileLocalYaw: 0 }
+    : { face: 'profile-left', visibleArm: 'front', profileLocalYaw: 0 };
 }
 
-export function profileMirrorScale(yaw) {
-  return normalizedYaw(yaw) >= 0 ? 1 : -1;
+export function shouldPauseWalkForTurn(turn) {
+  return turn !== null && turn !== undefined;
 }

@@ -9,7 +9,7 @@ import { allocationsFromSkills, appearanceGeometry, createRapper, cycleLookPart,
 import { canStartApartmentAction, describeApartmentAction, getApartmentAction } from './apartment-actions.js';
 import { APARTMENT_ACTOR_FOREGROUND_Z, APARTMENT_DESK, APARTMENT_ENTRY_DOOR, APARTMENT_FLOOR_Y, APARTMENT_INTERIOR_DOOR, APARTMENT_MICROPHONE, APARTMENT_ROOMS, APARTMENT_SPAWN, apartmentWalkTargets, cameraTargetX, getApartmentRoom } from './apartment-layout.js';
 import { actionUsesDeskSeat, createActionTransition, phaseAfterApproach } from './action-transitions.js';
-import { actionYaw, cameraYaw, facePresentationForYaw, profileMirrorScale, walkYaw } from './apartment-orientation.js';
+import { actionYaw, avatarFacingForYaw, cameraYaw, shouldPauseWalkForTurn, walkYaw } from './apartment-orientation.js';
 import { playSoundCue } from './sound-cues.js';
 import { desktopApps, getDesktopAction, openDesktopApp } from './desktop-apps.js';
 import { closeDesktopWindow, desktopShellLabels, desktopTaskbarLabel, finishDesktopBoot, openDesktopWindow, resumeDesktopWindow, shutdownDesktopSession, startDesktopSession } from './desktop-session.js';
@@ -1033,34 +1033,45 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   box(frontFace, [.055, .12, .05], 0xc48769, [0, 2.34, faceLayout.faceZ]);
   box(frontFace, [.2, .035, .045], 0x994f4b, [0, 2.2, faceLayout.faceZ]);
 
-  // This is intentionally a separate, camera-facing 2.5D profile. Rotating a
-  // pair of front eyes and ears into a side view was the source of the "two
-  // faces" artefact: in profile there must be one eye, one nose and one ear.
-  const profileFace = new THREE.Group();
-  profileFace.name = 'avatar-profile-face';
-  profileFace.position.set(0, 2.32, .267);
-  actor.model.add(profileFace);
-  box(profileFace, [.09, .17, .05], colors.skin, [-.22, 0, .02]);
-  box(profileFace, [.1, .09, .045], 0xe9eadf, [.065, .11, .04], { emissive: 0x6b6d60, emissiveIntensity: .16 });
-  box(profileFace, [.16, .035, .045], 0x2a2020, [.055, .205, .045]);
-  box(profileFace, [.18, .11, .055], 0xc48769, [.22, .015, .055]);
-  box(profileFace, [.14, .035, .045], 0x994f4b, [.05, -.13, .05]);
-  const profileMustache = box(profileFace, [.19, .055, .05], 0x1b1718, [.095, -.015, .065]);
-  const profileBeard = box(profileFace, [.25, .18, .055], 0x1b1718, [.015, -.19, .06]);
-  profileMustache.visible = false;
-  profileBeard.visible = false;
+  // These are actual side planes of the head, not camera-facing billboards.
+  // The body and its profile therefore turn as one piece while walking.
+  const profileRightFace = new THREE.Group();
+  profileRightFace.name = 'avatar-profile-right-face';
+  actor.model.add(profileRightFace);
+  box(profileRightFace, [.05, .17, .09], colors.skin, [-.29, 2.32, -.18]);
+  box(profileRightFace, [.045, .09, .1], 0xe9eadf, [-.305, 2.43, .055], { emissive: 0x6b6d60, emissiveIntensity: .16 });
+  box(profileRightFace, [.045, .035, .16], 0x2a2020, [-.31, 2.52, .055]);
+  box(profileRightFace, [.075, .11, .17], 0xc48769, [-.33, 2.34, .22]);
+  box(profileRightFace, [.05, .035, .14], 0x994f4b, [-.315, 2.2, .055]);
+  const profileRightMustache = box(profileRightFace, [.055, .055, .19], 0x1b1718, [-.34, 2.31, .105]);
+  const profileRightBeard = box(profileRightFace, [.06, .2, .25], 0x1b1718, [-.33, 2.13, .015]);
+  profileRightMustache.visible = false;
+  profileRightBeard.visible = false;
+
+  const profileLeftFace = new THREE.Group();
+  profileLeftFace.name = 'avatar-profile-left-face';
+  actor.model.add(profileLeftFace);
+  box(profileLeftFace, [.05, .17, .09], colors.skin, [.29, 2.32, -.18]);
+  box(profileLeftFace, [.045, .09, .1], 0xe9eadf, [.305, 2.43, .055], { emissive: 0x6b6d60, emissiveIntensity: .16 });
+  box(profileLeftFace, [.045, .035, .16], 0x2a2020, [.31, 2.52, .055]);
+  box(profileLeftFace, [.075, .11, .17], 0xc48769, [.33, 2.34, .22]);
+  box(profileLeftFace, [.05, .035, .14], 0x994f4b, [.315, 2.2, .055]);
+  const profileLeftMustache = box(profileLeftFace, [.055, .055, .19], 0x1b1718, [.34, 2.31, .105]);
+  const profileLeftBeard = box(profileLeftFace, [.06, .2, .25], 0x1b1718, [.33, 2.13, .015]);
+  profileLeftMustache.visible = false;
+  profileLeftBeard.visible = false;
 
   actor.backArm = makeLimb(actor.model, 'backArm', -.31, 0x1f2930, .62, .52);
   actor.frontArm = makeLimb(actor.model, 'frontArm', .31, 0x34444d, .62, .52);
-  actor.backArm.pivot.position.set(0, 1.83, 0);
-  actor.frontArm.pivot.position.set(0, 1.83, 0);
+  actor.backArm.pivot.position.set(-.42, 1.83, 0);
+  actor.frontArm.pivot.position.set(.42, 1.83, 0);
   box(actor.backArm.lowerPivot, [.22, .21, .22], colors.skin, [0, -.6, 0]);
   box(actor.frontArm.lowerPivot, [.22, .21, .22], colors.skin, [0, -.6, 0]);
 
   actor.backLeg = makeLimb(actor.model, 'backLeg', -.19, 0x33423f, .68, .6);
   actor.frontLeg = makeLimb(actor.model, 'frontLeg', .19, colors.pants, .68, .6);
-  actor.backLeg.pivot.position.set(0, 1.03, 0);
-  actor.frontLeg.pivot.position.set(0, 1.03, 0);
+  actor.backLeg.pivot.position.set(-.19, 1.03, 0);
+  actor.frontLeg.pivot.position.set(.19, 1.03, 0);
   box(actor.backLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
   box(actor.frontLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
 
@@ -1070,11 +1081,14 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
     hair,
     mustache,
     beard,
-    profileMustache,
-    profileBeard,
+    profileRightMustache,
+    profileRightBeard,
+    profileLeftMustache,
+    profileLeftBeard,
     frontFace,
     frontFaceHair,
-    profileFace,
+    profileRightFace,
+    profileLeftFace,
     frontLeg: actor.frontLeg.upper,
     backLeg: actor.backLeg.upper,
     frontShin: actor.frontLeg.lower,
@@ -1107,22 +1121,25 @@ function applyAvatarLook(target, look = {}) {
   target.lookParts.hair.position.y = normalizedLook.hair === 'mohawk' ? 2.72 : 2.64;
   target.lookParts.mustache.visible = normalizedLook.face === 'mustache';
   target.lookParts.beard.visible = normalizedLook.face === 'beard';
-  target.lookParts.profileMustache.visible = normalizedLook.face === 'mustache';
-  target.lookParts.profileBeard.visible = normalizedLook.face === 'beard';
+  target.lookParts.profileRightMustache.visible = normalizedLook.face === 'mustache';
+  target.lookParts.profileRightBeard.visible = normalizedLook.face === 'beard';
+  target.lookParts.profileLeftMustache.visible = normalizedLook.face === 'mustache';
+  target.lookParts.profileLeftBeard.visible = normalizedLook.face === 'beard';
   updateFacePresentation(target);
 }
 
 function updateFacePresentation(target) {
   const parts = target.lookParts;
-  if (!parts?.frontFace || !parts.profileFace) return;
-  const presentation = facePresentationForYaw(target.model.rotation.y);
-  parts.frontFace.visible = presentation === 'front';
-  parts.frontFaceHair.visible = presentation === 'front';
-  parts.profileFace.visible = presentation === 'profile';
-  if (presentation === 'profile') {
-    parts.profileFace.rotation.y = -target.model.rotation.y;
-    parts.profileFace.scale.set(profileMirrorScale(target.model.rotation.y), 1, 1);
-  }
+  if (!parts?.frontFace || !parts.profileRightFace || !parts.profileLeftFace) return;
+  const presentation = avatarFacingForYaw(target.model.rotation.y);
+  parts.frontFace.visible = presentation.face === 'front';
+  parts.frontFaceHair.visible = presentation.face === 'front';
+  parts.profileRightFace.visible = presentation.face === 'profile-right';
+  parts.profileLeftFace.visible = presentation.face === 'profile-left';
+  parts.profileRightFace.rotation.y = presentation.profileLocalYaw;
+  parts.profileLeftFace.rotation.y = presentation.profileLocalYaw;
+  target.backArm.pivot.visible = presentation.visibleArm !== 'front';
+  target.frontArm.pivot.visible = presentation.visibleArm !== 'back';
 }
 
 function createEggOpponent(parent, x = 3.75) {
@@ -1762,6 +1779,13 @@ function updateAction(delta, elapsed) {
 function updateApartment(delta, elapsed) {
   updateTurn(delta);
   if (updateAction(delta, elapsed)) {
+    updateInteriorDoor(delta);
+    updateApartmentCamera(delta);
+    setStatus();
+    return;
+  }
+  if (actor.destinationX !== null && shouldPauseWalkForTurn(actor.turn)) {
+    updatePose(0, elapsed);
     updateInteriorDoor(delta);
     updateApartmentCamera(delta);
     setStatus();
