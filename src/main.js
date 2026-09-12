@@ -939,6 +939,131 @@ function makeLimb(parent, name, z, color, upperLength, lowerLength) {
   return { pivot, lowerPivot, upper, lower };
 }
 
+// A complete view is drawn as one 2.5D figure. We never compose a profile
+// from a front-facing head and a separately rotated body.
+function createAvatarView(parent, id) {
+  const group = new THREE.Group();
+  group.name = `avatar-view-${id}`;
+  parent.add(group);
+  const profile = id === 'profile-right' || id === 'profile-left';
+  const faceRight = id === 'profile-right';
+  const faceLeft = id === 'profile-left';
+  const isFront = id === 'front';
+  const isBack = id === 'back';
+  const topMeshes = [];
+  const pantsMeshes = [];
+  const lowerLegMeshes = [];
+  const hairMeshes = [];
+
+  const headWidth = profile ? .42 : .53;
+  const headX = profile ? (faceRight ? -.04 : .04) : 0;
+  const head = box(group, [headWidth, .57, .16], colors.skin, [headX, 2.32, .05]);
+  const hair = box(group, [headWidth + .02, .09, .18], 0x17151b, [headX, 2.64, .06]);
+  hairMeshes.push(hair);
+  const face = new THREE.Group();
+  face.name = `avatar-view-${id}-face`;
+  group.add(face);
+
+  if (isFront) {
+    [-.34, .34].forEach((x) => box(face, [.12, .18, .06], colors.skin, [x, 2.32, .16]));
+    [-.17, .17].forEach((x) => {
+      box(face, [.1, .09, .04], 0xe9eadf, [x, 2.43, .17], { emissive: 0x6b6d60, emissiveIntensity: .16 });
+      const brow = box(face, [.15, .035, .045], 0x2a2020, [x, 2.52, .17]);
+      brow.rotation.z = x < 0 ? .1 : -.1;
+    });
+    box(face, [.055, .12, .05], 0xc48769, [0, 2.34, .17]);
+    box(face, [.2, .035, .045], 0x994f4b, [0, 2.2, .17]);
+  } else if (profile) {
+    const sign = faceRight ? 1 : -1;
+    box(face, [.1, .17, .055], colors.skin, [-sign * .29, 2.32, .17]);
+    box(face, [.09, .09, .045], 0xe9eadf, [sign * .075, 2.43, .17], { emissive: 0x6b6d60, emissiveIntensity: .16 });
+    box(face, [.14, .035, .05], 0x2a2020, [sign * .09, 2.52, .17]);
+    box(face, [.11, .11, .06], 0xc48769, [sign * .3, 2.34, .17]);
+    box(face, [.13, .035, .05], 0x994f4b, [sign * .08, 2.2, .17]);
+  } else if (isBack) {
+    [-.34, .34].forEach((x) => box(face, [.12, .18, .06], colors.skin, [x, 2.32, .16]));
+  }
+  let mustache = null;
+  let beard = null;
+  if (isFront) {
+    mustache = box(face, [.26, .055, .05], 0x1b1718, [0, 2.31, .2]);
+    beard = box(face, [.37, .2, .055], 0x1b1718, [0, 2.13, .2]);
+  } else if (profile) {
+    const sign = faceRight ? 1 : -1;
+    mustache = box(face, [.13, .055, .055], 0x1b1718, [sign * .18, 2.31, .2]);
+    beard = box(face, [.18, .2, .06], 0x1b1718, [sign * .16, 2.13, .2]);
+  }
+  if (mustache) mustache.visible = false;
+  if (beard) beard.visible = false;
+
+  const torsoWidth = profile ? .56 : .78;
+  const torso = box(group, [torsoWidth, .96, .18], 0x2e5361, [0, 1.48, .04]);
+  topMeshes.push(torso);
+  const lapels = new THREE.Group();
+  group.add(lapels);
+  const leftLapel = box(lapels, [.2, .6, .04], 0x6b8b92, [-.2, 1.6, .15]);
+  const rightLapel = box(lapels, [.2, .6, .04], 0x6b8b92, [.2, 1.6, .15]);
+  leftLapel.rotation.z = -.3;
+  rightLapel.rotation.z = .3;
+  lapels.visible = isFront;
+  const hoodiePouch = box(group, [.54, .22, .04], colors.hoodie, [0, 1.21, .16]);
+  hoodiePouch.visible = false;
+  const hood = new THREE.Mesh(new THREE.TorusGeometry(.31, .055, 6, 10, Math.PI), material(colors.hoodie));
+  hood.rotation.x = Math.PI / 2;
+  hood.position.set(0, 1.95, -.06);
+  hood.visible = false;
+  group.add(hood);
+
+  const limbs = {};
+  const addArm = (key, x) => {
+    const limb = makeLimb(group, `${id}-${key}`, .04, 0x2e5361, .62, .52);
+    limb.pivot.position.set(x, 1.83, .04);
+    box(limb.lowerPivot, [.22, .21, .08], colors.skin, [0, -.6, .04]);
+    limbs[key] = limb;
+    topMeshes.push(limb.upper, limb.lower);
+  };
+  if (faceRight) addArm('backArm', -.32);
+  else if (faceLeft) addArm('frontArm', .32);
+  else {
+    addArm('backArm', -.42);
+    addArm('frontArm', .42);
+  }
+
+  const legXs = profile ? [-.14, .14] : [-.19, .19];
+  const addLeg = (key, x) => {
+    const limb = makeLimb(group, `${id}-${key}`, .04, colors.pants, .68, .6);
+    limb.pivot.position.set(x, 1.03, .04);
+    box(limb.lowerPivot, [.39, .16, .1], colors.shoe, [.1, -.64, .04]);
+    limbs[key] = limb;
+    pantsMeshes.push(limb.upper, limb.lower);
+    lowerLegMeshes.push(limb.lower);
+  };
+  addLeg('backLeg', legXs[0]);
+  addLeg('frontLeg', legXs[1]);
+
+  return {
+    group,
+    id,
+    head,
+    hairMeshes,
+    face,
+    mustache,
+    beard,
+    torso,
+    topMeshes,
+    pantsMeshes,
+    lowerLegMeshes,
+    lapels,
+    hoodiePouch,
+    hood,
+    limbs,
+  };
+}
+
+function createAvatarViews(parent) {
+  return Object.fromEntries(['front', 'profile-right', 'back', 'profile-left'].map((id) => [id, createAvatarView(parent, id)]));
+}
+
 function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   const actor = {
     group: new THREE.Group(),
@@ -1083,6 +1208,16 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   box(actor.backLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
   box(actor.frontLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
 
+  // The old articulated meshes remain as a hidden pose skeleton. The visible
+  // actor is one of the four complete views created above the skeleton.
+  actor.legacyVisual = visual;
+  actor.legacyVisual.visible = false;
+  actor.avatarViewPanel = new THREE.Group();
+  actor.avatarViewPanel.name = 'avatar-four-view-panel';
+  actor.model.add(actor.avatarViewPanel);
+  actor.avatarViews = createAvatarViews(actor.avatarViewPanel);
+  actor.activeAvatarView = null;
+
   actor.model.rotation.y = profileFaceLayout().rightYaw;
   actor.lookParts = {
     topStyles,
@@ -1134,13 +1269,64 @@ function applyAvatarLook(target, look = {}) {
   target.lookParts.profileRightBeard.visible = normalizedLook.face === 'beard';
   target.lookParts.profileLeftMustache.visible = normalizedLook.face === 'mustache';
   target.lookParts.profileLeftBeard.visible = normalizedLook.face === 'beard';
+  applyAvatarViewLook(target, normalizedLook, geometry);
   updateFacePresentation(target);
+}
+
+function setMeshColor(meshes, color) {
+  meshes.forEach((mesh) => mesh.material.color.setHex(color));
+}
+
+function applyAvatarViewLook(target, look, geometry) {
+  if (!target.avatarViews) return;
+  const topColors = { tee: 0x6e7c74, hoodie: colors.hoodie, jacket: 0x2e5361 };
+  const pantsColors = { cargo: colors.pants, jeans: 0x303d63, shorts: 0x77715b };
+  Object.values(target.avatarViews).forEach((view) => {
+    setMeshColor(view.topMeshes, topColors[look.top]);
+    setMeshColor(view.pantsMeshes, pantsColors[look.pants]);
+    setMeshColor(view.lowerLegMeshes, geometry.lowerLegsVisible ? colors.skin : pantsColors[look.pants]);
+    view.lapels.visible = look.top === 'jacket' && view.id === 'front';
+    view.hoodiePouch.visible = look.top === 'hoodie' && view.id === 'front';
+    view.hood.visible = look.top === 'hoodie';
+    view.torso.scale.y = look.top === 'tee' ? .86 : 1;
+    view.hairMeshes.forEach((hair) => {
+      hair.visible = look.hair !== 'bald';
+      hair.scale.set(look.hair === 'mohawk' ? .72 : 1, look.hair === 'mohawk' ? 2.2 : 1, look.hair === 'mohawk' ? .38 : 1);
+      hair.position.y = look.hair === 'mohawk' ? 2.72 : 2.64;
+    });
+    if (view.mustache) view.mustache.visible = look.face === 'mustache';
+    if (view.beard) view.beard.visible = look.face === 'beard';
+  });
+}
+
+function copyLimbPose(source, destination) {
+  if (!source || !destination) return;
+  destination.pivot.rotation.z = source.pivot.rotation.z;
+  destination.lowerPivot.rotation.z = source.lowerPivot.rotation.z;
+}
+
+function syncAvatarViewPose(target) {
+  const view = target.activeAvatarView;
+  if (!view) return;
+  copyLimbPose(target.backArm, view.limbs.backArm);
+  copyLimbPose(target.frontArm, view.limbs.frontArm);
+  copyLimbPose(target.backLeg, view.limbs.backLeg);
+  copyLimbPose(target.frontLeg, view.limbs.frontLeg);
 }
 
 function updateFacePresentation(target) {
   const parts = target.lookParts;
   if (!parts?.frontFace || !parts.profileRightFace || !parts.profileLeftFace) return;
   const presentation = avatarFacingForYaw(target.model.rotation.y);
+  if (target.avatarViewPanel) {
+    target.avatarViewPanel.rotation.y = presentation.billboardYaw;
+    Object.entries(target.avatarViews).forEach(([id, view]) => {
+      view.group.visible = id === presentation.face;
+    });
+    target.activeAvatarView = target.avatarViews[presentation.face];
+    syncAvatarViewPose(target);
+    return;
+  }
   const rig = presentation.rig;
   if (target.visual) {
     target.visual.rotation.y = presentation.billboardYaw;
@@ -2058,6 +2244,7 @@ function render() {
   const delta = Math.min(clock.getDelta(), .05);
   if (gameMode === 'apartment') updateApartment(delta, clock.elapsedTime);
   else updateBattle(delta, clock.elapsedTime);
+  syncAvatarViewPose(actor);
   updateActorBubble();
   if (!creatorModal.classList.contains('is-hidden')) {
     creatorPreviewActor.model.rotation.y = profileFaceLayout().previewYaw;
