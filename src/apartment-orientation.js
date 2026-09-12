@@ -25,19 +25,21 @@ function normalizedYaw(yaw) {
   return ((yaw + Math.PI) % fullTurn + fullTurn) % fullTurn - Math.PI;
 }
 
-// The profile is drawn on the actual side plane of the head. It therefore
-// inherits the body's yaw instead of counter-rotating towards the camera.
+// Gameplay yaw selects a prepared 2.5D silhouette. The visual panel cancels
+// that yaw so the selected face, torso and limbs remain on one screen plane.
 export function avatarFacingForYaw(yaw) {
-  const angle = Math.abs(normalizedYaw(yaw));
+  const normalized = normalizedYaw(yaw);
+  const angle = Math.abs(normalized);
+  const billboardYaw = normalized === 0 ? 0 : normalized === -Math.PI ? -Math.PI : -normalized;
   if (angle <= Math.PI / 4) {
-    return { face: 'front', visibleArm: 'both', profileLocalYaw: 0 };
+    return { face: 'front', visibleArm: 'both', profileLocalYaw: 0, billboardYaw, bodyWidth: 1 };
   }
   if (angle >= Math.PI * 3 / 4) {
-    return { face: 'back', visibleArm: 'both', profileLocalYaw: 0 };
+    return { face: 'back', visibleArm: 'both', profileLocalYaw: 0, billboardYaw, bodyWidth: 1 };
   }
-  return normalizedYaw(yaw) >= 0
-    ? { face: 'profile-right', visibleArm: 'back', profileLocalYaw: 0 }
-    : { face: 'profile-left', visibleArm: 'front', profileLocalYaw: 0 };
+  return normalized >= 0
+    ? { face: 'profile-right', visibleArm: 'back', profileLocalYaw: 0, billboardYaw, bodyWidth: .72 }
+    : { face: 'profile-left', visibleArm: 'front', profileLocalYaw: 0, billboardYaw, bodyWidth: .72 };
 }
 
 export function shouldPauseWalkForTurn(turn) {

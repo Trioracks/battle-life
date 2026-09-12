@@ -970,6 +970,14 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   actor.group.add(actor.model);
   parent.add(actor.group);
 
+  // `model` owns gameplay yaw and poses. Everything visible lives on this
+  // single 2.5D panel, which cancels that yaw and switches silhouette instead.
+  // That keeps head, body and limbs on one coherent plane in every direction.
+  const visual = new THREE.Group();
+  visual.name = 'avatar-visual-panel';
+  actor.model.add(visual);
+  actor.visual = visual;
+
   const shadow = new THREE.Mesh(new THREE.CircleGeometry(.62, 24), new THREE.MeshBasicMaterial({ color: 0x0a0e0e, transparent: true, opacity: .42 }));
   shadow.rotation.x = -Math.PI / 2;
   shadow.scale.y = .4;
@@ -980,7 +988,7 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   const topStyles = {};
   const tee = new THREE.Group();
   tee.name = 'avatar-top-tee';
-  actor.model.add(tee);
+  visual.add(tee);
   const teeTorso = box(tee, [.72, .84, .48], 0x6e7c74, [0, 1.48, 0]);
   const teeSleeveLeft = box(tee, [.24, .28, .5], 0x6e7c74, [-.47, 1.79, 0]);
   const teeSleeveRight = box(tee, [.24, .28, .5], 0x6e7c74, [.47, 1.79, 0]);
@@ -988,18 +996,18 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
 
   const hoodie = new THREE.Group();
   hoodie.name = 'avatar-top-hoodie';
-  actor.model.add(hoodie);
+  visual.add(hoodie);
   const hoodieTorso = box(hoodie, [.76, .98, .52], colors.hoodie, [0, 1.48, 0]);
   const hoodiePouch = box(hoodie, [.54, .22, .08], colors.hoodie, [0, 1.21, .3]);
   const hood = new THREE.Mesh(new THREE.TorusGeometry(.31, .09, 8, 12, Math.PI), material(colors.hoodie));
   hood.rotation.x = Math.PI / 2;
   hood.position.set(0, 1.95, -.27);
   hoodie.add(hood);
-  topStyles.hoodie = { group: hoodie, meshes: [hoodieTorso, hoodiePouch, hood] };
+  topStyles.hoodie = { group: hoodie, meshes: [hoodieTorso, hoodiePouch, hood], frontDetails: [hoodiePouch] };
 
   const jacket = new THREE.Group();
   jacket.name = 'avatar-top-jacket';
-  actor.model.add(jacket);
+  visual.add(jacket);
   const jacketTorso = box(jacket, [.78, .96, .54], 0x2e5361, [0, 1.48, 0]);
   const jacketLapels = [
     box(jacket, [.2, .6, .09], 0x6b8b92, [-.2, 1.6, .32]),
@@ -1007,19 +1015,19 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   ];
   jacketLapels[0].rotation.z = -.3;
   jacketLapels[1].rotation.z = .3;
-  topStyles.jacket = { group: jacket, meshes: [jacketTorso, ...jacketLapels] };
+  topStyles.jacket = { group: jacket, meshes: [jacketTorso, ...jacketLapels], frontDetails: jacketLapels };
 
-  box(actor.model, [.53, .57, .48], colors.skin, [0, 2.32, 0]);
-  const hair = box(actor.model, [.55, .09, .51], 0x17151b, [0, 2.64, 0]);
+  box(visual, [.53, .57, .48], colors.skin, [0, 2.32, 0]);
+  const hair = box(visual, [.55, .09, .51], 0x17151b, [0, 2.64, 0]);
   const frontFaceHair = new THREE.Group();
-  actor.model.add(frontFaceHair);
+  visual.add(frontFaceHair);
   const mustache = box(frontFaceHair, [.26, .055, .05], 0x1b1718, [0, 2.31, .27]);
   const beard = box(frontFaceHair, [.37, .2, .055], 0x1b1718, [0, 2.13, .27]);
   mustache.visible = false;
   beard.visible = false;
   const frontFace = new THREE.Group();
   frontFace.name = 'avatar-front-face';
-  actor.model.add(frontFace);
+  visual.add(frontFace);
   const faceLayout = frontFacingFaceLayout();
   faceLayout.earXs.forEach((x) => box(frontFace, [.12, .18, .17], colors.skin, [x, 2.32, .01]));
   const eyeMaterial = material(0xe9eadf, { emissive: 0x6b6d60, emissiveIntensity: .16 });
@@ -1033,43 +1041,43 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   box(frontFace, [.055, .12, .05], 0xc48769, [0, 2.34, faceLayout.faceZ]);
   box(frontFace, [.2, .035, .045], 0x994f4b, [0, 2.2, faceLayout.faceZ]);
 
-  // These are actual side planes of the head, not camera-facing billboards.
-  // The body and its profile therefore turn as one piece while walking.
+  // Profiles are deliberately drawn on the same display panel as the body.
+  // They are not side-mounted meshes: the whole panel is the 2.5D silhouette.
   const profileRightFace = new THREE.Group();
   profileRightFace.name = 'avatar-profile-right-face';
-  actor.model.add(profileRightFace);
-  box(profileRightFace, [.05, .17, .09], colors.skin, [-.29, 2.32, -.18]);
-  box(profileRightFace, [.045, .09, .1], 0xe9eadf, [-.305, 2.43, .055], { emissive: 0x6b6d60, emissiveIntensity: .16 });
-  box(profileRightFace, [.045, .035, .16], 0x2a2020, [-.31, 2.52, .055]);
-  box(profileRightFace, [.075, .11, .17], 0xc48769, [-.33, 2.34, .22]);
-  box(profileRightFace, [.05, .035, .14], 0x994f4b, [-.315, 2.2, .055]);
-  const profileRightMustache = box(profileRightFace, [.055, .055, .19], 0x1b1718, [-.34, 2.31, .105]);
-  const profileRightBeard = box(profileRightFace, [.06, .2, .25], 0x1b1718, [-.33, 2.13, .015]);
+  visual.add(profileRightFace);
+  box(profileRightFace, [.1, .17, .055], colors.skin, [-.29, 2.32, .27]);
+  box(profileRightFace, [.09, .09, .045], 0xe9eadf, [.075, 2.43, .27], { emissive: 0x6b6d60, emissiveIntensity: .16 });
+  box(profileRightFace, [.14, .035, .05], 0x2a2020, [.09, 2.52, .27]);
+  box(profileRightFace, [.11, .11, .06], 0xc48769, [.3, 2.34, .27]);
+  box(profileRightFace, [.13, .035, .05], 0x994f4b, [.08, 2.2, .27]);
+  const profileRightMustache = box(profileRightFace, [.13, .055, .055], 0x1b1718, [.18, 2.31, .275]);
+  const profileRightBeard = box(profileRightFace, [.18, .2, .06], 0x1b1718, [.16, 2.13, .275]);
   profileRightMustache.visible = false;
   profileRightBeard.visible = false;
 
   const profileLeftFace = new THREE.Group();
   profileLeftFace.name = 'avatar-profile-left-face';
-  actor.model.add(profileLeftFace);
-  box(profileLeftFace, [.05, .17, .09], colors.skin, [.29, 2.32, -.18]);
-  box(profileLeftFace, [.045, .09, .1], 0xe9eadf, [.305, 2.43, .055], { emissive: 0x6b6d60, emissiveIntensity: .16 });
-  box(profileLeftFace, [.045, .035, .16], 0x2a2020, [.31, 2.52, .055]);
-  box(profileLeftFace, [.075, .11, .17], 0xc48769, [.33, 2.34, .22]);
-  box(profileLeftFace, [.05, .035, .14], 0x994f4b, [.315, 2.2, .055]);
-  const profileLeftMustache = box(profileLeftFace, [.055, .055, .19], 0x1b1718, [.34, 2.31, .105]);
-  const profileLeftBeard = box(profileLeftFace, [.06, .2, .25], 0x1b1718, [.33, 2.13, .015]);
+  visual.add(profileLeftFace);
+  box(profileLeftFace, [.1, .17, .055], colors.skin, [.29, 2.32, .27]);
+  box(profileLeftFace, [.09, .09, .045], 0xe9eadf, [-.075, 2.43, .27], { emissive: 0x6b6d60, emissiveIntensity: .16 });
+  box(profileLeftFace, [.14, .035, .05], 0x2a2020, [-.09, 2.52, .27]);
+  box(profileLeftFace, [.11, .11, .06], 0xc48769, [-.3, 2.34, .27]);
+  box(profileLeftFace, [.13, .035, .05], 0x994f4b, [-.08, 2.2, .27]);
+  const profileLeftMustache = box(profileLeftFace, [.13, .055, .055], 0x1b1718, [-.18, 2.31, .275]);
+  const profileLeftBeard = box(profileLeftFace, [.18, .2, .06], 0x1b1718, [-.16, 2.13, .275]);
   profileLeftMustache.visible = false;
   profileLeftBeard.visible = false;
 
-  actor.backArm = makeLimb(actor.model, 'backArm', -.31, 0x1f2930, .62, .52);
-  actor.frontArm = makeLimb(actor.model, 'frontArm', .31, 0x34444d, .62, .52);
+  actor.backArm = makeLimb(visual, 'backArm', -.31, 0x1f2930, .62, .52);
+  actor.frontArm = makeLimb(visual, 'frontArm', .31, 0x34444d, .62, .52);
   actor.backArm.pivot.position.set(-.42, 1.83, 0);
   actor.frontArm.pivot.position.set(.42, 1.83, 0);
   box(actor.backArm.lowerPivot, [.22, .21, .22], colors.skin, [0, -.6, 0]);
   box(actor.frontArm.lowerPivot, [.22, .21, .22], colors.skin, [0, -.6, 0]);
 
-  actor.backLeg = makeLimb(actor.model, 'backLeg', -.19, 0x33423f, .68, .6);
-  actor.frontLeg = makeLimb(actor.model, 'frontLeg', .19, colors.pants, .68, .6);
+  actor.backLeg = makeLimb(visual, 'backLeg', -.19, 0x33423f, .68, .6);
+  actor.frontLeg = makeLimb(visual, 'frontLeg', .19, colors.pants, .68, .6);
   actor.backLeg.pivot.position.set(-.19, 1.03, 0);
   actor.frontLeg.pivot.position.set(.19, 1.03, 0);
   box(actor.backLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
@@ -1132,12 +1140,19 @@ function updateFacePresentation(target) {
   const parts = target.lookParts;
   if (!parts?.frontFace || !parts.profileRightFace || !parts.profileLeftFace) return;
   const presentation = avatarFacingForYaw(target.model.rotation.y);
+  if (target.visual) {
+    target.visual.rotation.y = presentation.billboardYaw;
+    target.visual.scale.x = presentation.bodyWidth;
+  }
   parts.frontFace.visible = presentation.face === 'front';
   parts.frontFaceHair.visible = presentation.face === 'front';
   parts.profileRightFace.visible = presentation.face === 'profile-right';
   parts.profileLeftFace.visible = presentation.face === 'profile-left';
-  parts.profileRightFace.rotation.y = presentation.profileLocalYaw;
-  parts.profileLeftFace.rotation.y = presentation.profileLocalYaw;
+  Object.values(parts.topStyles).forEach((style) => {
+    style.frontDetails?.forEach((detail) => {
+      detail.visible = presentation.face === 'front';
+    });
+  });
   target.backArm.pivot.visible = presentation.visibleArm !== 'front';
   target.frontArm.pivot.visible = presentation.visibleArm !== 'back';
 }
@@ -1839,6 +1854,7 @@ function resetStagePose(performer, facing) {
   performer.frontLeg.lowerPivot.rotation.z = 0;
   performer.backLeg.lowerPivot.rotation.z = 0;
   performer.shadow.scale.set(1, 1, 1);
+  updateFacePresentation(performer);
 }
 
 function applyStageWalk(performer, delta, direction) {
@@ -1854,6 +1870,7 @@ function applyStageWalk(performer, delta, direction) {
   performer.frontArm.lowerPivot.rotation.z = 0;
   performer.backArm.lowerPivot.rotation.z = 0;
   performer.model.position.y = Math.abs(Math.sin(performer.phase * 2)) * .055;
+  updateFacePresentation(performer);
 }
 
 function moveStageActor(performer, targetX, delta) {
@@ -1882,6 +1899,7 @@ function applyRapGesture(performer, gesture, elapsed, facing) {
     performer.backArm.pivot.rotation.z = .92 - beat * .14;
     performer.frontArm.lowerPivot.rotation.z = -.58;
     performer.backArm.lowerPivot.rotation.z = -.48;
+    updateFacePresentation(performer);
     return;
   }
   if (gesture === 'shoulder-rock') {
@@ -1890,6 +1908,7 @@ function applyRapGesture(performer, gesture, elapsed, facing) {
     performer.backArm.pivot.rotation.z = -.22 - beat * .42;
     performer.frontLeg.pivot.rotation.z = secondaryBeat * .08;
     performer.backLeg.pivot.rotation.z = -secondaryBeat * .08;
+    updateFacePresentation(performer);
     return;
   }
   if (gesture === 'crowd-turn') {
@@ -1897,6 +1916,7 @@ function applyRapGesture(performer, gesture, elapsed, facing) {
     performer.frontArm.pivot.rotation.z = .78;
     performer.backArm.pivot.rotation.z = -.42;
     performer.frontArm.lowerPivot.rotation.z = -.42;
+    updateFacePresentation(performer);
     return;
   }
   performer.frontArm.pivot.rotation.z = 1.38 + beat * .08;
@@ -1904,6 +1924,7 @@ function applyRapGesture(performer, gesture, elapsed, facing) {
   performer.backArm.pivot.rotation.z = -.28 + beat * .18;
   performer.backArm.lowerPivot.rotation.z = .36;
   performer.model.rotation.z = -.045;
+  updateFacePresentation(performer);
 }
 
 function updateStageAudience(elapsed) {
