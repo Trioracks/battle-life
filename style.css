@@ -164,6 +164,16 @@ kbd {
 .creator-error { min-height: 21px; margin: 13px 0 0; color: #f08c6d !important; }
 .primary-button { margin-top: 10px; min-height: 44px; padding: 0 20px; border: 1px solid #f1ce66; color: #1d211e; background: #e9c45a; cursor: pointer; font: inherit; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
 .primary-button:hover { background: #f5d676; }
+.start-screen { position: absolute; z-index: 11; inset: 0; display: grid; place-items: center; padding: 28px; background: rgba(5, 11, 12, .79); backdrop-filter: blur(7px); }
+.start-screen.is-hidden { display: none; }
+.start-card { width: min(560px, 100%); padding: clamp(26px, 5vw, 52px); border: 1px solid rgba(230, 189, 88, .58); background: linear-gradient(145deg, rgba(30, 47, 44, .98), rgba(10, 18, 20, .98)); box-shadow: 0 28px 90px rgba(0, 0, 0, .66); }
+.start-card h2 { margin: 0; color: #f2ead7; font-size: clamp(28px, 5vw, 52px); letter-spacing: -.04em; }
+.start-card > p:not(.eyebrow) { max-width: 430px; margin: 16px 0 0; color: #bfcbc0; line-height: 1.55; }
+.start-card__actions { display: grid; gap: 10px; margin-top: 28px; }
+.start-card__actions .primary-button { width: 100%; margin: 0; }
+.secondary-button { min-height: 42px; border: 1px solid rgba(220, 190, 101, .72); color: #f2e6bd; background: rgba(48, 69, 62, .72); cursor: pointer; font: inherit; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.secondary-button:hover { border-color: #edcb64; background: rgba(74, 88, 52, .85); }
+.secondary-button.is-hidden { display: none; }
 
 @media (max-width: 680px) {
   .campaign-hud { top: auto; bottom: 88px; width: min(290px, calc(100vw - 36px)); }

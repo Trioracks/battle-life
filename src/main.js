@@ -5,6 +5,7 @@ import { clickIntent } from './click-intent.js';
 import { stepCharacter } from './character-motion.js';
 import { presentActionProgress } from './action-progress.js';
 import { advanceCampaign, createCampaign, loadCampaign, saveCampaign } from './game-state.js';
+import { newGameState, startScreenState } from './start-screen.js';
 import { allocationsFromSkills, appearanceGeometry, createRapper, cycleLookPart, frontFacingFaceLayout, LOOK_PART_LABELS, lookOptionLabel, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
 import { canStartApartmentAction, describeApartmentAction, getApartmentAction } from './apartment-actions.js';
 import { APARTMENT_ACTOR_FOREGROUND_Z, APARTMENT_DESK, APARTMENT_ENTRY_DOOR, APARTMENT_FLOOR_Y, APARTMENT_INTERIOR_DOOR, APARTMENT_MICROPHONE, APARTMENT_ROOMS, APARTMENT_SPAWN, apartmentWalkTargets, cameraTargetX, getApartmentRoom } from './apartment-layout.js';
@@ -35,6 +36,9 @@ const needElements = {
   health: document.querySelector('#need-health'),
   leisure: document.querySelector('#need-leisure'),
 };
+const startScreen = document.querySelector('#start-screen');
+const startNewGame = document.querySelector('#start-new-game');
+const startContinue = document.querySelector('#start-continue');
 const creatorModal = document.querySelector('#creator-modal');
 const creatorForm = document.querySelector('#creator-form');
 const creatorStats = document.querySelector('#creator-stats');
@@ -57,9 +61,8 @@ const mapDistricts = document.querySelector('#map-districts');
 const mapLocationPanel = document.querySelector('#map-location-panel');
 const mapClose = document.querySelector('#map-close');
 let campaign = loadCampaign() ?? createCampaign();
-saveCampaign(campaign);
 let creatorAllocations = campaign.player ? allocationsFromSkills(campaign.player.skills) : Object.fromEntries(STAT_KEYS.map((key) => [key, 0]));
-let creatorLook = campaign.player?.look ?? { hair: 'bald', face: 'clean', top: 'hoodie', pants: 'cargo' };
+let creatorLook = campaign.player?.look ?? normalizeLook({ hair: 'bald', face: 'clean', top: 'hoodie', pants: 'cargo', footwear: 'sneakers' });
 let creatorSelectedPart = 'hair';
 let audioContext = null;
 let desktopOpen = false;
@@ -142,7 +145,7 @@ function renderActorBubble(content) {
 }
 
 function updateActorBubble() {
-  if (gameMode !== 'apartment') return renderActorBubble(null);
+  if (entryMode !== 'apartment' || gameMode !== 'apartment') return renderActorBubble(null);
   if (actor.computerTask) {
     const task = actor.computerTask;
     const progress = presentActionProgress(task, actor.actionElapsed, 2.45);
@@ -561,12 +564,45 @@ function openCreator() {
     creatorForm.elements.nickname.value = player.nickname;
     creatorAllocations = allocationsFromSkills(player.skills);
     creatorLook = normalizeLook(player.look);
+  } else {
+    creatorForm.reset();
+    creatorForm.elements.name.value = 'Миша';
+    creatorForm.elements.nickname.value = '';
+    creatorAllocations = Object.fromEntries(STAT_KEYS.map((key) => [key, 0]));
+    creatorLook = normalizeLook({ hair: 'bald', face: 'clean', top: 'hoodie', pants: 'cargo', footwear: 'sneakers' });
+    creatorSelectedPart = 'hair';
   }
+  entryMode = 'creator';
+  startScreen.classList.add('is-hidden');
   creatorError.textContent = '';
   renderCreator();
   creatorModal.classList.remove('is-hidden');
   resizeCreatorPreview();
 }
+
+function renderStartScreen() {
+  const state = startScreenState(campaign);
+  startContinue.classList.toggle('is-hidden', !state.canContinue);
+  startScreen.classList.remove('is-hidden');
+}
+
+function enterApartment() {
+  if (!campaign.player) return;
+  entryMode = 'apartment';
+  startScreen.classList.add('is-hidden');
+  creatorModal.classList.add('is-hidden');
+  applyAvatarLook(actor, campaign.player.look);
+  sceneTitle.textContent = `КВАРТИРА · ${campaign.player.nickname.toUpperCase()}`;
+  setStatus();
+}
+
+startNewGame.addEventListener('click', () => {
+  campaign = newGameState();
+  saveCampaign(campaign);
+  openCreator();
+});
+
+startContinue.addEventListener('click', enterApartment);
 
 creatorStats.addEventListener('click', (event) => {
   const button = event.target.closest('button[data-stat]');
@@ -610,10 +646,7 @@ creatorForm.addEventListener('submit', (event) => {
     });
     campaign = { ...campaign, player };
     saveCampaign(campaign);
-    applyAvatarLook(actor, player.look);
-    sceneTitle.textContent = `КВАРТИРА · ${player.nickname.toUpperCase()}`;
-    creatorModal.classList.add('is-hidden');
-    setStatus();
+    enterApartment();
   } catch (error) {
     creatorError.textContent = error.message;
   }
@@ -1545,6 +1578,7 @@ creatorPreviewActor.model.rotation.y = profileFaceLayout().previewYaw;
 applyAvatarLook(creatorPreviewActor, creatorLook);
 const battle = createBattleScene();
 let gameMode = 'apartment';
+let entryMode = 'start';
 
 scene.add(new THREE.HemisphereLight(0x97c7cf, 0x1d211a, 1.55));
 const keyLight = new THREE.DirectionalLight(0xefe0b4, 2.1);
@@ -2242,10 +2276,14 @@ function updateBattle(delta, elapsed) {
 
 function render() {
   const delta = Math.min(clock.getDelta(), .05);
-  if (gameMode === 'apartment') updateApartment(delta, clock.elapsedTime);
-  else updateBattle(delta, clock.elapsedTime);
-  syncAvatarViewPose(actor);
-  updateActorBubble();
+  if (entryMode === 'apartment') {
+    if (gameMode === 'apartment') updateApartment(delta, clock.elapsedTime);
+    else updateBattle(delta, clock.elapsedTime);
+    syncAvatarViewPose(actor);
+    updateActorBubble();
+  } else {
+    renderActorBubble(null);
+  }
   if (!creatorModal.classList.contains('is-hidden')) {
     creatorPreviewActor.model.rotation.y = profileFaceLayout().previewYaw;
     creatorPreviewActor.model.scale.x = 1;
@@ -2253,7 +2291,7 @@ function render() {
     updateFacePresentation(creatorPreviewActor);
     creatorPreviewRenderer.render(creatorPreviewScene, creatorPreviewCamera);
   }
-  renderer.render(scene, camera);
+  if (entryMode === 'apartment') renderer.render(scene, camera);
   requestAnimationFrame(render);
 }
 
@@ -2293,7 +2331,7 @@ function pointFromPointerEvent(event) {
 }
 
 canvas.addEventListener('pointermove', (event) => {
-  if (gameMode !== 'apartment') {
+  if (entryMode !== 'apartment' || gameMode !== 'apartment') {
     Object.values(actionHighlights).forEach((highlight) => { highlight.visible = false; });
     clearWorldTooltip();
     canvas.style.cursor = 'default';
@@ -2313,7 +2351,7 @@ canvas.addEventListener('pointerleave', () => {
 });
 
 canvas.addEventListener('pointerdown', (event) => {
-  if (event.button !== 0 || gameMode !== 'apartment') return;
+  if (event.button !== 0 || entryMode !== 'apartment' || gameMode !== 'apartment') return;
   const { hitComputer, hitAction, worldPoint } = pointFromPointerEvent(event);
   const intent = clickIntent({
     hitAction,
@@ -2328,9 +2366,6 @@ canvas.addEventListener('pointerdown', (event) => {
 resize();
 renderCampaignHud();
 renderCreator();
-if (campaign.player) {
-  creatorModal.classList.add('is-hidden');
-  sceneTitle.textContent = `КВАРТИРА · ${campaign.player.nickname.toUpperCase()}`;
-}
+renderStartScreen();
 setStatus();
 render();

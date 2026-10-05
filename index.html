@@ -44,7 +44,18 @@
       </section>
       <section id="map-screen" class="map-screen is-hidden" aria-label="Карта Каликфорнии"><header><span>КАЛИКФОРНИЯ · КАРТА</span><button id="map-close" type="button">Вернуться домой ×</button></header><div class="map-canvas"><div id="map-districts" class="map-districts"></div><aside id="map-location-panel" class="map-location-panel" aria-live="polite"></aside></div></section>
       <aside id="phone-panel" class="phone-panel is-hidden" aria-live="polite"></aside>
-      <section id="creator-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="creator-title">
+      <section id="start-screen" class="start-screen" aria-labelledby="start-title">
+        <div class="start-card">
+          <p class="eyebrow">BATTLE LIFE / КАЛИКФОРНИЯ</p>
+          <h2 id="start-title">КВАРТИРА · ПЕРВЫЙ ВЕЧЕР</h2>
+          <p>Сентябрь 2026-го. Панелька, тусклый свет и ещё не записанный первый трек.</p>
+          <div class="start-card__actions">
+            <button id="start-new-game" class="primary-button" type="button">Новая игра →</button>
+            <button id="start-continue" class="secondary-button is-hidden" type="button">Продолжить</button>
+          </div>
+        </div>
+      </section>
+      <section id="creator-modal" class="modal is-hidden" role="dialog" aria-modal="true" aria-labelledby="creator-title">
         <form id="creator-form" class="creator-card">
           <div class="creator-card__heading">
             <p class="eyebrow">ПЕРВЫЙ ВЕЧЕР · КАЛИКФОРНИЯ</p>
@@ -53,7 +64,7 @@
           </div>
           <div class="creator-identity">
             <label>Имя<input id="creator-name" name="name" maxlength="24" value="Миша" required /></label>
-            <label>Никнейм<input id="creator-nickname" name="nickname" maxlength="32" placeholder="Например, Ночной Маяк" required /></label>
+            <label>Никнейм<input id="creator-nickname" name="nickname" maxlength="32" placeholder="Если пусто — будет использовано имя" /></label>
           </div>
           <div class="creator-split">
             <section><div class="creator-section-title"><span>Стартовые навыки</span><strong id="creator-points">10 очков</strong></div><div id="creator-stats" class="creator-stats"></div></section>
@@ -70,6 +81,6 @@
       </section>
       <div class="scanlines" aria-hidden="true"></div>
     </main>
-    <script type="module" src="./src/main.js?rev=four-direction-avatar"></script>
+    <script type="module" src="./src/main.js?rev=entry-flow-v1"></script>
   </body>
 </html>
