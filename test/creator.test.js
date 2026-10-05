@@ -24,16 +24,17 @@ test('creator turns ten allocated points into visible 10–50 skills', () => {
   assert.equal(rapper.nickname, 'Ночной Маяк');
   assert.equal(rapper.skills.intelligence, 30);
   assert.equal(rapper.skills.resilience, 10);
-  assert.deepEqual(rapper.look, { hair: 'mohawk', face: 'mustache', top: 'tee', pants: 'jeans' });
+  assert.deepEqual(rapper.look, { hair: 'mohawk', face: 'mustache', top: 'tee', pants: 'trousers', footwear: 'sneakers' });
 });
 
 test('creator cycles body-zone appearance without adding a cap back into saved look', () => {
-  const base = { hair: 'bald', face: 'clean', top: 'hoodie', pants: 'cargo' };
+  const base = { hair: 'bald', face: 'clean', top: 'hoodie', pants: 'cargo', footwear: 'canvas' };
 
   assert.deepEqual(cycleLookPart(base, 'hair', 1), { ...base, hair: 'crop' });
   assert.deepEqual(cycleLookPart(base, 'face', -1), { ...base, face: 'mustache' });
   assert.deepEqual(cycleLookPart(base, 'top', -1), { ...base, top: 'tee' });
-  assert.deepEqual(cycleLookPart(base, 'pants', 1), { ...base, pants: 'jeans' });
+  assert.deepEqual(cycleLookPart(base, 'pants', 1), { ...base, pants: 'trousers' });
+  assert.deepEqual(cycleLookPart(base, 'footwear', 1), { ...base, footwear: 'shoes' });
   assert.equal(Object.hasOwn(cycleLookPart({ ...base, cap: 'red' }, 'hair', 1), 'cap'), false);
 });
 
@@ -48,17 +49,26 @@ test('creator keeps a shirt option and defaults an unknown top to it', () => {
 
 test('creator presents every persisted appearance value with a Russian label', () => {
   assert.equal(lookOptionLabel('top', 'tee'), 'Футболка');
-  assert.equal(lookOptionLabel('top', 'jacket'), 'Куртка');
+  assert.equal(lookOptionLabel('top', 'sweater'), 'Свитер');
   assert.equal(lookOptionLabel('pants', 'shorts'), 'Шорты');
+  assert.equal(lookOptionLabel('footwear', 'boots'), 'Сапоги');
 });
 
-test('creator appearance geometry reveals calves only for shorts', () => {
-  assert.deepEqual(appearanceGeometry({ top: 'tee', pants: 'shorts', face: 'beard' }), {
-    top: 'short-sleeve',
+test('creator appearance geometry describes clothing, legs and footwear from the saved look', () => {
+  assert.deepEqual(appearanceGeometry({ top: 'tee', pants: 'shorts', footwear: 'sandals', face: 'beard' }), {
+    top: 'tee',
+    legStyle: 'shorts',
+    footwear: 'sandals',
     lowerLegsVisible: true,
     facialHair: 'beard',
   });
-  assert.equal(appearanceGeometry({ top: 'jacket', pants: 'jeans' }).lowerLegsVisible, false);
+  assert.deepEqual(appearanceGeometry({ top: 'sports', pants: 'sports', footwear: 'canvas', face: 'clean' }), {
+    top: 'tee',
+    legStyle: 'sports',
+    footwear: 'canvas',
+    lowerLegsVisible: false,
+    facialHair: 'clean',
+  });
 });
 
 test('creator selection changes only to a known clicked appearance part', () => {
@@ -103,6 +113,7 @@ test('creator maps a click on the preview body to the closest appearance zone', 
   assert.equal(lookPartAtPreviewHeight(.42), 'face');
   assert.equal(lookPartAtPreviewHeight(.61), 'top');
   assert.equal(lookPartAtPreviewHeight(.86), 'pants');
+  assert.equal(lookPartAtPreviewHeight(.98), 'footwear');
 });
 
 test('creator refuses an allocation above the 50-point per-stat ceiling', () => {
@@ -122,9 +133,19 @@ test('creator refuses an allocation above the 50-point per-stat ceiling', () => 
   assert.match(result.message, /50/);
 });
 
-test('creator requires exactly ten points and a nickname', () => {
+test('creator requires exactly ten points and uses the name when nickname is blank', () => {
   const allocation = { intelligence: 1, writing: 1, musicality: 1, flow: 1, beatmaking: 1, sound: 1, charisma: 1, confidence: 1, resilience: 1 };
 
   assert.deepEqual(validateAllocations(allocation), { valid: false, total: 9, message: 'Распредели все 10 очков.' });
-  assert.throws(() => createRapper({ name: 'Миша', nickname: ' ', allocations: { ...allocation, intelligence: 2 }, look: {} }), /никнейм/i);
+  assert.equal(createRapper({ name: 'Миша', nickname: ' ', allocations: { ...allocation, intelligence: 2 }, look: {} }).nickname, 'Миша');
+});
+
+test('creator migrates retired outfit ids and fills in every new appearance category', () => {
+  assert.deepEqual(normalizeLook({ hair: 'crop', face: 'beard', top: 'jacket', pants: 'jeans' }), {
+    hair: 'crop',
+    face: 'beard',
+    top: 'sweater',
+    pants: 'trousers',
+    footwear: 'sneakers',
+  });
 });

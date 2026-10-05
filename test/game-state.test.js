@@ -61,6 +61,26 @@ test('saved campaigns round-trip through the supplied storage without exposing i
   assert.deepEqual(loadCampaign(storage), campaign);
 });
 
+test('loading an earlier save adds footwear and maps retired outfit ids', () => {
+  const writes = new Map();
+  const storage = {
+    setItem(key, value) { writes.set(key, value); },
+    getItem(key) { return writes.get(key) ?? null; },
+  };
+  const legacy = createCampaign();
+  legacy.player = { name: 'Миша', nickname: 'Миша', look: { hair: 'crop', face: 'clean', top: 'jacket', pants: 'jeans' } };
+
+  saveCampaign(legacy, storage);
+
+  assert.deepEqual(loadCampaign(storage).player.look, {
+    hair: 'crop',
+    face: 'clean',
+    top: 'sweater',
+    pants: 'trousers',
+    footwear: 'sneakers',
+  });
+});
+
 test('inventory summary exposes only the home food state without mutating campaign', () => {
   const campaign = createCampaign();
   campaign.inventory = { ingredients: 4, cookedMeals: 2, dirtyDishes: 1 };
