@@ -1,0 +1,51 @@
+{
+  "asset": "avatar.glb",
+  "animationAsset": "avatar-animations.glb",
+  "skeleton": "avatar-armature",
+  "skinnedMesh": "avatar-body-skinned",
+  "materials": [
+    "hair",
+    "top",
+    "pants",
+    "footwear",
+    "skin"
+  ],
+  "clips": [
+    "idle",
+    "walk",
+    "sit",
+    "desk-idle",
+    "kitchen-work",
+    "lie-down",
+    "door-reach"
+  ],
+  "variants": {
+    "top": [
+      "tee",
+      "hoodie",
+      "sweater"
+    ],
+    "pants": [
+      "shorts",
+      "breeches",
+      "sports",
+      "cargo",
+      "trousers"
+    ],
+    "footwear": [
+      "sandals",
+      "sneakers",
+      "canvas",
+      "shoes",
+      "boots"
+    ],
+    "optionalNodes": [
+      "variant-hood",
+      "variant-shorts-calves",
+      "variant-sandals",
+      "variant-boots",
+      "facial-hair-mustache",
+      "facial-hair-beard"
+    ]
+  }
+}
