@@ -30,7 +30,7 @@ test('the exported cutaway camera is horizontally side-on with a shallow downwar
   const {position:p,target:t}=config().camera;
   assert.ok(Math.abs(p[0]-t[0])<1e-6,'horizontal wall and floor lines must remain level');
   const pitch=Math.atan2(p[1]-t[1],Math.hypot(p[0]-t[0],p[2]-t[2]))*180/Math.PI;
-  assert.ok(pitch>=10&&pitch<=12,'camera should look down only slightly');
+  assert.ok(Math.abs(pitch-8)<.1,'approved camera pitch is eight degrees');
 });
 
 test('the seated actor shares actual chair geometry with four floor-supported legs',()=>{

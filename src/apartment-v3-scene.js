@@ -5,6 +5,8 @@ import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=7';
 import {homeLight} from './apartment-v3-time.js?rev=8';
 import {createBackdropMaterial,sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=8';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=7';
+import {CameraModes,cameraPose,pickVisible} from './apartment-v3-camera.js?rev=9';
+import {createOutsideLighting} from './apartment-v3-outside.js?rev=9';
 
 const BASE='./assets/apartment/v3/';
 export async function createApartmentScene(canvas,config){
@@ -14,21 +16,24 @@ export async function createApartmentScene(canvas,config){
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   const scene=new THREE.Scene();scene.background=new THREE.Color('#141c20');
   const camera=new THREE.OrthographicCamera(-5,5,2.7,-2.7,.1,80);
+  const modes=new CameraModes(),firstCamera=new THREE.PerspectiveCamera(60,1,.03,80);
+  let staticScene=null,updateOutside=()=>{};const backdropSets=new Map();
   const basePosition=new THREE.Vector3(...config.camera.position),baseTarget=new THREE.Vector3(...config.camera.target);
   camera.position.copy(basePosition);camera.lookAt(baseTarget);
   const loader=new GLTFLoader();
   const textureLoader=new THREE.TextureLoader(),textureCache=new Map();
   function loadTexture(file){
-    if(!textureCache.has(file))textureCache.set(file,textureLoader.loadAsync(BASE+file+'?rev=8').then(texture=>{
+    if(!textureCache.has(file))textureCache.set(file,textureLoader.loadAsync(BASE+file+'?rev=9').then(texture=>{
       texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=renderer.capabilities.getMaxAnisotropy();return texture;
-    }));return textureCache.get(file);
+    }).catch(error=>{textureCache.delete(file);throw error;}));return textureCache.get(file);
   }
   const stateFiles=config.lightingStates??{both:{night:config.background,day:config.backgroundDay}};
   const [stateEntries,environment,model]=await Promise.all([
     Promise.all(Object.entries(stateFiles).map(async([name,files])=>[name,{night:await loadTexture(files.night),day:await loadTexture(files.day)}])),
-    loader.loadAsync(BASE+config.geometry+'?rev=8'),loader.loadAsync(BASE+config.rig+'?rev=8')
+    loader.loadAsync(BASE+config.geometry+'?rev=9'),loader.loadAsync(BASE+config.rig+'?rev=9')
   ]);
   const lightingStates=Object.fromEntries(stateEntries);
+  backdropSets.set('2D',lightingStates);
   const back=new THREE.Mesh(new THREE.PlaneGeometry(config.camera.width,config.camera.height),createBackdropMaterial(THREE,lightingStates.both.night,lightingStates.both.day,lightingStates));
   back.position.copy(baseTarget).add(basePosition.clone().sub(baseTarget).normalize().multiplyScalar(-8));
   back.quaternion.copy(camera.quaternion);back.renderOrder=-100;scene.add(back);
@@ -42,6 +47,7 @@ export async function createApartmentScene(canvas,config){
     if(bulbRoom&&config.lampFixtures?.[bulbRoom]?.bakedBulb){o.visible=false;o.castShadow=false;}
   });scene.add(environment.scene);
   const switchRockers=Object.fromEntries(['living','kitchen'].map(room=>{const o=environment.scene.getObjectByName('switch-'+room+'-rocker');return [room,{object:o,rotation:o?.rotation.x??0}];}));
+  const bulbMaterials=Object.fromEntries(['living','kitchen'].map(room=>{const o=environment.scene.getObjectByName('lamp-'+room+'-bulb');return [room,o?(Array.isArray(o.material)?o.material:[o.material]):[]];}));
   const landing=environment.scene.getObjectByName('landing-root'),landingReveal=createLandingReveal(landing);
   let lastEntryOpen=0;
   const clockHour=environment.scene.getObjectByName('clock-hour-hand'),clockMinute=environment.scene.getObjectByName('clock-minute-hand');
@@ -52,6 +58,32 @@ export async function createApartmentScene(canvas,config){
   function hinge(id,angle){hinges[id].quaternion.copy(hingeBases[id]).premultiply(rotation.setFromAxisAngle(up,angle));}
   const actor=new THREE.Group();actor.name='player';scene.add(actor);actor.add(model.scene);
   applyAppearance(model.scene,DEFAULT_APPEARANCE);
+  model.scene.updateMatrixWorld(true);
+  const head=model.scene.getObjectByName('head');
+  const eyeHeight=head?head.getWorldPosition(new THREE.Vector3()).y+.09:1.61;
+  async function loadMode(mode){
+    if(mode==='3D'){
+      if(!staticScene){const result=await loader.loadAsync(BASE+config.staticGeometry+'?rev=9');staticScene=result.scene;staticScene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});updateOutside=createOutsideLighting(staticScene);staticScene.visible=false;scene.add(staticScene);}return;
+    }
+    if(!backdropSets.has(mode)){
+      const files=config.cameraViews[mode].lightingStates;
+      backdropSets.set(mode,Object.fromEntries(await Promise.all(Object.entries(files).map(async([key,p])=>[key,{night:await loadTexture(p.night),day:await loadTexture(p.day)}]))));
+    }
+  }
+  let appliedMode='2D';
+  function applyCamera(state){
+    const fp=modes.mode==='3D',pose=cameraPose(modes.mode,state,eyeHeight,modes);
+    if(fp){firstCamera.position.fromArray(pose.position);firstCamera.rotation.set(pose.pitch,pose.yaw,0,'YXZ');firstCamera.updateMatrixWorld();}
+    else{
+      camera.position.fromArray(pose.position);camera.lookAt(new THREE.Vector3(...pose.target));camera.updateMatrixWorld();
+      if(appliedMode!==modes.mode){const set=backdropSets.get(modes.mode);back.material.dispose();back.material=createBackdropMaterial(THREE,set.both.night,set.both.day,set);}
+      const view=config.cameraViews?.[modes.mode]??config.camera;
+      back.position.fromArray(view.target).add(new THREE.Vector3(...view.position).sub(new THREE.Vector3(...view.target)).normalize().multiplyScalar(-8));back.quaternion.copy(camera.quaternion);
+    }
+    appliedMode=modes.mode;back.visible=!fp;actor.visible=!fp;shadowFloor.visible=!fp;shadow.visible=!fp&&shadow.visible;bones.visible=!fp&&bones.visible;
+    if(staticScene)staticScene.visible=fp;
+    environment.scene.traverse(o=>{if(o.name.startsWith('depth-'))o.visible=!fp;if(/^lamp-(living|kitchen)-bulb/.test(o.name))o.visible=fp;});
+  }
   const actorColors=[];
   model.scene.traverse(o=>{if(o.isSkinnedMesh){o.frustumCulled=false;o.castShadow=true;o.receiveShadow=true;for(const material of Array.isArray(o.material)?o.material:[o.material])actorColors.push([material,material.color.clone()]);}});
   const blanket=environment.scene.getObjectByName('sleep-blanket');if(blanket)blanket.visible=false;
@@ -87,13 +119,23 @@ export async function createApartmentScene(canvas,config){
   ring.rotation.x=-Math.PI/2;ring.visible=false;scene.add(ring);
   const ray=new THREE.Raycaster(),pointer=new THREE.Vector2(),floor=new THREE.Plane(new THREE.Vector3(0,1,0),0),point=new THREE.Vector3();
   function pick(event){
-    const r=canvas.getBoundingClientRect();pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);
-    const hit=ray.intersectObjects(targets)[0];if(hit)return {id:hit.object.userData.action};
-    const hero=ray.intersectObject(actor,true).find(hit=>{for(let o=hit.object;o;o=o.parent)if(!o.visible)return false;return true;});if(hero)return {hero:true};
-    if(ray.ray.intersectPlane(floor,point))return {x:point.x};return {};
+    scene.updateMatrixWorld(true);
+    const r=canvas.getBoundingClientRect();pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,modes.mode==='3D'?firstCamera:camera);
+    if(modes.mode==='3D'){
+      const visible=o=>{for(let p=o;p;p=p.parent)if(!p.visible)return false;return true;};
+      const blockers=ray.intersectObjects([staticScene,environment.scene].filter(Boolean),true).filter(h=>visible(h.object));
+      const hits=ray.intersectObjects(targets).map(h=>({distance:h.distance,id:h.object.userData.action}));
+      const surface=blockers[0],normal=surface?.face?.normal.clone().transformDirection(surface.object.matrixWorld);
+      const f=surface&&surface.point.y<.12&&normal?.y>.7?{distance:surface.distance,x:surface.point.x}:null;
+      return pickVisible(hits,blockers,f);
+    }
+    const blocker=ray.intersectObject(environment.scene,true).find(hit=>{for(let o=hit.object;o;o=o.parent)if(!o.visible)return false;return true;}),distance=blocker?.distance??Infinity;
+    const hit=ray.intersectObjects(targets)[0];if(hit&&hit.distance<=distance+.025)return {id:hit.object.userData.action};
+    const hero=ray.intersectObject(actor,true).find(hit=>{for(let o=hit.object;o;o=o.parent)if(!o.visible)return false;return true;});if(hero&&hero.distance<=distance+.025)return {hero:true};
+    if(ray.ray.intersectPlane(floor,point)&&ray.ray.origin.distanceTo(point)<=distance+.025)return {x:point.x};return {};
   }
   function resize(){const r=canvas.getBoundingClientRect(),aspect=r.width/r.height,h=Math.max(4.1,5.6/aspect);
-    camera.left=-h*aspect/2;camera.right=h*aspect/2;camera.top=h/2;camera.bottom=-h/2;camera.updateProjectionMatrix();renderer.setSize(r.width,r.height,false);}
+    camera.left=-h*aspect/2;camera.right=h*aspect/2;camera.top=h/2;camera.bottom=-h/2;camera.updateProjectionMatrix();firstCamera.aspect=aspect;firstCamera.updateProjectionMatrix();renderer.setSize(r.width,r.height,false);}
   const observer=new ResizeObserver(resize);observer.observe(canvas);resize();
   let fridgeOpen=0,light=homeLight(1410),roomLights={living:true,kitchen:true},lightLevels={living:1,kitchen:1};
   function setRoomLights(lights){roomLights={living:lights.living!==false,kitchen:lights.kitchen!==false};}
@@ -104,6 +146,7 @@ export async function createApartmentScene(canvas,config){
     }
   }
   function render(state,dt,{skeleton=false,paused=false,instant=false}={}){
+    applyCamera(state);
     back.visible=true;environment.scene.visible=true;actor.visible=true;
     shadowFloor.visible=true;practical.sky.visible=true;practical.window.visible=true;
     hemi.intensity=0;key.intensity=0;fill.intensity=0;
@@ -111,8 +154,10 @@ export async function createApartmentScene(canvas,config){
       lightLevels[room]=THREE.MathUtils.lerp(lightLevels[room],Number(roomLights[room]),dt>0?1-Math.exp(-dt*24):1);
       back.material.uniforms[room+'Light'].value=lightLevels[room];
       const rocker=switchRockers[room];if(rocker.object)rocker.object.rotation.x=rocker.rotation+(roomLights[room]?-.12:.12);
+      for(const material of bulbMaterials[room])material.emissiveIntensity=3*lightLevels[room];
     }
     practical.update({daylight:light.daylight,...lightLevels});
+    updateOutside(light.daylight);
     lastEntryOpen=state.entryOpen??0;landingReveal.apartment(lastEntryOpen);
     back.material.uniforms.daylight.value=light.daylight;back.material.uniforms.warmth.value=light.warmth;
     actor.position.fromArray(state.position);actor.rotation.y=state.yaw;
@@ -122,7 +167,6 @@ export async function createApartmentScene(canvas,config){
     for(const [material,color] of actorColors)material.color.copy(color).multiplyScalar(thresholdShade);
     animation.update(instant?{clip:state.clip,fade:1,walkDistance:state.walkDistance}:state,dt,paused);
     // Follow the actual hero root, including during transitions; no room snapping.
-    camera.position.copy(basePosition);camera.position.x=state.cameraX+basePosition.x-baseTarget.x;camera.updateMatrixWorld();
     hinge('passage',state.doorOpen*config.passageOpenAngle);
     const inAction=['perform','approach-depth'].includes(state.phase),lerp=1-Math.exp(-dt*6);
     fridgeOpen=THREE.MathUtils.lerp(fridgeOpen,inAction&&state.actionId==='fridge'?1:0,lerp);
@@ -132,11 +176,12 @@ export async function createApartmentScene(canvas,config){
     if(blanket)blanket.visible=state.clip==='sleep';
     if(bedCover)bedCover.visible=state.clip!=='sleep';
     ring.visible=state.phase==='walk';ring.position.set(state.targetX,.015,config.spawn[2]);
-    renderer.render(scene,camera);
+    applyCamera(state);renderer.render(scene,modes.mode==='3D'?firstCamera:camera);
   }
   const previewCamera=new THREE.OrthographicCamera(-1,1,1.1,-1.1,.1,20);
   previewCamera.position.set(0,1.08,5);previewCamera.lookAt(0,.94,0);
   function renderPreview(dt,yaw,rect){
+    if(staticScene)staticScene.visible=false;
     back.visible=false;environment.scene.visible=false;plate.visible=false;food.visible=false;water.visible=false;ring.visible=false;bones.visible=false;
     shadowFloor.visible=false;practical.update({daylight:0,living:0,kitchen:0});practical.sky.visible=false;practical.window.visible=false;
     hemi.intensity=2;key.intensity=2.5;fill.intensity=.8;
@@ -155,6 +200,7 @@ export async function createApartmentScene(canvas,config){
   peepholeCamera.position.fromArray(config.peepholeCamera?.position??[6.61,1.645,.675]);
   peepholeCamera.lookAt(new THREE.Vector3(...(config.peepholeCamera?.target??[9.05,1.51,-.15])));
   function renderPeephole(rect){
+    if(staticScene)staticScene.visible=false;
     back.visible=false;actor.visible=false;shadow.visible=false;ring.visible=false;bones.visible=false;plate.visible=false;food.visible=false;water.visible=false;
     environment.scene.visible=true;landingReveal.peephole();
     const visible=[];
@@ -169,5 +215,5 @@ export async function createApartmentScene(canvas,config){
     for(const [o,value] of visible)o.visible=value;
     landingReveal.apartment(lastEntryOpen);
   }
-  return {render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance:appearance=>applyAppearance(model.scene,appearance),clips:[...animation.actions.keys()],dispose(){observer.disconnect();renderer.dispose();}};
+  return {modes,loadMode,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance:appearance=>applyAppearance(model.scene,appearance),clips:[...animation.actions.keys()],dispose(){observer.disconnect();renderer.dispose();}};
 }

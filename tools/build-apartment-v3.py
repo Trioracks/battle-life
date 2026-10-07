@@ -5,6 +5,7 @@ random.seed(19)
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0,os.path.join(ROOT,'tools'))
 from apartment_v3_details import add_home_details
+from apartment_v3_cameras import camera_views, export_static
 OUT=os.path.join(ROOT,'assets','apartment','v3')
 os.makedirs(OUT,exist_ok=True)
 LIGHTING_STATES=dict(off=dict(night='background-off.png',day='background-day-off.png'),living=dict(night='background-living.png',day='background-day-living.png'),kitchen=dict(night='background-kitchen.png',day='background-day-kitchen.png'),both=dict(night='background.png',day='background-day.png'))
@@ -42,15 +43,44 @@ def render_light_states():
             render_scene.render.filepath=os.path.join(OUT,LIGHTING_STATES[state][period]);bpy.ops.render.render(write_still=True)
             print('V8_BACKDROP_READY',period,state,flush=True)
 
+if '--static-existing' in sys.argv:
+    import struct
+    bpy.ops.wm.open_mainfile(filepath=os.path.join(ROOT,'assets','source','apartment-cutaway-v3.blend'))
+    scene=bpy.context.scene;scene.cycles.samples=8
+    preferences=bpy.context.preferences.addons['cycles'].preferences;preferences.compute_device_type='OPTIX';preferences.get_devices()
+    for device in preferences.devices:device.use=device.type=='OPTIX'
+    scene.cycles.device='GPU'
+    with open(os.path.join(OUT,'interaction.glb'),'rb') as f:data=f.read()
+    gltf=json.loads(data[20:20+struct.unpack_from('<I',data,12)[0]])
+    dynamic={node.get('name') for node in gltf['nodes']}
+    static=[obj for obj in scene.objects if obj.type in {'MESH','CURVE'} and obj.name not in dynamic and not obj.name.startswith('depth-')]
+    for obj in scene.objects:obj.hide_render=True
+    def existing_shell(name,*args):return bpy.data.objects[name]
+    export_static(scene,static,existing_shell,{'plaster':bpy.data.materials['dirty-warm-plaster']},OUT)
+    print('V9_STATIC_READY',OUT,flush=True);sys.exit(0)
+
 if '--render-existing' in sys.argv:
     bpy.ops.wm.open_mainfile(filepath=os.path.join(ROOT,'assets','source','apartment-cutaway-v3.blend'))
-    render_light_states();print('V3_APARTMENT_READY',OUT,flush=True);sys.exit(0)
+    scene=bpy.context.scene
+    manifest_path=os.path.join(OUT,'scene.json')
+    with open(manifest_path,encoding='utf8') as f:manifest=json.load(f)
+    manifest['cameraViews']=camera_views(scene,scene.camera,OUT,render_light_states)
+    manifest['camera']=manifest['cameraViews']['2D']
+    with open(manifest_path,'w',encoding='utf8') as f:json.dump(manifest,f,ensure_ascii=False,indent=2)
+    scene.camera.location=(.85,-12,1.35+12*math.tan(math.radians(8)))
+    scene.camera.rotation_euler=(Vector((.85,0,1.35))-scene.camera.location).to_track_quat('-Z','Y').to_euler()
+    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT,'assets','source','apartment-cutaway-v3.blend'))
+    print('V3_APARTMENT_READY',OUT,flush=True);sys.exit(0)
 
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 scene=bpy.context.scene
 scene.render.engine='CYCLES'
 scene.render.threads_mode='FIXED';scene.render.threads=max(4,(os.cpu_count() or 8)//2)
 scene.cycles.samples=48
+preferences=bpy.context.preferences.addons['cycles'].preferences
+preferences.compute_device_type='OPTIX';preferences.get_devices()
+for device in preferences.devices:device.use=device.type=='OPTIX'
+scene.cycles.device='GPU'
 scene.render.use_persistent_data=True
 scene.cycles.use_denoising=True
 scene.render.resolution_x=3840;scene.render.resolution_y=1536;scene.render.resolution_percentage=100
@@ -438,7 +468,7 @@ for room,x in [('living',3.60),('kitchen',-.25)]:
 area('soft-facade-fill',(0,-4,4),(0,0,1),190,(.46,.55,.71),8)
 details=add_home_details(cube,cylinder,curve,material,M,scene,static,moving)
 
-bpy.ops.object.camera_add(location=(.85,-12,1.35+12*math.tan(math.radians(11))));camera=bpy.context.object;camera.name='camera-master';camera.data.type='ORTHO';camera.data.ortho_scale=16.8;aim(camera,(.85,0,1.35));scene.camera=camera
+bpy.ops.object.camera_add(location=(.85,-12,1.35+12*math.tan(math.radians(8))));camera=bpy.context.object;camera.name='camera-master';camera.data.type='ORTHO';camera.data.ortho_scale=16.8;aim(camera,(.85,0,1.35));scene.camera=camera
 scene.render.film_transparent=False
 for o in proxies:o.hide_render=True;o.hide_set(True)
 def prepare_backdrop_geometry():
@@ -505,5 +535,15 @@ print('V3_APARTMENT_GEOMETRY_READY',OUT,flush=True)
 
 if '--export-only' not in sys.argv:
     prepare_backdrop_geometry();scene.cycles.samples=48
-    render_light_states()
+    manifest['cameraViews']=camera_views(scene,camera,OUT,render_light_states)
+    manifest['camera']=manifest['cameraViews']['2D']
+    for obj in static+moving+proxies:obj.hide_render=True
+    scene.cycles.samples=8
+    shell=export_static(scene,static,cube,M,OUT)
+    manifest['staticGeometry']='static.glb'
+    with open(os.path.join(OUT,'scene.json'),'w',encoding='utf8') as f:json.dump(manifest,f,ensure_ascii=False,indent=2)
+    prepare_backdrop_geometry()
+    for obj in shell:obj.hide_render=True
+    camera.location=(.85,-12,1.35+12*math.tan(math.radians(8)));aim(camera,(.85,0,1.35))
+    bpy.ops.wm.save_as_mainfile(filepath=source)
 print('V3_APARTMENT_READY',OUT,flush=True)

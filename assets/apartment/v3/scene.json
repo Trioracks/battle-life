@@ -22,7 +22,7 @@
   "camera": {
     "position": [
       0.8500000238418579,
-      3.6825637817382812,
+      3.036489963531494,
       12.0
     ],
     "target": [
@@ -31,7 +31,27 @@
       0
     ],
     "width": 16.8,
-    "height": 6.72
+    "height": 6.72,
+    "lightingStates": {
+      "off": {
+        "night": "background-off.png",
+        "day": "background-day-off.png"
+      },
+      "living": {
+        "night": "background-living.png",
+        "day": "background-day-living.png"
+      },
+      "kitchen": {
+        "night": "background-kitchen.png",
+        "day": "background-day-kitchen.png"
+      },
+      "both": {
+        "night": "background.png",
+        "day": "background-day.png"
+      }
+    },
+    "yaw": 0,
+    "pitch": 8
   },
   "actions": {
     "computer": {
@@ -405,5 +425,76 @@
       ],
       "bakedBulb": true
     }
-  }
+  },
+  "cameraViews": {
+    "2D": {
+      "position": [
+        0.8500000238418579,
+        3.036489963531494,
+        12.0
+      ],
+      "target": [
+        0.85,
+        1.35,
+        0
+      ],
+      "width": 16.8,
+      "height": 6.72,
+      "lightingStates": {
+        "off": {
+          "night": "background-off.png",
+          "day": "background-day-off.png"
+        },
+        "living": {
+          "night": "background-living.png",
+          "day": "background-day-living.png"
+        },
+        "kitchen": {
+          "night": "background-kitchen.png",
+          "day": "background-day-kitchen.png"
+        },
+        "both": {
+          "night": "background.png",
+          "day": "background-day.png"
+        }
+      },
+      "yaw": 0,
+      "pitch": 8
+    },
+    "2.5D": {
+      "position": [
+        2.5200772285461426,
+        3.036489963531494,
+        11.883216857910156
+      ],
+      "target": [
+        0.85,
+        1.35,
+        0
+      ],
+      "width": 16.8,
+      "height": 6.72,
+      "lightingStates": {
+        "off": {
+          "night": "angled-background-off.png",
+          "day": "angled-background-day-off.png"
+        },
+        "living": {
+          "night": "angled-background-living.png",
+          "day": "angled-background-day-living.png"
+        },
+        "kitchen": {
+          "night": "angled-background-kitchen.png",
+          "day": "angled-background-day-kitchen.png"
+        },
+        "both": {
+          "night": "angled-background.png",
+          "day": "angled-background-day.png"
+        }
+      },
+      "yaw": 8,
+      "pitch": 8
+    }
+  },
+  "staticGeometry": "static.glb"
 }

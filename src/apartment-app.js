@@ -3,16 +3,33 @@ import {ApartmentTime,loadHomeTime,saveHomeTime} from './apartment-v3-time.js?re
 import {districts,getDistrictLocations} from './calikfornia.js';
 import {advanceHomeFrame,prepareApartmentConfig} from './apartment-v3-runtime.js?rev=8';
 import {playSoundCue} from './sound-cues.js';
+import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=9';
 import {APPEARANCE_OPTIONS,DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,createProfile,saveProfile,loadProfile} from './avatar-v3-profile.js?rev=7';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false;
 const cue=id=>{try{audio??=new AudioContext();if(audio.state==='suspended')audio.resume();playSoundCue(id,audio);}catch{/* Sound is optional. */}};
 try{
-  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=8');
+  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=9');
   const response=await fetch('./assets/apartment/v3/scene.json',{cache:'no-cache'});if(!response.ok)throw Error('Scene manifest '+response.status);
   const config=prepareApartmentConfig(await response.json()),view=await createApartmentScene(canvas,config);
   let motion=new ApartmentMotion(config),mode='menu',playing=false,previewYaw=0,previewTarget=0;
+  let cameraFade=false;const lookInput=new CameraPointer();
+  const cameraButton=$('#camera-mode');
+  function cameraLabel(){const blocked=view.modes.mode==='2.5D'&&!cameraAllowsFirstPerson(motion);cameraButton.disabled=view.modes.loading||blocked;cameraButton.title=blocked?'Вид от первого лица доступен стоя':'2D → 2.5D → 3D. В 3D: правая кнопка — обзор, левая — действие.';cameraButton.textContent=view.modes.loading?'Камера: загрузка…':view.modes.error?'Камера: повторить':`Камера: ${view.modes.mode}`;}
+  cameraButton.addEventListener('click',async()=>{
+    const switching=view.modes.cycle(motion,view.loadMode,async apply=>{
+      cameraFade=true;const overlay=$('#camera-fade');
+      await overlay.animate([{opacity:0},{opacity:1}],{duration:100,fill:'forwards'}).finished;
+      apply();view.render(motion,0,{paused:true});
+      await overlay.animate([{opacity:1},{opacity:0}],{duration:100,fill:'forwards'}).finished;
+      cameraFade=false;last=performance.now();
+    });cameraLabel();await switching;cameraLabel();
+  });
+  canvas.addEventListener('contextmenu',e=>{if(mode==='game'&&view.modes.mode==='3D')e.preventDefault();});
+  canvas.addEventListener('pointerdown',e=>{if(lookInput.start(e,mode==='game'&&view.modes.mode==='3D')){canvas.setPointerCapture(e.pointerId);e.preventDefault();}});
+  function stopLook(){lookInput.stop();}
+  canvas.addEventListener('pointerup',stopLook);canvas.addEventListener('pointercancel',stopLook);canvas.addEventListener('lostpointercapture',stopLook);
   let storage;try{storage=window.localStorage;}catch{/* Browsers can deny local storage. */}
   const saved=loadProfile(storage);let profile=saved.profile;
   let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lightPreview='game';
@@ -23,6 +40,7 @@ try{
   const completed={computer:'Работа за компьютером закончена.',bed:'Отдохнул. Можно идти дальше.',sink:'Посуда вымыта.',stove:'Еда приготовлена.',fridge:'Взял еду из холодильника.'};
   let message='',messageUntil=0,last=performance.now(),lastStep=0,lastDoor=false,frameRate=60;
   function setMode(next){
+    lookInput.stop();
     mode=next;document.body.dataset.mode=next;
     $('#main-menu').hidden=next!=='menu';$('#creator').hidden=next!=='creator';
     $('#destinations').hidden=next!=='destinations';
@@ -36,6 +54,7 @@ try{
   }
   function resumeAnimation(){paused=false;$('#pause').textContent='Пауза';}
   function enterApartment(nextProfile){
+    view.modes.mode='2D';view.modes.revision++;cameraLabel();
     profile=nextProfile;motion=new ApartmentMotion(config);if(homeTime.initialRest||homeTime.isSleeping)motion.startSleeping();view.setAppearance(profile.appearance);
     playing=true;lastStep=0;lastDoor=false;hold=false;skeleton=false;$('#hold').checked=false;$('#show-bones').checked=false;
     $('#player-name').textContent=profile.name;resumeAnimation();setMode('game');cue('sleep');
@@ -115,8 +134,8 @@ try{
     if(config.actions[id]?.lightRoom)b.setAttribute('aria-label',label);
     $('#actions').append(b);
   }
-  canvas.addEventListener('pointerdown',e=>{if(e.button!==0||mode!=='game')return;const hit=view.pick(e);resumeAnimation();if(hit.id)act(hit.id);else if(hit.hero)motion.faceCamera();else if(Number.isFinite(hit.x)){motion.move(hit.x);cue('footstep');}});
-  canvas.addEventListener('pointermove',e=>{if(mode!=='game'){canvas.style.cursor='default';return;}const hit=view.pick(e);canvas.style.cursor=hit.id||hit.hero?'pointer':'crosshair';
+  canvas.addEventListener('pointerdown',e=>{if(!lookInput.canPick(e)||cameraFade||mode!=='game')return;const hit=view.pick(e);resumeAnimation();if(hit.id)act(hit.id);else if(hit.hero)motion.faceCamera();else if(Number.isFinite(hit.x)){motion.move(hit.x);cue('footstep');}});
+  canvas.addEventListener('pointermove',e=>{if(mode!=='game'){canvas.style.cursor='default';return;}const delta=lookInput.move(e);if(delta){view.modes.look(...delta);canvas.style.cursor='grabbing';$('#hover-label').textContent='';return;}const hit=view.pick(e);canvas.style.cursor=hit.id||hit.hero?'pointer':'crosshair';
     const action=config.actions[hit.id];$('#hover-label').textContent=action?.lightRoom?(homeTime.lights[action.lightRoom]?'Выключить':'Включить')+' свет '+(action.lightRoom==='living'?'в комнате':'на кухне'):action?.label??(hit.hero?'Повернуться к камере':'');});
   canvas.addEventListener('pointerleave',()=>$('#hover-label').textContent='');
   $('#rig-toggle').addEventListener('click',()=>{$('#inspector').hidden=!$('#inspector').hidden;$('#rig-toggle').setAttribute('aria-expanded',String(!$('#inspector').hidden));});
@@ -125,6 +144,8 @@ try{
   $('#step').addEventListener('click',()=>{paused=true;$('#pause').textContent='Продолжить';update(1/30,performance.now(),true);});$('#face').addEventListener('click',()=>motion.faceCamera());
   document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(mode==='peephole')stopPeeking();else if(mode==='door')setMode('game');else if(mode==='game')setMode('menu');});
   function update(dt,now,step=false){
+    cameraLabel();
+    if(cameraFade){view.render(motion,0,{paused:true});return;}
     view.setRoomLights(homeTime.lights);
     if(mode==='creator'){
       const delta=Math.atan2(Math.sin(previewTarget-previewYaw),Math.cos(previewTarget-previewYaw));previewYaw+=delta*(1-Math.exp(-dt*9));
@@ -134,6 +155,7 @@ try{
     if(mode==='menu'||mode==='destinations'||mode==='door'){view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));view.render(motion,0,{paused:true});return;}
     const events=!paused||step?advanceHomeFrame(motion,homeTime,dt,hold).events:[];
     for(const event of events){
+      view.modes.onMotionEvent(event);cameraLabel();
       if(sounds[event.id]&&(event.type==='swap'||(event.type==='started'&&!config.actions[event.id].fade)))cue(sounds[event.id]);
       if(event.type==='interacted'){
         const room=config.actions[event.id].lightRoom;
