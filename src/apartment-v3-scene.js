@@ -7,11 +7,13 @@ import {createBackdropMaterial,sceneTimeState,createPracticalLighting} from './a
 import {createLandingReveal} from './apartment-v3-landing.js?rev=7';
 import {CameraModes,cameraPose,pickVisible} from './apartment-v3-camera.js?rev=9';
 import {createOutsideLighting} from './apartment-v3-outside.js?rev=9';
+import {createRetroPass} from './apartment-v3-retro.js?rev=11';
 
 const BASE='./assets/apartment/v3/';
 export async function createApartmentScene(canvas,config){
-  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:false,alpha:false});
+  renderer.outputColorSpace=THREE.SRGBColorSpace;
+  const retro=createRetroPass(THREE,renderer,canvas);
   renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   const scene=new THREE.Scene();scene.background=new THREE.Color('#141c20');
@@ -135,7 +137,7 @@ export async function createApartmentScene(canvas,config){
     if(ray.ray.intersectPlane(floor,point)&&ray.ray.origin.distanceTo(point)<=distance+.025)return {x:point.x};return {};
   }
   function resize(){const r=canvas.getBoundingClientRect(),aspect=r.width/r.height,h=Math.max(4.1,5.6/aspect);
-    camera.left=-h*aspect/2;camera.right=h*aspect/2;camera.top=h/2;camera.bottom=-h/2;camera.updateProjectionMatrix();firstCamera.aspect=aspect;firstCamera.updateProjectionMatrix();renderer.setSize(r.width,r.height,false);}
+    camera.left=-h*aspect/2;camera.right=h*aspect/2;camera.top=h/2;camera.bottom=-h/2;camera.updateProjectionMatrix();firstCamera.aspect=aspect;firstCamera.updateProjectionMatrix();retro.resize(r.width,r.height);}
   const observer=new ResizeObserver(resize);observer.observe(canvas);resize();
   let fridgeOpen=0,light=homeLight(1410),roomLights={living:true,kitchen:true},lightLevels={living:1,kitchen:1};
   function setRoomLights(lights){roomLights={living:lights.living!==false,kitchen:lights.kitchen!==false};}
@@ -176,11 +178,11 @@ export async function createApartmentScene(canvas,config){
     if(blanket)blanket.visible=state.clip==='sleep';
     if(bedCover)bedCover.visible=state.clip!=='sleep';
     ring.visible=state.phase==='walk';ring.position.set(state.targetX,.015,config.spawn[2]);
-    applyCamera(state);renderer.render(scene,modes.mode==='3D'?firstCamera:camera);
+    applyCamera(state);retro.render(scene,modes.mode==='3D'?firstCamera:camera);
   }
   const previewCamera=new THREE.OrthographicCamera(-1,1,1.1,-1.1,.1,20);
   previewCamera.position.set(0,1.08,5);previewCamera.lookAt(0,.94,0);
-  function renderPreview(dt,yaw,rect,zone='body'){
+  function renderPreview(dt,yaw,rect,zone='body',zoom=1){
     if(staticScene)staticScene.visible=false;
     back.visible=false;environment.scene.visible=false;plate.visible=false;food.visible=false;water.visible=false;ring.visible=false;bones.visible=false;
     shadowFloor.visible=false;practical.update({daylight:0,living:0,kitchen:0});practical.sky.visible=false;practical.window.visible=false;
@@ -191,12 +193,9 @@ export async function createApartmentScene(canvas,config){
     shadow.position.set(0,.014,0);shadow.visible=true;
     const framing={body:[.94,2.12],head:[1.68,.62],top:[1.23,1.04],bottom:[.53,1.14],footwear:[.17,.5]}[zone]??[.94,2.12];
     previewCamera.position.set(0,framing[0]+.14,5);previewCamera.lookAt(0,framing[0],0);
-    const canvasRect=canvas.getBoundingClientRect(),aspect=rect.width/rect.height,h=Math.max(framing[1],(zone==='body'?.72:.42)/aspect);
+    const aspect=rect.width/rect.height,h=Math.max(framing[1],(zone==='body'?.72:.42)/aspect)/zoom;
     previewCamera.left=-h*aspect/2;previewCamera.right=h*aspect/2;previewCamera.top=h/2;previewCamera.bottom=-h/2;previewCamera.updateProjectionMatrix();
-    renderer.setViewport(0,0,canvasRect.width,canvasRect.height);renderer.clear();
-    renderer.setViewport(rect.left-canvasRect.left,canvasRect.bottom-rect.bottom,rect.width,rect.height);
-    renderer.setScissor(rect.left-canvasRect.left,canvasRect.bottom-rect.bottom,rect.width,rect.height);renderer.setScissorTest(true);
-    renderer.render(scene,previewCamera);renderer.setScissorTest(false);renderer.setViewport(0,0,canvasRect.width,canvasRect.height);
+    retro.render(scene,previewCamera,rect);
   }
   const peepholeCamera=new THREE.PerspectiveCamera(92,1,.04,30);
   peepholeCamera.position.fromArray(config.peepholeCamera?.position??[6.61,1.645,.675]);
@@ -209,11 +208,7 @@ export async function createApartmentScene(canvas,config){
     environment.scene.traverse(o=>{if(!o.isMesh)return;let inLanding=false;for(let p=o;p;p=p.parent)if(p===landing)inLanding=true;visible.push([o,o.visible]);o.visible=inLanding;});
     shadowFloor.visible=false;practical.update({daylight:0,living:0,kitchen:0});practical.sky.visible=false;practical.window.visible=false;
     hemi.intensity=1.3;key.intensity=2.5;fill.intensity=.35;
-    const r=canvas.getBoundingClientRect();renderer.setViewport(0,0,r.width,r.height);renderer.clear();
-    renderer.setViewport(rect.left-r.left,r.bottom-rect.bottom,rect.width,rect.height);
-    renderer.setScissor(rect.left-r.left,r.bottom-rect.bottom,rect.width,rect.height);renderer.setScissorTest(true);
-    peepholeCamera.aspect=rect.width/rect.height;peepholeCamera.updateProjectionMatrix();renderer.render(scene,peepholeCamera);
-    renderer.setScissorTest(false);renderer.setViewport(0,0,r.width,r.height);
+    peepholeCamera.aspect=rect.width/rect.height;peepholeCamera.updateProjectionMatrix();retro.render(scene,peepholeCamera,rect);
     for(const [o,value] of visible)o.visible=value;
     landingReveal.apartment(lastEntryOpen);
   }
@@ -222,5 +217,5 @@ export async function createApartmentScene(canvas,config){
     for(const [material,color] of actorColors)if(material.userData.tintChannel)color.copy(material.color);
     return result;
   }
-  return {modes,loadMode,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,clips:[...animation.actions.keys()],dispose(){observer.disconnect();renderer.dispose();}};
+  return {modes,loadMode,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,clips:[...animation.actions.keys()],dispose(){observer.disconnect();retro.dispose();renderer.dispose();}};
 }

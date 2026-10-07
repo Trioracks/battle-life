@@ -4,13 +4,14 @@ import {districts,getDistrictLocations} from './calikfornia.js';
 import {advanceHomeFrame,prepareApartmentConfig} from './apartment-v3-runtime.js?rev=8';
 import {playSoundCue} from './sound-cues.js';
 import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=9';
-import {APPEARANCE_OPTIONS,DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,createProfile,saveProfile,loadProfile} from './avatar-v3-profile.js?rev=10';
+import {DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,createProfile,saveProfile,loadProfile} from './avatar-v3-profile.js?rev=10';
+import {mountCreator} from './apartment-v3-creator.js?rev=11';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false;
 const cue=id=>{try{audio??=new AudioContext();if(audio.state==='suspended')audio.resume();playSoundCue(id,audio);}catch{/* Sound is optional. */}};
 try{
-  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=9');
+  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=11');
   const response=await fetch('./assets/apartment/v3/scene.json',{cache:'no-cache'});if(!response.ok)throw Error('Scene manifest '+response.status);
   const config=prepareApartmentConfig(await response.json()),view=await createApartmentScene(canvas,config);
   let motion=new ApartmentMotion(config),mode='menu',playing=false,previewYaw=0,previewTarget=0;
@@ -74,12 +75,7 @@ try{
     }
     $('#start-game').disabled=remaining!==0||!$('#character-name').value.trim();
   }
-  for(const [key,category] of Object.entries(APPEARANCE_OPTIONS)){
-    const label=document.createElement('label');label.className='appearance-field';label.textContent=category.label;
-    const select=document.createElement('select');select.id='look-'+key;select.name=key;select.setAttribute('aria-label',category.label);
-    for(const option of category.options){const el=document.createElement('option');el.value=option.id;el.textContent=option.label;select.append(el);}
-    select.value=appearance[key];select.addEventListener('change',()=>{appearance[key]=select.value;view.setAppearance(appearance);});label.append(select);$('#appearance-fields').append(label);
-  }
+  const creator=mountCreator($('#appearance-fields'),next=>{appearance=next;view.setAppearance(appearance);});
   for(const key of STAT_KEYS){
     const row=document.createElement('div');row.className='stat-row';
     const name=document.createElement('span');name.textContent=STAT_LABELS[key];
@@ -93,9 +89,8 @@ try{
   $('#character-name').addEventListener('input',updateStats);
   $('#distribute').addEventListener('click',()=>{allocations=Object.fromEntries(STAT_KEYS.map((k,i)=>[k,i===0?2:1]));updateStats();});
   $('#new-game').addEventListener('click',()=>{
-    appearance={...DEFAULT_APPEARANCE};allocations=Object.fromEntries(STAT_KEYS.map(k=>[k,0]));$('#character-name').value='';$('#creator-error').textContent='';
-    for(const key of Object.keys(APPEARANCE_OPTIONS))$('#look-'+key).value=appearance[key];
-    previewYaw=previewTarget=0;for(const b of $('#preview-angles').children)b.classList.toggle('active',b.dataset.yaw==='0');
+    creator.reset();appearance=creator.selection.appearance;$('#preview-zoom').value=1;allocations=Object.fromEntries(STAT_KEYS.map(k=>[k,0]));$('#character-name').value='';$('#creator-error').textContent='';
+    previewYaw=previewTarget=0;for(const b of $('#preview-angles').children){b.classList.toggle('active',b.dataset.yaw==='0');b.setAttribute('aria-pressed',String(b.dataset.yaw==='0'));}
     view.setAppearance(appearance);selectStep(false);updateStats();setMode('creator');$('#character-name').focus();
   });
   $('#continue-game').addEventListener('click',()=>{if(playing){view.setAppearance(profile.appearance);setMode('game');}else if(profile)enterApartment(profile);});
@@ -108,7 +103,13 @@ try{
       if(!result.ok){message='Персонаж создан, но браузер не разрешил сохранение.';messageUntil=performance.now()+8000;}
     }catch(error){$('#creator-error').textContent=error.message;}
   });
-  for(const b of $('#preview-angles').children)b.addEventListener('click',()=>{previewTarget=Number(b.dataset.yaw);for(const other of $('#preview-angles').children)other.classList.toggle('active',other===b);});
+  for(const b of $('#preview-angles').children)b.addEventListener('click',()=>{previewTarget=Number(b.dataset.yaw);for(const other of $('#preview-angles').children){other.classList.toggle('active',other===b);other.setAttribute('aria-pressed',String(other===b));}});
+  $('#preview-body').addEventListener('click',()=>{creator.selection.frame('body');$('#preview-zoom').value=1;});
+  $('#preview-zoom').addEventListener('input',e=>creator.selection.setZoom(Number(e.target.value)));
+  const previewStage=$('#preview-stage');let previewDrag=null;
+  previewStage.addEventListener('pointerdown',e=>{if(e.button!==0)return;previewDrag={id:e.pointerId,x:e.clientX};previewStage.setPointerCapture(e.pointerId);});
+  previewStage.addEventListener('pointermove',e=>{if(previewDrag?.id!==e.pointerId)return;previewTarget+=(e.clientX-previewDrag.x)*.014;previewYaw=previewTarget;previewDrag.x=e.clientX;for(const b of $('#preview-angles').children){b.classList.remove('active');b.setAttribute('aria-pressed','false');}});
+  for(const event of ['pointerup','pointercancel','lostpointercapture'])previewStage.addEventListener(event,()=>previewDrag=null);
   $('#menu-button').addEventListener('click',()=>setMode('menu'));
   $('#wake').addEventListener('click',()=>{resumeAnimation();motion.wakeUp();});
   $('#light-preview').addEventListener('change',e=>lightPreview=e.target.value);
@@ -149,7 +150,8 @@ try{
     view.setRoomLights(homeTime.lights);
     if(mode==='creator'){
       const delta=Math.atan2(Math.sin(previewTarget-previewYaw),Math.cos(previewTarget-previewYaw));previewYaw+=delta*(1-Math.exp(-dt*9));
-      view.renderPreview(dt,previewYaw,$('#preview-stage').getBoundingClientRect());return;
+      $('#preview-zoom').value=creator.selection.zoom;
+      view.renderPreview(dt,previewYaw,$('#preview-stage').getBoundingClientRect(),creator.selection.zone,creator.selection.zoom);return;
     }
     if(mode==='peephole'){view.renderPeephole($('#peek-stage').getBoundingClientRect());return;}
     if(mode==='menu'||mode==='destinations'||mode==='door'){view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));view.render(motion,0,{paused:true});return;}

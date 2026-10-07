@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Battle Life — первый вечер</title>
-  <link rel="stylesheet" href="./apartment-v3.css?rev=9">
+  <link rel="stylesheet" href="./apartment-v3.css?rev=11">
   <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
 </head>
 <body>
@@ -17,7 +17,7 @@
   <section id="creator" class="screen" hidden aria-labelledby="creator-title">
     <header class="creator-heading"><div><p class="eyebrow">НОВАЯ ИГРА</p><h2 id="creator-title">Кто ты?</h2></div><p>Обычная квартира.<br>Твоя история начинается здесь.</p></header>
     <div class="creator-layout">
-      <section class="preview-card" aria-label="Объёмный предпросмотр героя"><div class="preview-caption"><span>ТВОЙ ПЕРСОНАЖ</span><span>3D / В РЕАЛЬНОМ ВРЕМЕНИ</span></div><div id="preview-stage"></div><div id="preview-angles" role="group" aria-label="Ракурс персонажа"><button data-yaw="0" class="active">Анфас</button><button data-yaw="1.5707963267948966">Справа</button><button data-yaw="3.141592653589793">Спина</button><button data-yaw="-1.5707963267948966">Слева</button></div><p class="preview-note">Эта модель появится в квартире — вместе с выбранной одеждой.</p></section>
+      <section class="preview-card" aria-label="Объёмный предпросмотр героя"><div class="preview-caption"><span>ТВОЙ ПЕРСОНАЖ</span><span>ЖИВАЯ МОДЕЛЬ</span></div><div id="preview-stage" aria-label="Перетащи, чтобы повернуть героя"></div><div id="preview-angles" role="group" aria-label="Ракурс персонажа"><button data-yaw="0" class="active" aria-pressed="true">Анфас</button><button data-yaw="1.5707963267948966" aria-pressed="false">Справа</button><button data-yaw="3.141592653589793" aria-pressed="false">Спина</button><button data-yaw="-1.5707963267948966" aria-pressed="false">Слева</button></div><div class="preview-tools"><button id="preview-body" type="button">Весь рост</button><label for="preview-zoom">Масштаб <input id="preview-zoom" type="range" min="0.8" max="1.5" step="0.05" value="1"></label></div><p class="preview-note">Тяни героя для поворота.<br>Категория приближает нужную часть тела.</p></section>
       <form id="creator-form" novalidate>
         <label class="name-field" for="character-name">ИМЯ ПЕРСОНАЖА<input id="character-name" name="name" placeholder="Как тебя зовут?" maxlength="32" autocomplete="off" required></label>
         <nav class="creator-tabs" aria-label="Создание персонажа"><button type="button" id="appearance-tab" aria-pressed="true">01 / Внешность</button><button type="button" id="stats-tab" aria-pressed="false">02 / Характеристики <span id="points-badge">10</span></button></nav>
@@ -33,6 +33,6 @@
   <section id="door-choice" class="screen" hidden aria-labelledby="door-title"><div class="door-card"><p class="eyebrow">ВХОДНАЯ ДВЕРЬ</p><h2 id="door-title">За порогом</h2><p>Тихая лестничная площадка. Можно сначала посмотреть, что снаружи.</p><button id="door-peek">Посмотреть в глазок</button><button id="door-exit" class="primary">Открыть дверь и выйти</button><button id="door-cancel">Остаться дома</button></div></section>
   <section id="peephole" class="screen" hidden aria-labelledby="peek-title"><div class="peek-heading"><p class="eyebrow">ЗА ДВЕРЬЮ</p><h2 id="peek-title">Лестничная площадка</h2></div><div id="peek-stage" aria-label="Вид через дверной глазок"></div><div class="peek-footer"><p>Дверь закрыта. В подъезде никого.</p><button id="peek-close">Отойти от глазка</button></div></section>
   <section id="loading"><p class="brand">BATTLE LIFE / ПЕРВЫЙ ВЕЧЕР</p><h2>Включаем свет в квартире</h2><div class="loader-line"></div><p>Загружаются квартира, персонаж и его гардероб.</p></section>
-  <script type="module" src="./src/apartment-app.js?rev=9"></script>
+  <script type="module" src="./src/apartment-app.js?rev=11"></script>
 </body>
 </html>
