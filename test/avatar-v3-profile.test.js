@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {registerHooks} from 'node:module';
 import { Group, Mesh } from '../vendor/three/three.module.js';
 import {
   APPEARANCE_OPTIONS, DEFAULT_APPEARANCE, STAT_KEYS, STAT_LABELS, SAVE_KEY,
@@ -50,6 +52,36 @@ test('multi-material GLTF primitive children remain visible with their selected 
   assert.equal(other.visible,false);assert.equal(hidden.visible,false);
   applyAppearance(root,{face:'oval'});
   assert.equal(selected.visible,false);assert.equal(skin.visible,false);assert.equal(hidden.visible,true);
+});
+
+test('actual GLTFLoader primitive children inherit fitted look ownership across every face and sibling', async () => {
+  // Match the browser import map without installing a second Three.js copy.
+  const hook=registerHooks({resolve(specifier,context,nextResolve){
+    return nextResolve(specifier==='three'?new URL('../vendor/three/three.module.js',import.meta.url).href:specifier,context);
+  }});
+  let GLTFLoader;
+  try{({GLTFLoader}=await import('../vendor/three/addons/loaders/GLTFLoader.js'));}finally{hook.deregister();}
+  const bytes=fs.readFileSync(new URL('../assets/apartment/v3/mannequin.glb',import.meta.url));
+  const gltf=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
+  const owners=[];
+  gltf.scene.traverse(node=>{
+    const match=/^look-(hair|beard|mustache)-([^-]+)(?:-|$)/.exec(node.name);
+    if(match&&node.userData.faceVariant)owners.push({node,category:match[1],style:match[2],face:node.userData.faceVariant});
+  });
+  assert.equal(owners.length,36,'all exported fitted hair/beard/moustache owners must be exercised');
+  applyAppearance(gltf.scene,{face:'square',beard:'full'});
+  const squareFull=owners.find(owner=>owner.face==='square'&&owner.category==='beard'&&owner.style==='full').node;
+  squareFull.traverse(child=>assert.equal(child.visible,true,child.name+' must render the selected square full beard'));
+  for(const face of ['oval','square','long'])for(const [category,styles] of Object.entries({hair:['buzz','lake'],beard:['stubble','short','full','goatee','chinstrap'],mustache:['pencil','classic','walrus','handlebar','horseshoe']}))for(const style of styles){
+    applyAppearance(gltf.scene,{face,hair:'bald',beard:'none',mustache:'none',[category]:style});
+    for(const owner of owners){
+      const expected=owner.face===face&&owner.category===category&&owner.style===style;
+      assert.equal(owner.node.visible,expected,owner.node.name+' owner');
+      owner.node.traverse(child=>assert.equal(child.visible,expected,`${face}/${category}/${style}: ${child.name} must inherit ${owner.node.name}`));
+    }
+  }
+  applyAppearance(gltf.scene,{face:'square',hair:'bald',beard:'none',mustache:'none'});
+  for(const {node} of owners)node.traverse(child=>assert.equal(child.visible,false,child.name+' must hide when deselected'));
 });
 
 test('every catalog option survives normalization and has a readable Russian UI label', () => {

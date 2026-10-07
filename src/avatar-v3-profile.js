@@ -47,11 +47,21 @@ export function normalizeAppearance(input) {
 
 export function applyAppearance(model, appearance) {
   const normalized = normalizeAppearance(appearance);
+  const lookOwners = new WeakMap();
   model?.traverse?.((node) => {
-    const match = /^look-([^-]+)-([^_-]+)(?:[-_]|$)/.exec(node.name);
-    if (match && Object.hasOwn(APPEARANCE_OPTIONS, match[1])) {
-      node.visible = normalized[match[1]] === (match[2]==='shaggy'?'bowl':match[2]);
-      if(node.userData?.faceVariant)node.visible&&=node.userData.faceVariant===normalized.face;
+    const owner = lookOwners.get(node.parent);
+    if (owner) {
+      // GLTFLoader gives material primitives independent Blender mesh names
+      // (e.g. full001). Only their containing look owns selection and face fit.
+      node.visible = owner.visible;
+      lookOwners.set(node, owner);
+    } else {
+      const match = /^look-([^-]+)-([^_-]+)(?:[-_]|$)/.exec(node.name);
+      if (match && Object.hasOwn(APPEARANCE_OPTIONS, match[1])) {
+        node.visible = normalized[match[1]] === (match[2]==='shaggy'?'bowl':match[2]);
+        if(node.userData?.faceVariant)node.visible&&=node.userData.faceVariant===normalized.face;
+        lookOwners.set(node, node);
+      }
     }
     for(const material of (Array.isArray(node.material)?node.material:[node.material])){
       const channel=material?.userData?.tintChannel;
