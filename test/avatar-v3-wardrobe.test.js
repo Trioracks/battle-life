@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {Group,Mesh,MeshStandardMaterial,Ray,Vector3} from '../vendor/three/three.module.js';
+import {Group,Mesh,MeshStandardMaterial,Ray,Vector3,Triangle} from '../vendor/three/three.module.js';
 import {normalizeAppearance,applyAppearance,createProfile,saveProfile,loadProfile} from '../src/avatar-v3-profile.js';
 import {readGlb} from './helpers/glb-pose.js';
 test('new wardrobe choices and independent colors survive normalization; old shaggy retains bowl silhouette',()=>{
@@ -50,8 +50,30 @@ test('layered hairstyles use sparse tapered planes and messy fringe leaves an as
     const n=g.nodes.find(n=>n.name==='look-hair-'+kind),primitives=g.meshes[n.mesh].primitives;
     assert.ok(primitives.reduce((sum,p)=>sum+g.accessors[p.attributes.POSITION].count,0)<1800,kind+' should have broad angular locks rather than dense round capsules');
     if(kind==='messy'){
+      const all=primitives.flatMap(p=>values(p.attributes.POSITION));
+      assert.ok(all.some(v=>v[0]>-.10&&v[0]<0&&v[1]<1.735&&v[2]>.12),'one diagonal fringe must reach the left brow');
+      assert.ok(all.some(v=>v[1]<1.55&&v[2]<-.07),'irregular nape tufts must be longer than crop');
       const ray=new Ray(new Vector3(.045,1.744,.08),new Vector3(0,0,1));
       for(const p of primitives){const vv=values(p.attributes.POSITION),ii=values(p.indices).flat();for(let i=0;i<ii.length;i+=3)assert.equal(ray.intersectTriangle(...ii.slice(i,i+3).map(j=>new Vector3().fromArray(vv[j])),false,new Vector3()),null,'right eye/forehead must remain open');}
+    }
+  }
+});
+test('each face-specific shaved shell stays within 4 mm of its own actual scalp triangles without a raised roof',()=>{
+  const {json:g,values}=readGlb('mannequin.glb');
+  for(const face of ['oval','square','long']){
+    const head=g.nodes.find(n=>n.name==='look-face-'+face),triangles=[];let headTop=0;
+    for(const p of g.meshes[head.mesh].primitives.filter(p=>g.materials[p.material].name==='warm-skin')){
+      const vv=values(p.attributes.POSITION),ii=values(p.indices).flat();headTop=Math.max(headTop,...vv.map(v=>v[1]));
+      for(let i=0;i<ii.length;i+=3)triangles.push(new Triangle(...ii.slice(i,i+3).map(j=>new Vector3().fromArray(vv[j]))));
+    }
+    for(const kind of ['buzz','lake']){
+      const n=g.nodes.find(n=>n.name.startsWith('look-hair-'+kind)&&n.extras?.faceVariant===face)??g.nodes.find(n=>n.name==='look-hair-'+kind);
+      const vv=g.meshes[n.mesh].primitives.filter(p=>g.materials[p.material].name===(kind==='buzz'?'shaved-scalp-skin-mix':'hair-dark-brown')).flatMap(p=>values(p.attributes.POSITION));
+      assert.ok(vv.length>16);
+      for(const v of vv){const point=new Vector3().fromArray(v),closest=new Vector3();const distance=Math.min(...triangles.map(t=>t.closestPointToPoint(point,closest).distanceTo(point)));assert.ok(distance<=.0041,`${face}/${kind}: scalp clearance ${distance} exceeds 4 mm`);}
+      assert.ok(Math.max(...vv.map(v=>v[1]))<=headTop+.0031,face+' shell cannot rise above a 3 mm crown offset');
+      if(kind==='buzz')assert.ok(Math.max(...vv.map(v=>v[1]))>headTop+.002,face+' crown must sit outside the skin');
+      assert.equal(n.extras?.faceVariant,face);
     }
   }
 });
