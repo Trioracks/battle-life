@@ -147,22 +147,37 @@ for kind,profile in face_profiles.items():
         hit,point,normal,index=head_shell.ray_cast(Vector((x,-1,z)),Vector((0,1,0)))
         if not hit:raise ValueError('Feature outside '+prefix+' scalp at '+str((x,z)))
         return point.y
+    def fitted_feature(name,outline,triangles,material):
+        # A four-corner chord can sink through the intervening skull facets.
+        # Tessellate in the face plane before projecting every point to skin.
+        vertices=[];faces=[]
+        for triangle in triangles:
+            corners=[Vector(outline[i]) for i in triangle]
+            steps=math.ceil(max((a-b).length for a in corners for b in corners)/.0015)
+            grid={}
+            for i in range(steps+1):
+                for j in range(steps+1-i):
+                    x,z=corners[0]+(corners[1]-corners[0])*(i/steps)+(corners[2]-corners[0])*(j/steps)
+                    grid[i,j]=len(vertices);vertices.append((x,face_y(x,z)-.0007,z))
+            for i in range(steps):
+                for j in range(steps-i):
+                    faces.append((grid[i,j],grid[i+1,j],grid[i,j+1]))
+                    if i+j<steps-1:faces.append((grid[i+1,j],grid[i+1,j+1],grid[i,j+1]))
+        surface(name,vertices,faces,material,[{'head':1}]*len(vertices))
     nose=[(-.020,-.119,1.699),(.020,-.119,1.699),(-.025,-.126,1.645),(.025,-.126,1.645),(0,-.177,1.651),(0,-.145,1.704),(0,-.142,1.637)]
     nose=[(x*(1.28 if kind=='square' else .78 if kind=='long' else 1),y,z-(.006 if kind=='long' else 0)) for x,y,z in nose]
     # Five base vertices bury 2 mm into this actual face. Only tip and ridge
     # project outwards; a long nose does not move its entire base off the skin.
     nose=[(x,face_y(x,z)+(.002 if i in [0,1,2,3,6] else -.055 if i==4 else -.025),z) for i,(x,y,z) in enumerate(nose)]
     surface(prefix+'-nose',nose,[(0,1,5),(0,5,4,2),(5,1,3,4),(2,4,6),(4,3,6),(0,2,6,3,1)],skin,[{'head':1}]*7)
-    mouth=[(x,face_y(x,z)-.0007,z) for x,z in [(-.033,1.606),(0,1.604),(.033,1.606),(0,1.596)]]
-    surface(prefix+'-mouth',mouth,[(0,1,3),(1,2,3)],lip,[{'head':1}]*4)
+    fitted_feature(prefix+'-mouth',[(-.033,1.606),(0,1.604),(.033,1.606),(0,1.596)],[(0,1,3),(1,2,3)],lip)
     for s in [-1,1]:
         width=.119 if kind=='long' else .133
         ellipsoid(prefix+'-ear',(s*width,.003,1.660),(.021,.027,.038),skin,'head')
         for label,scale,material,relief in [('eye-white',(.011,.004,.008),eye_white,.0008),('eye',(.008,.0035,.008),eye,.0032)]:
             o=ellipsoid(prefix+'-'+label,(s*.046,0,1.706),scale,material,'head')
             for v in o.data.vertices:v.co.y+=face_y(o.location.x+v.co.x,o.location.z+v.co.z)-relief
-        brow=[(x,face_y(x,z)-.0007,z) for x,z in [(s*.026,1.731),(s*.070,1.727),(s*.071,1.734),(s*.029,1.739)]]
-        surface(prefix+'-brow',brow,[(0,1,2,3)],hair,[{'head':1}]*4)
+        fitted_feature(prefix+'-brow',[(s*.026,1.731),(s*.070,1.727),(s*.071,1.734),(s*.029,1.739)],[(0,1,2),(0,2,3)],hair)
     finish_group(prefix,start)
 
 def hair_cap(name,style):

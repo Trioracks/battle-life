@@ -91,7 +91,21 @@ test('nose base, brows and lips attach to each exported face surface instead of 
     const gap=v=>{const ray=new Ray(new Vector3(v[0],v[1],1),new Vector3(0,0,-1)),hits=triangles.map(t=>ray.intersectTriangle(...t,false,new Vector3())).filter(Boolean);assert.ok(hits.length,face+' feature must project onto skin');return v[2]-Math.max(...hits.map(p=>p.z));};
     const nosePoints=[...nose].map(k=>points.get(k)),lowest=Math.min(...nosePoints.map(v=>v[1]));
     for(const v of nosePoints.filter(v=>Math.abs(v[0])>.001||v[1]===lowest))assert.ok(gap(v)<=.001&&gap(v)>=-.004,`${face} nose base is detached: ${gap(v)}`);
-    for(const p of primitives.filter(p=>['hair-dark-brown','lips'].includes(g.materials[p.material].name)))for(const v of values(p.attributes.POSITION))assert.ok(Math.abs(gap(v))<.002,face+' brow/lip must rest on skin');
+    for(const p of primitives.filter(p=>['hair-dark-brown','lips'].includes(g.materials[p.material].name))){
+      const vertices=values(p.attributes.POSITION),indices=values(p.indices).flat(),label=face+' '+g.materials[p.material].name;
+      let visibleArea=0;
+      for(let i=0;i<indices.length;i+=3){
+        const triangle=indices.slice(i,i+3).map(j=>vertices[j]);
+        const [a,b,c]=triangle;visibleArea+=Math.abs((b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]))/2;
+        // Vertices alone miss chords that cut under a faceted skull. Sample
+        // exported triangle edges and interiors, including their centroid.
+        for(let a=0;a<=6;a++)for(let b=0;b<=6-a;b++){
+          const weights=[a/6,b/6,1-(a+b)/6],v=[0,1,2].map(axis=>triangle.reduce((sum,p,j)=>sum+p[axis]*weights[j],0)),clearance=gap(v);
+          assert.ok(clearance>.00015&&clearance<.002,`${label} surface must stay visible above skin: ${clearance}`);
+        }
+      }
+      assert.ok(visibleArea>(g.materials[p.material].name==='lips'?.0002:.0005),label+' must retain a visible strip area at metre scene scale');
+    }
     for(const p of primitives.filter(p=>g.materials[p.material].name==='eye-ivory')){
       for(const side of [-1,1]){const eye=values(p.attributes.POSITION).filter(v=>v[0]*side>0);assert.ok(Math.min(...eye.map(gap))<.001,face+' eye white needs a skin attachment');}
     }
