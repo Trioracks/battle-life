@@ -9,19 +9,23 @@ function category(label, options) {
   });
 }
 
+export const CLOTHING_COLORS = Object.freeze({white:0xe6e1d7,grey:0x858589,black:0x24252a,red:0xb73535,yellow:0xe0b638,green:0x398353,blue:0x3159a6,lightblue:0x86b8d1,olive:0x697248,beige:0xc3ac86,brown:0x79513a});
+const colorOptions=[['white','Белый'],['grey','Серый'],['black','Чёрный'],['red','Красный'],['yellow','Жёлтый'],['green','Зелёный'],['blue','Синий'],['lightblue','Голубой'],['olive','Оливковый'],['beige','Бежевый'],['brown','Коричневый']];
 export const APPEARANCE_OPTIONS = Object.freeze({
-  hair: category('Волосы', [['crop', 'Короткие'], ['parted', 'С пробором'], ['shaggy', 'Растрёпанные']]),
+  hair: category('Волосы', [['bald','Лысый'],['lake','Озеро в лесу'],['buzz','Под машинку — 3 мм'],['crop', 'Короткие'], ['parted', 'С пробором'], ['bowl','Под горшок'],['messy','Растрёпанные'],['longshag','Длинный шегги']]),
   face: category('Форма лица', [['oval', 'Овальное'], ['square', 'Квадратное'], ['long', 'Вытянутое']]),
-  beard: category('Борода', [['none', 'Без бороды'], ['stubble', 'Щетина'], ['full', 'Полная борода']]),
-  mustache: category('Усы', [['none', 'Без усов'], ['classic', 'Классические']]),
-  top: category('Верх', [['tee', 'Футболка'], ['shirt', 'Рубашка'], ['hoodie', 'Худи'], ['sweater', 'Свитер']]),
-  bottom: category('Низ', [['jeans', 'Джинсы'], ['breeches', 'Бриджи'], ['shorts', 'Шорты'], ['sports', 'Спортивные штаны']]),
-  footwear: category('Обувь', [['sneakers', 'Кроссовки'], ['boots', 'Ботинки'], ['flipflops', 'Шлёпанцы'], ['sandals', 'Сандалии']]),
+  beard: category('Борода', [['none', 'Без бороды'], ['stubble', 'Щетина'],['short','Короткая полная'], ['full', 'Широкая полная'],['goatee','Эспаньолка'],['chinstrap','По линии челюсти']]),
+  mustache: category('Усы', [['none', 'Без усов'],['pencil','Карандаш'], ['classic', 'Шеврон'],['walrus','Морж'],['handlebar','Закрученные'],['horseshoe','Подкова']]),
+  top: category('Верх', [['tee', 'Футболка'], ['shirt', 'Рубашка'], ['hoodie', 'Худи'], ['sweater', 'Свитер'],['tank','Майка'],['turtleneck','Водолазка']]),
+  bottom: category('Низ', [['jeans', 'Широкие джинсы'],['skinny','Узкие джинсы'], ['breeches', 'Бриджи'], ['shorts', 'Шорты'], ['sports', 'Спортивные штаны']]),
+  footwear: category('Обувь', [['sneakers', 'Кроссовки'],['canvas','Кеды'], ['boots', 'Сапоги'], ['flipflops', 'Шлёпанцы'], ['sandals', 'Сандалии']]),
+  topColor:category('Цвет верха',colorOptions),bottomColor:category('Цвет низа',colorOptions),footwearColor:category('Цвет обуви',colorOptions),
 });
 
 export const DEFAULT_APPEARANCE = Object.freeze({
   hair: 'crop', face: 'oval', beard: 'none', mustache: 'none',
   top: 'tee', bottom: 'jeans', footwear: 'sneakers',
+  topColor:'blue',bottomColor:'blue',footwearColor:'grey',
 });
 
 export const SAVE_KEY = 'battle-life-apartment-v3';
@@ -31,7 +35,10 @@ function isRecord(value) {
 }
 
 export function normalizeAppearance(input) {
-  const appearance = isRecord(input) ? input : {};
+  const appearance = isRecord(input) ? {...input} : {};
+  if(appearance.hair==='shaggy')appearance.hair='bowl';
+  if(appearance.mustache==='chevron')appearance.mustache='classic';
+  if(appearance.beard==='broad')appearance.beard='full';
   return Object.fromEntries(Object.entries(APPEARANCE_OPTIONS).map(([key, { options }]) => [
     key,
     options.some(({ id }) => id === appearance[key]) ? appearance[key] : DEFAULT_APPEARANCE[key],
@@ -43,7 +50,12 @@ export function applyAppearance(model, appearance) {
   model?.traverse?.((node) => {
     const match = /^look-([^-]+)-([^_-]+)(?:[-_]|$)/.exec(node.name);
     if (match && Object.hasOwn(APPEARANCE_OPTIONS, match[1])) {
-      node.visible = normalized[match[1]] === match[2];
+      node.visible = normalized[match[1]] === (match[2]==='shaggy'?'bowl':match[2]);
+      if(node.userData?.faceVariant)node.visible&&=node.userData.faceVariant===normalized.face;
+    }
+    for(const material of (Array.isArray(node.material)?node.material:[node.material])){
+      const channel=material?.userData?.tintChannel;
+      if(channel&&CLOTHING_COLORS[normalized[channel+'Color']]!==undefined)material.color.setHex(CLOTHING_COLORS[normalized[channel+'Color']]);
     }
   });
   return normalized;

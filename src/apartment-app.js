@@ -4,7 +4,7 @@ import {districts,getDistrictLocations} from './calikfornia.js';
 import {advanceHomeFrame,prepareApartmentConfig} from './apartment-v3-runtime.js?rev=8';
 import {playSoundCue} from './sound-cues.js';
 import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=9';
-import {APPEARANCE_OPTIONS,DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,createProfile,saveProfile,loadProfile} from './avatar-v3-profile.js?rev=7';
+import {APPEARANCE_OPTIONS,DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,createProfile,saveProfile,loadProfile} from './avatar-v3-profile.js?rev=10';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false;

@@ -17,6 +17,7 @@ const expectedSkills = {
 const expectedDefault = {
   hair: 'crop', face: 'oval', beard: 'none', mustache: 'none',
   top: 'tee', bottom: 'jeans', footwear: 'sneakers',
+  topColor:'blue',bottomColor:'blue',footwearColor:'grey',
 };
 
 function profile(overrides = {}) {
@@ -63,13 +64,15 @@ test('every catalog option survives normalization and has a readable Russian UI 
     hair: 'parted', face: 'square', beard: 'stubble', mustache: 'classic',
     top: 'shirt', bottom: 'breeches', footwear: 'flipflops',
   }), {
+    topColor:'blue',bottomColor:'blue',footwearColor:'grey',
     hair: 'parted', face: 'square', beard: 'stubble', mustache: 'classic',
     top: 'shirt', bottom: 'breeches', footwear: 'flipflops',
   });
   assert.deepEqual(normalizeAppearance({
     hair: 'shaggy', face: 'long', beard: 'full', top: 'hoodie', bottom: 'sports', footwear: 'boots',
   }), {
-    hair: 'shaggy', face: 'long', beard: 'full', mustache: 'none',
+    hair: 'bowl', face: 'long', beard: 'full', mustache: 'none',
+    topColor:'blue',bottomColor:'blue',footwearColor:'grey',
     top: 'hoodie', bottom: 'sports', footwear: 'boots',
   });
   assert.equal(normalizeAppearance({ top: 'sweater', bottom: 'shorts', footwear: 'sandals' }).bottom, 'shorts');

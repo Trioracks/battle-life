@@ -251,7 +251,7 @@ test('shoe outsoles have a broad flat contact patch rather than ellipsoid tips',
 // Catches a missing export, rigid props, duplicate skeletons, or flat face cards.
 test('every selectable look exports three-dimensional geometry on the shared skeleton',()=>{
   const {g,values}=model();
-  const choices={hair:['crop','parted','shaggy'],face:['oval','square','long'],beard:['stubble','full'],mustache:['classic'],top:['tee','shirt','hoodie','sweater'],bottom:['jeans','breeches','shorts','sports'],footwear:['sneakers','boots','flipflops','sandals']};
+  const choices={hair:['crop','parted','bowl','lake','buzz','messy','longshag'],face:['oval','square','long'],beard:['stubble','short','full','goatee','chinstrap'],mustache:['pencil','classic','walrus','handlebar','horseshoe'],top:['tee','shirt','hoodie','sweater','tank','turtleneck'],bottom:['jeans','skinny','breeches','shorts','sports'],footwear:['sneakers','canvas','boots','flipflops','sandals']};
   const joints=g.skins[0].joints;
   for(const [category,options] of Object.entries(choices))for(const option of options){
     const prefix=`look-${category}-${option}`;
@@ -286,7 +286,7 @@ test('hair, faces, clothes and shoes have distinct selectable geometry',()=>{
       variants.set(match[1],[...(variants.get(match[1])??[]),...positions]);
     }
     const signatures=[...variants.values()].map(p=>JSON.stringify(p));
-    assert.equal(new Set(signatures).size,category==='hair'||category==='face'?3:4,`${category} must change geometry`);
+    assert.equal(new Set(signatures).size,{hair:7,face:3,top:6,bottom:5,footwear:5}[category],`${category} must change geometry`);
   }
 });
 
@@ -370,7 +370,7 @@ test('exported sleep lies on the side with the face toward the wall and head on 
 });
 
 // Catches separately capped waist/leg tubes and a raised detached neck ring.
-test('shorts form a single continuous waist and crotch, and sweater neckline stays open',()=>{
+test('shorts form a single continuous waist and crotch, and raised sweater neck has no cap',()=>{
   const {g,values}=model();
   const shorts=g.nodes.find(n=>n.name==='look-bottom-shorts'),mesh=g.meshes[shorts.mesh];
   const adjacency=new Map(),key=v=>v.map(x=>Math.round(x*10000)).join(',');
@@ -387,7 +387,7 @@ test('shorts form a single continuous waist and crotch, and sweater neckline sta
   const sweater=g.nodes.find(n=>n.name==='look-top-sweater');
   for(const p of g.meshes[sweater.mesh].primitives){
     const positions=values(p.attributes.POSITION),indices=values(p.indices).flat();
-    assert.ok(Math.max(...positions.map(v=>v[1]))<1.46,'sweater must finish at the natural neckline');
+    assert.ok(Math.max(...positions.map(v=>v[1]))>1.50&&Math.max(...positions.map(v=>v[1]))<1.53,'thick sweater must cover neck below the chin');
     for(let i=0;i<indices.length;i+=3){
       const triangle=indices.slice(i,i+3).map(j=>positions[j]);
       assert.ok(!triangle.every(v=>v[1]>1.44)||Math.max(...triangle.map(v=>v[1]))-Math.min(...triangle.map(v=>v[1]))>.002,'neck opening cannot be a capped disc');

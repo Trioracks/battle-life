@@ -128,8 +128,8 @@ finish_group('neutral-skinned-body',0)
 lower_face=[(1.498,.051,.058),(1.531,.082,.077),(1.582,.107,.094),(1.630,.122,.104),(1.657,.126,.109)]
 face_profiles={
  'oval':lower_face+[(1.715,.127,.111),(1.772,.111,.096),(1.812,.067,.060),(1.827,.020,.022)],
- 'square':lower_face+[(1.715,.137,.114),(1.779,.130,.098),(1.814,.079,.064),(1.827,.023,.025)],
- 'long':lower_face+[(1.718,.114,.109),(1.780,.101,.095),(1.827,.059,.057),(1.842,.018,.020)]}
+ 'square':[(1.498,.080,.066),(1.531,.110,.084),(1.582,.119,.099),(1.630,.128,.108),(1.657,.130,.112)]+[(1.715,.137,.114),(1.779,.130,.098),(1.814,.079,.064),(1.827,.023,.025)],
+ 'long':[(1.474,.043,.056),(1.517,.068,.078),(1.575,.093,.099),(1.630,.111,.106),(1.657,.115,.109)]+[(1.718,.114,.109),(1.780,.101,.095),(1.827,.059,.057),(1.842,.018,.020)]}
 def face_point(z,rx,ry,j,offset=0):
     a=2*math.pi*j/16
     # Broader frontal planes and angular cheeks, deliberately faceted.
@@ -143,6 +143,7 @@ for kind,profile in face_profiles.items():
     faces.extend([tuple(reversed(range(16))),tuple((len(profile)-1)*16+j for j in range(16))])
     surface(prefix+'-head',vertices,faces,skin,[{'head':1}]*len(vertices))
     nose=[(-.020,-.119,1.699),(.020,-.119,1.699),(-.025,-.126,1.645),(.025,-.126,1.645),(0,-.177,1.651),(0,-.145,1.704),(0,-.142,1.637)]
+    nose=[(x*(1.28 if kind=='square' else .78 if kind=='long' else 1),y-(.012 if kind=='long' else 0),z-(.006 if kind=='long' else 0)) for x,y,z in nose]
     surface(prefix+'-nose',nose,[(0,1,5),(0,5,4,2),(5,1,3,4),(2,4,6),(4,3,6),(0,2,6,3,1)],skin,[{'head':1}]*7)
     surface(prefix+'-mouth',[(-.033,-.116,1.606),(0,-.122,1.604),(.033,-.116,1.606),(0,-.120,1.596)],[(0,1,3),(1,2,3)],lip,[{'head':1}]*4)
     for s in [-1,1]:
@@ -267,6 +268,7 @@ def torso_garment(prefix,material,loose,kind):
           (1.320,.205,.131,{'chest':1}),
           (1.421,.206,.118,{'chest':1}),
           (1.452,.071,.065,{'chest':.8,'neck':.2})]
+    if kind=='tank':rows[-1]=(1.391,.103,.085,{'chest':1})
     def vertex(v,w):vertices.append(v);weights.append(w);return len(vertices)-1
     for level,(z,rx,ry,w) in enumerate(rows):
         loop=[]
@@ -288,6 +290,7 @@ def torso_garment(prefix,material,loose,kind):
                 faces.append((levels[level-1][j],levels[level-1][(j+1)%n],loop[(j+1)%n],loop[j]))
     for side,s in [('L',1),('R',-1)]:
         up='upper_arm.'+side;lo='forearm.'+side;c=0 if s>0 else 8
+        if kind=='tank':continue
         # Start at the shoulder, round the back, through armpit, up the front.
         step=1 if s>0 else -1
         previous=[levels[4][c],levels[4][(c+step)%16],levels[3][(c+step)%16],levels[2][(c+step)%16],levels[2][c],levels[2][(c-step)%16],levels[3][(c-step)%16],levels[4][(c-step)%16]]
@@ -312,7 +315,7 @@ for kind,material,loose in [('tee',tee,0),('shirt',shirt,.002),('hoodie',hoodie,
         for z in [1.05,1.12,1.19,1.26,1.33,1.40]:ellipsoid(prefix+'-button',(0,-(.130 if z<1.21 else .135),z),(.004,.004,.004),leather,'chest' if z>1.2 else 'spine')
     if kind=='hoodie':
         # Folded hood is a rounded shell around the back of the neck.
-        rings(prefix+'-hood',[((0,.049,1.383),.109,.080,{'chest':1}),((0,.052,1.445),.109,.079,{'chest':.7,'neck':.3}),((0,.037,1.493),.081,.061,{'neck':1})],hoodie)
+        rings(prefix+'-hood',[((0,.070,1.348),.119,.095,{'chest':1}),((0,.072,1.445),.121,.095,{'chest':.7,'neck':.3}),((0,.047,1.493),.085,.066,{'neck':1})],hoodie,cap=False)
         surface(prefix+'-pocket',[(-.102,-.140,1.015),(.102,-.140,1.015),(.094,-.144,1.102),(.060,-.145,1.129),(-.060,-.145,1.129),(-.094,-.144,1.102)],[(0,1,2,3,4,5)],hoodie,[{'spine':1}]*6,thickness=.003)
         for s in [-1,1]:capsule(prefix+'-drawstring',(s*.042,-.086,1.426),(s*.044,-.128,1.305),(.003,.003),trim,'chest')
     finish_group(prefix,start)
@@ -362,7 +365,8 @@ def pants_surface(name,material,kind):
                 ring.append(vertex((x,y,z),w))
             bridge(boundary,ring);boundary=ring
         if kind=='sports':
-            rings(name+'-stripe-'+side,[((s*(.112+rx-.003),.005 if abs(z-.39)<.001 else 0,z),.0035,.023,w) for z,rx,ry,w in rows],trim)
+            for stripe_y in [-.013,.013]:
+                rings(name+'-stripe-'+side,[((s*(.112+rx-.001),stripe_y+(.005 if abs(z-.39)<.001 else 0),z),.002,.004,w) for z,rx,ry,w in rows],trim)
     me=bpy.data.meshes.new(name);me.from_pydata(vertices,[],faces);me.update()
     o=bpy.data.objects.new(name,me);scene.collection.objects.link(o);o.data.materials.append(material)
     for i,w in enumerate(weights):
@@ -416,6 +420,8 @@ for kind in ['sneakers','boots','flipflops','sandals']:
             for y in [-.126,-.042]:capsule(prefix+'-strap-'+side,(x-.05,y,.078),(x+.05,y,.078),(.015,.010),leather,foot)
             capsule(prefix+'-heel-'+side,(x-.042,.039,.076),(x+.042,.039,.076),(.011,.013),leather,foot)
     finish_group(prefix,start)
+
+exec(compile(open(os.path.join(ROOT,'tools','avatar-wardrobe-v3.py'),encoding='utf-8').read(),'avatar-wardrobe-v3.py','exec'))
 
 for o in meshes:
     mod=o.modifiers.new('shared-humanoid-skeleton','ARMATURE');mod.object=rig;o.parent=rig
@@ -566,7 +572,7 @@ for kind in ['idle','walk','seated','sleep','wash','reach','open-door','switch']
 rig.animation_data.action=None
 for track in rig.animation_data.nla_tracks:track.mute=False
 scene.frame_start=1;scene.frame_end=61;scene.frame_set(1)
-bpy.ops.export_scene.gltf(filepath=os.path.join(OUT,'mannequin.glb'),export_format='GLB',export_animations=True,export_animation_mode='NLA_TRACKS',export_nla_strips=True,export_force_sampling=True,export_def_bones=True,export_skins=True)
+bpy.ops.export_scene.gltf(filepath=os.path.join(OUT,'mannequin.glb'),export_format='GLB',export_extras=True,export_animations=True,export_animation_mode='NLA_TRACKS',export_nla_strips=True,export_force_sampling=True,export_def_bones=True,export_skins=True)
 # Export every variant and clip, then make the editable source pleasant to open.
 default_looks={'look-hair-crop','look-face-oval','look-top-tee','look-bottom-jeans','look-footwear-sneakers'}
 for o in meshes:
@@ -579,7 +585,7 @@ bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT,'assets','source','manneq
 with open(os.path.join(OUT,'rig.json'),'w') as f:json.dump({
  'height':1.85,'forward':'local +Z in glTF',
  'wardrobe':'All look-{category}-{value} meshes bind to the same 19-bone armature. Show exactly one value per category; none hides the category.',
- 'looks':{'hair':['crop','parted','shaggy'],'face':['oval','square','long'],'beard':['none','stubble','full'],'mustache':['none','classic'],'top':['tee','shirt','hoodie','sweater'],'bottom':['jeans','breeches','shorts','sports'],'footwear':['sneakers','boots','flipflops','sandals']},
+ 'looks':{'hair':['bald','lake','buzz','crop','parted','bowl','messy','longshag'],'face':['oval','square','long'],'beard':['none','stubble','short','full','goatee','chinstrap'],'mustache':['none','pencil','classic','walrus','handlebar','horseshoe'],'top':['tee','shirt','hoodie','sweater','tank','turtleneck'],'bottom':['jeans','skinny','breeches','shorts','sports'],'footwear':['sneakers','canvas','boots','flipflops','sandals']},
  'walk':{'strideDistance':WALK_STRIDE,'duration':1.0,'stanceFraction':.6,'swingClearance':.045,'soleProfile':SOLE_PROFILE,'pelvisHeightRange':[min(s['pelvis']['head'][2] for s in walk_samples),max(s['pelvis']['head'][2] for s in walk_samples)],'heelStrikeDegrees':-12,'toeOffDegrees':24},
  'clips':clips},f,indent=2)
 with open(os.path.join(OUT,'walk-audit.json'),'w') as f:json.dump(walk_samples,f)

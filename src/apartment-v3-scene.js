@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {ApartmentAnimation} from './apartment-v3-animation.js?rev=8';
-import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=7';
+import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=10';
 import {homeLight} from './apartment-v3-time.js?rev=8';
 import {createBackdropMaterial,sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=8';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=7';
@@ -180,7 +180,7 @@ export async function createApartmentScene(canvas,config){
   }
   const previewCamera=new THREE.OrthographicCamera(-1,1,1.1,-1.1,.1,20);
   previewCamera.position.set(0,1.08,5);previewCamera.lookAt(0,.94,0);
-  function renderPreview(dt,yaw,rect){
+  function renderPreview(dt,yaw,rect,zone='body'){
     if(staticScene)staticScene.visible=false;
     back.visible=false;environment.scene.visible=false;plate.visible=false;food.visible=false;water.visible=false;ring.visible=false;bones.visible=false;
     shadowFloor.visible=false;practical.update({daylight:0,living:0,kitchen:0});practical.sky.visible=false;practical.window.visible=false;
@@ -189,7 +189,9 @@ export async function createApartmentScene(canvas,config){
     for(const [material,color] of actorColors)material.color.copy(color);
     animation.update({clip:'idle',fade:1,walkDistance:0},dt);
     shadow.position.set(0,.014,0);shadow.visible=true;
-    const canvasRect=canvas.getBoundingClientRect(),aspect=rect.width/rect.height,h=Math.max(2.12,.72/aspect);
+    const framing={body:[.94,2.12],head:[1.68,.62],top:[1.23,1.04],bottom:[.53,1.14],footwear:[.17,.5]}[zone]??[.94,2.12];
+    previewCamera.position.set(0,framing[0]+.14,5);previewCamera.lookAt(0,framing[0],0);
+    const canvasRect=canvas.getBoundingClientRect(),aspect=rect.width/rect.height,h=Math.max(framing[1],(zone==='body'?.72:.42)/aspect);
     previewCamera.left=-h*aspect/2;previewCamera.right=h*aspect/2;previewCamera.top=h/2;previewCamera.bottom=-h/2;previewCamera.updateProjectionMatrix();
     renderer.setViewport(0,0,canvasRect.width,canvasRect.height);renderer.clear();
     renderer.setViewport(rect.left-canvasRect.left,canvasRect.bottom-rect.bottom,rect.width,rect.height);
@@ -215,5 +217,10 @@ export async function createApartmentScene(canvas,config){
     for(const [o,value] of visible)o.visible=value;
     landingReveal.apartment(lastEntryOpen);
   }
-  return {modes,loadMode,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance:appearance=>applyAppearance(model.scene,appearance),clips:[...animation.actions.keys()],dispose(){observer.disconnect();renderer.dispose();}};
+  function setAppearance(appearance){
+    const result=applyAppearance(model.scene,appearance);
+    for(const [material,color] of actorColors)if(material.userData.tintChannel)color.copy(material.color);
+    return result;
+  }
+  return {modes,loadMode,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,clips:[...animation.actions.keys()],dispose(){observer.disconnect();renderer.dispose();}};
 }

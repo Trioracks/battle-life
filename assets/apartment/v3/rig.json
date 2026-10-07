@@ -4,9 +4,14 @@
   "wardrobe": "All look-{category}-{value} meshes bind to the same 19-bone armature. Show exactly one value per category; none hides the category.",
   "looks": {
     "hair": [
+      "bald",
+      "lake",
+      "buzz",
       "crop",
       "parted",
-      "shaggy"
+      "bowl",
+      "messy",
+      "longshag"
     ],
     "face": [
       "oval",
@@ -16,26 +21,37 @@
     "beard": [
       "none",
       "stubble",
-      "full"
+      "short",
+      "full",
+      "goatee",
+      "chinstrap"
     ],
     "mustache": [
       "none",
-      "classic"
+      "pencil",
+      "classic",
+      "walrus",
+      "handlebar",
+      "horseshoe"
     ],
     "top": [
       "tee",
       "shirt",
       "hoodie",
-      "sweater"
+      "sweater",
+      "tank",
+      "turtleneck"
     ],
     "bottom": [
       "jeans",
+      "skinny",
       "breeches",
       "shorts",
       "sports"
     ],
     "footwear": [
       "sneakers",
+      "canvas",
       "boots",
       "flipflops",
       "sandals"
