@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {Group,Mesh,MeshStandardMaterial} from '../vendor/three/three.module.js';
+import {Group,Mesh,MeshStandardMaterial,Ray,Vector3} from '../vendor/three/three.module.js';
 import {normalizeAppearance,applyAppearance,createProfile,saveProfile,loadProfile} from '../src/avatar-v3-profile.js';
 import {readGlb} from './helpers/glb-pose.js';
 test('new wardrobe choices and independent colors survive normalization; old shaggy retains bowl silhouette',()=>{
@@ -38,4 +38,20 @@ test('real exported trims stay fixed while every clothing variant exposes a tint
     for(const m of materials.filter(m=>/sole|fixed-white|clothing-trim/.test(m.name)))assert.equal(m.extras?.tintChannel,undefined,m.name);
   }
   for(const face of ['oval','square','long'])for(const style of ['stubble','short','full','goatee','chinstrap'])assert.ok(g.nodes.some(n=>n.name.startsWith('look-beard-'+style)&&n.extras?.faceVariant===face),face+' '+style);
+});
+test('buzz is a light skin-adjacent shaved surface, visibly distinct from solid crop',()=>{
+  const {json:g}=readGlb('mannequin.glb');
+  const luminance=id=>{const n=g.nodes.find(n=>n.name==='look-hair-'+id);return Math.max(...g.meshes[n.mesh].primitives.map(p=>{const c=g.materials[p.material].pbrMetallicRoughness.baseColorFactor;return c[0]*.2126+c[1]*.7152+c[2]*.0722;}));};
+  assert.ok(luminance('buzz')>luminance('crop')*2.5,'shaved scalp cannot use the dark crop cap material');
+});
+test('layered hairstyles use sparse tapered planes and messy fringe leaves an asymmetric forehead opening',()=>{
+  const {json:g,values}=readGlb('mannequin.glb');
+  for(const kind of ['parted','messy','longshag']){
+    const n=g.nodes.find(n=>n.name==='look-hair-'+kind),primitives=g.meshes[n.mesh].primitives;
+    assert.ok(primitives.reduce((sum,p)=>sum+g.accessors[p.attributes.POSITION].count,0)<1800,kind+' should have broad angular locks rather than dense round capsules');
+    if(kind==='messy'){
+      const ray=new Ray(new Vector3(.045,1.744,.08),new Vector3(0,0,1));
+      for(const p of primitives){const vv=values(p.attributes.POSITION),ii=values(p.indices).flat();for(let i=0;i<ii.length;i+=3)assert.equal(ray.intersectTriangle(...ii.slice(i,i+3).map(j=>new Vector3().fromArray(vv[j])),false,new Vector3()),null,'right eye/forehead must remain open');}
+    }
+  }
 });

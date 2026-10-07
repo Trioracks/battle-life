@@ -11,10 +11,9 @@ white_trim=mat('fixed-white-sports-markings',(.92,.92,.89))
 
 # Preserve the old saved shaggy silhouette under its accurate new name.
 old=bpy.data.objects.get('look-hair-shaggy');old.name='look-hair-bowl'
-for kind in ['lake','buzz','messy','longshag']:
+for kind in ['lake','buzz']:
     start=len(meshes);prefix='look-hair-'+kind
-    if kind in ['messy','longshag']:hair_cap(prefix+'-cap','shaggy')
-    else:
+    if kind in ['lake','buzz']:
         verts=[];faces=[];n=48
         for row in range(9):
             for j in range(n):
@@ -33,18 +32,68 @@ for kind in ['lake','buzz','messy','longshag']:
             for j in range(n):
                 if kind=='lake' and math.sin(2*math.pi*j/n)<-.65:continue
                 faces.append((row*n+j,row*n+(j+1)%n,(row+1)*n+(j+1)%n,(row+1)*n+j))
-        surface(prefix+'-shell',verts,faces,hair,[{'head':1}]*len(verts))
+        buzz_skin=mat('shaved-scalp-skin-mix',(.285,.179,.121)) if kind=='buzz' else hair
+        surface(prefix+'-shell',verts,faces,buzz_skin,[{'head':1}]*len(verts))
         if kind=='buzz':
             for row in range(1,8):
                 for j in range(0,n,3):
-                    v=verts[row*n+j];ellipsoid(prefix+'-texture',v,(.0025,.0025,.0025),hair_highlight,'head')
-    if kind in ['messy','longshag']:
-        for j in range(18):
-            a=2*math.pi*j/18;front=max(0,-math.sin(a));z=1.68-(.16 if kind=='longshag' else .045)*(1-front)+.015*math.sin(j*4)
-            capsule(prefix+'-layer',(.125*math.cos(a),-.01+.108*math.sin(a),1.79),(.153*math.cos(a+.12),-.012+.126*math.sin(a+.12),z),(.028,.022),hair if j%3 else hair_highlight,'head')
-        for j in range(6):
-            x=-.09+j*.034
-            capsule(prefix+'-fringe',(x-.025,-.09,1.815),(x+.022,-.139,1.727+(j%3)*.014),(.025,.015),hair,'head')
+                    v=verts[row*n+j];ellipsoid(prefix+'-texture',v,(.0012,.0012,.0012),stubble,'head')
+    finish_group(prefix,start)
+
+# The reference cuts use broad swept planes with pointed ends, not tube locks.
+old=bpy.data.objects.get('look-hair-parted');meshes.remove(old);bpy.data.objects.remove(old,do_unlink=True)
+def scalp_radii(z):
+    sizes=[]
+    for profile in face_profiles.values():
+        extended=profile+[(1.860,.001,.001)]
+        for (lo,rx,ry),(hi,xx,yy) in zip(extended,extended[1:]):
+            if lo<=z<=hi:
+                t=(z-lo)/(hi-lo);sizes.append((rx+(xx-rx)*t,ry+(yy-ry)*t));break
+    return (max(v[0] for v in sizes),max(v[1] for v in sizes)) if sizes else (.005,.005)
+def tapered_lock(name,path,width,axis,normal,material):
+    axis=Vector(axis).normalized();normal=Vector(normal).normalized();verts=[]
+    for center,factor,depth in [(path[0],1,.005),(path[1],.68,.008)]:
+        center=Vector(center)
+        for a,b in [(-1,-1),(1,-1),(1,1),(-1,1)]:verts.append(tuple(center+axis*(width*factor*a)+normal*(depth*b)))
+    verts.append(path[2]);faces=[(3,2,1,0)]
+    for j in range(4):faces.extend([(j,(j+1)%4,(j+1)%4+4,j+4),(j+4,(j+1)%4+4,8)])
+    surface(name,verts,faces,material,[{'head':1}]*len(verts))
+for kind in ['parted','messy','longshag']:
+    start=len(meshes);prefix='look-hair-'+kind;verts=[];faces=[];n=24;rows=8
+    for row in range(rows+1):
+        t=row/rows
+        for j in range(n):
+            a=2*math.pi*j/n;front=max(0,-math.sin(a))
+            # Lift the right fringe into a pronounced opening over the eye.
+            lower=1.66+( .112 if kind=='parted' else .105)*front
+            if kind!='parted':lower+=.027*front*max(0,math.cos(a))
+            z=1.856*(1-t)+lower*t
+            rx,ry=scalp_radii(z);extra=.003 if kind=='parted' else .010
+            x=(rx+extra)*math.copysign(abs(math.cos(a))**.78,math.cos(a));y=-.012+(ry+extra)*math.copysign(abs(math.sin(a))**.78,math.sin(a))
+            z+=(.028 if kind=='parted' else .013)*math.sin(math.pi*t)*(1 if kind=='parted' else 1+.4*math.sin(j*2.3))
+            verts.append((x,y,z))
+    for row in range(rows):
+        for j in range(n):faces.append((row*n+j,row*n+(j+1)%n,(row+1)*n+(j+1)%n,(row+1)*n+j))
+    faces.append(tuple(reversed(range(n))))
+    surface(prefix+'-shaped-scalp',verts,faces,hair,[{'head':1}]*len(verts))
+    if kind=='parted':
+        # Broad connected-looking diagonals flow from a high right part to left temple.
+        for j in range(5):
+            y=.062-j*.035
+            tapered_lock(prefix+'-sweep',[(.092,y,1.818),(.008,y-.038,1.872-j*.004),(-.124,y-.055,1.757+j*.013)],.026,(0,1,0),(0,0,1),hair_highlight if j==2 else hair)
+        tapered_lock(prefix+'-sideways-fringe',[(.075,-.104,1.807),(-.014,-.135,1.792),(-.114,-.122,1.735)],.024,(0,0,1),(0,-1,0),hair)
+    else:
+        # Uneven diagonal fringe: left tips lower, right eyebrow/eye stays exposed.
+        for j,(rootx,tipx,tipz) in enumerate([(.077,-.064,1.755),(.025,-.114,1.734),(-.022,-.134,1.713)]):
+            tapered_lock(prefix+'-diagonal-fringe',[(rootx,-.075,1.835-j*.009),((rootx+tipx)/2,-.139,1.800-j*.016),(tipx,-.132,tipz)],.025,(0,0,1),(0,-1,0),hair_highlight if j==1 else hair)
+        # Side/back layers alternate slant, length and width; triangular nape ends.
+        for j in range(13):
+            a=.12+math.pi*j/12;s=1 if math.cos(a)>=0 else -1
+            z=1.61+.047*math.sin(j*2.1) if kind=='messy' else 1.50+.061*math.sin(j*1.8)
+            tipa=a+(.18 if j%2 else -.16)
+            tapered_lock(prefix+'-layer',[(.124*math.cos(a),-.008+.107*math.sin(a),1.784),(.149*math.cos(a+.07),.129*math.sin(a+.07),1.68),(.162*math.cos(tipa),.138*math.sin(tipa),z)],.025+(j%3)*.004,(-math.sin(a),math.cos(a),0),(math.cos(a),math.sin(a),0),hair_highlight if j%4==1 else hair)
+        for s in [-1,1]:
+            tapered_lock(prefix+'-temple',[(s*.112,-.045,1.773),(s*.151,-.050,1.70),(s*.151,-.031,1.606 if kind=='longshag' else 1.656)],.019,(0,1,0),(s,0,0),hair)
     finish_group(prefix,start)
 
 # Each beard is one curved surface, fitted independently to each actual jaw.
