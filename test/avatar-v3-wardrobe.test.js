@@ -77,3 +77,23 @@ test('each face-specific shaved shell stays within 4 mm of its own actual scalp 
     }
   }
 });
+test('nose base, brows and lips attach to each exported face surface instead of an oval envelope',()=>{
+  const {json:g,values}=readGlb('mannequin.glb'),key=v=>v.map(x=>x.toFixed(6)).join(',');
+  for(const face of ['oval','square','long']){
+    const node=g.nodes.find(n=>n.name==='look-face-'+face),primitives=g.meshes[node.mesh].primitives;
+    const skin=primitives.find(p=>g.materials[p.material].name==='warm-skin'),vv=values(skin.attributes.POSITION),ii=values(skin.indices).flat(),graph=new Map(),points=new Map();
+    for(let i=0;i<ii.length;i+=3){const keys=ii.slice(i,i+3).map(j=>{const k=key(vv[j]);points.set(k,vv[j]);return k;});for(const a of keys){if(!graph.has(a))graph.set(a,new Set());for(const b of keys)graph.get(a).add(b);}}
+    const remaining=new Set(graph.keys()),components=[];
+    while(remaining.size){const component=new Set(),queue=[remaining.values().next().value];remaining.delete(queue[0]);while(queue.length){const k=queue.pop();component.add(k);for(const n of graph.get(k))if(remaining.delete(n))queue.push(n);}components.push(component);}
+    const head=components.find(c=>[...c].some(k=>points.get(k)[1]>1.81)),nose=components.find(c=>c.size===7);
+    assert.ok(head&&nose,face+' needs distinguishable actual skull and nose surfaces');
+    const triangles=[];for(let i=0;i<ii.length;i+=3)if(ii.slice(i,i+3).every(j=>head.has(key(vv[j]))))triangles.push(ii.slice(i,i+3).map(j=>new Vector3().fromArray(vv[j])));
+    const gap=v=>{const ray=new Ray(new Vector3(v[0],v[1],1),new Vector3(0,0,-1)),hits=triangles.map(t=>ray.intersectTriangle(...t,false,new Vector3())).filter(Boolean);assert.ok(hits.length,face+' feature must project onto skin');return v[2]-Math.max(...hits.map(p=>p.z));};
+    const nosePoints=[...nose].map(k=>points.get(k)),lowest=Math.min(...nosePoints.map(v=>v[1]));
+    for(const v of nosePoints.filter(v=>Math.abs(v[0])>.001||v[1]===lowest))assert.ok(gap(v)<=.001&&gap(v)>=-.004,`${face} nose base is detached: ${gap(v)}`);
+    for(const p of primitives.filter(p=>['hair-dark-brown','lips'].includes(g.materials[p.material].name)))for(const v of values(p.attributes.POSITION))assert.ok(Math.abs(gap(v))<.002,face+' brow/lip must rest on skin');
+    for(const p of primitives.filter(p=>g.materials[p.material].name==='eye-ivory')){
+      for(const side of [-1,1]){const eye=values(p.attributes.POSITION).filter(v=>v[0]*side>0);assert.ok(Math.min(...eye.map(gap))<.001,face+' eye white needs a skin attachment');}
+    }
+  }
+});
