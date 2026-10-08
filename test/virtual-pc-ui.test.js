@@ -74,6 +74,18 @@ test('torent exposes its ft studio download control in Russian', () => {
   assert.equal(download.getAttribute('aria-label'), 'Скачать FT Studio через torent');
 });
 
+test('the desktop controller accepts reconciled game-time download state before the next action', () => {
+  const initial = createVirtualPcState({ power: 'on', lastGameMinute: 720, download: { status: 'downloading', receivedBytes: 0 } });
+  const reconciled = createVirtualPcState({ power: 'on', lastGameMinute: 810, download: { status: 'downloading', receivedBytes: 200000000 } });
+  const { controller, root } = createController(initial);
+
+  controller.showDesktop(initial);
+  controller.syncState(reconciled);
+  controller.open('torent');
+
+  assert.equal(hasText(root, '200.0 / 800 МБ · 37 КБ/с · осталось 270 игровых мин.'), true);
+});
+
 test('closing an edited studio project opens a save, discard, or cancel guard', () => {
   const installed = createVirtualPcState({ download: { status: 'installed' } });
   const { controller, root } = createController(installed);
@@ -88,4 +100,23 @@ test('closing an edited studio project opens a save, discard, or cancel guard', 
   assert.equal(hasText(root, 'Сохранить'), true);
   assert.equal(hasText(root, 'Не сохранять'), true);
   assert.equal(hasText(root, 'Отмена'), true);
+});
+
+test('power-off asks before discarding an edited studio project', () => {
+  const installed = createVirtualPcState({ download: { status: 'installed' } });
+  let shutdowns = 0;
+  const document = creatorDocument();
+  const root = document.createElement('section');
+  const controller = mountVirtualPc(root, { onShutdown() { shutdowns++; } });
+  const project = createStudioProject({ id: 'power-guard', name: 'Питание', battleId: BATTLE_BRIEFS[0].id }).project;
+
+  controller.showDesktop(installed);
+  controller.openProject(project);
+  find(root, element => element.tagName === 'BUTTON' && element.dataset.track === 'kick' && element.dataset.step === '0').click();
+  controller.requestShutdown();
+
+  assert.equal(shutdowns, 0);
+  assert.equal(hasText(root, 'Сохранить проект перед закрытием?'), true);
+  find(root, element => element.tagName === 'BUTTON' && element.textContent === 'Не сохранять').click();
+  assert.equal(shutdowns, 1);
 });

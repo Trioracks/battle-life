@@ -1,5 +1,7 @@
 import {advanceApartmentFrame} from './apartment-v3-frame.js';
 
+import {advanceVirtualPc} from './virtual-pc-runtime.js';
+
 export function canStartHomeAction(id,clock){
   return id==='dining'&&!clock.mealReady?{allowed:false,reason:'Сначала приготовь еду на плите'}:{allowed:true,reason:''};
 }
@@ -33,4 +35,13 @@ export function advanceHomeFrame(motion,clock,dt,hold=false){
     events.push(...wakeEvents);
   }
   return {elapsed,events,sleepCompleted:result.sleepCompleted};
+}
+
+export function advanceComputerHomeFrame(motion,clock,pcState,dt,computerOpen=false){
+  const holdComputer=computerOpen&&motion.actionId==='computer'&&motion.phase==='perform';
+  const home=advanceHomeFrame(motion,clock,dt,holdComputer);
+  const pc=advanceVirtualPc(pcState,clock);
+  const computerStarted=home.events.some(event=>event.type==='started'&&event.id==='computer');
+  const computerSeated=motion.actionId==='computer'&&motion.phase==='perform';
+  return {...home,pcState:pc.state,pcAdvancedBytes:pc.advancedBytes,computerStarted,computerSeated};
 }

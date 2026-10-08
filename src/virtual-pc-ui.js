@@ -59,6 +59,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     selectedBrief: BATTLE_BRIEFS[0].id,
     dirty: false,
     confirmClose: false,
+    pendingShutdown: false,
     message: '',
     bootTimer: null,
   };
@@ -66,6 +67,10 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.persist = (state = pc.state) => {
     pc.state = createVirtualPcState(state);
     pc.callbacks.onPersist(pc.state);
+  };
+
+  pc.syncState = state => {
+    pc.state = createVirtualPcState(state);
   };
 
   pc.renderBoot = () => {
@@ -114,7 +119,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     const menu = el(document, 'aside', { className: 'pc-start-menu', attributes: { 'aria-label': 'Меню Пуск' } });
     add(menu, el(document, 'strong', { text: 'Sloboda Desk 96' }));
     add(menu, button(document, 'Отойти от ПК', { attributes: { 'aria-label': 'Отойти от ПК, оставив его включённым' } }, () => { pc.audio.stop(); pc.callbacks.onLeave(); }));
-    add(menu, button(document, 'Выключить', { attributes: { 'aria-label': 'Выключить компьютер' } }, () => { pc.audio.stop(); pc.callbacks.onShutdown(); }));
+    add(menu, button(document, 'Выключить', { attributes: { 'aria-label': 'Выключить компьютер' } }, () => pc.requestShutdown()));
     return menu;
   };
 
@@ -211,6 +216,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.selectedBrief = normalized.battleId;
     pc.dirty = false;
     pc.confirmClose = false;
+    pc.pendingShutdown = false;
     pc.callbacks.onOpenProject(normalized);
     pc.render();
   };
@@ -223,6 +229,12 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.dirty = false;
     pc.confirmClose = false;
     pc.persist({ ...result.state, draft: null });
+    if (pc.pendingShutdown) {
+      pc.pendingShutdown = false;
+      pc.audio.stop();
+      pc.callbacks.onShutdown();
+      return;
+    }
     pc.message = 'Проект сохранён в Мои проекты.';
     pc.render();
   };
@@ -300,7 +312,13 @@ export function mountVirtualPc(root, callbacks = {}) {
       const guard = el(document, 'aside', { className: 'pc-close-guard', attributes: { 'aria-label': 'Сохранение проекта' } });
       add(guard, el(document, 'strong', { text: 'Сохранить проект перед закрытием?' }));
       add(guard, button(document, 'Сохранить', {}, () => pc.saveProject()));
-      add(guard, button(document, 'Не сохранять', {}, () => { pc.dirty = false; pc.confirmClose = false; pc.state = createVirtualPcState({ ...pc.state, draft: null }); pc.closeWindow(); }));
+      add(guard, button(document, 'Не сохранять', {}, () => {
+        const shutdown = pc.pendingShutdown;
+        pc.dirty = false;pc.confirmClose = false;pc.pendingShutdown = false;
+        pc.persist({ ...pc.state, draft: null });
+        if (shutdown) { pc.audio.stop(); pc.callbacks.onShutdown(); }
+        else pc.closeWindow();
+      }));
       add(guard, button(document, 'Отмена', {}, () => { pc.confirmClose = false; pc.render(); }));
       add(content, guard);
     }
@@ -343,6 +361,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.window = appId;
     pc.startOpen = false;
     pc.confirmClose = false;
+    pc.pendingShutdown = false;
     if (appId === 'underweb') pc.underweb = resolveUnderweb(pc.address);
     if (appId === 'ft-studio') {
       pc.project = normalizeStudioProject(pc.state.draft);
@@ -357,6 +376,18 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.window = null;
     pc.confirmClose = false;
     pc.render();
+  };
+
+  pc.requestShutdown = () => {
+    if (pc.window === 'ft-studio' && pc.project && pc.dirty) {
+      pc.pendingShutdown = true;
+      pc.confirmClose = true;
+      pc.startOpen = false;
+      pc.render();
+      return;
+    }
+    pc.audio.stop();
+    pc.callbacks.onShutdown();
   };
 
   pc.dispose = () => {

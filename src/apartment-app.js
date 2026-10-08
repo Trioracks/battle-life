@@ -1,12 +1,15 @@
 import {ApartmentMotion} from './apartment-v3-motion.js?rev=8';
 import {ApartmentTime,loadHomeTime,saveHomeTime} from './apartment-v3-time.js?rev=12';
 import {districts,getDistrictLocations} from './calikfornia.js';
-import {advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=12';
+import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=13';
 import {playSoundCue} from './sound-cues.js';
 import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=12';
 import {DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,loadProfile} from './avatar-v3-profile.js?rev=10';
 import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=12';
 import {createCreatorSession} from './apartment-v3-creator-session.js?rev=12';
+import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=1';
+import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=1';
+import {mountVirtualPc} from './virtual-pc-ui.js?rev=1';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false;
@@ -35,6 +38,25 @@ try{
   let storage;try{storage=window.localStorage;}catch{/* Browsers can deny local storage. */}
   const saved=loadProfile(storage);let profile=saved.profile;
   let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lightPreview='game';
+  const pcRoot=$('#virtual-pc'),savedPc=loadVirtualPcState(storage);let pcState=savedPc.state;
+  function persistPc(next){pcState=createVirtualPcState(next);return saveVirtualPcState(storage,pcState);}
+  function leaveComputer(shutdown=false){
+    if(shutdown)persistPc(setPcPower(pcState,'off'));
+    pcRoot.hidden=true;
+    if(motion.actionId==='computer'&&motion.phase==='perform')motion.leaveAction();
+    setMode('game');resumeAnimation();
+  }
+  const virtualPc=mountVirtualPc(pcRoot,{
+    onPersist:next=>persistPc(next),
+    onLeave:()=>leaveComputer(false),
+    onShutdown:()=>leaveComputer(true),
+    onSaveProject:(state,project)=>saveStudioProject(state,project),
+  });
+  function openComputer(){
+    const alreadyOn=pcState.power==='on';persistPc(setPcPower(pcState,'on'));
+    setMode('pc');pcRoot.hidden=false;
+    if(alreadyOn)virtualPc.showDesktop(pcState);else virtualPc.boot(pcState);
+  }
   if(profile)view.setAppearance(profile.appearance);
   let appearance={...DEFAULT_APPEARANCE},allocations=Object.fromEntries(STAT_KEYS.map(k=>[k,0]));
   const names={dining:'Ест за столом',computer:'За компьютером',bed:'Сон',sink:'Моет посуду',stove:'Готовит еду',fridge:'Берёт еду',entry:'Открывает дверь','light-living':'Нажимает выключатель в комнате','light-kitchen':'Нажимает выключатель на кухне'};
@@ -47,6 +69,7 @@ try{
     $('#main-menu').hidden=next!=='menu';$('#creator').hidden=next!=='creator';
     $('#destinations').hidden=next!=='destinations';
     $('#door-choice').hidden=next!=='door';$('#peephole').hidden=next!=='peephole';
+    pcRoot.hidden=next!=='pc';
     $('#game-header').hidden=next!=='game';$('#controls').hidden=next!=='game';
     $('#inspector').hidden=true;$('#rig-toggle').setAttribute('aria-expanded','false');$('#hover-label').textContent='';
     $('#fade').style.opacity=next==='destinations'?1:0;$('#continue-game').hidden=!profile&&!playing;
@@ -154,7 +177,7 @@ try{
   $('#show-bones').addEventListener('change',e=>skeleton=e.target.checked);$('#hold').addEventListener('change',e=>hold=e.target.checked);
   $('#pause').addEventListener('click',()=>{paused=!paused;$('#pause').textContent=paused?'Продолжить':'Пауза';});
   $('#step').addEventListener('click',()=>{paused=true;$('#pause').textContent='Продолжить';update(1/30,performance.now(),true);});$('#face').addEventListener('click',()=>motion.faceCamera());
-  document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(mode==='peephole')stopPeeking();else if(mode==='door')setMode('game');else if(mode==='game')setMode('menu');});
+  document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(mode==='peephole')stopPeeking();else if(mode==='door')setMode('game');else if(mode==='pc')virtualPc.closeWindow();else if(mode==='game')setMode('menu');});
   function update(dt,now,step=false){
     cameraLabel();
     if(cameraFade){view.render(motion,0,{paused:true});return;}
@@ -166,7 +189,15 @@ try{
     }
     if(mode==='peephole'){view.renderPeephole($('#peek-stage').getBoundingClientRect());return;}
     if(mode==='menu'||mode==='destinations'||mode==='door'){view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));view.render(motion,0,{paused:true});return;}
-    const events=!paused||step?advanceHomeFrame(motion,homeTime,dt,hold).events:[];
+    let events=[];
+    if(!paused||step){
+      if(mode==='pc'){
+        const frame=advanceComputerHomeFrame(motion,homeTime,pcState,dt,true);pcState=frame.pcState;virtualPc.syncState(pcState);events=frame.events;
+      }else{
+        events=advanceHomeFrame(motion,homeTime,dt,hold).events;
+        pcState=advanceVirtualPc(pcState,homeTime).state;virtualPc.syncState(pcState);
+      }
+    }
     for(const event of events){
       view.modes.onMotionEvent(event);cameraLabel();
       if(sounds[event.id]&&(event.type==='swap'||(event.type==='started'&&!config.actions[event.id].fade)))cue(sounds[event.id]);
@@ -176,6 +207,7 @@ try{
       }
       if(event.type==='completed'){message=completed[event.id]??message;messageUntil=now+4000;saveHomeTime(storage,homeTime);}
       if(event.type==='started'&&event.id==='bed')saveHomeTime(storage,homeTime);
+      if(event.type==='started'&&event.id==='computer')openComputer();
       if(event.type==='started'&&event.id==='peephole'){setMode('peephole');view.renderPeephole($('#peek-stage').getBoundingClientRect());return;}
       if(event.type==='exited'){saveHomeTime(storage,homeTime);setMode('destinations');}
     }
@@ -184,7 +216,7 @@ try{
     view.setRoomLights(homeTime.lights);view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));
     view.render(motion,paused&&!step?0:dt,{skeleton,paused:paused&&!step});$('#fade').style.opacity=motion.fade;
     $('#home-time').textContent=`День ${homeTime.day} · ${homeTime.label} · ${homeTime.period} · Дом`;
-    if(now-lastTimeSave>(homeTime.isSleeping?500:15000)){saveHomeTime(storage,homeTime);lastTimeSave=now;}
+    if(now-lastTimeSave>(homeTime.isSleeping?500:15000)){saveHomeTime(storage,homeTime);saveVirtualPcState(storage,pcState);lastTimeSave=now;}
     $('#room').textContent=motion.position[0]<0?'КУХНЯ':'ЖИЛАЯ КОМНАТА';
     $('#state').textContent=`${motion.phase} · ${motion.clip} · x ${motion.position[0].toFixed(2)} · камера ${motion.cameraX.toFixed(2)} · ${Math.round(motion.yaw*180/Math.PI)}° · дверь ${Math.round(motion.doorOpen*100)}% · ${Math.round(frameRate)} FPS`;
     $('#wake').hidden=!motion.sleeping;
