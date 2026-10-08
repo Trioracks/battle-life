@@ -1,0 +1,66 @@
+#virtual-pc {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  color: #141f1f;
+  font-family: "Courier New", monospace;
+}
+
+#virtual-pc[hidden] { display: none; }
+.pc-shell { box-sizing: border-box; min-height: 100%; }
+.pc-boot { display: grid; place-content: center; gap: .7rem; min-height: 100vh; padding: 2rem; background: #071d18; color: #b6ee9a; text-align: center; }
+.pc-boot h2 { margin: 0; color: #fbefb1; font-size: clamp(1.8rem, 6vw, 4rem); letter-spacing: .08em; }
+.pc-boot p { margin: 0; }
+.pc-boot progress { width: min(32rem, 85vw); height: 1rem; accent-color: #d1b45d; }
+.pc-boot-kicker, .pc-boot-status { color: #80b8a3; }
+.pc-desktop { display: grid; grid-template-rows: auto 1fr auto; min-height: 100vh; background-color: #49606a; background-image: linear-gradient(#0002, #0005), var(--pc-wallpaper); background-position: center; background-size: cover; }
+.pc-desktop-header, .pc-taskbar { display: flex; align-items: center; gap: .75rem; min-height: 2.2rem; padding: .25rem .5rem; background: #174b4c; color: #f2edcf; border-block: 2px solid #8fb1a7; font-size: .76rem; }
+.pc-desktop-header span:last-child { margin-left: auto; }
+.pc-workspace { position: relative; min-height: 0; padding: 1rem; overflow: auto; }
+.pc-icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); gap: .65rem; max-width: 32rem; }
+.pc-icon { min-height: 4.6rem; color: #fbf1d6; text-shadow: 1px 1px #102326; background: #16393eaa; border: 2px outset #b3c7b8; font: inherit; cursor: pointer; }
+.pc-icon:hover, .pc-icon:focus-visible { background: #285e61e6; outline: 2px solid #f0d568; }
+.pc-taskbar { position: sticky; bottom: 0; background: #b7b6a5; color: #102525; border-color: #eff0d7 #52645d #52645d #eff0d7; }
+.pc-start, .pc-taskbar button, .pc-window button, .pc-window input, .pc-window select { font: inherit; border: 2px outset #e6e2c8; background: #cfccb5; color: #172322; padding: .28rem .45rem; }
+.pc-task-label { min-width: 8rem; padding: .25rem .5rem; border: 2px inset #7b867c; background: #c5c3ad; }
+.pc-wallpaper-picker { display: flex; gap: .25rem; margin-left: auto; overflow-x: auto; }
+.pc-wallpaper-picker button.active, .pc-window button.on { background: #456d62; color: #fff5c3; }
+.pc-start-menu { position: absolute; left: 1rem; bottom: 3.1rem; z-index: 3; display: grid; gap: .5rem; min-width: 14rem; padding: .8rem; background: #c8c5ad; border: 3px outset #ede9d1; box-shadow: .35rem .35rem #172828aa; }
+.pc-start-menu strong { color: #16484a; }
+.pc-window { position: absolute; inset: 7% 7% auto; max-height: 78%; overflow: auto; min-width: min(20rem, 86vw); background: #cbc6ad; border: 3px outset #edf0d5; box-shadow: .55rem .55rem #0b1b1ddd; }
+.pc-window-title { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .35rem .5rem; background: #215657; color: #fff3bd; }
+.pc-window-title button { min-width: 1.7rem; padding: 0; font-weight: 900; }
+.pc-window-content { padding: .8rem; background: #dbd5ba; }
+.pc-window-content h3 { margin: .15rem 0 .55rem; }
+.pc-window-content p { line-height: 1.4; }
+.pc-files, .pc-torent { display: grid; gap: .55rem; }
+.pc-underweb form, .ft-header, .ft-track { display: flex; align-items: center; gap: .3rem; flex-wrap: wrap; }
+.pc-underweb input { flex: 1 1 14rem; min-width: 0; }
+.pc-brief { padding: .55rem; margin-top: .55rem; border: 2px dashed #64736a; background: #e7e0c2; }
+.pc-error { color: #8f2020; font-weight: 700; }
+.pc-field { display: grid; gap: .2rem; margin: .35rem 0; }
+.ft-studio { display: grid; gap: .7rem; }
+.ft-header { padding-bottom: .5rem; border-bottom: 2px solid #887843; }
+.ft-berry { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: #aa4c25; color: #d9e478; font-size: 1.5rem; }
+.ft-header strong { flex: 1 1 10rem; }
+.ft-header input { width: 4.6rem; }
+.ft-sequencer, .ft-arrangement, .ft-mixer { display: grid; gap: .35rem; padding: .55rem; background: #292d2b; color: #f0db8c; border: 2px inset #626b60; }
+.ft-track { display: grid; grid-template-columns: 3.7rem repeat(16, minmax(1.25rem, 1fr)); gap: .18rem; }
+.ft-track strong { align-self: center; color: #c6d6ac; font-size: .7rem; }
+.ft-track button { min-width: 1.25rem; padding: .2rem; background: #6a6252; color: #1c2221; }
+.ft-track button.on { background: #d19c43; color: #1c2523; }
+.ft-arrangement .ft-track { grid-template-columns: 3.7rem repeat(8, minmax(1.6rem, 1fr)); }
+.ft-mixer { grid-template-columns: repeat(4, minmax(6rem, 1fr)); }
+.ft-mixer h3 { grid-column: 1 / -1; }
+.ft-mixer input { width: 100%; accent-color: #d19c43; }
+.pc-close-guard { display: grid; gap: .45rem; padding: .7rem; background: #7e321f; color: #fff4c5; border: 2px solid #f1d080; }
+.pc-status { padding: .4rem; background: #b3c9a4; }
+
+@media (max-width: 640px) {
+  .pc-window { inset: .55rem; max-height: calc(100% - 1.1rem); min-width: 0; }
+  .pc-workspace { padding: .5rem; }
+  .pc-taskbar { flex-wrap: wrap; }
+  .pc-wallpaper-picker { order: 3; width: 100%; margin-left: 0; }
+  .ft-track { grid-template-columns: 3rem repeat(16, minmax(1.2rem, 1fr)); overflow-x: auto; }
+  .ft-mixer { grid-template-columns: repeat(2, minmax(6rem, 1fr)); }
+}
