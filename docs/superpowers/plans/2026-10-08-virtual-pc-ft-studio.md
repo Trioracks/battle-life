@@ -177,9 +177,12 @@ Run: `git add src/virtual-pc-ui.js virtual-pc.css assets/ui/virtual-pc test/virt
 - Modify: `index.html`
 - Modify: `src/apartment-app.js`
 - Modify: `src/apartment-v3-runtime.js`
+- Modify: `src/virtual-pc-ui.js`
 - Modify: `apartment-v3.css` only for PC-layer layout integration if needed
 - Test: `test/apartment-v3-runtime.test.js`
 - Test: `test/virtual-pc-integration.test.js`
+- Test: `test/virtual-pc-ui.test.js`
+- Test: `test/client-module-version.test.js`
 
 **Interfaces:**
 - Consumes: Tasks 1–4 and existing `ApartmentMotion`, `ApartmentTime`, `advanceHomeFrame`.
