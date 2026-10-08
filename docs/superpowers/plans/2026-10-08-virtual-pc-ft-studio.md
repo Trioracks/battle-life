@@ -46,7 +46,7 @@ Test default 1,500 MB free state, corrupt/blocked storage fallback, wallpaper pe
 
 - [ ] **Step 2: Run the focused test to verify it fails**
 
-Run: `node --test test/virtual-pc-state.test.js`  
+Run: `node --test test/virtual-pc-state.test.js`
 Expected: FAIL because the module does not exist.
 
 - [ ] **Step 3: Implement the immutable state transitions in `src/virtual-pc-state.js`**
@@ -55,12 +55,12 @@ Use a versioned normalized snapshot with power (`off`/`on`), wallpaper id, downl
 
 - [ ] **Step 4: Run focused tests to verify they pass**
 
-Run: `node --test test/virtual-pc-state.test.js`  
+Run: `node --test test/virtual-pc-state.test.js`
 Expected: PASS.
 
 - [ ] **Step 5: Commit only Task 1 files**
 
-Run: `git add src/virtual-pc-state.js test/virtual-pc-state.test.js && git commit -m "feat: add virtual pc state"`  
+Run: `git add src/virtual-pc-state.js test/virtual-pc-state.test.js && git commit -m "feat: add virtual pc state"`
 Expected: a commit containing only the two listed files; do not stage pre-existing dirty files.
 
 ### Task 2: Game-time download runtime and fictional catalog
@@ -81,7 +81,7 @@ Assert exact six-hour completion, no progression while off, no progression witho
 
 - [ ] **Step 2: Run the focused tests to verify they fail**
 
-Run: `node --test test/virtual-pc-runtime.test.js test/virtual-pc-catalog.test.js`  
+Run: `node --test test/virtual-pc-runtime.test.js test/virtual-pc-catalog.test.js`
 Expected: FAIL because the modules do not exist.
 
 - [ ] **Step 3: Implement time reconciliation and fixed catalog**
@@ -90,7 +90,7 @@ Convert `{day, minutes}` to a monotonic game-minute stamp. Store the last reconc
 
 - [ ] **Step 4: Run focused tests to verify they pass**
 
-Run: `node --test test/virtual-pc-runtime.test.js test/virtual-pc-catalog.test.js`  
+Run: `node --test test/virtual-pc-runtime.test.js test/virtual-pc-catalog.test.js`
 Expected: PASS.
 
 - [ ] **Step 5: Commit only Task 2 files**
@@ -115,7 +115,7 @@ Cover required name/brief validation, 32-character maximum, four named tracks, 1
 
 - [ ] **Step 2: Run the focused tests to verify they fail**
 
-Run: `node --test test/ft-studio-project.test.js test/ft-studio-audio.test.js`  
+Run: `node --test test/ft-studio-project.test.js test/ft-studio-audio.test.js`
 Expected: FAIL because the modules do not exist.
 
 - [ ] **Step 3: Implement the model and Web Audio adapter**
@@ -124,7 +124,7 @@ Use a serialized object with id, name, battle id, BPM, four 16-cell patterns, fo
 
 - [ ] **Step 4: Run focused tests to verify they pass**
 
-Run: `node --test test/ft-studio-project.test.js test/ft-studio-audio.test.js`  
+Run: `node --test test/ft-studio-project.test.js test/ft-studio-audio.test.js`
 Expected: PASS.
 
 - [ ] **Step 5: Commit only Task 3 files**
@@ -155,7 +155,7 @@ Use the project's minimal DOM test approach or extracted pure view-state functio
 
 - [ ] **Step 3: Run the focused test to verify it fails**
 
-Run: `node --test test/virtual-pc-ui.test.js`  
+Run: `node --test test/virtual-pc-ui.test.js`
 Expected: FAIL because the controller does not exist.
 
 - [ ] **Step 4: Implement Sloboda Desk 96 and FT Studio UI**
@@ -164,7 +164,7 @@ Render full PC content inside one mounted layer: 5.5-second boot sequence, deskt
 
 - [ ] **Step 5: Run focused tests to verify they pass**
 
-Run: `node --test test/virtual-pc-ui.test.js`  
+Run: `node --test test/virtual-pc-ui.test.js`
 Expected: PASS.
 
 - [ ] **Step 6: Commit only Task 4 files**
@@ -194,7 +194,7 @@ Assert a computer action becomes visible only after the seated `started` event, 
 
 - [ ] **Step 2: Run focused tests to verify they fail**
 
-Run: `node --test test/apartment-v3-runtime.test.js test/virtual-pc-integration.test.js`  
+Run: `node --test test/apartment-v3-runtime.test.js test/virtual-pc-integration.test.js`
 Expected: FAIL on the new PC assertions.
 
 - [ ] **Step 3: Integrate the mounted controller into the active app**
@@ -203,7 +203,7 @@ Add a hidden `#virtual-pc` root and its scoped stylesheet link. Load and persist
 
 - [ ] **Step 4: Run focused integration tests to verify they pass**
 
-Run: `node --test test/apartment-v3-runtime.test.js test/virtual-pc-integration.test.js`  
+Run: `node --test test/apartment-v3-runtime.test.js test/virtual-pc-integration.test.js`
 Expected: PASS.
 
 - [ ] **Step 5: Commit only Task 5 files**
@@ -221,12 +221,12 @@ Run: `git add index.html src/apartment-app.js src/apartment-v3-runtime.js apartm
 
 - [ ] **Step 1: Run all automated tests**
 
-Run: `npm test`  
+Run: `npm test`
 Expected: every existing test plus virtual-PC tests passes.
 
 - [ ] **Step 2: Run the relevant static/module checks and inspect Git scope**
 
-Run: `git diff --check` and `git status --short`  
+Run: `git diff --check` and `git status --short`
 Expected: no whitespace errors; only feature files are new/modified in addition to the known pre-existing dirty files.
 
 - [ ] **Step 3: Perform browser acceptance if the existing supported automation is available**
@@ -243,5 +243,5 @@ Give the reviewer the spec, this plan, tests, and generated assets. Address veri
 
 - [ ] **Step 6: Commit only the QA evidence**
 
-Run: `git add docs/superpowers/qa/2026-10-08-virtual-pc-ft-studio.md && git commit -m "test: verify virtual pc flow"`  
+Run: `git add docs/superpowers/qa/2026-10-08-virtual-pc-ft-studio.md && git commit -m "test: verify virtual pc flow"`
 Expected: no unrelated dirty file enters the commit. Make any reviewer-approved source fix in a separate commit that names only the exact feature files it changes.
