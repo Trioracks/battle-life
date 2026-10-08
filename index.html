@@ -4,6 +4,7 @@
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Battle Life — первый вечер</title>
   <link rel="stylesheet" href="./apartment-v3.css?rev=11">
+  <link rel="stylesheet" href="./creator-v12.css?rev=12">
   <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
 </head>
 <body>
@@ -15,18 +16,25 @@
   <section id="controls" hidden><div class="activity-row"><div id="activity" role="status">Загрузка…</div><span id="room">ЖИЛАЯ КОМНАТА</span></div><progress id="sleep-progress" aria-label="Прошедшее время сна" max="1" value="0" hidden></progress><button id="wake" class="primary" hidden>Проснуться раньше</button><nav id="actions" aria-label="Взаимодействия в квартире"></nav></section>
   <section id="main-menu" class="screen" hidden aria-labelledby="menu-title"><div class="menu-copy"><p class="eyebrow">ПЕРВЫЙ ВЕЧЕР / ПЕРВАЯ ЗАПИСЬ</p><h2 id="menu-title">BATTLE<br><span>LIFE</span></h2><p class="menu-description">За окном — чужие окна.<br>Здесь — твоя комната и ещё не написанный трек.</p><div class="menu-actions"><button id="new-game" class="primary">Новая игра <span>↗</span></button><button id="continue-game" hidden>Продолжить</button></div><p id="save-note" class="small-note"></p><a class="legacy-link" href="./legacy.html">Прежний прототип кампании ↗</a></div><div class="menu-foot">КВАРТИРА <span>01 / НАЧАЛО</span></div></section>
   <section id="creator" class="screen" hidden aria-labelledby="creator-title">
-    <header class="creator-heading"><div><p class="eyebrow">НОВАЯ ИГРА</p><h2 id="creator-title">Кто ты?</h2></div><p>Обычная квартира.<br>Твоя история начинается здесь.</p></header>
+    <header class="creator-heading"><div><p class="eyebrow">BATTLE LIFE · НОВАЯ ИГРА</p><h2 id="creator-title">Создание персонажа</h2></div><p>Первый вечер.<br>Всё остальное — ещё впереди.</p></header>
+    <nav class="creator-tabs" aria-label="Создание персонажа"><button type="button" id="appearance-tab" aria-pressed="true">I · Внешность</button><button type="button" id="clothing-tab" aria-pressed="false">II · Одежда</button><button type="button" id="stats-tab" aria-pressed="false">III · Характеристики <span id="points-badge">10</span></button></nav>
     <div class="creator-layout">
-      <section class="preview-card" aria-label="Объёмный предпросмотр героя"><div class="preview-caption"><span>ТВОЙ ПЕРСОНАЖ</span><span>ЖИВАЯ МОДЕЛЬ</span></div><div id="preview-stage" aria-label="Перетащи, чтобы повернуть героя"></div><div id="preview-angles" role="group" aria-label="Ракурс персонажа"><button data-yaw="0" class="active" aria-pressed="true">Анфас</button><button data-yaw="1.5707963267948966" aria-pressed="false">Справа</button><button data-yaw="3.141592653589793" aria-pressed="false">Спина</button><button data-yaw="-1.5707963267948966" aria-pressed="false">Слева</button></div><div class="preview-tools"><button id="preview-body" type="button">Весь рост</button><label for="preview-zoom">Масштаб <input id="preview-zoom" type="range" min="0.8" max="1.5" step="0.05" value="1"></label></div><p class="preview-note">Тяни героя для поворота.<br>Категория приближает нужную часть тела.</p></section>
       <form id="creator-form" novalidate>
-        <label class="name-field" for="character-name">ИМЯ ПЕРСОНАЖА<input id="character-name" name="name" placeholder="Как тебя зовут?" maxlength="32" autocomplete="off" required></label>
-        <nav class="creator-tabs" aria-label="Создание персонажа"><button type="button" id="appearance-tab" aria-pressed="true">01 / Внешность</button><button type="button" id="stats-tab" aria-pressed="false">02 / Характеристики <span id="points-badge">10</span></button></nav>
-        <section id="appearance-panel"><p class="section-hint">Выбери лицо, причёску и то, в чём начнёшь свой первый вечер.</p><div id="appearance-fields"></div></section>
-        <section id="stats-panel" hidden><div class="stats-summary"><div>Свободных очков: <strong id="points-left">10</strong><p>Одно очко = +10 к навыку. Максимум — 50.</p></div><button type="button" id="distribute">Базовый набор</button></div><div id="stat-fields"></div></section>
-        <p id="creator-error" role="alert"></p>
+        <aside class="creator-sidebar creator-frame">
+          <label class="name-field" for="character-name">Имя<input id="character-name" name="name" placeholder="Как тебя зовут?" maxlength="32" autocomplete="off" required aria-describedby="name-error"></label>
+          <p id="name-error" class="field-error" role="alert"></p>
+          <div id="creator-categories"></div>
+          <section class="creator-attributes" aria-label="Текущие характеристики"><h3>Характеристики</h3><dl id="stats-overview"></dl></section>
+        </aside>
+        <div class="creator-parchment">
+          <section id="appearance-panel"><p class="section-hint">Облик, в котором начнётся твоя история.</p><div id="appearance-fields"></div></section>
+          <section id="stats-panel" hidden><h3>Точка отсчёта</h3><div class="stats-summary"><div>Свободных очков: <strong id="points-left">10</strong><p>Одно очко даёт +10 к навыку.<br>Не больше 50 в одном навыке.</p></div><button type="button" id="distribute">Базовый набор</button></div><div id="stat-fields"></div><p id="allocations-error" class="field-error" role="alert"></p></section>
+          <p id="creator-error" role="alert"></p>
+        </div>
       </form>
+      <section class="preview-card creator-frame" aria-label="Объёмный предпросмотр героя"><div class="preview-caption"><span>ТВОЙ ПЕРСОНАЖ</span><span>ЖИВАЯ МОДЕЛЬ</span></div><div id="preview-stage" aria-label="Перетащи, чтобы повернуть героя"></div><div id="preview-angles" role="group" aria-label="Ракурс персонажа"><button type="button" data-yaw="0" class="active" aria-pressed="true">Анфас</button><button type="button" data-yaw="1.5707963267948966" aria-pressed="false">Справа</button><button type="button" data-yaw="3.141592653589793" aria-pressed="false">Спина</button><button type="button" data-yaw="-1.5707963267948966" aria-pressed="false">Слева</button></div><div class="preview-tools"><button id="preview-body" type="button">Весь рост</button><label for="preview-zoom">Масштаб <input id="preview-zoom" type="range" min="0.8" max="1.5" step="0.05" value="1"></label></div><p class="preview-note">Зажми и потяни, чтобы повернуть.<br>Одежда останется той же и в квартире.</p></section>
     </div>
-    <footer class="creator-footer"><button id="cancel-creator">← Назад</button><span id="creator-footer-note">Сначала внешность. Затем — 10 очков навыков.</span><button id="next-step" class="primary">Характеристики →</button><button id="start-game" class="primary" form="creator-form" type="submit" hidden>Начать историю →</button></footer>
+    <footer class="creator-footer"><button id="cancel-creator" type="button">← Назад</button><span id="creator-footer-note">Выбери внешность, одежду и свои сильные стороны.</span><button id="next-step" type="button" class="primary">Одежда →</button><button id="start-game" class="primary" form="creator-form" type="submit" hidden>Начать историю →</button></footer>
   </section>
   <section id="destinations" class="screen" hidden aria-labelledby="destinations-title"><div class="destination-card"><p class="eyebrow">ЗА ПОРОГОМ / КАЛИФОРНИЯ</p><h2 id="destinations-title">Куда пойти?</h2><p class="destination-note">Дома всё остаётся на своих местах.</p><nav id="districts" aria-label="Районы города"></nav><section id="district-detail" aria-live="polite"></section><p class="small-note">Пока доступен выбор направления. Городские локации ещё не подключены к новой сцене.</p><button id="return-home" class="primary">← Вернуться домой</button></div></section>
   <div id="fade" aria-hidden="true"></div>

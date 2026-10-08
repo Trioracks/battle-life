@@ -1,10 +1,11 @@
+import {assetPath} from './helpers/apartment-assets.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 test('exported walking speed moves thirty percent farther with the same stride length',async()=>{
  const {ApartmentMotion}=await api();
- const exported=JSON.parse(fs.readFileSync(new URL('../assets/apartment/v3/scene.json',import.meta.url),'utf8'));
+ const exported=JSON.parse(fs.readFileSync(assetPath('scene.json'),'utf8'));
  const fast=new ApartmentMotion(exported),old=new ApartmentMotion({...exported,speed:1.02});
  for(const actor of [fast,old]){actor.yaw=Math.PI/2;actor.move(5.5);for(let i=0;i<30;i++)actor.tick(1/60);}
  assert.ok(Math.abs(fast.walkDistance/old.walkDistance-1.3)<1e-10);

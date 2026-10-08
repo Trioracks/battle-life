@@ -1,10 +1,11 @@
+import {assetPath} from './helpers/apartment-assets.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {Object3D,AnimationMixer,AnimationClip,VectorKeyframeTrack,QuaternionKeyframeTrack,Vector3,Matrix4,Ray} from '../vendor/three/three.module.js';
 
 function model() {
-  const b=fs.readFileSync(new URL('../assets/apartment/v3/mannequin.glb',import.meta.url));
+  const b=fs.readFileSync(assetPath('mannequin.glb'));
   const jsonLength=b.readUInt32LE(12),g=JSON.parse(b.subarray(20,20+jsonLength).toString());
   const bin=b.subarray(28+jsonLength);
   const widths={SCALAR:1,VEC2:2,VEC3:3,VEC4:4,MAT4:16};
@@ -320,7 +321,7 @@ test('cropped hair has outward-facing crown normals',()=>{
 // Catches a short shuffling stride, crouched support, rigid feet or bad export.
 test('exported walk takes grounded full steps with knee extension and heel-to-toe roll',()=>{
   const avatar=animatedModel('walk');
-  const rig=JSON.parse(fs.readFileSync(new URL('../assets/apartment/v3/rig.json',import.meta.url),'utf8'));
+  const rig=JSON.parse(fs.readFileSync(assetPath('rig.json'),'utf8'));
   assert.ok(rig.walk?.strideDistance>=.85&&rig.walk.strideDistance<=1,'full walking stride, not rapid little shuffles');
   for(const side of ['L','R']){
     const offset=side==='L'?0:.5,angles=[],supportAngles=[],ankles=[],pitches=[],soleMin=[];

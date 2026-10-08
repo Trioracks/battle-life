@@ -11,3 +11,21 @@ export function createOutsideLighting(root){
   for(const {night,materials} of surfaces)for(const material of materials)material.color.setRGB(...night.map(v=>v+(1-v)*daylight));
  };
 }
+
+// Outdoor meshes are self-lit by the shared day value, not the apartment lamps.
+export function createCourtyardLighting(THREE,root){
+ const surfaces=[],windows=[];
+ root.traverse(o=>{
+  if(!o.isMesh)return;
+  const isWindow=o.name.includes('exterior-window-lights');
+  const source=Array.isArray(o.material)?o.material:[o.material];
+  const materials=source.map(m=>new THREE.MeshBasicMaterial({color:m.color.clone(),map:m.map,transparent:isWindow,depthWrite:!isWindow}));
+  o.material=materials.length===1?materials[0]:materials;
+  for(const mat of materials)surfaces.push({mat,base:mat.color.clone(),isWindow});
+  if(isWindow)windows.push(o);
+ });
+ return daylight=>{
+  for(const {mat,base,isWindow} of surfaces){mat.color.copy(base).multiplyScalar(isWindow?1.3:.20+.80*daylight);if(isWindow)mat.opacity=1-daylight;}
+  for(const o of windows)o.visible=daylight<.999;
+ };
+}

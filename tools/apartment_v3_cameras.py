@@ -6,16 +6,28 @@ def camera_views(scene, camera, out, render_states):
     views={}
     for mode,yaw,prefix in [('2D',0,'')]:
         distance=12
-        camera.location=(.85+math.sin(math.radians(yaw))*distance,-math.cos(math.radians(yaw))*distance,1.35+12*math.tan(math.radians(8)))
-        camera.rotation_euler=(Vector((.85,0,1.35))-camera.location).to_track_quat('-Z','Y').to_euler()
+        camera.location=(1.5,-distance,1.35+distance*math.tan(math.radians(8)))
+        camera.rotation_euler=(Vector((1.5,0,1.35))-camera.location).to_track_quat('-Z','Y').to_euler()
+        camera.data.ortho_scale=20.8
         states={s:{p:prefix+f for p,f in files.items()} for s,files in render_states.__globals__['LIGHTING_STATES'].items()}
-        views[mode]=dict(position=[camera.location.x,camera.location.z,-camera.location.y],target=[.85,1.35,0],width=16.8,height=6.72,lightingStates=states,yaw=yaw,pitch=8)
+        views[mode]=dict(position=[camera.location.x,camera.location.z,-camera.location.y],target=[1.5,1.35,0],width=20.8,height=8.32,lightingStates=states,yaw=yaw,pitch=8)
         old=render_states.__globals__['LIGHTING_STATES'];render_states.__globals__['LIGHTING_STATES']=states
         render_states();render_states.__globals__['LIGHTING_STATES']=old
     return views
 
+def add_first_person_shell(cube,materials,layout):
+    shell=[]
+    for room,mat in [('kitchen',materials['plaster']),('living',materials['wall'])]:
+        l,r=layout['rooms'][room]['x'];cx=(l+r)/2
+        shell.append(cube('first-person-front-'+room,(cx,-1.82,1.5),(r-l,.14,3.15),mat))
+        shell.append(cube('first-person-ceiling-'+room,(cx,0,3.08),(r-l,3.7,.14),materials['plaster']))
+        shell.append(cube('first-person-front-skirting-'+room,(cx,-1.72,.065),(r-l,.06,.13),materials['wood']))
+        if room=='living':
+            for i in range(29):shell.append(cube('first-person-wallpaper-stripe',(.17+i*.29,-1.743,1.5),(.028,.006,2.92),materials['chip'],0))
+    return shell
+
 def export_static(scene,static,cube,materials,out):
-    shell=[cube('first-person-front',(0,-1.82,1.5),(13.2,.14,3.15),materials['plaster']),cube('first-person-ceiling',(0,0,3.08),(13.2,3.7,.14),materials['plaster'])]
+    shell=[o for o in static if o.name.startswith('first-person-')]
     # Bake connected procedural colour at material-group scope into UV atlases.
     groups={}
     for obj in list(static):

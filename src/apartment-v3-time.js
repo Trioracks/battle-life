@@ -41,6 +41,7 @@ export class ApartmentTime {
     const saved = validSnapshot(snapshot) ? snapshot : { day: 1, minutes: 1410 };
     this.day = saved.day;
     this.minutes = saved.minutes;
+    this.mealReady = saved.mealReady === true;
     this.lights = Object.fromEntries(['living','kitchen'].map(room=>[room,typeof saved.lights?.[room]==='boolean'?saved.lights[room]:true]));
     this.initialRest = typeof saved.initialRest === 'boolean' ? saved.initialRest : saved.day === 1 && saved.minutes >= 1410;
     if (validSleep(saved.sleep)) {
@@ -95,6 +96,11 @@ export class ApartmentTime {
   }
 
   completeAction(id) {
+    if (id === 'stove') this.mealReady = true;
+    if (id === 'dining') {
+      if (this.mealReady) { this.mealReady = false; this.advanceMinutes(15); }
+      return;
+    }
     if (id === 'bed') this.cancelSleep();
     else this.advanceMinutes(durations[id] ?? 0);
   }
@@ -107,6 +113,7 @@ export class ApartmentTime {
 
   snapshot() {
     const snapshot = { day: this.day, minutes: this.minutes, initialRest: this.initialRest };
+    if (this.mealReady) snapshot.mealReady = true;
     if (!this.lights.living || !this.lights.kitchen) snapshot.lights = {...this.lights};
     if (this.isSleeping) {
       const { minutes, seconds, elapsedSeconds } = this.#sleep;

@@ -1,6 +1,24 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 const creator=await import('../src/apartment-v3-creator.js').catch(()=>({}));
+import {creatorDocument} from './helpers/creator-dom.js';
+
+test('section navigation keeps selected garments, colour and last category',()=>{
+ const ui=new creator.CreatorSelection();assert.equal(ui.section,'appearance');assert.equal(ui.selected,'face');
+ ui.selectSection('clothing');assert.deepEqual(ui.categories().map(x=>x.id),['top','bottom','footwear']);
+ ui.category('top');ui.select('top','hoodie');ui.select('topColor','red');ui.selectSection('appearance');ui.category('hair');ui.select('hair','parted');
+ ui.selectSection('clothing');assert.equal(ui.selected,'top');assert.equal(ui.appearance.top,'hoodie');assert.equal(ui.appearance.topColor,'red');
+ ui.selectSection('stats');assert.equal(ui.zone,'body');ui.selectSection('appearance');assert.equal(ui.selected,'hair');assert.equal(ui.appearance.hair,'parted');
+ const before=JSON.stringify(ui);ui.selectSection('bad');ui.category('bad');assert.equal(JSON.stringify(ui),before);
+ ui.reset();assert.equal(ui.section,'appearance');assert.equal(ui.selected,'face');assert.equal(ui.appearance.topColor,'white');
+});
+test('separate category root navigates without changing appearance or focused selected option',()=>{
+ const doc=creatorDocument(),root=doc.createElement('section'),nav=doc.createElement('aside');let changes=0;
+ const mounted=creator.mountCreator(root,()=>changes++,{categoryRoot:nav});assert.ok(nav.children.some(o=>o.className==='look-categories'));
+ mounted.selectSection('clothing');const options=root.children.find(o=>o.className==='look-options');
+ const button=options.children.find(o=>o.dataset.option==='hoodie');button.focus();button.click();assert.equal(doc.activeElement,button);assert.ok(options.children.includes(button));
+ mounted.selectSection('appearance');mounted.selectSection('clothing');assert.equal(changes,1);assert.equal(mounted.selection.appearance.top,'hoodie');
+});
 
 test('category selection frames the corresponding body zone and full body is recoverable',()=>{
   assert.equal(typeof creator.CreatorSelection,'function','creator selection controller must exist');
@@ -21,32 +39,6 @@ test('independent swatches survive category changes in selection state',()=>{
   ui.select('top','invalid');assert.equal(ui.appearance.top,'hoodie');
   ui.reset();assert.equal(ui.appearance.top,'tee');assert.equal(ui.appearance.topColor,'white');
 });
-
-// Node has no document. This small DOM boundary adapter implements only the
-// element/event/focus semantics used by mountCreator; the mounted UI and its
-// handlers are production code. Layout/native keyboard behavior is browser QA.
-function creatorDocument(){
-  const document={activeElement:null,createElement(tag){return new Element(tag);}};
-  class Element extends EventTarget{
-    constructor(tag){
-      super();this.tagName=tag.toUpperCase();this.ownerDocument=document;
-      this.children=[];this.parentElement=null;this.dataset={};this.attributes=new Map();
-      this.style={setProperty:(key,value)=>this.attributes.set('style:'+key,value)};
-    }
-    setAttribute(key,value){this.attributes.set(key,String(value));}
-    getAttribute(key){return this.attributes.get(key)??null;}
-    append(...children){for(const child of children){child.parentElement=this;this.children.push(child);}}
-    contains(node){return node===this||this.children.some(child=>child.contains(node));}
-    replaceChildren(...children){
-      if(this.children.some(child=>child.contains(document.activeElement)))document.activeElement=null;
-      for(const child of this.children)child.parentElement=null;
-      this.children=[];this.append(...children);
-    }
-    focus(){document.activeElement=this;}
-    click(){this.dispatchEvent(new Event('click'));}
-  }
-  return document;
-}
 
 test('mounted creator activates labeled buttons, retains focused controls and restores selections after category rerender',()=>{
   const doc=creatorDocument(),root=doc.createElement('section'),changes=[];

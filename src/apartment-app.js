@@ -1,11 +1,12 @@
 import {ApartmentMotion} from './apartment-v3-motion.js?rev=8';
-import {ApartmentTime,loadHomeTime,saveHomeTime} from './apartment-v3-time.js?rev=8';
+import {ApartmentTime,loadHomeTime,saveHomeTime} from './apartment-v3-time.js?rev=12';
 import {districts,getDistrictLocations} from './calikfornia.js';
-import {advanceHomeFrame,prepareApartmentConfig} from './apartment-v3-runtime.js?rev=8';
+import {advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=12';
 import {playSoundCue} from './sound-cues.js';
 import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=12';
-import {DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,createProfile,saveProfile,loadProfile} from './avatar-v3-profile.js?rev=10';
-import {mountCreator} from './apartment-v3-creator.js?rev=11';
+import {DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,loadProfile} from './avatar-v3-profile.js?rev=10';
+import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=12';
+import {createCreatorSession} from './apartment-v3-creator-session.js?rev=12';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false;
@@ -36,9 +37,9 @@ try{
   let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lightPreview='game';
   if(profile)view.setAppearance(profile.appearance);
   let appearance={...DEFAULT_APPEARANCE},allocations=Object.fromEntries(STAT_KEYS.map(k=>[k,0]));
-  const names={computer:'За компьютером',bed:'Сон',sink:'Моет посуду',stove:'Готовит еду',fridge:'Берёт еду',entry:'Открывает дверь','light-living':'Нажимает выключатель в комнате','light-kitchen':'Нажимает выключатель на кухне'};
-  const sounds={computer:'chair-scrape',bed:'sleep',sink:'dishes',stove:'cook',fridge:'fridge',entry:'door'};
-  const completed={computer:'Работа за компьютером закончена.',bed:'Отдохнул. Можно идти дальше.',sink:'Посуда вымыта.',stove:'Еда приготовлена.',fridge:'Взял еду из холодильника.'};
+  const names={dining:'Ест за столом',computer:'За компьютером',bed:'Сон',sink:'Моет посуду',stove:'Готовит еду',fridge:'Берёт еду',entry:'Открывает дверь','light-living':'Нажимает выключатель в комнате','light-kitchen':'Нажимает выключатель на кухне'};
+  const sounds={dining:'dishes',computer:'chair-scrape',bed:'sleep',sink:'dishes',stove:'cook',fridge:'fridge',entry:'door'};
+  const completed={dining:'Поел.',computer:'Работа за компьютером закончена.',bed:'Отдохнул. Можно идти дальше.',sink:'Посуда вымыта.',stove:'Еда приготовлена.',fridge:'Взял еду из холодильника.'};
   let message='',messageUntil=0,last=performance.now(),lastStep=0,lastDoor=false,frameRate=60;
   function setMode(next){
     lookInput.stop();
@@ -60,23 +61,29 @@ try{
     playing=true;lastStep=0;lastDoor=false;hold=false;skeleton=false;$('#hold').checked=false;$('#show-bones').checked=false;
     $('#player-name').textContent=profile.name;resumeAnimation();setMode('game');cue('sleep');
   }
-  function selectStep(stats){
+  function selectCreatorSection(section){
+    creator.selectSection(section);const stats=section==='stats';
     $('#appearance-panel').hidden=stats;$('#stats-panel').hidden=!stats;$('#next-step').hidden=stats;$('#start-game').hidden=!stats;
-    $('#appearance-tab').setAttribute('aria-pressed',String(!stats));$('#stats-tab').setAttribute('aria-pressed',String(stats));
-    $('#creator-footer-note').textContent=stats?'Распредели 10 очков и начни дома, под одеялом.':'Сначала внешность. Затем — 10 очков навыков.';
+    for(const name of ['appearance','clothing','stats'])$('#'+name+'-tab').setAttribute('aria-pressed',String(name===section));
+    $('#next-step').textContent=section==='appearance'?'Одежда →':'Характеристики →';
+    $('#creator-footer-note').textContent=stats?'Распредели 10 очков. Твоя история начнётся дома.':section==='clothing'?'Ткань, силуэт, цвет. Всё выбранное сохранится.':'Лицо, волосы и характер. Начни с главного.';
   }
   function updateStats(){
     const remaining=10-Object.values(allocations).reduce((a,b)=>a+b,0);
     $('#points-left').textContent=remaining;$('#points-badge').textContent=remaining;
     for(const key of STAT_KEYS){
       $(`#stat-${key}`).textContent=10+allocations[key]*10;
+      $(`[data-stat-summary="${key}"]`).textContent=10+allocations[key]*10;
       $(`[data-increase="${key}"]`).disabled=remaining===0||allocations[key]>=4;
       $(`[data-decrease="${key}"]`).disabled=allocations[key]===0;
     }
     $('#start-game').disabled=remaining!==0||!$('#character-name').value.trim();
   }
-  const creator=mountCreator($('#appearance-fields'),next=>{appearance=next;view.setAppearance(appearance);});
+  const creator=mountCreator($('#appearance-fields'),next=>{appearance=next;view.setAppearance(appearance);},{categoryRoot:$('#creator-categories')});
+  let creatorSession=null;
+  for(const [id,icon] of [['appearance-tab','face'],['clothing-tab','top'],['stats-tab','stats'],['preview-body','rotate'],['cancel-creator','back'],['start-game','confirm']])decorateCreatorButton($('#'+id),icon);
   for(const key of STAT_KEYS){
+    const term=document.createElement('dt'),summary=document.createElement('dd');term.textContent=STAT_LABELS[key];summary.dataset.statSummary=key;summary.textContent='10';$('#stats-overview').append(term,summary);
     const row=document.createElement('div');row.className='stat-row';
     const name=document.createElement('span');name.textContent=STAT_LABELS[key];
     const minus=document.createElement('button');minus.type='button';minus.dataset.decrease=key;minus.textContent='−';minus.setAttribute('aria-label','Уменьшить: '+STAT_LABELS[key]);
@@ -89,19 +96,22 @@ try{
   $('#character-name').addEventListener('input',updateStats);
   $('#distribute').addEventListener('click',()=>{allocations=Object.fromEntries(STAT_KEYS.map((k,i)=>[k,i===0?2:1]));updateStats();});
   $('#new-game').addEventListener('click',()=>{
+    creatorSession=createCreatorSession(profile,storage,{enter(next){homeTime=new ApartmentTime();saveHomeTime(storage,homeTime);enterApartment(next);},restore(look){view.setAppearance(look);setMode('menu');}});
+    $('#name-error').textContent=$('#allocations-error').textContent='';$('#character-name').setAttribute('aria-invalid','false');
     creator.reset();appearance=creator.selection.appearance;$('#preview-zoom').value=1;allocations=Object.fromEntries(STAT_KEYS.map(k=>[k,0]));$('#character-name').value='';$('#creator-error').textContent='';
     previewYaw=previewTarget=0;for(const b of $('#preview-angles').children){b.classList.toggle('active',b.dataset.yaw==='0');b.setAttribute('aria-pressed',String(b.dataset.yaw==='0'));}
-    view.setAppearance(appearance);selectStep(false);updateStats();setMode('creator');$('#character-name').focus();
+    view.setAppearance(appearance);selectCreatorSection('appearance');creator.selection.frame('body');updateStats();setMode('creator');$('#character-name').focus();
   });
   $('#continue-game').addEventListener('click',()=>{if(playing){view.setAppearance(profile.appearance);setMode('game');}else if(profile)enterApartment(profile);});
-  $('#cancel-creator').addEventListener('click',()=>{view.setAppearance(profile?.appearance??DEFAULT_APPEARANCE);setMode('menu');});
-  $('#next-step').addEventListener('click',()=>selectStep(true));$('#stats-tab').addEventListener('click',()=>selectStep(true));$('#appearance-tab').addEventListener('click',()=>selectStep(false));
+  $('#cancel-creator').addEventListener('click',()=>creatorSession?.cancel());
+  $('#next-step').addEventListener('click',()=>selectCreatorSection(creator.selection.section==='appearance'?'clothing':'stats'));
+  for(const section of ['appearance','clothing','stats'])$('#'+section+'-tab').addEventListener('click',()=>selectCreatorSection(section));
   $('#creator-form').addEventListener('submit',e=>{
-    e.preventDefault();try{
-      const next=createProfile({name:$('#character-name').value,allocations,appearance});
-      const result=saveProfile(storage,next);homeTime=new ApartmentTime();saveHomeTime(storage,homeTime);enterApartment(next);
-      if(!result.ok){message='Персонаж создан, но браузер не разрешил сохранение.';messageUntil=performance.now()+8000;}
-    }catch(error){$('#creator-error').textContent=error.message;}
+    e.preventDefault();const result=creatorSession?.submit({name:$('#character-name').value,allocations,appearance});if(!result)return;
+    $('#name-error').textContent=result.errors?.name??'';$('#allocations-error').textContent=result.errors?.allocations??'';
+    $('#character-name').setAttribute('aria-invalid',String(Boolean(result.errors?.name)));
+    if(result.errors?.name)$('#character-name').focus();else if(result.errors?.allocations)selectCreatorSection('stats');
+    if(result.ok&&!result.saved){message='Персонаж создан, но браузер не разрешил сохранение.';messageUntil=performance.now()+8000;}
   });
   for(const b of $('#preview-angles').children)b.addEventListener('click',()=>{previewTarget=Number(b.dataset.yaw);for(const other of $('#preview-angles').children){other.classList.toggle('active',other===b);other.setAttribute('aria-pressed',String(other===b));}});
   $('#preview-body').addEventListener('click',()=>{creator.selection.frame('body');$('#preview-zoom').value=1;});
@@ -124,13 +134,14 @@ try{
   for(const district of districts){const b=document.createElement('button');b.textContent=district.name;b.dataset.district=district.id;b.addEventListener('click',()=>showDistrict(district.id));$('#districts').append(b);}
   showDistrict('north-sloboda');
   $('#return-home').addEventListener('click',()=>{if(motion.returnHome()){setMode('game');resumeAnimation();cue('door');}});
-  function act(id){resumeAnimation();if(id==='entry'){if(!motion.busy)setMode('door');return;}if(motion.interact(id))cue('footstep');}
+  function act(id){resumeAnimation();if(id==='entry'){if(!motion.busy)setMode('door');return;}const result=startHomeAction(motion,homeTime,id);if(result.allowed)cue('footstep');else if(result.reason){message=result.reason;messageUntil=performance.now()+5000;}}
   $('#door-peek').addEventListener('click',()=>{setMode('game');act('peephole');});
   $('#door-exit').addEventListener('click',()=>{setMode('game');resumeAnimation();motion.interact('entry');});
   $('#door-cancel').addEventListener('click',()=>setMode('game'));
   function stopPeeking(){setMode('game');if(motion.actionId==='peephole'&&motion.phase==='perform')motion.leaveAction();}
   $('#peek-close').addEventListener('click',stopPeeking);
-  for(const [id,label] of Object.entries({computer:'Компьютер',bed:'Кровать',sink:'Посуда',stove:'Плита',fridge:'Холодильник',passage:'Другая комната',entry:'Входная дверь','light-living':'Выключатель в комнате','light-kitchen':'Выключатель на кухне'})){
+  for(const [id,label] of Object.entries({dining:'Обеденный стол',computer:'Компьютер',bed:'Кровать',sink:'Посуда',stove:'Плита',fridge:'Холодильник',passage:'Другая комната',entry:'Входная дверь','light-living':'Выключатель в комнате','light-kitchen':'Выключатель на кухне'})){
+    if(!config.actions[id])continue;
     const b=document.createElement('button');b.textContent=label;b.dataset.action=id;b.addEventListener('click',()=>act(id));
     if(config.actions[id]?.lightRoom)b.setAttribute('aria-label',label);
     $('#actions').append(b);

@@ -1,7 +1,8 @@
+import {assetPath} from './apartment-assets.js';
 import fs from 'node:fs';
 import {Object3D,AnimationMixer,AnimationClip,VectorKeyframeTrack,QuaternionKeyframeTrack,Vector3,Matrix4} from '../../vendor/three/three.module.js';
 export function readGlb(name){
-  const b=fs.readFileSync(new URL('../../assets/apartment/v3/'+name,import.meta.url));
+  const b=fs.readFileSync(assetPath(name));
   const length=b.readUInt32LE(12),json=JSON.parse(b.subarray(20,20+length)),bin=b.subarray(28+length);
   const widths={SCALAR:1,VEC2:2,VEC3:3,VEC4:4,MAT4:16};
   const values=index=>{const a=json.accessors[index],view=json.bufferViews[a.bufferView],width=widths[a.type];

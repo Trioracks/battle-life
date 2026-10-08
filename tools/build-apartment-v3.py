@@ -5,9 +5,12 @@ random.seed(19)
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0,os.path.join(ROOT,'tools'))
 from apartment_v3_details import add_home_details
-from apartment_v3_cameras import camera_views, export_static
-OUT=os.path.join(ROOT,'assets','apartment','v3')
-os.makedirs(OUT,exist_ok=True)
+from apartment_v3_cameras import camera_views, export_static, add_first_person_shell
+from apartment_v3_layout import load_layout, motion_config, to_blender, output_paths
+from apartment_v3_exterior import add_exterior, export_geometry
+OUT,SOURCE_OUT=output_paths(sys.argv,ROOT)
+LAYOUT=load_layout()
+bpy.context.preferences.filepaths.save_version=0
 LIGHTING_STATES=dict(off=dict(night='background-off.png',day='background-day-off.png'),living=dict(night='background-living.png',day='background-day-living.png'),kitchen=dict(night='background-kitchen.png',day='background-day-kitchen.png'),both=dict(night='background.png',day='background-day.png'))
 
 def render_light_states():
@@ -24,18 +27,17 @@ def render_light_states():
             for device in preferences.devices:device.use=device.type=='OPTIX'
             render_scene.cycles.device='GPU';render_scene.cycles.denoiser='OPTIX'
             print('V8_RENDER_DEVICE',','.join(d.name for d in devices),flush=True)
-    blue=bpy.data.materials['dusty-blue-night-glass'];city=bpy.data.materials['distant-panel-buildings']
     bulbs={room:bpy.data.objects['lamp-'+room+'-bulb'] for room in ['living','kitchen']}
     lamps={room:bpy.data.objects['warm-ceiling-pool-'+room] for room in ['living','kitchen']}
     for period in ['night','day']:
-        is_day=period=='day';ramp=blue.node_tree.nodes.get('Color Ramp').color_ramp
-        ramp.elements[0].color=(.20,.28,.31,1) if is_day else (.031,.049,.065,1)
-        ramp.elements[1].color=(.45,.53,.53,1) if is_day else (.073,.105,.13,1)
-        city.node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value=(.095,.14,.15,1) if is_day else (.018,.034,.065,1)
+        is_day=period=='day'
         render_scene.world.node_tree.nodes['Background'].inputs[1].default_value=.42 if is_day else .28
+        render_scene.world.node_tree.nodes['Background'].inputs[0].default_value=(.28,.34,.40,1) if is_day else (.022,.031,.054,1)
         for obj in render_scene.objects:
             if obj.name.startswith('cool-window-fill'):obj.data.energy=205 if is_day else 100;obj.data.color=(.72,.83,.90) if is_day else (.32,.48,1)
             if obj.name.startswith('distant-window'):obj.hide_render=is_day
+            if obj.name.startswith('exterior-lit-'):obj.hide_render=is_day
+            if obj.name=='exterior-overcast':obj.data.energy=30000 if is_day else 650
         for state in ['both','off','living','kitchen']:
             for room in ['living','kitchen']:
                 enabled=state in [room,'both'];lamps[room].data.energy=(95 if is_day else 150) if enabled else 0
@@ -45,7 +47,7 @@ def render_light_states():
 
 if '--static-existing' in sys.argv:
     import struct
-    bpy.ops.wm.open_mainfile(filepath=os.path.join(ROOT,'assets','source','apartment-cutaway-v3.blend'))
+    bpy.ops.wm.open_mainfile(filepath=os.path.join(SOURCE_OUT,'apartment-cutaway-v3.blend'))
     scene=bpy.context.scene;scene.cycles.samples=8
     preferences=bpy.context.preferences.addons['cycles'].preferences;preferences.compute_device_type='OPTIX';preferences.get_devices()
     for device in preferences.devices:device.use=device.type=='OPTIX'
@@ -60,16 +62,16 @@ if '--static-existing' in sys.argv:
     print('V9_STATIC_READY',OUT,flush=True);sys.exit(0)
 
 if '--render-existing' in sys.argv:
-    bpy.ops.wm.open_mainfile(filepath=os.path.join(ROOT,'assets','source','apartment-cutaway-v3.blend'))
+    bpy.ops.wm.open_mainfile(filepath=os.path.join(SOURCE_OUT,'apartment-cutaway-v3.blend'))
     scene=bpy.context.scene
     manifest_path=os.path.join(OUT,'scene.json')
     with open(manifest_path,encoding='utf8') as f:manifest=json.load(f)
     manifest['cameraViews']=camera_views(scene,scene.camera,OUT,render_light_states)
     manifest['camera']=manifest['cameraViews']['2D']
     with open(manifest_path,'w',encoding='utf8') as f:json.dump(manifest,f,ensure_ascii=False,indent=2)
-    scene.camera.location=(.85,-12,1.35+12*math.tan(math.radians(8)))
-    scene.camera.rotation_euler=(Vector((.85,0,1.35))-scene.camera.location).to_track_quat('-Z','Y').to_euler()
-    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT,'assets','source','apartment-cutaway-v3.blend'))
+    scene.camera.location=(1.5,-12,1.35+12*math.tan(math.radians(8)))
+    scene.camera.rotation_euler=(Vector((1.5,0,1.35))-scene.camera.location).to_track_quat('-Z','Y').to_euler()
+    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(SOURCE_OUT,'apartment-cutaway-v3.blend'))
     print('V3_APARTMENT_READY',OUT,flush=True);sys.exit(0)
 
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
@@ -162,48 +164,63 @@ def aim(o,target):o.rotation_euler=(Vector(target)-o.location).to_track_quat('-Z
 def area(name,loc,target,power,color,size):
     bpy.ops.object.light_add(type='AREA',location=loc);o=bpy.context.object;o.name=name;o.data.energy=power;o.data.color=color;o.data.shape='DISK';o.data.size=size;aim(o,target);return o
 
-# Architectural shell, with a missing facade for the playable camera.
-cube('foundation',(0,0,-.16),(13.2,3.8,.25),M['dark'])
-cube('rear-kitchen',(-3.25,1.72,1.48),(6.5,.15,3.0),M['plaster'])
-cube('rear-living',(3.25,1.72,1.48),(6.5,.15,3.0),M['wall'])
-cube('left-return',(-6.5,.12,1.47),(.14,3.3,3),M['plaster'])
-cube('right-return-rear',(6.5,.785,1.47),(.14,1.87,3),M['wall'])
-cube('right-return-front',(6.5,-1.475,1.47),(.14,.55,3),M['wall'])
-cube('right-return-lintel',(6.5,-.675,2.59),(.14,1.05,.76),M['wall'])
-cube('ceiling-cutaway',(0,1.50,3.02),(13.3,.42,.15),M['plaster'])
-cube('ceiling-back-edge',(0,1.70,3.05),(13.4,.12,.2),M['dark'])
-for x in [-6.58,6.58]:cube('facade-post',(x,-1.75,1.45),(.16,.2,3.2),M['dark'])
-for ix in range(12):
+# The same rectangular openings cut the substrate, tiles and wallpaper strips.
+def rear_piece(name,loc,size,mat,bevel=.005):
+    x,y,z=loc;w,d,h=size
+    pieces=[(x-w/2,x+w/2,z-h/2,z+h/2)]
+    for win in LAYOUT['windows']:
+        cx,cz,_=win['center'];a=cx-win['width']/2;b=cx+win['width']/2
+        low=cz-win['height']/2;high=cz+win['height']/2;next_pieces=[]
+        for l,r,bottom,top in pieces:
+            if r<=a or l>=b or top<=low or bottom>=high:next_pieces.append((l,r,bottom,top));continue
+            if l<a:next_pieces.append((l,a,bottom,top))
+            if r>b:next_pieces.append((b,r,bottom,top))
+            if bottom<low:next_pieces.append((max(l,a),min(r,b),bottom,low))
+            if top>high:next_pieces.append((max(l,a),min(r,b),high,top))
+        pieces=next_pieces
+    for l,r,bottom,top in pieces:
+        if r-l>.001 and top-bottom>.001:cube(name,((l+r)/2,y,(bottom+top)/2),(r-l,d,top-bottom),mat,bevel)
+
+left=LAYOUT['rooms']['kitchen']['x'][0];right=LAYOUT['rooms']['living']['x'][1]
+cube('foundation',((left+right)/2,0,-.16),(right-left+.2,3.8,.25),M['dark'])
+cube('kitchen-floor-substrate',(left/2,0,-.032),(-left,3.64,.064),M['tilewhite'],0)
+cube('living-floor-substrate',(right/2,0,-.032),(right,3.64,.064),M['floor'],0)
+rear_piece('rear-kitchen',(left/2,1.72,1.5),(-left,.15,3),M['plaster'])
+rear_piece('rear-living',(right/2,1.72,1.5),(right,.15,3),M['wall'])
+cube('left-return',(left,0,1.5),(.14,3.64,3),M['plaster'])
+cube('right-return-rear',(right,.785,1.5),(.14,1.87,3),M['wall'])
+cube('right-return-front',(right,-1.51,1.5),(.14,.62,3),M['wall'])
+cube('right-return-lintel',(right,-.675,2.59),(.14,1.05,.82),M['wall'])
+cube('ceiling-cutaway',((left+right)/2,1.50,3.02),(right-left+.3,.42,.15),M['plaster'])
+cube('ceiling-back-edge',((left+right)/2,1.70,3.05),(right-left+.4,.12,.2),M['dark'])
+for x in [left-.08,right+.08]:cube('facade-post',(x,-1.75,1.45),(.16,.2,3.2),M['dark'])
+for ix in range(16):
     for iy in range(6):
-        cube('kitchen-floor-tile',(-6.2+ix*.52,-1.45+iy*.52,-.018),(.505,.505,.045),M['tilewhite'],.004)
+        cube('kitchen-floor-tile',(left+.25+ix*.5,-1.45+iy*.52,-.018),(.49,.505,.045),M['tilewhite'],.004)
 for row in range(10):
-    for col in range(8):
+    for col in range(11):
         x=.38+col*.79+(row%2)*.16
-        if x<6.45:
-            o=cube('floor-board',(x,-1.5+row*.315,-.017),(.775,.306,.046),M['floor'],.003)
-for ix in range(12):
+        if x<right:
+            width=min(.775,2*(right-x));o=cube('floor-board',(x,-1.5+row*.315,-.017),(width,.306,.046),M['floor'],.003)
+for ix in range(16):
     for iz in range(4):
-        cube('checker-backsplash',(-6.23+ix*.52,1.625,.30+iz*.52),(.505,.027,.505),M['tilewhite' if (ix+iz)%2 else 'tileblack'],.004)
-for x in range(1,22):
+        rear_piece('checker-backsplash',(left+.25+ix*.5,1.625,.30+iz*.52),(.49,.027,.505),M['tilewhite' if (ix+iz)%2 else 'tileblack'],.004)
+for x in range(1,29):
     xx=.05+x*.29
-    cube('wallpaper-faded-stripe',(xx,1.623,1.47),(.028,.006,2.92),M['chip'],0)
+    rear_piece('wallpaper-faded-stripe',(xx,1.623,1.47),(.028,.006,2.92),M['chip'],0)
 for i in range(60):
-    x=random.uniform(.14,6.2);z=random.uniform(.12,2.94)
-    if 2.5<x<4.8 and .94<z<2.5:continue
+    x=random.uniform(.14,right-.2);z=random.uniform(.12,2.94)
+    if any(abs(x-w['center'][0])<w['width']/2+.1 and abs(z-w['center'][1])<w['height']/2+.16 for w in LAYOUT['windows']):continue
     verts=[(x+math.cos(a)*random.uniform(.025,.07),1.612,z+math.sin(a)*random.uniform(.04,.15)) for a in [j*math.tau/7 for j in range(7)]]
     mesh=bpy.data.meshes.new('peel');mesh.from_pydata(verts,[],[list(range(7))]);mesh.materials.append(M['chip']);o=bpy.data.objects.new('wallpaper-peel',mesh);scene.collection.objects.link(o);static.append(o)
-for x,w in [(-3.25,6.35),(3.25,6.35)]:cube('skirting',(x,1.57,.065),(w,.07,.13),M['wood'])
+for x,w in [(left/2,-left-.15),(right/2,right-.15)]:cube('skirting',(x,1.57,.065),(w,.07,.13),M['wood'])
 
 # Windows: real frames, night view and window sill; no false shelving.
 def window(x,width):
     z=1.85
-    cube('window-recess',(x,1.60,z),(width+.14,.09,1.55),M['dark'])
-    cube('blue-night-glass',(x,1.54,z),(width,.028,1.40),M['blue'],.005)
-    for j in range(6):
-        xx=x-width*.44+j*width*.16;hh=random.uniform(.3,.7)
-        cube('distant-building',(xx,1.52,z-.7+hh/2),(width*.16,.006,hh),M['city'],0)
-        for k in range(3):
-            if random.random()>.55:cube('distant-window',(xx+.01,1.508,z-.59+k*.13),(.032,.003,.044),M['brass'],0)
+    # Open air, not a painted opaque pane: jambs line the genuine wall opening.
+    for xx in [x-width/2,x+width/2]:cube('window-inner-reveal',(xx,1.72,z),(.035,.31,1.46),M['cream'],.003)
+    for zz in [z-.73,z+.73]:cube('window-inner-reveal',(x,1.72,zz),(width,.31,.035),M['cream'],.003)
     for xx in [x-width/2,x+width/2]:
         cube('window-aged-wood-trim',(xx,1.49,z),(.13,.10,1.65),M['wood'],.008)
     for xx in [x-width/2,x,x+width/2]:
@@ -214,7 +231,21 @@ def window(x,width):
     cube('window-latch',(x+.025,1.333,1.69),(.022,.018,.105),M['metal'],.006)
     cube('window-sill',(x,1.29,z-.78),(width+.26,.44,.07),M['cream'])
     area('cool-window-fill',(x,1.18,2.20),(x,-.5,1.05),100,(.32,.48,1),1.5)
-window(-2.45,1.08);window(2.65,1.08);window(4.55,1.08)
+for win in LAYOUT['windows']:window(win['center'][0],win['width'])
+
+# Modest kitchen eating place, with room for the seated actor under the apron.
+dx=-7.25
+cube('dining-top',(dx,.88,.785),(1.1,.82,.085),M['oak'],.022)
+for x in [dx-.46,dx+.46]:
+    for y in [.57,1.20]:cube('dining-table-leg',(x,y,.375),(.065,.065,.75),M['wood'],.01)
+cube('dining-chair-seat',(dx,.02,.38),(.48,.46,.07),M['wood'],.022)
+cube('dining-chair-pad',(dx,.02,.425),(.45,.43,.04),M['teal'],.026)
+for x in [dx-.19,dx+.19]:
+    for y in [-.16,.19]:cube('dining-chair-leg',(x,y,.195),(.043,.043,.39),M['wood'],.01)
+    cube('dining-chair-upright',(x,-.19,.71),(.05,.06,.67),M['wood'],.012)
+cube('dining-chair-backrest',(dx,-.19,.86),(.46,.06,.21),M['oak'],.015)
+proxy('dining-top',(dx,.88,.785),(1.1,.82,.085))
+proxy('dining-chair-back',(dx,-.19,.86),(.46,.06,.21))
 
 # Kitchen sink, dishes and worn cupboards.
 for x in [-5.45,-4.35]:
@@ -285,7 +316,7 @@ for center in [.09,.125,.84,.875]:
         combine=nodes.new('ShaderNodeMath');combine.operation='MAXIMUM';links.new(stripe,combine.inputs[0]);links.new(less.outputs[0],combine.inputs[1]);stripe=combine.outputs[0]
 mix=nodes.new('ShaderNodeMixRGB');links.new(stripe,mix.inputs[0]);links.new(base,mix.inputs[1]);mix.inputs[2].default_value=(.34,.23,.12,1);links.new(mix.outputs[0],bsdf.inputs['Base Color'])
 nx=40;ny=28;faces=[]
-sleep_envelope=json.loads(subprocess.check_output(['node',os.path.join(ROOT,'tools','measure-sleep-cover.mjs')],cwd=ROOT,text=True))
+sleep_envelope=json.loads(subprocess.check_output(['node',os.path.join(ROOT,'tools','measure-sleep-cover.mjs')],cwd=ROOT,text=True,env={**os.environ,'APARTMENT_ASSETS_DIR':OUT}))
 for ix in range(nx):
     for iy in range(ny):
         a=ix*(ny+1)+iy;faces.append((a,a+ny+1,a+ny+2,a+1))
@@ -361,6 +392,12 @@ proxy('desk-top',(4.70,.88,.785),(1.92,.82,.085))
 proxy('desk-drawer',(5.22,.94,.38),(.57,.65,.70))
 proxy('crt',(4.63,1.045,1.12),(.63,.42,.52))
 
+# The deep CRT must stand in front of the sill, never intersect it.
+for obj in static+proxies:
+    if obj.name.startswith(('crt-','screen-text','depth-crt')):
+        obj.location.y-=.21
+        obj.location.z+=.0175 if obj.name.startswith('crt-stand') else .045
+
 # Two actual hinged doors. The middle doorway cuts through the side partition.
 cube('partition-rear',(0,.77,1.46),(.16,1.90,2.94),M['plaster'])
 cube('partition-front',(0,-1.50,1.46),(.16,.50,2.94),M['plaster'])
@@ -380,6 +417,7 @@ for face in [-1,1]:
 for name,z in [('lower',.37),('upper',1.73)]:cylinder('passage-hinge-'+name,(0,0,z),.025,.13,M['metal'],kind='moving',parent=door)
 proxy('middle-wall',(0,.77,1.46),(.16,1.90,2.94))
 proxy('middle-front-wall',(0,-1.50,1.46),(.16,.50,2.94))
+entry_assembly_before=set(scene.objects)
 entry=empty('hinge-entry',(6.5,-.15,.015))
 for y in [-1.23,-.12]:cube('entry-frame',(6.46,y,1.08),(.22,.09,2.20),M['wood'])
 cube('entry-lintel',(6.46,-.675,2.19),(.22,1.2,.08),M['wood'])
@@ -425,12 +463,18 @@ hall_cube('switch',(8.98,-.48,1.1),(.04,.072,.09),M['plastic'])
 hall_cube('lamp-backplate',(9.015,-.48,2.53),(.10,.23,.27),M['metal'])
 hall_cube('lamp-frosted-glass',(8.95,-.48,2.53),(.12,.19,.22),M['cream'],.045)
 area('dim-landing-light',(8.85,-.44,2.42),(7.7,.1,.5),28,(1,.69,.36),.45)
+for obj in set(scene.objects)-entry_assembly_before:
+    if obj.parent is None:obj.location.x+=right-6.5
+
+# The living face of the partition carries the same wallpaper as its room.
+for name,loc,size in [('rear',(0.083,.77,1.46),(.004,1.90,2.94)),('front',(0.083,-1.50,1.46),(.004,.50,2.94)),('lintel',(0.113,-.70,2.57),(.004,1.18,.78))]:
+    cube('partition-living-paper-'+name,loc,size,M['wall'],0)
 
 # Details at a readable density: pipes, radiator, sockets, book stack, old light.
 curve('heating-pipe',[(-6.34,1.56,.12),(-6.34,1.56,2.82),(-3.34,1.56,2.82)],.022,M['cream'])
 for rx in [2.65,4.55]:
-    for i in range(9):cube('radiator-section',(rx-.44+i*.11,1.45,.46),(.083,.20,.55),M['cream'],.033)
-    curve('radiator-pipe',[(rx-.5,1.45,.30),(rx-.61,1.45,.30),(rx-.61,1.45,.1)],.015,M['cream'])
+    for i in range(9):cube('radiator-section',(rx-.44+i*.11,1.535,.46),(.083,.20,.55),M['cream'],.033)
+    curve('radiator-pipe',[(rx-.5,1.535,.30),(rx-.61,1.535,.30),(rx-.61,1.535,.1)],.015,M['cream'])
 for x in [-4,3.8,5.5]:
     cube('socket',(x,1.615,.31),(.084,.025,.09),M['cream'],.006)
     for dx in [-.018,.018]:cylinder('socket-hole',(x+dx,1.598,.31),.006,.004,M['dark'],(math.pi/2,0,0))
@@ -467,16 +511,44 @@ for room,x in [('living',3.60),('kitchen',-.25)]:
     for zz in [-.060,.060]:cylinder('switch-'+room+'-screw',(0,-.019,zz),.006,.007,M['metal'],(math.pi/2,0,0),'moving',switch_root)
 area('soft-facade-fill',(0,-4,4),(0,0,1),190,(.46,.55,.71),8)
 details=add_home_details(cube,cylinder,curve,material,M,scene,static,moving)
+exterior=add_exterior(scene,dict(cube=cube,cylinder=cylinder,material=material),LAYOUT)
+exterior_objects=exterior.pop('roots')
+static[:]=[o for o in static if o not in exterior_objects]
+matte=material('cutaway-surround-black',(0,0,0))
+matte.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=0
+matte_start=len(static)
+rear_piece('cutaway-surround',(1.5,2.02,1.35),(55,.03,35),matte,0)
+cutaway_surround=static[matte_start:];del static[matte_start:]
+area('exterior-overcast',(-8,18,28),(0,27,0),30000,(.73,.82,.91),28)
 
-bpy.ops.object.camera_add(location=(.85,-12,1.35+12*math.tan(math.radians(8))));camera=bpy.context.object;camera.name='camera-master';camera.data.type='ORTHO';camera.data.ortho_scale=16.8;aim(camera,(.85,0,1.35));scene.camera=camera
+bpy.ops.object.camera_add(location=(1.5,-12,1.35+12*math.tan(math.radians(8))));camera=bpy.context.object;camera.name='camera-master';camera.data.type='ORTHO';camera.data.ortho_scale=20.8;aim(camera,(1.5,0,1.35));scene.camera=camera
 scene.render.film_transparent=False
 for o in proxies:o.hide_render=True;o.hide_set(True)
+shell=add_first_person_shell(cube,M,LAYOUT)
+import importlib.util
+audit_spec=importlib.util.spec_from_file_location('apartment_audit',os.path.join(ROOT,'tools','audit-apartment-v3.py'))
+audit_module=importlib.util.module_from_spec(audit_spec);audit_spec.loader.exec_module(audit_module)
+audit=audit_module.audit_scene(scene,LAYOUT)
+with open(os.path.join(OUT,'geometry-audit.json'),'w',encoding='utf8') as f:json.dump(audit,f,ensure_ascii=False,indent=2)
+print('GEOMETRY_AUDIT',len(audit['errors']),'errors',len(audit['warnings']),'warnings',flush=True)
+if '--audit-only' in sys.argv:
+    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(SOURCE_OUT,'apartment-cutaway-v3.blend'))
+    sys.exit(1 if audit['errors'] else 0)
+if audit['errors']:raise ValueError('Geometry audit failed: '+str(audit['errors']))
+export_geometry(scene,exterior_objects,os.path.join(OUT,exterior['geometry']),'outside-')
+occlusion=[o for o in static if o.name.startswith(('rear-','left-return','right-return','partition-','window-','foundation','kitchen-floor-substrate','living-floor-substrate'))]
+occlusion += [o for o in exterior_objects if o.name.endswith(('-body','-roof')) or o.name in ['exterior-courtyard-ground','exterior-factory-hall']]
+occlusion += cutaway_surround
+export_geometry(scene,occlusion,os.path.join(OUT,exterior['occluders']),'outside-mask-',False)
+
 def prepare_backdrop_geometry():
     for o in static:o.hide_render=False
+    for o in exterior_objects:o.hide_render=False
+    for o in shell:o.hide_render=True
     for o in proxies:o.hide_render=True
     for o in moving:o.hide_render=not((o.parent==landing and o.name!='landing-ceiling') or o in lamp_objects.values())
 prepare_backdrop_geometry()
-source=os.path.join(ROOT,'assets','source','apartment-cutaway-v3.blend')
+source=os.path.join(SOURCE_OUT,'apartment-cutaway-v3.blend')
 bpy.ops.wm.save_as_mainfile(filepath=source)
 
 # Export exact occlusion geometry and door hinges in glTF's Y-up coordinates.
@@ -529,6 +601,9 @@ for room,actor_x,switch_x in [('living',3.35,3.60),('kitchen',-.50,-.25)]:
     a.update(lightRoom=room,contactTime=.32);actions['light-'+room]=a
 manifest=dict(version=3,bounds=[-6.1,6.15],spawn=[3.4,0,.85],speed=1.326,doorX=0,doorSweep=[-.4,1.35],passageOpenAngle=math.pi*.52,background='background.png',backgroundDay='background-day.png',geometry='interaction.glb',camera=dict(position=xyz(camera.location),target=[.85,1.35,0],width=16.8,height=6.72),actions=actions,rig='mannequin.glb',stride=.90,entryExit=dict(position=[8.35,0,.675],yaw=math.pi/2),entryDoor=dict(hinge=[6.5,.015,.15],openAngle=math.pi/2,threshold=6.55,closedBounds=6.15),clock=details['clock'],backgroundResolution=[3840,1536],landing=dict(root='landing-root'),peepholeCamera=dict(position=[6.61,1.645,.675],target=[9.05,1.51,-.15]))
 lighting_states=LIGHTING_STATES
+manifest.update(motion_config(LAYOUT))
+manifest['exterior']=exterior
+manifest['camera']=dict(position=xyz(camera.location),target=[1.5,1.35,0],width=20.8,height=8.32)
 manifest.update(lightingStates=lighting_states,liveRoots=[o.name for o in live_roots],lampFixtures={room:dict(bulb=o.name,position=xyz(o.location),lightPosition=xyz(lamp_lights[room].location),bakedBulb=True) for room,o in lamp_objects.items()})
 with open(os.path.join(OUT,'scene.json'),'w',encoding='utf8') as f:json.dump(manifest,f,ensure_ascii=False,indent=2)
 print('V3_APARTMENT_GEOMETRY_READY',OUT,flush=True)
@@ -544,6 +619,6 @@ if '--export-only' not in sys.argv:
     with open(os.path.join(OUT,'scene.json'),'w',encoding='utf8') as f:json.dump(manifest,f,ensure_ascii=False,indent=2)
     prepare_backdrop_geometry()
     for obj in shell:obj.hide_render=True
-    camera.location=(.85,-12,1.35+12*math.tan(math.radians(8)));aim(camera,(.85,0,1.35))
+    camera.location=(1.5,-12,1.35+12*math.tan(math.radians(8)));aim(camera,(1.5,0,1.35))
     bpy.ops.wm.save_as_mainfile(filepath=source)
 print('V3_APARTMENT_READY',OUT,flush=True)

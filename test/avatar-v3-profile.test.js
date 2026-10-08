@@ -1,3 +1,4 @@
+import {assetPath} from './helpers/apartment-assets.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -61,7 +62,7 @@ test('actual GLTFLoader primitive children inherit fitted look ownership across 
   }});
   let GLTFLoader;
   try{({GLTFLoader}=await import('../vendor/three/addons/loaders/GLTFLoader.js'));}finally{hook.deregister();}
-  const bytes=fs.readFileSync(new URL('../assets/apartment/v3/mannequin.glb',import.meta.url));
+  const bytes=fs.readFileSync(assetPath('mannequin.glb'));
   const gltf=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
   const owners=[];
   gltf.scene.traverse(node=>{

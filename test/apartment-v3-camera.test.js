@@ -1,3 +1,4 @@
+import {assetPath} from './helpers/apartment-assets.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {CameraModes, CameraPointer, cameraPose, pickVisible, cameraAllowsFirstPerson} from '../src/apartment-v3-camera.js';
@@ -36,7 +37,7 @@ test('raycasting actual closed door occludes a target, open doorway allows targe
  door.position.x=.65;door.rotation.y=Math.PI/2;door.updateMatrixWorld();assert.deepEqual(pickVisible(hits(),ray.intersectObject(door),null),{id:'sink'});
 });
 test('real computer and bed transitions switch cameras at opaque swap, preserving routes',()=>{
- const config=JSON.parse(fs.readFileSync(new URL('../assets/apartment/v3/scene.json',import.meta.url),'utf8'));
+ const config=JSON.parse(fs.readFileSync(assetPath('scene.json'),'utf8'));
  for(const id of ['computer','bed']){
   const m=new ApartmentMotion(config),c=new CameraModes();c.mode='3D';m.interact(id);let swapped=false;
   for(let i=0;i<2000&&!swapped;i++){

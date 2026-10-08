@@ -3,11 +3,13 @@
 Blender 4.5, authored geometry only. Every look-* object uses the same armature.
 The in-place walk's stance speed is the exported strideDistance per cycle.
 """
-import bpy, bmesh, math, os, json
+import bpy, bmesh, math, os, json, sys
 from mathutils import Vector, Matrix
 
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT=os.path.join(ROOT,'assets','apartment','v3');os.makedirs(OUT,exist_ok=True)
+sys.path.insert(0,os.path.join(ROOT,'tools'))
+from apartment_v3_layout import output_paths
+OUT,SOURCE_OUT=output_paths(sys.argv,ROOT)
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 scene=bpy.context.scene;scene.render.fps=30
 bpy.context.preferences.filepaths.save_version=0
@@ -506,7 +508,7 @@ def set_pose(kind,phase):
         breath=math.sin(phase*math.pi*2)
         ch.y-=.0015*breath
         for p in [neck,head,top]:p.z+=.0022*breath;p.y-=.0015*breath
-    if kind=='seated':
+    if kind in ['seated','eat']:
         for p in [pelvis,sp,ch,neck,head,top]:p.z-=.38
     targets={'pelvis':(pelvis,sp),'spine':(sp,ch),'chest':(ch,neck),'neck':(neck,head),'head':(head,top)}
     for side,s,offset in [('L',1,0),('R',-1,.5)]:
@@ -516,7 +518,7 @@ def set_pose(kind,phase):
             a.y,a.z,pitch=walking_foot(p)
             roll=Matrix.Rotation(pitch,3,'X')
             toe=a+roll@Vector((0,-.145,-.04));tip=a+roll@Vector((0,-.205,-.05))
-        if kind=='seated':
+        if kind in ['seated','eat']:
             knee=h+Vector((0,-.397,-.07));a=knee+Vector((0,-.01,-.402));toe=a+Vector((0,-.145,-.04));tip=a+Vector((0,-.205,-.05))
         elif kind=='sleep':
             # Mildly curled legs, with the upper knee slightly further forward.
@@ -540,10 +542,10 @@ def set_pose(kind,phase):
             sh=neck+Vector((s*.120,-.025,-.025))
             el=sh+Vector((-s*.02,-.19,-.195))
             wr=el+Vector((-s*.05,-.035,.226))
-        if kind in ['wash','reach','seated','open-door']:
+        if kind in ['wash','reach','seated','eat','open-door']:
             amount=math.sin(phase*2*math.pi+(0 if s>0 else .7))
             el=sh+Vector((s*.008,-.10,-.257))
-            if kind=='seated':wr=el+Vector((-s*.025,-.232,.034+.009*amount))
+            if kind in ['seated','eat']:wr=el+Vector((-s*.025,-.232,.034+.009*amount))
             elif kind=='wash':wr=el+Vector((-s*.04,-.23,.025+.028*amount))
             elif s>0:el=sh+Vector((0,-.21,-.17));wr=el+Vector((0,-.23,.025+.018*amount))
             if kind=='open-door':
@@ -551,6 +553,13 @@ def set_pose(kind,phase):
                     push=smooth((phase-.10)/.45)
                     wr=sh+Vector((0,-.24-.20*push,-.23+.035*push));el=leg_knee(sh,wr,.276,.235)
                 else:el=sh+Vector((s*.02,-.01,-.274));wr=el+Vector((s*.005,-.01,-.235))
+            if kind=='eat' and side=='L':
+                lift=smooth((1-math.cos(phase*math.tau))/2)
+                wr=Vector((.14-.09*lift,-.37+.18*lift,.82+.34*lift))
+                d=wr-sh;length=d.length;v=d.normalized();l1=.276;l2=.235
+                mid=(length*length+l1*l1-l2*l2)/(2*length)
+                down=Vector((0,0,-1));bend=(down-v*down.dot(v)).normalized()
+                el=sh+v*mid+bend*math.sqrt(max(0,l1*l1-mid*mid))
         hand_tip=wr+(wr-el).normalized()*.105
         if kind=='switch' and side=='R':
             time=phase*.7
@@ -579,7 +588,7 @@ def set_pose(kind,phase):
     return {name:{'head':list(rig.pose.bones[name].head),'tail':list(rig.pose.bones[name].tail)} for name in targets}
 
 rig.animation_data_create();clips={};walk_samples=[]
-for kind in ['idle','walk','seated','sleep','wash','reach','open-door','switch']:
+for kind in ['idle','walk','seated','eat','sleep','wash','reach','open-door','switch']:
     action=bpy.data.actions.new(kind);rig.animation_data.action=action
     last=31 if kind=='walk' else 22 if kind=='switch' else 61
     for sample_frame in range(1,last+1):
@@ -607,7 +616,7 @@ for o in meshes:
 for track in rig.animation_data.nla_tracks:track.mute=track.name!='idle'
 scene.frame_set(1)
 bpy.ops.object.select_all(action='DESELECT');rig.select_set(True);bpy.context.view_layer.objects.active=rig
-bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT,'assets','source','mannequin-v3.blend'))
+bpy.ops.wm.save_as_mainfile(filepath=os.path.join(SOURCE_OUT,'mannequin-v3.blend'))
 with open(os.path.join(OUT,'rig.json'),'w') as f:json.dump({
  'height':1.85,'forward':'local +Z in glTF',
  'wardrobe':'All look-{category}-{value} meshes bind to the same 19-bone armature. Show exactly one value per category; none hides the category.',

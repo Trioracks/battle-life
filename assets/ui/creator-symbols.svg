@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+<symbol id="face" viewBox="0 0 24 24"><path d="M7 4Q12 1 17 4L18 13Q17 19 12 22Q7 19 6 13Z M8 9h2m4 0h2m-4 1-1 4h2m-4 3h6"/></symbol>
+<symbol id="hair" viewBox="0 0 24 24"><path d="M4 15Q1 7 8 3Q14 0 20 7L21 16L17 13L16 6L11 10L6 8L6 16M7 17Q12 24 17 17"/></symbol>
+<symbol id="beard" viewBox="0 0 24 24"><path d="M5 4L6 13L9 11L12 14L15 11L18 13L19 4M5 9L4 14L8 20L12 23L17 20L20 14L19 9M9 16l3 3 3-3"/></symbol>
+<symbol id="mustache" viewBox="0 0 24 24"><path d="M12 10Q7 6 5 12Q2 15 2 9Q-1 18 8 18L12 15L16 18Q25 18 22 9Q22 15 19 12Q17 6 12 10Z"/></symbol>
+<symbol id="top" viewBox="0 0 24 24"><path d="M8 3L3 6L1 11L6 13V22H18V13L23 11L21 6L16 3Q12 8 8 3Z"/></symbol>
+<symbol id="bottom" viewBox="0 0 24 24"><path d="M5 2H19L20 22H14L12 10L10 22H4ZM5 6H19M12 2V7"/></symbol>
+<symbol id="footwear" viewBox="0 0 24 24"><path d="M5 3H12L13 14L21 16L22 21H2V16L5 12ZM3 18H21M9 8H12M9 11H13"/></symbol>
+<symbol id="stats" viewBox="0 0 24 24"><path d="M3 21V13H7V21ZM10 21V8H14V21ZM17 21V3H21V21Z"/></symbol>
+<symbol id="rotate" viewBox="0 0 24 24"><path d="M4 8Q12 0 20 8M20 8V3M20 8H15M20 16Q12 24 4 16M4 16V21M4 16H9"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path d="M20 12H4L11 5M4 12L11 19"/></symbol>
+<symbol id="confirm" viewBox="0 0 24 24"><path d="M3 12L9 19L21 4"/></symbol>
+</svg>

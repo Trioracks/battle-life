@@ -10,7 +10,7 @@
 
 **Spec:** `docs/superpowers/specs/2026-10-08-apartment-expansion-creator-design.md`, раздел редактора и общие проверки. Очередь: `docs/superpowers/plans/2026-10-08-delivery-queue.md`.
 
-Статус: план ожидает проверки пользователем. Выполняется после плана квартиры; корень `D:/Project/Battle`.
+Статус: утверждён пользователем; реализация установлена, автоматические проверки пройдены. Браузерная приёмка открыта, см. `../qa/2026-10-08-souls-creator.md`. Корень `D:/Project/Battle`.
 
 ## Global Constraints
 

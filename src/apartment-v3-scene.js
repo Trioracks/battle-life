@@ -2,37 +2,39 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {ApartmentAnimation} from './apartment-v3-animation.js?rev=8';
 import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=10';
-import {homeLight} from './apartment-v3-time.js?rev=8';
+import {homeLight} from './apartment-v3-time.js?rev=12';
 import {createBackdropMaterial,sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=8';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=7';
 import {CameraModes,cameraPose,pickVisible} from './apartment-v3-camera.js?rev=12';
-import {createOutsideLighting} from './apartment-v3-outside.js?rev=9';
+import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=12';
+import {createSmoke} from './apartment-v3-smoke.js?rev=12';
 import {createRetroPass} from './apartment-v3-retro.js?rev=11';
 
-const BASE='./assets/apartment/v3/';
 export async function createApartmentScene(canvas,config){
+  const BASE=config.assetBase??'./assets/apartment/v3/';
   const renderer=new THREE.WebGLRenderer({canvas,antialias:false,alpha:false});
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   const retro=createRetroPass(THREE,renderer,canvas);
   renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   const scene=new THREE.Scene();scene.background=new THREE.Color('#141c20');
-  const camera=new THREE.OrthographicCamera(-5,5,2.7,-2.7,.1,80);
-  const modes=new CameraModes(),firstCamera=new THREE.PerspectiveCamera(60,1,.03,80);
+  const far=config.exterior?.farPlane??80;
+  const camera=new THREE.OrthographicCamera(-5,5,2.7,-2.7,.1,far);
+  const modes=new CameraModes(),firstCamera=new THREE.PerspectiveCamera(60,1,.03,far);
   let staticScene=null,updateOutside=()=>{};const backdropSets=new Map();
   const basePosition=new THREE.Vector3(...config.camera.position),baseTarget=new THREE.Vector3(...config.camera.target);
   camera.position.copy(basePosition);camera.lookAt(baseTarget);
   const loader=new GLTFLoader();
   const textureLoader=new THREE.TextureLoader(),textureCache=new Map();
   function loadTexture(file){
-    if(!textureCache.has(file))textureCache.set(file,textureLoader.loadAsync(BASE+file+'?rev=9').then(texture=>{
+    if(!textureCache.has(file))textureCache.set(file,textureLoader.loadAsync(BASE+file+'?rev=12').then(texture=>{
       texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=renderer.capabilities.getMaxAnisotropy();return texture;
     }).catch(error=>{textureCache.delete(file);throw error;}));return textureCache.get(file);
   }
   const stateFiles=config.lightingStates??{both:{night:config.background,day:config.backgroundDay}};
   const [stateEntries,environment,model]=await Promise.all([
     Promise.all(Object.entries(stateFiles).map(async([name,files])=>[name,{night:await loadTexture(files.night),day:await loadTexture(files.day)}])),
-    loader.loadAsync(BASE+config.geometry+'?rev=9'),loader.loadAsync(BASE+config.rig+'?rev=9')
+    loader.loadAsync(BASE+config.geometry+'?rev=12'),loader.loadAsync(BASE+config.rig+'?rev=12')
   ]);
   const lightingStates=Object.fromEntries(stateEntries);
   backdropSets.set('2D',lightingStates);
@@ -40,6 +42,14 @@ export async function createApartmentScene(canvas,config){
   back.position.copy(baseTarget).add(basePosition.clone().sub(baseTarget).normalize().multiplyScalar(-8));
   back.quaternion.copy(camera.quaternion);back.renderOrder=-100;scene.add(back);
   const depthMaterial=new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:true,side:THREE.DoubleSide});
+  const courtyard=new THREE.Group(),outsideMask=new THREE.Group();scene.add(courtyard,outsideMask);
+  let updateCourtyard=()=>{},smokeSeconds=0;
+  if(config.exterior){
+    const [outside,mask]=await Promise.all([loader.loadAsync(BASE+config.exterior.geometry+'?rev=12'),loader.loadAsync(BASE+config.exterior.occluders+'?rev=12')]);
+    courtyard.add(outside.scene);outsideMask.add(mask.scene);updateCourtyard=createCourtyardLighting(THREE,courtyard);
+    outsideMask.traverse(o=>{if(o.isMesh){o.material=depthMaterial;o.renderOrder=-60;}});
+  }
+  const smoke=createSmoke(THREE,config.exterior??{emitters:[]});scene.add(smoke.root);
   environment.scene.traverse(o=>{
     if(!o.isMesh)return;
     o.castShadow=true;o.receiveShadow=true;
@@ -65,7 +75,7 @@ export async function createApartmentScene(canvas,config){
   const eyeHeight=head?head.getWorldPosition(new THREE.Vector3()).y+.09:1.61;
   async function loadMode(mode){
     if(mode==='3D'){
-      if(!staticScene){const result=await loader.loadAsync(BASE+config.staticGeometry+'?rev=9');staticScene=result.scene;staticScene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});updateOutside=createOutsideLighting(staticScene);staticScene.visible=false;scene.add(staticScene);}return;
+      if(!staticScene){const result=await loader.loadAsync(BASE+config.staticGeometry+'?rev=12');staticScene=result.scene;staticScene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});updateOutside=createOutsideLighting(staticScene);staticScene.visible=false;scene.add(staticScene);}return;
     }
   }
   let appliedMode='2D';
@@ -80,6 +90,7 @@ export async function createApartmentScene(canvas,config){
     }
     appliedMode=modes.mode;back.visible=!fp;actor.visible=!fp;shadowFloor.visible=!fp;shadow.visible=!fp&&shadow.visible;bones.visible=!fp&&bones.visible;
     if(staticScene)staticScene.visible=fp;
+    courtyard.visible=fp;outsideMask.visible=!fp;smoke.root.visible=true;
     environment.scene.traverse(o=>{if(o.name.startsWith('depth-'))o.visible=!fp;if(/^lamp-(living|kitchen)-bulb/.test(o.name))o.visible=fp;});
   }
   const actorColors=[];
@@ -93,13 +104,21 @@ export async function createApartmentScene(canvas,config){
   food.position.y=.08;leftHand?.add(food);food.visible=false;
   const water=new THREE.Mesh(new THREE.CylinderGeometry(.006,.007,.15,8),new THREE.MeshBasicMaterial({color:0x9bbec4,transparent:true,opacity:.6}));
   water.position.set(-5.3,1.055,-.96);scene.add(water);water.visible=false;
+  const mealPlate=new THREE.Mesh(new THREE.CylinderGeometry(.14,.12,.023,24),new THREE.MeshStandardMaterial({color:0xb6b3a0,roughness:.75}));
+  mealPlate.position.set(config.actions.dining?.pose[0]??-7.25,.843,-.67);scene.add(mealPlate);mealPlate.visible=false;
+  const meal=new THREE.Mesh(new THREE.SphereGeometry(.10,12,6),new THREE.MeshStandardMaterial({color:0xa58c51,roughness:1}));meal.scale.set(1,.24,1);meal.position.y=.023;mealPlate.add(meal);
+  const spoon=new THREE.Group(),spoonMetal=new THREE.MeshStandardMaterial({color:0x92968a,metalness:.4,roughness:.6});
+  const handle=new THREE.Mesh(new THREE.BoxGeometry(.01,.105,.007),spoonMetal);handle.position.y=.12;spoon.add(handle);
+  const bowl=new THREE.Mesh(new THREE.SphereGeometry(.019,10,6),spoonMetal);bowl.scale.set(.7,1,.25);bowl.position.y=.184;spoon.add(bowl);leftHand?.add(spoon);spoon.visible=false;
   const animation=new ApartmentAnimation(new THREE.AnimationMixer(model.scene),model.animations,config.stride);
   const bones=new THREE.SkeletonHelper(model.scene);bones.visible=false;bones.material.depthTest=false;bones.material.transparent=true;bones.renderOrder=10;scene.add(bones);
   const hemi=new THREE.HemisphereLight(0xb3c6d4,0x494333,2);scene.add(hemi);
   const key=new THREE.DirectionalLight(0xffdda8,2.5);key.position.set(-3,6,4);scene.add(key);
   const fill=new THREE.DirectionalLight(0x9db9e5,.8);fill.position.set(3,3,-3);scene.add(fill);
   const practical=createPracticalLighting(THREE,scene,{living:config.lampFixtures?.living?.lightPosition??[4.05,2.37,-.1],kitchen:config.lampFixtures?.kitchen?.lightPosition??[-4.8,2.37,-.1]});
-  const shadowFloor=new THREE.Mesh(new THREE.PlaneGeometry(13,3.5),new THREE.ShadowMaterial({opacity:.32,depthWrite:false}));
+  const left=config.layout?.rooms.kitchen.x[0]??-6.5,right=config.layout?.rooms.living.x[1]??6.5;
+  const shadowFloor=new THREE.Mesh(new THREE.PlaneGeometry(right-left,3.5),new THREE.ShadowMaterial({opacity:.32,depthWrite:false}));
+  shadowFloor.position.x=(left+right)/2;
   shadowFloor.rotation.x=-Math.PI/2;shadowFloor.position.y=.009;shadowFloor.receiveShadow=true;scene.add(shadowFloor);
   // A subtle contact patch remains when all practical lamps are off.
   const shadowCanvas=document.createElement('canvas');shadowCanvas.width=128;shadowCanvas.height=128;
@@ -156,6 +175,9 @@ export async function createApartmentScene(canvas,config){
     }
     practical.update({daylight:light.daylight,...lightLevels});
     updateOutside(light.daylight);
+    if(!paused)smokeSeconds+=dt;
+    smoke.update(smokeSeconds,light.daylight);updateCourtyard(light.daylight);
+    scene.background.setRGB(.025+.22*light.daylight,.035+.29*light.daylight,.055+.34*light.daylight);
     lastEntryOpen=state.entryOpen??0;landingReveal.apartment(lastEntryOpen);
     back.material.uniforms.daylight.value=light.daylight;back.material.uniforms.warmth.value=light.warmth;
     actor.position.fromArray(state.position);actor.rotation.y=state.yaw;
@@ -169,7 +191,8 @@ export async function createApartmentScene(canvas,config){
     const inAction=['perform','approach-depth'].includes(state.phase),lerp=1-Math.exp(-dt*6);
     fridgeOpen=THREE.MathUtils.lerp(fridgeOpen,inAction&&state.actionId==='fridge'?1:0,lerp);
     hinge('fridge',-fridgeOpen*Math.PI*.49);hinge('entry',(state.entryOpen??0)*(config.entryDoor?.openAngle??Math.PI*.51));
-    shadow.position.set(actor.position.x,.014,actor.position.z);shadow.visible=!['sleep','seated'].includes(state.clip);bones.visible=skeleton;
+    shadow.position.set(actor.position.x,.014,actor.position.z);shadow.visible=!['sleep','seated','eat'].includes(state.clip);bones.visible=skeleton;
+    mealPlate.visible=spoon.visible=state.clip==='eat';
     plate.visible=state.phase==='perform'&&state.actionId==='sink';food.visible=state.phase==='perform'&&state.actionId==='fridge';water.visible=plate.visible;
     if(blanket)blanket.visible=state.clip==='sleep';
     if(bedCover)bedCover.visible=state.clip!=='sleep';
@@ -179,6 +202,9 @@ export async function createApartmentScene(canvas,config){
   const previewCamera=new THREE.OrthographicCamera(-1,1,1.1,-1.1,.1,20);
   previewCamera.position.set(0,1.08,5);previewCamera.lookAt(0,.94,0);
   function renderPreview(dt,yaw,rect,zone='body',zoom=1){
+    courtyard.visible=outsideMask.visible=smoke.root.visible=false;
+    scene.background.set('#12120f');
+    mealPlate.visible=spoon.visible=false;
     if(staticScene)staticScene.visible=false;
     back.visible=false;environment.scene.visible=false;plate.visible=false;food.visible=false;water.visible=false;ring.visible=false;bones.visible=false;
     shadowFloor.visible=false;practical.update({daylight:0,living:0,kitchen:0});practical.sky.visible=false;practical.window.visible=false;
@@ -197,6 +223,7 @@ export async function createApartmentScene(canvas,config){
   peepholeCamera.position.fromArray(config.peepholeCamera?.position??[6.61,1.645,.675]);
   peepholeCamera.lookAt(new THREE.Vector3(...(config.peepholeCamera?.target??[9.05,1.51,-.15])));
   function renderPeephole(rect){
+    courtyard.visible=outsideMask.visible=smoke.root.visible=false;mealPlate.visible=spoon.visible=false;
     if(staticScene)staticScene.visible=false;
     back.visible=false;actor.visible=false;shadow.visible=false;ring.visible=false;bones.visible=false;plate.visible=false;food.visible=false;water.visible=false;
     environment.scene.visible=true;landingReveal.peephole();
@@ -213,5 +240,5 @@ export async function createApartmentScene(canvas,config){
     for(const [material,color] of actorColors)if(material.userData.tintChannel)color.copy(material.color);
     return result;
   }
-  return {modes,loadMode,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,clips:[...animation.actions.keys()],dispose(){observer.disconnect();retro.dispose();renderer.dispose();}};
+  return {modes,loadMode,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,clips:[...animation.actions.keys()],dispose(){observer.disconnect();smoke.dispose();for(const root of [courtyard,outsideMask])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
 }

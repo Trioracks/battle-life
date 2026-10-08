@@ -1,5 +1,13 @@
 import {advanceApartmentFrame} from './apartment-v3-frame.js';
 
+export function canStartHomeAction(id,clock){
+  return id==='dining'&&!clock.mealReady?{allowed:false,reason:'Сначала приготовь еду на плите'}:{allowed:true,reason:''};
+}
+export function startHomeAction(motion,clock,id){
+  const check=canStartHomeAction(id,clock);
+  return check.allowed?{allowed:motion.interact(id),reason:''}:check;
+}
+
 export function prepareApartmentConfig(exported){
   const actions={...exported.actions,bed:{...exported.actions.bed,clockDriven:true}};
   const entry=actions.entry;

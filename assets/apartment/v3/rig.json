@@ -180,6 +180,10 @@
       "frames": 61,
       "loop": true
     },
+    "eat": {
+      "frames": 61,
+      "loop": true
+    },
     "sleep": {
       "frames": 61,
       "loop": true

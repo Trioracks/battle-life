@@ -6,7 +6,7 @@ export class CameraPointer{
  move(event){if(!this.active)return null;const delta=[event.clientX-this.x,event.clientY-this.y];this.x=event.clientX;this.y=event.clientY;return delta;}
  stop(){this.active=false;}
 }
-export function cameraAllowsFirstPerson(state){return !['sleep','seated'].includes(state.clip)&&!(/^(fade|black|return-out|return-in|transfer|entry-)/.test(state.phase??''));}
+export function cameraAllowsFirstPerson(state){return !['sleep','seated','eat'].includes(state.clip)&&!(/^(fade|black|return-out|return-in|transfer|entry-)/.test(state.phase??''));}
 export function cameraPose(mode,state,eyeHeight,look={yaw:0,pitch:0}){
  if(mode==='3D')return {position:[state.position[0],state.position[1]+eyeHeight,state.position[2]],yaw:look.yaw,pitch:look.pitch,fov:60,near:.03};
  const yaw=0,pitch=8,distance=12;
@@ -21,7 +21,7 @@ export function pickVisible(targets,blockers,floor){
 export class CameraModes{
  constructor(){this.mode='2D';this.yaw=0;this.pitch=0;this.loading=false;this.error=null;this.loaded=new Set(['2D']);this.revision=0;}
  look(dx,dy){this.yaw-=dx*.004;this.pitch=Math.max(-70*DEG,Math.min(70*DEG,this.pitch-dy*.004));}
- onMotionEvent(event){if(event.type==='swap'&&['bed','computer'].includes(event.id)){this.mode='2D';this.revision++;}}
+ onMotionEvent(event){if(event.type==='swap'&&['bed','computer','dining'].includes(event.id)){this.mode='2D';this.revision++;}}
  async cycle(state,load,transition=async apply=>apply()){
   if(this.loading)return false;
   if(!['2D','3D'].includes(this.mode))this.mode='2D';

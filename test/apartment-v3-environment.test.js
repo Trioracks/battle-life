@@ -1,12 +1,14 @@
+import {assetPath} from './helpers/apartment-assets.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {inflateSync} from 'node:zlib';
 import {readGlb,posedRig} from './helpers/glb-pose.js';
-const config=()=>JSON.parse(fs.readFileSync(new URL('../assets/apartment/v3/scene.json',import.meta.url),'utf8'));
+const config=()=>JSON.parse(fs.readFileSync(assetPath('scene.json'),'utf8'));
 
 function roomBrightness(file){
-  const b=fs.readFileSync(new URL('../assets/apartment/v3/'+file,import.meta.url)),w=b.readUInt32BE(16),h=b.readUInt32BE(20),channels=b[25]===6?4:3;
+  const scene=config(),camera=scene.camera,rooms=scene.layout?.rooms??{kitchen:{x:[-6.5,0]},living:{x:[0,6.5]}};
+  const b=fs.readFileSync(assetPath(file)),w=b.readUInt32BE(16),h=b.readUInt32BE(20),channels=b[25]===6?4:3;
   assert.equal(b[24],8,'8-bit render');const chunks=[];
   for(let at=8;at<b.length;){const n=b.readUInt32BE(at),type=b.toString('ascii',at+4,at+8);if(type==='IDAT')chunks.push(b.subarray(at+8,at+8+n));at+=n+12;}
   const raw=inflateSync(Buffer.concat(chunks)),stride=w*channels;let previous=Buffer.alloc(stride),offset=0;
@@ -18,7 +20,7 @@ function roomBrightness(file){
       row[x]=(raw[offset++]+(filter===1?a:filter===2?up:filter===3?Math.floor((a+up)/2):filter===4?paeth(a,up,corner):0))&255;
     }
     if(y>h*.27&&y<h*.69&&y%8===0)for(let x=0;x<w;x+=8){
-      const worldX=(x/w-.5)*16.8+.85,room=worldX>-.3&&worldX<.3?-1:worldX>=-6.2&&worldX<-.3?0:worldX>.3&&worldX<=6.2?1:-1;
+      const worldX=(x/w-.5)*camera.width+camera.target[0],room=worldX>-.3&&worldX<.3?-1:worldX>=rooms.kitchen.x[0]+.3&&worldX<-.3?0:worldX>.3&&worldX<=rooms.living.x[1]-.3?1:-1;
       if(room>=0){const i=x*channels;sums[room]+=.2126*row[i]+.7152*row[i+1]+.0722*row[i+2];count[room]++;}
     }
     previous=row;
@@ -88,7 +90,7 @@ test('room lighting manifest supplies eight matching rendered backdrops',()=>{
   const c=config();
   for(const state of ['off','living','kitchen','both'])for(const period of ['night','day']){
     const file=c.lightingStates?.[state]?.[period];assert.ok(file,state+' '+period);
-    const b=fs.readFileSync(new URL('../assets/apartment/v3/'+file,import.meta.url));
+    const b=fs.readFileSync(assetPath(file));
     assert.deepEqual([b.readUInt32BE(16),b.readUInt32BE(20)],[3840,1536]);
   }
 });

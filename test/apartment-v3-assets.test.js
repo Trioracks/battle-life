@@ -1,9 +1,10 @@
+import {assetPath} from './helpers/apartment-assets.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 function glb(name){
-  const b=fs.readFileSync(new URL('../assets/apartment/v3/'+name,import.meta.url));
+  const b=fs.readFileSync(assetPath(name));
   assert.equal(b.readUInt32LE(0),0x46546c67);
   const n=b.readUInt32LE(12),json=JSON.parse(b.subarray(20,20+n).toString());
   const bin=b.subarray(28+n);
@@ -42,10 +43,10 @@ test('walk is cyclic, bends both knees, and keys the full body',()=>{
 });
 
 test('walk samples keep stance feet planted and swing arms forward/back, not sideways',()=>{
-  const samples=JSON.parse(fs.readFileSync(new URL('../assets/apartment/v3/walk-audit.json',import.meta.url),'utf8'));
+  const samples=JSON.parse(fs.readFileSync(assetPath('walk-audit.json'),'utf8'));
   const spread=a=>Math.max(...a)-Math.min(...a);
   const stance=samples.slice(0,19);
-  const rig=JSON.parse(fs.readFileSync(new URL('../assets/apartment/v3/rig.json',import.meta.url),'utf8'));
+  const rig=JSON.parse(fs.readFileSync(assetPath('rig.json'),'utf8'));
   assert.ok(spread(stance.map((s,i)=>s['foot.L'].head[1]-rig.walk.strideDistance*i/30))<.005,'no foot sliding during stance');
   const soleHeights=stance.map(s=>{
     const a=s['foot.L'].head,b=s['toe.L'].head,pitch=Math.atan2(-(b[2]-a[2]),-(b[1]-a[1]))-Math.atan2(.04,.145);
@@ -64,7 +65,7 @@ test('exported apartment contains actual hinged doors and body occluders',()=>{
   const {json:g}=glb('interaction.glb'),names=new Set(g.nodes.map(n=>n.name));
   for(const name of ['hinge-passage','hinge-entry','hinge-fridge'])assert.ok(names.has(name),name);
   assert.ok([...names].filter(n=>n.startsWith('depth-')).length>=6);
-  const scene=JSON.parse(fs.readFileSync(new URL('../assets/apartment/v3/scene.json',import.meta.url),'utf8'));
+  const scene=JSON.parse(fs.readFileSync(assetPath('scene.json'),'utf8'));
   for(const a of Object.values(scene.actions))if(a.pose){assert.ok(Math.abs(a.pose[0]-a.approach[0])<.2);assert.ok(a.pose[0]>=scene.bounds[0]&&a.pose[0]<=scene.bounds[1]);}
 });
 
@@ -101,7 +102,7 @@ test('side exit opens into an actual landing and clock hands can show game time'
   const {json:g}=glb('interaction.glb');
   const entry=g.nodes.find(n=>n.name==='hinge-entry');
   assert.ok(entry.translation[0]>6.3,'entry hinge belongs to the right side wall');
-  const scene=JSON.parse(fs.readFileSync(new URL('../assets/apartment/v3/scene.json',import.meta.url),'utf8'));
+  const scene=JSON.parse(fs.readFileSync(assetPath('scene.json'),'utf8'));
   assert.ok(scene.entryExit.position[0]>7.5,'exit continues outward through the side wall');
   assert.ok(Math.abs(scene.actions.entry.yaw-Math.PI/2)<.001);
   const landing=g.nodes.find(n=>n.name==='landing-root');
