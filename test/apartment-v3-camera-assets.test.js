@@ -5,12 +5,12 @@ import {Object3D,Vector3,BufferGeometry,Float32BufferAttribute,Mesh,MeshBasicMat
 import {readGlb} from './helpers/glb-pose.js';
 const base=new URL('../assets/apartment/v3/',import.meta.url);
 const config=()=>JSON.parse(fs.readFileSync(new URL('scene.json',base),'utf8'));
-test('both orthographic views contain eight distinct exported lighting images',()=>{
- const c=config();for(const [mode,yaw] of [['2D',0],['2.5D',8]]){
+test('side view contains eight distinct exported lighting images',()=>{
+ const c=config();for(const [mode,yaw] of [['2D',0]]){
   const v=c.cameraViews[mode];assert.equal(v.yaw,yaw);assert.equal(v.pitch,8);
   for(const files of Object.values(v.lightingStates))for(const file of Object.values(files))assert.ok(fs.statSync(new URL(file,base)).size>100000,file);
  }
- assert.notEqual(c.cameraViews['2D'].lightingStates.both.day,c.cameraViews['2.5D'].lightingStates.both.day);
+ assert.equal(new Set(Object.values(c.cameraViews['2D'].lightingStates).flatMap(Object.values)).size,8);
 });
 test('exported textured apartment encloses first-person eyes through full rotation, floor and ceiling',()=>{
  const meshes=[],material=new MeshBasicMaterial({side:DoubleSide});

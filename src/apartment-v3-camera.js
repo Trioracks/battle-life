@@ -9,7 +9,7 @@ export class CameraPointer{
 export function cameraAllowsFirstPerson(state){return !['sleep','seated'].includes(state.clip)&&!(/^(fade|black|return-out|return-in|transfer|entry-)/.test(state.phase??''));}
 export function cameraPose(mode,state,eyeHeight,look={yaw:0,pitch:0}){
  if(mode==='3D')return {position:[state.position[0],state.position[1]+eyeHeight,state.position[2]],yaw:look.yaw,pitch:look.pitch,fov:60,near:.03};
- const yaw=mode==='2.5D'?8:0,pitch=8,distance=12;
+ const yaw=0,pitch=8,distance=12;
  const centerX=state.cameraX-Math.tan(yaw*DEG)*(state.position?.[2]??.85);
  return {position:[centerX+Math.sin(yaw*DEG)*distance,1.35+12*Math.tan(pitch*DEG),Math.cos(yaw*DEG)*distance],target:[centerX,1.35,0],yaw,pitch};
 }
@@ -23,7 +23,9 @@ export class CameraModes{
  look(dx,dy){this.yaw-=dx*.004;this.pitch=Math.max(-70*DEG,Math.min(70*DEG,this.pitch-dy*.004));}
  onMotionEvent(event){if(event.type==='swap'&&['bed','computer'].includes(event.id)){this.mode='2D';this.revision++;}}
  async cycle(state,load,transition=async apply=>apply()){
-  if(this.loading)return false;const next={'2D':'2.5D','2.5D':'3D','3D':'2D'}[this.mode];
+  if(this.loading)return false;
+  if(!['2D','3D'].includes(this.mode))this.mode='2D';
+  const next=this.mode==='2D'?'3D':'2D';
   if(next==='3D'&&!cameraAllowsFirstPerson(state))return false;
   this.loading=true;this.error=null;const revision=this.revision;
   try{if(!this.loaded.has(next)){await load(next);this.loaded.add(next);}if(revision!==this.revision||(next==='3D'&&!cameraAllowsFirstPerson(state)))return false;

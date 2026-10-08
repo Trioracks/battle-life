@@ -3,7 +3,7 @@ import {ApartmentTime,loadHomeTime,saveHomeTime} from './apartment-v3-time.js?re
 import {districts,getDistrictLocations} from './calikfornia.js';
 import {advanceHomeFrame,prepareApartmentConfig} from './apartment-v3-runtime.js?rev=8';
 import {playSoundCue} from './sound-cues.js';
-import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=9';
+import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=12';
 import {DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,createProfile,saveProfile,loadProfile} from './avatar-v3-profile.js?rev=10';
 import {mountCreator} from './apartment-v3-creator.js?rev=11';
 
@@ -11,13 +11,13 @@ const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'
 let audio=null,paused=false,skeleton=false,hold=false;
 const cue=id=>{try{audio??=new AudioContext();if(audio.state==='suspended')audio.resume();playSoundCue(id,audio);}catch{/* Sound is optional. */}};
 try{
-  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=11');
+  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=12');
   const response=await fetch('./assets/apartment/v3/scene.json',{cache:'no-cache'});if(!response.ok)throw Error('Scene manifest '+response.status);
   const config=prepareApartmentConfig(await response.json()),view=await createApartmentScene(canvas,config);
   let motion=new ApartmentMotion(config),mode='menu',playing=false,previewYaw=0,previewTarget=0;
   let cameraFade=false;const lookInput=new CameraPointer();
   const cameraButton=$('#camera-mode');
-  function cameraLabel(){const blocked=view.modes.mode==='2.5D'&&!cameraAllowsFirstPerson(motion);cameraButton.disabled=view.modes.loading||blocked;cameraButton.title=blocked?'Вид от первого лица доступен стоя':'2D → 2.5D → 3D. В 3D: правая кнопка — обзор, левая — действие.';cameraButton.textContent=view.modes.loading?'Камера: загрузка…':view.modes.error?'Камера: повторить':`Камера: ${view.modes.mode}`;}
+  function cameraLabel(){const blocked=view.modes.mode!=='3D'&&!cameraAllowsFirstPerson(motion);cameraButton.disabled=view.modes.loading||blocked;cameraButton.title=blocked?'Вид от первого лица доступен стоя':'2D ↔ 3D (первое лицо). В 3D: правая кнопка — обзор, левая — действие.';cameraButton.textContent=view.modes.loading?'Камера: загрузка…':view.modes.error?'Камера: повторить':`Камера: ${view.modes.mode}`;}
   cameraButton.addEventListener('click',async()=>{
     const switching=view.modes.cycle(motion,view.loadMode,async apply=>{
       cameraFade=true;const overlay=$('#camera-fade');

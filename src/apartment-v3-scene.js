@@ -5,7 +5,7 @@ import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=10'
 import {homeLight} from './apartment-v3-time.js?rev=8';
 import {createBackdropMaterial,sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=8';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=7';
-import {CameraModes,cameraPose,pickVisible} from './apartment-v3-camera.js?rev=9';
+import {CameraModes,cameraPose,pickVisible} from './apartment-v3-camera.js?rev=12';
 import {createOutsideLighting} from './apartment-v3-outside.js?rev=9';
 import {createRetroPass} from './apartment-v3-retro.js?rev=11';
 
@@ -66,10 +66,6 @@ export async function createApartmentScene(canvas,config){
   async function loadMode(mode){
     if(mode==='3D'){
       if(!staticScene){const result=await loader.loadAsync(BASE+config.staticGeometry+'?rev=9');staticScene=result.scene;staticScene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});updateOutside=createOutsideLighting(staticScene);staticScene.visible=false;scene.add(staticScene);}return;
-    }
-    if(!backdropSets.has(mode)){
-      const files=config.cameraViews[mode].lightingStates;
-      backdropSets.set(mode,Object.fromEntries(await Promise.all(Object.entries(files).map(async([key,p])=>[key,{night:await loadTexture(p.night),day:await loadTexture(p.day)}]))));
     }
   }
   let appliedMode='2D';

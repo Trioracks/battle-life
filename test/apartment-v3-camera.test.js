@@ -7,16 +7,16 @@ import fs from 'node:fs';
 import {ApartmentMotion} from '../src/apartment-v3-motion.js';
 test('camera cycle caches loads and preserves independent actor/time state',async()=>{
  const state={position:[3,0,.85],cameraX:3,clip:'idle',phase:'idle',minutes:1410};const before=structuredClone(state),loads=[];
- const c=new CameraModes();for(const mode of ['2.5D','3D','2D','2.5D']){assert.equal(await c.cycle(state,async m=>loads.push(m)),true);assert.equal(c.mode,mode);}
- assert.deepEqual(loads,['2.5D','3D']);assert.deepEqual(state,before);
+ const c=new CameraModes();for(const mode of ['3D','2D','3D']){assert.equal(await c.cycle(state,async m=>loads.push(m)),true);assert.equal(c.mode,mode);}
+ assert.deepEqual(loads,['3D']);assert.deepEqual(state,before);
 });
 test('load failure retains mode and can retry; competing switch is ignored',async()=>{
  const c=new CameraModes();assert.equal(await c.cycle({},async()=>{throw Error('offline');}),false);assert.equal(c.mode,'2D');assert.match(c.error.message,/offline/);
- let done;const pending=c.cycle({},()=>new Promise(r=>done=r));assert.equal(await c.cycle({},async()=>{}),false);done();await pending;assert.equal(c.mode,'2.5D');
+ let done;const pending=c.cycle({},()=>new Promise(r=>done=r));assert.equal(await c.cycle({},async()=>{}),false);done();await pending;assert.equal(c.mode,'3D');
 });
 test('look is independent, remembers yaw and clamps pitch; camera has no animation bob',()=>{
  const c=new CameraModes();c.look(100000,-100000);assert.equal(c.pitch,70*Math.PI/180);const p=cameraPose('3D',{position:[2,0,.85]},1.61,c);assert.deepEqual(p.position,[2,1.61,.85]);assert.equal(p.fov,60);assert.equal(p.near,.03);
- const a=cameraPose('2D',{cameraX:3},1.6,c),b=cameraPose('2.5D',{cameraX:3},1.6,c);assert.equal(a.pitch,8);assert.equal(b.pitch,8);assert.equal(a.yaw,0);assert.equal(b.yaw,8);
+ const a=cameraPose('2D',{cameraX:3},1.6,c);assert.equal(a.pitch,8);assert.equal(a.yaw,0);
 });
 test('pose restrictions and opaque swap only force 2D for bed and computer',()=>{
  for(const clip of ['seated','sleep'])assert.equal(cameraAllowsFirstPerson({clip}),false);
@@ -54,8 +54,16 @@ test('right drag never picks, left click immediately works after release',()=>{
  assert.equal(input.start(right,true),true);assert.equal(input.canPick(right),false);assert.equal(input.canPick(left),false);
  assert.deepEqual(input.move({clientX:30,clientY:14}),[20,-6]);input.stop();assert.equal(input.canPick(left),true);assert.equal(input.move({clientX:100,clientY:100}),null);
 });
-test('angled follow compensates rail depth so hero stays horizontally centered',()=>{
- for(const z of [.85,-.3,-1.1]){const pose=cameraPose('2.5D',{cameraX:3,position:[3,0,z]},1.63),angle=pose.yaw*Math.PI/180;assert.ok(Math.abs((3-pose.target[0])*Math.cos(angle)-z*Math.sin(angle))<1e-12);}
+test('side follow centers the hero at every approach depth',()=>{
+ for(const z of [.85,-.3,-1.1]){const pose=cameraPose('2D',{cameraX:3,position:[3,0,z]},1.63);assert.equal(pose.target[0],3);assert.equal(pose.position[0],3);}
+});
+test('a computer swap invalidates a first-person load already in flight',async()=>{
+ const c=new CameraModes();let resolve;const pending=c.cycle({clip:'idle'},()=>new Promise(r=>resolve=r));
+ c.onMotionEvent({type:'swap',id:'computer'});resolve();assert.equal(await pending,false);assert.equal(c.mode,'2D');
+});
+test('unsupported saved camera state normalizes before switching',async()=>{
+ const c=new CameraModes();c.mode='2.5D';let loaded;
+ assert.equal(await c.cycle({clip:'idle'},async id=>{loaded=id;}),true);assert.equal(c.mode,'3D');assert.equal(loaded,'3D');
 });
 test('outside windows and sky follow daylight without changing interior brass',()=>{
  const root=new Group();for(const name of ['static-outside-window-lights','static-dusty-blue-night-glass','static-distant-panel-buildings','static-aged-brass']){const mesh=new Mesh(new BoxGeometry(),new MeshBasicMaterial());mesh.name=name;root.add(mesh);}

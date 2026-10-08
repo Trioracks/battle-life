@@ -9,7 +9,7 @@
     0,
     0.85
   ],
-  "speed": 1.02,
+  "speed": 1.326,
   "doorX": 0,
   "doorSweep": [
     -0.4,
@@ -23,7 +23,7 @@
     "position": [
       0.8500000238418579,
       3.036489963531494,
-      12.0
+      12
     ],
     "target": [
       0.85,
@@ -161,7 +161,7 @@
         [
           -3.32,
           0.77,
-          -1.0
+          -1
         ],
         [
           0.82,
@@ -431,7 +431,7 @@
       "position": [
         0.8500000238418579,
         3.036489963531494,
-        12.0
+        12
       ],
       "target": [
         0.85,
@@ -459,40 +459,6 @@
         }
       },
       "yaw": 0,
-      "pitch": 8
-    },
-    "2.5D": {
-      "position": [
-        2.5200772285461426,
-        3.036489963531494,
-        11.883216857910156
-      ],
-      "target": [
-        0.85,
-        1.35,
-        0
-      ],
-      "width": 16.8,
-      "height": 6.72,
-      "lightingStates": {
-        "off": {
-          "night": "angled-background-off.png",
-          "day": "angled-background-day-off.png"
-        },
-        "living": {
-          "night": "angled-background-living.png",
-          "day": "angled-background-day-living.png"
-        },
-        "kitchen": {
-          "night": "angled-background-kitchen.png",
-          "day": "angled-background-day-kitchen.png"
-        },
-        "both": {
-          "night": "angled-background.png",
-          "day": "angled-background-day.png"
-        }
-      },
-      "yaw": 8,
       "pitch": 8
     }
   },

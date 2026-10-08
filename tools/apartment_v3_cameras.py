@@ -4,7 +4,7 @@ from mathutils import Vector
 
 def camera_views(scene, camera, out, render_states):
     views={}
-    for mode,yaw,prefix in [('2D',0,''),('2.5D',8,'angled-')]:
+    for mode,yaw,prefix in [('2D',0,'')]:
         distance=12
         camera.location=(.85+math.sin(math.radians(yaw))*distance,-math.cos(math.radians(yaw))*distance,1.35+12*math.tan(math.radians(8)))
         camera.rotation_euler=(Vector((.85,0,1.35))-camera.location).to_track_quat('-Z','Y').to_euler()
