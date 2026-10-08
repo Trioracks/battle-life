@@ -8,6 +8,7 @@ from apartment_v3_details import add_home_details
 from apartment_v3_cameras import camera_views, export_static, add_first_person_shell
 from apartment_v3_layout import load_layout, motion_config, to_blender, output_paths
 from apartment_v3_exterior import add_exterior, export_geometry
+from apartment_v3_roles import is_interior_static
 OUT,SOURCE_OUT=output_paths(sys.argv,ROOT)
 LAYOUT=load_layout()
 bpy.context.preferences.filepaths.save_version=0
@@ -55,7 +56,7 @@ if '--static-existing' in sys.argv:
     with open(os.path.join(OUT,'interaction.glb'),'rb') as f:data=f.read()
     gltf=json.loads(data[20:20+struct.unpack_from('<I',data,12)[0]])
     dynamic={node.get('name') for node in gltf['nodes']}
-    static=[obj for obj in scene.objects if obj.type in {'MESH','CURVE'} and obj.name not in dynamic and not obj.name.startswith('depth-')]
+    static=[obj for obj in scene.objects if is_interior_static(obj,dynamic)]
     for obj in scene.objects:obj.hide_render=True
     def existing_shell(name,*args):return bpy.data.objects[name]
     export_static(scene,static,existing_shell,{'plaster':bpy.data.materials['dirty-warm-plaster']},OUT)
@@ -519,6 +520,7 @@ matte.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].defaul
 matte_start=len(static)
 rear_piece('cutaway-surround',(1.5,2.02,1.35),(55,.03,35),matte,0)
 cutaway_surround=static[matte_start:];del static[matte_start:]
+for o in cutaway_surround:o['apartment_role']='cutaway-mask'
 area('exterior-overcast',(-8,18,28),(0,27,0),30000,(.73,.82,.91),28)
 
 bpy.ops.object.camera_add(location=(1.5,-12,1.35+12*math.tan(math.radians(8))));camera=bpy.context.object;camera.name='camera-master';camera.data.type='ORTHO';camera.data.ortho_scale=20.8;aim(camera,(1.5,0,1.35));scene.camera=camera

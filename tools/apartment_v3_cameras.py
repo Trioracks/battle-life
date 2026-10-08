@@ -1,6 +1,7 @@
 """Additional views from the authored scene; dynamic meshes remain shared."""
 import bpy, math, os, json
 from mathutils import Vector
+from apartment_v3_roles import is_interior_static
 
 def camera_views(scene, camera, out, render_states):
     views={}
@@ -31,7 +32,7 @@ def export_static(scene,static,cube,materials,out):
     # Bake connected procedural colour at material-group scope into UV atlases.
     groups={}
     for obj in list(static):
-        if obj.type not in {'MESH','CURVE'}:continue
+        if not is_interior_static(obj,set()):continue
         key='outside-window-lights' if obj.name.startswith('distant-window') else obj.data.materials[0].name
         groups.setdefault(key,[]).append(obj)
     exports=[]

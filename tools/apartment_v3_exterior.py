@@ -65,6 +65,7 @@ def add_exterior(scene, factories, layout):
     for x in [-5,4]:
         box('exterior-bench-seat',[x,-3.85,-9],[2,.12,.50],roof)
         for side in [-.75,.75]:box('exterior-bench-leg',[x+side,-4.17,-9],[.09,.64,.42],panels)
+    for obj in roots:obj['apartment_role']='exterior'
     return dict(roots=roots,geometry='exterior.glb',occluders='exterior-occluders.glb',
                 buildings=buildings,emitters=emitters,farPlane=200)
 

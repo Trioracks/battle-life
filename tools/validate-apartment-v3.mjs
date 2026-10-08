@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
+import {isDeepStrictEqual} from 'node:util';
 
 export function validateApartmentBundle(root){
  const base=path.resolve(root),errors=[],files=new Set(),glbs=new Map();
@@ -26,7 +27,12 @@ export function validateApartmentBundle(root){
  const c=json('scene.json');if(!c)return {ok:false,errors,files:[...files]};
  if(c.version!==3)errors.push('scene.json: unsupported version');
  if(JSON.stringify(Object.keys(c.cameraViews??{}))!==JSON.stringify(['2D']))errors.push('scene.json: expected only 2D baked camera');
- const backgrounds=new Set([c.background,c.backgroundDay,...Object.values(c.camera?.lightingStates??{}).flatMap(Object.values)]);
+ // Read the same effective contract as the browser, then reject stale duplicates.
+ const lighting=c.lightingStates??{both:{night:c.background,day:c.backgroundDay}};
+ for(const state of ['off','living','kitchen','both'])for(const period of ['day','night'])if(typeof lighting[state]?.[period]!=='string')errors.push('missing lighting state: '+state+'/'+period);
+ for(const copy of [c.camera?.lightingStates,c.cameraViews?.['2D']?.lightingStates])if(!isDeepStrictEqual(copy,lighting))errors.push('lighting contract mismatch');
+ if(c.background!==lighting.both?.night||c.backgroundDay!==lighting.both?.day)errors.push('background lighting contract mismatch');
+ const backgrounds=new Set([c.background,c.backgroundDay,...Object.values(lighting).flatMap(Object.values)]);
  if(backgrounds.size!==8)errors.push('scene.json: expected eight lighting backgrounds');
  for(const file of backgrounds){const b=read(file);if(!b)continue;if(b.length<24||b.subarray(0,8).toString('hex')!=='89504e470d0a1a0a'||b.readUInt32BE(16)!==c.backgroundResolution?.[0]||b.readUInt32BE(20)!==c.backgroundResolution?.[1])errors.push(file+': invalid PNG dimensions');}
  const interaction=glb(c.geometry);glb(c.staticGeometry);const rig=glb(c.rig);glb(c.exterior?.geometry);glb(c.exterior?.occluders);

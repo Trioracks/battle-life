@@ -30,6 +30,11 @@ test('validator rejects missing, truncated, unsafe and mismatched bundle referen
   fs.writeFileSync(path.join(dir,'scene.json'),JSON.stringify({...original,geometry:'../escape.glb'}));
   assert.match(validateApartmentBundle(dir).errors.join('\n'),/unsafe.*escape/);
   for(const filename of validateApartmentBundle(assetPath()).files)fs.copyFileSync(assetPath(filename),path.join(dir,filename));
+  const badLighting=structuredClone(original);badLighting.lightingStates.both.night='missing-renderer-texture.png';
+  fs.writeFileSync(path.join(dir,'scene.json'),JSON.stringify(badLighting));
+  assert.equal(validateApartmentBundle(dir).ok,false,'renderer lighting references must be validated');
+  assert.match(validateApartmentBundle(dir).errors.join('\n'),/missing-renderer-texture|lighting.*mismatch/);
+  fs.writeFileSync(path.join(dir,'scene.json'),JSON.stringify(original));
   const json=JSON.parse(fs.readFileSync(path.join(dir,'scene.json')));json.liveRoots.push('nonexistent-root');
   fs.writeFileSync(path.join(dir,'scene.json'),JSON.stringify(json));
   assert.match(validateApartmentBundle(dir).errors.join('\n'),/nonexistent-root/);
