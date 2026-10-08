@@ -37,7 +37,7 @@
 - Test: `test/virtual-pc-state.test.js`
 
 **Interfaces:**
-- Produces: `VIRTUAL_PC_STORAGE_KEY`, `createVirtualPcState(seed?)`, `loadVirtualPcState(storage)`, `saveVirtualPcState(storage, state)`, `diskUsage(state)`, `setPcPower(state, power)`, `setWallpaper(state, id)`, `startFtDownload(state)`, `cancelFtDownload(state)`, `markFtDownloadComplete(state)`, and `installFtStudio(state)`.
+- Produces: `VIRTUAL_PC_STORAGE_KEY`, `createVirtualPcState(seed?)`, `loadVirtualPcState(storage)`, `saveVirtualPcState(storage, state)`, `diskUsage(state)`, `setPcPower(state, power)`, `setWallpaper(state, id)`, `startFtDownload(state)`, `cancelFtDownload(state)`, `markFtDownloadComplete(state)`, `installFtStudio(state)`, and `saveStudioProject(state, project)`.
 - Consumes: serializable project records shaped by Task 3.
 
 - [ ] **Step 1: Write failing virtual-state tests**
