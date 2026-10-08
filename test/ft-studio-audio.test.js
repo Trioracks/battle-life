@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { BATTLE_BRIEFS } from '../src/virtual-pc-catalog.js';
-import { createStudioProject, setStudioStep } from '../src/ft-studio-project.js';
+import { createStudioProject, setArrangementCell, setStudioStep } from '../src/ft-studio-project.js';
 import { FtStudioAudio } from '../src/ft-studio-audio.js';
 
 class FakeParam {
@@ -74,4 +74,45 @@ test('dispose stops scheduled playback and closes the audio context', async () =
 
   assert.equal(cleared, 1);
   assert.equal(context.closed, true);
+});
+
+test('arrangement mask can make the eighth bar audible', async () => {
+  const timers = [];
+  const audio = new FtStudioAudio({
+    AudioContext: FakeAudioContext,
+    setIntervalFn(callback) { timers.push(callback); return callback; },
+    clearIntervalFn() {},
+  });
+  let project = fourVoiceProject();
+  for (const track of project.tracks) {
+    for (let bar = 0; bar < 7; bar++) project = setArrangementCell(project, track.id, bar, false);
+  }
+
+  await audio.play(project);
+  for (let tick = 0; tick < 112; tick++) timers[0]();
+
+  assert.ok(audio.context.oscillators.length > 0, 'bar eight must schedule audible notes');
+  audio.stop();
+});
+
+test('stopping while AudioContext resumes prevents delayed playback from starting', async () => {
+  let resolveResume;
+  class DeferredContext extends FakeAudioContext {
+    resume() { return new Promise(resolve => { resolveResume = resolve; }); }
+  }
+  const timers = [];
+  const audio = new FtStudioAudio({
+    AudioContext: DeferredContext,
+    setIntervalFn(callback) { timers.push(callback); return callback; },
+    clearIntervalFn() {},
+  });
+
+  const pending = audio.play(fourVoiceProject());
+  audio.stop();
+  resolveResume();
+  const result = await pending;
+
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, 'stopped');
+  assert.equal(timers.length, 0);
 });

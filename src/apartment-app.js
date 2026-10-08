@@ -7,9 +7,9 @@ import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?re
 import {DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,loadProfile} from './avatar-v3-profile.js?rev=10';
 import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=12';
 import {createCreatorSession} from './apartment-v3-creator-session.js?rev=12';
-import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=1';
-import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=1';
-import {mountVirtualPc} from './virtual-pc-ui.js?rev=1';
+import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=2';
+import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=2';
+import {mountVirtualPc} from './virtual-pc-ui.js?rev=2';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false;

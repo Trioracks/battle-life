@@ -10,11 +10,13 @@ export class FtStudioAudio {
     this.context = null;
     this.timer = null;
     this.nodes = [];
-    this.step = 0;
+    this.position = 0;
+    this.playbackId = 0;
   }
 
-  trigger(project, step) {
-    const bar = Math.floor(step / STUDIO_STEP_COUNT) % 8;
+  trigger(project, position) {
+    const step = position % STUDIO_STEP_COUNT;
+    const bar = Math.floor(position / STUDIO_STEP_COUNT) % 8;
     for (const track of project.tracks) {
       if (!track.steps[step] || !track.bars[bar]) continue;
       const gain = this.context.createGain();
@@ -27,6 +29,9 @@ export class FtStudioAudio {
       oscillator.start(time);
       oscillator.stop(time + .13);
       this.nodes.push(oscillator);
+      const release = () => { this.nodes = this.nodes.filter(node => node !== oscillator); };
+      if (typeof oscillator.addEventListener === 'function') oscillator.addEventListener('ended', release, { once: true });
+      else oscillator.onended = release;
     }
   }
 
@@ -35,15 +40,17 @@ export class FtStudioAudio {
     if (!normalized) return { ok: false, reason: 'invalid-project' };
     if (!this.AudioContext) return { ok: false, reason: 'audio-unavailable' };
     this.stop();
+    const playbackId = this.playbackId;
     try {
       this.context ??= new this.AudioContext();
       if (typeof this.context.resume === 'function') await this.context.resume();
-      this.step = 0;
-      this.trigger(normalized, this.step);
+      if (playbackId !== this.playbackId) return { ok: false, reason: 'stopped' };
+      this.position = 0;
+      this.trigger(normalized, this.position);
       const interval = 60000 / normalized.bpm / 4;
       this.timer = this.setIntervalFn(() => {
-        this.step = (this.step + 1) % STUDIO_STEP_COUNT;
-        this.trigger(normalized, this.step);
+        this.position = (this.position + 1) % (STUDIO_STEP_COUNT * 8);
+        this.trigger(normalized, this.position);
       }, interval);
       return { ok: true, reason: '' };
     } catch {
@@ -53,6 +60,7 @@ export class FtStudioAudio {
   }
 
   stop() {
+    this.playbackId++;
     if (this.timer !== null) this.clearIntervalFn(this.timer);
     this.timer = null;
     for (const node of this.nodes) {
