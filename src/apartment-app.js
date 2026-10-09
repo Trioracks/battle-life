@@ -1,15 +1,15 @@
 import {ApartmentMotion} from './apartment-v3-motion.js?rev=8';
 import {ApartmentTime,loadHomeTime,saveHomeTime} from './apartment-v3-time.js?rev=12';
 import {districts,getDistrictLocations} from './calikfornia.js';
-import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=13';
+import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=17';
 import {playSoundCue} from './sound-cues.js';
 import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=12';
 import {DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,loadProfile} from './avatar-v3-profile.js?rev=10';
 import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=12';
-import {createNewGameSession} from './apartment-v3-new-game.js?rev=1';
-import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=2';
-import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=2';
-import {mountVirtualPc} from './virtual-pc-ui.js?rev=4';
+import {createNewGameSession} from './apartment-v3-new-game.js?rev=17';
+import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=17';
+import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=17';
+import {mountVirtualPc} from './virtual-pc-ui.js?rev=17';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false;
@@ -64,6 +64,7 @@ try{
   function openComputer(){
     const alreadyOn=pcState.power==='on';persistPc(setPcPower(pcState,'on'));
     setMode('pc');pcRoot.hidden=false;
+    virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label});
     if(alreadyOn)virtualPc.showDesktop(pcState);else virtualPc.boot(pcState);
   }
   if(profile)view.setAppearance(profile.appearance);
@@ -229,6 +230,7 @@ try{
     const door=motion.doorOpen>.3;if(door&&!lastDoor)cue('door');lastDoor=door;
     view.setRoomLights(homeTime.lights);view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));
     view.render(motion,paused&&!step?0:dt,{skeleton,paused:paused&&!step});$('#fade').style.opacity=motion.fade;
+    virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label});
     $('#home-time').textContent=`День ${homeTime.day} · ${homeTime.label} · ${homeTime.period} · Дом`;
     if(now-lastTimeSave>(homeTime.isSleeping?500:15000)){saveHomeTime(storage,homeTime);persistPc(pcState);lastTimeSave=now;}
     $('#room').textContent=motion.position[0]<0?'КУХНЯ':'ЖИЛАЯ КОМНАТА';

@@ -1,7 +1,7 @@
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js';
-import {createPcIcon} from './virtual-pc-icons.js';
-import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties,EXPLORER_PATHS} from './virtual-pc-explorer.js';
-import {createVirtualPcState,diskUsage} from './virtual-pc-state.js';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=17';
+import {createPcIcon} from './virtual-pc-icons.js?rev=17';
+import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties,EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=17';
+import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=17';
 import {normalizeStudioProject} from './ft-studio-project.js';
 
 export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu}) {

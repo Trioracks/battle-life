@@ -1,5 +1,5 @@
-import {diskUsage} from './virtual-pc-state.js';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js';
+import {diskUsage} from './virtual-pc-state.js?rev=17';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=17';
 export const EXPLORER_PATHS=Object.freeze({
   computer:{label:'Мой компьютер',address:'Мой компьютер',parent:null,iconId:'computer'},
   disk:{label:'Локальный диск (C:)',address:'C:\\',parent:'computer',iconId:'disk'},

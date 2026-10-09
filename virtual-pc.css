@@ -214,3 +214,10 @@
 #virtual-pc .pc-shutdown { width:min(410px,calc(100vw - 24px)); min-height:0; text-align:center; background:linear-gradient(#0c4caf,#5d8ce1); color:white; border:2px solid #17408a; box-shadow:3px 5px 14px #0006; border-radius:4px; }
 #virtual-pc .pc-shutdown h3 { font-size:19px; margin:0 0 18px; text-align:left; }
 #virtual-pc .pc-shutdown p { font-size:13px; margin:12px 0 24px; }
+#virtual-pc .pc-boot { background:#080a0e; color:white; gap:12px; padding:30px; }
+#virtual-pc .pc-boot .pc-graphic { margin:auto; }
+#virtual-pc .pc-boot h2 { color:white; font:italic bold 44px Tahoma,Arial,sans-serif; letter-spacing:-2px; }
+#virtual-pc .pc-boot p { font-size:12px; color:#d1d6df; }
+#virtual-pc .pc-boot .pc-boot-edition { font-size:17px; margin-bottom:25px; }
+#virtual-pc .pc-boot progress { width:235px; height:15px; border:1px solid #8e929f; border-radius:4px; background:#05070b; accent-color:#276add; margin:0 auto; }
+#virtual-pc .pc-boot-status { min-width:300px; margin-top:8px; }

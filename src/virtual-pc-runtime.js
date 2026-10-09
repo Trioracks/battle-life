@@ -1,4 +1,4 @@
-import { FT_STUDIO_BYTES, createVirtualPcState, markFtDownloadComplete } from './virtual-pc-state.js';
+import { FT_STUDIO_BYTES, createVirtualPcState, markFtDownloadComplete } from './virtual-pc-state.js?rev=17';
 
 const DOWNLOAD_MINUTES = 360;
 const SPEED_KB_PER_SECOND = Math.round(FT_STUDIO_BYTES / (DOWNLOAD_MINUTES * 60 * 1000));

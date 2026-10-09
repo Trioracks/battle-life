@@ -1,23 +1,23 @@
 import { FtStudioAudio } from './ft-studio-audio.js?rev=4';
-import {mountPcShell} from './virtual-pc-shell.js';
-import {mountExplorer} from './virtual-pc-explorer-view.js';
-import {mountPcMenu} from './virtual-pc-menus.js';
-import {mountSystemWindow} from './virtual-pc-system-windows.js';
-import {explorerProperties} from './virtual-pc-explorer.js';
-import {createWindowState,reduceWindows} from './virtual-pc-window-state.js';
-import {layoutDesktopIcons,setDesktopIconPosition,resetDesktopIconPositions} from './virtual-pc-state.js';
-import {createPcIcon} from './virtual-pc-icons.js';
+import {mountPcShell} from './virtual-pc-shell.js?rev=17';
+import {mountExplorer} from './virtual-pc-explorer-view.js?rev=17';
+import {mountPcMenu} from './virtual-pc-menus.js?rev=17';
+import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=17';
+import {explorerProperties} from './virtual-pc-explorer.js?rev=17';
+import {createWindowState,reduceWindows} from './virtual-pc-window-state.js?rev=17';
+import {layoutDesktopIcons,setDesktopIconPosition,resetDesktopIconPositions} from './virtual-pc-state.js?rev=17';
+import {createPcIcon} from './virtual-pc-icons.js?rev=17';
 import { createStudioProject, normalizeStudioProject, setArrangementCell, setBpm, setStudioStep, setTrackGain } from './ft-studio-project.js';
-import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js';
-import { cancelFtDownload, createVirtualPcState, diskUsage, FT_STUDIO_MB, PROJECT_MB, installFtStudio, saveStudioProject, setWallpaper, startFtDownload } from './virtual-pc-state.js';
-import { downloadPresentation } from './virtual-pc-runtime.js';
+import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js?rev=17';
+import { cancelFtDownload, createVirtualPcState, diskUsage, FT_STUDIO_MB, PROJECT_MB, installFtStudio, saveStudioProject, setWallpaper, startFtDownload } from './virtual-pc-state.js?rev=17';
+import { downloadPresentation } from './virtual-pc-runtime.js?rev=17';
 
 const NOOP = () => {};
 const BOOT_STAGES = [
   { percent: 5, delay: 1100, text: 'Проверка памяти…' },
   { percent: 30, delay: 1500, text: 'Найден жёсткий диск C: · чтение системы…' },
   { percent: 65, delay: 1900, text: 'Подготовка звука и рабочего стола…' },
-  { percent: 90, delay: 1000, text: 'Запуск Sloboda Desk 96…' },
+  { percent: 90, delay: 1000, text: 'Запуск Windows XP…' },
 ];
 
 function add(parent, child) { parent.append(child); return child; }
@@ -183,10 +183,11 @@ export function mountVirtualPc(root, callbacks = {}) {
     const stage = BOOT_STAGES[pc.bootStep];
     root.dataset.pcStage = 'booting';
     const shell = el(document, 'section', { className: 'pc-shell pc-boot' });
-    add(shell, el(document, 'p', { className: 'pc-boot-kicker', text: 'SLOBODA-486 / SELF TEST' }));
-    add(shell, el(document, 'h2', { text: 'Sloboda Desk 96' }));
-    add(shell, el(document, 'p', { text: 'Проверка памяти · поиск жёсткого диска · запуск оболочки' }));
-    const progress = el(document, 'progress', { attributes: { max: '100', value: String(stage.percent), 'aria-label': 'Загрузка Sloboda Desk 96' } });
+    add(shell, createPcIcon(document,'start',{size:76}));
+    add(shell, el(document, 'p', { className: 'pc-boot-kicker', text: 'BATTLE LIFE · HOME COMPUTER' }));
+    add(shell, el(document, 'h2', { text: 'Windows XP' }));
+    add(shell, el(document, 'p', { className:'pc-boot-edition',text: 'Домашний компьютер' }));
+    const progress = el(document, 'progress', { attributes: { max: '100', value: String(stage.percent), 'aria-label': 'Загрузка Windows XP' } });
     progress.value = stage.percent;
     add(shell, progress);
     add(shell, el(document, 'p', { className: 'pc-boot-status', text: stage.text, attributes: { 'aria-live': 'polite' } }));
@@ -581,7 +582,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.bootTimer = null;
     pc.state = createVirtualPcState(state);
     pc.phase = 'desktop';
-    pc.render();
+    pc.renderDesktop(false);
   };
 
   pc.openNow = appId => {
