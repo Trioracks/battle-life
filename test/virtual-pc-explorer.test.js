@@ -51,3 +51,11 @@ test('tree and double click navigate while single click only selects',()=>{
   fire(disk,'dblclick');assert.ok(findButton(root,'Открыть папку Мои документы'));
   view.navigate('projects');assert.ok(allPc(root).some(n=>n.textContent==='Объектов: 0'));
 });
+test('download ticks retain focused file and tree nodes while updating free space',()=>{
+  const {root,view}=setup({download:{status:'downloading',receivedBytes:0}});
+  const disk=findButton(root,'Открыть диск C:'),tree=findButton(root,'Перейти: Мой компьютер');disk.focus();
+  view.update(createVirtualPcState({download:{status:'downloading',receivedBytes:3000000}}));
+  assert.equal(findButton(root,'Открыть диск C:')===disk,true);
+  assert.equal(findButton(root,'Перейти: Мой компьютер')===tree,true);assert.equal(root.ownerDocument.activeElement===disk,true);
+  assert.ok(allPc(disk).some(n=>n.textContent==='Свободно 1497 МБ'));
+});

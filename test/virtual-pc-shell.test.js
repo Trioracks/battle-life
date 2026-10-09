@@ -59,3 +59,23 @@ test('XP base controls explicitly reset apartment button shadows',async()=>{
   const css=await readFile(new URL('../virtual-pc.css',import.meta.url),'utf8');
   assert.match(css,/#virtual-pc button\s*\{[^}]*box-shadow:\s*none/);
 });
+test('clicking icon artwork focuses it for immediate Enter',()=>{
+  const {root,document,commands}=setup(),icon=findPc(root,'desktop-icon');
+  fire(icon,'pointerdown',{button:0,pointerId:1,clientX:15,clientY:15,target:icon});
+  fire(icon,'pointerup',{pointerId:1});icon.click();assert.equal(document.activeElement===icon,true);
+  fire(icon,'keydown',{key:'Enter'});assert.equal(commands.at(-1).type,'open-app');
+});
+test('ResizeObserver still reports viewport changes while a modal is open',()=>{
+  const document=pcDocument();let resize;
+  document.defaultView={ResizeObserver:class{constructor(cb){resize=cb;}observe(){}disconnect(){}}};
+  const root=document.createElement('section'),commands=[],shell=mountPcShell(root,{onCommand:c=>commands.push(c)});
+  shell.render({windows:createWindowState({width:1280,height:720}),apps:[],iconPositions:{},wallpaper:'',metadata:{clockLabel:'12:00'},warning:''});
+  shell.setModal(document.createElement('aside'));root.getBoundingClientRect=()=>({width:640,height:900});resize();
+  assert.ok(commands.some(c=>c.type==='window'&&c.action.type==='viewport'&&c.action.width===640));
+});
+test('desktop icon label participates in the same drag gesture as its artwork',()=>{
+  const {root,commands}=setup(),icon=findPc(root,'desktop-icon'),label=icon.children[1];
+  fire(icon,'pointerdown',{button:0,pointerId:2,clientX:15,clientY:60,target:label});
+  fire(icon,'pointermove',{pointerId:2,clientX:155,clientY:160});fire(icon,'pointerup',{pointerId:2});
+  assert.ok(commands.some(c=>c.type==='move-icon'));
+});

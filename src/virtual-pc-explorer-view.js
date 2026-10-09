@@ -5,7 +5,7 @@ import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=17';
 import {normalizeStudioProject} from './ft-studio-project.js';
 
 export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu,onNavigate}) {
-  const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',disposed=false;
+  const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',diskLabel=null,disposed=false;
   const wrap=el(d,'div',{className:'pc-explorer'}),menubar=el(d,'div',{className:'pc-menubar'});
   const tools=el(d,'div',{className:'pc-explorer-tools'}),form=el(d,'form',{className:'pc-address'});
   const address=el(d,'input',{attributes:{'aria-label':'Адрес папки'},value:'Мой компьютер'});
@@ -42,6 +42,7 @@ export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu,on
   tools.append(back,forward,up,button(d,'Папки',{},()=>change({type:'toggle-tree'})),button(d,'Вид',{},e=>menu(e.currentTarget,viewItems())));
   function render(updateAddress) {
     if(disposed)return;
+    signature=JSON.stringify(entries());
     if(updateAddress)address.value=EXPLORER_PATHS[nav.path].address;
     back.disabled=nav.index===0;forward.disabled=nav.index===nav.history.length-1;up.disabled=nav.path==='computer';
     tree.hidden=!nav.treeVisible;tree.replaceChildren();
@@ -50,7 +51,7 @@ export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu,on
       const b=button(d,'',{className:'pc-tree-item',attributes:{'aria-label':'Перейти: '+p.label,'aria-current':String(nav.path===id)}},()=>navigate(id));
       b.style.setProperty('padding-left',(6+depth*14)+'px');b.append(createPcIcon(d,p.iconId,{size:16}),el(d,'span',{text:p.label}));tree.append(b);
     }
-    files.replaceChildren();files.dataset.view=nav.view;
+    files.replaceChildren();files.dataset.view=nav.view;diskLabel=null;
     if(nav.view==='details')files.append(el(d,'div',{className:'pc-details-head',text:'Имя                                      Тип                 Размер'}));
     if(nav.path==='windows')files.append(el(d,'p',{className:'pc-system-note',text:'Windows — системная папка игрового компьютера. Доступна только для просмотра.'}));
     for(const entry of entries()){
@@ -61,7 +62,7 @@ export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu,on
         status.textContent=entry.name;
       });
       b.append(createPcIcon(d,entry.iconId,{size:nav.view==='details'?16:32}),el(d,'span',{className:'pc-file-name',text:entry.name}));
-      if(entry.kind==='disk')b.append(el(d,'small',{text:'Свободно '+Math.round(diskUsage(state).freeMb)+' МБ'}));
+      if(entry.kind==='disk'){diskLabel=el(d,'small',{text:'Свободно '+Math.round(diskUsage(state).freeMb)+' МБ'});b.append(diskLabel);}
       if(nav.view==='details')b.append(el(d,'span',{className:'pc-file-type',text:entry.kind==='project'?'Проект FT Studio':entry.kind==='disk'?'Локальный диск':'Папка'}),el(d,'span',{text:entry.sizeMb?entry.sizeMb+' МБ':''}));
       b.addEventListener('dblclick',()=>openEntry(entry));
       const context=e=>{e.preventDefault();e.stopPropagation();nav={...nav,selection:entry.id};b.setAttribute('aria-pressed','true');menu(b,[{id:'open',label:'Открыть',onSelect:()=>openEntry(entry)},{id:'properties',label:'Свойства',onSelect:()=>properties(entry)}],e.type==='contextmenu'?e:undefined);};
@@ -81,7 +82,8 @@ export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu,on
   files.addEventListener('contextmenu',backgroundMenu);
   render(true);
   return {navigate,update(next){
-    state=next;const sig=JSON.stringify([state.projects,diskUsage(state)]);
-    if(sig!==signature){signature=sig;if(nav.selection&&!entries().some(e=>e.id===nav.selection))nav={...nav,selection:null};render(false);}
+    state=next;const sig=JSON.stringify(entries());
+    if(sig!==signature){if(nav.selection&&!entries().some(e=>e.id===nav.selection))nav={...nav,selection:null};render(false);}
+    else if(diskLabel)diskLabel.textContent='Свободно '+Math.round(diskUsage(state).freeMb)+' МБ';
   },dispose(){disposed=true;form.removeEventListener('submit',submit);files.removeEventListener('contextmenu',backgroundMenu);root.replaceChildren();}};
 }

@@ -69,3 +69,17 @@ test('async audio result does not recreate a different active application',async
   finish({ok:true});await Promise.resolve();await Promise.resolve();
   assert.equal(allPc(c.shell.getContentRoot('underweb')).find(n=>n.tagName==='INPUT')===input,true);
 });
+test('cancelling a dirty close returns focus to its initiating caption button',()=>{
+  const {controller:c,root,d}=setup();c.openProject(project());c.updateProject({...c.project,name:'Черновик'});
+  const caption=findButton(root,'Закрыть окно');caption.focus();caption.click();c.cancelPendingAction();
+  assert.equal(d.activeElement===caption,true);
+});
+test('cancel from another app restores its active window and initiating control',()=>{
+  const {controller:c,root,d}=setup();c.openProject(project());c.updateProject({...c.project,name:'Черновик'});c.open('underweb');
+  const launch=findButton(c.shell.getContentRoot('underweb'),'Выбрать баттл Бетонное эхо');launch.focus();launch.click();c.cancelPendingAction();
+  assert.equal(c.windows.activeId,'underweb');assert.equal(d.activeElement===launch,true);
+});
+test('dirty guard also accepts viewport resize without dismissing the guard',()=>{
+  const {controller:c}=setup();c.openProject(project());c.updateProject({...c.project,name:'Черновик'});c.closeWindow();
+  c.windowAction({type:'viewport',width:640,height:900});assert.equal(c.windows.viewport.width,640);assert.equal(c.confirmClose,true);
+});

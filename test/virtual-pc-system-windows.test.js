@@ -61,3 +61,9 @@ test('clock refresh does not steal focus inside shutdown confirmation',()=>{
   c.showShutdown();const cancel=findButton(root,'Отмена');cancel.focus();c.syncHost({playerName:'Игрок',clockLabel:'17:00'});
   assert.equal(d.activeElement,cancel);
 });
+test('modal viewport updates clamp windows without allowing a close command',()=>{
+  const d=pcDocument(),root=d.createElement('section'),c=mountVirtualPc(root,{audio:{stop(){},dispose(){}}});c.showDesktop(createVirtualPcState());c.open('underweb');
+  c.windowAction({type:'geometry',id:'underweb',rect:{x:700,y:50,width:560,height:420}});c.showShutdown();
+  c.windowAction({type:'viewport',width:640,height:900});assert.equal(c.windows.viewport.width,640);assert.ok(c.windows.windows[0].rect.x<640);
+  c.windowAction({type:'close',id:'underweb'});assert.equal(c.windows.windows.length,1);
+});

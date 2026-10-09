@@ -145,7 +145,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.windows=reduceWindows(pc.windows,{type:'open',id:appId,appId,title:app?.label??appId});
   };
   pc.windowAction = action => {
-    if(pc.confirmClose||pc.shutdownModal)return;
+    if((pc.confirmClose||pc.shutdownModal)&&action.type!=='viewport')return;
     if(action.type==='close'){pc.closeWindow(action.id);return;}
     pc.windows=reduceWindows(pc.windows,action);
     pc.renderDesktop(false);
@@ -370,10 +370,15 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.cancelPendingAction = () => {
+    const restoreDraft=pc.recoveringDraft;
     pc.pendingAction = null;
     pc.confirmClose = false;
     pc.recoveringDraft = false;
-    pc.render();
+    const origin=!restoreDraft&&pc.windows.windows.find(w=>findByDataset(root,'windowId',w.id)?.contains(pc.returnFocus));
+    if(restoreDraft)pc.returnFocus=null;
+    pc.refreshApp('ft-studio',{replaceContent:true});
+    if(origin)pc.windows=reduceWindows(pc.windows,{type:'activate',id:origin.id});
+    pc.renderDesktop(false);
   };
 
   pc.requestProjectTransition = (action, protectDraft = false) => {

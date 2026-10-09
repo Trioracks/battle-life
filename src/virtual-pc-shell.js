@@ -18,7 +18,7 @@ export function mountPcShell(root,{onCommand}) {
   const warning=el(d,'div',{className:'pc-storage-warning',dataset:{pcRole:'persistence-warning'},attributes:{'aria-live':'polite'}});
   const menus=el(d,'div',{className:'pc-menu-layer'}),modal=el(d,'div',{className:'pc-modal-layer'});
   modal.hidden=true;shell.append(workspace,taskbar,warning,menus,modal);root.replaceChildren(shell);
-  const emit=c=>{if(!disposed&&!modalNode)onCommand(c);};
+  const emit=c=>{if(!disposed&&(!modalNode||(c.type==='window'&&c.action.type==='viewport')))onCommand(c);};
   function listen(n,type,fn,group=cleanups) {
     n.addEventListener(type,fn);const off=()=>{n.removeEventListener(type,fn);cleanups.delete(off);};
     cleanups.add(off);if(group!==cleanups)group.add(off);return off;
@@ -37,7 +37,7 @@ export function mountPcShell(root,{onCommand}) {
     };
     listen(host,'pointerdown',e=>{
       if(e.button!==0||e.isPrimary===false||modalNode)return;
-      if(e.target!==host&&e.target?.closest?.('button,input,select'))return;
+      const control=e.target?.closest?.('button,input,select');if(control&&control!==host)return;
       const rect=getRect();if(!rect)return;
       drag={x:e.clientX,y:e.clientY,rect:{...rect},moved:false,pointerId:e.pointerId};
       host.setPointerCapture?.(e.pointerId);e.preventDefault();
@@ -67,7 +67,7 @@ export function mountPcShell(root,{onCommand}) {
       const a=bounds(),p={x:Math.max(0,Math.min(r.x,a.width-80)),y:Math.max(0,Math.min(r.y,a.height-88))};
       emit({type:'move-icon',id:app.id,position:p});
     }});
-    listen(node,'click',()=>{if(!suppressed())select(app.id);},group);
+    listen(node,'click',()=>{if(!suppressed()){select(app.id);node.focus();}},group);
     listen(node,'dblclick',()=>{if(!suppressed())emit({type:'open-app',appId:app.id});},group);
     listen(node,'contextmenu',e=>{e.preventDefault();e.stopPropagation();select(app.id);emit({type:'desktop-menu',targetId:app.id,x:e.clientX,y:e.clientY,anchor:node});},group);
     listen(node,'keydown',e=>{
