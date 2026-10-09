@@ -1,7 +1,7 @@
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=17';
-import {createPcIcon} from './virtual-pc-icons.js?rev=17';
-import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties,EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=17';
-import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=17';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=18';
+import {createPcIcon} from './virtual-pc-icons.js?rev=18';
+import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties,EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=18';
+import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=18';
 import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=18';
 import {normalizeStudioProject} from './ft-studio-project.js';
 

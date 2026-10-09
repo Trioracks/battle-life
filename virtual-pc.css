@@ -228,3 +228,11 @@
 #virtual-pc .pc-boot .pc-boot-edition { font-size:17px; margin-bottom:25px; }
 #virtual-pc .pc-boot progress { width:235px; height:15px; border:1px solid #8e929f; border-radius:4px; background:#05070b; accent-color:#276add; margin:0 auto; }
 #virtual-pc .pc-boot-status { min-width:300px; margin-top:8px; }
+.pc-transition{position:absolute;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#030507;color:#f7faff;font:16px Tahoma,Arial,sans-serif;pointer-events:none}
+.pc-transition[hidden]{display:none}
+.pc-transition h2{font-size:clamp(30px,5vw,56px);font-weight:500;margin:24px 0 12px;letter-spacing:-1px}
+.pc-transition p{color:#c1cde2;margin:0 0 36px}
+.pc-transition progress{width:240px;height:16px;accent-color:#4d83d4}
+.pc-transition[data-screen="welcome"],.pc-transition[data-screen="shutdown"]{background:linear-gradient(#183678 0 15%,#4674be 15% 83%,#183678 83%);border-top:2px solid #98b5e2;border-bottom:2px solid #98b5e2}
+.pc-transition[data-screen="bios"]{align-items:flex-start;padding:8%;font-family:monospace}
+.pc-transition[data-screen="bios"] svg{display:none}

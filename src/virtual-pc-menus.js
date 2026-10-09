@@ -1,5 +1,5 @@
-import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=17';
-import {createPcIcon} from './virtual-pc-icons.js?rev=17';
+import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=18';
+import {createPcIcon} from './virtual-pc-icons.js?rev=18';
 
 export function mountPcMenu(root,{onDismiss=()=>{}}={}) {
   const d=root.ownerDocument,host=root.parentElement??root;let stack=[],origin=null,disposed=false;

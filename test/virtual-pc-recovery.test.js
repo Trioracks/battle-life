@@ -16,7 +16,7 @@ function setup(state) {
   return { controller, root, document };
 }
 
-test('native Window timers keep their receiver while the PC boots and closes', t => {
+test('boot and close do not schedule independent Window timers', t => {
   const timers = new Map(); let id = 0;
   t.mock.method(globalThis, 'setTimeout', function (callback) {
     if (this !== globalThis) throw new TypeError('Illegal invocation');
@@ -29,10 +29,8 @@ test('native Window timers keep their receiver while the PC boots and closes', t
   const { controller, root } = setup();
   assert.doesNotThrow(() => controller.boot(createVirtualPcState({ power: 'on' })));
   assert.equal(root.dataset.pcStage, 'booting');
-  for (let stage = 0; stage < 4; stage++) {
-    const [timer, callback] = timers.entries().next().value;
-    timers.delete(timer); callback();
-  }
+  assert.equal(timers.size,0);
+  controller.presentTransition({phase:'desktop',progress:0,overlay:1,locked:false});
   assert.equal(root.dataset.pcStage, 'desktop');
   assert.ok(find(root, 'Мой компьютер'));
   controller.dispose();
@@ -114,21 +112,16 @@ test('keyboard navigation enters an opened window and wraps inside it', () => {
   assert.ok(document.activeElement === first, 'Tab must wrap to the first window control');
 });
 
-test('boot shows intermediate progress before reaching the desktop at 5.5 seconds', () => {
+test('boot presentation accepts intermediate host progress with no independent timer', () => {
   const document = creatorDocument(), root = document.createElement('section'), timers = [];
   const pc = mountVirtualPc(root, { setTimeoutFn(fn, delay) { timers.push({ fn, delay }); return timers.length; }, clearTimeoutFn() {} });
   pc.boot(createVirtualPcState({ power: 'on' }));
-  const seen = [], labels = new Set();
-  let elapsed = 0;
-  while (pc.phase === 'booting' && timers.length) {
-    seen.push(nodes(root).find(node => node.tagName === 'PROGRESS').value);
-    labels.add(nodes(root).find(node => node.className === 'pc-boot-status').textContent);
-    const timer = timers.shift(); elapsed += timer.delay; timer.fn();
-  }
+  const seen = [];
+  for(const progress of [.1,.4,.8]){pc.presentTransition({phase:'loading',progress,overlay:1,locked:true});seen.push(nodes(root).find(node=>node.tagName==='PROGRESS').value);}
+  pc.presentTransition({phase:'desktop',progress:0,overlay:1,locked:false});
   assert.equal(pc.phase, 'desktop');
-  assert.equal(elapsed, 5500);
+  assert.equal(timers.length, 0);
   assert.ok(new Set(seen).size >= 3, 'boot must visibly advance before completion');
-  assert.ok(labels.size >= 3, 'boot must describe the current stage');
   pc.dispose();
 });
 

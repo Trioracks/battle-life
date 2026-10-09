@@ -1,25 +1,20 @@
 import { FtStudioAudio } from './ft-studio-audio.js?rev=4';
-import {mountPcShell} from './virtual-pc-shell.js?rev=17';
-import {mountExplorer} from './virtual-pc-explorer-view.js?rev=17';
-import {mountPcMenu} from './virtual-pc-menus.js?rev=17';
-import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=17';
-import {explorerProperties} from './virtual-pc-explorer.js?rev=17';
-import {createWindowState,reduceWindows} from './virtual-pc-window-state.js?rev=17';
-import {layoutDesktopIcons,setDesktopIconPosition,resetDesktopIconPositions} from './virtual-pc-state.js?rev=17';
-import {createPcIcon} from './virtual-pc-icons.js?rev=17';
+import {mountPcShell} from './virtual-pc-shell.js?rev=18';
+import {mountExplorer} from './virtual-pc-explorer-view.js?rev=18';
+import {mountPcMenu} from './virtual-pc-menus.js?rev=18';
+import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=18';
+import {explorerProperties} from './virtual-pc-explorer.js?rev=18';
+import {createWindowState,reduceWindows} from './virtual-pc-window-state.js?rev=18';
+import {layoutDesktopIcons,setDesktopIconPosition,resetDesktopIconPositions} from './virtual-pc-state.js?rev=18';
+import {createPcIcon} from './virtual-pc-icons.js?rev=18';
 import { createStudioProject, normalizeStudioProject, setArrangementCell, setBpm, setStudioStep, setTrackGain } from './ft-studio-project.js';
-import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js?rev=17';
-import { cancelFtDownload, createVirtualPcState, diskUsage, FT_STUDIO_MB, PROJECT_MB, installFtStudio, saveStudioProject, setWallpaper, startFtDownload } from './virtual-pc-state.js?rev=17';
-import { downloadPresentation } from './virtual-pc-runtime.js?rev=17';
+import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js?rev=18';
+import { cancelFtDownload, createVirtualPcState, diskUsage, FT_STUDIO_MB, PROJECT_MB, installFtStudio, saveStudioProject, setWallpaper, startFtDownload } from './virtual-pc-state.js?rev=18';
+import { downloadPresentation } from './virtual-pc-runtime.js?rev=18';
 import {diskAmount} from './virtual-pc-disk-view.js?rev=18';
+import {pcPresentation} from './virtual-pc-presentation.js?rev=18';
 
 const NOOP = () => {};
-const BOOT_STAGES = [
-  { percent: 5, delay: 1100, text: 'Проверка памяти…' },
-  { percent: 30, delay: 1500, text: 'Найден жёсткий диск C: · чтение системы…' },
-  { percent: 65, delay: 1900, text: 'Подготовка звука и рабочего стола…' },
-  { percent: 90, delay: 1000, text: 'Запуск Windows XP…' },
-];
 
 function add(parent, child) { parent.append(child); return child; }
 
@@ -180,19 +175,22 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (pc.phase === 'desktop') pc.refreshDynamicState();
   };
 
-  pc.renderBoot = () => {
-    const stage = BOOT_STAGES[pc.bootStep];
-    root.dataset.pcStage = 'booting';
-    const shell = el(document, 'section', { className: 'pc-shell pc-boot' });
-    add(shell, createPcIcon(document,'start',{size:76}));
-    add(shell, el(document, 'p', { className: 'pc-boot-kicker', text: 'BATTLE LIFE · HOME COMPUTER' }));
-    add(shell, el(document, 'h2', { text: 'Windows XP' }));
-    add(shell, el(document, 'p', { className:'pc-boot-edition',text: 'Домашний компьютер' }));
-    const progress = el(document, 'progress', { attributes: { max: '100', value: String(stage.percent), 'aria-label': 'Загрузка Windows XP' } });
-    progress.value = stage.percent;
-    add(shell, progress);
-    add(shell, el(document, 'p', { className: 'pc-boot-status', text: stage.text, attributes: { 'aria-live': 'polite' } }));
-    root.replaceChildren(shell);
+  let transitionLayer=null,transitionTitle=null,transitionSubtitle=null,transitionProgress=null;
+  pc.presentTransition = snapshot => {
+    const p=pcPresentation(snapshot,pc.state.power,pc.metadata.playerName);
+    pc.locked=snapshot.locked;root.dataset.pcTransition=snapshot.phase;
+    root.dataset.pcStage=['loading','welcome','power-on'].includes(snapshot.phase)?'booting':pc.phase;
+    root.style.opacity=String(snapshot.overlay??0);root.style.pointerEvents=snapshot.locked?'none':'auto';
+    for(const child of root.children)if(child!==transitionLayer)child.inert=Boolean(snapshot.locked);
+    if(!transitionLayer||transitionLayer.parentElement!==root){
+      transitionLayer=el(document,'section',{className:'pc-transition',attributes:{'aria-live':'polite'}});
+      add(transitionLayer,createPcIcon(document,'start',{size:72}));
+      transitionTitle=add(transitionLayer,el(document,'h2'));transitionSubtitle=add(transitionLayer,el(document,'p'));
+      transitionProgress=add(transitionLayer,el(document,'progress',{attributes:{max:'1','aria-label':'Загрузка Windows HP'}}));root.append(transitionLayer);
+    }
+    transitionLayer.hidden=p.screen==='desktop'||(p.screen==='off'&&snapshot.phase==='room');transitionLayer.dataset.screen=p.screen;
+    transitionLayer.style.opacity='1';transitionLayer.style.filter=`brightness(${p.brightness})`;transitionTitle.textContent=p.title;transitionSubtitle.textContent=p.subtitle;
+    transitionProgress.hidden=p.screen!=='loading';transitionProgress.value=p.progress;
   };
 
   pc.renderDesktop = (replaceActive=true) => {
@@ -558,8 +556,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.render = () => {
-    if (pc.phase === 'booting') pc.renderBoot();
-    else if (pc.phase === 'desktop') pc.renderDesktop();
+    if (pc.phase === 'desktop') pc.renderDesktop();
     else { root.dataset.pcStage = 'off'; root.replaceChildren(); }
   };
 
@@ -567,22 +564,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.prepareAudio = () => Promise.resolve(pc.audio.unlock?.()).catch(NOOP);
 
   pc.boot = state => {
-    pc.state = createVirtualPcState(state);
-    pc.phase = 'booting';
-    pc.clearViews();pc.menu?.dispose();pc.menu=null;
-    pc.shell?.dispose();pc.shell=null;
-    pc.windows=reduceWindows(pc.windows,{type:'clear'});
-    pc.bootStep = 0;
-    if (pc.bootTimer !== null) pc.clearTimeoutFn(pc.bootTimer);
-    Promise.resolve(pc.audio.playBoot?.()).catch(NOOP);
-    const advanceBoot = () => {
-      pc.bootStep++;
-      if (pc.bootStep === BOOT_STAGES.length) { pc.showDesktop(pc.state); return; }
-      pc.render();
-      pc.bootTimer = pc.setTimeoutFn(advanceBoot, BOOT_STAGES[pc.bootStep].delay);
-    };
-    pc.bootTimer = pc.setTimeoutFn(advanceBoot, BOOT_STAGES[0].delay);
-    pc.render();
+    pc.showDesktop(state);pc.presentTransition({phase:'power-on',progress:0,overlay:0,locked:true,coldStart:true});
   };
 
   pc.showDesktop = state => {
@@ -590,6 +572,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.bootTimer = null;
     pc.state = createVirtualPcState(state);
     pc.phase = 'desktop';
+    pc.locked=false;root.style.opacity='1';root.style.pointerEvents='auto';
     pc.renderDesktop(false);
   };
 
@@ -608,7 +591,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.shell.focusActive();
   };
   pc.open = appId => {
-    if(!desktopApps(pc.state).some(app=>app.id===appId)||pc.confirmClose||pc.shutdownModal)return;
+    if(pc.locked||!desktopApps(pc.state).some(app=>app.id===appId)||pc.confirmClose||pc.shutdownModal)return;
     pc.openNow(appId);
   };
   pc.closeNow = id => {
@@ -620,13 +603,13 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.renderDesktop(false);
   };
   pc.closeWindow = (id=pc.windows.activeId) => {
-    if(pc.confirmClose||!id)return;
+    if(pc.locked||pc.confirmClose||!id)return;
     if(id==='ft-studio')pc.requestProjectTransition(()=>pc.closeNow(id));
     else pc.closeNow(id);
   };
 
   pc.requestLeave = () => {
-    if (pc.confirmClose||pc.shutdownModal) return;
+    if (pc.locked||pc.confirmClose||pc.shutdownModal) return;
     pc.menu?.close();
     pc.requestProjectTransition(() => {
       pc.audio.stop();
@@ -635,15 +618,14 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.requestShutdown = () => {
-    if (pc.confirmClose) return;
+    if (pc.locked||pc.confirmClose) return;
     pc.requestProjectTransition(() => {
       pc.audio.stop();
-      pc.clearViews();
-      pc.windows=reduceWindows(pc.windows,{type:'clear'});
-      pc.renderDesktop(false);
       pc.callbacks.onShutdown();
     });
   };
+
+  pc.completeShutdown=()=>{pc.clearViews();pc.windows=reduceWindows(pc.windows,{type:'clear'});pc.renderDesktop(false);};
 
   pc.discardProject = () => {
     pc.dirty = false;
@@ -660,7 +642,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   root.addEventListener('keydown', event => {
-    if (pc.phase !== 'desktop' || event.defaultPrevented) return;
+    if (pc.locked || pc.phase !== 'desktop' || event.defaultPrevented) return;
     const scope = pc.focusScope();
     const controls = focusableControls(scope);
     if(event.key==='Escape'&&pc.shutdownModal){event.preventDefault();event.stopPropagation();pc.cancelShutdown();return;}

@@ -40,7 +40,8 @@ test('syncState retains torent controls and studio fader',()=>{
 test('shutdown clears windows but leave preserves them',()=>{
   const {controller:c}=setup();c.open('underweb');c.requestLeave();c.showDesktop(c.state);
   assert.equal(c.windows.windows.length,1);
-  c.requestShutdown();assert.equal(c.windows.windows.length,0);
+  c.requestShutdown();assert.equal(c.windows.windows.length,1);
+  c.completeShutdown();assert.equal(c.windows.windows.length,0);
 });
 test('closing another app never asks about dirty studio',()=>{
   const {controller:c}=setup();c.openProject(project());c.updateProject({...c.project,name:'Редакция'});c.open('underweb');c.closeWindow();
