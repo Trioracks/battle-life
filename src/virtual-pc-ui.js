@@ -119,7 +119,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     const controls = findByDataset(root, 'pcRole', 'torent-controls');
     if (label) label.textContent = `${progress.receivedMb.toFixed(1)} / ${progress.totalMb} МБ · ${progress.speedKbPerSecond} КБ/с · осталось ${progress.remainingGameMinutes} игровых мин.`;
     if (meter) { meter.value = progress.percent; meter.setAttribute('value', String(progress.percent)); }
-    if (controls) pc.renderTorentControls(controls);
+    if (controls?.dataset.downloadStatus !== pc.state.download.status) pc.renderTorentControls(controls);
   };
 
   pc.refreshDynamicState = () => {
@@ -248,6 +248,7 @@ export function mountVirtualPc(root, callbacks = {}) {
 
   pc.renderTorentControls = controls => {
     controls.replaceChildren();
+    controls.dataset.downloadStatus = pc.state.download.status;
     if (pc.state.download.status === 'idle') add(controls, button(document, 'Скачать FT Studio', { attributes: { 'aria-label': 'Скачать FT Studio через torent' } }, () => { pc.persist(startFtDownload(pc.state)); pc.render(); }));
     if (pc.state.download.status === 'downloading') add(controls, button(document, 'Отменить загрузку', {}, () => { pc.persist(cancelFtDownload(pc.state)); pc.render(); }));
     if (pc.state.download.status === 'ready-to-install') add(controls, button(document, 'Установить FT Studio', {}, () => { pc.persist(installFtStudio(pc.state)); pc.render(); }));

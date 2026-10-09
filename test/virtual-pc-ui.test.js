@@ -109,6 +109,21 @@ test('game-time reconciliation does not replace an in-progress Underweb address'
   assert.equal(document.activeElement, address);
 });
 
+test('a clock-only torent update retains the focused install control', () => {
+  const ready = createVirtualPcState({ power: 'on', lastGameMinute: 720, download: { status: 'ready-to-install' } });
+  const nextMinute = createVirtualPcState({ power: 'on', lastGameMinute: 721, download: { status: 'ready-to-install' } });
+  const { controller, root, document } = createController(ready);
+
+  controller.showDesktop(ready);
+  controller.open('torent');
+  const install = find(root, element => element.tagName === 'BUTTON' && element.textContent === 'Установить FT Studio');
+  install.focus();
+  controller.syncState(nextMinute);
+
+  assert.equal(find(root, element => element.tagName === 'BUTTON' && element.textContent === 'Установить FT Studio'), install);
+  assert.equal(document.activeElement, install);
+});
+
 test('an Underweb brief routes an uninstalled studio to torent instead of creating a project', () => {
   const { controller, root, state } = createController();
 
