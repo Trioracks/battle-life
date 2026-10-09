@@ -1,0 +1,53 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties} from '../src/virtual-pc-explorer.js';
+import {mountExplorer} from '../src/virtual-pc-explorer-view.js';
+import {createVirtualPcState} from '../src/virtual-pc-state.js';
+import {createStudioProject} from '../src/ft-studio-project.js';
+import {pcDocument,findButton,allPc,fire} from './helpers/virtual-pc-dom.js';
+test('history discards forward branch after new navigation and root disables up',()=>{
+  let e=createExplorerState();assert.strictEqual(navigateExplorer(e,{type:'up'}),e);
+  for(const path of ['disk','documents'])e=navigateExplorer(e,{type:'navigate',path});
+  e=navigateExplorer(e,{type:'back'});assert.equal(e.path,'disk');
+  assert.equal(navigateExplorer(e,{type:'forward'}).path,'documents');
+  e=navigateExplorer(e,{type:'navigate',path:'windows'});
+  assert.deepEqual(e.history,['computer','disk','windows']);assert.equal(navigateExplorer(e,{type:'forward'}).path,'windows');
+});
+test('invalid address preserves current folder and accepts normalized virtual addresses',()=>{
+  const e=navigateExplorer(createExplorerState(),{type:'navigate',path:'c:/Мои документы/'});
+  assert.equal(e.path,'documents');
+  const bad=navigateExplorer(e,{type:'navigate',path:'https://example.org'});
+  assert.equal(bad.path,'documents');assert.match(bad.error,/не найден/);
+});
+test('disk properties use existing accounting and empty projects remain empty',()=>{
+  const s=createVirtualPcState({download:{status:'installed'},projects:[{id:'p'}]});
+  assert.equal(explorerProperties(s,explorerEntries(s,'computer')[0]).rows.find(r=>r.label==='Свободно').value,'698 МБ');
+  assert.deepEqual(explorerEntries(createVirtualPcState(),'projects'),[]);
+});
+function setup(seed={}) {
+  const document=pcDocument(),root=document.createElement('div'),opened=[],properties=[],menus=[];
+  const view=mountExplorer(root,{onOpenProject:p=>opened.push(p),onProperties:p=>properties.push(p),onClose(){},onMenu:p=>menus.push(p)});
+  view.update(createVirtualPcState(seed));return {root,view,opened,properties,menus};
+}
+test('projects refresh after save without losing selection or address input',()=>{
+  const p=createStudioProject({id:'p',name:'Бит',battleId:'concrete-echo'}).project;
+  const {root,view}=setup({projects:[p]});view.navigate('projects');
+  findButton(root,'Открыть проект Бит').click();
+  const address=allPc(root).find(n=>n.getAttribute('aria-label')==='Адрес папки');address.value='Ввод';
+  view.update(createVirtualPcState({projects:[p,{...p,id:'p2',name:'Второй'}]}));
+  assert.equal(address.value,'Ввод');assert.equal(findButton(root,'Открыть проект Бит').getAttribute('aria-pressed'),'true');
+  assert.ok(findButton(root,'Открыть проект Второй'));
+});
+test('malformed project shows local error and text names cannot inject markup',()=>{
+  const {root,view,opened}=setup({projects:[{id:'bad',name:'<img src=x>'}]});view.navigate('projects');
+  fire(findButton(root,'Открыть проект <img src=x>'),'dblclick');
+  assert.equal(opened.length,0);
+  assert.ok(allPc(root).some(n=>/повреждён/.test(n.textContent??'')));
+  assert.equal(allPc(root).filter(n=>n.tagName==='IMG').some(n=>n.getAttribute('src')==='x'),false);
+});
+test('tree and double click navigate while single click only selects',()=>{
+  const {root,view}=setup();const disk=findButton(root,'Открыть диск C:');
+  disk.click();assert.equal(allPc(root).find(n=>n.getAttribute('aria-label')==='Адрес папки').value,'Мой компьютер');
+  fire(disk,'dblclick');assert.ok(findButton(root,'Открыть папку Мои документы'));
+  view.navigate('projects');assert.ok(allPc(root).some(n=>n.textContent==='Объектов: 0'));
+});

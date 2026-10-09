@@ -4,7 +4,7 @@ import { createStudioProject } from '../src/ft-studio-project.js';
 import { BATTLE_BRIEFS } from '../src/virtual-pc-catalog.js';
 import { createVirtualPcState } from '../src/virtual-pc-state.js';
 import { mountVirtualPc } from '../src/virtual-pc-ui.js';
-import { pcDocument as creatorDocument } from './helpers/virtual-pc-dom.js';
+import { pcDocument as creatorDocument, fire } from './helpers/virtual-pc-dom.js';
 
 function descendants(root) {
   return root.children.flatMap(child => [child, ...descendants(child)]);
@@ -55,10 +55,11 @@ test('my computer shows an empty projects folder before a project exists', () =>
 
   controller.showDesktop(state);
   controller.open('computer');
-  find(root, element => element.getAttribute?.('aria-label') === 'Открыть диск C:').click();
+  fire(find(root, element => element.getAttribute?.('aria-label') === 'Открыть диск C:'),'dblclick');
   assert.equal(hasText(root, 'Windows'), true);
-  find(root, element => element.getAttribute?.('aria-label') === 'Открыть папку Мои проекты').click();
-  assert.equal(hasText(root, 'Мои проекты · пусто'), true);
+  fire(find(root, element => element.getAttribute?.('aria-label') === 'Открыть папку Мои документы'),'dblclick');
+  fire(find(root, element => element.getAttribute?.('aria-label') === 'Открыть папку Мои проекты'),'dblclick');
+  assert.equal(hasText(root, 'Объектов: 0'), true);
 });
 
 test('underweb renders a local error instead of following an unknown address', () => {

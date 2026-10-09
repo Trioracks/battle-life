@@ -1,5 +1,6 @@
 import { FtStudioAudio } from './ft-studio-audio.js?rev=4';
 import {mountPcShell} from './virtual-pc-shell.js';
+import {mountExplorer} from './virtual-pc-explorer-view.js';
 import {createWindowState,reduceWindows} from './virtual-pc-window-state.js';
 import {layoutDesktopIcons,setDesktopIconPosition} from './virtual-pc-state.js';
 import {createPcIcon} from './virtual-pc-icons.js';
@@ -91,6 +92,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     phase: 'off',
     windows: createWindowState({width:globalThis.innerWidth??1280,height:globalThis.innerHeight??720}),
     shell: null,
+    explorer: null,
     metadata: {playerName:'Игрок',clockLabel:'12:00'},
     returnFocus: null,
     folder: 'computer',
@@ -200,6 +202,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       const target=pc.shell.getContentRoot(w.id);
       if(!target.children.length||(replaceActive&&w.id===pc.windows.activeId))pc.refreshApp(w.id,{replaceContent:true});
     }
+    pc.explorer?.update(pc.state);
     const menuRoot=pc.shell.getMenuRoot();
     menuRoot.replaceChildren();
     if(pc.startOpen)menuRoot.append(pc.renderStartMenu());
@@ -212,6 +215,10 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
   pc.refreshApp = (appId,{replaceContent=false}={}) => {
     const target=pc.shell?.getContentRoot(appId);if(!target)return;
+    if(appId==='computer'){
+      if(!pc.explorer)pc.explorer=mountExplorer(target,{onOpenProject:p=>pc.openProject(p),onProperties:p=>pc.showProperties?.(p),onClose:()=>pc.closeWindow('computer'),onMenu:p=>pc.menu?.open(p)});
+      pc.explorer.update(pc.state);return;
+    }
     if(replaceContent)target.replaceChildren(pc.renderWindow(appId));
     else if(appId==='torent')pc.refreshTorent();
   };
@@ -226,31 +233,7 @@ export function mountVirtualPc(root, callbacks = {}) {
 
   pc.windowFrame = (title, content) => content;
 
-  pc.openFolder = folder => {
-    if (!['computer', 'disk', 'windows', 'projects'].includes(folder)) return;
-    pc.folder = folder;
-    pc.render();
-  };
-
-  pc.renderComputer = () => {
-    const content = el(document, 'div', { className: 'pc-window-content pc-files' });
-    const paths = { computer: 'Мой компьютер', disk: 'Мой компьютер > C:', windows: 'Мой компьютер > C: > Windows', projects: 'Мой компьютер > C: > Мои проекты' };
-    add(content, el(document, 'p', { text: paths[pc.folder], attributes: { 'aria-label': 'Текущая папка' } }));
-    if (pc.folder !== 'computer') add(content, button(document, 'Назад', {}, () => pc.openFolder(pc.folder === 'disk' ? 'computer' : 'disk')));
-    if (pc.folder === 'computer') {
-      add(content, button(document, 'C: · ' + pc.diskLabel(), { attributes: { 'aria-label': 'Открыть диск C:' } }, () => pc.openFolder('disk')));
-    } else if (pc.folder === 'disk') {
-      add(content, button(document, 'Windows', { attributes: { 'aria-label': 'Открыть папку Windows' } }, () => pc.openFolder('windows')));
-      add(content, button(document, 'Мои проекты', { attributes: { 'aria-label': 'Открыть папку Мои проекты' } }, () => pc.openFolder('projects')));
-    } else if (pc.folder === 'windows') {
-      add(content, el(document, 'p', { text: 'Системные файлы Sloboda Desk 96. Эта папка доступна только для просмотра.' }));
-    } else {
-      add(content, el(document, 'h3', { text: 'Мои проекты' }));
-      if (!pc.state.projects.length) add(content, el(document, 'p', { text: 'Мои проекты · пусто' }));
-      for (const project of pc.state.projects) add(content, button(document, project.name ?? project.id, { attributes: { 'aria-label': `Открыть проект ${project.name ?? project.id}` } }, () => pc.openProject(project)));
-    }
-    return pc.windowFrame('Мой компьютер', content);
-  };
+  pc.openFolder = folder => pc.explorer?.navigate(folder);
 
   pc.navigateUnderweb = address => {
     pc.address = typeof address === 'string' ? address : '';
@@ -511,7 +494,6 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.renderWindow = (appId=pc.windows.activeId) => {
-    if(appId==='computer')return pc.renderComputer();
     if(appId==='underweb')return pc.renderUnderweb();
     if(appId==='torent')return pc.renderTorent();
     if(appId==='ft-studio')return pc.renderStudio();
@@ -530,6 +512,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.boot = state => {
     pc.state = createVirtualPcState(state);
     pc.phase = 'booting';
+    pc.explorer?.dispose();pc.explorer=null;
     pc.shell?.dispose();pc.shell=null;
     pc.windows=reduceWindows(pc.windows,{type:'clear'});
     pc.bootStep = 0;
@@ -554,6 +537,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.openNow = appId => {
+    const documents=appId==='documents';if(documents)appId='computer';
     const existing=pc.windows.windows.some(w=>w.id===appId);
     pc.ensureWindow(appId);
     pc.startOpen=false;
@@ -562,6 +546,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.project=normalizeStudioProject(pc.state.draft);pc.dirty=Boolean(pc.project);
     }
     pc.renderDesktop(false);
+    if(documents)pc.explorer?.navigate('documents');
     pc.shell.focusActive();
   };
   pc.open = appId => {
@@ -569,6 +554,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.openNow(appId);
   };
   pc.closeNow = id => {
+    if(id==='computer'){pc.explorer?.dispose();pc.explorer=null;}
     if(id==='ft-studio')pc.audio.stop();
     pc.windows=reduceWindows(pc.windows,{type:'close',id});
     pc.confirmClose=false;pc.pendingAction=null;
@@ -592,6 +578,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (pc.confirmClose) return;
     pc.requestProjectTransition(() => {
       pc.audio.stop();
+      pc.explorer?.dispose();pc.explorer=null;
       pc.windows=reduceWindows(pc.windows,{type:'clear'});
       pc.renderDesktop(false);
       pc.callbacks.onShutdown();
@@ -635,6 +622,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.audio.stop();
     pc.state = createVirtualPcState(state);
     pc.phase = 'off';
+    pc.explorer?.dispose();pc.explorer=null;
     pc.shell?.dispose();pc.shell=null;
     pc.windows=reduceWindows(pc.windows,{type:'clear'});
     pc.folder = 'computer';
@@ -656,6 +644,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (pc.bootTimer !== null) pc.clearTimeoutFn(pc.bootTimer);
     pc.bootTimer = null;
     pc.audio.dispose();
+    pc.explorer?.dispose();pc.explorer=null;
     pc.shell?.dispose();pc.shell=null;
     pc.phase = 'off';
     pc.render();

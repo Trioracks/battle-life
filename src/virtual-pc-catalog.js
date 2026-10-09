@@ -1,5 +1,6 @@
 const apps = Object.freeze([
   { id: 'computer', label: 'Мой компьютер', iconId: 'computer', description: 'Диск C: и Мои проекты' },
+  { id: 'documents', label: 'Мои документы', iconId: 'documents', description: 'Документы и музыкальные проекты' },
   { id: 'underweb', label: 'Underweb', iconId: 'underweb', description: 'Локальная сеть баттлов' },
   { id: 'torent', label: 'torent', iconId: 'torent', description: 'Каталог игровых загрузок' },
   { id: 'ft-studio', label: 'FT Studio', iconId: 'studio', description: 'Музыкальная станция' },

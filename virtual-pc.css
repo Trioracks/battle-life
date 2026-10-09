@@ -148,3 +148,32 @@
   #virtual-pc .ft-mixer { grid-template-columns:repeat(2,minmax(60px,1fr)); }
   #virtual-pc .pc-window { inset:auto; }
 }
+#virtual-pc .pc-explorer { height:100%; display:flex; flex-direction:column; background:#ece9d8; }
+#virtual-pc .pc-menubar { display:flex; flex:none; gap:0; padding:2px 3px; border-bottom:1px solid #d8d2be; height:24px; }
+#virtual-pc .pc-menubar .pc-menu-trigger { border:1px solid transparent; background:none; padding:1px 8px; min-height:20px; border-radius:0; }
+#virtual-pc .pc-menubar .pc-menu-trigger:hover { border-color:#9dbaf2; background:#c1d2ef; }
+#virtual-pc .pc-explorer-tools { display:flex; gap:4px; padding:5px; flex:none; border-bottom:1px solid #d2cbb6; }
+#virtual-pc .pc-explorer-tools button { padding:4px 7px!important; background:transparent!important; border-color:transparent!important; }
+#virtual-pc .pc-explorer-tools button:hover { border-color:#b6b1a0!important; background:#f8f6ee!important; }
+#virtual-pc .pc-address { display:flex; align-items:center; gap:5px; padding:3px 5px; flex:none; border-bottom:1px solid #a6a6a6; }
+#virtual-pc .pc-address input { flex:1; width:0; min-width:0; height:23px; }
+#virtual-pc .pc-address label { font-size:12px; color:#555; }
+#virtual-pc .pc-explorer-main { display:flex; flex:1; min-height:0; background:white; }
+#virtual-pc .pc-folder-tree { flex:0 0 175px; min-width:0; overflow:auto; padding:6px 0; border-right:3px solid #e8e4d8; }
+#virtual-pc .pc-tree-item { display:flex; width:100%; align-items:center; gap:3px; white-space:nowrap; min-height:23px; padding:3px 5px; border:0; background:white; color:#111; }
+#virtual-pc .pc-tree-item[aria-current=true] span { background:#316ac5; color:white; }
+#virtual-pc .pc-file-area { flex:1; min-width:0; overflow:auto; padding:12px; display:flex; align-content:flex-start; flex-wrap:wrap; gap:12px; }
+#virtual-pc .pc-file { display:flex; align-items:center; flex-direction:column; justify-content:flex-start; width:100px; height:max-content; padding:4px; gap:5px; border:1px solid transparent; background:white; color:#111; line-height:17px; }
+#virtual-pc .pc-file-name { overflow-wrap:anywhere; max-width:100%; }
+#virtual-pc .pc-file small { font-size:10px; color:#666; }
+#virtual-pc .pc-file[aria-pressed=true] { background:#d8e8ff; border:1px dotted #668bbf; }
+#virtual-pc .pc-file[aria-pressed=true] .pc-file-name { background:#316ac5; color:white; }
+#virtual-pc .pc-file-area[data-view=details] { display:block; padding:0; }
+#virtual-pc [data-view=details] .pc-file { flex-direction:row; width:100%; gap:8px; padding:4px 8px; text-align:left; }
+#virtual-pc [data-view=details] .pc-file-name { flex:1; min-width:0; }
+#virtual-pc [data-view=details] .pc-file-type { width:110px; }
+#virtual-pc .pc-details-head { white-space:pre; background:#ece9d8; border-bottom:1px solid #999; padding:4px 8px; font-size:12px; }
+#virtual-pc .pc-explorer-status { flex:none; border-top:1px solid #b3b0a3; padding:4px 8px; font-size:12px; min-height:23px; }
+#virtual-pc .pc-explorer-status[data-error=true] { color:#a11; background:#fff8dd; }
+#virtual-pc .pc-system-note { max-width:420px; padding:12px; color:#345681; }
+@media(max-width:640px) { #virtual-pc .pc-folder-tree { flex-basis:150px; } }

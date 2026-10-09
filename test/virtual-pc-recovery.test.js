@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { pcDocument as creatorDocument } from './helpers/virtual-pc-dom.js';
+import { pcDocument as creatorDocument, fire } from './helpers/virtual-pc-dom.js';
 import { mountVirtualPc } from '../src/virtual-pc-ui.js';
 import { createVirtualPcState } from '../src/virtual-pc-state.js';
 import { createStudioProject } from '../src/ft-studio-project.js';
@@ -138,12 +138,13 @@ test('projects are opened by navigating through the virtual disk and folder', ()
   controller.open('computer');
   assert.ok(!find(root, 'Открыть проект on-disk'));
   assert.ok(find(root, 'Открыть диск C:'));
-  find(root, 'Открыть диск C:').click();
-  find(root, 'Открыть папку Windows').click();
+  fire(find(root, 'Открыть диск C:'),'dblclick');
+  fire(find(root, 'Открыть папку Windows'),'dblclick');
   assert.ok(!find(root, 'Открыть проект on-disk'));
   find(root, 'Назад').click();
-  find(root, 'Открыть папку Мои проекты').click();
-  find(root, 'Открыть проект on-disk').click();
+  fire(find(root, 'Открыть папку Мои документы'),'dblclick');
+  fire(find(root, 'Открыть папку Мои проекты'),'dblclick');
+  fire(find(root, 'Открыть проект on-disk'),'dblclick');
   assert.equal(controller.project.id, 'on-disk');
 });
 

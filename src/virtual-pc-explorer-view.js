@@ -1,0 +1,87 @@
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js';
+import {createPcIcon} from './virtual-pc-icons.js';
+import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties,EXPLORER_PATHS} from './virtual-pc-explorer.js';
+import {createVirtualPcState,diskUsage} from './virtual-pc-state.js';
+import {normalizeStudioProject} from './ft-studio-project.js';
+
+export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu}) {
+  const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',disposed=false;
+  const wrap=el(d,'div',{className:'pc-explorer'}),menubar=el(d,'div',{className:'pc-menubar'});
+  const tools=el(d,'div',{className:'pc-explorer-tools'}),form=el(d,'form',{className:'pc-address'});
+  const address=el(d,'input',{attributes:{'aria-label':'Адрес папки'},value:'Мой компьютер'});
+  form.append(el(d,'label',{text:'Адрес'}),createPcIcon(d,'folder',{size:16}),address,button(d,'Переход',{},()=>navigate(address.value)));
+  const main=el(d,'div',{className:'pc-explorer-main'}),tree=el(d,'nav',{className:'pc-folder-tree',attributes:{'aria-label':'Дерево папок'}});
+  const files=el(d,'div',{className:'pc-file-area',attributes:{'aria-label':'Содержимое папки'}}),status=el(d,'div',{className:'pc-explorer-status',attributes:{'aria-live':'polite'}});
+  main.append(tree,files);wrap.append(menubar,tools,form,main,status);root.replaceChildren(wrap);
+  const change=a=>{nav=navigateExplorer(nav,a);render(true);};
+  const navigate=path=>change({type:'navigate',path});
+  const entries=()=>explorerEntries(state,nav.path);
+  const selected=()=>entries().find(e=>e.id===nav.selection);
+  function openEntry(entry) {
+    if(!entry)return;
+    if(entry.targetPath){navigate(entry.targetPath);return;}
+    const p=normalizeStudioProject(state.projects.find(p=>p.id===entry.projectId));
+    if(!p){nav={...nav,error:'Этот проект повреждён и не может быть открыт.'};render(false);return;}
+    onOpenProject(p);
+  }
+  function properties(entry=selected()){if(entry)onProperties(explorerProperties(state,entry));}
+  const viewItems=()=>[
+    {id:'icons',label:'Значки',onSelect:()=>change({type:'view',view:'icons'})},
+    {id:'details',label:'Таблица',onSelect:()=>change({type:'view',view:'details'})},
+    {id:'tree',label:'Панель папок',onSelect:()=>change({type:'toggle-tree'})},
+  ];
+  function menu(anchor,items,e) {const r=anchor.getBoundingClientRect();onMenu?.({anchor,items,x:e?.clientX??r.left,y:e?.clientY??r.bottom});}
+  for(const [label,items]of [
+    ['Файл',()=>[{id:'open',label:'Открыть',disabled:!selected(),onSelect:()=>openEntry(selected())},{id:'properties',label:'Свойства',disabled:!selected(),onSelect:()=>properties()},{id:'close',label:'Закрыть',onSelect:onClose}]],
+    ['Вид',viewItems],
+    ['Переход',()=>[{id:'back',label:'Назад',disabled:nav.index===0,onSelect:()=>change({type:'back'})},{id:'forward',label:'Вперёд',disabled:nav.index===nav.history.length-1,onSelect:()=>change({type:'forward'})},{id:'up',label:'Вверх',disabled:nav.path==='computer',onSelect:()=>change({type:'up'})}]],
+  ]) {const b=button(d,label,{className:'pc-menu-trigger'},()=>menu(b,items()));menubar.append(b);}
+  const back=button(d,'← Назад',{'attributes':{'aria-label':'Назад'}},()=>change({type:'back'}));
+  const forward=button(d,'Вперёд →',{'attributes':{'aria-label':'Вперёд'}},()=>change({type:'forward'}));
+  const up=button(d,'↑ Вверх',{'attributes':{'aria-label':'Вверх'}},()=>change({type:'up'}));
+  tools.append(back,forward,up,button(d,'Папки',{},()=>change({type:'toggle-tree'})),button(d,'Вид',{},e=>menu(e.currentTarget,viewItems())));
+  function render(updateAddress) {
+    if(disposed)return;
+    if(updateAddress)address.value=EXPLORER_PATHS[nav.path].address;
+    back.disabled=nav.index===0;forward.disabled=nav.index===nav.history.length-1;up.disabled=nav.path==='computer';
+    tree.hidden=!nav.treeVisible;tree.replaceChildren();
+    for(const [id,p]of Object.entries(EXPLORER_PATHS)){
+      const depth=id==='computer'?0:id==='disk'?1:id==='projects'?3:2;
+      const b=button(d,'',{className:'pc-tree-item',attributes:{'aria-label':'Перейти: '+p.label,'aria-current':String(nav.path===id)}},()=>navigate(id));
+      b.style.setProperty('padding-left',(6+depth*14)+'px');b.append(createPcIcon(d,p.iconId,{size:16}),el(d,'span',{text:p.label}));tree.append(b);
+    }
+    files.replaceChildren();files.dataset.view=nav.view;
+    if(nav.view==='details')files.append(el(d,'div',{className:'pc-details-head',text:'Имя                                      Тип                 Размер'}));
+    if(nav.path==='windows')files.append(el(d,'p',{className:'pc-system-note',text:'Windows — системная папка игрового компьютера. Доступна только для просмотра.'}));
+    for(const entry of entries()){
+      const label=entry.kind==='project'?'Открыть проект '+entry.name:entry.kind==='disk'?'Открыть диск C:':'Открыть папку '+entry.name;
+      const b=button(d,'',{className:'pc-file',dataset:{entryId:entry.id},attributes:{'aria-label':label,'aria-pressed':String(nav.selection===entry.id)}},()=>{
+        nav={...nav,selection:entry.id,error:''};
+        for(const item of files.children)if(item.dataset.entryId)item.setAttribute('aria-pressed',String(item.dataset.entryId===entry.id));
+        status.textContent=entry.name;
+      });
+      b.append(createPcIcon(d,entry.iconId,{size:nav.view==='details'?16:32}),el(d,'span',{className:'pc-file-name',text:entry.name}));
+      if(entry.kind==='disk')b.append(el(d,'small',{text:'Свободно '+Math.round(diskUsage(state).freeMb)+' МБ'}));
+      if(nav.view==='details')b.append(el(d,'span',{className:'pc-file-type',text:entry.kind==='project'?'Проект FT Studio':entry.kind==='disk'?'Локальный диск':'Папка'}),el(d,'span',{text:entry.sizeMb?entry.sizeMb+' МБ':''}));
+      b.addEventListener('dblclick',()=>openEntry(entry));
+      const context=e=>{e.preventDefault();e.stopPropagation();nav={...nav,selection:entry.id};b.setAttribute('aria-pressed','true');menu(b,[{id:'open',label:'Открыть',onSelect:()=>openEntry(entry)},{id:'properties',label:'Свойства',onSelect:()=>properties(entry)}],e.type==='contextmenu'?e:undefined);};
+      b.addEventListener('contextmenu',context);
+      b.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();openEntry(entry);}if(e.key==='F10'&&e.shiftKey)context(e);});
+      files.append(b);
+    }
+    status.textContent=nav.error||'Объектов: '+entries().length;
+    status.dataset.error=String(!!nav.error);
+  }
+  const submit=e=>{e.preventDefault();navigate(address.value);};
+  form.addEventListener('submit',submit);
+  const backgroundMenu=e=>{
+    if(e.target!==files)return;e.preventDefault();nav={...nav,selection:null};
+    menu(files,[{id:'view',label:'Вид',items:viewItems()},{id:'refresh',label:'Обновить',onSelect:()=>render(false)}],e);
+  };
+  files.addEventListener('contextmenu',backgroundMenu);
+  render(true);
+  return {navigate,update(next){
+    state=next;const sig=JSON.stringify([state.projects,diskUsage(state)]);
+    if(sig!==signature){signature=sig;if(nav.selection&&!entries().some(e=>e.id===nav.selection))nav={...nav,selection:null};render(false);}
+  },dispose(){disposed=true;form.removeEventListener('submit',submit);files.removeEventListener('contextmenu',backgroundMenu);root.replaceChildren();}};
+}
