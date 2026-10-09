@@ -4,7 +4,7 @@ Date: 2026-10-09
 
 ## Automated verification
 
-- `npm test` — audit-fix run in the working directory: **342 passed, 0 failed** (23.21 s).
+- `npm test` — browser-timer fix in the working directory: **344 passed, 0 failed** (24.77 s).
 - `npm test` — clean Git export, excluding all pre-existing local/untracked work: **336 passed, 0 failed** (23.03 s). Source/test snapshot tree: `665e2eb18b1ef1152c1ecab9f9e9e87522a99bf5`. The differing totals come from pre-existing local test additions.
 - `git diff --check` — no whitespace errors.
 - Focused coverage in the full suite includes immutable PC state and virtual-disk accounting, six-game-hour download completion, power-off pause, midnight timestamps, local Underweb routes, FT Studio project serialization, simulated four-voice audio scheduling, safe close and shutdown prompts, and apartment clock integration.
@@ -19,12 +19,16 @@ Date: 2026-10-09
 
 ## Visual/browser acceptance
 
-Not completed. The supported browser automation crashed at initial local-tab creation with `trusted Node process exited unexpectedly; kernel reset`. Consequently the following are intentionally **not claimed as passed**:
+The in-app browser automation still crashes at initialization, but the existing Playwright/Chromium installation was usable through the CLI. `tools/verify-virtual-pc-browser.mjs` completed in an isolated browser context without touching the player's saves or downloading dependencies:
 
-- the complete browser route at 1280x720;
-- narrow 640x900 layout/scrolling;
-- audible Start/Stop playback in a real browser;
-- visual confirmation of save/reopen and unsaved-change prompts.
+- actual apartment click → seated transition → boot stages → desktop occupying the entire viewport;
+- Underweb battle → download → leave PC powered on → sleep → return → install;
+- create project → real browser Web Audio Play/Stop → pointer-drag mixer → save;
+- desktop/Studio fullscreen bounds and screenshots at 1280x720 and Studio at 640x900, with the taskbar visible;
+- My Computer → C: → My Projects → reopen/play → shutdown → reload → preserved wallpaper, installation and project → reopen/play;
+- **zero browser page errors** over this route.
+
+Screenshots: `artifacts/virtual-pc-acceptance/desktop-1280.png`, `studio-1280.png`, `studio-640.png`. The desktop and narrow Studio screenshots were visually inspected. Headless Web Audio activation is verified, but audible output through the user's speakers and browser unsaved-change dialog acceptance are **not claimed**. The latter remains covered by DOM-controller tests.
 
 The original local wallpaper assets are present at:
 
@@ -32,7 +36,7 @@ The original local wallpaper assets are present at:
 - `assets/ui/virtual-pc/wallpaper-factory.png`
 - `assets/ui/virtual-pc/wallpaper-room.png`
 
-They are covered by the desktop implementation but await the blocked browser visual check.
+Courtyard and factory wallpapers were exercised in the browser route; the room wallpaper remains covered by state/controller tests.
 
 ## Independent review and follow-up
 
@@ -78,6 +82,15 @@ The user requested corrections after the follow-up audit reproduced draft loss, 
 
 Focused audit tests: **38 passed, 0 failed** across PC UI/recovery, new-game lifecycle and audio. New regression cases first failed against the old implementation, then passed after correction.
 
-Browser acceptance was attempted again after the fixes. The browser kernel exited during initialization with `windows sandbox failed: helper_unknown_error: setup refresh had errors`. Real audio playback, pointer dragging, and the full 1280×720 / 640×900 route therefore remain **unverified**. DOM/audio-adapter tests do not replace that acceptance.
+At this audit stage the browser kernel exited during initialization with `windows sandbox failed: helper_unknown_error: setup refresh had errors`. The subsequent CLI Chromium verification above supersedes that browser limitation for the explicitly listed checks; it does not claim human listening acceptance.
+
+## Empty fullscreen PC correction — 9 October 2026
+
+The user's screenshot showed a seated actor and hidden apartment HUD, but no PC UI. Chromium reproduced `TypeError: Illegal invocation`: the controller stored native Window timers as object methods, losing their required Window receiver. The apartment switched to PC mode before boot rendering, so that exception left an empty transparent overlay. Studio's interval methods had the same defect.
+
+- Timer defaults now invoke `globalThis.setTimeout/clearTimeout/setInterval/clearInterval` with the correct receiver; injected test timers remain supported.
+- Two receiver-enforcing regression tests failed before the fix and passed afterward. Focused recovery/audio tests: **18 passed, 0 failed**.
+- The real browser route above passed after the fix, followed by the full **344-test** working-directory run. The earlier 336-test clean export belongs to the preceding audit, not this correction.
+- The entry point is now revision 16, with updated PC/audio module revisions so a page refresh loads the correction.
 
 The subsequent beat → microphone recording → mix → battle submission/result loop is a separate future gameplay step, not part of these corrections.

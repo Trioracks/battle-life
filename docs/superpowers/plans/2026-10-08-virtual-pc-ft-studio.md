@@ -231,7 +231,7 @@ Expected: no whitespace errors; only feature files are new/modified in addition 
 
 - [ ] **Step 3: Perform browser acceptance if the existing supported automation is available**
 
-Status, 9 October 2026: retried after audit fixes; browser automation still exits during initialization (`helper_unknown_error: setup refresh had errors`). Actual browser/audio/responsive acceptance is not complete.
+Status, 9 October 2026: the in-app automation remains unavailable, but CLI Chromium exposed and verified a fix for the native-timer `Illegal invocation` that prevented PC rendering. `tools/verify-virtual-pc-browser.mjs` passed the actual apartment/boot/desktop/download/install/project/Play/Stop/save/reload route, pointer dragging and 1280×720 / 640×900 bounds with zero page errors. Speaker listening and browser unsaved-change dialog acceptance remain open, so the full step is not marked complete. See QA for screenshots and exact scope.
 
 Exercise the complete spec route at 1280×720 and 640×900, including real audible Start/Stop and saved-project reopen. If the supported browser automation again fails before verification, record it as not completed; do not replace this with a claim based on source code or Blender output.
 

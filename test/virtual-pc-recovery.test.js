@@ -16,6 +16,28 @@ function setup(state) {
   return { controller, root, document };
 }
 
+test('native Window timers keep their receiver while the PC boots and closes', t => {
+  const timers = new Map(); let id = 0;
+  t.mock.method(globalThis, 'setTimeout', function (callback) {
+    if (this !== globalThis) throw new TypeError('Illegal invocation');
+    timers.set(++id, callback); return id;
+  });
+  t.mock.method(globalThis, 'clearTimeout', function (timer) {
+    if (this !== globalThis) throw new TypeError('Illegal invocation');
+    timers.delete(timer);
+  });
+  const { controller, root } = setup();
+  assert.doesNotThrow(() => controller.boot(createVirtualPcState({ power: 'on' })));
+  assert.equal(root.dataset.pcStage, 'booting');
+  for (let stage = 0; stage < 4; stage++) {
+    const [timer, callback] = timers.entries().next().value;
+    timers.delete(timer); callback();
+  }
+  assert.equal(root.dataset.pcStage, 'desktop');
+  assert.ok(find(root, 'Мой компьютер'));
+  controller.dispose();
+});
+
 test('a new-game reset clears the previous controller project and pending shutdown', () => {
   const { controller, root } = setup({ draft: project('old') });
   controller.open('ft-studio');

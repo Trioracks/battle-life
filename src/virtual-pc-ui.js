@@ -1,4 +1,4 @@
-import { FtStudioAudio } from './ft-studio-audio.js?rev=3';
+import { FtStudioAudio } from './ft-studio-audio.js?rev=4';
 import { createStudioProject, normalizeStudioProject, setArrangementCell, setBpm, setStudioStep, setTrackGain } from './ft-studio-project.js';
 import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js';
 import { cancelFtDownload, createVirtualPcState, diskUsage, FT_STUDIO_MB, PROJECT_MB, installFtStudio, saveStudioProject, setWallpaper, startFtDownload } from './virtual-pc-state.js';
@@ -80,8 +80,8 @@ export function mountVirtualPc(root, callbacks = {}) {
       onOpenProject: callbacks.onOpenProject ?? NOOP,
       onSaveProject: callbacks.onSaveProject ?? saveStudioProject,
     },
-    setTimeoutFn: callbacks.setTimeoutFn ?? globalThis.setTimeout,
-    clearTimeoutFn: callbacks.clearTimeoutFn ?? globalThis.clearTimeout,
+    setTimeoutFn: callbacks.setTimeoutFn ?? ((...args) => globalThis.setTimeout(...args)),
+    clearTimeoutFn: callbacks.clearTimeoutFn ?? (timer => globalThis.clearTimeout(timer)),
     audio: callbacks.audio ?? new FtStudioAudio(),
     state: createVirtualPcState(),
     phase: 'off',

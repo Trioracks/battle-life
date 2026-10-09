@@ -5,8 +5,8 @@ const voices = Object.freeze({ kick: 88, snare: 220, hat: 6800, bass: 55 });
 export class FtStudioAudio {
   constructor(options = {}) {
     this.AudioContext = options.AudioContext === undefined ? globalThis.AudioContext : options.AudioContext;
-    this.setIntervalFn = options.setIntervalFn ?? globalThis.setInterval;
-    this.clearIntervalFn = options.clearIntervalFn ?? globalThis.clearInterval;
+    this.setIntervalFn = options.setIntervalFn ?? ((...args) => globalThis.setInterval(...args));
+    this.clearIntervalFn = options.clearIntervalFn ?? (timer => globalThis.clearInterval(timer));
     this.context = null;
     this.timer = null;
     this.nodes = [];

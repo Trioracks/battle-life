@@ -9,7 +9,7 @@ import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=
 import {createNewGameSession} from './apartment-v3-new-game.js?rev=1';
 import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=2';
 import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=2';
-import {mountVirtualPc} from './virtual-pc-ui.js?rev=3';
+import {mountVirtualPc} from './virtual-pc-ui.js?rev=4';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false;

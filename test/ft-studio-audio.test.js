@@ -31,6 +31,25 @@ function fourVoiceProject() {
   return project;
 }
 
+test('native Window interval methods allow studio playback and Stop', async t => {
+  let callback = null;
+  t.mock.method(globalThis, 'setInterval', function (tick) {
+    if (this !== globalThis) throw new TypeError('Illegal invocation');
+    callback = tick; return 1;
+  });
+  t.mock.method(globalThis, 'clearInterval', function () {
+    if (this !== globalThis) throw new TypeError('Illegal invocation');
+    callback = null;
+  });
+  const audio = new FtStudioAudio({ AudioContext: FakeAudioContext });
+  const result = await audio.play(fourVoiceProject());
+  assert.equal(result.ok, true);
+  assert.equal(typeof callback, 'function');
+  callback();
+  assert.doesNotThrow(() => audio.stop());
+  assert.equal(callback, null);
+});
+
 test('boot audio schedules short tones without starting the sequencer', async () => {
   const audio = new FtStudioAudio({ AudioContext: FakeAudioContext });
   assert.equal(typeof audio.playBoot, 'function');
