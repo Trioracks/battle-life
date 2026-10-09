@@ -178,6 +178,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   let transitionLayer=null,transitionTitle=null,transitionSubtitle=null,transitionProgress=null;
   pc.presentTransition = snapshot => {
     const p=pcPresentation(snapshot,pc.state.power,pc.metadata.playerName);
+    const wasLocked=pc.locked;
     pc.locked=snapshot.locked;root.dataset.pcTransition=snapshot.phase;
     root.dataset.pcStage=['loading','welcome','power-on'].includes(snapshot.phase)?'booting':pc.phase;
     root.style.opacity=String(snapshot.overlay??0);root.style.pointerEvents=snapshot.locked?'none':'auto';
@@ -191,6 +192,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     transitionLayer.hidden=p.screen==='desktop'||(p.screen==='off'&&snapshot.phase==='room');transitionLayer.dataset.screen=p.screen;
     transitionLayer.style.opacity='1';transitionLayer.style.filter=`brightness(${p.brightness})`;transitionTitle.textContent=p.title;transitionSubtitle.textContent=p.subtitle;
     transitionProgress.hidden=p.screen!=='loading';transitionProgress.value=p.progress;
+    if(wasLocked&&!pc.locked&&snapshot.phase==='desktop')pc.shell?.focusActive();
   };
 
   pc.renderDesktop = (replaceActive=true) => {

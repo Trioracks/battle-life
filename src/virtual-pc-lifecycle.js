@@ -1,8 +1,13 @@
 import {PcTransition} from './virtual-pc-transition.js?rev=18';
 export const pcNeedsSceneFrame=(snapshot,mode)=>mode!=='pc'||snapshot.overlay<1;
+export function moveInRoom(motion,lifecycle,x){
+ if(!motion.move(x))return false;
+ if(lifecycle.pending&&!lifecycle.entering)lifecycle.reset();
+ return true;
+}
 export class PcLifecycle{
  constructor({view,getState,setPower,sounds,onDesktop=()=>{},onRoom=()=>{},onError=()=>{}}){Object.assign(this,{view,getState,setPower,sounds,onDesktop,onRoom,onError});this.transition=new PcTransition();this.generation=0;this.pending=null;this.savedLook=null;this.entering=false;}
- get snapshot(){return this.transition.snapshot;}
+ get snapshot(){const snapshot=this.transition.snapshot;return this.pending?{...snapshot,phase:'preparing',locked:true}:snapshot;}
  prepare(){
   if(this.pending||this.snapshot.phase!=='room')return false;
   this.savedLook={mode:this.view.modes.mode,yaw:this.view.modes.yaw,pitch:this.view.modes.pitch};

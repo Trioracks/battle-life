@@ -25,10 +25,12 @@ Work was performed on master in D:/Project/Battle with explicit user approval. P
 - Baseline: 399/399.
 - Staged suite: 426/426 before browser refinements.
 - Installed suite after refinements: 428/428 (installed-suite.log).
-- Per-task RED/GREEN logs and exact commits are in the execution ledger until final archival.
+- Final suite after review corrections: 431/431 (final-suite.log).
+- Per-task RED/GREEN logs, review, execution ledger and final verification are archived at D:/Codex/Builds/Battle/pc-immersion-20261009-01/execution-record. Only this plan's scratch directory is removed after archival; sibling plans remain untouched.
 - Browser run 1 found flipped screen text; fixed with a failing orientation regression test. Hidden 3D rendering was also eliminated. Run 1 was stopped, not reported as a pass.
 - Browser run 2: D:/Codex/Builds/Battle/pc-immersion-qa-20261009-02. Passed all scenarios, zero page errors or unexpected missing assets. Isolated storage; player profile untouched. Includes cold/warm, resize mid-zoom, both desktop widths, disk meter, background sleep download, dirty guards, reload during shutdown, denied storage, 3D restoration and asset retry with WebAudio disabled. Recording and 21 PNG captures retained on D:.
 - Inspected real screenshots: seated BIOS, portrait zoom, boot/loading/welcome, desktop and Explorer at both widths, shutdown and restored 3D view. Original flipped portrait image was replaced in run 2 and re-inspected with upright text.
+- Post-review browser run 3: D:/Codex/Builds/Battle/pc-immersion-qa-20261009-03. All full acceptance scenarios passed again, zero page errors or unexpected missing assets; upright portrait BIOS inspected. Focused pending/focus/persisted-page regressions also passed (final-browser-green.log).
 
 ## Execution rulings
 
@@ -36,7 +38,14 @@ Work was performed on master in D:/Project/Battle with explicit user approval. P
 2. Pot support means the burner grate at 1.008m, not the enamel below. Risk: a further height adjustment if a different support is intended.
 3. Front wall/ceiling are separate static groups hidden only for cutaway entry. Risk: static asset regeneration if the grouping is unsuitable.
 4. Host orchestration is a separate lifecycle module to make stale-promise and restoration cases testable. Risk: reintegration of one module if this boundary changes.
+5. Underweb search/navigation and the new visual FT Studio remain next stages, not delivered by this plan. Risk: revise next-stage scope.
+6. Existing music and user dirty files stay outside changed-code review; music/guard regressions still run. Risk: a separate investigation if an existing behavior is wrong.
+7. Original XP fidelity and subjective audio quality remain explicitly unaccepted. Risk: replace audio and perform a listening pass.
 
 ## Final review
 
-Pending independent read-only review of the full implementation range. No merge, push or publication is requested.
+Independent read-only review of 23ed5c5..1c6dfe1 found four Important issues and no Critical issues. One author fix pass added RED→GREEN regressions for cancelled approach, invisible pending desktop, focus-before-unlock and disposal on persisted pagehide. Full suite: 431/431. Focused Chromium regression passed with zero page errors; persisted PageTransitionEvents exercise BFCache handler behavior, not automatic browser BFCache eligibility. No second review.
+
+Deferred minor: PC imports in apartment-v3-runtime.js and apartment-v3-new-game.js retain rev17; no current changed-capacity regression was found. Align at the next revision bump.
+
+Final full browser rerun passed. No merge, push or publication is requested; retain master in place as explicitly chosen by the user. Current local preview: http://127.0.0.1:4173/?rev=18. Existing powered-on saves use warm entry; to see the full cold boot, shut the PC down through Start first or use a new game.

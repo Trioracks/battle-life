@@ -10,7 +10,7 @@ import {createNewGameSession} from './apartment-v3-new-game.js?rev=18';
 import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=18';
 import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=18';
 import {mountVirtualPc} from './virtual-pc-ui.js?rev=18';
-import {PcLifecycle,pcNeedsSceneFrame} from './virtual-pc-lifecycle.js?rev=18';
+import {PcLifecycle,pcNeedsSceneFrame,moveInRoom} from './virtual-pc-lifecycle.js?rev=18';
 import {PcSounds} from './virtual-pc-sounds.js?rev=18';
 import {playIndoorFootstep} from './indoor-footsteps.js?rev=18';
 
@@ -59,7 +59,7 @@ try{
     if(motion.actionId==='computer'&&motion.phase==='perform')motion.leaveAction();
     setMode('game');resumeAnimation();
   }
-  const pcLifecycle=new PcLifecycle({view,getState:()=>pcState,setPower:power=>persistPc(setPcPower(pcState,power)),sounds:pcSounds,onRoom:returnFromComputer,onDesktop:()=>virtualPc.shell?.focusActive(),onError:()=>{pcPrepareError=true;message='Не удалось подготовить экран. Попробуйте сесть за ПК ещё раз.';messageUntil=performance.now()+6000;}});
+  const pcLifecycle=new PcLifecycle({view,getState:()=>pcState,setPower:power=>persistPc(setPcPower(pcState,power)),sounds:pcSounds,onRoom:returnFromComputer,onError:()=>{pcPrepareError=true;message='Не удалось подготовить экран. Попробуйте сесть за ПК ещё раз.';messageUntil=performance.now()+6000;}});
   virtualPc=mountVirtualPc(pcRoot,{
     onPersist:next=>persistPc(next),
     onLeave:()=>pcLifecycle.leave(),
@@ -192,7 +192,7 @@ try{
     if(config.actions[id]?.lightRoom)b.setAttribute('aria-label',label);
     $('#actions').append(b);
   }
-  canvas.addEventListener('pointerdown',e=>{if(!lookInput.canPick(e)||cameraFade||mode!=='game')return;const hit=view.pick(e);resumeAnimation();if(hit.id)act(hit.id);else if(hit.hero)motion.faceCamera();else if(Number.isFinite(hit.x)){motion.move(hit.x);cue('footstep');}});
+  canvas.addEventListener('pointerdown',e=>{if(!lookInput.canPick(e)||cameraFade||mode!=='game')return;const hit=view.pick(e);resumeAnimation();if(hit.id)act(hit.id);else if(hit.hero)motion.faceCamera();else if(Number.isFinite(hit.x)&&moveInRoom(motion,pcLifecycle,hit.x))cue('footstep');});
   canvas.addEventListener('pointermove',e=>{if(mode!=='game'){canvas.style.cursor='default';return;}const delta=lookInput.move(e);if(delta){view.modes.look(...delta);canvas.style.cursor='grabbing';$('#hover-label').textContent='';return;}const hit=view.pick(e);canvas.style.cursor=hit.id||hit.hero?'pointer':'crosshair';
     const action=config.actions[hit.id];$('#hover-label').textContent=action?.lightRoom?(homeTime.lights[action.lightRoom]?'Выключить':'Включить')+' свет '+(action.lightRoom==='living'?'в комнате':'на кухне'):action?.label??(hit.hero?'Повернуться к камере':'');});
   canvas.addEventListener('pointerleave',()=>$('#hover-label').textContent='');
@@ -266,5 +266,6 @@ try{
   loading.hidden=true;setMode('menu');view.render(motion,0);
   function frame(now){const raw=(now-last)/1000,dt=Math.min(raw,.25);if(raw>0)frameRate=frameRate*.9+Math.min(240,1/raw)*.1;last=now;update(dt,now);requestAnimationFrame(frame);}requestAnimationFrame(frame);
   document.addEventListener('visibilitychange',()=>last=performance.now());
-  window.addEventListener('pagehide',()=>{pcLifecycle.reset();pcSounds.dispose();virtualPc.dispose();view.dispose();},{once:true});
+  window.addEventListener('pagehide',event=>{if(event.persisted){pcSounds.stop();return;}pcLifecycle.reset();pcSounds.dispose();virtualPc.dispose();view.dispose();});
+  window.addEventListener('pageshow',event=>{if(event.persisted)last=performance.now();});
 }catch(error){console.error(error);loading.querySelector('h2').textContent='Не удалось загрузить сцену';loading.querySelector('p').textContent=error.message;loading.classList.add('error');}
