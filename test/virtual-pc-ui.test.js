@@ -4,7 +4,7 @@ import { createStudioProject } from '../src/ft-studio-project.js';
 import { BATTLE_BRIEFS } from '../src/virtual-pc-catalog.js';
 import { createVirtualPcState } from '../src/virtual-pc-state.js';
 import { mountVirtualPc } from '../src/virtual-pc-ui.js';
-import { creatorDocument } from './helpers/creator-dom.js';
+import { pcDocument as creatorDocument } from './helpers/virtual-pc-dom.js';
 
 function descendants(root) {
   return root.children.flatMap(child => [child, ...descendants(child)]);
@@ -204,7 +204,7 @@ test('a close guard moves focus into its own dialog and traps reverse Tab there'
   assert.equal(document.activeElement, cancel);
 });
 
-test('switching applications cannot discard a dirty studio project without a choice', () => {
+test('switching applications retains the dirty studio without a close dialog', () => {
   const installed = createVirtualPcState({ download: { status: 'installed' } });
   const { controller, root } = createController(installed);
   const project = createStudioProject({ id: 'guard-navigation', name: 'Переход', battleId: BATTLE_BRIEFS[0].id }).project;
@@ -214,7 +214,9 @@ test('switching applications cannot discard a dirty studio project without a cho
   find(root, element => element.dataset.track === 'kick' && element.dataset.step === '0').click();
   controller.open('underweb');
 
-  assert.equal(hasText(root, 'Сохранить проект перед закрытием?'), true);
+  assert.equal(hasText(root, 'Сохранить проект перед закрытием?'), false);
+  assert.equal(controller.project.id, 'guard-navigation');
+  assert.equal(controller.dirty, true);
 });
 
 test('cancelling shutdown does not make a later ordinary save turn off the pc', () => {

@@ -124,7 +124,7 @@ export function mountPcShell(root,{onCommand}) {
       f.controls['toggle-maximize'].setAttribute('aria-label',w.mode==='maximized'?'Восстановить окно':'Развернуть окно');
     }
   }
-  function focusActive(){const scope=modalNode??frames.get(model?.windows.activeId)?.content??workspace;pcFocusable(scope)[0]?.focus();}
+  function focusActive(){const scope=modalNode??frames.get(model?.windows.activeId)?.frame??workspace;pcFocusable(scope)[0]?.focus();}
   function setModal(node,returnFocus) {
     const had=modalNode;modalNode=node;workspace.inert=!!node;taskbar.inert=!!node;menus.inert=!!node;
     modal.hidden=!node;

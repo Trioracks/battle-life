@@ -1,8 +1,8 @@
 const apps = Object.freeze([
-  { id: 'computer', label: 'Мой компьютер', icon: '▣', description: 'Диск C: и Мои проекты' },
-  { id: 'underweb', label: 'Underweb', icon: '⌁', description: 'Локальная сеть баттлов' },
-  { id: 'torent', label: 'torent', icon: '⇣', description: 'Каталог игровых загрузок' },
-  { id: 'ft-studio', label: 'FT Studio', icon: '❋', description: 'Музыкальная станция' },
+  { id: 'computer', label: 'Мой компьютер', iconId: 'computer', description: 'Диск C: и Мои проекты' },
+  { id: 'underweb', label: 'Underweb', iconId: 'underweb', description: 'Локальная сеть баттлов' },
+  { id: 'torent', label: 'torent', iconId: 'torent', description: 'Каталог игровых загрузок' },
+  { id: 'ft-studio', label: 'FT Studio', iconId: 'studio', description: 'Музыкальная станция' },
 ]);
 
 export const WALLPAPERS = Object.freeze([

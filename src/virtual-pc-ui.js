@@ -1,4 +1,8 @@
 import { FtStudioAudio } from './ft-studio-audio.js?rev=4';
+import {mountPcShell} from './virtual-pc-shell.js';
+import {createWindowState,reduceWindows} from './virtual-pc-window-state.js';
+import {layoutDesktopIcons,setDesktopIconPosition} from './virtual-pc-state.js';
+import {createPcIcon} from './virtual-pc-icons.js';
 import { createStudioProject, normalizeStudioProject, setArrangementCell, setBpm, setStudioStep, setTrackGain } from './ft-studio-project.js';
 import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js';
 import { cancelFtDownload, createVirtualPcState, diskUsage, FT_STUDIO_MB, PROJECT_MB, installFtStudio, saveStudioProject, setWallpaper, startFtDownload } from './virtual-pc-state.js';
@@ -85,7 +89,10 @@ export function mountVirtualPc(root, callbacks = {}) {
     audio: callbacks.audio ?? new FtStudioAudio(),
     state: createVirtualPcState(),
     phase: 'off',
-    window: null,
+    windows: createWindowState({width:globalThis.innerWidth??1280,height:globalThis.innerHeight??720}),
+    shell: null,
+    metadata: {playerName:'Игрок',clockLabel:'12:00'},
+    returnFocus: null,
     folder: 'computer',
     startOpen: false,
     address: 'underweb://battles',
@@ -123,7 +130,22 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.refreshPersistenceWarning();
   };
 
-  pc.makeAppIcon = app => button(document, `${app.icon} ${app.label}`, { className: 'pc-icon', dataset: { app: app.id }, attributes: { 'aria-label': app.label, title: app.description } }, () => pc.open(app.id));
+  Object.defineProperty(pc,'window',{get:()=>pc.windows.activeId});
+  pc.ensureWindow = appId => {
+    const app=desktopApps(pc.state).find(a=>a.id===appId);
+    pc.windows=reduceWindows(pc.windows,{type:'open',id:appId,appId,title:app?.label??appId});
+  };
+  pc.windowAction = action => {
+    if(pc.confirmClose)return;
+    if(action.type==='close'){pc.closeWindow(action.id);return;}
+    pc.windows=reduceWindows(pc.windows,action);
+    pc.renderDesktop(false);
+  };
+  pc.syncHost = metadata => {
+    if(pc.metadata.playerName===metadata.playerName&&pc.metadata.clockLabel===metadata.clockLabel)return;
+    pc.metadata={...metadata};
+    if(pc.phase==='desktop')pc.renderDesktop(false);
+  };
 
   pc.refreshTorent = () => {
     const progress = downloadPresentation(pc.state);
@@ -136,13 +158,9 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.refreshDynamicState = () => {
-    const disk = findByDataset(root, 'pcRole', 'free-space');
-    if (disk) disk.textContent = pc.diskLabel();
     pc.refreshPersistenceWarning();
-    if (pc.window === 'torent') pc.refreshTorent();
-    const apps = findByDataset(root, 'pcRole', 'icons');
-    const studio = desktopApps(pc.state).find(app => app.id === 'ft-studio');
-    if (apps && studio && !findByDataset(apps, 'app', 'ft-studio')) add(apps, pc.makeAppIcon(studio));
+    if(pc.windows.windows.some(w=>w.id==='torent'))pc.refreshTorent();
+    pc.renderDesktop(false);
   };
 
   pc.syncState = state => {
@@ -166,38 +184,36 @@ export function mountVirtualPc(root, callbacks = {}) {
     root.replaceChildren(shell);
   };
 
-  pc.renderDesktop = () => {
-    const focusId = document.activeElement?.dataset?.focusId;
-    root.dataset.pcStage = 'desktop';
-    const shell = el(document, 'section', { className: 'pc-shell pc-desktop' });
-    const wallpaper = WALLPAPERS.find(item => item.id === pc.state.wallpaper) ?? WALLPAPERS[0];
-    shell.style.setProperty('--pc-wallpaper', `url("${wallpaper.path}")`);
-    const header = el(document, 'header', { className: 'pc-desktop-header' });
-    add(header, el(document, 'span', { text: 'SLOBODA DESK 96' }));
-    add(header, el(document, 'span', { text: pc.diskLabel(), dataset: { pcRole: 'free-space' } }));
-    add(header, el(document, 'span', { className: 'pc-storage-warning', text: pc.persistenceWarning, dataset: { pcRole: 'persistence-warning' }, attributes: { 'aria-live': 'polite' } }));
-    add(shell, header);
-    const workspace = el(document, 'div', { className: 'pc-workspace', attributes: { 'aria-label': 'Рабочий стол Sloboda Desk 96' } });
-    const icons = el(document, 'nav', { className: 'pc-icons', dataset: { pcRole: 'icons' }, attributes: { 'aria-label': 'Приложения компьютера' } });
-    for (const app of desktopApps(pc.state)) {
-      add(icons, pc.makeAppIcon(app));
+  pc.renderDesktop = (replaceActive=true) => {
+    const focused=document.activeElement,focusId=focused?.dataset?.focusId;
+    root.dataset.pcStage='desktop';
+    if(!pc.shell)pc.shell=mountPcShell(root,{onCommand:command=>{
+      if(command.type==='window')pc.windowAction(command.action);
+      else if(command.type==='open-app')pc.open(command.appId);
+      else if(command.type==='move-icon'){pc.persist(setDesktopIconPosition(pc.state,command.id,command.position));pc.renderDesktop(false);}
+      else if(command.type==='start-menu'){pc.startOpen=!pc.startOpen;pc.renderDesktop(false);}
+    }});
+    const apps=desktopApps(pc.state),v=pc.windows.viewport;
+    pc.shell.render({windows:pc.windows,apps,wallpaper:(WALLPAPERS.find(w=>w.id===pc.state.wallpaper)??WALLPAPERS[0]).path,
+      iconPositions:layoutDesktopIcons(apps.map(a=>a.id),pc.state.desktopIcons,{width:v.width,height:v.height-32}),metadata:pc.metadata,warning:pc.persistenceWarning});
+    for(const w of pc.windows.windows){
+      const target=pc.shell.getContentRoot(w.id);
+      if(!target.children.length||(replaceActive&&w.id===pc.windows.activeId))pc.refreshApp(w.id,{replaceContent:true});
     }
-    add(workspace, icons);
-    if (pc.window) add(workspace, pc.renderWindow());
-    if (pc.startOpen) add(workspace, pc.renderStartMenu());
-    add(shell, workspace);
-    const taskbar = el(document, 'footer', { className: 'pc-taskbar' });
-    add(taskbar, button(document, 'Пуск', { className: 'pc-start', attributes: { 'aria-label': 'Пуск' } }, () => { pc.startOpen = !pc.startOpen; pc.render(); }));
-    add(taskbar, el(document, 'span', { className: 'pc-task-label', text: pc.window ? desktopApps(pc.state).find(app => app.id === pc.window)?.label ?? 'Окно' : 'Рабочий стол' }));
-    const wallpapers = el(document, 'div', { className: 'pc-wallpaper-picker', attributes: { 'aria-label': 'Обои рабочего стола' } });
-    for (const item of WALLPAPERS) add(wallpapers, button(document, item.label, { className: item.id === pc.state.wallpaper ? 'active' : '', attributes: { 'aria-pressed': String(item.id === pc.state.wallpaper) } }, () => { pc.persist(setWallpaper(pc.state, item.id)); pc.render(); }));
-    add(taskbar, wallpapers);
-    add(shell, taskbar);
-    root.replaceChildren(shell);
-    const scope = pc.focusScope();
-    const restored = focusId && findFocusControl(scope, focusId);
-    const control = pc.confirmClose ? focusableControls(scope)[0] : (restored && !restored.disabled ? restored : focusableControls(scope)[0]);
-    control?.focus?.();
+    const menuRoot=pc.shell.getMenuRoot();
+    menuRoot.replaceChildren();
+    if(pc.startOpen)menuRoot.append(pc.renderStartMenu());
+    const guard=pc.confirmClose?findByDataset(root,'pcRole','close-guard'):null;
+    pc.shell.setModal(guard,pc.returnFocus);
+    if(!pc.confirmClose&&replaceActive){
+      const scope=pc.focusScope(),restored=focusId&&findFocusControl(scope,focusId);
+      (restored&&!restored.disabled?restored:focusableControls(scope)[0])?.focus?.();
+    }
+  };
+  pc.refreshApp = (appId,{replaceContent=false}={}) => {
+    const target=pc.shell?.getContentRoot(appId);if(!target)return;
+    if(replaceContent)target.replaceChildren(pc.renderWindow(appId));
+    else if(appId==='torent')pc.refreshTorent();
   };
 
   pc.renderStartMenu = () => {
@@ -208,15 +224,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     return menu;
   };
 
-  pc.windowFrame = (title, content) => {
-    const frame = el(document, 'section', { className: 'pc-window', dataset: { pcRole: 'window' }, attributes: { 'aria-label': title } });
-    const titlebar = el(document, 'header', { className: 'pc-window-title' });
-    add(titlebar, el(document, 'strong', { text: title }));
-    add(titlebar, button(document, '×', { attributes: { 'aria-label': 'Закрыть окно' } }, () => pc.closeWindow()));
-    add(frame, titlebar);
-    add(frame, content);
-    return frame;
-  };
+  pc.windowFrame = (title, content) => content;
 
   pc.openFolder = folder => {
     if (!['computer', 'disk', 'windows', 'projects'].includes(folder)) return;
@@ -340,10 +348,12 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (draft) {
       pc.project = draft;
       pc.dirty = true;
-      pc.window = 'ft-studio';
+      pc.ensureWindow('ft-studio');
       pc.recoveringDraft = true;
     }
     if (pc.project && pc.dirty) {
+      pc.returnFocus=document.activeElement;
+      pc.ensureWindow('ft-studio');
       pc.pendingAction = action;
       pc.confirmClose = true;
       pc.startOpen = false;
@@ -356,7 +366,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.openTorentForStudio = briefId => {
     pc.audio.stop();
     pc.selectedBrief = briefId;
-    pc.window = 'torent';
+    pc.ensureWindow('torent');
     pc.project = null;
     pc.dirty = false;
     pc.message = 'Сначала установи FT Studio через torent.';
@@ -368,7 +378,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       if (pc.state.download.status !== 'installed') { pc.openTorentForStudio(briefId); return; }
       pc.audio.stop();
       pc.selectedBrief = briefId;
-      pc.window = 'ft-studio';
+      pc.ensureWindow('ft-studio');
       pc.project = null;
       pc.dirty = false;
       pc.confirmClose = false;
@@ -383,7 +393,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.requestProjectTransition(() => {
       if (pc.state.download.status !== 'installed') { pc.openTorentForStudio(normalized.battleId); return; }
       pc.audio.stop();
-      pc.window = 'ft-studio';
+      pc.ensureWindow('ft-studio');
       pc.project = normalized;
       pc.selectedBrief = normalized.battleId;
       pc.dirty = false;
@@ -447,7 +457,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (!pc.project) pc.renderStudioStart(content);
     else {
       const header = el(document, 'div', { className: 'ft-header' });
-      add(header, el(document, 'span', { className: 'ft-berry', text: '✽' }));
+      add(header, createPcIcon(document,'studio',{size:28}));
       add(header, el(document, 'strong', { text: `FT Studio · ${pc.project.name}` }));
       const bpm = el(document, 'input', { type: 'number', value: String(pc.project.bpm), dataset: { focusId: 'studio-bpm' }, attributes: { min: '72', max: '150', 'aria-label': 'Темп проекта в BPM' } });
       bpm.addEventListener('change', () => pc.updateProject(setBpm(pc.project, Number(bpm.value))));
@@ -500,12 +510,12 @@ export function mountVirtualPc(root, callbacks = {}) {
     return pc.windowFrame('FT Studio', content);
   };
 
-  pc.renderWindow = () => {
-    if (pc.window === 'computer') return pc.renderComputer();
-    if (pc.window === 'underweb') return pc.renderUnderweb();
-    if (pc.window === 'torent') return pc.renderTorent();
-    if (pc.window === 'ft-studio') return pc.renderStudio();
-    return pc.windowFrame('Sloboda Desk 96', el(document, 'p', { text: 'Выбери приложение на рабочем столе.' }));
+  pc.renderWindow = (appId=pc.windows.activeId) => {
+    if(appId==='computer')return pc.renderComputer();
+    if(appId==='underweb')return pc.renderUnderweb();
+    if(appId==='torent')return pc.renderTorent();
+    if(appId==='ft-studio')return pc.renderStudio();
+    return el(document,'p',{text:'Приложение недоступно.'});
   };
 
   pc.render = () => {
@@ -520,7 +530,8 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.boot = state => {
     pc.state = createVirtualPcState(state);
     pc.phase = 'booting';
-    pc.window = null;
+    pc.shell?.dispose();pc.shell=null;
+    pc.windows=reduceWindows(pc.windows,{type:'clear'});
     pc.bootStep = 0;
     if (pc.bootTimer !== null) pc.clearTimeoutFn(pc.bootTimer);
     Promise.resolve(pc.audio.playBoot?.()).catch(NOOP);
@@ -543,38 +554,30 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.openNow = appId => {
-    pc.audio.stop();
-    pc.window = appId;
-    pc.startOpen = false;
-    pc.confirmClose = false;
-    if (appId === 'computer') pc.folder = 'computer';
-    if (appId === 'underweb') pc.underweb = resolveUnderweb(pc.address);
-    if (appId === 'ft-studio') {
-      pc.project = normalizeStudioProject(pc.state.draft);
-      pc.dirty = Boolean(pc.project);
+    const existing=pc.windows.windows.some(w=>w.id===appId);
+    pc.ensureWindow(appId);
+    pc.startOpen=false;
+    if(!existing&&appId==='computer')pc.folder='computer';
+    if(!existing&&appId==='ft-studio'){
+      pc.project=normalizeStudioProject(pc.state.draft);pc.dirty=Boolean(pc.project);
     }
-    pc.render();
+    pc.renderDesktop(false);
+    pc.shell.focusActive();
   };
-
   pc.open = appId => {
-    if (!desktopApps(pc.state).some(app => app.id === appId) || pc.confirmClose) return;
-    const open = () => pc.openNow(appId);
-    if (pc.window === 'ft-studio') pc.requestProjectTransition(open);
-    else open();
+    if(!desktopApps(pc.state).some(app=>app.id===appId)||pc.confirmClose)return;
+    pc.openNow(appId);
   };
-
-  pc.closeNow = () => {
-    pc.audio.stop();
-    pc.window = null;
-    pc.confirmClose = false;
-    pc.pendingAction = null;
-    pc.render();
+  pc.closeNow = id => {
+    if(id==='ft-studio')pc.audio.stop();
+    pc.windows=reduceWindows(pc.windows,{type:'close',id});
+    pc.confirmClose=false;pc.pendingAction=null;
+    pc.renderDesktop(false);
   };
-
-  pc.closeWindow = () => {
-    if (pc.confirmClose) return;
-    if (pc.window === 'ft-studio') pc.requestProjectTransition(() => pc.closeNow());
-    else pc.closeNow();
+  pc.closeWindow = (id=pc.windows.activeId) => {
+    if(pc.confirmClose||!id)return;
+    if(id==='ft-studio')pc.requestProjectTransition(()=>pc.closeNow(id));
+    else pc.closeNow(id);
   };
 
   pc.requestLeave = () => {
@@ -589,6 +592,8 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (pc.confirmClose) return;
     pc.requestProjectTransition(() => {
       pc.audio.stop();
+      pc.windows=reduceWindows(pc.windows,{type:'clear'});
+      pc.renderDesktop(false);
       pc.callbacks.onShutdown();
     });
   };
@@ -604,11 +609,11 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.focusScope = () => {
     if (pc.confirmClose) return findByDataset(root, 'pcRole', 'close-guard');
     if (pc.startOpen) return findByDataset(root, 'pcRole', 'start-menu');
-    return findByDataset(root, 'pcRole', 'window') ?? root;
+    return findByDataset(root, 'windowId', pc.windows.activeId) ?? root;
   };
 
   root.addEventListener('keydown', event => {
-    if (pc.phase !== 'desktop') return;
+    if (pc.phase !== 'desktop' || event.defaultPrevented) return;
     const scope = pc.focusScope();
     const controls = focusableControls(scope);
     if (event.key === 'Escape' && pc.confirmClose) {
@@ -621,12 +626,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       event.preventDefault(); event.stopPropagation();
       pc.startOpen = false; pc.render(); return;
     }
-    if (event.key !== 'Tab') return;
-    const index = controls.indexOf(document.activeElement);
-    const next = event.shiftKey ? (index <= 0 ? controls.length - 1 : index - 1) : (index < 0 || index === controls.length - 1 ? 0 : index + 1);
-    event.preventDefault();
-    event.stopPropagation();
-    controls[next]?.focus?.();
+    // The shell owns Tab traversal; apartment Escape handling closes the active window.
   });
 
   pc.reset = state => {
@@ -635,7 +635,8 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.audio.stop();
     pc.state = createVirtualPcState(state);
     pc.phase = 'off';
-    pc.window = null;
+    pc.shell?.dispose();pc.shell=null;
+    pc.windows=reduceWindows(pc.windows,{type:'clear'});
     pc.folder = 'computer';
     pc.startOpen = false;
     pc.project = null;
@@ -655,6 +656,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (pc.bootTimer !== null) pc.clearTimeoutFn(pc.bootTimer);
     pc.bootTimer = null;
     pc.audio.dispose();
+    pc.shell?.dispose();pc.shell=null;
     pc.phase = 'off';
     pc.render();
   };

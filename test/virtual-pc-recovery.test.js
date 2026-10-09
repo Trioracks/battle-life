@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { creatorDocument } from './helpers/creator-dom.js';
+import { pcDocument as creatorDocument } from './helpers/virtual-pc-dom.js';
 import { mountVirtualPc } from '../src/virtual-pc-ui.js';
 import { createVirtualPcState } from '../src/virtual-pc-state.js';
 import { createStudioProject } from '../src/ft-studio-project.js';
@@ -104,7 +104,7 @@ test('dragging a mixer fader preserves the live control across consecutive input
 test('keyboard navigation enters an opened window and wraps inside it', () => {
   const { controller, root, document } = setup();
   controller.open('underweb');
-  const first = find(root, 'Закрыть окно'), last = find(root, `Выбрать баттл ${BATTLE_BRIEFS.at(-1).title}`);
+  const first = find(root, 'Свернуть окно'), last = find(root, `Выбрать баттл ${BATTLE_BRIEFS.at(-1).title}`);
   assert.ok(root.contains(document.activeElement));
   last.focus();
   const event = new Event('keydown', { cancelable: true });
