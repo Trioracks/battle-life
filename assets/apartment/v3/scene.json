@@ -791,6 +791,10 @@
     ],
     "farPlane": 200
   },
+  "computer": {
+    "screen": "crt-glass",
+    "indicator": "crt-power-led"
+  },
   "lightingStates": {
     "off": {
       "night": "background-off.png",
@@ -817,7 +821,9 @@
     "chair-root",
     "passage-frame-root",
     "switch-living-root",
-    "switch-kitchen-root"
+    "switch-kitchen-root",
+    "crt-glass",
+    "crt-power-led"
   ],
   "lampFixtures": {
     "kitchen": {

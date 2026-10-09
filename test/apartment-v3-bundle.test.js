@@ -10,12 +10,17 @@ import {assetPath} from './helpers/apartment-assets.js';
 test('installer dry-run validates paths and never changes the live manifest',()=>{
  const installed='D:/Project/Battle/assets/apartment/v3/scene.json';
  const hash=()=>createHash('sha256').update(fs.readFileSync(installed)).digest('hex'),before=hash();
- const bundle=process.env.APARTMENT_ASSETS_DIR??'D:/Codex/Builds/Battle/apartment-v12/assets';
+ const fixture=fs.mkdtempSync('D:/Codex/Builds/Battle/installer-test-'),bundle=path.join(fixture,'assets'),source=path.join(fixture,'source');
+ fs.mkdirSync(bundle);fs.mkdirSync(source);
+ for(const file of validateApartmentBundle(assetPath()).files)fs.linkSync(assetPath(file),path.join(bundle,file));
+ for(const file of ['apartment-cutaway-v3.blend','mannequin-v3.blend'])fs.linkSync(path.resolve('assets/source',file),path.join(source,file));
+ try{
  const backup='D:/Codex/Builds/Battle/dry-run-'+Date.now();
  const run=(args)=>spawnSync('powershell.exe',['-NoProfile','-ExecutionPolicy','Bypass','-File','tools/install-apartment-v3.ps1','-Bundle',bundle,'-Backup',backup,'-WhatIf',...args],{encoding:'utf8'});
  const invalid=run(['-Project','D:/Project/Unexpected']);assert.notEqual(invalid.status,0);assert.match(invalid.stderr,/Unexpected project/);
  const valid=run([]);assert.equal(valid.status,0,valid.stderr);assert.match(valid.stdout,/What if|Что если/i);
  assert.equal(fs.existsSync(backup),false);assert.equal(hash(),before);
+ }finally{assert.ok(path.resolve(fixture).startsWith('D:\\Codex\\Builds\\Battle\\installer-test-'));fs.rmSync(fixture,{recursive:true});}
 });
 
 test('the actual delivery bundle is complete and contains the eating rig',()=>{
