@@ -4,7 +4,8 @@ Date: 2026-10-09
 
 ## Automated verification
 
-- `npm test` — fresh post-follow-up-review run: **328 passed, 0 failed** (20.89 s).
+- `npm test` — audit-fix run in the working directory: **342 passed, 0 failed** (23.21 s).
+- `npm test` — clean Git export, excluding all pre-existing local/untracked work: **336 passed, 0 failed** (23.03 s). Source/test snapshot tree: `665e2eb18b1ef1152c1ecab9f9e9e87522a99bf5`. The differing totals come from pre-existing local test additions.
 - `git diff --check` — no whitespace errors.
 - Focused coverage in the full suite includes immutable PC state and virtual-disk accounting, six-game-hour download completion, power-off pause, midnight timestamps, local Underweb routes, FT Studio project serialization, simulated four-voice audio scheduling, safe close and shutdown prompts, and apartment clock integration.
 
@@ -55,8 +56,28 @@ The review follow-up exposed and then verified corrections for one introduced fo
 - failed virtual-PC load and periodic persistence writes use the same persistent Russian storage warning.
 - a clock-only update retains the existing focused `torent` control; its buttons are rebuilt only when download status changes.
 
-Focused post-fix verification: **19 passed, 0 failed** (`test/virtual-pc-ui.test.js`), followed by the full 328-test run above.
+Earlier review-phase verification: **19 passed, 0 failed** (`test/virtual-pc-ui.test.js`), followed by a full 328-test working-directory run. The newer audit results above supersede that total.
 
 ## Scope notes
 
 Pre-existing dirty files and artifact folders were retained. One previously dirty client-module test was initially included in an integration commit, then the two affected local commits were safely rebuilt so that test is again uncommitted and outside this feature's commit scope.
+
+## Audit corrections — 9 October 2026
+
+The user requested corrections after the follow-up audit reproduced draft loss, a stale clock on new game, and a failing committed entry-point test.
+
+- A recovered draft is protected when a new Underweb project or a saved project would replace it. The player can save it before continuing, explicitly discard it, or restore it for editing. A failed storage write retains the guard.
+- A validated new-character submission now resets and persists apartment time and PC state together. Cancelling or invalidating the creator preserves the old PC. The controller also clears its previous project, pending action, boot timer, and open window.
+- Mixer input updates the project and autosave without replacing the actively dragged range control.
+- Window keyboard focus wraps inside the visible window or Start menu. Save dialogs skip disabled controls, contain focus, and make the underlying Studio controls inert.
+- Boot advances through four visible stages over 5.5 seconds; short synthesized tones use an AudioContext unlocked by the initial computer click. A denied audio context remains non-fatal.
+- My Computer now navigates C: → Windows / My Projects, supports Back, and opens saved project files from their folder.
+- Insufficient virtual space disables download/new-project save and displays a Russian explanation. Existing projects can still be updated on a full disk.
+- The committed entry-point test now expects the active apartment module. Only that single correction was staged; pre-existing local test additions and `legacy.html` remain outside the commit. An initial attempt to stage the entire modified test was rejected by approval review; the narrower patch was approved and tested in the clean export.
+- Client module/style revisions were advanced. The handoff, queue and original plan now distinguish implemented features from the still-open browser acceptance.
+
+Focused audit tests: **38 passed, 0 failed** across PC UI/recovery, new-game lifecycle and audio. New regression cases first failed against the old implementation, then passed after correction.
+
+Browser acceptance was attempted again after the fixes. The browser kernel exited during initialization with `windows sandbox failed: helper_unknown_error: setup refresh had errors`. Real audio playback, pointer dragging, and the full 1280×720 / 640×900 route therefore remain **unverified**. DOM/audio-adapter tests do not replace that acceptance.
+
+The subsequent beat → microphone recording → mix → battle submission/result loop is a separate future gameplay step, not part of these corrections.

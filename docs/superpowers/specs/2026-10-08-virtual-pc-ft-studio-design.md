@@ -58,6 +58,8 @@ New projects require a non-empty name of at most 32 characters and a selected Un
 
 ## Error handling and accessibility
 
+Audit correction (9 October 2026): a confirmed new-character submission resets the PC, its projects/draft, and its clock together with apartment time; opening or cancelling the creator does not reset anything. A draft recovered after a page reload is protected before any new or saved project replaces it: save and continue, discard and continue, or restore the draft. Mixer input retains its DOM node while dragging. File navigation follows My Computer → C: → Windows / Projects, with a back action; the system folder is read-only.
+
 Every interactive control is a real button, label, input, or form control with Russian visible labels. Keyboard focus remains within a visible PC window; Escape closes only a non-modal window and never shuts down the PC. Full-screen and narrow layouts scroll the PC layer rather than hiding its taskbar or primary controls.
 
 Unknown Underweb routes, invalid project input, insufficient virtual disk, unavailable storage, cancelled download, and unavailable Web Audio each have actionable Russian messages. Web Audio failure never corrupts project data. Power-off requests prompt before discarding an edited studio project.

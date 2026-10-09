@@ -6,10 +6,10 @@ import {playSoundCue} from './sound-cues.js';
 import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=12';
 import {DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,loadProfile} from './avatar-v3-profile.js?rev=10';
 import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=12';
-import {createCreatorSession} from './apartment-v3-creator-session.js?rev=12';
+import {createNewGameSession} from './apartment-v3-new-game.js?rev=1';
 import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=2';
 import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=2';
-import {mountVirtualPc} from './virtual-pc-ui.js?rev=2';
+import {mountVirtualPc} from './virtual-pc-ui.js?rev=3';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false;
@@ -128,7 +128,12 @@ try{
   $('#character-name').addEventListener('input',updateStats);
   $('#distribute').addEventListener('click',()=>{allocations=Object.fromEntries(STAT_KEYS.map((k,i)=>[k,i===0?2:1]));updateStats();});
   $('#new-game').addEventListener('click',()=>{
-    creatorSession=createCreatorSession(profile,storage,{enter(next){homeTime=new ApartmentTime();saveHomeTime(storage,homeTime);enterApartment(next);},restore(look){view.setAppearance(look);setMode('menu');}});
+    creatorSession=createNewGameSession(profile,storage,{enter(next,home){
+      homeTime=home.homeTime;pcState=home.pcState;virtualPc.reset(pcState);
+      pcStorageWarning=home.pcSaved?'':'Сохранение виртуального ПК недоступно.';
+      virtualPc.setPersistenceWarning(pcStorageWarning);enterApartment(next);
+      if(!home.homeSaved||!home.pcSaved){message='Новая игра начата, но браузер не подтвердил сохранение.';messageUntil=performance.now()+8000;}
+    },restore(look){view.setAppearance(look);setMode('menu');}});
     $('#name-error').textContent=$('#allocations-error').textContent='';$('#character-name').setAttribute('aria-invalid','false');
     creator.reset();appearance=creator.selection.appearance;$('#preview-zoom').value=1;allocations=Object.fromEntries(STAT_KEYS.map(k=>[k,0]));$('#character-name').value='';$('#creator-error').textContent='';
     previewYaw=previewTarget=0;for(const b of $('#preview-angles').children){b.classList.toggle('active',b.dataset.yaw==='0');b.setAttribute('aria-pressed',String(b.dataset.yaw==='0'));}
@@ -166,7 +171,7 @@ try{
   for(const district of districts){const b=document.createElement('button');b.textContent=district.name;b.dataset.district=district.id;b.addEventListener('click',()=>showDistrict(district.id));$('#districts').append(b);}
   showDistrict('north-sloboda');
   $('#return-home').addEventListener('click',()=>{if(motion.returnHome()){setMode('game');resumeAnimation();cue('door');}});
-  function act(id){resumeAnimation();if(id==='entry'){if(!motion.busy)setMode('door');return;}const result=startHomeAction(motion,homeTime,id);if(result.allowed)cue('footstep');else if(result.reason){message=result.reason;messageUntil=performance.now()+5000;}}
+  function act(id){resumeAnimation();if(id==='computer')virtualPc.prepareAudio();if(id==='entry'){if(!motion.busy)setMode('door');return;}const result=startHomeAction(motion,homeTime,id);if(result.allowed)cue('footstep');else if(result.reason){message=result.reason;messageUntil=performance.now()+5000;}}
   $('#door-peek').addEventListener('click',()=>{setMode('game');act('peephole');});
   $('#door-exit').addEventListener('click',()=>{setMode('game');resumeAnimation();motion.interact('entry');});
   $('#door-cancel').addEventListener('click',()=>setMode('game'));

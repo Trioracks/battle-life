@@ -14,6 +14,41 @@ export class FtStudioAudio {
     this.playbackId = 0;
   }
 
+  async unlock() {
+    if (!this.AudioContext) return { ok: false, reason: 'audio-unavailable' };
+    try {
+      this.context ??= new this.AudioContext();
+      if (typeof this.context.resume === 'function') await this.context.resume();
+      return { ok: true };
+    } catch { return { ok: false, reason: 'audio-unavailable' }; }
+  }
+
+  async playBoot() {
+    this.stop();
+    const playbackId = this.playbackId;
+    const unlocked = await this.unlock();
+    if (!unlocked.ok) return unlocked;
+    if (playbackId !== this.playbackId) return { ok: false, reason: 'stopped' };
+    try {
+      for (const [index, frequency] of [880, 1320].entries()) {
+        const oscillator = this.context.createOscillator(), gain = this.context.createGain();
+        const time = this.context.currentTime + index * .18;
+        oscillator.type = 'square';
+        oscillator.frequency.setValueAtTime(frequency, time);
+        gain.gain.setValueAtTime(.035, time);
+        gain.gain.exponentialRampToValueAtTime(.001, time + .07);
+        oscillator.connect(gain).connect(this.context.destination);
+        oscillator.start(time); oscillator.stop(time + .08);
+        this.nodes.push(oscillator);
+        oscillator.onended = () => {
+          this.nodes = this.nodes.filter(node => node !== oscillator);
+          oscillator.disconnect?.(); gain.disconnect?.();
+        };
+      }
+      return { ok: true };
+    } catch { this.stop(); return { ok: false, reason: 'audio-unavailable' }; }
+  }
+
   trigger(project, position) {
     const step = position % STUDIO_STEP_COUNT;
     const bar = Math.floor(position / STUDIO_STEP_COUNT) % 8;

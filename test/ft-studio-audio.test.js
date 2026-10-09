@@ -31,6 +31,17 @@ function fourVoiceProject() {
   return project;
 }
 
+test('boot audio schedules short tones without starting the sequencer', async () => {
+  const audio = new FtStudioAudio({ AudioContext: FakeAudioContext });
+  assert.equal(typeof audio.playBoot, 'function');
+  const result = await audio.playBoot();
+  assert.equal(result.ok, true);
+  assert.equal(audio.timer, null);
+  assert.ok(audio.context.oscillators.length >= 2);
+  assert.ok(audio.context.oscillators.every(node => node.started && node.stopped));
+  await audio.dispose();
+});
+
 test('play schedules distinct audible voices for all four studio tracks', async () => {
   const timers = [];
   const audio = new FtStudioAudio({

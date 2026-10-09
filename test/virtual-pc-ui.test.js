@@ -55,9 +55,10 @@ test('my computer shows an empty projects folder before a project exists', () =>
 
   controller.showDesktop(state);
   controller.open('computer');
-
-  assert.equal(hasText(root, 'Мои проекты · пусто'), true);
+  find(root, element => element.getAttribute?.('aria-label') === 'Открыть диск C:').click();
   assert.equal(hasText(root, 'Windows'), true);
+  find(root, element => element.getAttribute?.('aria-label') === 'Открыть папку Мои проекты').click();
+  assert.equal(hasText(root, 'Мои проекты · пусто'), true);
 });
 
 test('underweb renders a local error instead of following an unknown address', () => {

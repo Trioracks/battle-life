@@ -1,10 +1,16 @@
-import { FtStudioAudio } from './ft-studio-audio.js?rev=2';
+import { FtStudioAudio } from './ft-studio-audio.js?rev=3';
 import { createStudioProject, normalizeStudioProject, setArrangementCell, setBpm, setStudioStep, setTrackGain } from './ft-studio-project.js';
 import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js';
-import { cancelFtDownload, createVirtualPcState, installFtStudio, saveStudioProject, setWallpaper, startFtDownload } from './virtual-pc-state.js';
+import { cancelFtDownload, createVirtualPcState, diskUsage, FT_STUDIO_MB, PROJECT_MB, installFtStudio, saveStudioProject, setWallpaper, startFtDownload } from './virtual-pc-state.js';
 import { downloadPresentation } from './virtual-pc-runtime.js';
 
 const NOOP = () => {};
+const BOOT_STAGES = [
+  { percent: 5, delay: 1100, text: 'Проверка памяти…' },
+  { percent: 30, delay: 1500, text: 'Найден жёсткий диск C: · чтение системы…' },
+  { percent: 65, delay: 1900, text: 'Подготовка звука и рабочего стола…' },
+  { percent: 90, delay: 1000, text: 'Запуск Sloboda Desk 96…' },
+];
 
 function add(parent, child) { parent.append(child); return child; }
 
@@ -16,6 +22,9 @@ function el(document, tag, options = {}) {
   if (options.value !== undefined) node.value = options.value;
   if (options.id) node.id = options.id;
   if (options.dataset) Object.assign(node.dataset, options.dataset);
+  if (['button', 'input', 'select'].includes(tag) && !node.dataset.focusId) {
+    node.dataset.focusId = options.attributes?.['aria-label'] ?? options.text ?? '';
+  }
   for (const [name, value] of Object.entries(options.attributes ?? {})) node.setAttribute(name, value);
   return node;
 }
@@ -44,7 +53,8 @@ function findFocusControl(node, id) {
 }
 
 function focusableControls(node, controls = []) {
-  if (['BUTTON', 'INPUT', 'SELECT'].includes(node?.tagName)) controls.push(node);
+  if (node?.hidden || node?.inert) return controls;
+  if (['BUTTON', 'INPUT', 'SELECT'].includes(node?.tagName) && !node.disabled && !node.hidden) controls.push(node);
   for (const child of node?.children ?? []) focusableControls(child, controls);
   return controls;
 }
@@ -76,6 +86,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     state: createVirtualPcState(),
     phase: 'off',
     window: null,
+    folder: 'computer',
     startOpen: false,
     address: 'underweb://battles',
     underweb: resolveUnderweb('underweb://battles'),
@@ -83,10 +94,12 @@ export function mountVirtualPc(root, callbacks = {}) {
     selectedBrief: BATTLE_BRIEFS[0].id,
     dirty: false,
     confirmClose: false,
+    recoveringDraft: false,
     pendingAction: null,
     persistenceWarning: '',
     message: '',
     bootTimer: null,
+    bootStep: 0,
   };
 
   pc.persist = (state = pc.state) => {
@@ -140,15 +153,16 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.renderBoot = () => {
+    const stage = BOOT_STAGES[pc.bootStep];
     root.dataset.pcStage = 'booting';
     const shell = el(document, 'section', { className: 'pc-shell pc-boot' });
     add(shell, el(document, 'p', { className: 'pc-boot-kicker', text: 'SLOBODA-486 / SELF TEST' }));
     add(shell, el(document, 'h2', { text: 'Sloboda Desk 96' }));
     add(shell, el(document, 'p', { text: 'Проверка памяти · поиск жёсткого диска · запуск оболочки' }));
-    const progress = el(document, 'progress', { attributes: { max: '100', value: '68', 'aria-label': 'Загрузка Sloboda Desk 96' } });
-    progress.value = 68;
+    const progress = el(document, 'progress', { attributes: { max: '100', value: String(stage.percent), 'aria-label': 'Загрузка Sloboda Desk 96' } });
+    progress.value = stage.percent;
     add(shell, progress);
-    add(shell, el(document, 'p', { className: 'pc-boot-status', text: 'Не выключайте питание…' }));
+    add(shell, el(document, 'p', { className: 'pc-boot-status', text: stage.text, attributes: { 'aria-live': 'polite' } }));
     root.replaceChildren(shell);
   };
 
@@ -180,12 +194,14 @@ export function mountVirtualPc(root, callbacks = {}) {
     add(taskbar, wallpapers);
     add(shell, taskbar);
     root.replaceChildren(shell);
-    const control = pc.confirmClose ? findFocusControl(root, 'guard-save') : focusId ? findFocusControl(root, focusId) : null;
+    const scope = pc.focusScope();
+    const restored = focusId && findFocusControl(scope, focusId);
+    const control = pc.confirmClose ? focusableControls(scope)[0] : (restored && !restored.disabled ? restored : focusableControls(scope)[0]);
     control?.focus?.();
   };
 
   pc.renderStartMenu = () => {
-    const menu = el(document, 'aside', { className: 'pc-start-menu', attributes: { 'aria-label': 'Меню Пуск' } });
+    const menu = el(document, 'aside', { className: 'pc-start-menu', dataset: { pcRole: 'start-menu' }, attributes: { 'aria-label': 'Меню Пуск' } });
     add(menu, el(document, 'strong', { text: 'Sloboda Desk 96' }));
     add(menu, button(document, 'Отойти от ПК', { attributes: { 'aria-label': 'Отойти от ПК, оставив его включённым' } }, () => pc.requestLeave()));
     add(menu, button(document, 'Выключить', { attributes: { 'aria-label': 'Выключить компьютер' } }, () => pc.requestShutdown()));
@@ -193,7 +209,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.windowFrame = (title, content) => {
-    const frame = el(document, 'section', { className: 'pc-window', attributes: { 'aria-label': title } });
+    const frame = el(document, 'section', { className: 'pc-window', dataset: { pcRole: 'window' }, attributes: { 'aria-label': title } });
     const titlebar = el(document, 'header', { className: 'pc-window-title' });
     add(titlebar, el(document, 'strong', { text: title }));
     add(titlebar, button(document, '×', { attributes: { 'aria-label': 'Закрыть окно' } }, () => pc.closeWindow()));
@@ -202,13 +218,27 @@ export function mountVirtualPc(root, callbacks = {}) {
     return frame;
   };
 
+  pc.openFolder = folder => {
+    if (!['computer', 'disk', 'windows', 'projects'].includes(folder)) return;
+    pc.folder = folder;
+    pc.render();
+  };
+
   pc.renderComputer = () => {
     const content = el(document, 'div', { className: 'pc-window-content pc-files' });
-    add(content, el(document, 'p', { text: 'Мой компьютер > C:' }));
-    add(content, el(document, 'p', { text: 'Windows' }));
-    if (!pc.state.projects.length) add(content, el(document, 'p', { text: 'Мои проекты · пусто' }));
-    else {
+    const paths = { computer: 'Мой компьютер', disk: 'Мой компьютер > C:', windows: 'Мой компьютер > C: > Windows', projects: 'Мой компьютер > C: > Мои проекты' };
+    add(content, el(document, 'p', { text: paths[pc.folder], attributes: { 'aria-label': 'Текущая папка' } }));
+    if (pc.folder !== 'computer') add(content, button(document, 'Назад', {}, () => pc.openFolder(pc.folder === 'disk' ? 'computer' : 'disk')));
+    if (pc.folder === 'computer') {
+      add(content, button(document, 'C: · ' + pc.diskLabel(), { attributes: { 'aria-label': 'Открыть диск C:' } }, () => pc.openFolder('disk')));
+    } else if (pc.folder === 'disk') {
+      add(content, button(document, 'Windows', { attributes: { 'aria-label': 'Открыть папку Windows' } }, () => pc.openFolder('windows')));
+      add(content, button(document, 'Мои проекты', { attributes: { 'aria-label': 'Открыть папку Мои проекты' } }, () => pc.openFolder('projects')));
+    } else if (pc.folder === 'windows') {
+      add(content, el(document, 'p', { text: 'Системные файлы Sloboda Desk 96. Эта папка доступна только для просмотра.' }));
+    } else {
       add(content, el(document, 'h3', { text: 'Мои проекты' }));
+      if (!pc.state.projects.length) add(content, el(document, 'p', { text: 'Мои проекты · пусто' }));
       for (const project of pc.state.projects) add(content, button(document, project.name ?? project.id, { attributes: { 'aria-label': `Открыть проект ${project.name ?? project.id}` } }, () => pc.openProject(project)));
     }
     return pc.windowFrame('Мой компьютер', content);
@@ -249,7 +279,12 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.renderTorentControls = controls => {
     controls.replaceChildren();
     controls.dataset.downloadStatus = pc.state.download.status;
-    if (pc.state.download.status === 'idle') add(controls, button(document, 'Скачать FT Studio', { attributes: { 'aria-label': 'Скачать FT Studio через torent' } }, () => { pc.persist(startFtDownload(pc.state)); pc.render(); }));
+    if (pc.state.download.status === 'idle') {
+      const download = button(document, 'Скачать FT Studio', { attributes: { 'aria-label': 'Скачать FT Studio через torent' } }, () => { pc.persist(startFtDownload(pc.state)); pc.render(); });
+      download.disabled = diskUsage(pc.state).freeMb < FT_STUDIO_MB;
+      add(controls, download);
+      if (download.disabled) add(controls, el(document, 'p', { className: 'pc-error', text: 'На C: недостаточно места: для загрузки FT Studio нужно 800 МБ.' }));
+    }
     if (pc.state.download.status === 'downloading') add(controls, button(document, 'Отменить загрузку', {}, () => { pc.persist(cancelFtDownload(pc.state)); pc.render(); }));
     if (pc.state.download.status === 'ready-to-install') add(controls, button(document, 'Установить FT Studio', {}, () => { pc.persist(installFtStudio(pc.state)); pc.render(); }));
     if (pc.state.download.status === 'installed') add(controls, el(document, 'p', { text: 'FT Studio установлена. Ярлык появился на рабочем столе.' }));
@@ -270,19 +305,24 @@ export function mountVirtualPc(root, callbacks = {}) {
     return pc.windowFrame('torent', content);
   };
 
-  pc.updateProject = next => {
+  pc.updateProject = (next, rerender = true) => {
     pc.audio.stop();
     pc.project = next;
     pc.dirty = true;
     pc.persist({ ...pc.state, draft: next });
     pc.message = pc.persistenceWarning;
-    pc.render();
+    if (rerender) pc.render();
+    else {
+      const status = findByDataset(root, 'pcRole', 'studio-status');
+      if (status) status.textContent = pc.message;
+    }
   };
 
   pc.runPendingAction = () => {
     const action = pc.pendingAction;
     pc.pendingAction = null;
     pc.confirmClose = false;
+    pc.recoveringDraft = false;
     if (action) action();
     else pc.render();
   };
@@ -290,11 +330,19 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.cancelPendingAction = () => {
     pc.pendingAction = null;
     pc.confirmClose = false;
+    pc.recoveringDraft = false;
     pc.render();
   };
 
-  pc.requestProjectTransition = action => {
+  pc.requestProjectTransition = (action, protectDraft = false) => {
     if (pc.confirmClose) return;
+    const draft = protectDraft && !pc.dirty && normalizeStudioProject(pc.state.draft);
+    if (draft) {
+      pc.project = draft;
+      pc.dirty = true;
+      pc.window = 'ft-studio';
+      pc.recoveringDraft = true;
+    }
     if (pc.project && pc.dirty) {
       pc.pendingAction = action;
       pc.confirmClose = true;
@@ -326,7 +374,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.confirmClose = false;
       pc.message = '';
       pc.render();
-    });
+    }, true);
   };
 
   pc.openProject = project => {
@@ -342,8 +390,10 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.confirmClose = false;
       pc.callbacks.onOpenProject(normalized);
       pc.render();
-    });
+    }, true);
   };
+
+  pc.canSaveProject = () => pc.state.projects.some(project => project.id === pc.project?.id) || diskUsage(pc.state).freeMb >= PROJECT_MB;
 
   pc.saveProject = () => {
     if (!pc.project) return;
@@ -426,19 +476,25 @@ export function mountVirtualPc(root, callbacks = {}) {
       add(mixer, el(document, 'h3', { text: 'Микшер' }));
       for (const track of pc.project.tracks) {
         const gain = el(document, 'input', { type: 'range', value: String(track.gain), dataset: { focusId: `gain-${track.id}` }, attributes: { min: '0', max: '1', step: '.05', 'aria-label': `Громкость ${track.id}` } });
-        gain.addEventListener('input', () => pc.updateProject(setTrackGain(pc.project, track.id, Number(gain.value))));
+        gain.addEventListener('input', () => pc.updateProject(setTrackGain(pc.project, track.id, Number(gain.value)), false));
         add(mixer, labeledInput(document, track.id.toUpperCase(), gain));
       }
       add(content, mixer);
-      add(content, button(document, 'Сохранить в Мои проекты', { attributes: { 'aria-label': 'Сохранить проект в Мои проекты' } }, () => pc.saveProject()));
+      const save = button(document, 'Сохранить в Мои проекты', { attributes: { 'aria-label': 'Сохранить проект в Мои проекты' } }, () => pc.saveProject());
+      save.disabled = !pc.canSaveProject();
+      add(content, save);
+      if (save.disabled) add(content, el(document, 'p', { className: 'pc-error', text: 'На C: недостаточно места для нового проекта: нужно 2 МБ. Уже сохранённые проекты можно обновлять.' }));
     }
-    if (pc.message || pc.persistenceWarning) add(content, el(document, 'p', { className: 'pc-status', text: pc.message || pc.persistenceWarning }));
+    add(content, el(document, 'p', { className: 'pc-status', dataset: { pcRole: 'studio-status' }, attributes: { 'aria-live': 'polite' }, text: pc.message || pc.persistenceWarning }));
     if (pc.confirmClose) {
       const guard = el(document, 'aside', { className: 'pc-close-guard', dataset: { pcRole: 'close-guard' }, attributes: { 'aria-label': 'Сохранение проекта', role: 'dialog', 'aria-modal': 'true' } });
-      add(guard, el(document, 'strong', { text: 'Сохранить проект перед закрытием?' }));
-      add(guard, button(document, 'Сохранить', { dataset: { focusId: 'guard-save' } }, () => pc.saveProject()));
+      for (const child of content.children) child.inert = true;
+      add(guard, el(document, 'strong', { text: pc.recoveringDraft ? 'Найден несохранённый черновик: ' + pc.project.name : 'Сохранить проект перед закрытием?' }));
+      const save = button(document, 'Сохранить', { dataset: { focusId: 'guard-save' } }, () => pc.saveProject());
+      save.disabled = !pc.canSaveProject();
+      add(guard, save);
       add(guard, button(document, 'Не сохранять', { dataset: { focusId: 'guard-discard' } }, () => pc.discardProject()));
-      add(guard, button(document, 'Отмена', { dataset: { focusId: 'guard-cancel' } }, () => pc.cancelPendingAction()));
+      add(guard, button(document, pc.recoveringDraft ? 'Восстановить черновик' : 'Отмена', { dataset: { focusId: 'guard-cancel' } }, () => pc.cancelPendingAction()));
       add(content, guard);
     }
     return pc.windowFrame('FT Studio', content);
@@ -458,12 +514,23 @@ export function mountVirtualPc(root, callbacks = {}) {
     else { root.dataset.pcStage = 'off'; root.replaceChildren(); }
   };
 
+  // Called directly by the apartment's computer click, before the seated animation.
+  pc.prepareAudio = () => Promise.resolve(pc.audio.unlock?.()).catch(NOOP);
+
   pc.boot = state => {
     pc.state = createVirtualPcState(state);
     pc.phase = 'booting';
     pc.window = null;
+    pc.bootStep = 0;
     if (pc.bootTimer !== null) pc.clearTimeoutFn(pc.bootTimer);
-    pc.bootTimer = pc.setTimeoutFn(() => pc.showDesktop(pc.state), 5500);
+    Promise.resolve(pc.audio.playBoot?.()).catch(NOOP);
+    const advanceBoot = () => {
+      pc.bootStep++;
+      if (pc.bootStep === BOOT_STAGES.length) { pc.showDesktop(pc.state); return; }
+      pc.render();
+      pc.bootTimer = pc.setTimeoutFn(advanceBoot, BOOT_STAGES[pc.bootStep].delay);
+    };
+    pc.bootTimer = pc.setTimeoutFn(advanceBoot, BOOT_STAGES[0].delay);
     pc.render();
   };
 
@@ -480,6 +547,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.window = appId;
     pc.startOpen = false;
     pc.confirmClose = false;
+    if (appId === 'computer') pc.folder = 'computer';
     if (appId === 'underweb') pc.underweb = resolveUnderweb(pc.address);
     if (appId === 'ft-studio') {
       pc.project = normalizeStudioProject(pc.state.draft);
@@ -533,15 +601,25 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.runPendingAction();
   };
 
+  pc.focusScope = () => {
+    if (pc.confirmClose) return findByDataset(root, 'pcRole', 'close-guard');
+    if (pc.startOpen) return findByDataset(root, 'pcRole', 'start-menu');
+    return findByDataset(root, 'pcRole', 'window') ?? root;
+  };
+
   root.addEventListener('keydown', event => {
-    if (!pc.confirmClose) return;
-    const guard = findByDataset(root, 'pcRole', 'close-guard');
-    const controls = focusableControls(guard);
-    if (event.key === 'Escape') {
+    if (pc.phase !== 'desktop') return;
+    const scope = pc.focusScope();
+    const controls = focusableControls(scope);
+    if (event.key === 'Escape' && pc.confirmClose) {
       event.preventDefault();
       event.stopPropagation();
       pc.cancelPendingAction();
       return;
+    }
+    if (event.key === 'Escape' && pc.startOpen) {
+      event.preventDefault(); event.stopPropagation();
+      pc.startOpen = false; pc.render(); return;
     }
     if (event.key !== 'Tab') return;
     const index = controls.indexOf(document.activeElement);
@@ -550,6 +628,28 @@ export function mountVirtualPc(root, callbacks = {}) {
     event.stopPropagation();
     controls[next]?.focus?.();
   });
+
+  pc.reset = state => {
+    if (pc.bootTimer !== null) pc.clearTimeoutFn(pc.bootTimer);
+    pc.bootTimer = null;
+    pc.audio.stop();
+    pc.state = createVirtualPcState(state);
+    pc.phase = 'off';
+    pc.window = null;
+    pc.folder = 'computer';
+    pc.startOpen = false;
+    pc.project = null;
+    pc.dirty = false;
+    pc.confirmClose = false;
+    pc.recoveringDraft = false;
+    pc.pendingAction = null;
+    pc.selectedBrief = BATTLE_BRIEFS[0].id;
+    pc.address = 'underweb://battles';
+    pc.underweb = resolveUnderweb(pc.address);
+    pc.message = '';
+    pc.persistenceWarning = '';
+    pc.render();
+  };
 
   pc.dispose = () => {
     if (pc.bootTimer !== null) pc.clearTimeoutFn(pc.bootTimer);
