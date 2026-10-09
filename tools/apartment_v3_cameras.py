@@ -34,6 +34,7 @@ def export_static(scene,static,cube,materials,out):
     for obj in list(static):
         if not is_interior_static(obj,set()):continue
         key='outside-window-lights' if obj.name.startswith('distant-window') else obj.data.materials[0].name
+        if obj.name.startswith('first-person-'):key='cutaway-shell-'+key
         groups.setdefault(key,[]).append(obj)
     exports=[]
     for name,objects in groups.items():

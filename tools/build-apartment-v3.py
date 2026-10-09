@@ -14,6 +14,14 @@ LAYOUT=load_layout()
 bpy.context.preferences.filepaths.save_version=0
 LIGHTING_STATES=dict(off=dict(night='background-off.png',day='background-day-off.png'),living=dict(night='background-living.png',day='background-day-living.png'),kitchen=dict(night='background-kitchen.png',day='background-day-kitchen.png'),both=dict(night='background.png',day='background-day.png'))
 
+def normalize_computer_surface(obj):
+    bpy.context.view_layer.objects.active=obj
+    bpy.ops.object.transform_apply(location=False,rotation=True,scale=True)
+    uv=obj.data.uv_layers.active or obj.data.uv_layers.new()
+    for loop in obj.data.loops:
+        p=obj.data.vertices[loop.vertex_index].co
+        uv.data[loop.index].uv=(p.x/obj.dimensions.x+.5,p.z/obj.dimensions.z+.5)
+
 def render_light_states():
     for key,folder in [('CUDA_CACHE_PATH','cuda'),('OPTIX_CACHE_PATH','optix'),('XDG_CACHE_HOME','blender')]:
         os.environ.setdefault(key,os.path.join('D:/Codex/Caches',folder));os.makedirs(os.environ[key],exist_ok=True)
@@ -56,10 +64,21 @@ if '--static-existing' in sys.argv:
     with open(os.path.join(OUT,'interaction.glb'),'rb') as f:data=f.read()
     gltf=json.loads(data[20:20+struct.unpack_from('<I',data,12)[0]])
     dynamic={node.get('name') for node in gltf['nodes']}
+    # Normalize authored live CRT axes when refreshing an existing staged source.
+    bpy.ops.object.select_all(action='DESELECT')
+    for name in ['crt-glass','crt-power-led']:
+        obj=bpy.data.objects.get(name)
+        if obj and obj.get('apartment_role')=='computer-live':
+            obj.hide_set(False);obj.select_set(True);bpy.context.view_layer.objects.active=obj
+            normalize_computer_surface(obj);obj.select_set(False)
+    for obj in scene.objects:
+        if obj.name in dynamic:obj.hide_set(False);obj.select_set(True)
+    bpy.ops.export_scene.gltf(filepath=os.path.join(OUT,'interaction.glb'),export_format='GLB',use_selection=True,export_apply=True,export_animations=False,export_cameras=False,export_lights=False,export_extras=True)
     static=[obj for obj in scene.objects if is_interior_static(obj,dynamic)]
     for obj in scene.objects:obj.hide_render=True
     def existing_shell(name,*args):return bpy.data.objects[name]
     export_static(scene,static,existing_shell,{'plaster':bpy.data.materials['dirty-warm-plaster']},OUT)
+    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(SOURCE_OUT,'apartment-cutaway-v3.blend'))
     print('V9_STATIC_READY',OUT,flush=True);sys.exit(0)
 
 if '--render-existing' in sys.argv:
@@ -278,10 +297,10 @@ for x in [-3.53,-3.1]:
         cylinder('gas-burner',(x,y,.979),.10,.032,M['dark'])
         for a in [0,math.pi/2]:o=cube('burner-grate',(x,y,1.001),(.28,.019,.014),M['dark'],.003);o.rotation_euler.z=a
 for j in range(4):cylinder('stove-knob',(-3.58+j*.17,.636,.807),.032,.041,M['dark'],(math.pi/2,0,0))
-cylinder('saucepan',(-3.11,1.18,1.07),.126,.15,M['metal'])
-cube('saucepan-handle',(-2.9,1.18,1.09),(.24,.045,.04),M['dark'])
-cube('hood-canopy',(-3.32,1.34,2.13),(1,.65,.22),M['cream'],.04)
-cube('hood-chimney',(-3.32,1.46,2.53),(.32,.32,.64),M['cream'])
+cylinder('saucepan',(-3.11,1.18,1.083),.126,.15,M['metal'])
+cube('saucepan-handle',(-2.9,1.18,1.103),(.24,.045,.04),M['dark'])
+cube('hood-canopy',(-3.30,1.30,2.15),(.90,.60,.22),M['cream'],.04)
+cube('hood-chimney',(-3.30,1.41,2.55),(.30,.27,.64),M['cream'])
 proxy('stove',(-3.32,1.045,.49),(.81,.79,.98))
 
 # Fridge interior remains in baked art; its hinged leaf is runtime geometry.
@@ -368,20 +387,27 @@ for z in [.18,.4,.62]:
     cube('desk-drawer',(5.22,.589,z),(.51,.048,.18),M['oak'],.008)
     cube('desk-pull',(5.22,.55,z+.02),(.14,.035,.022),M['dark'])
 cube('crt-case',(4.63,1.045,1.12),(.63,.42,.52),M['plastic'],.05)
-cube('crt-bezel',(4.63,.815,1.14),(.56,.05,.40),M['plastic'],.025)
-screen=material('phosphor-blue',(.058,.12,.20));bs=screen.node_tree.nodes.get('Principled BSDF');bs.inputs['Emission Color'].default_value=(.07,.18,.32,1);bs.inputs['Emission Strength'].default_value=.6
-cube('crt-glass',(4.63,.784,1.145),(.465,.014,.315),screen,.02)
-for i in range(4):cube('screen-text',(4.54,.774,1.23-i*.04),(.20+i*.025,.001,.006),M['teal'],0)
+for x in [4.374,4.886]:cube('crt-bezel-side',(x,.815,1.14),(.048,.05,.40),M['plastic'],.009)
+for z in [.956,1.324]:cube('crt-bezel-rail',(4.63,.815,z),(.48,.05,.032),M['plastic'],.007)
+cube('crt-recess',(4.63,.829,1.14),(.48,.009,.345),M['dark'],.009)
+screen=material('crt-off',(.009,.013,.015));screen.node_tree.nodes.get('Principled BSDF').inputs['Roughness'].default_value=.24
+glass=cube('crt-glass',(4.63,.805,1.145),(.465,.315,.004),screen,.004,'moving')
+glass.rotation_euler.x=math.pi/2;glass['apartment_role']='computer-live'
+normalize_computer_surface(glass)
+led=cube('crt-power-led',(4.83,.787,.956),(.009,.005,.002),material('crt-led',(.025,.03,.016)),.001,'moving')
+led.rotation_euler.x=math.pi/2;led['apartment_role']='computer-live'
+normalize_computer_surface(led)
+computer_live=[glass,led]
 cube('crt-stand',(4.63,1.05,.85),(.28,.27,.1),M['plastic'])
-cube('keyboard',(4.48,.565,.851),(.59,.20,.035),M['plastic'],.008)
+cube('keyboard',(4.58,.565,.851),(.59,.20,.035),M['plastic'],.008)
 for row in range(4):
-    for col in range(12):cube('key',(4.22+col*.046,.491+row*.045,.874),(.037,.031,.008),M['cream'],.002)
-o=cube('mouse',(4.91,.54,.866),(.075,.12,.04),M['plastic'],.021)
-curve('mouse-cable',[(4.91,.60,.87),(5,.8,.836),(4.8,1.19,.83)],.005,M['dark'])
+    for col in range(12):cube('key',(4.32+col*.046,.491+row*.045,.874),(.037,.031,.008),M['cream'],.002)
+o=cube('mouse',(5.01,.54,.8475),(.075,.12,.04),M['plastic'],.021)
+curve('mouse-cable',[(5.01,.60,.85),(5.1,.8,.836),(4.9,1.19,.83)],.005,M['dark'])
 cylinder('desk-mug',(5.36,.91,.89),.061,.14,M['cream'])
-cylinder('microphone-base',(5.12,1.12,.854),.083,.031,M['dark'])
-cylinder('microphone-stand',(5.12,1.12,1.005),.014,.28,M['metal'])
-cylinder('microphone-capsule',(5.12,1.1,1.18),.036,.13,M['dark'])
+cylinder('microphone-base',(5.12,.94,.843),.083,.031,M['dark'])
+cylinder('microphone-stand',(5.12,.94,.994),.014,.28,M['metal'])
+cylinder('microphone-capsule',(5.12,.94,1.169),.036,.13,M['dark'])
 chair=empty('chair-root',(0,0,0))
 cube('chair-seat',(4.48,.02,.38),(.48,.46,.07),M['wood'],.022,'moving',chair)
 cube('chair-pad',(4.48,.02,.425),(.45,.43,.04),M['teal'],.026,'moving',chair)
@@ -394,7 +420,7 @@ proxy('desk-drawer',(5.22,.94,.38),(.57,.65,.70))
 proxy('crt',(4.63,1.045,1.12),(.63,.42,.52))
 
 # The deep CRT must stand in front of the sill, never intersect it.
-for obj in static+proxies:
+for obj in static+moving+proxies:
     if obj.name.startswith(('crt-','screen-text','depth-crt')):
         obj.location.y-=.21
         obj.location.z+=.0175 if obj.name.startswith('crt-stand') else .045
@@ -548,7 +574,7 @@ def prepare_backdrop_geometry():
     for o in exterior_objects:o.hide_render=False
     for o in shell:o.hide_render=True
     for o in proxies:o.hide_render=True
-    for o in moving:o.hide_render=not((o.parent==landing and o.name!='landing-ceiling') or o in lamp_objects.values())
+    for o in moving:o.hide_render=not((o.parent==landing and o.name!='landing-ceiling') or o in lamp_objects.values() or o in computer_live)
 prepare_backdrop_geometry()
 source=os.path.join(SOURCE_OUT,'apartment-cutaway-v3.blend')
 bpy.ops.wm.save_as_mainfile(filepath=source)
@@ -557,14 +583,14 @@ bpy.ops.wm.save_as_mainfile(filepath=source)
 bpy.ops.object.select_all(action='DESELECT')
 for o in proxies:o.hide_set(False);o.hide_render=False;o.select_set(True)
 for o in moving:o.hide_render=False;o.hide_set(False);o.select_set(True)
-live_roots=[door,entry,fridge,landing,chair,passage_frame]+switches
+live_roots=[door,entry,fridge,landing,chair,passage_frame]+switches+computer_live
 for o in live_roots:o.select_set(True)
 # glTF cannot carry Blender's procedural nodes. Bake their actual base colour
 # into UV textures instead of silently replacing every door with a flat colour.
 scene.cycles.samples=8
 for obj in static+moving+proxies:obj.hide_render=True
 for o in moving:
-    if o==blanket:continue
+    if o==blanket or o in computer_live:continue
     o.hide_render=False
     bpy.ops.object.select_all(action='DESELECT');o.select_set(True);bpy.context.view_layer.objects.active=o
     if o!=bed_cover:
@@ -584,7 +610,7 @@ for o in moving:
 blanket.data.materials[0]=bed_cover.data.materials[0]
 bpy.ops.object.select_all(action='DESELECT')
 for o in proxies+moving+live_roots:o.hide_render=False;o.select_set(True)
-bpy.ops.export_scene.gltf(filepath=os.path.join(OUT,'interaction.glb'),export_format='GLB',use_selection=True,export_apply=True,export_animations=False,export_cameras=False,export_lights=False)
+bpy.ops.export_scene.gltf(filepath=os.path.join(OUT,'interaction.glb'),export_format='GLB',use_selection=True,export_apply=True,export_animations=False,export_cameras=False,export_lights=False,export_extras=True)
 
 def xyz(p):return [p[0],p[2],-p[1]]
 def action(label,x,pose,yaw,clip='work',fade=False,duration=6,hit=None):
@@ -605,6 +631,7 @@ manifest=dict(version=3,bounds=[-6.1,6.15],spawn=[3.4,0,.85],speed=1.326,doorX=0
 lighting_states=LIGHTING_STATES
 manifest.update(motion_config(LAYOUT))
 manifest['exterior']=exterior
+manifest['computer']=dict(screen=glass.name,indicator=led.name)
 manifest['camera']=dict(position=xyz(camera.location),target=[1.5,1.35,0],width=20.8,height=8.32)
 manifest.update(lightingStates=lighting_states,liveRoots=[o.name for o in live_roots],lampFixtures={room:dict(bulb=o.name,position=xyz(o.location),lightPosition=xyz(lamp_lights[room].location),bakedBulb=True) for room,o in lamp_objects.items()})
 with open(os.path.join(OUT,'scene.json'),'w',encoding='utf8') as f:json.dump(manifest,f,ensure_ascii=False,indent=2)

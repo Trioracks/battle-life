@@ -35,7 +35,14 @@ export function validateApartmentBundle(root){
  const backgrounds=new Set([c.background,c.backgroundDay,...Object.values(lighting).flatMap(Object.values)]);
  if(backgrounds.size!==8)errors.push('scene.json: expected eight lighting backgrounds');
  for(const file of backgrounds){const b=read(file);if(!b)continue;if(b.length<24||b.subarray(0,8).toString('hex')!=='89504e470d0a1a0a'||b.readUInt32BE(16)!==c.backgroundResolution?.[0]||b.readUInt32BE(20)!==c.backgroundResolution?.[1])errors.push(file+': invalid PNG dimensions');}
- const interaction=glb(c.geometry);glb(c.staticGeometry);const rig=glb(c.rig);glb(c.exterior?.geometry);glb(c.exterior?.occluders);
+ const interaction=glb(c.geometry),interior=glb(c.staticGeometry);const rig=glb(c.rig);glb(c.exterior?.geometry);glb(c.exterior?.occluders);
+ if(!c.computer?.screen||!c.computer?.indicator)errors.push('missing computer live surfaces');
+ for(const name of Object.values(c.computer??{})){
+  const nodes=interaction?.nodes.filter(n=>n.name===name)??[];
+  if(nodes.length!==1||nodes[0]?.extras?.apartment_role!=='computer-live'||nodes[0]?.mesh==null)errors.push('invalid computer live mesh: '+name);
+  if(interior?.nodes.some(n=>n.name===name||n.extras?.apartment_role==='computer-live'))errors.push('computer live surface baked into static: '+name);
+ }
+ if(interior?.materials.some(m=>/crt-off|crt-led/.test(m.name)))errors.push('computer live material baked into static');
  const names=new Set(interaction?.nodes.map(n=>n.name));
  for(const name of c.liveRoots??[])if(!names.has(name))errors.push('missing live root: '+name);
  const clips=new Set(rig?.animations?.map(a=>a.name));
