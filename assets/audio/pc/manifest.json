@@ -1,0 +1,6 @@
+{
+  "startup": {"path": null, "status": "unavailable", "provenance": "Original Windows XP recording not supplied or cleared for redistribution."},
+  "shutdown": {"path": null, "status": "unavailable", "provenance": "Original Windows XP recording not supplied or cleared for redistribution."},
+  "bios": {"status": "procedural", "provenance": "Original four-pulse oscillator cue in virtual-pc-sounds.js"},
+  "click": {"status": "procedural", "provenance": "Original quiet oscillator click in virtual-pc-sounds.js"}
+}
