@@ -8,6 +8,22 @@ const wallpaperIds = new Set(['courtyard', 'factory', 'room']);
 const downloadStates = new Set(['idle', 'downloading', 'ready-to-install', 'installed']);
 const isRecord = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const clone = value => JSON.parse(JSON.stringify(value));
+const iconIds = new Set(['computer','documents','underweb','torent','ft-studio']);
+function normalizeIcons(value) {
+  return Object.fromEntries(Object.entries(isRecord(value)?value:{}).filter(([id,p])=>iconIds.has(id)&&Number.isFinite(p?.x)&&Number.isFinite(p?.y)).map(([id,p])=>[id,{x:Math.max(0,p.x),y:Math.max(0,p.y)}]));
+}
+export function setDesktopIconPosition(state,id,position) {
+  const normalized=normalizeSnapshot(state), valid=normalizeIcons({[id]:position});
+  return {...normalized,desktopIcons:{...normalized.desktopIcons,...valid}};
+}
+export function resetDesktopIconPositions(state) { return {...normalizeSnapshot(state),desktopIcons:{}}; }
+export function layoutDesktopIcons(ids,positions,{width,height}) {
+  const columnsHeight=Math.max(1,Math.floor((height-8)/88)),valid=normalizeIcons(positions);
+  return Object.fromEntries(ids.map((id,index)=>{
+    const p=valid[id]??{x:8+Math.floor(index/columnsHeight)*80,y:8+(index%columnsHeight)*88};
+    return [id,{x:Math.max(0,Math.min(p.x,width-80)),y:Math.max(0,Math.min(p.y,height-88))}];
+  }));
+}
 
 function normalizeProject(value) {
   return isRecord(value) && typeof value.id === 'string' && value.id.trim() ? clone(value) : null;
@@ -33,6 +49,7 @@ function normalizeSnapshot(value) {
     version: 1,
     power: source.power === 'on' ? 'on' : 'off',
     wallpaper: wallpaperIds.has(source.wallpaper) ? source.wallpaper : 'courtyard',
+    desktopIcons: normalizeIcons(source.desktopIcons),
     download: normalizeDownload(source.download),
     projects,
     draft: isRecord(source.draft) ? clone(source.draft) : null,

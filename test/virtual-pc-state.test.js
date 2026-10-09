@@ -13,7 +13,31 @@ import {
   setPcPower,
   setWallpaper,
   startFtDownload,
+  setDesktopIconPosition, resetDesktopIconPositions, layoutDesktopIcons,
 } from '../src/virtual-pc-state.js';
+
+test('old save retains projects download wallpaper and adds an empty icon layout',()=>{
+  const s=createVirtualPcState({projects:[{id:'old',name:'Бит'}],download:{status:'installed'},wallpaper:'factory'});
+  assert.deepEqual(s.desktopIcons,{});
+  assert.equal(s.projects[0].name,'Бит'); assert.equal(s.download.status,'installed'); assert.equal(s.wallpaper,'factory');
+});
+test('unknown icon and nonfinite position are ignored and layout stays in bounds',()=>{
+  const s=createVirtualPcState({desktopIcons:{computer:{x:9999,y:9999},bad:{x:4,y:5},underweb:{x:NaN,y:3}}});
+  assert.deepEqual(Object.keys(s.desktopIcons),['computer']);
+  const p=layoutDesktopIcons(['computer','documents'],s.desktopIcons,{width:640,height:868});
+  assert.deepEqual(p.computer,{x:560,y:780});
+  assert.deepEqual(p.documents,{x:8,y:96});
+});
+test('desktop positions round trip without persisting windows and reset independently',()=>{
+  const s=setDesktopIconPosition(createVirtualPcState({wallpaper:'factory'}),'computer',{x:80,y:88});
+  const storage=mapStorage();
+  assert.equal(saveVirtualPcState(storage,{...s,windows:[{id:'computer'}]}),true);
+  const restored=loadVirtualPcState(storage).state;
+  assert.deepEqual(restored.desktopIcons.computer,{x:80,y:88});
+  assert.equal(restored.windows,undefined);
+  assert.deepEqual(resetDesktopIconPositions(restored).desktopIcons,{});
+  assert.equal(restored.wallpaper,'factory');
+});
 
 function mapStorage(seed = new Map()) {
   return {
