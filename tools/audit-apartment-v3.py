@@ -1,0 +1,75 @@
+"""Audit pre-merge world geometry. CLI also accepts plain bounds fixtures."""
+import json
+import sys
+from apartment_v3_layout import load_layout
+
+
+def overlap(a, b, epsilon=.012):
+    return all(min(a['max'][i], b['max'][i])-max(a['min'][i], b['min'][i]) > epsilon for i in range(3))
+
+
+def audit_records(objects, layout):
+    errors, warnings = [], []
+    reserve = layout['furnitureReserve']
+    walls = [o for o in objects if o['role'] == 'wall']
+    desktops = [o for o in objects if o['role'] == 'desktop']
+    for o in objects:
+        if o['role'] == 'chair-leg' and abs(o['min'][1]) > .008:
+            errors.append(o['name']+': chair-leg must contact the floor')
+        if o['role'] == 'desk-prop':
+            supported = any(o['min'][0] >= d['min'][0]-.01 and o['max'][0] <= d['max'][0]+.01
+                            and o['min'][2] >= d['min'][2]-.015 and o['max'][2] <= d['max'][2]+.015
+                            and abs(o['min'][1]-d['max'][1]) < .018 for d in desktops)
+            if not supported:
+                errors.append(o['name']+': desk-prop is not supported by desktop')
+        if o['role'] in {'furniture', 'desktop', 'chair-leg', 'desk-prop'}:
+            if overlap(o, reserve):
+                errors.append(o['name']+': obstructs furniture reserve')
+            for wall in walls:
+                if overlap(o, wall):
+                    errors.append(o['name']+': penetrates wall '+wall['name'])
+    furniture = [o for o in objects if o['role'] in {'furniture', 'desktop', 'chair-leg', 'desk-prop', 'window-sill'}]
+    for i, a in enumerate(furniture):
+        for b in furniture[i+1:]:
+            if a['assembly'] != b['assembly'] and overlap(a, b):
+                warnings.append(a['name']+' / '+b['name']+': independent assembly AABB overlap')
+    return dict(errors=errors, warnings=warnings, objects=objects)
+
+
+def semantics(name):
+    if name.startswith(('rear-', 'left-return', 'right-return', 'partition-', 'first-person-')):
+        return 'shell', 'wall'
+    if name.startswith('window-sill'):
+        return name, 'window-sill'
+    for prefix, assembly in [('dining-', 'dining'), ('chair-', 'chair'), ('desk-', 'desk'),
+                              ('drawer-', 'desk'), ('crt-', 'desk'), ('keyboard', 'desk'),
+                              ('kitchen-cabinet', 'counter'), ('sink-counter', 'counter'),
+                              ('bed-', 'bed'), ('radiator-', 'radiator')]:
+        if name.startswith(prefix):
+            role = 'chair-leg' if 'chair-leg' in name else 'desktop' if name.startswith(('desk-top', 'dining-top')) else 'desk-prop' if name.startswith(('keyboard', 'crt-stand')) else 'furniture'
+            return assembly, role
+    return name.split('.')[0], 'detail'
+
+
+def audit_scene(scene, layout):
+    from mathutils import Vector
+    import bpy
+    bpy.context.view_layer.update()
+    objects = []
+    for obj in scene.objects:
+        if obj.type not in {'MESH', 'CURVE', 'FONT'} or obj.name.startswith(('depth-', 'static-')):
+            continue
+        points = [obj.matrix_world @ Vector(p) for p in obj.bound_box]
+        runtime = [(p.x, p.z, -p.y) for p in points]
+        assembly, role = semantics(obj.name)
+        obj['assembly'] = assembly
+        objects.append(dict(name=obj.name, assembly=assembly, role=role,
+                            min=[min(p[i] for p in runtime) for i in range(3)],
+                            max=[max(p[i] for p in runtime) for i in range(3)],
+                            materials=[m.name for m in obj.data.materials if m]))
+    return audit_records(objects, layout)
+
+
+if __name__ == '__main__':
+    data = json.load(sys.stdin)
+    print(json.dumps(audit_records(data['objects'], data.get('layout', load_layout()))))

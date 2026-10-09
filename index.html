@@ -1,86 +1,48 @@
 <!doctype html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Battle Life — Каликфорния</title>
-    <link rel="stylesheet" href="./style.css?v=20260911-creator2" />
-  </head>
-  <body>
-    <main class="game-shell">
-      <canvas id="game" aria-label="3D apartment visual prototype"></canvas>
-      <section class="hud hud--top" aria-label="Game status">
-        <p class="eyebrow">BATTLE LIFE / КАЛИКФОРНИЯ</p>
-        <h1 id="scene-title">КВАРТИРА · 17 СЕНТЯБРЯ</h1>
-      </section>
-      <section class="campaign-hud" aria-label="Состояние кампании">
-        <div class="campaign-hud__time">
-          <span class="campaign-hud__label">СЕЙЧАС</span>
-          <strong id="campaign-clock">17 СЕН · 19:00</strong>
-          <span id="campaign-rent">Аренда 3 500 ₽ · 1 окт</span>
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Life — первый вечер</title>
+  <link rel="stylesheet" href="./apartment-v3.css?rev=11">
+  <link rel="stylesheet" href="./creator-v12.css?rev=12">
+  <link rel="stylesheet" href="./virtual-pc.css?rev=1">
+  <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
+</head>
+<body>
+  <canvas id="apartment" aria-label="Квартира. Нажмите на пол, чтобы идти, или на мебель для взаимодействия."></canvas>
+  <div id="camera-fade" aria-hidden="true"></div>
+  <header class="topbar" id="game-header" hidden><div><p class="brand">BATTLE LIFE</p><h1 id="player-name">Первый вечер</h1><div class="tag" id="home-time">Дом · первый вечер</div></div><div class="top-right"><button id="camera-mode" title="2D ↔ 3D (первое лицо). В 3D: правая кнопка — обзор, левая — действие.">Камера: 2D</button><button id="rig-toggle" aria-expanded="false" aria-controls="inspector">Проверка анимаций</button><button id="menu-button">Меню</button></div></header>
+  <section id="inspector" hidden><h2>Движение и скелет</h2><p>Та же 3D-модель, что в редакторе. Можно остановить действие и просмотреть походку по кадрам.</p><label><input id="show-bones" type="checkbox">Показать кости</label><label><input id="hold" type="checkbox">Удерживать действие для осмотра</label><div class="buttons"><button id="pause">Пауза</button><button id="step">Кадр +1</button><button id="face">Анфас</button></div><label for="light-preview">Освещение для осмотра</label><select id="light-preview"><option value="game">По игровому времени</option value="390">Утро · 06:30</option><option value="720">День · 12:00</option><option value="1140">Вечер · 19:00</option><option value="1410">Ночь · 23:30</option></select><output id="state"></output></section>
+  <div id="hover-label"></div>
+  <section id="controls" hidden><div class="activity-row"><div id="activity" role="status">Загрузка…</div><span id="room">ЖИЛАЯ КОМНАТА</span></div><progress id="sleep-progress" aria-label="Прошедшее время сна" max="1" value="0" hidden></progress><button id="wake" class="primary" hidden>Проснуться раньше</button><nav id="actions" aria-label="Взаимодействия в квартире"></nav></section>
+  <section id="main-menu" class="screen" hidden aria-labelledby="menu-title"><div class="menu-copy"><p class="eyebrow">ПЕРВЫЙ ВЕЧЕР / ПЕРВАЯ ЗАПИСЬ</p><h2 id="menu-title">BATTLE<br><span>LIFE</span></h2><p class="menu-description">За окном — чужие окна.<br>Здесь — твоя комната и ещё не написанный трек.</p><div class="menu-actions"><button id="new-game" class="primary">Новая игра <span>↗</span></button><button id="continue-game" hidden>Продолжить</button></div><p id="save-note" class="small-note"></p><a class="legacy-link" href="./legacy.html">Прежний прототип кампании ↗</a></div><div class="menu-foot">КВАРТИРА <span>01 / НАЧАЛО</span></div></section>
+  <section id="creator" class="screen" hidden aria-labelledby="creator-title">
+    <header class="creator-heading"><div><p class="eyebrow">BATTLE LIFE · НОВАЯ ИГРА</p><h2 id="creator-title">Создание персонажа</h2></div><p>Первый вечер.<br>Всё остальное — ещё впереди.</p></header>
+    <nav class="creator-tabs" aria-label="Создание персонажа"><button type="button" id="appearance-tab" aria-pressed="true">I · Внешность</button><button type="button" id="clothing-tab" aria-pressed="false">II · Одежда</button><button type="button" id="stats-tab" aria-pressed="false">III · Характеристики <span id="points-badge">10</span></button></nav>
+    <div class="creator-layout">
+      <form id="creator-form" novalidate>
+        <aside class="creator-sidebar creator-frame">
+          <label class="name-field" for="character-name">Имя<input id="character-name" name="name" placeholder="Как тебя зовут?" maxlength="32" autocomplete="off" required aria-describedby="name-error"></label>
+          <p id="name-error" class="field-error" role="alert"></p>
+          <div id="creator-categories"></div>
+          <section class="creator-attributes" aria-label="Текущие характеристики"><h3>Характеристики</h3><dl id="stats-overview"></dl></section>
+        </aside>
+        <div class="creator-parchment">
+          <section id="appearance-panel"><p class="section-hint">Облик, в котором начнётся твоя история.</p><div id="appearance-fields"></div></section>
+          <section id="stats-panel" hidden><h3>Точка отсчёта</h3><div class="stats-summary"><div>Свободных очков: <strong id="points-left">10</strong><p>Одно очко даёт +10 к навыку.<br>Не больше 50 в одном навыке.</p></div><button type="button" id="distribute">Базовый набор</button></div><div id="stat-fields"></div><p id="allocations-error" class="field-error" role="alert"></p></section>
+          <p id="creator-error" role="alert"></p>
         </div>
-        <div class="campaign-hud__cash"><span>НАЛИЧНЫЕ</span><strong id="campaign-cash">5 000 ₽</strong></div>
-        <div class="needs" aria-label="Потребности">
-          <div class="need"><span>Бодрость</span><i><b id="need-energy"></b></i></div>
-          <div class="need"><span>Сытость</span><i><b id="need-hunger"></b></i></div>
-          <div class="need"><span>Здоровье</span><i><b id="need-health"></b></i></div>
-          <div class="need"><span>Досуг</span><i><b id="need-leisure"></b></i></div>
-        </div>
-        <button id="creator-open" class="campaign-hud__profile" type="button">Настроить MC</button>
-      </section>
-      <section class="hud hud--bottom">
-        <p id="status">Кликни по комнате, чтобы отправить героя в нужную точку.</p>
-        <p class="controls">Клик слева или справа — идти · под героем — посмотреть в камеру · по компьютеру — работать</p>
-      </section>
-      <section id="interaction-dock" class="interaction-dock" aria-live="polite">
-        <span class="interaction-dock__hint">Подойди к предмету</span>
-      </section>
-      <aside id="world-tooltip" class="world-tooltip is-hidden" aria-live="polite"></aside>
-      <aside id="actor-bubble" class="actor-bubble is-hidden" aria-live="polite"></aside>
-      <section id="desktop-screen" class="desktop-screen is-hidden" aria-label="Экран компьютера">
-        <header class="desktop-bar"><span id="desktop-system">КАЛИКФОРНИЯ OS / ДОМАШНИЙ ПК</span><button id="desktop-close" type="button">Выключить ×</button></header>
-        <div id="desktop-content" class="desktop-content"></div>
-        <footer id="desktop-taskbar" class="desktop-taskbar" aria-label="Панель задач"></footer>
-      </section>
-      <section id="map-screen" class="map-screen is-hidden" aria-label="Карта Каликфорнии"><header><span>КАЛИКФОРНИЯ · КАРТА</span><button id="map-close" type="button">Вернуться домой ×</button></header><div class="map-canvas"><div id="map-districts" class="map-districts"></div><aside id="map-location-panel" class="map-location-panel" aria-live="polite"></aside></div></section>
-      <aside id="phone-panel" class="phone-panel is-hidden" aria-live="polite"></aside>
-      <section id="start-screen" class="start-screen" aria-labelledby="start-title">
-        <div class="start-card">
-          <p class="eyebrow">BATTLE LIFE / КАЛИКФОРНИЯ</p>
-          <h2 id="start-title">КВАРТИРА · ПЕРВЫЙ ВЕЧЕР</h2>
-          <p>Сентябрь 2026-го. Панелька, тусклый свет и ещё не записанный первый трек.</p>
-          <div class="start-card__actions">
-            <button id="start-new-game" class="primary-button" type="button">Новая игра →</button>
-            <button id="start-continue" class="secondary-button is-hidden" type="button">Продолжить</button>
-          </div>
-        </div>
-      </section>
-      <section id="creator-modal" class="modal is-hidden" role="dialog" aria-modal="true" aria-labelledby="creator-title">
-        <form id="creator-form" class="creator-card">
-          <div class="creator-card__heading">
-            <p class="eyebrow">ПЕРВЫЙ ВЕЧЕР · КАЛИКФОРНИЯ</p>
-            <h2 id="creator-title">Собери своего MC</h2>
-            <p>Все статы начинают с 10. Распредели 10 очков; один стат нельзя поднять выше 50.</p>
-          </div>
-          <div class="creator-identity">
-            <label>Имя<input id="creator-name" name="name" maxlength="24" value="Миша" required /></label>
-            <label>Никнейм<input id="creator-nickname" name="nickname" maxlength="32" placeholder="Если пусто — будет использовано имя" /></label>
-          </div>
-          <div class="creator-split">
-            <section><div class="creator-section-title"><span>Стартовые навыки</span><strong id="creator-points">10 очков</strong></div><div id="creator-stats" class="creator-stats"></div></section>
-            <section class="creator-look"><div class="creator-section-title"><span>Внешность MC</span><small>Нажми на зону модели</small></div>
-              <div class="creator-avatar-frame">
-                <canvas id="creator-preview" aria-label="Предпросмотр внешности персонажа"></canvas>
-              </div>
-              <div id="creator-look-controls" class="creator-look-controls" aria-label="Настройка внешности"></div>
-            </section>
-          </div>
-          <p id="creator-error" class="creator-error" role="alert"></p>
-          <button class="primary-button" type="submit">Начать вечер →</button>
-        </form>
-      </section>
-      <div class="scanlines" aria-hidden="true"></div>
-    </main>
-    <script type="module" src="./src/main.js?rev=entry-flow-v1"></script>
-  </body>
+      </form>
+      <section class="preview-card creator-frame" aria-label="Объёмный предпросмотр героя"><div class="preview-caption"><span>ТВОЙ ПЕРСОНАЖ</span><span>ЖИВАЯ МОДЕЛЬ</span></div><div id="preview-stage" aria-label="Перетащи, чтобы повернуть героя"></div><div id="preview-angles" role="group" aria-label="Ракурс персонажа"><button type="button" data-yaw="0" class="active" aria-pressed="true">Анфас</button><button type="button" data-yaw="1.5707963267948966" aria-pressed="false">Справа</button><button type="button" data-yaw="3.141592653589793" aria-pressed="false">Спина</button><button type="button" data-yaw="-1.5707963267948966" aria-pressed="false">Слева</button></div><div class="preview-tools"><button id="preview-body" type="button">Весь рост</button><label for="preview-zoom">Масштаб <input id="preview-zoom" type="range" min="0.8" max="1.5" step="0.05" value="1"></label></div><p class="preview-note">Зажми и потяни, чтобы повернуть.<br>Одежда останется той же и в квартире.</p></section>
+    </div>
+    <footer class="creator-footer"><button id="cancel-creator" type="button">← Назад</button><span id="creator-footer-note">Выбери внешность, одежду и свои сильные стороны.</span><button id="next-step" type="button" class="primary">Одежда →</button><button id="start-game" class="primary" form="creator-form" type="submit" hidden>Начать историю →</button></footer>
+  </section>
+  <section id="destinations" class="screen" hidden aria-labelledby="destinations-title"><div class="destination-card"><p class="eyebrow">ЗА ПОРОГОМ / КАЛИФОРНИЯ</p><h2 id="destinations-title">Куда пойти?</h2><p class="destination-note">Дома всё остаётся на своих местах.</p><nav id="districts" aria-label="Районы города"></nav><section id="district-detail" aria-live="polite"></section><p class="small-note">Пока доступен выбор направления. Городские локации ещё не подключены к новой сцене.</p><button id="return-home" class="primary">← Вернуться домой</button></div></section>
+  <div id="fade" aria-hidden="true"></div>
+  <section id="door-choice" class="screen" hidden aria-labelledby="door-title"><div class="door-card"><p class="eyebrow">ВХОДНАЯ ДВЕРЬ</p><h2 id="door-title">За порогом</h2><p>Тихая лестничная площадка. Можно сначала посмотреть, что снаружи.</p><button id="door-peek">Посмотреть в глазок</button><button id="door-exit" class="primary">Открыть дверь и выйти</button><button id="door-cancel">Остаться дома</button></div></section>
+  <section id="peephole" class="screen" hidden aria-labelledby="peek-title"><div class="peek-heading"><p class="eyebrow">ЗА ДВЕРЬЮ</p><h2 id="peek-title">Лестничная площадка</h2></div><div id="peek-stage" aria-label="Вид через дверной глазок"></div><div class="peek-footer"><p>Дверь закрыта. В подъезде никого.</p><button id="peek-close">Отойти от глазка</button></div></section>
+  <section id="virtual-pc" hidden aria-label="Виртуальный домашний компьютер"></section>
+  <section id="loading"><p class="brand">BATTLE LIFE / ПЕРВЫЙ ВЕЧЕР</p><h2>Включаем свет в квартире</h2><div class="loader-line"></div><p>Загружаются квартира, персонаж и его гардероб.</p></section>
+<script type="module" src="./src/apartment-app.js?rev=14"></script>
+</body>
 </html>

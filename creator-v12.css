@@ -1,0 +1,76 @@
+/* The character editor is deliberately separate from the pixel apartment HUD. */
+#creator{font:16px/1.35 Georgia,'Times New Roman',serif;color:#d8d0b9;padding:18px max(22px,calc((100vw - 1260px)/2));background:none;gap:12px;overflow:hidden;--creator-bronze:#8d794f;--creator-ink:#29241d}
+#creator *{min-width:0}
+#creator .creator-heading{margin:0;min-height:52px;padding:0 4px;border-bottom:1px solid #756440;background:linear-gradient(90deg,#14130ffc,transparent)}
+#creator .creator-heading h2{font-size:30px;line-height:1.2;color:#e0d3af;text-shadow:0 2px 3px #000}
+#creator .creator-heading .eyebrow{font:11px/1.5 Georgia,serif;letter-spacing:.19em;margin:0 0 4px;color:#a58d58;display:block}
+#creator .creator-heading>p{display:block;font:14px/1.5 Georgia,serif;color:#a19b8b;text-align:right}
+#creator button{font:16px/1.25 Georgia,'Times New Roman',serif;border:1px solid #6b5c3d;box-shadow:inset 0 0 0 1px #181711,0 2px 3px #0007;background:linear-gradient(#25231c,#171712);color:#c9c2ad;padding:9px 12px;border-radius:0;min-height:37px;overflow-wrap:anywhere}
+#creator button:hover:not(:disabled){background:linear-gradient(#49402b,#30281a);border-color:#bca36d;color:#fff0c9}
+#creator button[aria-pressed=true],#creator button.active{color:#f1e2ba;background:linear-gradient(90deg,#5e3e23,#30291c);border-color:#be9b5a;box-shadow:inset 3px 0 #d8b571,inset 0 0 0 1px #342416}
+#creator :is(button,input):focus-visible{outline:2px solid #efd49a;outline-offset:3px}
+#creator button:disabled{opacity:.45}
+#creator button.primary{background:linear-gradient(#736039,#4d3a20);border-color:#b69b61;color:#f6e7c3}
+#creator .creator-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0;border:0;flex-shrink:0;background:#11110ee8}
+#creator .creator-tabs button{font-size:17px;letter-spacing:.02em;text-align:center}
+#creator #points-badge{font-size:13px;display:inline-grid;place-items:center;min-width:20px;min-height:20px;border:1px solid #a08953;color:#e1c784}
+#creator .creator-layout{display:grid;grid-template-columns:minmax(0,25fr) minmax(0,32fr) minmax(0,43fr);gap:18px;flex:1;min-height:0}
+#creator #creator-form{display:contents}
+#creator .creator-frame{border:1px solid #776643;outline:1px solid #29271f;outline-offset:4px;box-shadow:inset 0 0 0 3px #0d0e0b,inset 0 0 0 4px #4c4531,0 6px 18px #0008}
+#creator .creator-sidebar{padding:17px 14px;background:radial-gradient(ellipse at top,#28271fd9,#11120feF 65%);overflow:auto;scrollbar-width:thin;scrollbar-color:#85714a #161710;pointer-events:auto}
+#creator .name-field{font-size:15px;color:#b5a67f;text-transform:none}
+#creator .name-field input{font:18px/1.3 Georgia,serif;margin:6px 0 3px;padding:9px 8px;background:#0b0e0a;border:1px solid #766545;color:#eee2c6}
+#creator .name-field input::placeholder{color:#777565}
+#creator .look-categories{display:flex;flex-direction:column;gap:3px;margin:13px 0 18px}
+#creator .look-categories button{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:37px;padding:8px 11px;font-size:17px;text-align:left}
+#creator .creator-icon{width:22px;height:22px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.4}
+#creator .creator-tabs button,#creator .creator-footer button,#creator #preview-body{display:flex;align-items:center;justify-content:center;gap:9px}
+#creator .creator-attributes h3{font:17px/1.3 Georgia,serif;color:#cdb987;border-block:1px solid #554a33;padding:8px 0;margin:0 0 5px}
+#creator #stats-overview{display:grid;grid-template-columns:minmax(0,1fr) 34px;gap:5px 10px;font-size:14px;margin:12px 0 0;color:#ada999}
+#creator #stats-overview dt{overflow-wrap:anywhere}
+#creator #stats-overview dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;color:#d8c491}
+#creator .creator-parchment{pointer-events:auto;padding:18px 18px 20px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#6a593f #b5a683;color:var(--creator-ink);border:1px solid #c1ae86;box-shadow:inset 0 0 22px #49351e70,0 0 0 4px #332a1d,0 6px 18px #0009;background:repeating-linear-gradient(9deg,#44351b05 0 1px,transparent 1px 4px),radial-gradient(ellipse at 40% 35%,#d2c6a4,#b1a181 72%,#96835f)}
+#creator .section-hint{font:15px/1.5 Georgia,serif;color:#5d503c;margin:0 0 14px;border-bottom:1px solid #786747;padding-bottom:10px}
+#creator .look-current{font:20px/1.35 Georgia,serif;color:#33291b;margin:0 0 13px;padding:0 0 11px;border-bottom:3px double #81704e}
+#creator .look-options{display:flex;flex-direction:column;gap:4px}
+#creator .look-options button{position:relative;min-height:34px;padding:7px 12px 7px 33px;font-size:17px;color:#342b20;background:#e0d4b722;border:1px solid #796849;box-shadow:inset 0 0 0 1px #f0e1b54d}
+#creator .look-options button:before{content:'◇';position:absolute;left:10px;top:6px;font-size:18px;color:#66532e}
+#creator .look-options button[aria-pressed=true]{color:#f3e4bc;background:linear-gradient(90deg,#765333,#4a3926);border-color:#49331c;box-shadow:inset 3px 0 #dbc18a}
+#creator .look-options button[aria-pressed=true]:before{content:'◆';color:#dfc185}
+#creator .look-options button:hover:not(:disabled){background:#8f7450;color:#fff2d2}
+#creator .look-description{font:15px/1.5 Georgia,serif;color:#51432f;margin:16px 0 0;padding:12px 4px;border-top:1px solid #8b7954;min-height:65px}
+#creator .look-palette{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-top:13px;padding-top:12px;border-top:3px double #8b7954}
+#creator .look-palette button{font-size:13px;min-height:31px;padding:5px 6px;gap:7px;color:#392f20;border:1px solid #897653;background:#c7b893;box-shadow:none}
+#creator .look-palette button:before{width:17px;height:17px;flex-basis:17px;border:1px solid #463c29;box-shadow:inset 0 0 0 1px #ffffff30}
+#creator .look-palette button[aria-pressed=true]{outline:1px solid #47321a;outline-offset:-3px;background:#765333;color:#fff1ca}
+#creator .preview-card{display:flex;flex-direction:column;min-height:0;background:transparent;padding:5px;position:relative}
+#creator .preview-card:before,#creator .preview-card:after{content:'✧';position:absolute;top:-12px;font-size:24px;color:#9d8857;pointer-events:none}
+#creator .preview-card:before{left:-10px}#creator .preview-card:after{right:-10px}
+#creator .preview-caption{font:12px/1.3 Georgia,serif;letter-spacing:.08em;color:#c5b68e;padding:10px 10px;background:#171813f0}
+#creator .preview-caption span:last-child{display:block;font-size:10px;color:#8e8e7d}
+#creator #preview-stage{flex:1;min-height:170px;background:transparent}
+#creator #preview-angles{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:6px;background:#171813ef}
+#creator #preview-angles button{font-size:13px;padding:6px 3px;min-height:31px;text-align:center}
+#creator .preview-tools{display:flex;flex-wrap:wrap;gap:10px;padding:6px 8px;background:#171813f5}
+#creator .preview-tools button{font-size:13px;padding:5px 9px;min-height:30px}
+#creator .preview-tools label{font:12px/1.2 Georgia,serif;min-width:130px;display:flex;flex:1;align-items:center;gap:7px;color:#b4ab91}
+#creator .preview-tools input{width:100%;accent-color:#ad8b4d}
+#creator .preview-note{display:block;font:12px/1.35 Georgia,serif;color:#888b78;background:#171813f5;padding:4px 8px 8px}
+#creator #stats-panel h3{font-size:24px;margin:0 0 13px;color:#493a26}
+#creator .stats-summary{display:block;color:#453623;font-size:16px;margin:0 0 12px}
+#creator .stats-summary strong{font:25px/1 Georgia,serif;color:#5a3c17}
+#creator .stats-summary p{font:13px/1.5 Georgia,serif;color:#6e5d42;margin:8px 0}
+#creator .stats-summary button{font-size:14px;padding:6px 12px}
+#creator #stat-fields{display:block}
+#creator .stat-row{display:grid;grid-template-columns:minmax(0,1fr) 25px 31px 25px;gap:4px;padding:7px 0;border-bottom:1px solid #8c7c58;font:15px/1.25 Georgia,serif;color:#392e1e}
+#creator .stat-row>span{grid-column:auto}
+#creator .stat-row button{grid-column:auto;font-size:17px;min-height:26px;line-height:1;padding:3px 0;text-align:center}
+#creator .stat-row output{font-size:16px;color:#513c1e}
+#creator .creator-footer{margin:0;padding:10px 0 0;gap:16px;min-height:48px;border-top:1px solid #756440;background:linear-gradient(90deg,#11120fe8,#171712e8);pointer-events:auto}
+#creator .creator-footer span{display:block;font:14px/1.4 Georgia,serif;color:#aaa28a}
+#creator .creator-footer button{font-size:16px;padding:9px 18px;white-space:normal}
+#creator .field-error,#creator #creator-error{font:14px/1.4 Georgia,serif;color:#f1c0a2;background:#42251c;border:1px solid #8d5440;padding:8px;margin:8px 0}
+#creator .field-error:empty,#creator #creator-error:empty{display:none}
+@media(max-width:1100px){#creator{padding:14px 18px;gap:10px}#creator .creator-layout{gap:13px;grid-template-columns:minmax(0,25fr) minmax(0,34fr) minmax(0,41fr)}#creator .creator-parchment{padding:14px}#creator .creator-sidebar{padding:14px 10px}#creator .creator-footer span{font-size:12px}}
+@media(max-width:899px){#creator{display:block;overflow-y:auto;padding:18px;background:none;pointer-events:auto}#creator .creator-heading{padding-bottom:10px;margin-bottom:12px}#creator .creator-heading>p{display:none}#creator .creator-heading h2{font-size:27px}#creator .creator-tabs{margin-bottom:16px}#creator .creator-tabs button{font-size:15px}#creator .creator-layout{grid-template-columns:minmax(0,42fr) minmax(0,58fr);gap:15px;min-height:auto}#creator .preview-card{grid-column:1/-1;grid-row:1;height:350px}#creator #preview-stage{min-height:170px}#creator .preview-caption span:last-child{display:block}#creator .preview-note{display:none}#creator .creator-sidebar,#creator .creator-parchment{overflow:visible}#creator .creator-footer{margin-top:18px;flex-wrap:wrap;padding-bottom:10px}#creator .creator-footer span{order:3;flex-basis:100%;font-size:14px}#creator .creator-footer button:last-child{margin-left:auto}}
+@media(max-width:519px){#creator{padding:12px}#creator .creator-heading h2{font-size:24px}#creator .creator-layout{grid-template-columns:minmax(0,1fr)}#creator .creator-tabs{gap:4px}#creator .creator-tabs button{font-size:13px;padding:8px 3px}#creator .preview-card{height:320px}#creator .creator-sidebar{padding:14px}#creator .creator-attributes{display:none}#creator .look-categories{display:grid;grid-template-columns:1fr 1fr;margin-bottom:0}#creator .look-categories button{font-size:16px}#creator .creator-parchment{padding:17px}#creator .creator-footer button{font-size:15px;padding:9px 12px}}

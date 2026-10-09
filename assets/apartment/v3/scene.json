@@ -1,0 +1,889 @@
+{
+  "version": 3,
+  "bounds": [
+    -7.6,
+    8.15
+  ],
+  "spawn": [
+    3.4,
+    0,
+    0.85
+  ],
+  "speed": 1.326,
+  "doorX": 0,
+  "doorSweep": [
+    -0.4,
+    1.35
+  ],
+  "passageOpenAngle": 1.6336281798666925,
+  "background": "background.png",
+  "backgroundDay": "background-day.png",
+  "geometry": "interaction.glb",
+  "camera": {
+    "position": [
+      1.5,
+      3.036489963531494,
+      12.0
+    ],
+    "target": [
+      1.5,
+      1.35,
+      0
+    ],
+    "width": 20.8,
+    "height": 8.32,
+    "lightingStates": {
+      "off": {
+        "night": "background-off.png",
+        "day": "background-day-off.png"
+      },
+      "living": {
+        "night": "background-living.png",
+        "day": "background-day-living.png"
+      },
+      "kitchen": {
+        "night": "background-kitchen.png",
+        "day": "background-day-kitchen.png"
+      },
+      "both": {
+        "night": "background.png",
+        "day": "background-day.png"
+      }
+    },
+    "yaw": 0,
+    "pitch": 8
+  },
+  "actions": {
+    "computer": {
+      "label": "Сесть за компьютер",
+      "pose": [
+        4.48,
+        0.045,
+        -0.02
+      ],
+      "yaw": 3.141592653589793,
+      "clip": "seated",
+      "fade": true,
+      "duration": 10,
+      "hit": [
+        [
+          4.45,
+          1.12,
+          -0.83
+        ],
+        [
+          1.25,
+          0.82,
+          0.7
+        ]
+      ],
+      "approach": [
+        4.48,
+        0,
+        0.85
+      ]
+    },
+    "bed": {
+      "label": "Лечь спать",
+      "pose": [
+        1.84,
+        0.95,
+        -0.8
+      ],
+      "yaw": 1.5707963267948966,
+      "clip": "sleep",
+      "fade": true,
+      "duration": 7,
+      "hit": [
+        [
+          1.75,
+          0.6,
+          -0.8
+        ],
+        [
+          2.1,
+          0.58,
+          1.12
+        ]
+      ],
+      "approach": [
+        1.75,
+        0,
+        0.85
+      ]
+    },
+    "sink": {
+      "label": "Помыть посуду",
+      "pose": [
+        -5.3,
+        0,
+        -0.29
+      ],
+      "yaw": 3.141592653589793,
+      "clip": "wash",
+      "fade": false,
+      "duration": 7,
+      "hit": [
+        [
+          -5.3,
+          0.96,
+          -0.88
+        ],
+        [
+          1.05,
+          0.65,
+          0.75
+        ]
+      ],
+      "approach": [
+        -5.3,
+        0,
+        0.85
+      ]
+    },
+    "stove": {
+      "label": "Приготовить еду",
+      "pose": [
+        -3.32,
+        0,
+        -0.25
+      ],
+      "yaw": 3.141592653589793,
+      "clip": "wash",
+      "fade": false,
+      "duration": 7,
+      "hit": [
+        [
+          -3.32,
+          0.77,
+          -1
+        ],
+        [
+          0.82,
+          1.04,
+          0.82
+        ]
+      ],
+      "approach": [
+        -3.32,
+        0,
+        0.85
+      ]
+    },
+    "fridge": {
+      "label": "Открыть холодильник",
+      "pose": [
+        -1.26,
+        0,
+        -0.05
+      ],
+      "yaw": 3.141592653589793,
+      "clip": "reach",
+      "fade": false,
+      "duration": 5,
+      "hit": [
+        [
+          -1.26,
+          0.91,
+          -0.7
+        ],
+        [
+          0.93,
+          1.82,
+          0.73
+        ]
+      ],
+      "approach": [
+        -1.26,
+        0,
+        0.85
+      ]
+    },
+    "entry": {
+      "label": "Выйти из квартиры",
+      "pose": [
+        8.04,
+        0,
+        0.675
+      ],
+      "yaw": 1.5707963267948966,
+      "clip": "open-door",
+      "fade": false,
+      "duration": 3,
+      "hit": [
+        [
+          8.5,
+          1.07,
+          0.675
+        ],
+        [
+          0.25,
+          2.13,
+          1.1
+        ]
+      ],
+      "approach": [
+        7.98,
+        0,
+        0.85
+      ]
+    },
+    "dining": {
+      "label": "Поесть за столом",
+      "pose": [
+        -7.25,
+        0.045,
+        -0.02
+      ],
+      "yaw": 3.141592653589793,
+      "clip": "eat",
+      "fade": true,
+      "duration": 6,
+      "hit": [
+        [
+          -7.25,
+          0.785,
+          -0.88
+        ],
+        [
+          1.1,
+          0.3,
+          0.82
+        ]
+      ],
+      "approach": [
+        -7.25,
+        0,
+        0.85
+      ]
+    },
+    "light-living": {
+      "label": "Выключатель света",
+      "pose": [
+        3.35,
+        0,
+        -1.1
+      ],
+      "yaw": 3.141592653589793,
+      "clip": "switch",
+      "fade": false,
+      "duration": 0.7,
+      "hit": [
+        [
+          3.6,
+          1.22,
+          -1.576
+        ],
+        [
+          0.23,
+          0.24,
+          0.16
+        ]
+      ],
+      "lightRoom": "living",
+      "contactTime": 0.32,
+      "approach": [
+        3.35,
+        0,
+        0.85
+      ]
+    },
+    "light-kitchen": {
+      "label": "Выключатель света",
+      "pose": [
+        -0.5,
+        0,
+        -1.1
+      ],
+      "yaw": 3.141592653589793,
+      "clip": "switch",
+      "fade": false,
+      "duration": 0.7,
+      "hit": [
+        [
+          -0.25,
+          1.22,
+          -1.576
+        ],
+        [
+          0.23,
+          0.24,
+          0.16
+        ]
+      ],
+      "lightRoom": "kitchen",
+      "contactTime": 0.32,
+      "approach": [
+        -0.5,
+        0,
+        0.85
+      ]
+    },
+    "passage": {
+      "label": "Перейти в другую комнату",
+      "crossRoom": true,
+      "hit": [
+        [
+          0,
+          1.06,
+          0.5
+        ],
+        [
+          0.35,
+          2.12,
+          1.64
+        ]
+      ]
+    }
+  },
+  "rig": "mannequin.glb",
+  "stride": 0.9,
+  "entryExit": {
+    "position": [
+      10.35,
+      0,
+      0.675
+    ],
+    "yaw": 1.5707963267948966
+  },
+  "entryDoor": {
+    "hinge": [
+      8.5,
+      0.015,
+      0.15
+    ],
+    "openAngle": 1.5707963267948966,
+    "threshold": 8.55,
+    "closedBounds": 8.15
+  },
+  "clock": {
+    "hourHand": "clock-hour-hand",
+    "minuteHand": "clock-minute-hand",
+    "axis": "z",
+    "center": [
+      1.25,
+      2.195,
+      -1.435
+    ],
+    "bounds": [
+      [
+        0.965,
+        1.34,
+        1.39
+      ],
+      [
+        1.535,
+        1.63,
+        2.65
+      ]
+    ]
+  },
+  "backgroundResolution": [
+    3840,
+    1536
+  ],
+  "landing": {
+    "root": "landing-root"
+  },
+  "peepholeCamera": {
+    "position": [
+      8.61,
+      1.645,
+      0.675
+    ],
+    "target": [
+      11.05,
+      1.51,
+      -0.15
+    ]
+  },
+  "layout": {
+    "rooms": {
+      "kitchen": {
+        "x": [
+          -8,
+          0
+        ],
+        "height": 3,
+        "rearZ": -1.72,
+        "frontZ": 1.82
+      },
+      "living": {
+        "x": [
+          0,
+          8.5
+        ],
+        "height": 3,
+        "rearZ": -1.72,
+        "frontZ": 1.82
+      }
+    },
+    "railZ": 0.85,
+    "furnitureReserve": {
+      "min": [
+        5.95,
+        0,
+        -1.5
+      ],
+      "max": [
+        7.75,
+        2,
+        -0.7
+      ]
+    },
+    "windows": [
+      {
+        "id": "kitchen",
+        "center": [
+          -2.45,
+          1.85,
+          -1.72
+        ],
+        "width": 1.08,
+        "height": 1.46
+      },
+      {
+        "id": "living-left",
+        "center": [
+          2.65,
+          1.85,
+          -1.72
+        ],
+        "width": 1.08,
+        "height": 1.46
+      },
+      {
+        "id": "living-right",
+        "center": [
+          4.55,
+          1.85,
+          -1.72
+        ],
+        "width": 1.08,
+        "height": 1.46
+      }
+    ],
+    "anchors": {
+      "spawn": [
+        3.4,
+        0,
+        0.85
+      ],
+      "entryHinge": [
+        8.5,
+        0.015,
+        0.15
+      ],
+      "entryExit": [
+        10.35,
+        0,
+        0.675
+      ],
+      "peepholeEye": [
+        8.61,
+        1.645,
+        0.675
+      ],
+      "peepholeTarget": [
+        11.05,
+        1.51,
+        -0.15
+      ],
+      "diningTable": [
+        -7.25,
+        0.785,
+        -0.88
+      ],
+      "diningChair": [
+        -7.25,
+        0.425,
+        -0.02
+      ],
+      "actions": {
+        "computer": {
+          "label": "Сесть за компьютер",
+          "x": 4.48,
+          "pose": [
+            4.48,
+            0.045,
+            -0.02
+          ],
+          "yaw": 3.141592653589793,
+          "clip": "seated",
+          "fade": true,
+          "duration": 10,
+          "hit": [
+            [
+              4.45,
+              1.12,
+              -0.83
+            ],
+            [
+              1.25,
+              0.82,
+              0.7
+            ]
+          ]
+        },
+        "bed": {
+          "label": "Лечь спать",
+          "x": 1.75,
+          "pose": [
+            1.84,
+            0.95,
+            -0.8
+          ],
+          "yaw": 1.5707963267948966,
+          "clip": "sleep",
+          "fade": true,
+          "duration": 7,
+          "hit": [
+            [
+              1.75,
+              0.6,
+              -0.8
+            ],
+            [
+              2.1,
+              0.58,
+              1.12
+            ]
+          ]
+        },
+        "sink": {
+          "label": "Помыть посуду",
+          "x": -5.3,
+          "pose": [
+            -5.3,
+            0,
+            -0.29
+          ],
+          "yaw": 3.141592653589793,
+          "clip": "wash",
+          "fade": false,
+          "duration": 7,
+          "hit": [
+            [
+              -5.3,
+              0.96,
+              -0.88
+            ],
+            [
+              1.05,
+              0.65,
+              0.75
+            ]
+          ]
+        },
+        "stove": {
+          "label": "Приготовить еду",
+          "x": -3.32,
+          "pose": [
+            -3.32,
+            0,
+            -0.25
+          ],
+          "yaw": 3.141592653589793,
+          "clip": "wash",
+          "fade": false,
+          "duration": 7,
+          "hit": [
+            [
+              -3.32,
+              0.77,
+              -1
+            ],
+            [
+              0.82,
+              1.04,
+              0.82
+            ]
+          ]
+        },
+        "fridge": {
+          "label": "Открыть холодильник",
+          "x": -1.26,
+          "pose": [
+            -1.26,
+            0,
+            -0.05
+          ],
+          "yaw": 3.141592653589793,
+          "clip": "reach",
+          "fade": false,
+          "duration": 5,
+          "hit": [
+            [
+              -1.26,
+              0.91,
+              -0.7
+            ],
+            [
+              0.93,
+              1.82,
+              0.73
+            ]
+          ]
+        },
+        "entry": {
+          "label": "Выйти из квартиры",
+          "x": 7.98,
+          "pose": [
+            8.04,
+            0,
+            0.675
+          ],
+          "yaw": 1.5707963267948966,
+          "clip": "open-door",
+          "fade": false,
+          "duration": 3,
+          "hit": [
+            [
+              8.5,
+              1.07,
+              0.675
+            ],
+            [
+              0.25,
+              2.13,
+              1.1
+            ]
+          ]
+        },
+        "dining": {
+          "label": "Поесть за столом",
+          "x": -7.25,
+          "pose": [
+            -7.25,
+            0.045,
+            -0.02
+          ],
+          "yaw": 3.141592653589793,
+          "clip": "eat",
+          "fade": true,
+          "duration": 6,
+          "hit": [
+            [
+              -7.25,
+              0.785,
+              -0.88
+            ],
+            [
+              1.1,
+              0.3,
+              0.82
+            ]
+          ]
+        },
+        "light-living": {
+          "label": "Выключатель света",
+          "x": 3.35,
+          "pose": [
+            3.35,
+            0,
+            -1.1
+          ],
+          "yaw": 3.141592653589793,
+          "clip": "switch",
+          "fade": false,
+          "duration": 0.7,
+          "hit": [
+            [
+              3.6,
+              1.22,
+              -1.576
+            ],
+            [
+              0.23,
+              0.24,
+              0.16
+            ]
+          ],
+          "lightRoom": "living",
+          "contactTime": 0.32
+        },
+        "light-kitchen": {
+          "label": "Выключатель света",
+          "x": -0.5,
+          "pose": [
+            -0.5,
+            0,
+            -1.1
+          ],
+          "yaw": 3.141592653589793,
+          "clip": "switch",
+          "fade": false,
+          "duration": 0.7,
+          "hit": [
+            [
+              -0.25,
+              1.22,
+              -1.576
+            ],
+            [
+              0.23,
+              0.24,
+              0.16
+            ]
+          ],
+          "lightRoom": "kitchen",
+          "contactTime": 0.32
+        }
+      }
+    }
+  },
+  "exterior": {
+    "geometry": "exterior.glb",
+    "occluders": "exterior-occluders.glb",
+    "buildings": [
+      {
+        "id": "block-west",
+        "floors": 5,
+        "bounds": {
+          "min": [
+            -19.0,
+            -4.5,
+            -28.5
+          ],
+          "max": [
+            -1.0,
+            10.0,
+            -19.5
+          ]
+        }
+      },
+      {
+        "id": "block-east",
+        "floors": 5,
+        "bounds": {
+          "min": [
+            1.5,
+            -4.5,
+            -40.5
+          ],
+          "max": [
+            22.5,
+            10.0,
+            -31.5
+          ]
+        }
+      }
+    ],
+    "emitters": [
+      {
+        "id": "factory-stack-west",
+        "position": [
+          -8,
+          20.0,
+          -75
+        ],
+        "seed": 14
+      },
+      {
+        "id": "factory-stack-east",
+        "position": [
+          8,
+          24.0,
+          -82
+        ],
+        "seed": 53
+      }
+    ],
+    "farPlane": 200
+  },
+  "lightingStates": {
+    "off": {
+      "night": "background-off.png",
+      "day": "background-day-off.png"
+    },
+    "living": {
+      "night": "background-living.png",
+      "day": "background-day-living.png"
+    },
+    "kitchen": {
+      "night": "background-kitchen.png",
+      "day": "background-day-kitchen.png"
+    },
+    "both": {
+      "night": "background.png",
+      "day": "background-day.png"
+    }
+  },
+  "liveRoots": [
+    "hinge-passage",
+    "hinge-entry",
+    "hinge-fridge",
+    "landing-root",
+    "chair-root",
+    "passage-frame-root",
+    "switch-living-root",
+    "switch-kitchen-root"
+  ],
+  "lampFixtures": {
+    "kitchen": {
+      "bulb": "lamp-kitchen-bulb",
+      "position": [
+        -4.800000190734863,
+        2.4000000953674316,
+        -0.15000000596046448
+      ],
+      "lightPosition": [
+        -4.800000190734863,
+        2.369999885559082,
+        -0.10000000149011612
+      ],
+      "bakedBulb": true
+    },
+    "living": {
+      "bulb": "lamp-living-bulb",
+      "position": [
+        4.050000190734863,
+        2.4000000953674316,
+        -0.15000000596046448
+      ],
+      "lightPosition": [
+        4.050000190734863,
+        2.369999885559082,
+        -0.10000000149011612
+      ],
+      "bakedBulb": true
+    }
+  },
+  "cameraViews": {
+    "2D": {
+      "position": [
+        1.5,
+        3.036489963531494,
+        12.0
+      ],
+      "target": [
+        1.5,
+        1.35,
+        0
+      ],
+      "width": 20.8,
+      "height": 8.32,
+      "lightingStates": {
+        "off": {
+          "night": "background-off.png",
+          "day": "background-day-off.png"
+        },
+        "living": {
+          "night": "background-living.png",
+          "day": "background-day-living.png"
+        },
+        "kitchen": {
+          "night": "background-kitchen.png",
+          "day": "background-day-kitchen.png"
+        },
+        "both": {
+          "night": "background.png",
+          "day": "background-day.png"
+        }
+      },
+      "yaw": 0,
+      "pitch": 8
+    }
+  },
+  "staticGeometry": "static.glb"
+}
