@@ -39,7 +39,7 @@ export function mountPcShell(root,{onCommand}) {
       if(e.button!==0||e.isPrimary===false||modalNode)return;
       if(e.target!==host&&e.target?.closest?.('button,input,select'))return;
       const rect=getRect();if(!rect)return;
-      drag={x:e.clientX,y:e.clientY,rect:{...rect},moved:false};
+      drag={x:e.clientX,y:e.clientY,rect:{...rect},moved:false,pointerId:e.pointerId};
       host.setPointerCapture?.(e.pointerId);e.preventDefault();
     },group);
     listen(host,'pointermove',e=>{
@@ -56,7 +56,7 @@ export function mountPcShell(root,{onCommand}) {
       onRect(r);e.preventDefault();
     },group);
     for(const type of ['pointerup','pointercancel','lostpointercapture'])listen(host,type,finish,group);
-    const cancel=()=>{drag=null;};cleanups.add(cancel);if(group!==cleanups)group.add(cancel);
+    const cancel=()=>{const id=drag?.pointerId;drag=null;if(id!==undefined&&host.hasPointerCapture?.(id))host.releasePointerCapture(id);cleanups.delete(cancel);};cleanups.add(cancel);if(group!==cleanups)group.add(cancel);
     return ()=>Date.now()<suppressUntil;
   }
   function makeIcon(app) {
@@ -79,9 +79,9 @@ export function mountPcShell(root,{onCommand}) {
   function makeFrame(w) {
     const group=new Set(),frame=el(d,'section',{className:'pc-window',dataset:{pcRole:'window',windowId:w.id},attributes:{'aria-label':w.title}});
     const titlebar=el(d,'header',{className:'pc-window-title',dataset:{pcRole:'titlebar',windowId:w.id}});
-    const iconId=model.apps.find(a=>a.id===w.appId)?.iconId??(w.appId==='display'?'display':'settings');
+    const iconId=w.iconId??model.apps.find(a=>a.id===w.appId)?.iconId??(w.appId==='display'?'display':'settings');
     const title=el(d,'strong',{text:w.title}),buttons=el(d,'div',{className:'pc-title-controls'});
-    titlebar.append(createPcIcon(d,iconId,{size:16}),title,buttons);
+    const titleIcon=createPcIcon(d,iconId,{size:16});titlebar.append(titleIcon,title,buttons);
     const controls={};
     for(const [type,label,id]of [['minimize','Свернуть окно','minimize'],['toggle-maximize','Развернуть окно','maximize'],['close','Закрыть окно','close']]){
       const b=el(d,'button',{type:'button',className:'pc-caption-button '+id,attributes:{'aria-label':label,title:label}});
@@ -97,9 +97,9 @@ export function mountPcShell(root,{onCommand}) {
       gesture(grip,{group,resize:side,getRect:()=>current(w.id)?.mode==='normal'?current(w.id).rect:null,onRect:rect=>windowCommand('geometry',w.id,{rect})});
     }
     const task=el(d,'button',{className:'pc-task',type:'button',dataset:{pcRole:'task',windowId:w.id},attributes:{'aria-label':'Переключить '+w.title}});
-    const taskText=el(d,'span',{text:w.title});task.append(createPcIcon(d,iconId,{size:16}),taskText);tasks.append(task);
+    const taskText=el(d,'span',{text:w.title}),taskIcon=createPcIcon(d,iconId,{size:16});task.append(taskIcon,taskText);tasks.append(task);
     listen(task,'click',()=>windowCommand('task',w.id),group);
-    const item={frame,title,content,controls,task,taskText,group};frames.set(w.id,item);return item;
+    const item={frame,title,titleIcon,taskIcon,iconId,content,controls,task,taskText,group};frames.set(w.id,item);return item;
   }
   const rectStyle=(node,r)=>{for(const k of ['x','y','width','height'])node.style.setProperty(k==='x'?'left':k==='y'?'top':k,r[k]+'px');};
   function render(next) {
@@ -121,7 +121,10 @@ export function mountPcShell(root,{onCommand}) {
       rectStyle(f.frame,w.rect);f.frame.style.setProperty('z-index',w.z);
       f.frame.hidden=w.mode==='minimized';f.frame.dataset.active=String(active);f.frame.dataset.mode=w.mode;
       f.title.textContent=w.title;f.taskText.textContent=w.title;f.task.setAttribute('aria-pressed',String(active));f.task.dataset.active=String(active);
+      f.task.setAttribute('aria-label','Переключить '+w.title);f.frame.setAttribute('aria-label',w.title);
+      if(w.iconId&&w.iconId!==f.iconId){f.iconId=w.iconId;const src=createPcIcon(d,w.iconId).getAttribute('src');f.titleIcon.setAttribute('src',src);f.taskIcon.setAttribute('src',src);}
       f.controls['toggle-maximize'].setAttribute('aria-label',w.mode==='maximized'?'Восстановить окно':'Развернуть окно');
+      f.controls['toggle-maximize'].children[0].setAttribute('src',createPcIcon(d,w.mode==='maximized'?'restore':'maximize').getAttribute('src'));
     }
   }
   function focusActive(){const scope=modalNode??frames.get(model?.windows.activeId)?.frame??workspace;pcFocusable(scope)[0]?.focus();}

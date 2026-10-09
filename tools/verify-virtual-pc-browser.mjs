@@ -1,131 +1,132 @@
-// Run against the local game with an isolated browser context, never a player profile.
-// PLAYWRIGHT_MODULE_PATH may point to an existing playwright-core installation.
+// Real-game acceptance in isolated contexts; never touches the player's browser profile.
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
-import { mkdir } from 'node:fs/promises';
-import { resolve } from 'node:path';
-
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE_PATH || 'playwright-core');
-const output = resolve(process.env.PC_QA_OUTPUT || 'artifacts/virtual-pc-acceptance');
-await mkdir(output, { recursive: true });
-const browser = await chromium.launch({
-  headless: true,
-  ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE } : {}),
-});
-const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+import {createRequire} from 'node:module';
+import {mkdir} from 'node:fs/promises';
+import {resolve} from 'node:path';
+const require=createRequire(import.meta.url);
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'playwright-core');
+const output=resolve(process.env.PC_QA_OUTPUT||'artifacts/xp-shell-acceptance');
+await mkdir(output,{recursive:true});
+const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE}:{})});
+const page=await browser.newPage({viewport:{width:1280,height:720}});
 page.setDefaultTimeout(30000);
-const errors = [];
-page.on('pageerror', error => errors.push(error.message));
-const pc = page.locator('#virtual-pc');
-const button = (name, root = pc) => root.getByRole('button', { name, exact: true });
-const desktop = () => page.waitForFunction(() => document.querySelector('#virtual-pc')?.dataset.pcStage === 'desktop');
-const state = () => page.evaluate(() => JSON.parse(localStorage.getItem('battle-life-virtual-pc-v1')));
-const checkFullscreen = async () => {
-  const layout = await page.evaluate(() => {
-    const root = document.querySelector('#virtual-pc'), box = root.getBoundingClientRect();
-    const bar = root.querySelector('.pc-taskbar').getBoundingClientRect();
-    return { hidden: root.hidden, display: getComputedStyle(root).display, left: box.left, top: box.top, width: box.width, height: box.height, viewportWidth: innerWidth, viewportHeight: innerHeight, taskbarBottom: bar.bottom };
+const errors=[];page.on('pageerror',e=>errors.push(e.message));
+const pc=page.locator('#virtual-pc'),url=process.env.PC_QA_URL||'http://127.0.0.1:4173/?rev=17&qa=xp';
+const button=(name,root=pc)=>root.getByRole('button',{name,exact:true}).or(root.getByRole('menuitem',{name,exact:true}));
+const frame=id=>pc.locator('.pc-window[data-window-id="'+id+'"]');
+const icon=id=>pc.locator('.pc-icon[data-app="'+id+'"]');
+const desktop=()=>page.waitForFunction(()=>document.querySelector('#virtual-pc')?.dataset.pcStage==='desktop');
+const state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('battle-life-virtual-pc-v1')));
+const start=async()=>{await button('Пуск').click();await pc.locator('[data-pc-role=start-menu]').waitFor();};
+const launch=async name=>{await start();await button(name,pc.locator('.pc-start-menu')).click();};
+const close=async id=>button('Закрыть окно',frame(id)).click();
+async function geometry(){
+  const result=await pc.evaluate(root=>{
+    const r=root.getBoundingClientRect(),bar=root.querySelector('.pc-taskbar').getBoundingClientRect();
+    return {r:{x:r.x,y:r.y,width:r.width,height:r.height},width:innerWidth,height:innerHeight,barBottom:bar.bottom,barHeight:bar.height,font:getComputedStyle(root).fontSize,windows:[...root.querySelectorAll('.pc-window:not([hidden])')].map(n=>{const b=n.getBoundingClientRect();return {x:b.x,y:b.y,right:b.right,bottom:b.bottom};})};
   });
-  assert.equal(layout.hidden, false);
-  assert.notEqual(layout.display, 'none');
-  assert.equal(layout.left, 0); assert.equal(layout.top, 0);
-  assert.equal(layout.width, layout.viewportWidth);
-  assert.equal(layout.height, layout.viewportHeight);
-  assert.ok(layout.taskbarBottom <= layout.viewportHeight + 1);
-};
-
-try {
-  await page.goto(process.env.PC_QA_URL || 'http://127.0.0.1:4173/?qa=virtual-pc', { waitUntil: 'networkidle' });
-  await page.locator('#new-game').click();
-  await page.locator('#character-name').fill('Проверка ПК');
-  await page.locator('#stats-tab').click();
-  await page.locator('#distribute').click();
-  await page.locator('#start-game').click();
-  await page.locator('#wake').click();
-  await page.locator('#actions [data-action="computer"]').click();
-  await page.waitForFunction(() => document.querySelector('#virtual-pc')?.dataset.pcStage === 'booting');
-  await desktop();
-  await checkFullscreen();
-  await page.screenshot({ path: resolve(output, 'desktop-1280.png') });
-  console.log('PASS seated transition -> boot -> fullscreen desktop');
-
-  await button('Заводской рассвет').click();
-  await button('Мой компьютер').click();
-  await button('Открыть диск C:').click();
-  await button('Открыть папку Мои проекты').click();
-  assert.match(await pc.innerText(), /Мои проекты · пусто/);
-  await button('Закрыть окно').click();
-  await button('Underweb').click();
-  await button('Выбрать баттл Бетонное эхо').click();
-  await button('Скачать FT Studio через torent').click();
-  await button('Пуск').click();
-  await button('Отойти от ПК, оставив его включённым').click();
-  await page.locator('#actions [data-action="bed"]').click();
-  await page.locator('#wake').waitFor({ state: 'visible' });
-  await page.locator('#wake').waitFor({ state: 'hidden' });
-  await page.locator('#actions [data-action="computer"]').click();
-  await desktop();
-  await button('torent').click();
-  await button('Установить FT Studio').click();
-  assert.equal((await state()).download.status, 'installed');
-  console.log('PASS background download during sleep -> install');
-
-  await button('FT Studio').click();
-  await pc.getByRole('textbox', { name: 'Название проекта', exact: true }).fill('Бит для проверки');
-  await button('Создать проект FT Studio').click();
-  await button('Слушать проект').click();
-  await pc.getByText('Играет паттерн.', { exact: true }).waitFor();
-  await button('Остановить проект').click();
-  const fader = await pc.getByRole('slider', { name: 'Громкость kick', exact: true }).elementHandle();
-  const rect = await fader.boundingBox();
-  await page.mouse.move(rect.x + rect.width * .8, rect.y + rect.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(rect.x + rect.width * .25, rect.y + rect.height / 2, { steps: 6 });
-  await page.mouse.up();
-  assert.equal(await fader.evaluate(node => node.isConnected), true);
-  assert.ok(Number(await fader.inputValue()) < .8);
-  await button('Сохранить проект в Мои проекты').click();
-  assert.equal((await state()).projects.length, 1);
-  await checkFullscreen();
-  await page.screenshot({ path: resolve(output, 'studio-1280.png') });
-  await page.setViewportSize({ width: 640, height: 900 });
-  await checkFullscreen();
-  await page.screenshot({ path: resolve(output, 'studio-640.png') });
-  console.log('PASS real browser Play/Stop, fader drag, save and 1280/640 layouts');
-
-  await button('Закрыть окно').click();
-  await button('Мой компьютер').click();
-  await button('Открыть диск C:').click();
-  await button('Открыть папку Мои проекты').click();
-  await button('Открыть проект Бит для проверки').click();
-  await button('Слушать проект').click();
-  await pc.getByText('Играет паттерн.', { exact: true }).waitFor();
-  await button('Пуск').click();
-  await button('Выключить компьютер').click();
-  await page.waitForFunction(() => document.body.dataset.mode === 'game');
-  assert.equal((await state()).power, 'off');
-  await page.reload({ waitUntil: 'networkidle' });
-  const restored = await state();
-  assert.equal(restored.wallpaper, 'factory');
-  assert.equal(restored.download.status, 'installed');
-  assert.equal(restored.projects[0].name, 'Бит для проверки');
-  await page.locator('#continue-game').click();
-  await page.locator('#actions [data-action="computer"]').click();
-  await desktop();
-  await button('Мой компьютер').click();
-  await button('Открыть диск C:').click();
-  await button('Открыть папку Мои проекты').click();
-  await button('Открыть проект Бит для проверки').click();
-  await button('Слушать проект').click();
-  await pc.getByText('Играет паттерн.', { exact: true }).waitFor();
-  assert.deepEqual(errors, []);
-  console.log('PASS reopen -> shutdown -> reload -> reopen/play; zero page errors');
-  console.log('Screenshots: ' + output);
-} catch (error) {
-  console.error('PAGE_ERRORS', errors);
-  await page.screenshot({ path: resolve(output, 'failure.png') }).catch(() => {});
-  throw error;
-} finally {
-  await browser.close();
+  assert.deepEqual(result.r,{x:0,y:0,width:result.width,height:result.height});assert.equal(result.barHeight,32);assert.equal(result.barBottom,result.height);assert.equal(result.font,'13px');
+  for(const r of result.windows){assert.ok(r.x>=0&&r.y>=0&&r.right<=result.width+1&&r.bottom<=result.height-31);}
 }
+async function menuBounds(){
+  for(const m of await pc.locator('.pc-popup').all()){const r=await m.boundingBox(),v=page.viewportSize();assert.ok(r.x>=0&&r.y>=0&&r.x+r.width<=v.width+1&&r.y+r.height<=v.height-31);}
+}
+async function projects(){
+  const explorer=frame('computer');await explorer.getByRole('textbox',{name:'Адрес папки',exact:true}).fill('C:\\Мои документы\\Мои проекты');
+  await explorer.getByRole('textbox',{name:'Адрес папки',exact:true}).press('Enter');
+}
+try{
+  await page.goto(url,{waitUntil:'networkidle'});await page.locator('#new-game').click();await page.locator('#character-name').fill('Проверка ПК');
+  await page.locator('#stats-tab').click();await page.locator('#distribute').click();await page.locator('#start-game').click();await page.locator('#wake').click();
+  await page.locator('#actions [data-action="computer"]').click();
+  await page.waitForFunction(()=>document.querySelector('#virtual-pc')?.dataset.pcStage==='booting');
+  await pc.getByText('Windows XP',{exact:true}).waitFor();await desktop();await geometry();
+  console.log('PASS apartment seating, XP boot, fullscreen and 13px chrome');
+  for(const size of [{width:1280,height:720},{width:640,height:900}]){
+    await page.setViewportSize(size);await geometry();await page.screenshot({path:resolve(output,'desktop-'+size.width+'.png')});
+    await start();assert.match(await pc.locator('.pc-start-menu').innerText(),/Проверка ПК/);await menuBounds();
+    await page.screenshot({path:resolve(output,'start-'+size.width+'.png')});
+    await button('Все программы').click();await menuBounds();await page.keyboard.press('ArrowLeft');await page.keyboard.press('Escape');
+    assert.equal(await pc.locator('.pc-popup').count(),0);
+    await icon('computer').click();assert.equal(await frame('computer').count(),0);
+    await icon('computer').dblclick();await frame('computer').waitFor();
+    if(size.width===640)assert.equal(await frame('computer').getAttribute('data-mode'),'maximized');
+    await button('Открыть диск C:',frame('computer')).dblclick();await button('Открыть папку Мои документы',frame('computer')).dblclick();await button('Открыть папку Мои проекты',frame('computer')).dblclick();
+    assert.match(await frame('computer').innerText(),/Объектов: 0/);
+    await button('Назад',frame('computer')).click();await button('Вперёд',frame('computer')).click();await button('Вверх',frame('computer')).click();
+    await button('Перейти: Локальный диск (C:)',frame('computer')).click();
+    await page.screenshot({path:resolve(output,'explorer-'+size.width+'.png')});
+    await button('Вид',frame('computer')).first().click();await pc.getByRole('menuitem',{name:'Таблица',exact:true}).click();
+    await geometry();await close('computer');
+    await page.mouse.click(size.width-5,size.height-40,{button:'right'});await menuBounds();
+    await pc.getByRole('menuitem',{name:'Свойства',exact:true}).click();
+    const display=frame('system:display');const before=(await state()).wallpaper;
+    if(before==='factory'){await button('Ночной двор',display).click();await button('Применить',display).click();}
+    const currentWallpaper=(await state()).wallpaper;
+    await button('Заводской рассвет',display).click();assert.equal((await state()).wallpaper,currentWallpaper);
+    await page.screenshot({path:resolve(output,'display-'+size.width+'.png')});
+    await button('Применить',display).click();assert.equal((await state()).wallpaper,'factory');
+    await button('Лампа у стены',display).click();await button('Отмена',display).click();assert.equal((await state()).wallpaper,'factory');
+    console.log('PASS '+size.width+' desktop, Start, Explorer, edge menus and wallpaper Apply/Cancel');
+  }
+  await page.setViewportSize({width:1280,height:720});
+  const original=await icon('computer').boundingBox();
+  await page.mouse.move(original.x+30,original.y+25);await page.mouse.down();await page.mouse.move(225,115,{steps:8});await page.mouse.up();
+  assert.equal(await frame('computer').count(),0);const iconPosition=(await state()).desktopIcons.computer;assert.ok(iconPosition.x>100);
+  await icon('computer').focus();await page.keyboard.press('Shift+F10');await pc.getByRole('menuitem',{name:'Открыть',exact:true}).click();
+  const initial=await frame('computer').boundingBox(),title=frame('computer').locator('.pc-window-title');
+  const tr=await title.boundingBox();await page.mouse.move(tr.x+130,tr.y+14);await page.mouse.down();await page.mouse.move(tr.x+245,tr.y+74,{steps:8});await page.mouse.up();
+  const moved=await frame('computer').boundingBox();assert.ok(moved.x>initial.x+90);
+  const grip=frame('computer').locator('.pc-resize-se'),gr=await grip.boundingBox();
+  await page.mouse.move(gr.x+3,gr.y+3);await page.mouse.down();await page.mouse.move(gr.x+80,gr.y+60,{steps:8});await page.mouse.up();
+  assert.ok((await frame('computer').boundingBox()).width>moved.width);
+  await button('Развернуть окно',frame('computer')).click();await geometry();await button('Восстановить окно',frame('computer')).click();
+  await button('Свернуть окно',frame('computer')).click();assert.equal(await frame('computer').isVisible(),false);
+  await button('Переключить Мой компьютер').click();assert.equal(await frame('computer').isVisible(),true);await close('computer');
+  console.log('PASS persistent icon drag, Shift+F10, window move/resize/minimize/restore');
+  await icon('underweb').dblclick();
+  const input=frame('underweb').getByRole('textbox',{name:'Адрес или поиск Underweb',exact:true}),inputHandle=await input.elementHandle();
+  await input.fill('Незавершённый ввод');await launch('torent');const clockBefore=await pc.locator('.pc-clock').innerText();
+  await page.waitForFunction(previous=>document.querySelector('.pc-clock').textContent!==previous,clockBefore);
+  await launch('Underweb');assert.equal(await input.inputValue(),'Незавершённый ввод');assert.equal(await inputHandle.evaluate(n=>n.isConnected),true);
+  assert.ok((await page.locator('#home-time').textContent()).includes(await pc.locator('.pc-clock').textContent()));
+  await button('Выбрать баттл Бетонное эхо',frame('underweb')).click();await button('Скачать FT Studio через torent',frame('torent')).click();
+  await launch('Отойти от ПК');await page.locator('#actions [data-action="bed"]').click();await page.locator('#wake').waitFor({state:'visible'});await page.locator('#wake').waitFor({state:'hidden'});
+  await page.locator('#actions [data-action="computer"]').click();await desktop();await launch('torent');await button('Установить FT Studio',frame('torent')).click();
+  assert.equal((await state()).download.status,'installed');await launch('FT Studio');
+  const name=frame('ft-studio').getByRole('textbox',{name:'Название проекта',exact:true});await name.fill('Бит для проверки');
+  await launch('Underweb');await launch('FT Studio');assert.equal(await name.inputValue(),'Бит для проверки');
+  await button('Создать проект FT Studio',frame('ft-studio')).click();await button('Слушать проект',frame('ft-studio')).click();await frame('ft-studio').getByText('Играет паттерн.',{exact:true}).waitFor();
+  await button('Свернуть окно',frame('ft-studio')).click();await launch('Underweb');await launch('FT Studio');assert.equal(await pc.locator('[data-pc-role=close-guard]').count(),0);
+  await button('Остановить проект',frame('ft-studio')).click();
+  const fader=await frame('ft-studio').getByRole('slider',{name:'Громкость kick',exact:true}).elementHandle(),r=await fader.boundingBox();
+  await page.mouse.move(r.x+r.width*.8,r.y+r.height/2);await page.mouse.down();await page.mouse.move(r.x+r.width*.25,r.y+r.height/2,{steps:8});await page.mouse.up();
+  assert.equal(await fader.evaluate(n=>n.isConnected),true);assert.ok(Number(await fader.inputValue())<.8);
+  await button('Сохранить проект в Мои проекты',frame('ft-studio')).click();assert.equal((await state()).projects.length,1);
+  await page.screenshot({path:resolve(output,'studio-1280.png')});await page.setViewportSize({width:640,height:900});await geometry();await page.screenshot({path:resolve(output,'studio-640.png')});
+  await launch('Мой компьютер');await projects();await button('Открыть проект Бит для проверки',frame('computer')).dblclick();
+  await button('kick, шаг 2',frame('ft-studio')).click();await button('Свернуть окно',frame('ft-studio')).click();
+  await launch('Выключение');await button('Выключить').click();await pc.locator('[data-pc-role=close-guard]').waitFor();
+  await page.keyboard.press('Escape');assert.equal(await pc.locator('[data-pc-role=close-guard]').count(),0);assert.equal(await pc.isVisible(),true);
+  await button('Сохранить проект в Мои проекты',frame('ft-studio')).click();
+  console.log('PASS live forms/clock, background sleep download, install, music transport, fader and dirty minimized guard');
+  await launch('Выключение');await button('Отмена').click();assert.equal(await pc.isVisible(),true);
+  await launch('Выключение');await button('Выключить').click();await page.waitForFunction(()=>document.body.dataset.mode==='game');assert.equal((await state()).power,'off');
+  await page.reload({waitUntil:'networkidle'});const saved=await state();assert.equal(saved.wallpaper,'factory');assert.deepEqual(saved.desktopIcons.computer,iconPosition);assert.equal(saved.projects[0].name,'Бит для проверки');
+  await page.locator('#continue-game').click();await page.locator('#actions [data-action="computer"]').click();await desktop();
+  assert.equal(await pc.locator('.pc-window').count(),0);await launch('Мой компьютер');await projects();await button('Открыть проект Бит для проверки',frame('computer')).dblclick();await button('Слушать проект',frame('ft-studio')).click();await frame('ft-studio').getByText('Играет паттерн.',{exact:true}).waitFor();
+  assert.deepEqual(errors,[]);console.log('PASS shutdown/reload preserves wallpaper, icon positions and project; zero page errors');
+  const savedStorage=await page.context().storageState(),failureContext=await browser.newContext({storageState:savedStorage,viewport:{width:1280,height:720}});
+  const failure=await failureContext.newPage();const failureErrors=[];failure.on('pageerror',e=>failureErrors.push(e.message));
+  await failure.addInitScript(()=>{Storage.prototype.setItem=function(){throw new DOMException('QA storage denied','QuotaExceededError');};});
+  await failure.goto(url,{waitUntil:'networkidle'});await failure.locator('#continue-game').click();await failure.locator('#actions [data-action="computer"]').click();
+  await failure.waitForFunction(()=>document.querySelector('#virtual-pc')?.dataset.pcStage==='desktop');
+  const fp=failure.locator('#virtual-pc'),fb=name=>fp.getByRole('button',{name,exact:true});
+  await fp.locator('.pc-icon[data-app="ft-studio"]').dblclick();await fb('Создать проект FT Studio').click();
+  await fb('Свернуть окно').click();await fb('Пуск').click();await fp.getByRole('menuitem',{name:'Выключение',exact:true}).click();await fb('Выключить').click();
+  await fb('Сохранить').click();assert.equal(await fp.locator('[data-pc-role=close-guard]').isVisible(),true);assert.equal(await fp.isVisible(),true);
+  assert.match(await fp.locator('[data-pc-role=persistence-warning]').innerText(),/недоступно|закрытия/);assert.deepEqual(failureErrors,[]);
+  await failure.screenshot({path:resolve(output,'storage-failure.png')});await failureContext.close();
+  console.log('PASS failed localStorage keeps guarded shutdown pending; screenshots: '+output);
+}catch(error){console.error('PAGE_ERRORS',errors);await page.screenshot({path:resolve(output,'failure.png')}).catch(()=>{});throw error;}
+finally{await browser.close();}

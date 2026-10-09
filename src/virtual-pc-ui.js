@@ -224,7 +224,9 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.refreshApp = (appId,{replaceContent=false}={}) => {
     const target=pc.shell?.getContentRoot(appId);if(!target)return;
     if(appId==='computer'){
-      if(!pc.explorer)pc.explorer=mountExplorer(target,{onOpenProject:p=>pc.openProject(p),onProperties:p=>pc.showProperties?.(p),onClose:()=>pc.closeWindow('computer'),onMenu:p=>pc.menu?.open(p)});
+      if(!pc.explorer)pc.explorer=mountExplorer(target,{onOpenProject:p=>pc.openProject(p),onProperties:p=>pc.showProperties(p),onClose:()=>pc.closeWindow('computer'),onMenu:p=>pc.menu?.open(p),onNavigate:location=>{
+        pc.windows={...pc.windows,windows:pc.windows.windows.map(w=>w.id==='computer'?{...w,title:location.label,iconId:location.iconId}:w)};pc.renderDesktop(false);
+      }});
       pc.explorer.update(pc.state);return;
     }
     if(appId.startsWith('system:')){
@@ -362,8 +364,9 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.pendingAction = null;
     pc.confirmClose = false;
     pc.recoveringDraft = false;
+    pc.refreshApp('ft-studio',{replaceContent:true});
+    pc.renderDesktop(false);
     if (action) action();
-    else pc.render();
   };
 
   pc.cancelPendingAction = () => {
@@ -494,7 +497,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       const bpm = el(document, 'input', { type: 'number', value: String(pc.project.bpm), dataset: { focusId: 'studio-bpm' }, attributes: { min: '72', max: '150', 'aria-label': 'Темп проекта в BPM' } });
       bpm.addEventListener('change', () => pc.updateProject(setBpm(pc.project, Number(bpm.value))));
       add(header, bpm);
-      add(header, button(document, '▶ Слушать', { attributes: { 'aria-label': 'Слушать проект' } }, async () => { const result = await pc.audio.play(pc.project); pc.message = result.ok ? 'Играет паттерн.' : 'Браузер не дал запустить звук.'; pc.render(); }));
+      add(header, button(document, '▶ Слушать', { attributes: { 'aria-label': 'Слушать проект' } }, async () => { const result = await pc.audio.play(pc.project); pc.message = result.ok ? 'Играет паттерн.' : 'Браузер не дал запустить звук.'; const status=findByDataset(root,'pcRole','studio-status');if(status)status.textContent=pc.message; }));
       add(header, button(document, '■ Стоп', { attributes: { 'aria-label': 'Остановить проект' } }, () => { pc.audio.stop(); pc.message = 'Воспроизведение остановлено.'; pc.render(); }));
       add(content, header);
       const sequencer = el(document, 'section', { className: 'ft-sequencer', attributes: { 'aria-label': 'Пошаговый секвенсор' } });

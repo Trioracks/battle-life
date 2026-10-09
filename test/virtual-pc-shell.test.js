@@ -45,3 +45,17 @@ test('desktop icons resolve real local SVG artwork',async()=>{
   assert.ok(imgs.length>=5);
   for(const img of imgs){const svg=await readFile(new URL('../'+img.getAttribute('src').replace('./',''),import.meta.url),'utf8');assert.match(svg,/<svg[^>]+viewBox=/);}
 });
+test('closing or disposing a dragging frame releases pointer capture',()=>{
+  for(const action of ['close','dispose']){
+    const {root,shell,model}=setup(),title=findPc(root,'titlebar','underweb');let captured=null;
+    title.setPointerCapture=id=>{captured=id;};title.hasPointerCapture=id=>captured===id;title.releasePointerCapture=()=>{captured=null;};
+    fire(title,'pointerdown',{button:0,pointerId:7,clientX:10,clientY:10});
+    assert.equal(captured,7);
+    if(action==='close')shell.render({...model,windows:reduceWindows(model.windows,{type:'close',id:'underweb'})});else shell.dispose();
+    assert.equal(captured,null);
+  }
+});
+test('XP base controls explicitly reset apartment button shadows',async()=>{
+  const css=await readFile(new URL('../virtual-pc.css',import.meta.url),'utf8');
+  assert.match(css,/#virtual-pc button\s*\{[^}]*box-shadow:\s*none/);
+});

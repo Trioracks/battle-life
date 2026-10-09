@@ -4,7 +4,7 @@ import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties,
 import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=17';
 import {normalizeStudioProject} from './ft-studio-project.js';
 
-export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu}) {
+export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu,onNavigate}) {
   const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',disposed=false;
   const wrap=el(d,'div',{className:'pc-explorer'}),menubar=el(d,'div',{className:'pc-menubar'});
   const tools=el(d,'div',{className:'pc-explorer-tools'}),form=el(d,'form',{className:'pc-address'});
@@ -13,7 +13,7 @@ export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu}) 
   const main=el(d,'div',{className:'pc-explorer-main'}),tree=el(d,'nav',{className:'pc-folder-tree',attributes:{'aria-label':'Дерево папок'}});
   const files=el(d,'div',{className:'pc-file-area',attributes:{'aria-label':'Содержимое папки'}}),status=el(d,'div',{className:'pc-explorer-status',attributes:{'aria-live':'polite'}});
   main.append(tree,files);wrap.append(menubar,tools,form,main,status);root.replaceChildren(wrap);
-  const change=a=>{nav=navigateExplorer(nav,a);render(true);};
+  const change=a=>{nav=navigateExplorer(nav,a);render(true);onNavigate?.(EXPLORER_PATHS[nav.path]);};
   const navigate=path=>change({type:'navigate',path});
   const entries=()=>explorerEntries(state,nav.path);
   const selected=()=>entries().find(e=>e.id===nav.selection);

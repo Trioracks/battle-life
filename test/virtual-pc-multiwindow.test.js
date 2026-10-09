@@ -46,3 +46,26 @@ test('closing another app never asks about dirty studio',()=>{
   const {controller:c}=setup();c.openProject(project());c.updateProject({...c.project,name:'Редакция'});c.open('underweb');c.closeWindow();
   assert.equal(c.confirmClose,false);assert.equal(c.windows.activeId,'ft-studio');assert.equal(c.dirty,true);
 });
+test('discarding a dirty project before leave returns to a usable Studio start form',()=>{
+  const {controller:c,root}=setup();c.openProject(project());c.updateProject({...c.project,name:'Черновик'});
+  c.requestLeave();findButton(root,'Не сохранять').click();c.showDesktop(c.state);
+  assert.equal(c.project,null);assert.ok(findButton(root,'Создать проект FT Studio'));
+});
+test('saving before leave removes the guard and unlocks the retained Studio',()=>{
+  const {controller:c,root}=setup();c.openProject(project());c.updateProject({...c.project,name:'Черновик'});
+  c.requestLeave();findButton(root,'Сохранить').click();c.showDesktop(c.state);
+  assert.equal(c.confirmClose,false);assert.equal(allPc(c.shell.getContentRoot('ft-studio')).some(n=>n.inert),false);
+});
+test('Explorer title and icon follow the current folder',()=>{
+  const {controller:c,root}=setup();c.open('computer');c.openFolder('projects');
+  const w=c.windows.windows.find(w=>w.id==='computer');assert.equal(w.title,'Мои проекты');
+  const title=allPc(root).find(n=>n.dataset.pcRole==='titlebar'&&n.dataset.windowId==='computer');
+  assert.ok(allPc(title).some(n=>n.tagName==='IMG'&&n.getAttribute('src').endsWith('/folder.svg')));
+});
+test('async audio result does not recreate a different active application',async()=>{
+  let finish;const {controller:c,root}=setup();c.audio.play=()=>new Promise(resolve=>{finish=resolve;});
+  c.openProject(project());findButton(root,'Слушать проект').click();c.open('underweb');
+  const input=allPc(c.shell.getContentRoot('underweb')).find(n=>n.tagName==='INPUT');input.value='Незавершённый ввод';
+  finish({ok:true});await Promise.resolve();await Promise.resolve();
+  assert.equal(allPc(c.shell.getContentRoot('underweb')).find(n=>n.tagName==='INPUT')===input,true);
+});
