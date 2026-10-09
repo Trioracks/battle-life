@@ -2,6 +2,7 @@ import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=17';
 import {createPcIcon} from './virtual-pc-icons.js?rev=17';
 import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties,EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=17';
 import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=17';
+import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=18';
 import {normalizeStudioProject} from './ft-studio-project.js';
 
 export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu,onNavigate}) {
@@ -51,7 +52,7 @@ export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu,on
       const b=button(d,'',{className:'pc-tree-item',attributes:{'aria-label':'Перейти: '+p.label,'aria-current':String(nav.path===id)}},()=>navigate(id));
       b.style.setProperty('padding-left',(6+depth*14)+'px');b.append(createPcIcon(d,p.iconId,{size:16}),el(d,'span',{text:p.label}));tree.append(b);
     }
-    files.replaceChildren();files.dataset.view=nav.view;diskLabel=null;
+    diskLabel?.dispose();files.replaceChildren();files.dataset.view=nav.view;diskLabel=null;
     if(nav.view==='details')files.append(el(d,'div',{className:'pc-details-head',text:'Имя                                      Тип                 Размер'}));
     if(nav.path==='windows')files.append(el(d,'p',{className:'pc-system-note',text:'Windows — системная папка игрового компьютера. Доступна только для просмотра.'}));
     for(const entry of entries()){
@@ -62,7 +63,7 @@ export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu,on
         status.textContent=entry.name;
       });
       b.append(createPcIcon(d,entry.iconId,{size:nav.view==='details'?16:32}),el(d,'span',{className:'pc-file-name',text:entry.name}));
-      if(entry.kind==='disk'){diskLabel=el(d,'small',{text:'Свободно '+Math.round(diskUsage(state).freeMb)+' МБ'});b.append(diskLabel);}
+      if(entry.kind==='disk'){const info=el(d,'span');b.append(info);diskLabel=mountDiskUsage(info);diskLabel.update(diskUsage(state));}
       if(nav.view==='details')b.append(el(d,'span',{className:'pc-file-type',text:entry.kind==='project'?'Проект FT Studio':entry.kind==='disk'?'Локальный диск':'Папка'}),el(d,'span',{text:entry.sizeMb?entry.sizeMb+' МБ':''}));
       b.addEventListener('dblclick',()=>openEntry(entry));
       const context=e=>{e.preventDefault();e.stopPropagation();nav={...nav,selection:entry.id};b.setAttribute('aria-pressed','true');menu(b,[{id:'open',label:'Открыть',onSelect:()=>openEntry(entry)},{id:'properties',label:'Свойства',onSelect:()=>properties(entry)}],e.type==='contextmenu'?e:undefined);};
@@ -84,6 +85,6 @@ export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu,on
   return {navigate,update(next){
     state=next;const sig=JSON.stringify(entries());
     if(sig!==signature){if(nav.selection&&!entries().some(e=>e.id===nav.selection))nav={...nav,selection:null};render(false);}
-    else if(diskLabel)diskLabel.textContent='Свободно '+Math.round(diskUsage(state).freeMb)+' МБ';
-  },dispose(){disposed=true;form.removeEventListener('submit',submit);files.removeEventListener('contextmenu',backgroundMenu);root.replaceChildren();}};
+    else diskLabel?.update(diskUsage(state));
+  },dispose(){disposed=true;diskLabel?.dispose();form.removeEventListener('submit',submit);files.removeEventListener('contextmenu',backgroundMenu);root.replaceChildren();}};
 }

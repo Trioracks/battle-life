@@ -21,7 +21,7 @@ test('invalid address preserves current folder and accepts normalized virtual ad
 });
 test('disk properties use existing accounting and empty projects remain empty',()=>{
   const s=createVirtualPcState({download:{status:'installed'},projects:[{id:'p'}]});
-  assert.equal(explorerProperties(s,explorerEntries(s,'computer')[0]).rows.find(r=>r.label==='Свободно').value,'698 МБ');
+  assert.equal(explorerProperties(s,explorerEntries(s,'computer')[0]).rows.find(r=>r.label==='Свободно').value,'1,2 ГБ (1198 МБ)');
   assert.deepEqual(explorerEntries(createVirtualPcState(),'projects'),[]);
 });
 function setup(seed={}) {
@@ -57,5 +57,9 @@ test('download ticks retain focused file and tree nodes while updating free spac
   view.update(createVirtualPcState({download:{status:'downloading',receivedBytes:3000000}}));
   assert.equal(findButton(root,'Открыть диск C:')===disk,true);
   assert.equal(findButton(root,'Перейти: Мой компьютер')===tree,true);assert.equal(root.ownerDocument.activeElement===disk,true);
-  assert.ok(allPc(disk).some(n=>n.textContent==='Свободно 1497 МБ'));
+  assert.ok(allPc(disk).some(n=>n.textContent==='Свободно 2,0 ГБ (1997 МБ)'));
+  const meter=allPc(disk).find(n=>n.getAttribute('role')==='meter');
+  assert.equal(meter.getAttribute('aria-valuenow'),'14003');
+  view.update(createVirtualPcState({download:{status:'downloading',receivedBytes:4000000}}));
+  assert.equal(allPc(disk).find(n=>n.getAttribute('role')==='meter'),meter);
 });

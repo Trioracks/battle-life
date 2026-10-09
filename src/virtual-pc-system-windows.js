@@ -2,11 +2,12 @@ import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=17';
 import {createPcIcon} from './virtual-pc-icons.js?rev=17';
 import {WALLPAPERS} from './virtual-pc-catalog.js?rev=17';
 import {setWallpaper,diskUsage} from './virtual-pc-state.js?rev=17';
+import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=18';
 export function mountSystemWindow(root,{kind,getState,onPersist,onOpen,onClose,onConfirmShutdown,properties}) {
   const d=root.ownerDocument,wrap=el(d,'div',{className:'pc-system-content pc-dialog'});
   const status=el(d,'p',{className:'pc-system-status',dataset:{pcRole:'system-status'},attributes:{'aria-live':'polite'}});
   root.replaceChildren(wrap);let selection=getState().wallpaper,applied=selection,disposed=false;
-  let preview=null,apply=null;const wallpaperButtons=[];
+  let preview=null,apply=null,diskView=null;const wallpaperButtons=[];
   function drawPreview(){const wallpaper=WALLPAPERS.find(w=>w.id===selection)??WALLPAPERS[0];
     preview.style.setProperty('background-image','url("'+wallpaper.path+'")');preview.setAttribute('aria-label','Предпросмотр: '+wallpaper.label);
     for(const [id,b]of wallpaperButtons)b.setAttribute('aria-pressed',String(id===selection));
@@ -35,9 +36,10 @@ export function mountSystemWindow(root,{kind,getState,onPersist,onOpen,onClose,o
   }else{
     wrap.append(createPcIcon(d,'settings',{size:32}),el(d,'h3',{text:properties?.title??'Свойства'}));
     const rows=el(d,'dl',{className:'pc-property-rows'});
-    for(const row of properties?.rows??[])rows.append(el(d,'dt',{text:row.label}),el(d,'dd',{text:String(row.value)}));
+    for(const row of properties?.rows??[])if(properties?.kind!=='disk'||row.label==='Тип')rows.append(el(d,'dt',{text:row.label}),el(d,'dd',{text:String(row.value)}));
+    if(properties?.kind==='disk'){const info=el(d,'div');diskView=mountDiskUsage(info);diskView.update(diskUsage(getState()));wrap.append(info);}
     wrap.append(rows,el(d,'p',{text:'Виртуальный компьютер в Battle Life. Доступа к устройству пользователя нет.'}),button(d,'ОК',{},onClose));
   }
-  return {update(){if(disposed)return;if(kind==='display'&&getState().wallpaper!==applied){const old=applied;applied=getState().wallpaper;if(selection===old)selection=applied;drawPreview();}},
-    dispose(){disposed=true;root.replaceChildren();}};
+  return {update(){if(disposed)return;diskView?.update(diskUsage(getState()));if(kind==='display'&&getState().wallpaper!==applied){const old=applied;applied=getState().wallpaper;if(selection===old)selection=applied;drawPreview();}},
+    dispose(){disposed=true;diskView?.dispose();root.replaceChildren();}};
 }

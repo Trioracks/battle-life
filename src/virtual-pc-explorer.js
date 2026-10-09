@@ -1,4 +1,5 @@
 import {diskUsage} from './virtual-pc-state.js?rev=17';
+import {formatDiskGb,diskAmount} from './virtual-pc-disk-view.js?rev=18';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=17';
 export const EXPLORER_PATHS=Object.freeze({
   computer:{label:'Мой компьютер',address:'Мой компьютер',parent:null,iconId:'computer'},
@@ -43,7 +44,7 @@ export function explorerEntries(pcState,path) {
 }
 export function explorerProperties(state,entry) {
   if(entry?.kind==='disk'){
-    const u=diskUsage(state);return {title:'Свойства: Локальный диск (C:)',rows:[{label:'Тип',value:'Локальный игровой диск'},{label:'Ёмкость',value:u.capacityMb+' МБ'},{label:'Занято',value:Math.round(u.usedMb)+' МБ'},{label:'Свободно',value:Math.round(u.freeMb)+' МБ'}]};
+    const u=diskUsage(state);return {kind:'disk',title:'Свойства: Локальный диск (C:)',rows:[{label:'Тип',value:'Локальный игровой диск'},{label:'Ёмкость',value:formatDiskGb(u.capacityMb)},{label:'Занято',value:diskAmount(u.usedMb)},{label:'Свободно',value:diskAmount(u.freeMb)}]};
   }
   const p=state.projects.find(p=>p.id===entry?.projectId);
   return {title:'Свойства: '+(entry?.name??'Объект'),rows:[{label:'Имя',value:entry?.name??''},{label:'Тип',value:entry?.kind==='project'?'Проект FT Studio':'Папка'},...(p?[{label:'Размер',value:'2 МБ'},{label:'Баттл',value:BATTLE_BRIEFS.find(b=>b.id===p.battleId)?.title??'Не указан'}]:[])]};

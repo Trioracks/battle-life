@@ -149,7 +149,7 @@ test('projects are opened by navigating through the virtual disk and folder', ()
 });
 
 test('insufficient disk space disables download with a Russian explanation', () => {
-  const { controller, root } = setup({ download: { status: 'idle' }, projects: Array.from({ length: 351 }, (_, i) => ({ id: 'p-' + i })) });
+  const { controller, root } = setup({ download: { status: 'idle' }, projects: Array.from({ length: 601 }, (_, i) => ({ id: 'p-' + i })) });
   controller.open('torent');
   assert.equal(find(root, 'Скачать FT Studio через torent').disabled, true);
   assert.ok(nodes(root).some(node => /недостаточно места/i.test(node.textContent ?? '')));
@@ -157,7 +157,7 @@ test('insufficient disk space disables download with a Russian explanation', () 
 });
 
 test('a full disk blocks a new project save but allows updating an existing one', () => {
-  const projects = Array.from({ length: 350 }, (_, i) => project('p-' + i));
+  const projects = Array.from({ length: 600 }, (_, i) => project('p-' + i));
   const { controller, root } = setup({ projects });
   controller.openProject(project('new'));
   assert.equal(find(root, 'Сохранить проект в Мои проекты').disabled, true);

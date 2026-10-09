@@ -211,6 +211,13 @@
 #virtual-pc .pc-control-item { display:flex; gap:12px; align-items:center; margin-top:10px; min-width:230px; }
 #virtual-pc .pc-property-rows { display:grid; grid-template-columns:100px 1fr; gap:12px; padding:16px 0; border-block:1px solid #bbb; }
 #virtual-pc .pc-property-rows dt,#virtual-pc .pc-property-rows dd { margin:0; overflow-wrap:anywhere; }
+#virtual-pc .pc-disk-usage { display:grid; gap:4px; min-width:0; width:100%; text-align:left; font-size:11px; line-height:1.4; }
+#virtual-pc .pc-disk-meter { display:block; height:13px; border:1px solid #7f9db9; background:#fff; padding:1px; overflow:hidden; }
+#virtual-pc .pc-disk-fill { display:block; height:100%; background:repeating-linear-gradient(90deg,#3a9d36 0,#73cf65 7px,#fff 7px,#fff 9px); }
+#virtual-pc .pc-disk-system { color:#666; }
+#virtual-pc .pc-file[data-entry-id=disk] { width:230px; max-width:100%; }
+#virtual-pc [data-view=details] .pc-file[data-entry-id=disk] { width:100%; flex-wrap:wrap; }
+#virtual-pc [data-view=details] .pc-file[data-entry-id=disk] > span:has(.pc-disk-usage) { width:100%; }
 #virtual-pc .pc-shutdown { width:min(410px,calc(100vw - 24px)); min-height:0; text-align:center; background:linear-gradient(#0c4caf,#5d8ce1); color:white; border:2px solid #17408a; box-shadow:3px 5px 14px #0006; border-radius:4px; }
 #virtual-pc .pc-shutdown h3 { font-size:19px; margin:0 0 18px; text-align:left; }
 #virtual-pc .pc-shutdown p { font-size:13px; margin:12px 0 24px; }

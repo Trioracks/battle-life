@@ -11,6 +11,7 @@ import { createStudioProject, normalizeStudioProject, setArrangementCell, setBpm
 import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js?rev=17';
 import { cancelFtDownload, createVirtualPcState, diskUsage, FT_STUDIO_MB, PROJECT_MB, installFtStudio, saveStudioProject, setWallpaper, startFtDownload } from './virtual-pc-state.js?rev=17';
 import { downloadPresentation } from './virtual-pc-runtime.js?rev=17';
+import {diskAmount} from './virtual-pc-disk-view.js?rev=18';
 
 const NOOP = () => {};
 const BOOT_STAGES = [
@@ -127,7 +128,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     return durable;
   };
 
-  pc.diskLabel = () => `C: свободно ${mb(1500 - (pc.state.projects.length * 2 + (pc.state.download.status === 'installed' ? 800 : pc.state.download.receivedBytes / 1000000)))}`;
+  pc.diskLabel = () => `C: свободно ${diskAmount(diskUsage(pc.state).freeMb)}`;
 
   pc.refreshPersistenceWarning = () => {
     const warning = findByDataset(root, 'pcRole', 'persistence-warning');
@@ -253,7 +254,6 @@ export function mountVirtualPc(root, callbacks = {}) {
     const appItems=desktopApps(pc.state).filter(a=>!['computer','documents'].includes(a.id)).map(a=>({id:a.id,label:a.label,iconId:a.iconId,onSelect:()=>pc.open(a.id)}));
     pc.menu.open({variant:'start',playerName:pc.metadata.playerName,anchor,x:0,y:pc.windows.viewport.height-32,items:[
       ...appItems,{id:'programs',label:'Все программы',iconId:'folder',items:appItems},
-      {id:'documents',label:'Мои документы',iconId:'documents',column:'right',onSelect:()=>pc.open('documents')},
       {id:'computer',label:'Мой компьютер',iconId:'computer',column:'right',onSelect:()=>pc.open('computer')},
       {id:'control-panel',label:'Панель управления',iconId:'settings',column:'right',onSelect:()=>pc.openSystem('control-panel')},
       {id:'leave',label:'Отойти от ПК',iconId:'start',column:'footer',onSelect:()=>pc.requestLeave()},

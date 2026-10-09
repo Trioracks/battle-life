@@ -4,6 +4,7 @@ import {mountSystemWindow} from '../src/virtual-pc-system-windows.js';
 import {mountPcMenu} from '../src/virtual-pc-menus.js';
 import {mountVirtualPc} from '../src/virtual-pc-ui.js';
 import {createVirtualPcState} from '../src/virtual-pc-state.js';
+import {explorerProperties} from '../src/virtual-pc-explorer.js';
 import {pcDocument,findButton,allPc,fire,findPc} from './helpers/virtual-pc-dom.js';
 function setup(kind='display',durable=true){
   const d=pcDocument(),root=d.createElement('section'),host=d.createElement('section');host.append(root);
@@ -11,6 +12,20 @@ function setup(kind='display',durable=true){
   const view=mountSystemWindow(root,{kind,getState:()=>state,onPersist:next=>{state=next;persisted.push(next);return durable;},onClose:()=>closed++,onConfirmShutdown:()=>shutdowns++,onOpen:()=>{}});
   return {d,root,view,persisted,state:()=>state,closed:()=>closed,shutdowns:()=>shutdowns};
 }
+test('Start has no duplicate documents shortcut but Explorer still opens its folder',()=>{
+  const root=pcDocument().createElement('section'),c=mountVirtualPc(root,{audio:{stop(){},dispose(){}}});
+  c.showDesktop(createVirtualPcState());findButton(root,'Пуск').click();
+  const start=findPc(root,'start-menu');assert.equal(Boolean(findButton(start,'Мои документы')),false);findButton(start,'Мой компьютер').click();
+  fire(findButton(root,'Открыть диск C:'),'dblclick');assert.ok(findButton(root,'Открыть папку Мои документы'));
+  c.dispose();
+});
+test('disk properties meter updates live without replacing its node',()=>{
+  const root=pcDocument().createElement('section');let state=createVirtualPcState();
+  const view=mountSystemWindow(root,{kind:'properties',getState:()=>state,onClose(){},properties:explorerProperties(state,{kind:'disk'})});
+  const meter=allPc(root).find(n=>n.getAttribute('role')==='meter');assert.ok(meter);
+  state=createVirtualPcState({download:{status:'installed'}});view.update();
+  assert.equal(allPc(root).find(n=>n.getAttribute('role')==='meter'),meter);assert.equal(meter.getAttribute('aria-valuenow'),'14800');view.dispose();
+});
 test('display selection is preview only',()=>{
   const s=setup();findButton(s.root,'Заводской рассвет').click();
   assert.equal(s.state().wallpaper,'courtyard');assert.equal(s.persisted.length,0);

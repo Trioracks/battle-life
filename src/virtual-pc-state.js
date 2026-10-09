@@ -1,5 +1,6 @@
 export const VIRTUAL_PC_STORAGE_KEY = 'battle-life-virtual-pc-v1';
-export const VIRTUAL_DISK_MB = 1500;
+export const VIRTUAL_DISK_MB = 16000;
+export const SYSTEM_RESERVED_MB = 14000;
 export const FT_STUDIO_BYTES = 800000000;
 export const FT_STUDIO_MB = FT_STUDIO_BYTES / 1000000;
 export const PROJECT_MB = 2;
@@ -8,7 +9,7 @@ const wallpaperIds = new Set(['courtyard', 'factory', 'room']);
 const downloadStates = new Set(['idle', 'downloading', 'ready-to-install', 'installed']);
 const isRecord = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const clone = value => JSON.parse(JSON.stringify(value));
-const iconIds = new Set(['computer','documents','underweb','torent','ft-studio']);
+const iconIds = new Set(['computer','underweb','torent','ft-studio']);
 function normalizeIcons(value) {
   return Object.fromEntries(Object.entries(isRecord(value)?value:{}).filter(([id,p])=>iconIds.has(id)&&Number.isFinite(p?.x)&&Number.isFinite(p?.y)).map(([id,p])=>[id,{x:Math.max(0,p.x),y:Math.max(0,p.y)}]));
 }
@@ -67,9 +68,10 @@ export function diskUsage(state) {
     ? normalized.download.receivedBytes / 1000000 : 0;
   const installedMb = normalized.download.status === 'installed' ? FT_STUDIO_MB : 0;
   const projectsMb = normalized.projects.length * PROJECT_MB;
-  const usedMb = downloadMb + installedMb + projectsMb;
+  const usedMb = SYSTEM_RESERVED_MB + downloadMb + installedMb + projectsMb;
   return {
     capacityMb: VIRTUAL_DISK_MB,
+    systemMb: SYSTEM_RESERVED_MB,
     usedMb,
     freeMb: Math.max(0, VIRTUAL_DISK_MB - usedMb),
     downloadMb,
