@@ -39,19 +39,28 @@ try{
   const saved=loadProfile(storage);let profile=saved.profile;
   let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lightPreview='game';
   const pcRoot=$('#virtual-pc'),savedPc=loadVirtualPcState(storage);let pcState=savedPc.state;
-  function persistPc(next){pcState=createVirtualPcState(next);return saveVirtualPcState(storage,pcState);}
+  let pcStorageWarning=savedPc.ok?'':'Сохранение виртуального ПК недоступно.';
+  let virtualPc;
+  function persistPc(next){
+    pcState=createVirtualPcState(next);
+    const saved=saveVirtualPcState(storage,pcState);
+    pcStorageWarning=saved?'':'Сохранение виртуального ПК недоступно.';
+    virtualPc?.setPersistenceWarning(pcStorageWarning);
+    return saved;
+  }
   function leaveComputer(shutdown=false){
     if(shutdown)persistPc(setPcPower(pcState,'off'));
     pcRoot.hidden=true;
     if(motion.actionId==='computer'&&motion.phase==='perform')motion.leaveAction();
     setMode('game');resumeAnimation();
   }
-  const virtualPc=mountVirtualPc(pcRoot,{
+  virtualPc=mountVirtualPc(pcRoot,{
     onPersist:next=>persistPc(next),
     onLeave:()=>leaveComputer(false),
     onShutdown:()=>leaveComputer(true),
     onSaveProject:(state,project)=>saveStudioProject(state,project),
   });
+  virtualPc.setPersistenceWarning(pcStorageWarning);
   function openComputer(){
     const alreadyOn=pcState.power==='on';persistPc(setPcPower(pcState,'on'));
     setMode('pc');pcRoot.hidden=false;
@@ -177,7 +186,7 @@ try{
   $('#show-bones').addEventListener('change',e=>skeleton=e.target.checked);$('#hold').addEventListener('change',e=>hold=e.target.checked);
   $('#pause').addEventListener('click',()=>{paused=!paused;$('#pause').textContent=paused?'Продолжить':'Пауза';});
   $('#step').addEventListener('click',()=>{paused=true;$('#pause').textContent='Продолжить';update(1/30,performance.now(),true);});$('#face').addEventListener('click',()=>motion.faceCamera());
-  document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(mode==='peephole')stopPeeking();else if(mode==='door')setMode('game');else if(mode==='pc')virtualPc.closeWindow();else if(mode==='game')setMode('menu');});
+  document.addEventListener('keydown',e=>{if(e.defaultPrevented||e.key!=='Escape')return;if(mode==='peephole')stopPeeking();else if(mode==='door')setMode('game');else if(mode==='pc')virtualPc.closeWindow();else if(mode==='game')setMode('menu');});
   function update(dt,now,step=false){
     cameraLabel();
     if(cameraFade){view.render(motion,0,{paused:true});return;}
@@ -216,7 +225,7 @@ try{
     view.setRoomLights(homeTime.lights);view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));
     view.render(motion,paused&&!step?0:dt,{skeleton,paused:paused&&!step});$('#fade').style.opacity=motion.fade;
     $('#home-time').textContent=`День ${homeTime.day} · ${homeTime.label} · ${homeTime.period} · Дом`;
-    if(now-lastTimeSave>(homeTime.isSleeping?500:15000)){saveHomeTime(storage,homeTime);saveVirtualPcState(storage,pcState);lastTimeSave=now;}
+    if(now-lastTimeSave>(homeTime.isSleeping?500:15000)){saveHomeTime(storage,homeTime);persistPc(pcState);lastTimeSave=now;}
     $('#room').textContent=motion.position[0]<0?'КУХНЯ':'ЖИЛАЯ КОМНАТА';
     $('#state').textContent=`${motion.phase} · ${motion.clip} · x ${motion.position[0].toFixed(2)} · камера ${motion.cameraX.toFixed(2)} · ${Math.round(motion.yaw*180/Math.PI)}° · дверь ${Math.round(motion.doorOpen*100)}% · ${Math.round(frameRate)} FPS`;
     $('#wake').hidden=!motion.sleeping;

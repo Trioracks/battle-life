@@ -49,6 +49,15 @@ function focusableControls(node, controls = []) {
   return controls;
 }
 
+function findByDataset(node, key, value) {
+  if (node?.dataset?.[key] === value) return node;
+  for (const child of node?.children ?? []) {
+    const found = findByDataset(child, key, value);
+    if (found) return found;
+  }
+  return null;
+}
+
 export function mountVirtualPc(root, callbacks = {}) {
   const document = root.ownerDocument ?? globalThis.document;
   const pc = {
@@ -85,14 +94,49 @@ export function mountVirtualPc(root, callbacks = {}) {
     const result = pc.callbacks.onPersist(pc.state);
     const durable = result?.ok ?? result !== false;
     pc.persistenceWarning = durable ? '' : 'Сохранение браузера недоступно: изменения останутся только до закрытия страницы.';
+    pc.refreshPersistenceWarning();
     return durable;
+  };
+
+  pc.diskLabel = () => `C: свободно ${mb(1500 - (pc.state.projects.length * 2 + (pc.state.download.status === 'installed' ? 800 : pc.state.download.receivedBytes / 1000000)))}`;
+
+  pc.refreshPersistenceWarning = () => {
+    const warning = findByDataset(root, 'pcRole', 'persistence-warning');
+    if (warning) warning.textContent = pc.persistenceWarning;
+  };
+
+  pc.setPersistenceWarning = message => {
+    pc.persistenceWarning = typeof message === 'string' ? message : '';
+    pc.refreshPersistenceWarning();
+  };
+
+  pc.makeAppIcon = app => button(document, `${app.icon} ${app.label}`, { className: 'pc-icon', dataset: { app: app.id }, attributes: { 'aria-label': app.label, title: app.description } }, () => pc.open(app.id));
+
+  pc.refreshTorent = () => {
+    const progress = downloadPresentation(pc.state);
+    const label = findByDataset(root, 'pcRole', 'torent-progress');
+    const meter = findByDataset(root, 'pcRole', 'torent-meter');
+    const controls = findByDataset(root, 'pcRole', 'torent-controls');
+    if (label) label.textContent = `${progress.receivedMb.toFixed(1)} / ${progress.totalMb} МБ · ${progress.speedKbPerSecond} КБ/с · осталось ${progress.remainingGameMinutes} игровых мин.`;
+    if (meter) { meter.value = progress.percent; meter.setAttribute('value', String(progress.percent)); }
+    if (controls) pc.renderTorentControls(controls);
+  };
+
+  pc.refreshDynamicState = () => {
+    const disk = findByDataset(root, 'pcRole', 'free-space');
+    if (disk) disk.textContent = pc.diskLabel();
+    pc.refreshPersistenceWarning();
+    if (pc.window === 'torent') pc.refreshTorent();
+    const apps = findByDataset(root, 'pcRole', 'icons');
+    const studio = desktopApps(pc.state).find(app => app.id === 'ft-studio');
+    if (apps && studio && !findByDataset(apps, 'app', 'ft-studio')) add(apps, pc.makeAppIcon(studio));
   };
 
   pc.syncState = state => {
     const next = createVirtualPcState(state);
     if (JSON.stringify(next) === JSON.stringify(pc.state)) return;
     pc.state = next;
-    if (pc.phase === 'desktop') pc.render();
+    if (pc.phase === 'desktop') pc.refreshDynamicState();
   };
 
   pc.renderBoot = () => {
@@ -116,13 +160,13 @@ export function mountVirtualPc(root, callbacks = {}) {
     shell.style.setProperty('--pc-wallpaper', `url("${wallpaper.path}")`);
     const header = el(document, 'header', { className: 'pc-desktop-header' });
     add(header, el(document, 'span', { text: 'SLOBODA DESK 96' }));
-    add(header, el(document, 'span', { text: `C: свободно ${mb(1500 - (pc.state.projects.length * 2 + (pc.state.download.status === 'installed' ? 800 : pc.state.download.receivedBytes / 1000000)))}` }));
+    add(header, el(document, 'span', { text: pc.diskLabel(), dataset: { pcRole: 'free-space' } }));
+    add(header, el(document, 'span', { className: 'pc-storage-warning', text: pc.persistenceWarning, dataset: { pcRole: 'persistence-warning' }, attributes: { 'aria-live': 'polite' } }));
     add(shell, header);
     const workspace = el(document, 'div', { className: 'pc-workspace', attributes: { 'aria-label': 'Рабочий стол Sloboda Desk 96' } });
-    const icons = el(document, 'nav', { className: 'pc-icons', attributes: { 'aria-label': 'Приложения компьютера' } });
+    const icons = el(document, 'nav', { className: 'pc-icons', dataset: { pcRole: 'icons' }, attributes: { 'aria-label': 'Приложения компьютера' } });
     for (const app of desktopApps(pc.state)) {
-      const icon = button(document, `${app.icon} ${app.label}`, { className: 'pc-icon', dataset: { app: app.id }, attributes: { 'aria-label': app.label, title: app.description } }, () => pc.open(app.id));
-      add(icons, icon);
+      add(icons, pc.makeAppIcon(app));
     }
     add(workspace, icons);
     if (pc.window) add(workspace, pc.renderWindow());
@@ -136,7 +180,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     add(taskbar, wallpapers);
     add(shell, taskbar);
     root.replaceChildren(shell);
-    const control = focusId ? findFocusControl(root, focusId) : pc.confirmClose ? findFocusControl(root, 'guard-save') : null;
+    const control = pc.confirmClose ? findFocusControl(root, 'guard-save') : focusId ? findFocusControl(root, focusId) : null;
     control?.focus?.();
   };
 
@@ -202,18 +246,25 @@ export function mountVirtualPc(root, callbacks = {}) {
     return pc.windowFrame('Underweb', content);
   };
 
+  pc.renderTorentControls = controls => {
+    controls.replaceChildren();
+    if (pc.state.download.status === 'idle') add(controls, button(document, 'Скачать FT Studio', { attributes: { 'aria-label': 'Скачать FT Studio через torent' } }, () => { pc.persist(startFtDownload(pc.state)); pc.render(); }));
+    if (pc.state.download.status === 'downloading') add(controls, button(document, 'Отменить загрузку', {}, () => { pc.persist(cancelFtDownload(pc.state)); pc.render(); }));
+    if (pc.state.download.status === 'ready-to-install') add(controls, button(document, 'Установить FT Studio', {}, () => { pc.persist(installFtStudio(pc.state)); pc.render(); }));
+    if (pc.state.download.status === 'installed') add(controls, el(document, 'p', { text: 'FT Studio установлена. Ярлык появился на рабочем столе.' }));
+  };
+
   pc.renderTorent = () => {
     const content = el(document, 'div', { className: 'pc-window-content pc-torent' });
     const progress = downloadPresentation(pc.state);
     add(content, el(document, 'h3', { text: 'FT Studio 1.0 · 800 МБ' }));
-    add(content, el(document, 'p', { text: `${progress.receivedMb.toFixed(1)} / ${progress.totalMb} МБ · ${progress.speedKbPerSecond} КБ/с · осталось ${progress.remainingGameMinutes} игровых мин.` }));
-    const meter = el(document, 'progress', { attributes: { max: '100', value: String(progress.percent), 'aria-label': 'Прогресс загрузки FT Studio' } });
+    add(content, el(document, 'p', { text: `${progress.receivedMb.toFixed(1)} / ${progress.totalMb} МБ · ${progress.speedKbPerSecond} КБ/с · осталось ${progress.remainingGameMinutes} игровых мин.`, dataset: { pcRole: 'torent-progress' } }));
+    const meter = el(document, 'progress', { dataset: { pcRole: 'torent-meter' }, attributes: { max: '100', value: String(progress.percent), 'aria-label': 'Прогресс загрузки FT Studio' } });
     meter.value = progress.percent;
     add(content, meter);
-    if (pc.state.download.status === 'idle') add(content, button(document, 'Скачать FT Studio', { attributes: { 'aria-label': 'Скачать FT Studio через torent' } }, () => { pc.persist(startFtDownload(pc.state)); pc.render(); }));
-    if (pc.state.download.status === 'downloading') add(content, button(document, 'Отменить загрузку', {}, () => { pc.persist(cancelFtDownload(pc.state)); pc.render(); }));
-    if (pc.state.download.status === 'ready-to-install') add(content, button(document, 'Установить FT Studio', {}, () => { pc.persist(installFtStudio(pc.state)); pc.render(); }));
-    if (pc.state.download.status === 'installed') add(content, el(document, 'p', { text: 'FT Studio установлена. Ярлык появился на рабочем столе.' }));
+    const controls = el(document, 'div', { className: 'pc-torent-controls', dataset: { pcRole: 'torent-controls' } });
+    pc.renderTorentControls(controls);
+    add(content, controls);
     if (pc.message || pc.persistenceWarning) add(content, el(document, 'p', { className: 'pc-status', text: pc.message || pc.persistenceWarning }));
     return pc.windowFrame('torent', content);
   };
@@ -298,11 +349,17 @@ export function mountVirtualPc(root, callbacks = {}) {
     const result = pc.callbacks.onSaveProject(pc.state, pc.project);
     if (!result?.ok) { pc.message = result?.reason === 'insufficient-space' ? 'На C: недостаточно места для нового проекта.' : 'Не удалось сохранить проект.'; pc.render(); return; }
     pc.project = result.state.projects.find(project => project.id === pc.project.id) ?? pc.project;
-    pc.dirty = false;
-    pc.confirmClose = false;
     pc.audio.stop();
     const durable = pc.persist({ ...result.state, draft: null });
     pc.message = durable ? 'Проект сохранён в Мои проекты.' : 'Проект сохранён только в памяти: браузер не подтвердил запись.';
+    if (!durable) {
+      pc.dirty = true;
+      if (pc.pendingAction) pc.confirmClose = true;
+      pc.render();
+      return;
+    }
+    pc.dirty = false;
+    pc.confirmClose = false;
     pc.runPendingAction();
   };
 
@@ -376,7 +433,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     }
     if (pc.message || pc.persistenceWarning) add(content, el(document, 'p', { className: 'pc-status', text: pc.message || pc.persistenceWarning }));
     if (pc.confirmClose) {
-      const guard = el(document, 'aside', { className: 'pc-close-guard', attributes: { 'aria-label': 'Сохранение проекта', role: 'dialog', 'aria-modal': 'true' } });
+      const guard = el(document, 'aside', { className: 'pc-close-guard', dataset: { pcRole: 'close-guard' }, attributes: { 'aria-label': 'Сохранение проекта', role: 'dialog', 'aria-modal': 'true' } });
       add(guard, el(document, 'strong', { text: 'Сохранить проект перед закрытием?' }));
       add(guard, button(document, 'Сохранить', { dataset: { focusId: 'guard-save' } }, () => pc.saveProject()));
       add(guard, button(document, 'Не сохранять', { dataset: { focusId: 'guard-discard' } }, () => pc.discardProject()));
@@ -477,16 +534,19 @@ export function mountVirtualPc(root, callbacks = {}) {
 
   root.addEventListener('keydown', event => {
     if (!pc.confirmClose) return;
+    const guard = findByDataset(root, 'pcRole', 'close-guard');
+    const controls = focusableControls(guard);
     if (event.key === 'Escape') {
       event.preventDefault();
+      event.stopPropagation();
       pc.cancelPendingAction();
       return;
     }
     if (event.key !== 'Tab') return;
-    const controls = focusableControls(root);
     const index = controls.indexOf(document.activeElement);
     const next = event.shiftKey ? (index <= 0 ? controls.length - 1 : index - 1) : (index < 0 || index === controls.length - 1 ? 0 : index + 1);
     event.preventDefault();
+    event.stopPropagation();
     controls[next]?.focus?.();
   });
 

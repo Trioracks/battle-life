@@ -18,6 +18,12 @@ function hasText(root, text) {
   return Boolean(find(root, element => element.textContent === text));
 }
 
+function keydown(key, shiftKey = false) {
+  const event = new Event('keydown', { cancelable: true });
+  Object.defineProperties(event, { key: { value: key }, shiftKey: { value: shiftKey } });
+  return event;
+}
+
 function createController(state = createVirtualPcState()) {
   const document = creatorDocument();
   const root = document.createElement('section');
@@ -87,6 +93,22 @@ test('the desktop controller accepts reconciled game-time download state before 
   assert.equal(hasText(root, '200.0 / 800 МБ · 37 КБ/с · осталось 270 игровых мин.'), true);
 });
 
+test('game-time reconciliation does not replace an in-progress Underweb address', () => {
+  const downloading = createVirtualPcState({ power: 'on', lastGameMinute: 720, download: { status: 'downloading', receivedBytes: 0 } });
+  const advanced = createVirtualPcState({ power: 'on', lastGameMinute: 721, download: { status: 'downloading', receivedBytes: 2222222 } });
+  const { controller, root, document } = createController(downloading);
+
+  controller.showDesktop(downloading);
+  controller.open('underweb');
+  const address = find(root, element => element.getAttribute?.('aria-label') === 'Адрес или поиск Underweb');
+  address.value = 'underweb://мой-адрес';
+  address.focus();
+  controller.syncState(advanced);
+
+  assert.equal(address.value, 'underweb://мой-адрес');
+  assert.equal(document.activeElement, address);
+});
+
 test('an Underweb brief routes an uninstalled studio to torent instead of creating a project', () => {
   const { controller, root, state } = createController();
 
@@ -145,6 +167,25 @@ test('a visible close guard blocks a second close request', () => {
   controller.closeWindow();
 
   assert.equal(hasText(root, 'Сохранить проект перед закрытием?'), true);
+});
+
+test('a close guard moves focus into its own dialog and traps reverse Tab there', () => {
+  const installed = createVirtualPcState({ download: { status: 'installed' } });
+  const { controller, root, document } = createController(installed);
+  const project = createStudioProject({ id: 'dialog-focus', name: 'Диалог', battleId: BATTLE_BRIEFS[0].id }).project;
+
+  controller.showDesktop(installed);
+  controller.openProject(project);
+  const step = find(root, element => element.dataset.track === 'kick' && element.dataset.step === '0');
+  step.focus();
+  step.click();
+  controller.closeWindow();
+  const save = find(root, element => element.dataset.focusId === 'guard-save');
+  const cancel = find(root, element => element.dataset.focusId === 'guard-cancel');
+  assert.equal(document.activeElement, save);
+  root.dispatchEvent(keydown('Tab', true));
+
+  assert.equal(document.activeElement, cancel);
 });
 
 test('switching applications cannot discard a dirty studio project without a choice', () => {
@@ -206,6 +247,36 @@ test('a blocked durable write is labelled as an in-memory save', () => {
   controller.saveProject();
 
   assert.equal(hasText(root, 'Проект сохранён только в памяти: браузер не подтвердил запись.'), true);
+});
+
+test('a failed guarded save keeps shutdown pending instead of hiding the storage warning', () => {
+  const installed = createVirtualPcState({ download: { status: 'installed' } });
+  let shutdowns = 0;
+  const document = creatorDocument();
+  const root = document.createElement('section');
+  const controller = mountVirtualPc(root, { onPersist() { return false; }, onShutdown() { shutdowns++; } });
+  const project = createStudioProject({ id: 'blocked-shutdown-save', name: 'Хранилище', battleId: BATTLE_BRIEFS[0].id }).project;
+
+  controller.showDesktop(installed);
+  controller.openProject(project);
+  find(root, element => element.dataset.track === 'kick' && element.dataset.step === '0').click();
+  controller.requestShutdown();
+  find(root, element => element.dataset.focusId === 'guard-save').click();
+
+  assert.equal(shutdowns, 0);
+  assert.equal(hasText(root, 'Сохранить проект перед закрытием?'), true);
+  assert.equal(hasText(root, 'Проект сохранён только в памяти: браузер не подтвердил запись.'), true);
+});
+
+test('host storage warnings remain visible after state synchronization', () => {
+  const installed = createVirtualPcState({ download: { status: 'installed' } });
+  const { controller, root } = createController(installed);
+
+  controller.showDesktop(installed);
+  controller.setPersistenceWarning('Сохранение виртуального ПК недоступно.');
+  controller.syncState(createVirtualPcState({ download: { status: 'installed' }, lastGameMinute: 900 }));
+
+  assert.equal(hasText(root, 'Сохранение виртуального ПК недоступно.'), true);
 });
 
 test('editing a sequencer step restores keyboard focus to the replacement control', () => {
