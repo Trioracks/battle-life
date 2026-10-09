@@ -128,7 +128,7 @@ export function mountPcShell(root,{onCommand}) {
   function setModal(node,returnFocus) {
     const had=modalNode;modalNode=node;workspace.inert=!!node;taskbar.inert=!!node;menus.inert=!!node;
     modal.hidden=!node;
-    if(node){if(had!==node)modal.replaceChildren(node);pcFocusable(node)[0]?.focus();}
+    if(node){if(had!==node){modal.replaceChildren(node);pcFocusable(node)[0]?.focus();}}
     else{modal.replaceChildren();if(had){if(returnFocus?.isConnected&&!returnFocus.disabled)returnFocus.focus();else focusActive();}}
   }
   listen(start,'click',()=>emit({type:'start-menu',anchor:start}));

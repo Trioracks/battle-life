@@ -1,8 +1,11 @@
 import { FtStudioAudio } from './ft-studio-audio.js?rev=4';
 import {mountPcShell} from './virtual-pc-shell.js';
 import {mountExplorer} from './virtual-pc-explorer-view.js';
+import {mountPcMenu} from './virtual-pc-menus.js';
+import {mountSystemWindow} from './virtual-pc-system-windows.js';
+import {explorerProperties} from './virtual-pc-explorer.js';
 import {createWindowState,reduceWindows} from './virtual-pc-window-state.js';
-import {layoutDesktopIcons,setDesktopIconPosition} from './virtual-pc-state.js';
+import {layoutDesktopIcons,setDesktopIconPosition,resetDesktopIconPositions} from './virtual-pc-state.js';
 import {createPcIcon} from './virtual-pc-icons.js';
 import { createStudioProject, normalizeStudioProject, setArrangementCell, setBpm, setStudioStep, setTrackGain } from './ft-studio-project.js';
 import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js';
@@ -93,6 +96,10 @@ export function mountVirtualPc(root, callbacks = {}) {
     windows: createWindowState({width:globalThis.innerWidth??1280,height:globalThis.innerHeight??720}),
     shell: null,
     explorer: null,
+    menu: null,
+    systemViews: new Map(),
+    properties: null,
+    shutdownModal: null,
     metadata: {playerName:'Игрок',clockLabel:'12:00'},
     returnFocus: null,
     folder: 'computer',
@@ -124,7 +131,7 @@ export function mountVirtualPc(root, callbacks = {}) {
 
   pc.refreshPersistenceWarning = () => {
     const warning = findByDataset(root, 'pcRole', 'persistence-warning');
-    if (warning) warning.textContent = pc.persistenceWarning;
+    if (warning) {warning.textContent = pc.persistenceWarning;warning.hidden=!pc.persistenceWarning;}
   };
 
   pc.setPersistenceWarning = message => {
@@ -138,7 +145,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.windows=reduceWindows(pc.windows,{type:'open',id:appId,appId,title:app?.label??appId});
   };
   pc.windowAction = action => {
-    if(pc.confirmClose)return;
+    if(pc.confirmClose||pc.shutdownModal)return;
     if(action.type==='close'){pc.closeWindow(action.id);return;}
     pc.windows=reduceWindows(pc.windows,action);
     pc.renderDesktop(false);
@@ -193,8 +200,10 @@ export function mountVirtualPc(root, callbacks = {}) {
       if(command.type==='window')pc.windowAction(command.action);
       else if(command.type==='open-app')pc.open(command.appId);
       else if(command.type==='move-icon'){pc.persist(setDesktopIconPosition(pc.state,command.id,command.position));pc.renderDesktop(false);}
-      else if(command.type==='start-menu'){pc.startOpen=!pc.startOpen;pc.renderDesktop(false);}
+      else if(command.type==='start-menu')pc.toggleStart(command.anchor);
+      else if(command.type==='desktop-menu')pc.openDesktopMenu(command);
     }});
+    if(!pc.menu)pc.menu=mountPcMenu(pc.shell.getMenuRoot(),{onDismiss:()=>{pc.startOpen=false;}});
     const apps=desktopApps(pc.state),v=pc.windows.viewport;
     pc.shell.render({windows:pc.windows,apps,wallpaper:(WALLPAPERS.find(w=>w.id===pc.state.wallpaper)??WALLPAPERS[0]).path,
       iconPositions:layoutDesktopIcons(apps.map(a=>a.id),pc.state.desktopIcons,{width:v.width,height:v.height-32}),metadata:pc.metadata,warning:pc.persistenceWarning});
@@ -203,11 +212,9 @@ export function mountVirtualPc(root, callbacks = {}) {
       if(!target.children.length||(replaceActive&&w.id===pc.windows.activeId))pc.refreshApp(w.id,{replaceContent:true});
     }
     pc.explorer?.update(pc.state);
-    const menuRoot=pc.shell.getMenuRoot();
-    menuRoot.replaceChildren();
-    if(pc.startOpen)menuRoot.append(pc.renderStartMenu());
+    for(const view of pc.systemViews.values())view.update();
     const guard=pc.confirmClose?findByDataset(root,'pcRole','close-guard'):null;
-    pc.shell.setModal(guard,pc.returnFocus);
+    pc.shell.setModal(pc.shutdownModal?.node??guard,pc.returnFocus);
     if(!pc.confirmClose&&replaceActive){
       const scope=pc.focusScope(),restored=focusId&&findFocusControl(scope,focusId);
       (restored&&!restored.disabled?restored:focusableControls(scope)[0])?.focus?.();
@@ -219,16 +226,56 @@ export function mountVirtualPc(root, callbacks = {}) {
       if(!pc.explorer)pc.explorer=mountExplorer(target,{onOpenProject:p=>pc.openProject(p),onProperties:p=>pc.showProperties?.(p),onClose:()=>pc.closeWindow('computer'),onMenu:p=>pc.menu?.open(p)});
       pc.explorer.update(pc.state);return;
     }
+    if(appId.startsWith('system:')){
+      if(!pc.systemViews.has(appId))pc.systemViews.set(appId,mountSystemWindow(target,{kind:appId.slice(7),getState:()=>pc.state,onPersist:next=>{const ok=pc.persist(next);pc.renderDesktop(false);return ok;},onOpen:kind=>pc.openSystem(kind),onClose:()=>pc.closeWindow(appId),properties:pc.properties}));
+      return;
+    }
     if(replaceContent)target.replaceChildren(pc.renderWindow(appId));
     else if(appId==='torent')pc.refreshTorent();
   };
 
-  pc.renderStartMenu = () => {
-    const menu = el(document, 'aside', { className: 'pc-start-menu', dataset: { pcRole: 'start-menu' }, attributes: { 'aria-label': 'Меню Пуск' } });
-    add(menu, el(document, 'strong', { text: 'Sloboda Desk 96' }));
-    add(menu, button(document, 'Отойти от ПК', { attributes: { 'aria-label': 'Отойти от ПК, оставив его включённым' } }, () => pc.requestLeave()));
-    add(menu, button(document, 'Выключить', { attributes: { 'aria-label': 'Выключить компьютер' } }, () => pc.requestShutdown()));
-    return menu;
+  pc.openDesktopMenu = ({targetId,x,y,anchor}) => {
+    const app=desktopApps(pc.state).find(a=>a.id===targetId);
+    const items=app?[
+      {id:'open',label:'Открыть',onSelect:()=>pc.open(app.id)},
+      {id:'properties',label:'Свойства',onSelect:()=>pc.showProperties({title:'Свойства: '+app.label,rows:[{label:'Тип',value:'Ярлык'},{label:'Назначение',value:app.description}]})},
+    ]:[
+      {id:'arrange',label:'Упорядочить значки',onSelect:()=>{pc.persist(resetDesktopIconPositions(pc.state));pc.renderDesktop(false);}},
+      {id:'refresh',label:'Обновить',onSelect:()=>pc.renderDesktop(false)},
+      {id:'display',label:'Свойства',iconId:'display',onSelect:()=>pc.openSystem('display')},
+    ];pc.menu.open({items,x,y,anchor});
+  };
+  pc.toggleStart = anchor => {
+    if(pc.startOpen){pc.menu.close();return;}
+    const appItems=desktopApps(pc.state).filter(a=>!['computer','documents'].includes(a.id)).map(a=>({id:a.id,label:a.label,iconId:a.iconId,onSelect:()=>pc.open(a.id)}));
+    pc.menu.open({variant:'start',playerName:pc.metadata.playerName,anchor,x:0,y:pc.windows.viewport.height-32,items:[
+      ...appItems,{id:'programs',label:'Все программы',iconId:'folder',items:appItems},
+      {id:'documents',label:'Мои документы',iconId:'documents',column:'right',onSelect:()=>pc.open('documents')},
+      {id:'computer',label:'Мой компьютер',iconId:'computer',column:'right',onSelect:()=>pc.open('computer')},
+      {id:'control-panel',label:'Панель управления',iconId:'settings',column:'right',onSelect:()=>pc.openSystem('control-panel')},
+      {id:'leave',label:'Отойти от ПК',iconId:'start',column:'footer',onSelect:()=>pc.requestLeave()},
+      {id:'shutdown',label:'Выключение',iconId:'power',column:'footer',onSelect:()=>pc.showShutdown()},
+    ]});pc.startOpen=true;
+  };
+  pc.showProperties = properties => {pc.properties=properties;pc.systemViews.get('system:properties')?.dispose();pc.systemViews.delete('system:properties');pc.openSystem('properties');};
+  pc.openSystem = kind => {
+    if(pc.confirmClose||pc.shutdownModal)return;pc.menu?.close();
+    if(kind==='disk'){pc.showProperties(explorerProperties(pc.state,{kind:'disk'}));return;}
+    const title=kind==='display'?'Свойства: Экран':kind==='control-panel'?'Панель управления':pc.properties?.title??'Свойства';
+    pc.windows=reduceWindows(pc.windows,{type:'open',id:'system:'+kind,appId:kind,title});
+    pc.renderDesktop(false);pc.shell.focusActive();
+  };
+  pc.cancelShutdown = () => {
+    pc.shutdownModal?.view.dispose();pc.shutdownModal=null;pc.shell.setModal(null,pc.returnFocus);pc.renderDesktop(false);
+  };
+  pc.showShutdown = () => {
+    if(pc.confirmClose||pc.shutdownModal)return;pc.menu.close();pc.returnFocus=document.activeElement;
+    const node=el(document,'div');const view=mountSystemWindow(node,{kind:'shutdown',getState:()=>pc.state,onClose:()=>pc.cancelShutdown(),onConfirmShutdown:()=>{pc.cancelShutdown();pc.requestShutdown();}});
+    pc.shutdownModal={node,view};pc.shell.setModal(node,pc.returnFocus);
+  };
+  pc.clearViews = () => {
+    pc.explorer?.dispose();pc.explorer=null;for(const view of pc.systemViews.values())view.dispose();pc.systemViews.clear();
+    pc.shutdownModal?.view.dispose();pc.shutdownModal=null;pc.menu?.close();
   };
 
   pc.windowFrame = (title, content) => content;
@@ -335,6 +382,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.recoveringDraft = true;
     }
     if (pc.project && pc.dirty) {
+      pc.menu?.close();
       pc.returnFocus=document.activeElement;
       pc.ensureWindow('ft-studio');
       pc.pendingAction = action;
@@ -512,7 +560,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.boot = state => {
     pc.state = createVirtualPcState(state);
     pc.phase = 'booting';
-    pc.explorer?.dispose();pc.explorer=null;
+    pc.clearViews();pc.menu?.dispose();pc.menu=null;
     pc.shell?.dispose();pc.shell=null;
     pc.windows=reduceWindows(pc.windows,{type:'clear'});
     pc.bootStep = 0;
@@ -537,6 +585,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.openNow = appId => {
+    pc.menu?.close();
     const documents=appId==='documents';if(documents)appId='computer';
     const existing=pc.windows.windows.some(w=>w.id===appId);
     pc.ensureWindow(appId);
@@ -550,10 +599,11 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.shell.focusActive();
   };
   pc.open = appId => {
-    if(!desktopApps(pc.state).some(app=>app.id===appId)||pc.confirmClose)return;
+    if(!desktopApps(pc.state).some(app=>app.id===appId)||pc.confirmClose||pc.shutdownModal)return;
     pc.openNow(appId);
   };
   pc.closeNow = id => {
+    pc.systemViews.get(id)?.dispose();pc.systemViews.delete(id);
     if(id==='computer'){pc.explorer?.dispose();pc.explorer=null;}
     if(id==='ft-studio')pc.audio.stop();
     pc.windows=reduceWindows(pc.windows,{type:'close',id});
@@ -567,7 +617,8 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.requestLeave = () => {
-    if (pc.confirmClose) return;
+    if (pc.confirmClose||pc.shutdownModal) return;
+    pc.menu?.close();
     pc.requestProjectTransition(() => {
       pc.audio.stop();
       pc.callbacks.onLeave();
@@ -578,7 +629,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (pc.confirmClose) return;
     pc.requestProjectTransition(() => {
       pc.audio.stop();
-      pc.explorer?.dispose();pc.explorer=null;
+      pc.clearViews();
       pc.windows=reduceWindows(pc.windows,{type:'clear'});
       pc.renderDesktop(false);
       pc.callbacks.onShutdown();
@@ -603,6 +654,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (pc.phase !== 'desktop' || event.defaultPrevented) return;
     const scope = pc.focusScope();
     const controls = focusableControls(scope);
+    if(event.key==='Escape'&&pc.shutdownModal){event.preventDefault();event.stopPropagation();pc.cancelShutdown();return;}
     if (event.key === 'Escape' && pc.confirmClose) {
       event.preventDefault();
       event.stopPropagation();
@@ -611,7 +663,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     }
     if (event.key === 'Escape' && pc.startOpen) {
       event.preventDefault(); event.stopPropagation();
-      pc.startOpen = false; pc.render(); return;
+      pc.menu?.close(); return;
     }
     // The shell owns Tab traversal; apartment Escape handling closes the active window.
   });
@@ -622,7 +674,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.audio.stop();
     pc.state = createVirtualPcState(state);
     pc.phase = 'off';
-    pc.explorer?.dispose();pc.explorer=null;
+    pc.clearViews();pc.menu?.dispose();pc.menu=null;
     pc.shell?.dispose();pc.shell=null;
     pc.windows=reduceWindows(pc.windows,{type:'clear'});
     pc.folder = 'computer';
@@ -644,7 +696,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (pc.bootTimer !== null) pc.clearTimeoutFn(pc.bootTimer);
     pc.bootTimer = null;
     pc.audio.dispose();
-    pc.explorer?.dispose();pc.explorer=null;
+    pc.clearViews();pc.menu?.dispose();pc.menu=null;
     pc.shell?.dispose();pc.shell=null;
     pc.phase = 'off';
     pc.render();
