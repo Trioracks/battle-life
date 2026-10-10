@@ -5,11 +5,11 @@ const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAY
 const output=process.env.FT_QA_DIR||'D:/Codex/Builds/Battle/home-studio-20261010';await mkdir(output,{recursive:true});
 const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
 const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
-await page.route('**/__home-studio-fixture',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><link rel="stylesheet" href="/virtual-pc.css?rev=21"><link rel="stylesheet" href="/desktop-apps.css?rev=25"><section id="virtual-pc"></section>'}));
+await page.route('**/__home-studio-fixture',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><link rel="stylesheet" href="/virtual-pc.css?rev=21"><link rel="stylesheet" href="/desktop-apps.css?rev=26"><section id="virtual-pc"></section>'}));
 try{
  await page.goto('http://127.0.0.1:4173/__home-studio-fixture');
  await page.evaluate(async()=>{
-  const [{mountVirtualPc},{createVirtualPcState},production]=await Promise.all([import('/src/virtual-pc-ui.js?rev=25'),import('/src/virtual-pc-state.js?rev=25'),import('/src/beat-production.js?rev=25')]);
+  const [{mountVirtualPc},{createVirtualPcState},production]=await Promise.all([import('/src/virtual-pc-ui.js?rev=26'),import('/src/virtual-pc-state.js?rev=26'),import('/src/beat-production.js?rev=26')]);
   window.production=production;window.pc=mountVirtualPc(document.querySelector('#virtual-pc'));
   pc.showDesktop(createVirtualPcState({power:'on',download:{status:'installed'}}));pc.syncHost({playerName:'QA',clockLabel:'12:00',gameDay:31,skills:{beatmaking:10}});pc.open('ft-studio');
  });

@@ -1,0 +1,51 @@
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {mkdir,writeFile} from 'node:fs/promises';
+const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'D:/Codex/Caches/npm/_npx/48b1ca104c3549f4/node_modules/playwright-core');
+const output=process.env.NOTEBOOK_QA_DIR||'D:/Codex/Builds/Battle/rap-notebook-20261010';await mkdir(output,{recursive:true});
+const rev=process.env.BATTLE_REV||'26',browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE||'D:/Codex/Caches/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-win64/chrome-headless-shell.exe'});
+const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage();page.setDefaultTimeout(60000);const errors=[];
+page.on('pageerror',e=>errors.push(e.message));
+await context.addInitScript(()=>{const raw=sessionStorage.getItem('notebook-seed');if(raw){sessionStorage.removeItem('notebook-seed');for(const [k,v]of Object.entries(JSON.parse(raw)))localStorage.setItem(k,JSON.stringify(v));}window.typingSources=0;const original=AudioContext.prototype.createBufferSource;AudioContext.prototype.createBufferSource=function(...args){if(document.querySelector('#virtual-pc')?.dataset.pcTransition==='working')window.typingSources++;return original.apply(this,args);};});
+const pc=page.locator('#virtual-pc'),frame=id=>pc.locator('.pc-window[data-window-id="'+id+'"]'),rn=frame('rap-notebook');
+const shot=name=>page.screenshot({path:output+'/'+name+'.png'}),saved=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('battle-life-virtual-pc-v1')));
+const phase=name=>page.waitForFunction(name=>document.querySelector('#virtual-pc').dataset.pcTransition===name,name);
+const start=async name=>{await pc.getByRole('button',{name:'Пуск',exact:true}).click();await pc.locator('.pc-start-menu').getByRole('menuitem',{name,exact:true}).click();};
+const enter=async()=>{await page.locator('#continue-game').click();if(await page.locator('#wake').isVisible())await page.locator('#wake').click();await page.waitForFunction(()=>document.querySelector('#state').textContent.startsWith('idle'));await page.locator('#actions [data-action=computer]').click();await phase('desktop');};
+try{
+ await page.goto('http://127.0.0.1:4173/?rev='+rev,{waitUntil:'networkidle'});
+ await page.locator('#new-game').click();await page.locator('#character-name').fill('Автор черновика');await page.locator('#clothing-tab').click();await page.locator('#start-game').click();await page.locator('#wake').click();
+ await page.evaluate(async rev=>{
+  const {createVirtualPcState}=await import('./src/virtual-pc-state.js?rev='+rev),{createBeat,startBeatStage,advanceBeatWork}=await import('./src/beat-production.js?rev='+rev);
+  let s=createVirtualPcState({power:'on',software:{notebook:{receivedBytes:4000000},ft:{installed:true}},music:{needs:{satiety:100,energy:100}}});s=createBeat(s,{id:'qa-beat',name:'Осенний мотив'},{beatmaking:10,sound:10},()=>.3).state;
+  for(let i=0;i<3;i++){s=startBeatStage(s,'qa-beat',undefined,{beatmaking:10},()=>.4).state;s=advanceBeatWork(s,1000).state;}s.music.needs={satiety:100,energy:100};
+  sessionStorage.setItem('notebook-seed',JSON.stringify({'battle-life-virtual-pc-v1':s,'battle-life-apartment-v3-time':{day:1,minutes:600,initialRest:false}}));
+ },rev);
+ await page.reload({waitUntil:'networkidle'});await enter();await start('Underweb');const uw=frame('underweb');await uw.getByRole('textbox',{name:'Адрес или поиск Underweb'}).fill('underweb://dump/notebook');await uw.getByRole('textbox',{name:'Адрес или поиск Underweb'}).press('Enter');
+ await uw.getByRole('button',{name:'Открыть установщик Рэпблокнот',exact:true}).click();const wizard=frame('installer');
+ await wizard.getByRole('button',{name:'Далее >',exact:true}).click();await wizard.getByRole('button',{name:'Далее >',exact:true}).click();await wizard.getByRole('button',{name:'Установить',exact:true}).click();
+ await page.waitForFunction(()=>document.querySelector('.pc-installer progress')?.value>10);await shot('01-installing');assert.equal((await saved()).software.notebook.installed,false);
+ await wizard.getByRole('button',{name:'Готово',exact:true}).click();assert.equal((await saved()).software.notebook.installed,true);
+ await start('Рэпблокнот');assert.equal(await rn.getAttribute('data-mode'),'maximized');await rn.getByRole('button',{name:'Новый текст',exact:true}).click();
+ assert.equal(await rn.locator('optgroup[label="Баттлы, где ты зарегистрирован"]').count(),0);
+ await rn.getByRole('combobox',{name:'Для чего пишем текст'}).selectOption('concrete-echo');assert.equal(await rn.getByRole('textbox',{name:'Название текста'}).inputValue(),'Голос спального района');
+ await shot('02-create');await rn.getByRole('button',{name:'Создать текст',exact:true}).click();assert.equal((await saved()).battleApplications.length,0);assert.equal(await rn.locator('input[type=range]').count(),0);
+ await rn.getByRole('button',{name:'Начать работу',exact:true}).click();await phase('working');await page.waitForFunction(()=>document.querySelector('.beat-work-hud progress').value>.2);await shot('03-writing');assert.match(await page.locator('[data-work-role=skill]').textContent(),/Письмо/);
+ await phase('desktop');assert.ok(await page.evaluate(()=>window.typingSources>0));await shot('04-first-draft');
+ await rn.getByRole('button',{name:'Новый текст',exact:true}).click();
+ assert.equal(await rn.locator('.rn-toolbar').evaluate(n=>n.inert),true);
+ await rn.getByRole('button',{name:'Отмена',exact:true}).focus();await page.keyboard.press('Tab');
+ assert.equal(await page.evaluate(()=>document.activeElement.getAttribute('aria-label')),'Для чего пишем текст');
+ await page.keyboard.press('Escape');assert.equal(await rn.locator('.rn-cover').count(),0);
+ assert.equal(await page.evaluate(()=>document.activeElement.textContent),'Новый текст');assert.equal((await saved()).writing.job,null);
+ await rn.getByRole('button',{name:'Начать работу',exact:true}).click();await phase('working');await page.waitForFunction(()=>document.querySelector('.beat-work-hud progress').value>.2);await page.reload({waitUntil:'networkidle'});
+ const partial=await saved();assert.ok(partial.writing.job.elapsed>0);await enter();await start('Рэпблокнот');await rn.getByRole('button',{name:'Продолжить работу',exact:true}).click();await phase('working');await phase('desktop');
+ await rn.getByRole('button',{name:'Начать работу',exact:true}).click();await phase('working');await phase('desktop');
+ let state=await saved(),text=state.projects.find(p=>p.kind==='lyrics');assert.equal(text.status,'ready');assert.ok(Math.abs(state.writing.practice-1)<1e-9);assert.equal(state.music.practice,1);assert.ok(await rn.locator('.rn-error').count()>0);await shot('05-ready-1280');
+ await rn.getByRole('button',{name:'Добавить',exact:true}).click();await rn.getByRole('button',{name:'Диссовую часть',exact:true}).click();await phase('working');await phase('desktop');assert.equal((await saved()).projects.find(p=>p.kind==='lyrics').revision,2);
+ await rn.getByRole('button',{name:'Адаптировать под бит',exact:true}).click();await rn.getByRole('button',{name:'Осенний мотив · 90 BPM',exact:true}).click();await phase('working');await phase('desktop');
+ text=(await saved()).projects.find(p=>p.kind==='lyrics');assert.equal(text.adaptation.beatId,'qa-beat');assert.equal(text.revision,3);await shot('06-adapted');
+ for(const width of [640,1280]){await page.setViewportSize({width,height:900});await shot('07-final-'+width);for(const name of ['Новый текст','Открыть текст','Добавить','Адаптировать под бит']){const b=await rn.getByRole('button',{name,exact:true}).boundingBox();assert.ok(b.x>=0&&b.x+b.width<=width);}}
+ const before=JSON.stringify(text);await page.reload({waitUntil:'networkidle'});assert.equal(JSON.stringify((await saved()).projects.find(p=>p.kind==='lyrics')),before);
+ assert.deepEqual(errors,[]);await writeFile(output+'/result.json',JSON.stringify({passed:true,errors,revision:rev,textId:text.id,stages:text.stages.length,documentVersion:text.revision,practice:state.writing.practice},null,2));console.log('PASS actual notebook install, battle topic, writing camera/keyboard, reload/resume, three stages, add verse, adapt beat, 640/1280, persistence');
+}catch(error){console.error('PAGE_ERRORS',errors);await shot('failure').catch(()=>{});throw error;}finally{await context.close();await browser.close();}

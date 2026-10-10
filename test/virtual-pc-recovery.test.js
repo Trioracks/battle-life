@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { pcDocument as creatorDocument, fire } from './helpers/virtual-pc-dom.js';
-import { mountVirtualPc } from '../src/virtual-pc-ui.js?rev=25';
-import { createVirtualPcState } from '../src/virtual-pc-state.js?rev=25';
-import { createStudioProject } from '../src/ft-studio-project.js?rev=25';
-import { BATTLE_BRIEFS } from '../src/virtual-pc-catalog.js?rev=25';
+import { mountVirtualPc } from '../src/virtual-pc-ui.js?rev=26';
+import { createVirtualPcState } from '../src/virtual-pc-state.js?rev=26';
+import { createStudioProject } from '../src/ft-studio-project.js?rev=26';
+import { BATTLE_BRIEFS } from '../src/virtual-pc-catalog.js?rev=26';
 
 const nodes = root => root.children.flatMap(child => [child, ...nodes(child)]);
 const find = (root, label) => nodes(root).find(node => node.getAttribute?.('aria-label') === label || node.textContent === label);
@@ -82,7 +82,7 @@ test('clock updates preserve an unfinished registration and its focused input', 
 test('keyboard navigation enters an opened window and wraps inside it', () => {
   const { controller, root, document } = setup();
   controller.open('underweb');
-  const first = find(root, 'Свернуть окно'), last = nodes(root).filter(n=>n.textContent==='Файловая помойка').at(-1);
+  const first = find(root, 'Свернуть окно'), last = nodes(controller.focusScope()).filter(n=>n.tagName==='BUTTON'&&!n.disabled).at(-1);
   assert.ok(root.contains(document.activeElement));
   last.focus();
   const event = new Event('keydown', { cancelable: true });

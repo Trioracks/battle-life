@@ -1,16 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=25';
-import {createBeat,startBeatStage,advanceBeatWork} from '../src/beat-production.js?rev=25';
-import {resolveBeatPlayback} from '../src/beat-playback.js?rev=25';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=26';
+import {createBeat,startBeatStage,advanceBeatWork} from '../src/beat-production.js?rev=26';
+import {resolveBeatPlayback} from '../src/beat-playback.js?rev=26';
 const create=(sound=10)=>createBeat(createVirtualPcState(),{id:'sound-test',name:'Звучание'},{beatmaking:10,sound},()=>.1).state;
-const mixModule=await import('../src/beat-mix.js?rev=25');
+const mixModule=await import('../src/beat-mix.js?rev=26');
 
 test('a new beat saves its sound skill; training and reload never rewrite that snapshot',()=>{
  let state=create(12);
- assert.equal(state.projects[0].mix?.skill,12);
- const snapshot=structuredClone(state.projects[0].mix);
+ assert.equal(state.projects[0].mix?.skills.sound,12);
  state=startBeatStage(state,'sound-test',[0,0,0],{beatmaking:10,sound:90}).state;
+ const snapshot=structuredClone(state.projects[0].mix);
  state=advanceBeatWork(state,600).state;
  state=createVirtualPcState(JSON.parse(JSON.stringify(state)));
  assert.deepEqual(state.projects[0].mix,snapshot);
@@ -18,14 +18,16 @@ test('a new beat saves its sound skill; training and reload never rewrite that s
  assert.deepEqual(resolveBeatPlayback(state.projects[0],{workStage:1}).descriptor.mix,snapshot);
 });
 
-test('sound is independent of hidden sliders and available to the work scene before the first completed layer',()=>{
+test('hidden slider decisions affect the saved work sound before the first completed layer',()=>{
  const state=create();
- assert.equal(state.projects[0].mix?.skill,10);
- const first=resolveBeatPlayback(state.projects[0],{workStage:0}).descriptor;
+ assert.equal(state.projects[0].mix?.skills.sound,10);
+ const keys=[];
  for(const sliders of [[0,0,0],[10,10,10]]){
   const next=startBeatStage(state,'sound-test',sliders,{sound:99}).state;
-  assert.deepEqual(resolveBeatPlayback(next.projects[0],{workStage:0}).descriptor,first);
+  const descriptor=resolveBeatPlayback(next.projects[0],{workStage:0}).descriptor;
+  assert.deepEqual(descriptor.parts[0].result.sliders,sliders);keys.push(descriptor.key);
  }
+ assert.notEqual(keys[0],keys[1]);
 });
 
 test('a different saved mix invalidates playback identity, but old projects remain unprocessed',()=>{

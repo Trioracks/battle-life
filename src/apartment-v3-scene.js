@@ -1,19 +1,19 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {ApartmentAnimation} from './apartment-v3-animation.js?rev=25';
-import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=25';
-import {homeLight} from './apartment-v3-time.js?rev=25';
-import {createBackdropMaterial,sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=25';
+import {ApartmentAnimation} from './apartment-v3-animation.js?rev=26';
+import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=26';
+import {homeLight} from './apartment-v3-time.js?rev=26';
+import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=26';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=7';
-import {CameraModes,cameraPose,pickVisible} from './apartment-v3-camera.js?rev=21';
+import {CameraModes,cameraPose,pickVisible,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=26';
 import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=21';
 import {createSmoke} from './apartment-v3-smoke.js?rev=21';
 import {createRetroPass} from './apartment-v3-retro.js?rev=11';
 import {createComputerView} from './apartment-v3-computer.js?rev=21';
-import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=25';
+import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=26';
 import {pcPresentation} from './virtual-pc-presentation.js?rev=21';
-import {createWardrobeFurniture} from './home-wardrobe.js?rev=25';
-import {applySwitchStyle} from './apartment-switch-style.js?rev=25';
+import {createWardrobeFurniture} from './home-wardrobe.js?rev=26';
+import {applySwitchStyle} from './apartment-switch-style.js?rev=26';
 
 export async function createApartmentScene(canvas,config){
   const BASE=config.assetBase??'./assets/apartment/v3/';
@@ -26,33 +26,22 @@ export async function createApartmentScene(canvas,config){
   const far=config.exterior?.farPlane??80;
   const camera=new THREE.OrthographicCamera(-5,5,2.7,-2.7,.1,far);
   const modes=new CameraModes(),firstCamera=new THREE.PerspectiveCamera(60,1,.03,far);
-  let staticScene=null,staticPending=null,disposed=false,updateOutside=()=>{};const backdropSets=new Map();
+  let disposed=false;
   const basePosition=new THREE.Vector3(...config.camera.position),baseTarget=new THREE.Vector3(...config.camera.target);
   camera.position.copy(basePosition);camera.lookAt(baseTarget);
   const loader=new GLTFLoader();
-  const textureLoader=new THREE.TextureLoader(),textureCache=new Map();
-  function loadTexture(file){
-    if(!textureCache.has(file))textureCache.set(file,textureLoader.loadAsync(BASE+file+'?rev=21').then(texture=>{
-      texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=renderer.capabilities.getMaxAnisotropy();return texture;
-    }).catch(error=>{textureCache.delete(file);throw error;}));return textureCache.get(file);
-  }
-  const stateFiles=config.lightingStates??{both:{night:config.background,day:config.backgroundDay}};
-  const [stateEntries,environment,model]=await Promise.all([
-    Promise.all(Object.entries(stateFiles).map(async([name,files])=>[name,{night:await loadTexture(files.night),day:await loadTexture(files.day)}])),
-    loader.loadAsync(BASE+config.geometry+'?rev=21'),loader.loadAsync(BASE+config.rig+'?rev=21')
+  const [environment,model,staticModel]=await Promise.all([
+    loader.loadAsync(BASE+config.geometry+'?rev=21'),loader.loadAsync(BASE+config.rig+'?rev=21'),loader.loadAsync(BASE+config.staticGeometry+'?rev=21')
   ]);
-  const lightingStates=Object.fromEntries(stateEntries);
-  backdropSets.set('2D',lightingStates);
-  const back=new THREE.Mesh(new THREE.PlaneGeometry(config.camera.width,config.camera.height),createBackdropMaterial(THREE,lightingStates.both.night,lightingStates.both.day,lightingStates));
-  back.position.copy(baseTarget).add(basePosition.clone().sub(baseTarget).normalize().multiplyScalar(-8));
-  back.quaternion.copy(camera.quaternion);back.renderOrder=-100;scene.add(back);
+  const staticScene=staticModel.scene;
+  staticScene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
+  const updateOutside=createOutsideLighting(staticScene);scene.add(staticScene);
   const depthMaterial=new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:true,side:THREE.DoubleSide});
-  const courtyard=new THREE.Group(),outsideMask=new THREE.Group();scene.add(courtyard,outsideMask);
+  const courtyard=new THREE.Group();scene.add(courtyard);
   let updateCourtyard=()=>{},smokeSeconds=0;
   if(config.exterior){
-    const [outside,mask]=await Promise.all([loader.loadAsync(BASE+config.exterior.geometry+'?rev=21'),loader.loadAsync(BASE+config.exterior.occluders+'?rev=21')]);
-    courtyard.add(outside.scene);outsideMask.add(mask.scene);updateCourtyard=createCourtyardLighting(THREE,courtyard);
-    outsideMask.traverse(o=>{if(o.isMesh){o.material=depthMaterial;o.renderOrder=-60;}});
+    const outside=await loader.loadAsync(BASE+config.exterior.geometry+'?rev=21');
+    courtyard.add(outside.scene);updateCourtyard=createCourtyardLighting(THREE,courtyard);
   }
   const smoke=createSmoke(THREE,config.exterior??{emitters:[]});scene.add(smoke.root);
   environment.scene.traverse(o=>{
@@ -60,8 +49,6 @@ export async function createApartmentScene(canvas,config){
     o.castShadow=true;o.receiveShadow=true;
     if(o.name.startsWith('depth-')){o.material=depthMaterial;o.renderOrder=-50;}
     else if(o.userData.apartment_role!=='computer-live')for(const material of Array.isArray(o.material)?o.material:[o.material]){material.roughness=.86;material.color.multiplyScalar(.58);}
-    const bulbRoom=o.name.match(/^lamp-(living|kitchen)-bulb/)?.[1];
-    if(bulbRoom&&config.lampFixtures?.[bulbRoom]?.bakedBulb){o.visible=false;o.castShadow=false;}
   });scene.add(environment.scene);
   const switchStyle=applySwitchStyle(THREE,environment.scene);
   const wardrobe=createWardrobeFurniture(THREE);environment.scene.add(wardrobe);
@@ -80,20 +67,14 @@ export async function createApartmentScene(canvas,config){
   model.scene.updateMatrixWorld(true);
   const head=model.scene.getObjectByName('head');
   const eyeHeight=head?head.getWorldPosition(new THREE.Vector3()).y+.09:1.61;
-  async function loadMode(mode){
-    if(mode==='3D'){
-      if(staticScene)return;
-      staticPending??=loader.loadAsync(BASE+config.staticGeometry+'?rev=21').then(result=>{
-        if(disposed){result.scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat().filter(Boolean))m.dispose();});return;}
-        staticScene=result.scene;staticScene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});updateOutside=createOutsideLighting(staticScene);staticScene.visible=false;scene.add(staticScene);
-      }).finally(()=>{staticPending=null;});return staticPending;
-    }
-  }
-  let appliedMode='2D';
+  // Both cameras are ready with the same scene. Keep the async mode contract for
+  // camera transitions and the monitor lifecycle without loading a second room.
+  async function loadMode(){if(disposed)throw Error('Scene disposed');}
+  const applySceneVisibility=createSharedSceneVisibility({staticScene,liveScene:environment.scene,courtyard});
   const rect=canvas.getBoundingClientRect();
   const computer=config.computer?createComputerView({THREE,screen:environment.scene.getObjectByName(config.computer.screen),indicator:environment.scene.getObjectByName(config.computer.indicator),viewport:rect}):null;
   let computerSnapshot={phase:'room',zoom:0},computerActive=false;
-  const normalBackdrop=back.material,transitionFrame=new THREE.WebGLRenderTarget(Math.max(1,rect.width),Math.max(1,rect.height));
+  const transitionFrame=new THREE.WebGLRenderTarget(Math.max(1,rect.width),Math.max(1,rect.height));
   transitionFrame.texture.colorSpace=THREE.SRGBColorSpace;
   const transitionBackdrop=new THREE.ShaderMaterial({uniforms:{frame:{value:transitionFrame.texture},pcBlend:{value:1}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:'uniform sampler2D frame;uniform float pcBlend;varying vec2 vUv;void main(){gl_FragColor=vec4(texture2D(frame,vUv).rgb,pcBlend);}',transparent:true,depthTest:false,depthWrite:false,toneMapped:false});
   const transitionQuad=new THREE.Mesh(new THREE.PlaneGeometry(2,2),transitionBackdrop);transitionQuad.frustumCulled=false;transitionQuad.renderOrder=1000;transitionQuad.visible=false;scene.add(transitionQuad);
@@ -106,19 +87,14 @@ export async function createApartmentScene(canvas,config){
     if(fp){firstCamera.position.fromArray(pose.position);firstCamera.rotation.set(pose.pitch,pose.yaw,0,'YXZ');firstCamera.updateMatrixWorld();}
     else{
       camera.position.fromArray(pose.position);camera.lookAt(new THREE.Vector3(...pose.target));camera.updateMatrixWorld();
-      const view=config.cameraViews?.[modes.mode]??config.camera;
-      back.position.fromArray(view.target).add(new THREE.Vector3(...view.position).sub(new THREE.Vector3(...view.target)).normalize().multiplyScalar(-8));back.quaternion.copy(camera.quaternion);
     }
-    appliedMode=modes.mode;back.visible=!fp;actor.visible=!fp&&pcActorVisible(state,computerActive,computerSnapshot.workActor);shadowFloor.visible=actor.visible;shadow.visible=actor.visible&&shadow.visible;bones.visible=actor.visible&&bones.visible;
-    if(staticScene){staticScene.visible=fp;staticScene.traverse(o=>{if(o.name.startsWith('static-cutaway-shell-'))o.visible=true;});}
-    courtyard.visible=fp;outsideMask.visible=!fp;smoke.root.visible=true;
-    environment.scene.traverse(o=>{if(o.name.startsWith('depth-'))o.visible=!fp;if(/^lamp-(living|kitchen)-bulb/.test(o.name))o.visible=fp;});
+    applySceneVisibility({mode:modes.mode,computerActive});
+    actor.visible=!fp&&pcActorVisible(state,computerActive,computerSnapshot.workActor);shadowFloor.visible=actor.visible;shadow.visible=actor.visible&&shadow.visible;bones.visible=actor.visible&&bones.visible;
+    smoke.root.visible=true;
     if(computerActive){
       const zoom=computerSnapshot.zoom??0,blend=1-THREE.MathUtils.smoothstep(zoom,0,.10);
-      staticScene.visible=true;staticScene.traverse(o=>{if(o.name.startsWith('static-cutaway-shell-'))o.visible=false;});
-      back.visible=false;transitionBackdrop.uniforms.pcBlend.value=blend;transitionQuad.visible=blend>0;
-      actor.visible=false;shadowFloor.visible=false;shadow.visible=false;bones.visible=false;outsideMask.visible=false;courtyard.visible=true;
-      environment.scene.traverse(o=>{if(o.name.startsWith('depth-'))o.visible=false;});
+      transitionBackdrop.uniforms.pcBlend.value=blend;transitionQuad.visible=blend>0;
+      actor.visible=false;shadowFloor.visible=false;shadow.visible=false;bones.visible=false;
     }
   }
   const actorColors=[];
@@ -174,9 +150,13 @@ export async function createApartmentScene(canvas,config){
       const f=surface&&surface.point.y<.12&&normal?.y>.7?{distance:surface.distance,x:surface.point.x}:null;
       return pickVisible(hits,blockers,f);
     }
-    const blocker=ray.intersectObject(environment.scene,true).find(hit=>{for(let o=hit.object;o;o=o.parent)if(!o.visible)return false;return true;}),distance=blocker?.distance??Infinity;
+    const blocker=ray.intersectObjects([staticScene,environment.scene],true).find(hit=>{for(let o=hit.object;o;o=o.parent)if(!o.visible)return false;return true;}),distance=blocker?.distance??Infinity;
     const hit=ray.intersectObjects(targets)[0];if(hit&&hit.distance<=distance+.025)return {id:hit.object.userData.action};
     const hero=ray.intersectObject(actor,true).find(hit=>{for(let o=hit.object;o;o=o.parent)if(!o.visible)return false;return true;});if(hero&&hero.distance<=distance+.025)return {hero:true};
+    // The furnished floor has thickness above the old mathematical y=0 plane.
+    // Walk on its visible upper surface just as the first-person camera does.
+    const normal=blocker?.face?.normal.clone().transformDirection(blocker.object.matrixWorld);
+    if(blocker&&blocker.point.y<.12&&normal?.y>.7)return {x:blocker.point.x};
     if(ray.ray.intersectPlane(floor,point)&&ray.ray.origin.distanceTo(point)<=distance+.025)return {x:point.x};return {};
   }
   function resize(){const r=canvas.getBoundingClientRect(),aspect=r.width/r.height,h=Math.max(4.1,5.6/aspect);
@@ -192,12 +172,11 @@ export async function createApartmentScene(canvas,config){
   }
   function render(state,dt,{skeleton=false,paused=false,instant=false}={}){
     applyCamera(state);
-    back.visible=true;environment.scene.visible=true;actor.visible=true;
+    environment.scene.visible=true;actor.visible=true;
     shadowFloor.visible=true;practical.sky.visible=true;practical.window.visible=true;
     hemi.intensity=0;key.intensity=0;fill.intensity=0;
     for(const room of ['living','kitchen']){
       lightLevels[room]=THREE.MathUtils.lerp(lightLevels[room],Number(roomLights[room]),dt>0?1-Math.exp(-dt*24):1);
-      normalBackdrop.uniforms[room+'Light'].value=lightLevels[room];
       const rocker=switchRockers[room];if(rocker.object)rocker.object.rotation.x=rocker.rotation+(roomLights[room]?-.12:.12);
       for(const material of bulbMaterials[room])material.emissiveIntensity=3*lightLevels[room];
     }
@@ -207,7 +186,6 @@ export async function createApartmentScene(canvas,config){
     smoke.update(smokeSeconds,light.daylight);updateCourtyard(light.daylight);
     scene.background.setRGB(.025+.22*light.daylight,.035+.29*light.daylight,.055+.34*light.daylight);
     lastEntryOpen=state.entryOpen??0;landingReveal.apartment(lastEntryOpen);
-    normalBackdrop.uniforms.daylight.value=light.daylight;normalBackdrop.uniforms.warmth.value=light.warmth;
     actor.position.fromArray(state.position);actor.rotation.y=state.yaw;
     const threshold=config.entryDoor?.threshold;
     const exteriorProgress=Number.isFinite(threshold)?(state.position[0]-threshold)/1.75:(-state.position[2]-1.45)/.65;
@@ -235,11 +213,11 @@ export async function createApartmentScene(canvas,config){
   const previewCamera=new THREE.OrthographicCamera(-1,1,1.1,-1.1,.1,20);
   previewCamera.position.set(0,1.08,5);previewCamera.lookAt(0,.94,0);
   function renderPreview(dt,yaw,rect,zone='body',zoom=1){
-    courtyard.visible=outsideMask.visible=smoke.root.visible=false;
+    courtyard.visible=smoke.root.visible=false;transitionQuad.visible=false;
     scene.background.set('#12120f');
     mealPlate.visible=spoon.visible=false;
     if(staticScene)staticScene.visible=false;
-    back.visible=false;environment.scene.visible=false;plate.visible=false;food.visible=false;water.visible=false;ring.visible=false;bones.visible=false;
+    environment.scene.visible=false;plate.visible=false;food.visible=false;water.visible=false;ring.visible=false;bones.visible=false;
     shadowFloor.visible=false;practical.update({daylight:0,living:0,kitchen:0});practical.sky.visible=false;practical.window.visible=false;
     hemi.intensity=2;key.intensity=2.5;fill.intensity=.8;
     actor.visible=true;actor.position.set(0,0,0);actor.rotation.y=yaw;
@@ -256,9 +234,9 @@ export async function createApartmentScene(canvas,config){
   peepholeCamera.position.fromArray(config.peepholeCamera?.position??[6.61,1.645,.675]);
   peepholeCamera.lookAt(new THREE.Vector3(...(config.peepholeCamera?.target??[9.05,1.51,-.15])));
   function renderPeephole(rect){
-    courtyard.visible=outsideMask.visible=smoke.root.visible=false;mealPlate.visible=spoon.visible=false;
+    courtyard.visible=smoke.root.visible=false;transitionQuad.visible=false;mealPlate.visible=spoon.visible=false;
     if(staticScene)staticScene.visible=false;
-    back.visible=false;actor.visible=false;shadow.visible=false;ring.visible=false;bones.visible=false;plate.visible=false;food.visible=false;water.visible=false;
+    actor.visible=false;shadow.visible=false;ring.visible=false;bones.visible=false;plate.visible=false;food.visible=false;water.visible=false;
     environment.scene.visible=true;landingReveal.peephole();
     const visible=[];
     environment.scene.traverse(o=>{if(!o.isMesh)return;let inLanding=false;for(let p=o;p;p=p.parent)if(p===landing)inLanding=true;visible.push([o,o.visible]);o.visible=inLanding;});
@@ -278,5 +256,5 @@ export async function createApartmentScene(canvas,config){
     point.y+=.24;point.project(modes.mode==='3D'?firstCamera:camera);
     return {x:rect.left+(point.x+1)*rect.width/2,y:rect.top+(1-point.y)*rect.height/2,visible:actor.visible&&!computerActive&&modes.mode!=='3D'};
   }
-  return {modes,loadMode,prepareComputerView,beginComputerView,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,getHeadScreenPosition,clips:[...animation.actions.keys()],dispose(){disposed=true;switchStyle.dispose();computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,outsideMask])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
+  return {modes,loadMode,prepareComputerView,beginComputerView,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,getHeadScreenPosition,clips:[...animation.actions.keys()],dispose(){disposed=true;switchStyle.dispose();computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,staticScene])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
 }

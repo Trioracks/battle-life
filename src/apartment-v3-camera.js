@@ -1,4 +1,17 @@
 const DEG=Math.PI/180;
+// Camera changes may hide the authored front wall/ceiling, never replace the
+// furnished room or reset live doors, blankets, switches and interaction targets.
+export function createSharedSceneVisibility({staticScene,liveScene,courtyard}){
+ const shell=[],proxies=[],bulbs=[];
+ staticScene.traverse(o=>{if(o.name.startsWith('static-cutaway-shell-'))shell.push(o);});
+ liveScene.traverse(o=>{if(o.name.startsWith('depth-'))proxies.push(o);if(/^lamp-(living|kitchen)-bulb/.test(o.name))bulbs.push(o);});
+ return ({mode,computerActive=false})=>{
+  staticScene.visible=liveScene.visible=courtyard.visible=true;
+  for(const object of shell)object.visible=mode==='3D'&&!computerActive;
+  for(const object of proxies)object.visible=false;
+  for(const object of bulbs)object.visible=true;
+ };
+}
 export class CameraPointer{
  constructor(){this.active=false;this.x=0;this.y=0;}
  start(event,firstPerson){if(event.button!==2||!firstPerson)return false;this.active=true;this.x=event.clientX;this.y=event.clientY;return true;}

@@ -1,6 +1,6 @@
-import {createVirtualPcState} from './virtual-pc-state.js?rev=25';
-import {softwareDiskBytes,withSoftware} from './pc-software.js?rev=25';
-import {SOFTWARE} from './pc-software-catalog.js?rev=25';
+import {createVirtualPcState} from './virtual-pc-state.js?rev=26';
+import {softwareDiskBytes,withSoftware} from './pc-software.js?rev=26';
+import {SOFTWARE} from './pc-software-catalog.js?rev=26';
 const RATES=[24,31,37,28,35,26];
 const PERIOD_BYTES=RATES.reduce((n,r)=>n+r*60000,0);
 export function gameMinuteStamp(clock){return Number.isSafeInteger(clock?.day)&&clock.day>=1&&Number.isFinite(clock.minutes)&&clock.minutes>=0&&clock.minutes<1440?(clock.day-1)*1440+clock.minutes:null;}

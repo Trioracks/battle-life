@@ -1,6 +1,7 @@
-import {diskUsage} from './virtual-pc-state.js?rev=25';
+import {diskUsage} from './virtual-pc-state.js?rev=26';
 import {formatDiskGb,diskAmount} from './virtual-pc-disk-view.js?rev=21';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=25';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=26';
+import {SOFTWARE} from './pc-software-catalog.js?rev=26';
 export const EXPLORER_PATHS=Object.freeze({
   computer:{label:'Мой компьютер',address:'Мой компьютер',parent:null,iconId:'computer'},
   disk:{label:'Локальный диск (C:)',address:'C:\\',parent:'computer',iconId:'disk'},
@@ -12,7 +13,7 @@ export const EXPLORER_PATHS=Object.freeze({
 export function explorerPaths(state={}){
  const paths={...EXPLORER_PATHS};
  for(const [id,app]of Object.entries(state.software??{})){
-  if(!['client','ft'].includes(id)||!app.installed)continue;
+  if(!SOFTWARE[id]||!app.installed)continue;
   const parts=app.path.slice(3).split('\\');let parent='disk',address='C:';
   for(const label of parts){address+='\\'+label;const key=Object.keys(paths).find(k=>paths[k].address.toLowerCase()===address.toLowerCase())??address;paths[key]={label,address,parent,iconId:'folder'};parent=key;}
   if(id==='ft')for(const label of ['Data','Projects','Plugins','Presets'])paths[address+'\\'+label]={label,address:address+'\\'+label,parent,iconId:'folder'};
@@ -49,11 +50,11 @@ export function explorerEntries(pcState,path) {
   const paths=explorerPaths(pcState),entries=Object.entries(paths).filter(([,p])=>p.parent===path).map(([id,p])=>({id,kind:id==='disk'?'disk':'folder',name:p.label,iconId:p.iconId,targetPath:id}));
   const s=pcState.software;
   if(path==='downloads'&&s){
-   for(const [id,app,name,total]of [['client',s.client,'torent-setup.exe',2000000],['ft',s.ft,'FT-Studio-setup.zip',800000000]])if(app.receivedBytes>0)entries.push({id:'archive:'+id,kind:'artifact',name:name+(app.receivedBytes<total?'.part':''),iconId:'project',sizeMb:app.receivedBytes/1000000,...(app.receivedBytes===total?{action:'installer',appId:id}:{})});
+   for(const [id,definition]of Object.entries(SOFTWARE)){const app=s[id],total=definition.downloadBytes;if(app?.receivedBytes>0)entries.push({id:'archive:'+id,kind:'artifact',name:definition.archive+(app.receivedBytes<total?'.part':''),iconId:'project',sizeMb:app.receivedBytes/1000000,...(app.receivedBytes===total?{action:'installer',appId:id}:{})});}
    if(s.metadata)entries.push({id:'ft-metadata',kind:'artifact',name:'FT-Studio.torrent',iconId:'torent',sizeMb:.012,action:'open-metadata'});
   }
-  for(const [id,app]of Object.entries(s??{}))if(['client','ft'].includes(id)&&app.installed&&paths[path]?.address.toLowerCase()===app.path.toLowerCase()){
-   entries.push({id:'exe:'+id,kind:'application',name:id==='ft'?'FT Studio.exe':'torent.exe',iconId:id==='ft'?'studio':'torent',appId:id==='ft'?'ft-studio':'torent'});
+  for(const [id,app]of Object.entries(s??{}))if(SOFTWARE[id]&&app.installed&&paths[path]?.address.toLowerCase()===app.path.toLowerCase()){
+   entries.push({id:'exe:'+id,kind:'application',name:SOFTWARE[id].name+'.exe',iconId:id==='ft'?'studio':id==='notebook'?'documents':'torent',appId:id==='ft'?'ft-studio':id==='notebook'?'rap-notebook':'torent'});
    if(id==='client')entries.push({id:'config:client',kind:'file',name:'settings.dat',iconId:'project'});
   }
   return entries;
@@ -64,6 +65,7 @@ export function explorerProperties(state,entry) {
   }
   const p=state.projects.find(p=>p.id===entry?.projectId);
   let type=({project:'Проект FT Studio',folder:'Папка',application:'Приложение',file:'Файл конфигурации'})[entry?.kind]??'Файл';
+  if(p?.kind==='lyrics')type='Документ Рэпблокнота';
   if(entry?.kind==='artifact')type=({part:'Незавершённая загрузка',torrent:'Файл метаданных BitTorrent',zip:'Архив ZIP',exe:'Приложение'})[entry.name.split('.').pop().toLowerCase()]??'Файл';
   return {title:'Свойства: '+(entry?.name??'Объект'),rows:[{label:'Имя',value:entry?.name??''},{label:'Тип',value:type},...(p?[{label:'Размер',value:'2 МБ'},{label:'Баттл',value:BATTLE_BRIEFS.find(b=>b.id===p.battleId)?.title??'Не указан'}]:[])]};
 }

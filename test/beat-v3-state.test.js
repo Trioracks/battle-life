@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=25';
-import {createBeat,startBeatStage,advanceBeatWork,normalizeBeat} from '../src/beat-production.js?rev=25';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=26';
+import {createBeat,startBeatStage,advanceBeatWork,normalizeBeat} from '../src/beat-production.js?rev=26';
 const seed=()=>createVirtualPcState({power:'on',download:{status:'installed'}});
 const make=(skill=25,random=()=>0)=>createBeat(seed(),{id:'a',name:'Первый'},{beatmaking:skill},random);
 
@@ -18,8 +18,9 @@ test('v3_only_requires_name and skill_tier_is_pinned through the free-bank bound
 test('choices_survive_roundtrip_and_resume without hidden rerolls or duplicate practice',()=>{
  let calls=0;const random=()=>[0,.5,.99][calls++%3],made=make(25,random);
  assert.equal(made.ok,true);assert.equal(calls,3);
- let s=made.state;const original=structuredClone(s.projects[0]);
+ let s=made.state;
  s=startBeatStage(s,'a',undefined,{beatmaking:25},()=>.4).state;
+ const original=structuredClone(s.projects[0]);
  assert.ok(s.music.job);assert.deepEqual(s.music.job.sliders,[4,4,4]);
  s=advanceBeatWork(s,10).state;
  s=createVirtualPcState(JSON.parse(JSON.stringify(s)));
@@ -33,7 +34,7 @@ test('choices_survive_roundtrip_and_resume without hidden rerolls or duplicate p
  assert.deepEqual(done.state.projects[0].audio,original.audio);
 });
 
-test('sliders_do_not_change_quality for new completions',()=>{
+test('saved slider fit affects new result quality but cannot make a novice professional',()=>{
  const qualities=[];
  for(const values of [[0,0,0],[10,10,10],[9,3,2]]){
   // Explicit genre keeps this regression executable against the previous implementation.
@@ -41,7 +42,7 @@ test('sliders_do_not_change_quality for new completions',()=>{
   s=startBeatStage(s,'a',values,{beatmaking:25}).state;
   s=advanceBeatWork(s,600).state;qualities.push(s.projects[0].stages[0].quality);
  }
- assert.deepEqual(qualities,[25,25,25]);
+ assert.ok(qualities[2]>qualities[0]);assert.ok(qualities[0]>qualities[1]);assert.ok(Math.max(...qualities)<50);
 });
 
 test('legacy_job_keeps_sources_and_progress while new completions ignore sliders',()=>{

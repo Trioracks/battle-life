@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=25';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=26';
 import {DRUMS} from '../src/beat-catalog.js';
-import {createBeat,startBeatStage,advanceBeatWork,acquireDrum,restoreMusicNeeds,installRipline,cleanMusicVirus} from '../src/beat-production.js?rev=25';
+import {createBeat,startBeatStage,advanceBeatWork,acquireDrum,restoreMusicNeeds,installRipline,cleanMusicVirus} from '../src/beat-production.js?rev=26';
 const seed=()=>createVirtualPcState({power:'on',download:{status:'installed'}});
 const make=(state=seed(),skill=10,assetId=null)=>createBeat(state,{id:'beat-1',name:'Ночной двор',genre:'boombap',assetId},{beatmaking:skill},()=>.4).state;
 test('catalog preserves fifteen original paths and 90 BPM; free unlock is 40',()=>{
@@ -42,7 +42,7 @@ test('working half a stage awards one sixth practice immediately and preserves i
  assert.ok(Math.abs(done.state.music.practice-2.8333333333333335)<1e-10);
  assert.ok(Math.abs(done.state.music.genrePractice.boombap-7.583333333333333)<1e-10);
  assert.ok(Math.abs(done.practiceGained-1/3)<1e-10);
- assert.equal(done.state.projects[0].stages[0].quality,13);
+ assert.equal(done.state.projects[0].stages[0].quality,13.6);
 });
 
 test('legacy partial work keeps earned totals at load and credits its unawarded effort only once',()=>{

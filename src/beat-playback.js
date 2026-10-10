@@ -1,6 +1,6 @@
 import {drumById,loopSeconds} from './beat-catalog.js';
 import {beginnerById} from './beat-beginner-bank.js?rev=21';
-import {normalizeBeatMix} from './beat-mix.js?rev=25';
+import {normalizeBeatMix} from './beat-mix.js?rev=26';
 
 // A project has one musical clock, even when a legacy drum loop is shorter.
 export function resolveBeatPlayback(beat,{workStage=null}={}){
@@ -13,7 +13,10 @@ export function resolveBeatPlayback(beat,{workStage=null}={}){
  if(!validDrum||modern&&(beat.audioIssue||beat.audio?.bankVersion!==1||beat.audio?.bars!==4||beginnerById(ids[1])?.kind!=='theme'||beginnerById(ids[2])?.kind!=='arrangement'))return fail('Не найден аудиобанк проекта. Проект сохранён.');
  const chosen=workStage===null?ids.slice(0,Math.min(3,beat.stages.length)):[ids[workStage]];
  if(!chosen.length)return fail('Сначала завершите ритмическую основу.');
- const owner=workStage===null?'studio':'work',parts=chosen.map(id=>({id,loopSeconds:beginnerById(id)?32/3:loopSeconds()}));
  const mix=normalizeBeatMix(beat.mix);
+ const owner=workStage===null?'studio':'work',parts=chosen.map((id,index)=>{
+  const part={id,loopSeconds:beginnerById(id)?32/3:loopSeconds()},layer=mix?.version===2?mix.layers[workStage??index]:null;
+  if(layer)part.result=layer;return part;
+ });
  return {ok:true,reason:'',descriptor:{key:JSON.stringify([beat.id,owner,workStage,chosen,mix]),owner,durationSeconds,parts,mix}};
 }

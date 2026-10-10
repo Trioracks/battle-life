@@ -1,8 +1,8 @@
 import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=21';
 const button=pcButton;
-import {SOFTWARE} from './pc-software-catalog.js?rev=25';
-import {softwareDiskBytes} from './pc-software.js?rev=25';
-import {downloadPresentation} from './virtual-pc-runtime.js?rev=25';
+import {SOFTWARE} from './pc-software-catalog.js?rev=26';
+import {softwareDiskBytes} from './pc-software.js?rev=26';
+import {downloadPresentation} from './virtual-pc-runtime.js?rev=26';
 export const softwareMessage=reason=>({'client-required':'Сначала скачай и установи torent из темы клиента.','metadata-required':'Сначала скачай файл FT-Studio.torrent.','insufficient-space':'Недостаточно места на C:. Загрузка сохранена; освободи место или отмени задачу.','invalid-path':'Укажи папку на игровом C: без .. и специальных символов.','transfer-active':'Сначала заверши или отмени текущую загрузку.','archive-required':'Сначала дождись полной загрузки установщика.','already-installed':'Программа уже установлена.','installer-active':'Сначала закрой текущий мастер установки.','pc-off':'Включи игровой компьютер.'}[reason]??reason??'');
 export function softwareForum(d,{topic,state,navigate,onAction,message=''}){
  const button=(doc,text,options={},handler)=>pcButton(doc,text,{...options,className:'uw-control '+(options.className??'')},handler);
@@ -12,12 +12,21 @@ export function softwareForum(d,{topic,state,navigate,onAction,message=''}){
  if(!topic){
   site.append(el(d,'h1',{text:'Программы и утилиты'}));
   const list=el(d,'div',{className:'dump-topic-list'}),heading=el(d,'div',{className:'dump-list-heading'});heading.append(el(d,'span',{text:'Тема / раздел'}),el(d,'span',{text:'Размер'}),el(d,'span',{text:'Статус'}));list.append(heading);
-  for(const [category,title,id,description,size]of [['Клиенты загрузок','torent — торрент-клиент','client','Установщик · прямая загрузка','2 МБ'],['Музыкальные программы','FT Studio — домашняя студия','ft-studio','Метаданные 12 КБ · загрузка в клиенте','800 МБ']]){
+  for(const [category,title,id,description,size]of [['Клиенты загрузок','torent — торрент-клиент','client','Установщик · прямая загрузка','2 МБ'],['Музыкальные программы','FT Studio — домашняя студия','ft-studio','Метаданные 12 КБ · загрузка в клиенте','800 МБ'],['Текстовые редакторы','Рэпблокнот — тексты и рифмы','notebook','Установщик · прямая загрузка','4 МБ']]){
    const row=el(d,'article',{className:'dump-topic-row'}),titleCell=el(d,'div',{className:'dump-topic-title'}),status=el(d,'div',{className:'dump-topic-status'});
    titleCell.append(el(d,'small',{text:category}),button(d,title,{},()=>navigate('underweb://dump/'+id)),el(d,'span',{text:description}));status.append(el(d,'strong',{text:'Закреплено'}),el(d,'small',{text:'sysop · 1 сообщение'}));
    row.append(el(d,'span',{className:'dump-topic-mark',text:'▣',attributes:{'aria-hidden':'true'}}),titleCell,el(d,'span',{className:'dump-topic-size',text:size}),status);list.append(row);
   }
   for(const title of ['Графика','Игры','Системы']){const row=el(d,'article',{className:'dump-category-row'});row.append(el(d,'span',{className:'dump-topic-mark',text:'□',attributes:{'aria-hidden':'true'}}),el(d,'strong',{text:title}),el(d,'span',{text:'Обсуждения · загрузок пока нет'}));list.append(row);}site.append(list);
+ }else if(topic==='notebook'){
+  const app=SOFTWARE.notebook,installed=state.software.notebook,post=el(d,'article',{className:'dump-post'}),body=el(d,'div'),actions=el(d,'div',{className:'dump-attachments'});
+  site.append(el(d,'h1',{text:'Рэпблокнот — тексты и рифмы'}));post.append(el(d,'aside',{text:'slogoman\nУчастник\nС нами с 2011'}));
+  body.append(el(d,'small',{text:'Бесплатный редактор · Windows HP'}),el(d,'h2',{text:'Не потеряй первую мысль'}),el(d,'p',{text:'Черновики для баттлов и собственных треков. Три этапа письма, доработка куплетов и адаптация под бит. torent не требуется.'}),el(d,'p',{text:'Установщик: 4 МБ · Программа: 12 МБ · Установка: 10 секунд'}));
+  const download=button(d,'Скачать установщик Рэпблокнот',{},()=>onAction('download-notebook'));download.disabled=installed.installed||installed.receivedBytes===app.downloadBytes||state.software.task?.appId==='notebook';actions.append(download);
+  if(installed.receivedBytes===app.downloadBytes&&!installed.installed)actions.append(button(d,'Открыть установщик Рэпблокнот',{},()=>onAction('installer','notebook')));
+  if(installed.installed)actions.append(el(d,'strong',{text:'Рэпблокнот установлен · '+installed.path}));
+  if(state.software.task?.appId==='notebook'){const p=downloadPresentation(state);actions.append(el(d,'p',{dataset:{pcRole:'forum-transfer'},text:`Загрузка: ${p.receivedMb.toFixed(2)} / ${p.totalMb} МБ · ${p.speedKbPerSecond} КБ/с`}),button(d,'Отменить загрузку',{},()=>onAction('cancel')));}
+  body.append(actions);post.append(body);site.append(post);
  }else{
   const client=topic==='client',id=client?'client':'ft',app=SOFTWARE[id],post=el(d,'article',{className:'dump-post'}),body=el(d,'div');
   site.append(el(d,'h1',{text:client?'torent — торрент-клиент':'FT Studio — домашняя студия'}));

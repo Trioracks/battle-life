@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=25';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=25';
-import {advanceBeatWork,createBeat,startBeatStage,restoreMusicNeeds} from '../src/beat-production.js?rev=25';
-import {createStudioProject} from '../src/ft-studio-project.js?rev=25';
+import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=26';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=26';
+import {advanceBeatWork,createBeat,startBeatStage,restoreMusicNeeds} from '../src/beat-production.js?rev=26';
+import {createStudioProject} from '../src/ft-studio-project.js?rev=26';
 import {pcDocument,allPc,findButton,fire} from './helpers/virtual-pc-dom.js';
 function setup(){const d=pcDocument(),root=d.createElement('section');let launch,work=0;const pc=mountVirtualPc(root,{audio:{stop(){},dispose(){}},beatAudio:{play:async()=>true,stop(){},dispose(){}},setTimeoutFn:f=>(launch=f,1),clearTimeoutFn(){},onWork:()=>{work++;return true;}});pc.showDesktop(createVirtualPcState({power:'on',download:{status:'installed'}}));pc.syncHost({playerName:'Игрок',clockLabel:'10:00',skills:{beatmaking:40}});return {pc,root,launch:()=>launch(),work:()=>work};}
 const field=(root,label)=>allPc(root).find(n=>n.getAttribute('aria-label')===label);
@@ -12,12 +12,21 @@ test('FT creates a beat without tempo editing and retains inputs across host tic
  const name=field(s.root,'Название бита');assert.ok(name);name.value='Город';fire(name,'input');name.focus();
  s.pc.syncHost({playerName:'Игрок',clockLabel:'10:01',skills:{beatmaking:40}});assert.equal(field(s.root,'Название бита'),name);assert.equal(name.value,'Город');
  findButton(s.root,'Начать проект').click();assert.equal(s.pc.state.projects[0].name,'Город');assert.match(s.pc.state.projects[0].drumId,/free/);
- assert.equal(allPc(s.root).filter(n=>n.type==='range').length,0);assert.equal(field(s.root,'BPM'),undefined);
- findButton(s.root,'Работать над этапом').click();assert.equal(s.work(),1);assert.ok(s.pc.state.music.job);
+ assert.equal(allPc(s.root).filter(n=>n.type==='range').length,3);assert.equal(field(s.root,'BPM'),undefined);
+ const groove=field(s.root,'Ровный грув');groove.value='9';fire(groove,'input');
+ findButton(s.root,'Работать над этапом').click();assert.equal(s.work(),1);assert.ok(s.pc.state.music.job);assert.equal(s.pc.state.music.job.sliders[0],9);
  s.pc.syncState(advanceBeatWork(s.pc.state,600).state);
  const workflow=allPc(s.root).find(n=>n.dataset.ftRole==='workflow');
  assert.ok(allPc(workflow).some(n=>n.textContent?.includes('Музыкальная основа')));
  assert.equal(allPc(s.root).filter(n=>n.dataset.ftRole==='clip').length,3);s.pc.dispose();
+});
+
+test('beginner decisions stay hidden at 25 and appear above 25',()=>{
+ for(const skill of [10,25,26]){
+  const s=setup();s.pc.syncHost({skills:{beatmaking:skill}});
+  const state=createBeat(s.pc.state,{id:'tier',name:'Порог'},{beatmaking:skill}).state;s.pc.syncState(state);s.pc.openProject(state.projects[0]);s.launch();
+  assert.equal(allPc(s.root).filter(n=>n.type==='range').length,skill<=25?0:3);s.pc.dispose();
+ }
 });
 test('local store buys a sample once and RIPLINE is installable',()=>{
  const s=setup();s.pc.open('underweb');s.pc.navigateUnderweb('underweb://samples');

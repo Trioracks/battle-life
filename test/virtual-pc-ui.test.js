@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createVirtualPcState } from '../src/virtual-pc-state.js?rev=25';
-import { mountVirtualPc } from '../src/virtual-pc-ui.js?rev=25';
+import { createVirtualPcState } from '../src/virtual-pc-state.js?rev=26';
+import { mountVirtualPc } from '../src/virtual-pc-ui.js?rev=26';
 import { pcDocument as creatorDocument, fire } from './helpers/virtual-pc-dom.js';
 
 function descendants(root) {

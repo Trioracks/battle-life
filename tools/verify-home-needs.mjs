@@ -11,7 +11,7 @@ async function fixture({satiety=50,energy=72,job=false,denyAudio=false,denyBacku
  await page.route('**/__home-needs-fixture',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><body>Isolated fixture</body>'}));
  await page.goto('http://127.0.0.1:4173/__home-needs-fixture');
  await page.evaluate(async options=>{
-  const [{createProfile,STAT_KEYS,SAVE_KEY},{createVirtualPcState,VIRTUAL_PC_STORAGE_KEY},production]=await Promise.all([import('/src/avatar-v3-profile.js?rev=25'),import('/src/virtual-pc-state.js?rev=25'),import('/src/beat-production.js?rev=25')]);
+  const [{createProfile,STAT_KEYS,SAVE_KEY},{createVirtualPcState,VIRTUAL_PC_STORAGE_KEY},production]=await Promise.all([import('/src/avatar-v3-profile.js?rev=26'),import('/src/virtual-pc-state.js?rev=26'),import('/src/beat-production.js?rev=26')]);
   const profile=createProfile({name:'Проверка дома',allocations:Object.fromEntries(STAT_KEYS.map((k,i)=>[k,i===0?2:1]))});
   localStorage.setItem(SAVE_KEY,JSON.stringify(profile));localStorage.setItem('battle-life-apartment-v3-time',JSON.stringify({day:2,minutes:720,initialRest:false}));
   let state=createVirtualPcState({power:options.job?'on':'off',download:{status:options.job?'installed':'idle'},music:{needs:{satiety:options.satiety,energy:options.energy}}});
@@ -82,7 +82,7 @@ try{
  // Browser controller boundary: hidden state and denied audio never replay or age.
  {
   const context=await browser.newContext(),page=await context.newPage();await page.goto('http://127.0.0.1:4173/');
-  const result=await page.evaluate(async()=>{const {createCharacterSpeech}=await import('/src/character-speech.js?rev=25');let beeps=0;const speech=createCharacterSpeech({beep:()=>beeps++});speech.say('Не могу работать, хочу поесть.');speech.tick(.2);const text=speech.snapshot.text;speech.tick(30,{hidden:true});const frozen=speech.snapshot.text===text;speech.tick(.001);return {frozen,beeps};});
+  const result=await page.evaluate(async()=>{const {createCharacterSpeech}=await import('/src/character-speech.js?rev=26');let beeps=0;const speech=createCharacterSpeech({beep:()=>beeps++});speech.say('Не могу работать, хочу поесть.');speech.tick(.2);const text=speech.snapshot.text;speech.tick(30,{hidden:true});const frozen=speech.snapshot.text===text;speech.tick(.001);return {frozen,beeps};});
   assert.deepEqual(result,{frozen:true,beeps:1});await context.close();console.log('PASS hidden speech freezes text and audio budget without replay');
  }
  assert.deepEqual(errors,[]);console.log('PASS zero page errors');

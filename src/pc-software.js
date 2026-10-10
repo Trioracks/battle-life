@@ -1,4 +1,4 @@
-import {SOFTWARE,METADATA_BYTES,DISK_BYTES,SYSTEM_BYTES} from './pc-software-catalog.js?rev=25';
+import {SOFTWARE,METADATA_BYTES,DISK_BYTES,SYSTEM_BYTES} from './pc-software-catalog.js?rev=26';
 const bytes=(n,max)=>Number.isFinite(n)?Math.max(0,Math.min(max,n)):0;
 export function normalizeInstallPath(value){
  if(typeof value!=='string')return null;
@@ -18,7 +18,7 @@ export function normalizeSoftware(value,legacy={}){
  else if(!source&&old==='downloading'&&ft.receivedBytes<800000000)task={appId:'ft',paused:false,error:'',baseMinute:null,baseBytes:ft.receivedBytes};
  const wizard=source?.installer,id=wizard?.appId,step=wizard?.step;
  const installer=SOFTWARE[id]&&['welcome','destination','summary','install','finish'].includes(step)&&app(id).receivedBytes===SOFTWARE[id].downloadBytes&&(!app(id).installed||step==='finish')?{appId:id,step:step==='finish'&&!app(id).installed?'welcome':step,path:normalizeInstallPath(wizard.path)??SOFTWARE[id].path,elapsedSeconds:step==='install'?bytes(wizard.elapsedSeconds,SOFTWARE[id].installSeconds):step==='finish'&&app(id).installed?SOFTWARE[id].installSeconds:0,error:step==='install'&&wizard.error==='insufficient-space'?'insufficient-space':''}:null;
- return {client,ft,metadata:source?source.metadata===true:['downloading','ready-to-install'].includes(old),task,installer};
+ return {client,ft,notebook:app('notebook'),metadata:source?source.metadata===true:['downloading','ready-to-install'].includes(old),task,installer};
 }
 export function withSoftware(state,software){
  const ft=software.ft;
@@ -27,7 +27,7 @@ export function withSoftware(state,software){
 }
 export function softwareDiskBytes(state){
  const s=normalizeSoftware(state.software,state.download);
- const downloaded=s.client.receivedBytes+s.ft.receivedBytes+(s.metadata?METADATA_BYTES:0),installed=(s.client.installed?8000000:0)+(s.ft.installed?800000000:0),projects=(state.projects?.length??0)*2000000;
+ const downloaded=Object.keys(SOFTWARE).reduce((n,id)=>n+s[id].receivedBytes,0)+(s.metadata?METADATA_BYTES:0),installed=Object.keys(SOFTWARE).reduce((n,id)=>n+(s[id].installed?SOFTWARE[id].installedBytes:0),0),projects=(state.projects?.length??0)*2000000;
  return {downloaded,installed,projects,used:SYSTEM_BYTES+downloaded+installed+projects,free:Math.max(0,DISK_BYTES-SYSTEM_BYTES-downloaded-installed-projects)};
 }
 const result=(state,ok=true,reason='')=>({ok,reason,state});
@@ -39,6 +39,14 @@ export function downloadClient(input){
  if(soft.task)return result(s,soft.task.appId==='client',soft.task.appId==='client'?'':'transfer-active');
  if(softwareDiskBytes(s).free<2000000-soft.client.receivedBytes)return result(s,false,'insufficient-space');
  soft.task={appId:'client',paused:false,error:'',baseMinute:s.lastGameMinute??null,baseBytes:soft.client.receivedBytes};return result(withSoftware(s,soft));
+}
+export function downloadNotebook(input){
+ const s=copy(input),soft=s.software,id='notebook',app=SOFTWARE[id];
+ if(s.power!=='on')return result(s,false,'pc-off');
+ if(soft[id].installed||soft[id].receivedBytes===app.downloadBytes)return result(s);
+ if(soft.task)return result(s,soft.task.appId===id,soft.task.appId===id?'':'transfer-active');
+ if(softwareDiskBytes(s).free<app.downloadBytes-soft[id].receivedBytes)return result(s,false,'insufficient-space');
+ soft.task={appId:id,paused:false,error:'',baseMinute:s.lastGameMinute??null,baseBytes:soft[id].receivedBytes};return result(withSoftware(s,soft));
 }
 export function downloadMetadata(input){
  const s=copy(input);if(s.power!=='on')return result(s,false,'pc-off');if(s.software.metadata)return result(s);

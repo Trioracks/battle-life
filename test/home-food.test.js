@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import * as food from '../src/home-food.js?rev=25';
-import {createVirtualPcState,loadVirtualPcState,saveVirtualPcState,setPcPower,VIRTUAL_PC_STORAGE_KEY} from '../src/virtual-pc-state.js?rev=25';
+import * as food from '../src/home-food.js?rev=26';
+import {createVirtualPcState,loadVirtualPcState,saveVirtualPcState,setPcPower,VIRTUAL_PC_STORAGE_KEY} from '../src/virtual-pc-state.js?rev=26';
 const storage=(map=new Map())=>({getItem:key=>map.get(key)??null,setItem:(key,value)=>map.set(key,value)});
 test('fruit consumes one portion, caps satiety and preserves unrelated state',()=>{
  for(const [satiety,want]of [[50,80],[85,100]]){

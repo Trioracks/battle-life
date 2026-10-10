@@ -1,10 +1,10 @@
 import {pcElement as el,pcButton as button,pcFind,pcFocusable} from './virtual-pc-dom.js?rev=21';
-import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=25';
+import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=26';
 import {BEAT_STAGES} from './beat-catalog.js';
-import {randomBeatName} from './beat-names.js?rev=25';
-import {resolveBeatPlayback} from './beat-playback.js?rev=25';
-import {describeBeatMix} from './beat-mix.js?rev=25';
-import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=25';
+import {randomBeatName} from './beat-names.js?rev=26';
+import {resolveBeatPlayback} from './beat-playback.js?rev=26';
+import {describeBeatMix} from './beat-mix.js?rev=26';
+import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=26';
 
 export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio,legacyName,initialProject}){
  const d=root.ownerDocument,workspace=createStudioWorkspace(d,{projectName:legacyName});root.replaceChildren(workspace);
@@ -45,7 +45,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
    form.append(el(d,'label',{text:'Название проекта'}),naming,el(d,'p',{className:'ft-production-note',text:'Начни с простого. Персонаж сам попробует собрать ритм, тему и аранжировку.'}),button(d,'Начать проект',{className:'ft-primary'},create),notice);
    form.addEventListener('submit',e=>{e.preventDefault();create();});card.append(form);
   }else if(mode==='projects'){
-   const projects=getState().projects;
+   const projects=getState().projects.filter(p=>p.kind!=='lyrics');
    if(!projects.length)card.append(el(d,'p',{className:'ft-production-note',text:'Пока нет сохранённых проектов.'}));
    const list=el(d,'div',{className:'ft-dialog-projects'});
    for(const p of projects)list.append(button(d,p.name+' · '+(p.kind==='beat'?(p.status==='ready'?'готов':p.stages.length+'/3'):'архив'),{className:'ft-project-item'},()=>selectProject(p)));
@@ -83,15 +83,25 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
    const steps=el(d,'ol',{className:'ft-stage-list'});BEAT_STAGES.forEach((item,i)=>steps.append(el(d,'li',{text:(i<stage?'✓ ':i===stage?'→ ':'○ ')+item.name,dataset:{complete:String(i<stage)}})));panel.append(steps);
    for(let i=0;i<stage;i++){
     const result=el(d,'section',{className:'ft-stage-result'});
-    result.append(el(d,'h3',{text:BEAT_STAGES[i].name}),el(d,'p',{text:FT_TRACKS.filter(t=>t.stage===i).map(t=>t.name).join(' · ')}),el(d,'small',{text:beat.version===3?'Навык при работе: '+beat.stages[i].quality+'/100':'Архивный слой · исходные данные сохранены'}));panel.append(result);
+    const layer=beat.mix?.version===2?beat.mix.layers[i]:null;
+    result.append(el(d,'h3',{text:BEAT_STAGES[i].name}),el(d,'p',{text:FT_TRACKS.filter(t=>t.stage===i).map(t=>t.name).join(' · ')}),el(d,'small',{text:layer?'Результат '+layer.quality+'/110 · решения '+Math.round(layer.fit)+'% · битмейкинг '+layer.skills.beatmaking.toFixed(1)+' · звук '+layer.skills.sound.toFixed(1):beat.version===3?'Навык при работе: '+beat.stages[i].quality+'/100':'Архивный слой · исходные данные сохранены'}));panel.append(result);
    }
    if(stage<3){
     panel.append(el(d,'p',{className:'ft-production-note',text:['Начнём с пульса. Персонаж подбирает простой ритм и пробует связать ударные.','Теперь мелодия. Несколько нот, немного атмосферы — у бита появляется тема.','Собираем всё вместе: низ, переходы и небольшие детали.'][stage]}));
     if(job)panel.append(el(d,'p',{text:'Сохранено '+Math.floor(job.elapsed)+' из '+job.total+' мин. Можно продолжить.'}));
     const blocked=beat.audioIssue?'Не найден аудиобанк проекта. Работа сохранена.':workBlockReason(s);
     if(blocked)panel.append(el(d,'p',{className:'ft-warning',text:blocked}));
+    let decisions;
+    if(effectiveBeatSkill(s,getMetadata().skills)>25){
+     decisions=job?[...job.sliders]:[5,5,5];
+     const fields=el(d,'div',{className:'ft-stage-result'});
+     BEAT_STAGES[stage].sliders.forEach((label,i)=>{
+      const row=el(d,'label'),caption=el(d,'span',{text:label+' · '+decisions[i]}),input=el(d,'input',{type:'range',value:String(decisions[i]),attributes:{type:'range',min:'0',max:'10',step:'1','aria-label':label}});
+      input.disabled=Boolean(job);input.addEventListener('input',()=>{decisions[i]=Number(input.value);caption.textContent=label+' · '+decisions[i];});row.append(caption,input);fields.append(row);
+     });panel.append(fields);
+    }
     const work=button(d,job?'Продолжить этап':'Работать над этапом',{className:'ft-primary'},()=>{
-     const r=startBeatStage(getState(),beat.id,undefined,getMetadata().skills);message=r.reason;
+     const r=startBeatStage(getState(),beat.id,decisions,getMetadata().skills);message=r.reason;
      if(r.ok){
       // Resume AudioContext in the click gesture, before the cinematic transition.
       Promise.resolve(audio.unlock?.()).catch(()=>{});audio.stop();onChange(r.state);

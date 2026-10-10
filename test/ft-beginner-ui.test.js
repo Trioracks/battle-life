@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createStudioWorkspace} from '../src/ft-studio-view.js?rev=25';
-import {mountBeatStudio} from '../src/beat-studio-view.js?rev=25';
-import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=25';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=25';
-import {createBeat,startBeatStage,advanceBeatWork,restoreMusicNeeds} from '../src/beat-production.js?rev=25';
+import {createStudioWorkspace} from '../src/ft-studio-view.js?rev=26';
+import {mountBeatStudio} from '../src/beat-studio-view.js?rev=26';
+import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=26';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=26';
+import {createBeat,startBeatStage,advanceBeatWork,restoreMusicNeeds} from '../src/beat-production.js?rev=26';
+import {createLyric} from '../src/lyric-production.js?rev=26';
 import {pcDocument,allPc,findButton,fire} from './helpers/virtual-pc-dom.js';
 const role=(root,key)=>allPc(root).find(n=>n.dataset.ftRole===key);
 function setup(state=createVirtualPcState(),metadata={skills:{beatmaking:10},gameDay:1}){
@@ -13,12 +14,22 @@ function setup(state=createVirtualPcState(),metadata={skills:{beatmaking:10},gam
  const view=mountBeatStudio(root,{getState:()=>state,getMetadata:()=>metadata,onChange:next=>state=next,onWork:()=>{work++;return true;},audio});
  return {d,root,view,audio,get state(){return state;},set state(next){state=next;view.update();},work:()=>work,unlocks:()=>unlocks};
 }
-test('analytics show the saved sound character, not the current character skill',()=>{
- const state=createBeat(createVirtualPcState(),{id:'audio',name:'Sound'},{sound:12}).state;
+
+test('FT project picker excludes notebook documents while keeping legacy music projects',()=>{
+ let state=createLyric(createVirtualPcState({projects:[{id:'legacy',name:'Старый бит'}]}),{id:'text',name:'Не музыка'}).state;
+ const s=setup(state);findButton(s.root,'Открыть проект').click();
+ const labels=allPc(role(s.root,'dialog')).filter(n=>n.className==='ft-project-item').map(n=>n.textContent);
+ assert.ok(labels.some(x=>x.includes('Старый бит')));assert.ok(labels.every(x=>!x.includes('Не музыка')));s.view.dispose();
+});
+test('analytics show the saved layer result and sound skill after the character trains',()=>{
+ let state=createBeat(createVirtualPcState(),{id:'audio',name:'Sound'},{sound:12}).state;
+ state=startBeatStage(state,'audio',[9,3,2],{beatmaking:10,sound:12}).state;state=advanceBeatWork(state,600).state;
  const s=setup(state,{skills:{beatmaking:10,sound:99},gameDay:1});s.view.openProject(state.projects[0]);
  const mix=role(s.root,'mix-character');assert.ok(mix);
- assert.ok(allPc(mix).some(n=>n.textContent?.includes('12/100')));
- assert.ok(!allPc(mix).some(n=>n.textContent?.includes('99/100')));
+ assert.ok(allPc(mix).some(n=>n.textContent?.includes('31.4/110')));
+ const analytics=role(s.root,'analytics');
+ assert.ok(allPc(analytics).some(n=>n.textContent?.includes('Результат 31.4/110')&&n.textContent.includes('звук 12.0')));
+ assert.ok(!allPc(analytics).some(n=>n.textContent?.includes('звук 99')));
  s.view.dispose();
 });
 test('unrelated preview or project playback does not own this FT transport',()=>{

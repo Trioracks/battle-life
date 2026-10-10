@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createVirtualPcState } from '../src/virtual-pc-state.js?rev=25';
-import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from '../src/virtual-pc-catalog.js?rev=25';
+import { createVirtualPcState } from '../src/virtual-pc-state.js?rev=26';
+import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from '../src/virtual-pc-catalog.js?rev=26';
 
 test('the fictional desktop exposes its own apps and reveals ft studio only after install', () => {
   const initialIds = desktopApps(createVirtualPcState()).map(app => app.id);
@@ -11,10 +11,10 @@ test('the fictional desktop exposes its own apps and reveals ft studio only afte
   assert.deepEqual(installedIds, ['computer', 'underweb', 'ft-studio']);
 });
 
-test('underweb has three local battle briefs and three selectable wallpapers', () => {
+test('underweb preserves existing battle addresses and includes Makarevich in the local catalog', () => {
   const page = resolveUnderweb('underweb://battles');
 
-  assert.equal(BATTLE_BRIEFS.length, 3);
+  assert.deepEqual(new Set(page.briefs.map(brief=>brief.id)),new Set(['concrete-echo','open-mic-17','yard-cipher','makarevich-1']));
   assert.equal(WALLPAPERS.length, 3);
   assert.equal(page.type, 'battles');
   assert.deepEqual(page.briefs.map(brief => brief.id), BATTLE_BRIEFS.map(brief => brief.id));

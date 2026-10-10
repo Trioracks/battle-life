@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { FT_STUDIO_BYTES, createVirtualPcState, setPcPower, startFtDownload } from '../src/virtual-pc-state.js?rev=25';
-import { advanceVirtualPc, downloadPresentation, gameMinuteStamp } from '../src/virtual-pc-runtime.js?rev=25';
+import { FT_STUDIO_BYTES, createVirtualPcState, setPcPower, startFtDownload } from '../src/virtual-pc-state.js?rev=26';
+import { advanceVirtualPc, downloadPresentation, gameMinuteStamp } from '../src/virtual-pc-runtime.js?rev=26';
 
 function downloadingState(seed = {}) {
   return createVirtualPcState({...seed,power:'on',download:{status:'downloading',receivedBytes:0}});

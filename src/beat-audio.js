@@ -1,7 +1,8 @@
 import {drumById,loopSeconds} from './beat-catalog.js';
 import {beginnerById} from './beat-beginner-bank.js?rev=21';
-import {resolveBeatPlayback} from './beat-playback.js?rev=25';
-import {connectBeatMix} from './beat-mix.js?rev=25';
+import {resolveBeatPlayback} from './beat-playback.js?rev=26';
+import {connectBeatMix} from './beat-mix.js?rev=26';
+import {transformBeatBuffer,connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=26';
 
 // Authored placeholder PCM, not a remix of third-party music. Sliders never enter here.
 export function primitiveSamples(kind,rate=44100){
@@ -25,7 +26,7 @@ export function primitiveSamples(kind,rate=44100){
 }
 export class BeatAudio{
  constructor({contextFactory=()=>new (globalThis.AudioContext??globalThis.webkitAudioContext)(),fetchFn=(...a)=>fetch(...a)}={}){
-  Object.assign(this,{contextFactory,fetchFn});this.cache=new Map();this.sources=[];this.retiring=[];this.generation=0;this.error='';this.disposed=false;this.status='stopped';this.offset=0;this.startedAt=0;this.descriptor=null;this.pending=null;
+  Object.assign(this,{contextFactory,fetchFn});this.cache=new Map();this.resultCache=new Map();this.sources=[];this.retiring=[];this.generation=0;this.error='';this.disposed=false;this.status='stopped';this.offset=0;this.startedAt=0;this.descriptor=null;this.pending=null;
  }
  async unlock(){
   if(this.disposed)return;
@@ -75,10 +76,20 @@ export class BeatAudio{
    const buffers=await Promise.all(descriptor.parts.map(part=>this.buffer(part.id,token)));
    if(!this.current(token))return false;
    this.gain=this.context.createGain();this.gain.gain.value=.7;
-   this.effects=connectBeatMix(this.context,descriptor.mix,this.context.destination);this.gain.connect(this.effects.input);
+   const layerEffects=[];
+   const master=descriptor.mix?.version===2?connectBeatResultMaster(this.context,this.context.destination):connectBeatMix(this.context,descriptor.mix,this.context.destination);
+   this.effects={input:master.input,dispose(){layerEffects.forEach(fx=>fx.dispose());master.dispose();}};this.gain.connect(master.input);
+   // Prepare all PCM before reading the shared scheduling clock.
+   const prepared=buffers.map((buffer,index)=>{
+    const part=descriptor.parts[index];if(!part.result)return {buffer,input:this.gain};
+    const key=JSON.stringify([part.id,part.loopSeconds,part.result]);
+    let transformed=this.resultCache.get(key);
+    if(!transformed){transformed=transformBeatBuffer(this.context,buffer,part.result,part.loopSeconds);if(this.resultCache.size>=8)this.resultCache.delete(this.resultCache.keys().next().value);this.resultCache.set(key,transformed);}
+    const fx=connectBeatResult(this.context,part.result,this.gain);layerEffects.push(fx);return {buffer:transformed,input:fx.input};
+   });
    const when=this.context.currentTime+.04;this.startedAt=when;
-   buffers.forEach((buffer,index)=>{
-    const part=descriptor.parts[index],source=this.context.createBufferSource();source.buffer=buffer;source.loop=true;source.loopStart=0;source.loopEnd=part.loopSeconds;source.connect(this.gain);this.sources.push(source);source.start(when,offset%part.loopSeconds);
+   prepared.forEach(({buffer,input},index)=>{
+    const part=descriptor.parts[index],source=this.context.createBufferSource();source.buffer=buffer;source.loop=true;source.loopStart=0;source.loopEnd=part.loopSeconds;source.connect(input);this.sources.push(source);source.start(when,offset%part.loopSeconds);
    });
    this.status='playing';this.pending=null;
    return true;
@@ -117,5 +128,5 @@ export class BeatAudio{
   }else this.release(voices,gain,effects);
   this.offset=0;this.status='stopped';this.error='';
  }
- dispose(){this.stop();this.disposed=true;this.cache.clear();Promise.resolve(this.context?.close()).catch(()=>{});}
+ dispose(){this.stop();this.disposed=true;this.cache.clear();this.resultCache.clear();Promise.resolve(this.context?.close()).catch(()=>{});}
 }

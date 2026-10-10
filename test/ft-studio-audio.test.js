@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { BATTLE_BRIEFS } from '../src/virtual-pc-catalog.js?rev=25';
-import { createStudioProject, setArrangementCell, setStudioStep } from '../src/ft-studio-project.js?rev=25';
-import { FtStudioAudio } from '../src/ft-studio-audio.js?rev=25';
+import { BATTLE_BRIEFS } from '../src/virtual-pc-catalog.js?rev=26';
+import { createStudioProject, setArrangementCell, setStudioStep } from '../src/ft-studio-project.js?rev=26';
+import { FtStudioAudio } from '../src/ft-studio-audio.js?rev=26';
 
 class FakeParam {
   constructor() { this.values = []; }

@@ -1,13 +1,16 @@
-import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=25';
-import {normalizeHousehold} from './home-food.js?rev=25';
-import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=25';
+import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=26';
+import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=26';
+import {normalizeCommunity} from './underweb-community.js?rev=26';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=26';
+import {normalizeHousehold} from './home-food.js?rev=26';
+import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=26';
 export const VIRTUAL_PC_STORAGE_KEY = 'battle-life-virtual-pc-v1';
 export const VIRTUAL_DISK_MB = 16000;
 export const SYSTEM_RESERVED_MB = 14000;
 export const FT_STUDIO_BYTES = 800000000;
 export const FT_STUDIO_MB = FT_STUDIO_BYTES / 1000000;
 export const PROJECT_MB = 2;
-const battleIds=new Set(['concrete-echo','open-mic-17','yard-cipher']);
+const battleIds=new Set(BATTLE_BRIEFS.map(b=>b.id));
 function normalizeApplications(value){
  const seen=new Set();return (Array.isArray(value)?value:[]).filter(a=>a&&battleIds.has(a.battleId)&&typeof a.nickname==='string'&&a.nickname.trim()&&!seen.has(a.battleId)&&seen.add(a.battleId)).map(a=>({battleId:a.battleId,nickname:a.nickname.trim().slice(0,32),status:'registered'}));
 }
@@ -22,7 +25,7 @@ const wallpaperIds = new Set(['courtyard', 'factory', 'room']);
 const downloadStates = new Set(['idle', 'downloading', 'ready-to-install', 'installed']);
 const isRecord = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const clone = value => JSON.parse(JSON.stringify(value));
-const iconIds = new Set(['computer','underweb','torent','ft-studio','ripline']);
+const iconIds = new Set(['computer','underweb','torent','ft-studio','ripline','rap-notebook']);
 function normalizeIcons(value) {
   return Object.fromEntries(Object.entries(isRecord(value)?value:{}).filter(([id,p])=>iconIds.has(id)&&Number.isFinite(p?.x)&&Number.isFinite(p?.y)).map(([id,p])=>[id,{x:Math.max(0,p.x),y:Math.max(0,p.y)}]));
 }
@@ -40,6 +43,7 @@ export function layoutDesktopIcons(ids,positions,{width,height}) {
 }
 
 function normalizeProject(value) {
+  if(value?.kind==='lyrics')return normalizeLyric(value);
   if(value?.kind==='beat')return normalizeBeat(value);
   return isRecord(value) && typeof value.id === 'string' && value.id.trim() ? clone(value) : null;
 }
@@ -70,6 +74,8 @@ function normalizeSnapshot(value) {
     download: normalizeDownload(source.download),
     projects,
     music:normalizeMusic(source.music,projects),
+    writing:normalizeWriting(source.writing,projects),
+    community:normalizeCommunity(source.community),
     household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),
     draft: isRecord(source.draft) ? clone(source.draft) : null,
