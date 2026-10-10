@@ -3,6 +3,53 @@ import assert from 'node:assert/strict';
 import {ApartmentTime,saveHomeTime,loadHomeTime} from '../src/apartment-v3-time.js';
 import {ApartmentMotion} from '../src/apartment-v3-motion.js';
 import {advanceHomeFrame} from '../src/apartment-v3-runtime.js';
+import * as THREE from '../vendor/three/three.module.js';
+import {readGlb} from './helpers/glb-pose.js';
+const style=await import('../src/apartment-switch-style.js').catch(()=>({}));
+
+function switchFixture(){
+  const {json:g}=readGlb('interaction.glb'),scene=new THREE.Group(),original=new THREE.MeshStandardMaterial({color:0x202018,map:new THREE.Texture()});
+  for(const room of ['living','kitchen']){
+    const node=g.nodes.find(n=>n.name==='switch-'+room+'-root'),root=new THREE.Group();root.name=node.name;root.position.fromArray(node.translation);scene.add(root);
+    for(const i of node.children){
+      const n=g.nodes[i],a=g.accessors[g.meshes[n.mesh].primitives[0].attributes.POSITION],size=a.max.map((v,i)=>v-a.min[i]);
+      const mesh=new THREE.Mesh(new THREE.BoxGeometry(...size),original);mesh.name=n.name.replaceAll('.','_');if(n.translation)mesh.position.fromArray(n.translation);if(n.rotation)mesh.quaternion.fromArray(n.rotation);root.add(mesh);
+    }
+  }
+  for(const name of ['socket','switch-bedroom-rocker','switch-living-rocker-decoration']){const mesh=new THREE.Mesh(new THREE.BoxGeometry(.1,.1,.1),original);mesh.name=name;mesh.position.set(9,1,0);scene.add(mesh);}
+  scene.updateMatrixWorld(true);return {scene,original};
+}
+
+test('switch styling replaces dark baked surfaces only on known switch parts without moving ray targets',()=>{
+  assert.equal(typeof style.applySwitchStyle,'function');const {scene,original}=switchFixture(),originalColor=original.color.clone(),originalMap=original.map;
+  const before=new Map();scene.traverse(o=>{if(o.isMesh)before.set(o,{matrix:o.matrixWorld.clone(),geometry:o.geometry});});
+  const rays=['living','kitchen'].map(room=>{const root=scene.getObjectByName('switch-'+room+'-root');return new THREE.Raycaster(new THREE.Vector3(root.position.x,root.position.y,2),new THREE.Vector3(0,0,-1));});
+  const hits=rays.map(ray=>ray.intersectObject(scene,true).map(hit=>[hit.object,hit.distance]));
+  const owned=style.applySwitchStyle(THREE,scene);scene.updateMatrixWorld(true);
+  for(const [mesh,snapshot] of before){
+    assert.deepEqual(mesh.matrixWorld,snapshot.matrix);assert.equal(mesh.geometry,snapshot.geometry);
+    if(/^switch-(living|kitchen)-(backplate|recess|rocker|screw(?:_001)?)$/.test(mesh.name)){
+      assert.notEqual(mesh.material,original);assert.equal(mesh.material.map,null,'baked dark map must not survive the override');
+      const brightness=mesh.material.color.r*.2126+mesh.material.color.g*.7152+mesh.material.color.b*.0722;
+      assert.ok(brightness>.18,'even the recess is muted rather than near black');
+      if(/backplate|rocker/.test(mesh.name)){assert.ok(brightness>.45,'cream remains readable');assert.ok(mesh.material.color.r>mesh.material.color.b,'cream is warm');}
+    }else assert.equal(mesh.material,original,'shared non-switch material remains untouched');
+  }
+  assert.deepEqual(rays.map(ray=>ray.intersectObject(scene,true).map(hit=>[hit.object,hit.distance])),hits);
+  assert.deepEqual(original.color,originalColor,'shared source finish is not recolored');assert.equal(original.map,originalMap);owned.dispose();
+});
+
+test('reapplying switch styling reuses owned resources and disposal restores shared originals exactly once',()=>{
+  assert.equal(typeof style.applySwitchStyle,'function');const {scene,original}=switchFixture(),rocker=scene.getObjectByName('switch-living-rocker'),plate=scene.getObjectByName('switch-living-backplate');
+  const array=[original,original];plate.material=array;let originalDisposals=0,textureDisposals=0,geometryDisposals=0;
+  original.addEventListener('dispose',()=>originalDisposals++);original.map.addEventListener('dispose',()=>textureDisposals++);rocker.geometry.addEventListener('dispose',()=>geometryDisposals++);
+  const first=style.applySwitchStyle(THREE,scene),materials=new Set();scene.traverse(o=>{if(o.isMesh&&o.material!==original)materials.add(o.material);});
+  const disposals=new Map([...materials].map(m=>[m,0]));for(const m of materials)m.addEventListener('dispose',()=>disposals.set(m,disposals.get(m)+1));
+  assert.equal(style.applySwitchStyle(THREE,scene),first);assert.ok(materials.has(rocker.material),'repeat did not replace resources');
+  first.dispose();first.dispose();assert.deepEqual([...disposals.values()],Array(materials.size).fill(1));assert.equal(rocker.material,original);assert.equal(plate.material,array);
+  assert.equal(originalDisposals,0);assert.equal(textureDisposals,0);assert.equal(geometryDisposals,0);
+  const next=style.applySwitchStyle(THREE,scene);assert.notEqual(next,first);assert.ok(!materials.has(rocker.material),'a disposed style can be reapplied');next.dispose();
+});
 
 const config={bounds:[-6,6.2],spawn:[2,0,.85],speed:1,doorX:0,actions:{
   'light-living':{approach:[3.6,0,.85],pose:[3.6,0,-1.0],yaw:Math.PI,clip:'reach',duration:.7,lightRoom:'living',contactTime:.32},

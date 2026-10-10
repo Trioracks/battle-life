@@ -13,6 +13,7 @@ import {createComputerView} from './apartment-v3-computer.js?rev=21';
 import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=21';
 import {pcPresentation} from './virtual-pc-presentation.js?rev=21';
 import {createWardrobeFurniture} from './home-wardrobe.js';
+import {applySwitchStyle} from './apartment-switch-style.js';
 
 export async function createApartmentScene(canvas,config){
   const BASE=config.assetBase??'./assets/apartment/v3/';
@@ -62,6 +63,7 @@ export async function createApartmentScene(canvas,config){
     const bulbRoom=o.name.match(/^lamp-(living|kitchen)-bulb/)?.[1];
     if(bulbRoom&&config.lampFixtures?.[bulbRoom]?.bakedBulb){o.visible=false;o.castShadow=false;}
   });scene.add(environment.scene);
+  const switchStyle=applySwitchStyle(THREE,environment.scene);
   const wardrobe=createWardrobeFurniture(THREE);environment.scene.add(wardrobe);
   const switchRockers=Object.fromEntries(['living','kitchen'].map(room=>{const o=environment.scene.getObjectByName('switch-'+room+'-rocker');return [room,{object:o,rotation:o?.rotation.x??0}];}));
   const bulbMaterials=Object.fromEntries(['living','kitchen'].map(room=>{const o=environment.scene.getObjectByName('lamp-'+room+'-bulb');return [room,o?(Array.isArray(o.material)?o.material:[o.material]):[]];}));
@@ -276,5 +278,5 @@ export async function createApartmentScene(canvas,config){
     point.y+=.24;point.project(modes.mode==='3D'?firstCamera:camera);
     return {x:rect.left+(point.x+1)*rect.width/2,y:rect.top+(1-point.y)*rect.height/2,visible:actor.visible&&!computerActive&&modes.mode!=='3D'};
   }
-  return {modes,loadMode,prepareComputerView,beginComputerView,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,getHeadScreenPosition,clips:[...animation.actions.keys()],dispose(){disposed=true;computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,outsideMask])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
+  return {modes,loadMode,prepareComputerView,beginComputerView,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,getHeadScreenPosition,clips:[...animation.actions.keys()],dispose(){disposed=true;switchStyle.dispose();computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,outsideMask])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
 }

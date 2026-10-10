@@ -530,12 +530,19 @@ for room,x in [('kitchen',-4.8),('living',4.05)]:
     lamp_lights[room]=area('warm-ceiling-pool-'+room,(x,.1,2.37),(x,.1,.2),150,(1,.70,.39),.65)
 
 switches=[]
+# Dedicated switch finishes match the runtime override in apartment-switch-style.js.
+# These are linear RGB values for the same aged cream and soft brown-gray palette.
+switch_plate=material('switch-aged-cream-plate',(.584,.527,.361),rough=.76)
+switch_rocker=material('switch-aged-cream-rocker',(.658,.591,.434),rough=.70)
+switch_recess=material('switch-soft-brown-gray-recess',(.275,.231,.162),rough=.88)
+switch_screw=material('switch-muted-screw',(.328,.292,.223),rough=.64)
+switch_screw.node_tree.nodes.get('Principled BSDF').inputs['Metallic'].default_value=.25
 for room,x in [('living',3.60),('kitchen',-.25)]:
     switch_root=empty('switch-'+room+'-root',(x,1.576,1.22));switches.append(switch_root)
-    cube('switch-'+room+'-backplate',(0,0,0),(.135,.034,.16),M['plastic'],.012,'moving',switch_root)
-    cube('switch-'+room+'-recess',(0,-.021,0),(.097,.014,.122),M['dark'],.007,'moving',switch_root)
-    cube('switch-'+room+'-rocker',(0,-.034,0),(.085,.026,.110),M['cream'],.009,'moving',switch_root)
-    for zz in [-.060,.060]:cylinder('switch-'+room+'-screw',(0,-.019,zz),.006,.007,M['metal'],(math.pi/2,0,0),'moving',switch_root)
+    cube('switch-'+room+'-backplate',(0,0,0),(.135,.034,.16),switch_plate,.012,'moving',switch_root)
+    cube('switch-'+room+'-recess',(0,-.021,0),(.097,.014,.122),switch_recess,.007,'moving',switch_root)
+    cube('switch-'+room+'-rocker',(0,-.034,0),(.085,.026,.110),switch_rocker,.009,'moving',switch_root)
+    for zz in [-.060,.060]:cylinder('switch-'+room+'-screw',(0,-.019,zz),.006,.007,switch_screw,(math.pi/2,0,0),'moving',switch_root)
 area('soft-facade-fill',(0,-4,4),(0,0,1),190,(.46,.55,.71),8)
 details=add_home_details(cube,cylinder,curve,material,M,scene,static,moving)
 exterior=add_exterior(scene,dict(cube=cube,cylinder=cylinder,material=material),LAYOUT)
