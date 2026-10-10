@@ -64,15 +64,14 @@ test('underweb renders a local error instead of following an unknown address', (
   assert.equal(hasText(root, 'Такой адрес в Underweb не найден.'), true);
 });
 
-test('torent exposes its ft studio download control in Russian', () => {
+test('new desktop routes software downloads through the forum', () => {
   const { controller, root, state } = createController();
 
   controller.showDesktop(state);
-  controller.open('torent');
-
-  const download = find(root, element => element.tagName === 'BUTTON' && element.textContent === 'Скачать FT Studio');
+  controller.open('underweb');controller.navigateUnderweb('underweb://dump/ft-studio');
+  const download = find(root, element => element.tagName === 'BUTTON' && element.textContent === 'Скачать FT-Studio.torrent');
   assert.ok(download);
-  assert.equal(download.getAttribute('aria-label'), 'Скачать FT Studio через torent');
+  assert.equal(controller.state.software.client.installed,false);
 });
 
 test('the desktop controller accepts reconciled game-time download state before the next action', () => {
@@ -84,7 +83,7 @@ test('the desktop controller accepts reconciled game-time download state before 
   controller.open('torent');
   controller.syncState(reconciled);
 
-  assert.equal(hasText(root, '200.0 / 800 МБ · 37 КБ/с · осталось 270 игровых мин.'), true);
+  assert.ok(find(root,n=>n.textContent?.startsWith('200.0 / 800 МБ · 24 КБ/с')));
 });
 
 test('game-time reconciliation does not replace an in-progress Underweb address', () => {
@@ -110,11 +109,11 @@ test('a clock-only torent update retains the focused install control', () => {
 
   controller.showDesktop(ready);
   controller.open('torent');
-  const install = find(root, element => element.tagName === 'BUTTON' && element.textContent === 'Установить FT Studio');
+  const install = find(root, element => element.tagName === 'BUTTON' && element.textContent === 'Открыть установщик FT Studio');
   install.focus();
   controller.syncState(nextMinute);
 
-  assert.equal(find(root, element => element.tagName === 'BUTTON' && element.textContent === 'Установить FT Studio'), install);
+  assert.equal(find(root, element => element.tagName === 'BUTTON' && element.textContent === 'Открыть установщик FT Studio'), install);
   assert.equal(document.activeElement, install);
 });
 

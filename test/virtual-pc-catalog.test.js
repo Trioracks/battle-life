@@ -7,8 +7,8 @@ test('the fictional desktop exposes its own apps and reveals ft studio only afte
   const initialIds = desktopApps(createVirtualPcState()).map(app => app.id);
   const installedIds = desktopApps(createVirtualPcState({ download: { status: 'installed' } })).map(app => app.id);
 
-  assert.deepEqual(initialIds, ['computer', 'underweb', 'torent']);
-  assert.deepEqual(installedIds, ['computer', 'underweb', 'torent', 'ft-studio']);
+  assert.deepEqual(initialIds, ['computer', 'underweb']);
+  assert.deepEqual(installedIds, ['computer', 'underweb', 'ft-studio']);
 });
 
 test('underweb has three local battle briefs and three selectable wallpapers', () => {

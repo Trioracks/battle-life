@@ -1,10 +1,13 @@
-import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=21';
+import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=21';
 import {resolveUnderweb} from './virtual-pc-catalog.js?rev=21';
 import {createBeatMarket} from './beat-market-view.js?rev=21';
+import {softwareForum,softwareMessage} from './pc-software-view.js';
+import {downloadPresentation} from './virtual-pc-runtime.js?rev=21';
 const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-control '+(options.className??'')},fn);
 
-export function mountUnderweb(root,{getState,getMetadata,onApply,onDownload,onChange,audio}){
- const d=root.ownerDocument,history=['underweb://iskra'];let index=0,route=resolveUnderweb(history[0]),applicationOpen=false,lastApplications='',applicationFocus=null;
+export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,getSoftwareMessage=()=>''}){
+ const d=root.ownerDocument,history=['underweb://iskra'];let index=0,route=resolveUnderweb(history[0]),applicationOpen=false,lastApplications='',applicationFocus=null,lastSoftware='';
+ const softwareSignature=()=>{const s=getState().software;return JSON.stringify([s?.client?.installed,s?.client?.receivedBytes===2000000,s?.ft?.installed,s?.ft?.receivedBytes===800000000,s?.metadata,s?.task?.appId,s?.task?.paused,s?.task?.error,getSoftwareMessage()]);};
  const browser=el(d,'section',{className:'uw-browser',attributes:{'aria-label':'Браузер Underweb'}}),toolbar=el(d,'form',{className:'uw-toolbar',attributes:{'aria-label':'Адрес Underweb'}});
  const back=button(d,'←',{attributes:{'aria-label':'Назад в Underweb'}},()=>travel(-1)),forward=button(d,'→',{attributes:{'aria-label':'Вперёд в Underweb'}},()=>travel(1));
  const home=button(d,'⌂',{attributes:{'aria-label':'Главная Underweb'}},()=>navigate('underweb://iskra'));
@@ -14,6 +17,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onDownload,onCh
  const bookmarks=el(d,'nav',{className:'uw-bookmarks',attributes:{'aria-label':'Избранное Underweb'}});
  bookmarks.append(el(d,'strong',{text:'UNDERWEB'}),button(d,'Искра',{},()=>navigate('underweb://iskra')),button(d,'Баттлы',{},()=>navigate('underweb://battles')),button(d,'FT Studio',{},()=>navigate('underweb://software/ft-studio')));
  bookmarks.append(button(d,'Базар',{},()=>navigate('underweb://samples')),button(d,'RIPLINE',{},()=>navigate('underweb://ripline')));
+ bookmarks.append(button(d,'Файловая помойка',{},()=>navigate('underweb://dump')));
  const page=el(d,'div',{className:'uw-page'}),status=el(d,'footer',{className:'uw-status',text:'Готово · Локальная сеть'});
  browser.append(toolbar,bookmarks,page,status);root.replaceChildren(browser);
  function searchForm(query=''){
@@ -27,7 +31,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onDownload,onCh
   const frequent=el(d,'section',{className:'uw-frequent'});frequent.append(el(d,'h2',{text:'Часто ищут'}));
   for(const text of ['рэп баттлы','Бетонное эхо','Купить сэмплы','FT Studio'])frequent.append(button(d,text,{},()=>navigate(text)));home.append(frequent);
   const directory=el(d,'div',{className:'uw-home-directory'});
-  for(const [number,title,text,url]of [['01','Баттлы рядом','Новые имена. Первые раунды. Твой голос.','underweb://battles'],['02','Домашняя студия','Программы для твоего рабочего стола.','underweb://software/ft-studio']]){
+  for(const [number,title,text,url]of [['01','Баттлы рядом','Новые имена. Первые раунды. Твой голос.','underweb://battles'],['02','Файловая помойка','Форум программ для твоего рабочего стола.','underweb://dump']]){
    const card=el(d,'article');card.append(el(d,'small',{text:number}),button(d,title,{},()=>navigate(url)),el(d,'p',{text}));directory.append(card);
   }
   home.append(directory,el(d,'footer',{className:'uw-site-footer',text:'Искра · Поиск по игровым сайтам · Без ИИ-ответов'}));return home;
@@ -73,18 +77,19 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onDownload,onCh
   }else {applicationFocus=button(d,'Подать заявку',{className:'uw-primary'},()=>{applicationOpen=true;render({resetScroll:false,focusApplication:true});});action.append(applicationFocus,el(d,'span',{text:'Бесплатная регистрация · Без отправки аудио'}));}
   site.append(action);return site;
  }
- function softwarePage(){
-  const page=el(d,'div',{className:'uw-software'});page.append(el(d,'small',{text:'UNDERWEB / СОФТ'}),el(d,'div',{className:'uw-software-logo',text:'FT'}),el(d,'h1',{text:'FT Studio'}),el(d,'h2',{text:'Твоя комната. Твоя студия.'}),el(d,'p',{text:'Рабочее пространство для музыкальных идей: библиотека, дорожки и область ритма в одном окне.'}),el(d,'p',{text:'Версия 1.0 · Windows HP · 800 МБ'}),button(d,'Открыть torent',{className:'uw-primary'},onDownload),el(d,'p',{className:'uw-muted',text:'На этом этапе доступен внешний вид студии. Музыкальные действия появятся позже.'}));return page;
- }
  function render({resetScroll=true,focusApplication=false}={}){
   const scrollTop=resetScroll?0:page.scrollTop;applicationFocus=null;
   address.value=route.url;back.disabled=index===0;forward.disabled=index===history.length-1;
   audio?.stop();
-  page.replaceChildren(['samples','ripline'].includes(route.type)?createBeatMarket(d,{getState,onChange,audio,navigate,ripline:route.type==='ripline'}):route.type==='home'?homePage():route.type==='search'?resultsPage():route.type==='battles'?catalogPage():route.type==='battle'?detailPage():route.type==='software'?softwarePage():el(d,'p',{className:'uw-error',text:route.message}));
+  page.replaceChildren(['samples','ripline'].includes(route.type)?createBeatMarket(d,{getState,onChange,audio,navigate,ripline:route.type==='ripline'}):route.type==='home'?homePage():route.type==='search'?resultsPage():route.type==='battles'?catalogPage():route.type==='battle'?detailPage():route.type==='dump'?softwareForum(d,{topic:route.topic,state:getState(),navigate,onAction:onSoftware,message:getSoftwareMessage()}):el(d,'p',{className:'uw-error',text:route.message}));
+  lastSoftware=softwareSignature();
   page.scrollTop=scrollTop;if(focusApplication)applicationFocus?.focus();
   status.textContent='Готово · '+(route.type==='home'||route.type==='search'?'Искра':'Локальная сеть');lastApplications=JSON.stringify(getState().battleApplications);
  }
  function navigate(input){route=resolveUnderweb(input);history.splice(index+1);history.push(route.url);index=history.length-1;applicationOpen=false;render();}
  function travel(delta){const next=index+delta;if(next<0||next>=history.length)return;index=next;route=resolveUnderweb(history[index]);applicationOpen=false;render();}
- render();return {navigate,get snapshot(){return {route,index,history:[...history]};},update(){if(lastApplications!==JSON.stringify(getState().battleApplications)&&['battle','battles'].includes(route.type))render();},dispose(){root.replaceChildren();}};
+ render();return {navigate,get snapshot(){return {route,index,history:[...history]};},update(){
+  if(lastApplications!==JSON.stringify(getState().battleApplications)&&['battle','battles'].includes(route.type)||route.type==='dump'&&lastSoftware!==softwareSignature())render({resetScroll:false});
+  else if(route.type==='dump'){const node=pcFind(page,n=>n.dataset?.pcRole==='forum-transfer');if(node){const p=downloadPresentation(getState());node.textContent=`Загрузка: ${p.receivedMb.toFixed(2)} / ${p.totalMb} МБ · ${p.speedKbPerSecond} КБ/с${p.error?' · '+softwareMessage(p.error):''}`;}}
+ },dispose(){root.replaceChildren();}};
 }

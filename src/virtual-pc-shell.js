@@ -105,6 +105,7 @@ export function mountPcShell(root,{onCommand}) {
   const rectStyle=(node,r)=>{for(const k of ['x','y','width','height'])node.style.setProperty(k==='x'?'left':k==='y'?'top':k,r[k]+'px');};
   function render(next) {
     if(disposed)return;model=next;
+    iconRoot.inert=Boolean(next.masterWindow);taskbar.inert=Boolean(next.masterWindow);menus.inert=Boolean(next.masterWindow);
     shell.style.setProperty('--pc-wallpaper','url("'+next.wallpaper+'")');
     clock.textContent=next.metadata.clockLabel;clock.setAttribute('title',homeDateLabel(next.metadata.gameDay));clock.setAttribute('aria-label','Игровое время '+next.metadata.clockLabel+', '+homeDateLabel(next.metadata.gameDay));
     warning.textContent=next.warning??'';warning.hidden=!next.warning;
@@ -119,6 +120,9 @@ export function mountPcShell(root,{onCommand}) {
     }
     for(const w of next.windows.windows) {
       const f=frames.get(w.id)??makeFrame(w),active=next.windows.activeId===w.id;
+      f.frame.inert=Boolean(next.masterWindow&&next.masterWindow!==w.id);
+      if(next.masterWindow===w.id){f.frame.setAttribute('role','dialog');f.frame.setAttribute('aria-modal','true');}
+      f.controls.minimize.disabled=next.masterWindow===w.id;
       rectStyle(f.frame,w.rect);f.frame.style.setProperty('z-index',w.z);
       f.frame.hidden=w.mode==='minimized';f.frame.dataset.active=String(active);f.frame.dataset.mode=w.mode;
       f.title.textContent=w.title;f.taskText.textContent=w.title;f.task.setAttribute('aria-pressed',String(active));f.task.dataset.active=String(active);
@@ -130,7 +134,7 @@ export function mountPcShell(root,{onCommand}) {
   }
   function focusActive(){const scope=modalNode??frames.get(model?.windows.activeId)?.frame??workspace;pcFocusable(scope)[0]?.focus();}
   function setModal(node,returnFocus) {
-    const had=modalNode;modalNode=node;workspace.inert=!!node;taskbar.inert=!!node;menus.inert=!!node;
+    const had=modalNode;modalNode=node;workspace.inert=!!node;taskbar.inert=!!node||Boolean(model?.masterWindow);menus.inert=!!node||Boolean(model?.masterWindow);
     modal.hidden=!node;
     if(node){if(had!==node){modal.replaceChildren(node);pcFocusable(node)[0]?.focus();}}
     else{modal.replaceChildren();if(had){if(returnFocus?.isConnected&&!returnFocus.disabled)returnFocus.focus();else focusActive();}}

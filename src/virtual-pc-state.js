@@ -1,5 +1,6 @@
 import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=21';
 import {normalizeHousehold} from './home-food.js';
+import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js';
 export const VIRTUAL_PC_STORAGE_KEY = 'battle-life-virtual-pc-v1';
 export const VIRTUAL_DISK_MB = 16000;
 export const SYSTEM_RESERVED_MB = 14000;
@@ -59,7 +60,7 @@ function normalizeDownload(value) {
 function normalizeSnapshot(value) {
   const source = isRecord(value) ? value : {};
   const projects = Array.isArray(source.projects) ? source.projects.map(normalizeProject).filter(Boolean) : [];
-  return {
+  return withSoftware({
     version: 1,
     noviceSchema: 1,
     ...(typeof source.noviceMigration==='string'?{noviceMigration:source.noviceMigration}:{}),
@@ -73,7 +74,7 @@ function normalizeSnapshot(value) {
     battleApplications:normalizeApplications(source.battleApplications),
     draft: isRecord(source.draft) ? clone(source.draft) : null,
     lastGameMinute: Number.isFinite(source.lastGameMinute) && source.lastGameMinute >= 0 ? source.lastGameMinute : null,
-  };
+  },normalizeSoftware(source.software,normalizeDownload(source.download)));
 }
 
 export function createVirtualPcState(seed) {
@@ -82,16 +83,16 @@ export function createVirtualPcState(seed) {
 
 export function diskUsage(state) {
   const normalized = normalizeSnapshot(state);
-  const downloadMb = ['downloading', 'ready-to-install'].includes(normalized.download.status)
-    ? normalized.download.receivedBytes / 1000000 : 0;
-  const installedMb = normalized.download.status === 'installed' ? FT_STUDIO_MB : 0;
+  const accounting=softwareDiskBytes(normalized);
+  const downloadMb = accounting.downloaded/1000000;
+  const installedMb = accounting.installed/1000000;
   const projectsMb = normalized.projects.length * PROJECT_MB;
-  const usedMb = SYSTEM_RESERVED_MB + downloadMb + installedMb + projectsMb;
+  const usedMb = accounting.used/1000000;
   return {
     capacityMb: VIRTUAL_DISK_MB,
     systemMb: SYSTEM_RESERVED_MB,
     usedMb,
-    freeMb: Math.max(0, VIRTUAL_DISK_MB - usedMb),
+    freeMb: accounting.free/1000000,
     downloadMb,
     installedMb,
     projectsMb,
@@ -100,7 +101,9 @@ export function diskUsage(state) {
 
 export function setPcPower(state, power) {
   const normalized = normalizeSnapshot(state);
-  return power === 'on' || power === 'off' ? { ...normalized, power } : normalized;
+  if(power!=='on'&&power!=='off')return normalized;
+  if(normalized.software.task){normalized.software.task.baseMinute=null;normalized.software.task.baseBytes=normalized.software[normalized.software.task.appId].receivedBytes;}
+  return {...normalized,power,lastGameMinute:null};
 }
 
 export function setWallpaper(state, wallpaper) {
@@ -110,29 +113,24 @@ export function setWallpaper(state, wallpaper) {
 
 export function startFtDownload(state) {
   const normalized = normalizeSnapshot(state);
-  if (normalized.power !== 'on' || normalized.download.status !== 'idle' || diskUsage(normalized).freeMb < FT_STUDIO_MB) return normalized;
-  return { ...normalized, download: { status: 'downloading', receivedBytes: 0 } };
+  return openMetadata(normalized).state;
 }
 
 export function cancelFtDownload(state) {
   const normalized = normalizeSnapshot(state);
-  return normalized.download.status === 'downloading'
-    ? { ...normalized, download: { status: 'idle', receivedBytes: 0 } }
-    : normalized;
+  return normalized.software.task?.appId==='ft'?cancelTransfer(normalized).state:normalized;
 }
 
 export function markFtDownloadComplete(state) {
   const normalized = normalizeSnapshot(state);
   return normalized.download.status === 'downloading'
-    ? { ...normalized, download: { status: 'ready-to-install', receivedBytes: FT_STUDIO_BYTES } }
+    ? withSoftware(normalized,{...normalized.software,ft:{...normalized.software.ft,receivedBytes:FT_STUDIO_BYTES},task:null})
     : normalized;
 }
 
 export function installFtStudio(state) {
   const normalized = normalizeSnapshot(state);
-  return normalized.download.status === 'ready-to-install'
-    ? { ...normalized, download: { status: 'installed', receivedBytes: 0 } }
-    : normalized;
+  return advanceInstaller(normalized).state;
 }
 
 export function saveStudioProject(state, project) {
@@ -166,6 +164,11 @@ function reserveHouseholdBackup(storage,raw){
   const key=VIRTUAL_PC_STORAGE_KEY+'-before-household';
   if(storage.getItem(key)===null)storage.setItem(key,raw);
 }
+function restoredSnapshot(parsed){
+  const restored=createVirtualPcState(parsed),task=restored.software.task;
+  if(task){restored.lastGameMinute=null;task.baseMinute=null;task.baseBytes=restored.software[task.appId].receivedBytes;}
+  return restored;
+}
 
 export function loadVirtualPcState(storage) {
   try {
@@ -175,9 +178,9 @@ export function loadVirtualPcState(storage) {
     const parsed = JSON.parse(raw);
     if (!isRecord(parsed) || parsed.version !== 1) return { ok: false, state: createVirtualPcState() };
     if(!Object.hasOwn(parsed,'household')){
-      try{reserveHouseholdBackup(storage,raw);}catch{return {ok:false,reason:'household-backup-failed',state:createVirtualPcState(parsed)};}
+      try{reserveHouseholdBackup(storage,raw);}catch{return {ok:false,reason:'household-backup-failed',state:restoredSnapshot(parsed)};}
     }
-    return { ok: true, state: createVirtualPcState(parsed) };
+    return { ok: true, state: restoredSnapshot(parsed) };
   } catch {
     return { ok: false, state: createVirtualPcState() };
   }

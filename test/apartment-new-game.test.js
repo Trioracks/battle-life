@@ -30,7 +30,7 @@ test('confirming a new character resets the persisted PC and its old game clock'
   assert.equal(pc.download.status, 'idle');
   assert.deepEqual(pc.projects, []);
   assert.equal(pc.draft, null);
-  let downloading = startFtDownload(setPcPower(pc, 'on'));
+  let downloading = createVirtualPcState({...pc,software:undefined,power:'on',download:{status:'downloading',receivedBytes:0}});
   downloading = advanceVirtualPc(downloading, { day: 1, minutes: 600 }).state;
   assert.ok(advanceVirtualPc(downloading, { day: 1, minutes: 660 }).advancedBytes > 0);
 });

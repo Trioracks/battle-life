@@ -57,9 +57,15 @@ test('download ticks retain focused file and tree nodes while updating free spac
   view.update(createVirtualPcState({download:{status:'downloading',receivedBytes:3000000}}));
   assert.equal(findButton(root,'Открыть диск C:')===disk,true);
   assert.equal(findButton(root,'Перейти: Мой компьютер')===tree,true);assert.equal(root.ownerDocument.activeElement===disk,true);
-  assert.ok(allPc(disk).some(n=>n.textContent==='Свободно 2,0 ГБ (1997 МБ)'));
+  assert.ok(allPc(disk).some(n=>n.textContent==='Свободно 2,0 ГБ (1988 МБ)'));
   const meter=allPc(disk).find(n=>n.getAttribute('role')==='meter');
-  assert.equal(meter.getAttribute('aria-valuenow'),'14003');
+  assert.equal(meter.getAttribute('aria-valuenow'),'14011.012');
   view.update(createVirtualPcState({download:{status:'downloading',receivedBytes:4000000}}));
   assert.equal(allPc(disk).find(n=>n.getAttribute('role')==='meter'),meter);
+});
+test('partial Downloads file keeps selection and focus while its size changes',()=>{
+ const {root,view}=setup({download:{status:'downloading',receivedBytes:1000000}});view.navigate('downloads');
+ const file=findButton(root,'Открыть FT-Studio-setup.zip.part');file.click();file.focus();
+ view.update(createVirtualPcState({download:{status:'downloading',receivedBytes:2000000}}));
+ assert.equal(findButton(root,'Открыть FT-Studio-setup.zip.part')===file,true);assert.equal(root.ownerDocument.activeElement===file,true);assert.equal(file.getAttribute('aria-pressed'),'true');
 });

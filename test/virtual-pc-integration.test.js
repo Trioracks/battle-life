@@ -14,7 +14,7 @@ const config = {
 };
 
 function downloadingPc(snapshot = {}) {
-  return startFtDownload(setPcPower(createVirtualPcState(snapshot), 'on'));
+  return createVirtualPcState({...snapshot,power:'on',download:{status:'downloading',receivedBytes:0}});
 }
 
 test('computer overlay becomes eligible only at the seated started event and holds the seated action', () => {
@@ -55,11 +55,11 @@ test('the same apartment clock advances a powered download during sleep without 
   const clock = new ApartmentTime({ day: 1, minutes: 600 });
   let pc = downloadingPc({ lastGameMinute: 600 });
   motion.startSleeping();
-  clock.beginSleep({ minutes: 360, seconds: 4 });
+  clock.beginSleep({ minutes: 480, seconds: 4 });
 
   for (let frame = 0; frame < 240; frame++) pc = advanceComputerHomeFrame(motion, clock, pc, 1 / 60, false).pcState;
 
-  assert.equal(clock.label, '16:00');
+  assert.equal(clock.label, '18:00');
   assert.equal(pc.download.status, 'ready-to-install');
   assert.equal(pc.lastGameMinute, (clock.day - 1) * 1440 + clock.minutes);
 });

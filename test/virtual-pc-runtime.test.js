@@ -4,12 +4,12 @@ import { FT_STUDIO_BYTES, createVirtualPcState, setPcPower, startFtDownload } fr
 import { advanceVirtualPc, downloadPresentation, gameMinuteStamp } from '../src/virtual-pc-runtime.js';
 
 function downloadingState(seed = {}) {
-  return startFtDownload(setPcPower(createVirtualPcState(seed), 'on'));
+  return createVirtualPcState({...seed,power:'on',download:{status:'downloading',receivedBytes:0}});
 }
 
-test('six in-game hours complete ft studio exactly once', () => {
+test('eight in-game hours complete ft studio exactly once', () => {
   const started = advanceVirtualPc(downloadingState(), { day: 1, minutes: 0 });
-  const completed = advanceVirtualPc(started.state, { day: 1, minutes: 360 });
+  const completed = advanceVirtualPc(started.state, { day: 1, minutes: 480 });
 
   assert.equal(completed.advancedBytes, FT_STUDIO_BYTES);
   assert.equal(completed.state.download.status, 'ready-to-install');
@@ -50,8 +50,8 @@ test('game minutes remain monotonic across midnight', () => {
   const advanced = advanceVirtualPc(state, { day: 2, minutes: 10 });
 
   assert.equal(gameMinuteStamp({ day: 2, minutes: 10 }), 1450);
-  assert.equal(Math.round(advanced.advancedBytes), 44444444);
-  assert.equal(Math.round(advanced.state.download.receivedBytes), 44444444);
+  assert.equal(advanced.advancedBytes, 36480000);
+  assert.equal(advanced.state.download.receivedBytes, 36480000);
 });
 
 test('repeating one reconciled clock position is stable', () => {
@@ -63,7 +63,7 @@ test('repeating one reconciled clock position is stable', () => {
   const first = advanceVirtualPc(state, { day: 1, minutes: 160 });
   const repeated = advanceVirtualPc(first.state, { day: 1, minutes: 160 });
 
-  assert.equal(first.advancedBytes, 133333333.33333333);
+  assert.equal(first.advancedBytes, 108600000);
   assert.equal(repeated.advancedBytes, 0);
   assert.equal(repeated.state.download.receivedBytes, first.state.download.receivedBytes);
 });
@@ -75,9 +75,9 @@ test('download presentation reports the agreed fictional speed and remaining gam
   });
   const presentation = downloadPresentation(state);
 
-  assert.equal(presentation.speedKbPerSecond, 37);
+  assert.equal(presentation.speedKbPerSecond, 24);
   assert.equal(presentation.totalMb, 800);
   assert.equal(presentation.receivedMb, 400);
-  assert.equal(presentation.remainingGameMinutes, 180);
+  assert.equal(presentation.remainingGameMinutes, 221);
   assert.equal(presentation.percent, 50);
 });

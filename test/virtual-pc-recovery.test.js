@@ -82,7 +82,7 @@ test('clock updates preserve an unfinished registration and its focused input', 
 test('keyboard navigation enters an opened window and wraps inside it', () => {
   const { controller, root, document } = setup();
   controller.open('underweb');
-  const first = find(root, 'Свернуть окно'), last = find(root, 'Домашняя студия');
+  const first = find(root, 'Свернуть окно'), last = nodes(root).filter(n=>n.textContent==='Файловая помойка').at(-1);
   assert.ok(root.contains(document.activeElement));
   last.focus();
   const event = new Event('keydown', { cancelable: true });
@@ -121,10 +121,9 @@ test('projects are opened by navigating through the virtual disk and folder', ()
   assert.equal(controller.project.id, 'on-disk');
 });
 
-test('insufficient disk space disables download with a Russian explanation', () => {
-  const { controller, root } = setup({ download: { status: 'idle' }, projects: Array.from({ length: 601 }, (_, i) => ({ id: 'p-' + i })) });
-  controller.open('torent');
-  assert.equal(find(root, 'Скачать FT Studio через torent').disabled, true);
+test('insufficient disk space rejects forum download with a Russian explanation', () => {
+  const { controller, root } = setup({ download: { status: 'idle' }, projects: Array.from({ length: 1000 }, (_, i) => ({ id: 'p-' + i })) });
+  controller.open('underweb');controller.navigateUnderweb('underweb://dump/client');find(root,'Скачать установщик torent').click();
   assert.ok(nodes(root).some(node => /недостаточно места/i.test(node.textContent ?? '')));
   assert.equal(controller.state.download.status, 'idle');
 });

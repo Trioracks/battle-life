@@ -20,7 +20,7 @@ export const BATTLE_BRIEFS = Object.freeze([
 
 export function desktopApps(state) {
   const installed = state?.download?.status === 'installed';
-  return apps.filter(app => (app.id !== 'ft-studio' || installed)&&(app.id!=='ripline'||state?.music?.ripline)).map(app => ({ ...app }));
+  return apps.filter(app => (app.id !== 'ft-studio' || installed)&&(app.id!=='torent'||state?.software?.client?.installed)&&(app.id!=='ripline'||state?.music?.ripline)).map(app => ({ ...app }));
 }
 
 export function resolveUnderweb(address) {
@@ -33,7 +33,9 @@ export function resolveUnderweb(address) {
   const id = normalized.startsWith('underweb://battles/') ? normalized.slice('underweb://battles/'.length) : '';
   const brief = BATTLE_BRIEFS.find(item => item.id === id);
   if (brief) return { type: 'battle',url:'underweb://battles/'+brief.id, brief: { ...brief } };
-  if(normalized==='underweb://software/ft-studio')return {type:'software',url:normalized};
+  if(normalized==='underweb://software/ft-studio')return {type:'dump',url:'underweb://dump/ft-studio',topic:'ft-studio'};
+  if(['underweb://dump','underweb://dump/','файловая помойка'].includes(normalized))return {type:'dump',url:'underweb://dump',topic:null};
+  if(['underweb://dump/client','underweb://dump/ft-studio'].includes(normalized))return {type:'dump',url:normalized,topic:normalized.split('/').at(-1)};
   if(['underweb://samples','underweb://ripline'].includes(normalized))return {type:normalized.endsWith('samples')?'samples':'ripline',url:normalized};
   if(normalized.includes('://')&&!normalized.startsWith('underweb://iskra/search?'))return {type:'error',url:raw,message:'Такой адрес в Underweb не найден.'};
   let query=raw;
@@ -41,7 +43,7 @@ export function resolveUnderweb(address) {
   // Limit the decoded query, never its percent-encoded history address.
   query=Array.from(query).slice(0,160).join('');
   const words=query.toLowerCase().replaceAll('ё','е').split(/[^\p{L}\p{N}]+/u).filter(Boolean);
-  const pages=[{title:'Каталог рэп-баттлов',url:'underweb://battles',site:'Район / Баттлы',description:'Открытые аудиобаттлы, правила, темы отборов и заявки. Бетонное эхо, Открытый микрофон 17, Шифр двора.',keywords:'рэп баттлы рэп-баттлы рэп батл rap battle турнир аудио конкурс'},...BATTLE_BRIEFS.map(b=>({title:b.title,url:'underweb://battles/'+b.id,site:'Район / '+b.season,description:b.description,keywords:'рэп баттл турнир '+b.theme})),{title:'FT Studio — домашняя студия',url:'underweb://software/ft-studio',site:'Софт / FT Studio',description:'Музыкальная рабочая среда. Установка через torent, 800 МБ.',keywords:'fl ft studio студия программа музыка скачать софт бит'}];
+  const pages=[{title:'Каталог рэп-баттлов',url:'underweb://battles',site:'Район / Баттлы',description:'Открытые аудиобаттлы, правила, темы отборов и заявки. Бетонное эхо, Открытый микрофон 17, Шифр двора.',keywords:'рэп баттлы рэп-баттлы рэп батл rap battle турнир аудио конкурс'},...BATTLE_BRIEFS.map(b=>({title:b.title,url:'underweb://battles/'+b.id,site:'Район / '+b.season,description:b.description,keywords:'рэп баттл турнир '+b.theme})),{title:'Файловая помойка — программы',url:'underweb://dump',site:'Файловая помойка / Форум',description:'Клиент torent и FT Studio для домашней студии. Темы, установщики, файлы .torrent.',keywords:'fl ft studio студия программа музыка скачать софт бит torent торрент клиент'}];
   pages.push({title:'Базар — лупы для FT',url:'underweb://samples',site:'Музыка / Базар',description:'Барабанные лупы 90 BPM. Прослушать и купить для своего бита.',keywords:'биты бит купить сэмплы samples drums барабаны лупы магазин'}, {title:'RIPLINE — срез сигнала',url:'underweb://ripline',site:'Софт / RIPLINE',description:'Игровое извлечение звука из роликов. Осторожно: риск заражения виртуального ПК.',keywords:'ripline видео youtube вырезать скачать пиратский'});
   const results=words.length?pages.map(p=>({...p,score:words.reduce((n,w)=>n+(p.title+' '+p.description+' '+p.keywords).toLowerCase().replaceAll('ё','е').includes(w),0)})).filter(p=>p.score>0).sort((a,b)=>b.score-a.score).map(({keywords,score,...p})=>p):[];
   return {type:'search',url:'underweb://iskra/search?q='+encodeURIComponent(query),query,results};

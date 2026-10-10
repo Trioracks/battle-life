@@ -1,5 +1,6 @@
 import {BEAT_RULES as R,BEAT_GENRES,DRUMS,drumById} from './beat-catalog.js';
 import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=21';
+import {softwareDiskBytes} from './pc-software.js';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
 const clamp=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,finite(v)));
 const text=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';
@@ -35,7 +36,7 @@ export function workBlockReason(state){
 export function createBeat(input,options={},skills={},random=Math.random){
  const s=normalized(input),id=text(options.id,100),name=text(options.name,64),genre=BEAT_GENRES.find(g=>g.id===(options.genre??'boombap')&&g.available);
  if(!id||!name||!genre||s.projects.some(p=>p.id===id))return result(s,false,'Укажи название и доступный жанр.');
- if(s.projects.length>=590)return result(s,false,'Недостаточно места для нового проекта.');
+ if(softwareDiskBytes(s).free<2000000)return result(s,false,'Недостаточно места для нового проекта.');
  if(options.assetId&&!s.music.owned.some(a=>a.id===options.assetId))return result(s,false,'Этот луп ещё не получен.');
  const skill=effectiveBeatSkill(s,skills),parts=chooseBeginnerParts(random),free=DRUMS.filter(d=>d.bank==='free');
  const drumId=options.assetId||(skill>=R.freeSkill?free[Math.floor(clamp(random(),0,.999999)*free.length)].id:parts.drumsId);

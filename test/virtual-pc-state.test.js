@@ -16,6 +16,7 @@ import {
   setDesktopIconPosition, resetDesktopIconPositions, layoutDesktopIcons,
   applyToBattle,
 } from '../src/virtual-pc-state.js';
+import {openInstaller,advanceInstaller} from '../src/pc-software.js';
 
 test('applications reject invalid entries, trim names and never duplicate a battle',()=>{
   const state=createVirtualPcState({battleApplications:[null,{}, {battleId:'external',nickname:'MC'}, {battleId:'concrete-echo',nickname:'  Район  '}, {battleId:'concrete-echo',nickname:'Дубль'}, {battleId:'yard-cipher',nickname:' '}]});
@@ -105,24 +106,24 @@ test('cancelling an unfinished package frees its partial virtual payload', () =>
   });
   const cancelled = cancelFtDownload(downloading);
 
-  assert.equal(diskUsage(downloading).freeMb, 1800);
+  assert.equal(diskUsage(downloading).freeMb, 1791.988);
   assert.equal(cancelled.download.status, 'idle');
   assert.equal(cancelled.download.receivedBytes, 0);
-  assert.equal(diskUsage(cancelled).freeMb, 2000);
+  assert.equal(diskUsage(cancelled).freeMb, 1991.988);
 });
 
-test('installing a completed ft studio package consumes 800 MB once', () => {
-  const started = startFtDownload(setPcPower(createVirtualPcState(), 'on'));
-  const completed = markFtDownloadComplete(started);
-  const installed = installFtStudio(completed);
+test('installing a completed ft studio package retains its archive and consumes 800 MB once', () => {
+  const completed = createVirtualPcState({power:'on',download:{status:'ready-to-install'}});
+  let installed=openInstaller(completed,'ft').state;
+  for(let i=0;i<4;i++)installed=advanceInstaller(installed).state;
 
   assert.equal(completed.download.status, 'ready-to-install');
-  assert.equal(diskUsage(completed).downloadMb, 800);
-  assert.equal(diskUsage(completed).freeMb, 1200);
+  assert.equal(diskUsage(completed).downloadMb, 800.012);
+  assert.equal(diskUsage(completed).freeMb, 1191.988);
   assert.equal(installed.download.status, 'installed');
-  assert.equal(diskUsage(installed).downloadMb, 0);
-  assert.equal(diskUsage(installed).installedMb, 800);
-  assert.equal(diskUsage(installed).freeMb, 1200);
+  assert.equal(diskUsage(installed).downloadMb, 800.012);
+  assert.equal(diskUsage(installed).installedMb, 808);
+  assert.equal(diskUsage(installed).freeMb, 391.988);
 });
 
 test('saving a project reserves two virtual megabytes', () => {
@@ -152,9 +153,9 @@ test('saving a project does not overfill the virtual disk', () => {
 test('old powered save retains payloads and discards only obsolete shortcut placement',()=>{
   const old={version:1,power:'on',wallpaper:'factory',download:{status:'downloading',receivedBytes:123000000},projects:[{id:'p',name:'Бит'}],draft:{id:'draft',name:'Не потерять'},lastGameMinute:22,desktopIcons:{documents:{x:8,y:96},computer:{x:12,y:16}}};
   const loaded=loadVirtualPcState(mapStorage(new Map([[VIRTUAL_PC_STORAGE_KEY,JSON.stringify(old)]]))).state;
-  assert.deepEqual({...loaded,desktopIcons:old.desktopIcons},{...old,noviceSchema:1,battleApplications:[],music:createVirtualPcState().music,household:{fridge:{apple:1,pear:1,banana:1}}});
+  assert.deepEqual(loaded.projects,old.projects);assert.deepEqual(loaded.download,old.download);assert.deepEqual(loaded.draft,old.draft);assert.equal(loaded.wallpaper,old.wallpaper);assert.equal(loaded.lastGameMinute,null);assert.equal(loaded.software.client.installed,true);
   assert.deepEqual(loaded.desktopIcons,{computer:{x:12,y:16}});
-  assert.equal(diskUsage(loaded).freeMb,1875);
+  assert.equal(diskUsage(loaded).freeMb,1866.988);
 });
 
 test('overfull import keeps all projects and overwrite needs no additional space',()=>{
