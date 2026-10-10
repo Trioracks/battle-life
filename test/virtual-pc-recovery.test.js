@@ -51,58 +51,38 @@ test('a new-game reset clears the previous controller project and pending shutdo
   assert.equal(find(root, 'FT Studio'), undefined);
 });
 
-test('an Underweb project cannot silently overwrite the draft recovered after reload', () => {
-  const { controller, root } = setup({ draft: project('unsaved', 'Черновик') });
-  controller.open('underweb');
-  find(root, `Выбрать баттл ${BATTLE_BRIEFS[1].title}`).click();
-  assert.ok(find(root, 'Восстановить черновик'));
-  assert.equal(controller.state.draft.id, 'unsaved');
-  find(root, 'Восстановить черновик').click();
-  assert.equal(controller.project.id, 'unsaved');
-  controller.closeWindow();
-  assert.equal(controller.confirmClose, true);
+test('battle registration does not overwrite a draft recovered after reload', () => {
+  const {controller,root}=setup({draft:project('unsaved','Черновик')});
+  const before=structuredClone(controller.state.draft);controller.open('underweb');
+  controller.navigateUnderweb('underweb://battles/open-mic-17');find(root,'Подать заявку').click();find(root,'Подтвердить заявку').click();
+  assert.deepEqual(controller.state.draft,before);assert.equal(controller.state.battleApplications[0].battleId,'open-mic-17');
+  assert.equal(controller.project,null);
 });
 
-test('opening a saved project first protects an orphan draft and can save it before proceeding', () => {
-  const saved = project('saved');
-  const { controller, root } = setup({ draft: project('unsaved'), projects: [saved] });
-  controller.open('computer');
-  controller.openProject(saved);
-  assert.equal(controller.confirmClose, true);
-  find(root, 'Сохранить').click();
-  assert.equal(controller.project.id, 'saved');
-  assert.deepEqual(controller.state.projects.map(item => item.id), ['saved', 'unsaved']);
-  assert.equal(controller.state.draft, null);
+test('opening an archived project leaves the independent draft untouched', () => {
+  const saved=project('saved'),{controller}=setup({draft:project('unsaved'),projects:[saved]});
+  const before=structuredClone(controller.state);controller.openProject(saved);
+  assert.equal(controller.project.id,'saved');assert.deepEqual(controller.state,before);controller.dispose();
 });
 
-test('explicitly discarding the recovered draft allows the selected new brief', () => {
-  const { controller, root } = setup({ draft: project('unsaved') });
-  controller.startStudio(BATTLE_BRIEFS[1].id);
-  assert.equal(controller.confirmClose, true);
-  find(root, 'Не сохранять').click();
-  find(root, 'Создать проект FT Studio').click();
-  assert.equal(controller.project.battleId, BATTLE_BRIEFS[1].id);
-  assert.notEqual(controller.state.draft.id, 'unsaved');
+test('new game clears registrations without retaining a previous Underweb view', () => {
+  const {controller,root}=setup();controller.open('underweb');controller.navigateUnderweb('underweb://battles/concrete-echo');
+  find(root,'Подать заявку').click();find(root,'Подтвердить заявку').click();
+  controller.reset(createVirtualPcState());controller.showDesktop(controller.state);controller.open('underweb');
+  assert.equal(controller.underwebView.snapshot.route.type,'home');assert.deepEqual(controller.state.battleApplications,[]);
 });
 
-test('dragging a mixer fader preserves the live control across consecutive input events', () => {
-  const { controller, root, document } = setup();
-  controller.openProject(project('mix'));
-  const gain = find(root, 'Громкость kick');
-  gain.focus();
-  for (const value of ['.5', '.25']) {
-    gain.value = value;
-    gain.dispatchEvent(new Event('input'));
-    assert.ok(find(root, 'Громкость kick') === gain, 'input must retain its DOM node');
-    assert.ok(document.activeElement === gain, 'fader must retain focus');
-  }
-  assert.equal(controller.state.draft.tracks[0].gain, .25);
+test('clock updates preserve an unfinished registration and its focused input', () => {
+  const {controller,root,document}=setup();controller.open('underweb');controller.navigateUnderweb('underweb://battles/concrete-echo');
+  find(root,'Подать заявку').click();const input=find(root,'Имя участника');input.value='Мой псевдоним';input.focus();
+  controller.syncState({...controller.state,lastGameMinute:901});controller.syncHost({playerName:'Игрок',clockLabel:'15:01'});
+  assert.equal(find(root,'Имя участника'),input);assert.equal(document.activeElement,input);assert.equal(input.value,'Мой псевдоним');
 });
 
 test('keyboard navigation enters an opened window and wraps inside it', () => {
   const { controller, root, document } = setup();
   controller.open('underweb');
-  const first = find(root, 'Свернуть окно'), last = find(root, `Выбрать баттл ${BATTLE_BRIEFS.at(-1).title}`);
+  const first = find(root, 'Свернуть окно'), last = find(root, 'Домашняя студия');
   assert.ok(root.contains(document.activeElement));
   last.focus();
   const event = new Event('keydown', { cancelable: true });
@@ -149,12 +129,9 @@ test('insufficient disk space disables download with a Russian explanation', () 
   assert.equal(controller.state.download.status, 'idle');
 });
 
-test('a full disk blocks a new project save but allows updating an existing one', () => {
-  const projects = Array.from({ length: 600 }, (_, i) => project('p-' + i));
-  const { controller, root } = setup({ projects });
-  controller.openProject(project('new'));
-  assert.equal(find(root, 'Сохранить проект в Мои проекты').disabled, true);
-  assert.ok(nodes(root).some(node => /недостаточно места/i.test(node.textContent ?? '')));
-  controller.openProject(projects[0]);
-  assert.notEqual(find(root, 'Сохранить проект в Мои проекты').disabled, true);
+test('full disk still permits opening an existing project without a save operation', () => {
+  const projects=Array.from({length:600},(_,i)=>project('p-'+i));const {controller,root}=setup({projects});
+  const before=structuredClone(controller.state);controller.openProject(projects[0]);
+  assert.equal(controller.project.id,'p-0');assert.equal(find(root,'Сохранить проект в Мои проекты'),undefined);
+  assert.deepEqual(controller.state,before);controller.dispose();
 });

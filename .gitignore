@@ -1,0 +1,18 @@
+# Dependencies and generated checks stay out of source history.
+node_modules/
+coverage/
+dist/
+artifacts/
+__pycache__/
+*.py[cod]
+*.log
+
+# Local editor backups and optional worktrees.
+*.blend[1-9]
+.worktrees/
+
+# Local credentials; examples may be tracked.
+.env
+.env.*
+!.env.example
+!.env.sample

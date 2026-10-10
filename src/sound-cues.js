@@ -1,6 +1,7 @@
 const cues = Object.freeze({
   footstep: { id: 'footstep', type: 'tick', frequency: 130, duration: .045 },
   computer: { id: 'computer', type: 'rise', frequency: 380, duration: .12 },
+  'chair-scrape': { id: 'chair-scrape', type: 'noise', frequency: 96, duration: .17 },
   fridge: { id: 'fridge', type: 'tick', frequency: 190, duration: .08 },
   cook: { id: 'cook', type: 'noise', frequency: 240, duration: .12 },
   dishes: { id: 'dishes', type: 'tick', frequency: 620, duration: .07 },

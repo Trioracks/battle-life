@@ -1,9 +1,10 @@
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=18';
-import {createPcIcon} from './virtual-pc-icons.js?rev=18';
-import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties,EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=18';
-import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=18';
-import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=18';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=20';
+import {createPcIcon} from './virtual-pc-icons.js?rev=20';
+import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties,EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=20';
+import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=20';
+import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=20';
 import {normalizeStudioProject} from './ft-studio-project.js';
+import {normalizeBeat} from './beat-production.js';
 
 export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu,onNavigate}) {
   const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',diskLabel=null,disposed=false;
@@ -21,7 +22,7 @@ export function mountExplorer(root,{onOpenProject,onProperties,onClose,onMenu,on
   function openEntry(entry) {
     if(!entry)return;
     if(entry.targetPath){navigate(entry.targetPath);return;}
-    const p=normalizeStudioProject(state.projects.find(p=>p.id===entry.projectId));
+    const raw=state.projects.find(p=>p.id===entry.projectId),p=normalizeBeat(raw)??normalizeStudioProject(raw);
     if(!p){nav={...nav,error:'Этот проект повреждён и не может быть открыт.'};render(false);return;}
     onOpenProject(p);
   }

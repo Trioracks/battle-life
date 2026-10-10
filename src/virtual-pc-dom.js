@@ -15,7 +15,10 @@ export function pcButton(document,text,options={},handler=()=>{}) {
 }
 export function pcFocusable(root,out=[]) {
   if(!root||root.hidden||root.inert)return out;
-  if(['BUTTON','INPUT','SELECT','TEXTAREA'].includes(root.tagName)&&!root.disabled&&root.tabIndex!==-1)out.push(root);
+  const tabindex=root.getAttribute?.('tabindex');
+  const native=['BUTTON','INPUT','SELECT','TEXTAREA'].includes(root.tagName);
+  const explicit=tabindex!==null&&tabindex!==undefined&&Number(tabindex)>=0;
+  if((native||explicit)&&!root.disabled&&root.tabIndex!==-1&&tabindex!=='-1')out.push(root);
   for(const child of root.children??[])pcFocusable(child,out);
   return out;
 }

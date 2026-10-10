@@ -1,5 +1,17 @@
-import {PcTransition} from './virtual-pc-transition.js?rev=18';
+import {PcTransition} from './virtual-pc-transition.js?rev=20';
 export const pcNeedsSceneFrame=(snapshot,mode)=>mode!=='pc'||snapshot.overlay<1;
+export function beginPcCutscene(motion){
+ if(motion.busy||!motion.config.actions.computer)return false;
+ motion.sleeping=false;motion.pending=null;motion.actionId='computer';motion.from=[...motion.position];motion.targetYaw=motion.config.actions.computer.yaw;motion.setPhase('fade-out');return true;
+}
+export function pcActorVisible(motion,computerActive,workActor=false){
+ if(workActor)return true;
+ return !computerActive&&!(motion.actionId==='computer'&&['black','fade-in','perform','return-out'].includes(motion.phase));
+}
+export function preparePcWorkPose(motion){
+ if(motion.actionId!=='computer'||motion.phase!=='perform')return false;
+ motion.yaw=motion.targetYaw=motion.config.actions.computer.yaw;return true;
+}
 export function moveInRoom(motion,lifecycle,x){
  if(!motion.move(x))return false;
  if(lifecycle.pending&&!lifecycle.entering)lifecycle.reset();
@@ -23,12 +35,16 @@ export class PcLifecycle{
   this.transition.enter({alreadyOn:this.getState().power==='on'});this.consume();return true;
  }
  leave(){const result=this.transition.leave();this.consume();return result;}
+ work(){const result=this.transition.work();this.consume();return result;}
+ finishWork(options){const result=this.transition.finishWork(options);this.consume();return result;}
  shutdown(){const result=this.transition.shutdown();this.consume();return result;}
  tick(dt,{paused=false,hidden=false}={}){if(!paused&&!hidden)this.transition.tick(dt);this.consume();}
  consume(){for(const event of this.transition.drainEvents()){
   if(event.type==='power-on')this.setPower('on');else if(event.type==='power-off')this.setPower('off');
   else if(['bios','startup','shutdown'].includes(event.type))Promise.resolve(this.sounds?.play(event.type)).catch(()=>{});
   else if(event.type==='desktop-ready')this.onDesktop();
+  else if(event.type==='work-scene'){this.view.endComputerView();this.view.modes.mode='2D';this.view.modes.revision++;}
+  else if(event.type==='work-camera')this.view.beginComputerView();
   else if(event.type==='room-ready'){this.view.endComputerView();this.onRoom();}
  }}
  restore(phase){if(phase!=='return-in'||!this.savedLook)return;Object.assign(this.view.modes,this.savedLook);this.view.modes.revision++;this.savedLook=null;}

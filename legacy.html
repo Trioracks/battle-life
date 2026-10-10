@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Battle Life — Каликфорния</title>
+    <link rel="stylesheet" href="./style.css?v=20260911-creator2" />
+    <script type="importmap">
+      { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" } }
+    </script>
+  </head>
+  <body>
+    <main class="game-shell">
+      <canvas id="game" aria-label="3D apartment visual prototype"></canvas>
+      <section class="hud hud--top" aria-label="Game status">
+        <p class="eyebrow">BATTLE LIFE / КАЛИКФОРНИЯ</p>
+        <h1 id="scene-title">КВАРТИРА · 17 СЕНТЯБРЯ</h1>
+      </section>
+      <section class="campaign-hud" aria-label="Состояние кампании">
+        <div class="campaign-hud__time">
+          <span class="campaign-hud__label">СЕЙЧАС</span>
+          <strong id="campaign-clock">17 СЕН · 19:00</strong>
+          <span id="campaign-rent">Аренда 3 500 ₽ · 1 окт</span>
+        </div>
+        <div class="campaign-hud__cash"><span>НАЛИЧНЫЕ</span><strong id="campaign-cash">5 000 ₽</strong></div>
+        <div class="needs" aria-label="Потребности">
+          <div class="need"><span>Бодрость</span><i><b id="need-energy"></b></i></div>
+          <div class="need"><span>Сытость</span><i><b id="need-hunger"></b></i></div>
+          <div class="need"><span>Здоровье</span><i><b id="need-health"></b></i></div>
+          <div class="need"><span>Досуг</span><i><b id="need-leisure"></b></i></div>
+        </div>
+        <button id="creator-open" class="campaign-hud__profile" type="button">Настроить MC</button>
+      </section>
+      <section class="hud hud--bottom">
+        <p id="status">Кликни по комнате, чтобы отправить героя в нужную точку.</p>
+        <p class="controls">Клик слева или справа — идти · под героем — посмотреть в камеру · по компьютеру — работать</p>
+      </section>
+      <section id="interaction-dock" class="interaction-dock" aria-live="polite">
+        <span class="interaction-dock__hint">Подойди к предмету</span>
+      </section>
+      <aside id="world-tooltip" class="world-tooltip is-hidden" aria-live="polite"></aside>
+      <aside id="actor-bubble" class="actor-bubble is-hidden" aria-live="polite"></aside>
+      <section id="desktop-screen" class="desktop-screen is-hidden" aria-label="Экран компьютера">
+        <header class="desktop-bar"><span id="desktop-system">КАЛИКФОРНИЯ OS / ДОМАШНИЙ ПК</span><button id="desktop-close" type="button">Выключить ×</button></header>
+        <div id="desktop-content" class="desktop-content"></div>
+        <footer id="desktop-taskbar" class="desktop-taskbar" aria-label="Панель задач"></footer>
+      </section>
+      <section id="map-screen" class="map-screen is-hidden" aria-label="Карта Каликфорнии"><header><span>КАЛИКФОРНИЯ · КАРТА</span><button id="map-close" type="button">Вернуться домой ×</button></header><div class="map-canvas"><div id="map-districts" class="map-districts"></div><aside id="map-location-panel" class="map-location-panel" aria-live="polite"></aside></div></section>
+      <aside id="phone-panel" class="phone-panel is-hidden" aria-live="polite"></aside>
+      <section id="start-screen" class="start-screen" aria-labelledby="start-title">
+        <div class="start-card">
+          <p class="eyebrow">BATTLE LIFE / КАЛИКФОРНИЯ</p>
+          <h2 id="start-title">КВАРТИРА · ПЕРВЫЙ ВЕЧЕР</h2>
+          <p>Сентябрь 2026-го. Панелька, тусклый свет и ещё не записанный первый трек.</p>
+          <div class="start-card__actions">
+            <button id="start-new-game" class="primary-button" type="button">Новая игра →</button>
+            <button id="start-continue" class="secondary-button is-hidden" type="button">Продолжить</button>
+          </div>
+        </div>
+      </section>
+      <section id="creator-modal" class="modal is-hidden" role="dialog" aria-modal="true" aria-labelledby="creator-title">
+        <form id="creator-form" class="creator-card">
+          <div class="creator-card__heading">
+            <p class="eyebrow">ПЕРВЫЙ ВЕЧЕР · КАЛИКФОРНИЯ</p>
+            <h2 id="creator-title">Собери своего MC</h2>
+            <p>Все статы начинают с 10. Распредели 10 очков; один стат нельзя поднять выше 50.</p>
+          </div>
+          <div class="creator-identity">
+            <label>Имя<input id="creator-name" name="name" maxlength="24" value="Миша" required /></label>
+            <label>Никнейм<input id="creator-nickname" name="nickname" maxlength="32" placeholder="Если пусто — будет использовано имя" /></label>
+          </div>
+          <div class="creator-split">
+            <section><div class="creator-section-title"><span>Стартовые навыки</span><strong id="creator-points">10 очков</strong></div><div id="creator-stats" class="creator-stats"></div></section>
+            <section class="creator-look"><div class="creator-section-title"><span>Внешность MC</span><small>Нажми на зону модели</small></div>
+              <div class="creator-avatar-frame">
+                <canvas id="creator-preview" aria-label="Предпросмотр внешности персонажа"></canvas>
+              </div>
+              <div id="creator-look-controls" class="creator-look-controls" aria-label="Настройка внешности"></div>
+            </section>
+          </div>
+          <p id="creator-error" class="creator-error" role="alert"></p>
+          <button class="primary-button" type="submit">Начать вечер →</button>
+        </form>
+      </section>
+      <div class="scanlines" aria-hidden="true"></div>
+      <div id="transition-fade" class="transition-fade" aria-hidden="true"></div>
+    </main>
+    <script type="module" src="./src/main.js?rev=apartment-assets-v2"></script>
+  </body>
+</html>

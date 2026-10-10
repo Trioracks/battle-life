@@ -1,5 +1,5 @@
-import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=18';
-import {createPcIcon} from './virtual-pc-icons.js?rev=18';
+import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=20';
+import {createPcIcon} from './virtual-pc-icons.js?rev=20';
 
 export function mountPcShell(root,{onCommand}) {
   const d=root.ownerDocument,win=d.defaultView??globalThis;

@@ -1,4 +1,4 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=18';
+import {pcElement as el} from './virtual-pc-dom.js?rev=20';
 
 export function formatDiskGb(mb) {
   return (Math.max(0,Number.isFinite(mb)?mb:0)/1000).toFixed(1).replace('.',',')+' ГБ';

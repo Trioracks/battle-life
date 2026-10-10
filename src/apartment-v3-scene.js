@@ -2,15 +2,16 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {ApartmentAnimation} from './apartment-v3-animation.js?rev=8';
 import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=10';
-import {homeLight} from './apartment-v3-time.js?rev=18';
+import {homeLight} from './apartment-v3-time.js?rev=20';
 import {createBackdropMaterial,sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=8';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=7';
-import {CameraModes,cameraPose,pickVisible} from './apartment-v3-camera.js?rev=18';
-import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=18';
-import {createSmoke} from './apartment-v3-smoke.js?rev=18';
+import {CameraModes,cameraPose,pickVisible} from './apartment-v3-camera.js?rev=20';
+import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=20';
+import {createSmoke} from './apartment-v3-smoke.js?rev=20';
 import {createRetroPass} from './apartment-v3-retro.js?rev=11';
-import {createComputerView} from './apartment-v3-computer.js?rev=18';
-import {pcPresentation} from './virtual-pc-presentation.js?rev=18';
+import {createComputerView} from './apartment-v3-computer.js?rev=20';
+import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=20';
+import {pcPresentation} from './virtual-pc-presentation.js?rev=20';
 
 export async function createApartmentScene(canvas,config){
   const BASE=config.assetBase??'./assets/apartment/v3/';
@@ -29,14 +30,14 @@ export async function createApartmentScene(canvas,config){
   const loader=new GLTFLoader();
   const textureLoader=new THREE.TextureLoader(),textureCache=new Map();
   function loadTexture(file){
-    if(!textureCache.has(file))textureCache.set(file,textureLoader.loadAsync(BASE+file+'?rev=18').then(texture=>{
+    if(!textureCache.has(file))textureCache.set(file,textureLoader.loadAsync(BASE+file+'?rev=20').then(texture=>{
       texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=renderer.capabilities.getMaxAnisotropy();return texture;
     }).catch(error=>{textureCache.delete(file);throw error;}));return textureCache.get(file);
   }
   const stateFiles=config.lightingStates??{both:{night:config.background,day:config.backgroundDay}};
   const [stateEntries,environment,model]=await Promise.all([
     Promise.all(Object.entries(stateFiles).map(async([name,files])=>[name,{night:await loadTexture(files.night),day:await loadTexture(files.day)}])),
-    loader.loadAsync(BASE+config.geometry+'?rev=18'),loader.loadAsync(BASE+config.rig+'?rev=18')
+    loader.loadAsync(BASE+config.geometry+'?rev=20'),loader.loadAsync(BASE+config.rig+'?rev=20')
   ]);
   const lightingStates=Object.fromEntries(stateEntries);
   backdropSets.set('2D',lightingStates);
@@ -47,7 +48,7 @@ export async function createApartmentScene(canvas,config){
   const courtyard=new THREE.Group(),outsideMask=new THREE.Group();scene.add(courtyard,outsideMask);
   let updateCourtyard=()=>{},smokeSeconds=0;
   if(config.exterior){
-    const [outside,mask]=await Promise.all([loader.loadAsync(BASE+config.exterior.geometry+'?rev=18'),loader.loadAsync(BASE+config.exterior.occluders+'?rev=18')]);
+    const [outside,mask]=await Promise.all([loader.loadAsync(BASE+config.exterior.geometry+'?rev=20'),loader.loadAsync(BASE+config.exterior.occluders+'?rev=20')]);
     courtyard.add(outside.scene);outsideMask.add(mask.scene);updateCourtyard=createCourtyardLighting(THREE,courtyard);
     outsideMask.traverse(o=>{if(o.isMesh){o.material=depthMaterial;o.renderOrder=-60;}});
   }
@@ -78,7 +79,7 @@ export async function createApartmentScene(canvas,config){
   async function loadMode(mode){
     if(mode==='3D'){
       if(staticScene)return;
-      staticPending??=loader.loadAsync(BASE+config.staticGeometry+'?rev=18').then(result=>{
+      staticPending??=loader.loadAsync(BASE+config.staticGeometry+'?rev=20').then(result=>{
         if(disposed){result.scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat().filter(Boolean))m.dispose();});return;}
         staticScene=result.scene;staticScene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});updateOutside=createOutsideLighting(staticScene);staticScene.visible=false;scene.add(staticScene);
       }).finally(()=>{staticPending=null;});return staticPending;
@@ -104,7 +105,7 @@ export async function createApartmentScene(canvas,config){
       const view=config.cameraViews?.[modes.mode]??config.camera;
       back.position.fromArray(view.target).add(new THREE.Vector3(...view.position).sub(new THREE.Vector3(...view.target)).normalize().multiplyScalar(-8));back.quaternion.copy(camera.quaternion);
     }
-    appliedMode=modes.mode;back.visible=!fp;actor.visible=!fp;shadowFloor.visible=!fp;shadow.visible=!fp&&shadow.visible;bones.visible=!fp&&bones.visible;
+    appliedMode=modes.mode;back.visible=!fp;actor.visible=!fp&&pcActorVisible(state,computerActive,computerSnapshot.workActor);shadowFloor.visible=actor.visible;shadow.visible=actor.visible&&shadow.visible;bones.visible=actor.visible&&bones.visible;
     if(staticScene){staticScene.visible=fp;staticScene.traverse(o=>{if(o.name.startsWith('static-cutaway-shell-'))o.visible=true;});}
     courtyard.visible=fp;outsideMask.visible=!fp;smoke.root.visible=true;
     environment.scene.traverse(o=>{if(o.name.startsWith('depth-'))o.visible=!fp;if(/^lamp-(living|kitchen)-bulb/.test(o.name))o.visible=fp;});
@@ -112,7 +113,7 @@ export async function createApartmentScene(canvas,config){
       const zoom=computerSnapshot.zoom??0,blend=1-THREE.MathUtils.smoothstep(zoom,0,.10);
       staticScene.visible=true;staticScene.traverse(o=>{if(o.name.startsWith('static-cutaway-shell-'))o.visible=false;});
       back.visible=false;transitionBackdrop.uniforms.pcBlend.value=blend;transitionQuad.visible=blend>0;
-      actor.visible=zoom<.2;shadowFloor.visible=false;shadow.visible=false;bones.visible=false;outsideMask.visible=false;courtyard.visible=true;
+      actor.visible=false;shadowFloor.visible=false;shadow.visible=false;bones.visible=false;outsideMask.visible=false;courtyard.visible=true;
       environment.scene.traverse(o=>{if(o.name.startsWith('depth-'))o.visible=false;});
     }
   }

@@ -1,15 +1,26 @@
+import {normalizeMusic,normalizeBeat} from './beat-production.js';
 export const VIRTUAL_PC_STORAGE_KEY = 'battle-life-virtual-pc-v1';
 export const VIRTUAL_DISK_MB = 16000;
 export const SYSTEM_RESERVED_MB = 14000;
 export const FT_STUDIO_BYTES = 800000000;
 export const FT_STUDIO_MB = FT_STUDIO_BYTES / 1000000;
 export const PROJECT_MB = 2;
+const battleIds=new Set(['concrete-echo','open-mic-17','yard-cipher']);
+function normalizeApplications(value){
+ const seen=new Set();return (Array.isArray(value)?value:[]).filter(a=>a&&battleIds.has(a.battleId)&&typeof a.nickname==='string'&&a.nickname.trim()&&!seen.has(a.battleId)&&seen.add(a.battleId)).map(a=>({battleId:a.battleId,nickname:a.nickname.trim().slice(0,32),status:'registered'}));
+}
+export function applyToBattle(state,battleId,nickname){
+ const normalized=normalizeSnapshot(state);
+ const application=normalizeApplications([{battleId,nickname}])[0];
+ if(!application||normalized.battleApplications.some(a=>a.battleId===battleId))return normalized;
+ return {...normalized,battleApplications:[...normalized.battleApplications,application]};
+}
 
 const wallpaperIds = new Set(['courtyard', 'factory', 'room']);
 const downloadStates = new Set(['idle', 'downloading', 'ready-to-install', 'installed']);
 const isRecord = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const clone = value => JSON.parse(JSON.stringify(value));
-const iconIds = new Set(['computer','underweb','torent','ft-studio']);
+const iconIds = new Set(['computer','underweb','torent','ft-studio','ripline']);
 function normalizeIcons(value) {
   return Object.fromEntries(Object.entries(isRecord(value)?value:{}).filter(([id,p])=>iconIds.has(id)&&Number.isFinite(p?.x)&&Number.isFinite(p?.y)).map(([id,p])=>[id,{x:Math.max(0,p.x),y:Math.max(0,p.y)}]));
 }
@@ -27,6 +38,7 @@ export function layoutDesktopIcons(ids,positions,{width,height}) {
 }
 
 function normalizeProject(value) {
+  if(value?.kind==='beat')return normalizeBeat(value);
   return isRecord(value) && typeof value.id === 'string' && value.id.trim() ? clone(value) : null;
 }
 
@@ -53,6 +65,8 @@ function normalizeSnapshot(value) {
     desktopIcons: normalizeIcons(source.desktopIcons),
     download: normalizeDownload(source.download),
     projects,
+    music:normalizeMusic(source.music,projects),
+    battleApplications:normalizeApplications(source.battleApplications),
     draft: isRecord(source.draft) ? clone(source.draft) : null,
     lastGameMinute: Number.isFinite(source.lastGameMinute) && source.lastGameMinute >= 0 ? source.lastGameMinute : null,
   };

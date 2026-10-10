@@ -114,6 +114,17 @@ kbd {
   background: repeating-linear-gradient(to bottom, transparent 0 3px, rgba(10, 14, 13, .48) 3px 4px);
 }
 
+.transition-fade {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: #040708;
+  transition: opacity .18s ease-in-out;
+}
+.transition-fade.is-active { pointer-events: auto; opacity: 1; }
+
 .modal { position: absolute; z-index: 8; inset: 0; display: grid; place-items: center; padding: 28px; background: rgba(5, 10, 12, .68); backdrop-filter: blur(5px); }
 .modal.is-hidden { display: none; }
 .desktop-screen { position: absolute; z-index: 7; inset: 0; display: grid; grid-template-rows: 44px 1fr 42px; overflow: hidden; border: 1px solid #849a81; background: #152224; box-shadow: 0 26px 80px rgba(0, 0, 0, .64); }

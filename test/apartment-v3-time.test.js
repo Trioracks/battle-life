@@ -21,9 +21,9 @@ test('daylight follows game time with smooth dawn and dusk and dark nights',()=>
 test('time continues slowly while playing and confirmed activities advance it once',()=>{
   const clock=new ApartmentTime({day:1,minutes:720});clock.tick(4);assert.equal(clock.label,'12:01');
   clock.completeAction('sink');assert.equal(clock.label,'12:16');
-  clock.completeAction('computer');assert.equal(clock.label,'14:16');
-  clock.completeAction('unknown');assert.equal(clock.label,'14:16');
-  clock.tick(-2);clock.advanceMinutes(NaN);assert.equal(clock.label,'14:16');
+  clock.completeAction('computer');assert.equal(clock.label,'12:16','time is now charged by actual production stages');
+  clock.completeAction('unknown');assert.equal(clock.label,'12:16');
+  clock.tick(-2);clock.advanceMinutes(NaN);assert.equal(clock.label,'12:16');
 });
 test('home time round trips separately and corrupt or inaccessible saves are safe',()=>{
   const data=new Map(),storage={setItem:(k,v)=>data.set(k,v),getItem:k=>data.get(k)};

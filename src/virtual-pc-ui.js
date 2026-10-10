@@ -1,18 +1,25 @@
 import { FtStudioAudio } from './ft-studio-audio.js?rev=4';
-import {mountPcShell} from './virtual-pc-shell.js?rev=18';
-import {mountExplorer} from './virtual-pc-explorer-view.js?rev=18';
-import {mountPcMenu} from './virtual-pc-menus.js?rev=18';
-import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=18';
-import {explorerProperties} from './virtual-pc-explorer.js?rev=18';
-import {createWindowState,reduceWindows} from './virtual-pc-window-state.js?rev=18';
-import {layoutDesktopIcons,setDesktopIconPosition,resetDesktopIconPositions} from './virtual-pc-state.js?rev=18';
-import {createPcIcon} from './virtual-pc-icons.js?rev=18';
-import { createStudioProject, normalizeStudioProject, setArrangementCell, setBpm, setStudioStep, setTrackGain } from './ft-studio-project.js';
-import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js?rev=18';
-import { cancelFtDownload, createVirtualPcState, diskUsage, FT_STUDIO_MB, PROJECT_MB, installFtStudio, saveStudioProject, setWallpaper, startFtDownload } from './virtual-pc-state.js?rev=18';
-import { downloadPresentation } from './virtual-pc-runtime.js?rev=18';
-import {diskAmount} from './virtual-pc-disk-view.js?rev=18';
-import {pcPresentation} from './virtual-pc-presentation.js?rev=18';
+import {mountPcShell} from './virtual-pc-shell.js?rev=20';
+import {mountExplorer} from './virtual-pc-explorer-view.js?rev=20';
+import {mountPcMenu} from './virtual-pc-menus.js?rev=20';
+import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=20';
+import {explorerProperties} from './virtual-pc-explorer.js?rev=20';
+import {createWindowState,reduceWindows} from './virtual-pc-window-state.js?rev=20';
+import {layoutDesktopIcons,setDesktopIconPosition,resetDesktopIconPositions} from './virtual-pc-state.js?rev=20';
+import {createPcIcon} from './virtual-pc-icons.js?rev=20';
+import { normalizeStudioProject } from './ft-studio-project.js';
+import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js?rev=20';
+import { cancelFtDownload, createVirtualPcState, diskUsage, FT_STUDIO_MB, PROJECT_MB, installFtStudio, saveStudioProject, setWallpaper, startFtDownload } from './virtual-pc-state.js?rev=20';
+import { downloadPresentation } from './virtual-pc-runtime.js?rev=20';
+import {diskAmount} from './virtual-pc-disk-view.js?rev=20';
+import {pcPresentation} from './virtual-pc-presentation.js?rev=20';
+import {createStudioWorkspace} from './ft-studio-view.js?rev=20';
+import {mountUnderweb} from './underweb-view.js?rev=20';
+import {applyToBattle} from './virtual-pc-state.js?rev=20';
+import {mountBeatStudio} from './beat-studio-view.js';
+import {BeatAudio} from './beat-audio.js';
+import {normalizeBeat} from './beat-production.js';
+import {createBeatMarket} from './beat-market-view.js';
 
 const NOOP = () => {};
 
@@ -87,6 +94,8 @@ export function mountVirtualPc(root, callbacks = {}) {
     setTimeoutFn: callbacks.setTimeoutFn ?? ((...args) => globalThis.setTimeout(...args)),
     clearTimeoutFn: callbacks.clearTimeoutFn ?? (timer => globalThis.clearTimeout(timer)),
     audio: callbacks.audio ?? new FtStudioAudio(),
+    beatAudio: callbacks.beatAudio ?? new BeatAudio(),
+    studioView:null,
     state: createVirtualPcState(),
     phase: 'off',
     windows: createWindowState({width:globalThis.innerWidth??1280,height:globalThis.innerHeight??720}),
@@ -94,14 +103,17 @@ export function mountVirtualPc(root, callbacks = {}) {
     explorer: null,
     menu: null,
     systemViews: new Map(),
+    underwebView:null,
+    studioLaunch:null,
+    launchGeneration:0,
     properties: null,
     shutdownModal: null,
     metadata: {playerName:'Игрок',clockLabel:'12:00'},
     returnFocus: null,
     folder: 'computer',
     startOpen: false,
-    address: 'underweb://battles',
-    underweb: resolveUnderweb('underweb://battles'),
+    address: 'underweb://iskra',
+    underweb: resolveUnderweb('underweb://iskra'),
     project: null,
     selectedBrief: BATTLE_BRIEFS[0].id,
     dirty: false,
@@ -147,7 +159,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.renderDesktop(false);
   };
   pc.syncHost = metadata => {
-    if(pc.metadata.playerName===metadata.playerName&&pc.metadata.clockLabel===metadata.clockLabel)return;
+    if(JSON.stringify(pc.metadata)===JSON.stringify(metadata))return;
     pc.metadata={...metadata};
     if(pc.phase==='desktop')pc.renderDesktop(false);
   };
@@ -214,6 +226,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       if(!target.children.length||(replaceActive&&w.id===pc.windows.activeId))pc.refreshApp(w.id,{replaceContent:true});
     }
     pc.explorer?.update(pc.state);
+    pc.studioView?.update();
     for(const view of pc.systemViews.values())view.update();
     const guard=pc.confirmClose?findByDataset(root,'pcRole','close-guard'):null;
     pc.shell.setModal(pc.shutdownModal?.node??guard,pc.returnFocus);
@@ -224,6 +237,14 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
   pc.refreshApp = (appId,{replaceContent=false}={}) => {
     const target=pc.shell?.getContentRoot(appId);if(!target)return;
+    if(appId==='underweb'){
+      if(!pc.underwebView)pc.underwebView=mountUnderweb(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onApply:(id,name)=>pc.persist(applyToBattle(pc.state,id,name)),onDownload:()=>pc.open('torent'),onChange:next=>{pc.persist(next);pc.renderDesktop(false);},audio:pc.beatAudio});
+      pc.underwebView.update();return;
+    }
+    if(appId==='ft-studio'){
+      if(!pc.studioView)pc.studioView=mountBeatStudio(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onChange:next=>pc.persist(next),onWork:()=>callbacks.onWork?.()??false,audio:pc.beatAudio,legacyName:pc.project?.version===1?pc.project.name:undefined});
+      pc.studioView.update();return;
+    }
     if(appId==='computer'){
       if(!pc.explorer)pc.explorer=mountExplorer(target,{onOpenProject:p=>pc.openProject(p),onProperties:p=>pc.showProperties(p),onClose:()=>pc.closeWindow('computer'),onMenu:p=>pc.menu?.open(p),onNavigate:location=>{
         pc.windows={...pc.windows,windows:pc.windows.windows.map(w=>w.id==='computer'?{...w,title:location.label,iconId:location.iconId}:w)};pc.renderDesktop(false);
@@ -272,11 +293,13 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.shutdownModal?.view.dispose();pc.shutdownModal=null;pc.shell.setModal(null,pc.returnFocus);pc.renderDesktop(false);
   };
   pc.showShutdown = () => {
-    if(pc.confirmClose||pc.shutdownModal)return;pc.menu.close();pc.returnFocus=document.activeElement;
+    if(pc.confirmClose||pc.shutdownModal)return;pc.cancelStudioLaunch();pc.menu.close();pc.returnFocus=document.activeElement;
     const node=el(document,'div');const view=mountSystemWindow(node,{kind:'shutdown',getState:()=>pc.state,onClose:()=>pc.cancelShutdown(),onConfirmShutdown:()=>{pc.cancelShutdown();pc.requestShutdown();}});
     pc.shutdownModal={node,view};pc.shell.setModal(node,pc.returnFocus);
   };
   pc.clearViews = () => {
+    pc.studioView?.dispose();pc.studioView=null;
+    pc.underwebView?.dispose();pc.underwebView=null;
     pc.explorer?.dispose();pc.explorer=null;for(const view of pc.systemViews.values())view.dispose();pc.systemViews.clear();
     pc.shutdownModal?.view.dispose();pc.shutdownModal=null;pc.menu?.close();
   };
@@ -285,37 +308,8 @@ export function mountVirtualPc(root, callbacks = {}) {
 
   pc.openFolder = folder => pc.explorer?.navigate(folder);
 
-  pc.navigateUnderweb = address => {
-    pc.address = typeof address === 'string' ? address : '';
-    pc.underweb = resolveUnderweb(pc.address);
-    pc.render();
-  };
+  pc.navigateUnderweb = address => pc.underwebView?.navigate(address);
 
-  pc.renderUnderweb = () => {
-    const content = el(document, 'div', { className: 'pc-window-content pc-underweb' });
-    const form = el(document, 'form', { attributes: { 'aria-label': 'Адрес Underweb' } });
-    const address = el(document, 'input', { value: pc.address, attributes: { 'aria-label': 'Адрес или поиск Underweb' } });
-    address.name = 'address';
-    add(form, address);
-    add(form, button(document, 'Открыть', { attributes: { 'aria-label': 'Открыть адрес Underweb' } }, () => pc.navigateUnderweb(address.value)));
-    form.addEventListener('submit', event => { event.preventDefault(); pc.navigateUnderweb(address.value); });
-    add(content, form);
-    if (pc.underweb.type === 'battles') {
-      add(content, el(document, 'h3', { text: 'Баттлы рядом' }));
-      for (const brief of pc.underweb.briefs) {
-        const card = el(document, 'article', { className: 'pc-brief' });
-        add(card, el(document, 'strong', { text: brief.title }));
-        add(card, el(document, 'p', { text: brief.condition }));
-        add(card, button(document, 'Выбрать для FT Studio', { attributes: { 'aria-label': `Выбрать баттл ${brief.title}` } }, () => pc.startStudio(brief.id)));
-        add(content, card);
-      }
-    } else if (pc.underweb.type === 'battle') {
-      add(content, el(document, 'h3', { text: pc.underweb.brief.title }));
-      add(content, el(document, 'p', { text: pc.underweb.brief.condition }));
-      add(content, button(document, 'Открыть в FT Studio', {}, () => pc.startStudio(pc.underweb.brief.id)));
-    } else add(content, el(document, 'p', { className: 'pc-error', text: pc.underweb.message }));
-    return pc.windowFrame('Underweb', content);
-  };
 
   pc.renderTorentControls = controls => {
     controls.replaceChildren();
@@ -346,214 +340,22 @@ export function mountVirtualPc(root, callbacks = {}) {
     return pc.windowFrame('torent', content);
   };
 
-  pc.updateProject = (next, rerender = true) => {
-    pc.audio.stop();
-    pc.project = next;
-    pc.dirty = true;
-    pc.persist({ ...pc.state, draft: next });
-    pc.message = pc.persistenceWarning;
-    if (rerender) pc.render();
-    else {
-      const status = findByDataset(root, 'pcRole', 'studio-status');
-      if (status) status.textContent = pc.message;
-    }
-  };
-
-  pc.runPendingAction = () => {
-    const action = pc.pendingAction;
-    pc.pendingAction = null;
-    pc.confirmClose = false;
-    pc.recoveringDraft = false;
-    pc.refreshApp('ft-studio',{replaceContent:true});
-    pc.renderDesktop(false);
-    if (action) action();
-  };
-
-  pc.cancelPendingAction = () => {
-    const restoreDraft=pc.recoveringDraft;
-    pc.pendingAction = null;
-    pc.confirmClose = false;
-    pc.recoveringDraft = false;
-    const origin=!restoreDraft&&pc.windows.windows.find(w=>findByDataset(root,'windowId',w.id)?.contains(pc.returnFocus));
-    if(restoreDraft)pc.returnFocus=null;
-    pc.refreshApp('ft-studio',{replaceContent:true});
-    if(origin)pc.windows=reduceWindows(pc.windows,{type:'activate',id:origin.id});
-    pc.renderDesktop(false);
-  };
-
-  pc.requestProjectTransition = (action, protectDraft = false) => {
-    if (pc.confirmClose) return;
-    const draft = protectDraft && !pc.dirty && normalizeStudioProject(pc.state.draft);
-    if (draft) {
-      pc.project = draft;
-      pc.dirty = true;
-      pc.ensureWindow('ft-studio');
-      pc.recoveringDraft = true;
-    }
-    if (pc.project && pc.dirty) {
-      pc.menu?.close();
-      pc.returnFocus=document.activeElement;
-      pc.ensureWindow('ft-studio');
-      pc.pendingAction = action;
-      pc.confirmClose = true;
-      pc.startOpen = false;
-      pc.render();
-      return;
-    }
-    action();
-  };
-
-  pc.openTorentForStudio = briefId => {
-    pc.audio.stop();
-    pc.selectedBrief = briefId;
-    pc.ensureWindow('torent');
-    pc.project = null;
-    pc.dirty = false;
-    pc.message = 'Сначала установи FT Studio через torent.';
-    pc.render();
-  };
-
-  pc.startStudio = briefId => {
-    pc.requestProjectTransition(() => {
-      if (pc.state.download.status !== 'installed') { pc.openTorentForStudio(briefId); return; }
-      pc.audio.stop();
-      pc.selectedBrief = briefId;
-      pc.ensureWindow('ft-studio');
-      pc.project = null;
-      pc.dirty = false;
-      pc.confirmClose = false;
-      pc.message = '';
-      pc.render();
-    }, true);
-  };
 
   pc.openProject = project => {
-    const normalized = normalizeStudioProject(project);
+    const beat=normalizeBeat(project),normalized = beat??normalizeStudioProject(project);
     if (!normalized) { pc.message = 'Этот проект повреждён и не может быть открыт.'; pc.render(); return; }
-    pc.requestProjectTransition(() => {
-      if (pc.state.download.status !== 'installed') { pc.openTorentForStudio(normalized.battleId); return; }
-      pc.audio.stop();
-      pc.ensureWindow('ft-studio');
-      pc.project = normalized;
-      pc.selectedBrief = normalized.battleId;
-      pc.dirty = false;
-      pc.confirmClose = false;
-      pc.callbacks.onOpenProject(normalized);
-      pc.render();
-    }, true);
+    if(pc.state.download.status!=='installed'){pc.open('torent');return;}
+    pc.project=normalized;pc.dirty=false;pc.confirmClose=false;
+    if(pc.state.music.activeBeatId!==(beat?.id??null))pc.persist({...pc.state,music:{...pc.state.music,activeBeatId:beat?.id??null}});
+    pc.callbacks.onOpenProject(normalized);pc.open('ft-studio');pc.refreshApp('ft-studio',{replaceContent:true});
+    pc.studioView?.openProject(normalized);
   };
 
-  pc.canSaveProject = () => pc.state.projects.some(project => project.id === pc.project?.id) || diskUsage(pc.state).freeMb >= PROJECT_MB;
-
-  pc.saveProject = () => {
-    if (!pc.project) return;
-    const result = pc.callbacks.onSaveProject(pc.state, pc.project);
-    if (!result?.ok) { pc.message = result?.reason === 'insufficient-space' ? 'На C: недостаточно места для нового проекта.' : 'Не удалось сохранить проект.'; pc.render(); return; }
-    pc.project = result.state.projects.find(project => project.id === pc.project.id) ?? pc.project;
-    pc.audio.stop();
-    const durable = pc.persist({ ...result.state, draft: null });
-    pc.message = durable ? 'Проект сохранён в Мои проекты.' : 'Проект сохранён только в памяти: браузер не подтвердил запись.';
-    if (!durable) {
-      pc.dirty = true;
-      if (pc.pendingAction) pc.confirmClose = true;
-      pc.render();
-      return;
-    }
-    pc.dirty = false;
-    pc.confirmClose = false;
-    pc.runPendingAction();
-  };
-
-  pc.renderStudioStart = content => {
-    add(content, el(document, 'p', { text: 'Новый проект · выбери баттл и собери первый паттерн.' }));
-    const form = el(document, 'form', { attributes: { 'aria-label': 'Новый проект FT Studio' } });
-    const name = el(document, 'input', { value: 'Новый бит', attributes: { maxlength: '32', 'aria-label': 'Название проекта' } });
-    const brief = el(document, 'select', { attributes: { 'aria-label': 'Баттл для проекта' } });
-    for (const item of BATTLE_BRIEFS) {
-      const option = el(document, 'option', { text: item.title, value: item.id });
-      option.value = item.id;
-      option.selected = item.id === pc.selectedBrief;
-      add(brief, option);
-    }
-    const bpm = el(document, 'input', { type: 'number', value: '92', attributes: { min: '72', max: '150', 'aria-label': 'Темп в BPM' } });
-    add(form, labeledInput(document, 'Название', name));
-    add(form, labeledInput(document, 'Баттл', brief));
-    add(form, labeledInput(document, 'BPM', bpm));
-    const create = () => {
-      const result = createStudioProject({ name: name.value, battleId: brief.value || pc.selectedBrief, bpm: Number(bpm.value) });
-      if (!result.ok) { pc.message = result.reason === 'invalid-name' ? 'Название нужно ввести (до 32 символов).' : 'Выбери баттл из Underweb.'; pc.render(); return; }
-      pc.project = result.project;
-      pc.dirty = true;
-      pc.persist({ ...pc.state, draft: pc.project });
-      pc.render();
-    };
-    add(form, button(document, 'Создать проект', { attributes: { 'aria-label': 'Создать проект FT Studio' } }, create));
-    form.addEventListener('submit', event => { event.preventDefault(); create(); });
-    add(content, form);
-  };
-
-  pc.renderStudio = () => {
-    const content = el(document, 'div', { className: 'pc-window-content ft-studio' });
-    if (!pc.project) pc.renderStudioStart(content);
-    else {
-      const header = el(document, 'div', { className: 'ft-header' });
-      add(header, createPcIcon(document,'studio',{size:28}));
-      add(header, el(document, 'strong', { text: `FT Studio · ${pc.project.name}` }));
-      const bpm = el(document, 'input', { type: 'number', value: String(pc.project.bpm), dataset: { focusId: 'studio-bpm' }, attributes: { min: '72', max: '150', 'aria-label': 'Темп проекта в BPM' } });
-      bpm.addEventListener('change', () => pc.updateProject(setBpm(pc.project, Number(bpm.value))));
-      add(header, bpm);
-      add(header, button(document, '▶ Слушать', { attributes: { 'aria-label': 'Слушать проект' } }, async () => { const result = await pc.audio.play(pc.project); pc.message = result.ok ? 'Играет паттерн.' : 'Браузер не дал запустить звук.'; const status=findByDataset(root,'pcRole','studio-status');if(status)status.textContent=pc.message; }));
-      add(header, button(document, '■ Стоп', { attributes: { 'aria-label': 'Остановить проект' } }, () => { pc.audio.stop(); pc.message = 'Воспроизведение остановлено.'; pc.render(); }));
-      add(content, header);
-      const sequencer = el(document, 'section', { className: 'ft-sequencer', attributes: { 'aria-label': 'Пошаговый секвенсор' } });
-      for (const track of pc.project.tracks) {
-        const row = el(document, 'div', { className: 'ft-track' });
-        add(row, el(document, 'strong', { text: track.id.toUpperCase() }));
-        for (let step = 0; step < track.steps.length; step++) add(row, button(document, track.steps[step] ? '●' : '·', { className: track.steps[step] ? 'on' : '', dataset: { track: track.id, step: String(step), focusId: `step-${track.id}-${step}` }, attributes: { 'aria-label': `${track.id}, шаг ${step + 1}` } }, () => pc.updateProject(setStudioStep(pc.project, track.id, step, !track.steps[step]))));
-        add(sequencer, row);
-      }
-      add(content, sequencer);
-      const arrangement = el(document, 'section', { className: 'ft-arrangement', attributes: { 'aria-label': 'Аранжировка на восемь тактов' } });
-      add(arrangement, el(document, 'h3', { text: 'Аранжировка · 8 тактов' }));
-      for (const track of pc.project.tracks) {
-        const row = el(document, 'div', { className: 'ft-track' });
-        add(row, el(document, 'strong', { text: track.id.toUpperCase() }));
-        for (let bar = 0; bar < track.bars.length; bar++) add(row, button(document, String(bar + 1), { className: track.bars[bar] ? 'on' : '', dataset: { focusId: `bar-${track.id}-${bar}` }, attributes: { 'aria-label': `${track.id}, такт ${bar + 1}` } }, () => pc.updateProject(setArrangementCell(pc.project, track.id, bar, !track.bars[bar]))));
-        add(arrangement, row);
-      }
-      add(content, arrangement);
-      const mixer = el(document, 'section', { className: 'ft-mixer', attributes: { 'aria-label': 'Микшер' } });
-      add(mixer, el(document, 'h3', { text: 'Микшер' }));
-      for (const track of pc.project.tracks) {
-        const gain = el(document, 'input', { type: 'range', value: String(track.gain), dataset: { focusId: `gain-${track.id}` }, attributes: { min: '0', max: '1', step: '.05', 'aria-label': `Громкость ${track.id}` } });
-        gain.addEventListener('input', () => pc.updateProject(setTrackGain(pc.project, track.id, Number(gain.value)), false));
-        add(mixer, labeledInput(document, track.id.toUpperCase(), gain));
-      }
-      add(content, mixer);
-      const save = button(document, 'Сохранить в Мои проекты', { attributes: { 'aria-label': 'Сохранить проект в Мои проекты' } }, () => pc.saveProject());
-      save.disabled = !pc.canSaveProject();
-      add(content, save);
-      if (save.disabled) add(content, el(document, 'p', { className: 'pc-error', text: 'На C: недостаточно места для нового проекта: нужно 2 МБ. Уже сохранённые проекты можно обновлять.' }));
-    }
-    add(content, el(document, 'p', { className: 'pc-status', dataset: { pcRole: 'studio-status' }, attributes: { 'aria-live': 'polite' }, text: pc.message || pc.persistenceWarning }));
-    if (pc.confirmClose) {
-      const guard = el(document, 'aside', { className: 'pc-close-guard', dataset: { pcRole: 'close-guard' }, attributes: { 'aria-label': 'Сохранение проекта', role: 'dialog', 'aria-modal': 'true' } });
-      for (const child of content.children) child.inert = true;
-      add(guard, el(document, 'strong', { text: pc.recoveringDraft ? 'Найден несохранённый черновик: ' + pc.project.name : 'Сохранить проект перед закрытием?' }));
-      const save = button(document, 'Сохранить', { dataset: { focusId: 'guard-save' } }, () => pc.saveProject());
-      save.disabled = !pc.canSaveProject();
-      add(guard, save);
-      add(guard, button(document, 'Не сохранять', { dataset: { focusId: 'guard-discard' } }, () => pc.discardProject()));
-      add(guard, button(document, pc.recoveringDraft ? 'Восстановить черновик' : 'Отмена', { dataset: { focusId: 'guard-cancel' } }, () => pc.cancelPendingAction()));
-      add(content, guard);
-    }
-    return pc.windowFrame('FT Studio', content);
-  };
 
   pc.renderWindow = (appId=pc.windows.activeId) => {
-    if(appId==='underweb')return pc.renderUnderweb();
+    if(appId==='ripline')return createBeatMarket(document,{getState:()=>pc.state,onChange:next=>pc.persist(next),audio:pc.beatAudio,ripline:true});
     if(appId==='torent')return pc.renderTorent();
-    if(appId==='ft-studio')return pc.renderStudio();
+    if(appId==='ft-studio')return createStudioWorkspace(document,{projectName:pc.project?.name});
     return el(document,'p',{text:'Приложение недоступно.'});
   };
 
@@ -585,57 +387,60 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.ensureWindow(appId);
     pc.startOpen=false;
     if(!existing&&appId==='computer')pc.folder='computer';
-    if(!existing&&appId==='ft-studio'){
-      pc.project=normalizeStudioProject(pc.state.draft);pc.dirty=Boolean(pc.project);
-    }
     pc.renderDesktop(false);
     if(documents)pc.explorer?.navigate('documents');
     pc.shell.focusActive();
   };
   pc.open = appId => {
     if(pc.locked||!desktopApps(pc.state).some(app=>app.id===appId)||pc.confirmClose||pc.shutdownModal)return;
+    if(appId==='ft-studio'&&!pc.windows.windows.some(w=>w.id===appId)){
+      pc.menu?.close();pc.startOpen=false;if(pc.studioLaunch!==null)return;
+      const generation=++pc.launchGeneration;pc.setStudioBusy(true);
+      pc.studioLaunch=pc.setTimeoutFn(()=>{
+        if(generation!==pc.launchGeneration)return;
+        pc.studioLaunch=null;pc.setStudioBusy(false);
+        if(pc.phase==='desktop'&&!pc.locked)pc.openNow('ft-studio');
+      },2500);return;
+    }
     pc.openNow(appId);
   };
+  let launchFeedback=null;
+  pc.setStudioBusy=busy=>{
+    root.setAttribute('aria-busy',String(busy));root.dataset.appLaunching=String(busy);
+    if(busy){launchFeedback=el(document,'div',{className:'pc-launch-feedback',text:'Запуск FT Studio…',attributes:{role:'status'}});root.append(launchFeedback);}
+    else{launchFeedback?.remove();launchFeedback=null;}
+  };
+  pc.cancelStudioLaunch=()=>{pc.launchGeneration++;if(pc.studioLaunch!==null)pc.clearTimeoutFn(pc.studioLaunch);pc.studioLaunch=null;pc.setStudioBusy(false);};
   pc.closeNow = id => {
+    if(id==='underweb'){pc.underwebView?.dispose();pc.underwebView=null;}
     pc.systemViews.get(id)?.dispose();pc.systemViews.delete(id);
     if(id==='computer'){pc.explorer?.dispose();pc.explorer=null;}
-    if(id==='ft-studio')pc.audio.stop();
+    if(id==='ft-studio'){pc.audio.stop();pc.studioView?.dispose();pc.studioView=null;}
+    if(['ft-studio','underweb','ripline'].includes(id))pc.beatAudio.stop();
     pc.windows=reduceWindows(pc.windows,{type:'close',id});
     pc.confirmClose=false;pc.pendingAction=null;
     pc.renderDesktop(false);
   };
   pc.closeWindow = (id=pc.windows.activeId) => {
     if(pc.locked||pc.confirmClose||!id)return;
-    if(id==='ft-studio')pc.requestProjectTransition(()=>pc.closeNow(id));
-    else pc.closeNow(id);
+    pc.closeNow(id);
   };
 
   pc.requestLeave = () => {
     if (pc.locked||pc.confirmClose||pc.shutdownModal) return;
+    pc.cancelStudioLaunch();
     pc.menu?.close();
-    pc.requestProjectTransition(() => {
-      pc.audio.stop();
-      pc.callbacks.onLeave();
-    });
+    pc.audio.stop();pc.beatAudio.stop();pc.callbacks.onLeave();
   };
 
   pc.requestShutdown = () => {
     if (pc.locked||pc.confirmClose) return;
-    pc.requestProjectTransition(() => {
-      pc.audio.stop();
-      pc.callbacks.onShutdown();
-    });
+    pc.cancelStudioLaunch();
+    pc.audio.stop();pc.beatAudio.stop();pc.callbacks.onShutdown();
   };
 
-  pc.completeShutdown=()=>{pc.clearViews();pc.windows=reduceWindows(pc.windows,{type:'clear'});pc.renderDesktop(false);};
+  pc.completeShutdown=()=>{pc.cancelStudioLaunch();pc.clearViews();pc.windows=reduceWindows(pc.windows,{type:'clear'});pc.renderDesktop(false);};
 
-  pc.discardProject = () => {
-    pc.dirty = false;
-    pc.project = null;
-    pc.persist({ ...pc.state, draft: null });
-    pc.audio.stop();
-    pc.runPendingAction();
-  };
 
   pc.focusScope = () => {
     if (pc.confirmClose) return findByDataset(root, 'pcRole', 'close-guard');
@@ -648,12 +453,6 @@ export function mountVirtualPc(root, callbacks = {}) {
     const scope = pc.focusScope();
     const controls = focusableControls(scope);
     if(event.key==='Escape'&&pc.shutdownModal){event.preventDefault();event.stopPropagation();pc.cancelShutdown();return;}
-    if (event.key === 'Escape' && pc.confirmClose) {
-      event.preventDefault();
-      event.stopPropagation();
-      pc.cancelPendingAction();
-      return;
-    }
     if (event.key === 'Escape' && pc.startOpen) {
       event.preventDefault(); event.stopPropagation();
       pc.menu?.close(); return;
@@ -662,6 +461,8 @@ export function mountVirtualPc(root, callbacks = {}) {
   });
 
   pc.reset = state => {
+    pc.cancelStudioLaunch();
+    pc.beatAudio.stop();
     if (pc.bootTimer !== null) pc.clearTimeoutFn(pc.bootTimer);
     pc.bootTimer = null;
     pc.audio.stop();
@@ -678,7 +479,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.recoveringDraft = false;
     pc.pendingAction = null;
     pc.selectedBrief = BATTLE_BRIEFS[0].id;
-    pc.address = 'underweb://battles';
+    pc.address = 'underweb://iskra';
     pc.underweb = resolveUnderweb(pc.address);
     pc.message = '';
     pc.persistenceWarning = '';
@@ -686,9 +487,11 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.dispose = () => {
+    pc.cancelStudioLaunch();
     if (pc.bootTimer !== null) pc.clearTimeoutFn(pc.bootTimer);
     pc.bootTimer = null;
     pc.audio.dispose();
+    pc.beatAudio.dispose();
     pc.clearViews();pc.menu?.dispose();pc.menu=null;
     pc.shell?.dispose();pc.shell=null;
     pc.phase = 'off';

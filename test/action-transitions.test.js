@@ -30,3 +30,11 @@ test('recording at the desk microphone uses the seated computer pose', () => {
   assert.equal(actionUsesDeskSeat('microphone'), true);
   assert.equal(actionUsesDeskSeat('stove'), false);
 });
+
+test('desk transfer is hidden behind a short fade before the seated pose appears', () => {
+  const transition = createActionTransition({ actionId: 'computer', fromRoom: 'living', toRoom: 'living', transition: 'desk-fade' });
+
+  assert.equal(transitionPhaseAt(transition, 1.29).id, 'fade-out');
+  assert.equal(transitionPhaseAt(transition, 1.50).id, 'swap-pose');
+  assert.equal(transitionPhaseAt(transition, 1.54).id, 'fade-in');
+});

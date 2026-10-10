@@ -16,7 +16,7 @@ export function reduceWindows(state,action) {
   const z=Math.max(0,...windows.map(w=>w.z))+1;
   if(action.type==='open'&&!w) {
     if(typeof action.id!=='string'||!action.id)return state;
-    const big=action.appId==='ft-studio',offset=windows.length*24;
+    const big=['ft-studio','underweb'].includes(action.appId),offset=windows.length*24;
     const normal=fit({x:120+offset,y:48+offset,width:big?940:560,height:big?620:420},state.viewport);
     const rect=action.rect&&Object.values(action.rect).length===4&&Object.values(action.rect).every(Number.isFinite)?fit(action.rect,state.viewport):normal;
     const mode=state.viewport.width<=640?'maximized':'normal';

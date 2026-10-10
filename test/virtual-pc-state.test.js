@@ -14,7 +14,18 @@ import {
   setWallpaper,
   startFtDownload,
   setDesktopIconPosition, resetDesktopIconPositions, layoutDesktopIcons,
+  applyToBattle,
 } from '../src/virtual-pc-state.js';
+
+test('applications reject invalid entries, trim names and never duplicate a battle',()=>{
+  const state=createVirtualPcState({battleApplications:[null,{}, {battleId:'external',nickname:'MC'}, {battleId:'concrete-echo',nickname:'  Район  '}, {battleId:'concrete-echo',nickname:'Дубль'}, {battleId:'yard-cipher',nickname:' '}]});
+  assert.deepEqual(state.battleApplications,[{battleId:'concrete-echo',nickname:'Район',status:'registered'}]);
+  assert.deepEqual(applyToBattle(state,'concrete-echo','Повтор'),state);
+  assert.deepEqual(applyToBattle(state,'unknown','Имя'),state);
+  assert.deepEqual(applyToBattle(state,'open-mic-17',' '),state);
+  const next=applyToBattle(state,'open-mic-17','А'.repeat(40));
+  assert.equal(next.battleApplications[1].nickname.length,32);assert.equal(state.battleApplications.length,1);
+});
 
 test('old save retains projects download wallpaper and adds an empty icon layout',()=>{
   const s=createVirtualPcState({projects:[{id:'old',name:'Бит'}],download:{status:'installed'},wallpaper:'factory'});
@@ -141,7 +152,7 @@ test('saving a project does not overfill the virtual disk', () => {
 test('old powered save retains payloads and discards only obsolete shortcut placement',()=>{
   const old={version:1,power:'on',wallpaper:'factory',download:{status:'downloading',receivedBytes:123000000},projects:[{id:'p',name:'Бит'}],draft:{id:'draft',name:'Не потерять'},lastGameMinute:22,desktopIcons:{documents:{x:8,y:96},computer:{x:12,y:16}}};
   const loaded=loadVirtualPcState(mapStorage(new Map([[VIRTUAL_PC_STORAGE_KEY,JSON.stringify(old)]]))).state;
-  assert.deepEqual({...loaded,desktopIcons:old.desktopIcons},old);
+  assert.deepEqual({...loaded,desktopIcons:old.desktopIcons},{...old,battleApplications:[],music:createVirtualPcState().music});
   assert.deepEqual(loaded.desktopIcons,{computer:{x:12,y:16}});
   assert.equal(diskUsage(loaded).freeMb,1875);
 });

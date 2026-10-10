@@ -1,5 +1,5 @@
 const KEY = 'battle-life-apartment-v3-time';
-const durations = { computer: 120, sink: 15, stove: 30, fridge: 5 };
+const durations = { sink: 15, stove: 30, fridge: 5 };
 const smooth = (x) => { const t = Math.max(0, Math.min(1, x)); return t * t * (3 - 2 * t); };
 const isRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const positiveFinite = (value) => Number.isFinite(value) && value > 0;

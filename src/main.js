@@ -1,7 +1,8 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
-import { easeInOut, keyboardArmPose, seatPose, turnAngle } from './animation-timing.js';
+import { easeInOut, keyboardArmPose, seatPose, sideWalkPose, turnAngle } from './animation-timing.js?rev=side-walk-v2';
 import { GESTURE_STYLES, PERFORMANCE_SECONDS, performanceStyleAt, shuffledStyles } from './battle-director.js';
 import { clickIntent } from './click-intent.js';
+import { avatarModelPlan } from './avatar-model-plan.js';
 import { stepCharacter } from './character-motion.js';
 import { presentActionProgress } from './action-progress.js';
 import { advanceCampaign, createCampaign, loadCampaign, saveCampaign } from './game-state.js';
@@ -12,6 +13,8 @@ import { APARTMENT_ACTOR_FOREGROUND_Z, APARTMENT_DESK, APARTMENT_ENTRY_DOOR, APA
 import { actionUsesDeskSeat, createActionTransition, phaseAfterApproach } from './action-transitions.js';
 import { actionYaw, avatarFacingForYaw, cameraYaw, shouldPauseWalkForTurn, walkYaw } from './apartment-orientation.js';
 import { playSoundCue } from './sound-cues.js';
+import { loadApartmentScene } from './apartment-scene.js';
+import { loadAvatarRig } from './avatar-rig.js';
 import { desktopApps, getDesktopAction, openDesktopApp } from './desktop-apps.js';
 import { closeDesktopWindow, desktopShellLabels, desktopTaskbarLabel, finishDesktopBoot, openDesktopWindow, resumeDesktopWindow, shutdownDesktopSession, startDesktopSession } from './desktop-session.js';
 import { getBankOverview, getBattleDetail, getBattleList, getJobListing, getMarketCatalog } from './desktop-view-models.js';
@@ -50,6 +53,7 @@ const creatorOpen = document.querySelector('#creator-open');
 const interactionDock = document.querySelector('#interaction-dock');
 const worldTooltip = document.querySelector('#world-tooltip');
 const actorBubble = document.querySelector('#actor-bubble');
+const transitionFade = document.querySelector('#transition-fade');
 const desktopScreen = document.querySelector('#desktop-screen');
 const desktopContent = document.querySelector('#desktop-content');
 const desktopClose = document.querySelector('#desktop-close');
@@ -583,6 +587,7 @@ function openCreator() {
 function renderStartScreen() {
   const state = startScreenState(campaign);
   startContinue.classList.toggle('is-hidden', !state.canContinue);
+  startNewGame.textContent = state.canContinue ? 'Новая игра →' : 'Новая игра →';
   startScreen.classList.remove('is-hidden');
 }
 
@@ -972,129 +977,16 @@ function makeLimb(parent, name, z, color, upperLength, lowerLength) {
   return { pivot, lowerPivot, upper, lower };
 }
 
-// A complete view is drawn as one 2.5D figure. We never compose a profile
-// from a front-facing head and a separately rotated body.
-function createAvatarView(parent, id) {
-  const group = new THREE.Group();
-  group.name = `avatar-view-${id}`;
-  parent.add(group);
-  const profile = id === 'profile-right' || id === 'profile-left';
-  const faceRight = id === 'profile-right';
-  const faceLeft = id === 'profile-left';
-  const isFront = id === 'front';
-  const isBack = id === 'back';
-  const topMeshes = [];
-  const pantsMeshes = [];
-  const lowerLegMeshes = [];
-  const hairMeshes = [];
-
-  const headWidth = profile ? .42 : .53;
-  const headX = profile ? (faceRight ? -.04 : .04) : 0;
-  const head = box(group, [headWidth, .57, .16], colors.skin, [headX, 2.32, .05]);
-  const hair = box(group, [headWidth + .02, .09, .18], 0x17151b, [headX, 2.64, .06]);
-  hairMeshes.push(hair);
-  const face = new THREE.Group();
-  face.name = `avatar-view-${id}-face`;
-  group.add(face);
-
-  if (isFront) {
-    [-.34, .34].forEach((x) => box(face, [.12, .18, .06], colors.skin, [x, 2.32, .16]));
-    [-.17, .17].forEach((x) => {
-      box(face, [.1, .09, .04], 0xe9eadf, [x, 2.43, .17], { emissive: 0x6b6d60, emissiveIntensity: .16 });
-      const brow = box(face, [.15, .035, .045], 0x2a2020, [x, 2.52, .17]);
-      brow.rotation.z = x < 0 ? .1 : -.1;
-    });
-    box(face, [.055, .12, .05], 0xc48769, [0, 2.34, .17]);
-    box(face, [.2, .035, .045], 0x994f4b, [0, 2.2, .17]);
-  } else if (profile) {
-    const sign = faceRight ? 1 : -1;
-    box(face, [.1, .17, .055], colors.skin, [-sign * .29, 2.32, .17]);
-    box(face, [.09, .09, .045], 0xe9eadf, [sign * .075, 2.43, .17], { emissive: 0x6b6d60, emissiveIntensity: .16 });
-    box(face, [.14, .035, .05], 0x2a2020, [sign * .09, 2.52, .17]);
-    box(face, [.11, .11, .06], 0xc48769, [sign * .3, 2.34, .17]);
-    box(face, [.13, .035, .05], 0x994f4b, [sign * .08, 2.2, .17]);
-  } else if (isBack) {
-    [-.34, .34].forEach((x) => box(face, [.12, .18, .06], colors.skin, [x, 2.32, .16]));
-  }
-  let mustache = null;
-  let beard = null;
-  if (isFront) {
-    mustache = box(face, [.26, .055, .05], 0x1b1718, [0, 2.31, .2]);
-    beard = box(face, [.37, .2, .055], 0x1b1718, [0, 2.13, .2]);
-  } else if (profile) {
-    const sign = faceRight ? 1 : -1;
-    mustache = box(face, [.13, .055, .055], 0x1b1718, [sign * .18, 2.31, .2]);
-    beard = box(face, [.18, .2, .06], 0x1b1718, [sign * .16, 2.13, .2]);
-  }
-  if (mustache) mustache.visible = false;
-  if (beard) beard.visible = false;
-
-  const torsoWidth = profile ? .56 : .78;
-  const torso = box(group, [torsoWidth, .96, .18], 0x2e5361, [0, 1.48, .04]);
-  topMeshes.push(torso);
-  const lapels = new THREE.Group();
-  group.add(lapels);
-  const leftLapel = box(lapels, [.2, .6, .04], 0x6b8b92, [-.2, 1.6, .15]);
-  const rightLapel = box(lapels, [.2, .6, .04], 0x6b8b92, [.2, 1.6, .15]);
-  leftLapel.rotation.z = -.3;
-  rightLapel.rotation.z = .3;
-  lapels.visible = isFront;
-  const hoodiePouch = box(group, [.54, .22, .04], colors.hoodie, [0, 1.21, .16]);
-  hoodiePouch.visible = false;
-  const hood = new THREE.Mesh(new THREE.TorusGeometry(.31, .055, 6, 10, Math.PI), material(colors.hoodie));
-  hood.rotation.x = Math.PI / 2;
-  hood.position.set(0, 1.95, -.06);
-  hood.visible = false;
-  group.add(hood);
-
-  const limbs = {};
-  const addArm = (key, x) => {
-    const limb = makeLimb(group, `${id}-${key}`, .04, 0x2e5361, .62, .52);
-    limb.pivot.position.set(x, 1.83, .04);
-    box(limb.lowerPivot, [.22, .21, .08], colors.skin, [0, -.6, .04]);
-    limbs[key] = limb;
-    topMeshes.push(limb.upper, limb.lower);
-  };
-  if (faceRight) addArm('backArm', -.32);
-  else if (faceLeft) addArm('frontArm', .32);
-  else {
-    addArm('backArm', -.42);
-    addArm('frontArm', .42);
-  }
-
-  const legXs = profile ? [-.14, .14] : [-.19, .19];
-  const addLeg = (key, x) => {
-    const limb = makeLimb(group, `${id}-${key}`, .04, colors.pants, .68, .6);
-    limb.pivot.position.set(x, 1.03, .04);
-    box(limb.lowerPivot, [.39, .16, .1], colors.shoe, [.1, -.64, .04]);
-    limbs[key] = limb;
-    pantsMeshes.push(limb.upper, limb.lower);
-    lowerLegMeshes.push(limb.lower);
-  };
-  addLeg('backLeg', legXs[0]);
-  addLeg('frontLeg', legXs[1]);
-
-  return {
-    group,
-    id,
-    head,
-    hairMeshes,
-    face,
-    mustache,
-    beard,
-    torso,
-    topMeshes,
-    pantsMeshes,
-    lowerLegMeshes,
-    lapels,
-    hoodiePouch,
-    hood,
-    limbs,
-  };
-}
-
-function createAvatarViews(parent) {
-  return Object.fromEntries(['front', 'profile-right', 'back', 'profile-left'].map((id) => [id, createAvatarView(parent, id)]));
+function createCharacterLimb(parent, name, color, upperLength, lowerLength) {
+  const pivot = new THREE.Group();
+  pivot.name = `avatar-${name}-pivot`;
+  parent.add(pivot);
+  const upper = box(pivot, [.28, upperLength, .28], color, [0, -upperLength / 2, 0]);
+  const lowerPivot = new THREE.Group();
+  lowerPivot.position.set(0, -upperLength, 0);
+  pivot.add(lowerPivot);
+  const lower = box(lowerPivot, [.25, lowerLength, .25], color, [0, -lowerLength / 2, 0]);
+  return { pivot, lowerPivot, upper, lower };
 }
 
 function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
@@ -1123,19 +1015,12 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
     actionCuePlayed: false,
     bubble: null,
     computerTask: null,
+    seatRevealUntil: 0,
+    look: normalizeLook(),
   };
-  actor.group.position.x = actor.state.x;
+  actor.group.position.x = x;
   actor.group.add(actor.model);
   parent.add(actor.group);
-
-  // `model` owns gameplay yaw and poses. Everything visible lives on this
-  // single 2.5D panel, which cancels that yaw and switches silhouette instead.
-  // That keeps head, body and limbs on one coherent plane in every direction.
-  const visual = new THREE.Group();
-  visual.name = 'avatar-visual-panel';
-  actor.model.add(visual);
-  actor.visual = visual;
-
   const shadow = new THREE.Mesh(new THREE.CircleGeometry(.62, 24), new THREE.MeshBasicMaterial({ color: 0x0a0e0e, transparent: true, opacity: .42 }));
   shadow.rotation.x = -Math.PI / 2;
   shadow.scale.y = .4;
@@ -1143,136 +1028,86 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   actor.group.add(shadow);
   actor.shadow = shadow;
 
+  const rig = new THREE.Group();
+  rig.name = 'avatar-three-mesh-rig';
+  actor.model.add(rig);
+  actor.meshRig = rig;
+
+  const [torsoPlan, headPlan, leftEarPlan, rightEarPlan] = avatarModelPlan(actor.look).parts;
   const topStyles = {};
   const tee = new THREE.Group();
   tee.name = 'avatar-top-tee';
-  visual.add(tee);
-  const teeTorso = box(tee, [.72, .84, .48], 0x6e7c74, [0, 1.48, 0]);
-  const teeSleeveLeft = box(tee, [.24, .28, .5], 0x6e7c74, [-.47, 1.79, 0]);
-  const teeSleeveRight = box(tee, [.24, .28, .5], 0x6e7c74, [.47, 1.79, 0]);
-  topStyles.tee = { group: tee, meshes: [teeTorso, teeSleeveLeft, teeSleeveRight], torso: teeTorso, sleeves: [teeSleeveLeft, teeSleeveRight] };
+  rig.add(tee);
+  const teeTorso = box(tee, torsoPlan.size, 0x6e7c74, torsoPlan.position);
+  topStyles.tee = { group: tee, meshes: [teeTorso] };
 
   const hoodie = new THREE.Group();
   hoodie.name = 'avatar-top-hoodie';
-  visual.add(hoodie);
+  rig.add(hoodie);
   const hoodieTorso = box(hoodie, [.76, .98, .52], colors.hoodie, [0, 1.48, 0]);
   const hoodiePouch = box(hoodie, [.54, .22, .08], colors.hoodie, [0, 1.21, .3]);
   const hood = new THREE.Mesh(new THREE.TorusGeometry(.31, .09, 8, 12, Math.PI), material(colors.hoodie));
   hood.rotation.x = Math.PI / 2;
   hood.position.set(0, 1.95, -.27);
+  hood.castShadow = true;
   hoodie.add(hood);
-  topStyles.hoodie = { group: hoodie, meshes: [hoodieTorso, hoodiePouch, hood], torso: hoodieTorso, frontDetails: [hoodiePouch] };
+  topStyles.hoodie = { group: hoodie, meshes: [hoodieTorso, hoodiePouch, hood] };
 
   const jacket = new THREE.Group();
   jacket.name = 'avatar-top-jacket';
-  visual.add(jacket);
+  rig.add(jacket);
   const jacketTorso = box(jacket, [.78, .96, .54], 0x2e5361, [0, 1.48, 0]);
-  const jacketLapels = [
-    box(jacket, [.2, .6, .09], 0x6b8b92, [-.2, 1.6, .32]),
-    box(jacket, [.2, .6, .09], 0x6b8b92, [.2, 1.6, .32]),
-  ];
-  jacketLapels[0].rotation.z = -.3;
-  jacketLapels[1].rotation.z = .3;
-  topStyles.jacket = { group: jacket, meshes: [jacketTorso, ...jacketLapels], torso: jacketTorso, frontDetails: jacketLapels };
+  topStyles.jacket = { group: jacket, meshes: [jacketTorso] };
 
-  const head = box(visual, [.53, .57, .48], colors.skin, [0, 2.32, 0]);
-  const hair = box(visual, [.55, .09, .51], 0x17151b, [0, 2.64, 0]);
-  const frontFaceHair = new THREE.Group();
-  visual.add(frontFaceHair);
-  const mustache = box(frontFaceHair, [.26, .055, .05], 0x1b1718, [0, 2.31, .27]);
-  const beard = box(frontFaceHair, [.37, .2, .055], 0x1b1718, [0, 2.13, .27]);
+  box(rig, headPlan.size, colors.skin, headPlan.position);
+  const hair = box(rig, [.55, .09, .51], 0x17151b, [0, 2.64, 0]);
+  box(rig, leftEarPlan.size, colors.skin, leftEarPlan.position);
+  box(rig, rightEarPlan.size, colors.skin, rightEarPlan.position);
+
+  const face = new THREE.Group();
+  face.name = 'avatar-physical-face';
+  rig.add(face);
+  const faceLayout = frontFacingFaceLayout();
+  const eyeMaterial = material(0xe9eadf, { emissive: 0x6b6d60, emissiveIntensity: .16 });
+  faceLayout.eyeXs.forEach((eyeX) => {
+    const eye = new THREE.Mesh(new THREE.BoxGeometry(.1, .09, .05), eyeMaterial);
+    eye.position.set(eyeX, 2.43, faceLayout.faceZ);
+    eye.castShadow = true;
+    face.add(eye);
+    const brow = box(face, [.15, .035, .055], 0x2a2020, [eyeX, 2.52, faceLayout.faceZ]);
+    brow.rotation.z = eyeX < 0 ? .1 : -.1;
+  });
+  box(face, [.055, .12, .07], 0xc48769, [0, 2.34, .295]);
+  box(face, [.2, .035, .055], 0x994f4b, [0, 2.2, .295]);
+  const mustache = box(face, [.26, .055, .06], 0x1b1718, [0, 2.31, .31]);
+  const beard = box(face, [.37, .2, .065], 0x1b1718, [0, 2.13, .31]);
   mustache.visible = false;
   beard.visible = false;
-  const frontFace = new THREE.Group();
-  frontFace.name = 'avatar-front-face';
-  visual.add(frontFace);
-  const faceLayout = frontFacingFaceLayout();
-  faceLayout.earXs.forEach((x) => box(frontFace, [.12, .18, .17], colors.skin, [x, 2.32, .01]));
-  const eyeMaterial = material(0xe9eadf, { emissive: 0x6b6d60, emissiveIntensity: .16 });
-  faceLayout.eyeXs.forEach((x) => {
-    const eye = new THREE.Mesh(new THREE.BoxGeometry(.1, .09, .04), eyeMaterial);
-    eye.position.set(x, 2.43, faceLayout.faceZ);
-    frontFace.add(eye);
-    const brow = box(frontFace, [.15, .035, .045], 0x2a2020, [x, 2.52, faceLayout.faceZ]);
-    brow.rotation.z = x < 0 ? .1 : -.1;
-  });
-  box(frontFace, [.055, .12, .05], 0xc48769, [0, 2.34, faceLayout.faceZ]);
-  box(frontFace, [.2, .035, .045], 0x994f4b, [0, 2.2, faceLayout.faceZ]);
 
-  // Profiles are deliberately drawn on the same display panel as the body.
-  // They are not side-mounted meshes: the whole panel is the 2.5D silhouette.
-  const profileRightFace = new THREE.Group();
-  profileRightFace.name = 'avatar-profile-right-face';
-  visual.add(profileRightFace);
-  box(profileRightFace, [.1, .17, .055], colors.skin, [-.29, 2.32, .27]);
-  box(profileRightFace, [.09, .09, .045], 0xe9eadf, [.075, 2.43, .27], { emissive: 0x6b6d60, emissiveIntensity: .16 });
-  box(profileRightFace, [.14, .035, .05], 0x2a2020, [.09, 2.52, .27]);
-  box(profileRightFace, [.11, .11, .06], 0xc48769, [.3, 2.34, .27]);
-  box(profileRightFace, [.13, .035, .05], 0x994f4b, [.08, 2.2, .27]);
-  const profileRightMustache = box(profileRightFace, [.13, .055, .055], 0x1b1718, [.18, 2.31, .275]);
-  const profileRightBeard = box(profileRightFace, [.18, .2, .06], 0x1b1718, [.16, 2.13, .275]);
-  profileRightMustache.visible = false;
-  profileRightBeard.visible = false;
+  actor.backArm = createCharacterLimb(rig, 'left-arm', 0x2e5361, .62, .52);
+  actor.frontArm = createCharacterLimb(rig, 'right-arm', 0x2e5361, .62, .52);
+  actor.backArm.pivot.position.set(-.42, 1.83, -.1);
+  actor.frontArm.pivot.position.set(.42, 1.83, .1);
+  box(actor.backArm.lowerPivot, [.22, .21, .22], colors.skin, [0, -.6, .01]);
+  box(actor.frontArm.lowerPivot, [.22, .21, .22], colors.skin, [0, -.6, .01]);
 
-  const profileLeftFace = new THREE.Group();
-  profileLeftFace.name = 'avatar-profile-left-face';
-  visual.add(profileLeftFace);
-  box(profileLeftFace, [.1, .17, .055], colors.skin, [.29, 2.32, .27]);
-  box(profileLeftFace, [.09, .09, .045], 0xe9eadf, [-.075, 2.43, .27], { emissive: 0x6b6d60, emissiveIntensity: .16 });
-  box(profileLeftFace, [.14, .035, .05], 0x2a2020, [-.09, 2.52, .27]);
-  box(profileLeftFace, [.11, .11, .06], 0xc48769, [-.3, 2.34, .27]);
-  box(profileLeftFace, [.13, .035, .05], 0x994f4b, [-.08, 2.2, .27]);
-  const profileLeftMustache = box(profileLeftFace, [.13, .055, .055], 0x1b1718, [-.18, 2.31, .275]);
-  const profileLeftBeard = box(profileLeftFace, [.18, .2, .06], 0x1b1718, [-.16, 2.13, .275]);
-  profileLeftMustache.visible = false;
-  profileLeftBeard.visible = false;
-
-  actor.backArm = makeLimb(visual, 'backArm', -.31, 0x1f2930, .62, .52);
-  actor.frontArm = makeLimb(visual, 'frontArm', .31, 0x34444d, .62, .52);
-  actor.backArm.pivot.position.set(-.42, 1.83, 0);
-  actor.frontArm.pivot.position.set(.42, 1.83, 0);
-  box(actor.backArm.lowerPivot, [.22, .21, .22], colors.skin, [0, -.6, 0]);
-  box(actor.frontArm.lowerPivot, [.22, .21, .22], colors.skin, [0, -.6, 0]);
-
-  actor.backLeg = makeLimb(visual, 'backLeg', -.19, 0x33423f, .68, .6);
-  actor.frontLeg = makeLimb(visual, 'frontLeg', .19, colors.pants, .68, .6);
-  actor.backLeg.pivot.position.set(-.19, 1.03, 0);
-  actor.frontLeg.pivot.position.set(.19, 1.03, 0);
+  actor.backLeg = createCharacterLimb(rig, 'left-leg', colors.pants, .68, .6);
+  actor.frontLeg = createCharacterLimb(rig, 'right-leg', colors.pants, .68, .6);
+  actor.backLeg.pivot.position.set(-.19, 1.03, -.03);
+  actor.frontLeg.pivot.position.set(.19, 1.03, .03);
   box(actor.backLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
   box(actor.frontLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
 
-  // The old articulated meshes remain as a hidden pose skeleton. The visible
-  // actor is one of the four complete views created above the skeleton.
-  actor.legacyVisual = visual;
-  actor.legacyVisual.visible = false;
-  actor.avatarViewPanel = new THREE.Group();
-  actor.avatarViewPanel.name = 'avatar-four-view-panel';
-  actor.model.add(actor.avatarViewPanel);
-  actor.avatarViews = createAvatarViews(actor.avatarViewPanel);
-  actor.activeAvatarView = null;
-
-  actor.model.rotation.y = profileFaceLayout().rightYaw;
   actor.lookParts = {
     topStyles,
-    head,
     hair,
     mustache,
     beard,
-    profileRightMustache,
-    profileRightBeard,
-    profileLeftMustache,
-    profileLeftBeard,
-    frontFace,
-    frontFaceHair,
-    profileRightFace,
-    profileLeftFace,
-    frontLeg: actor.frontLeg.upper,
-    backLeg: actor.backLeg.upper,
-    frontShin: actor.frontLeg.lower,
-    backShin: actor.backLeg.lower,
-    frontArm: actor.frontArm.upper,
-    backArm: actor.backArm.upper,
+    armMeshes: [actor.backArm.upper, actor.backArm.lower, actor.frontArm.upper, actor.frontArm.lower],
+    pantsMeshes: [actor.backLeg.upper, actor.frontLeg.upper],
+    lowerLegMeshes: [actor.backLeg.lower, actor.frontLeg.lower],
   };
+  actor.model.rotation.y = profileFaceLayout().rightYaw;
   updateFacePresentation(actor);
   return actor;
 }
@@ -1282,116 +1117,31 @@ function applyAvatarLook(target, look = {}) {
   const geometry = appearanceGeometry(normalizedLook);
   const topColors = { tee: 0x6e7c74, hoodie: colors.hoodie, jacket: 0x2e5361 };
   const pantsColors = { cargo: colors.pants, jeans: 0x303d63, shorts: 0x77715b };
-  const topColor = topColors[normalizedLook.top];
-  Object.entries(target.lookParts.topStyles).forEach(([id, style]) => {
-    style.group.visible = id === normalizedLook.top;
-    style.meshes.forEach((mesh) => mesh.material.color.setHex(topColor));
+  target.look = normalizedLook;
+  target.authoredRig?.setLook(normalizedLook);
+  if (!target.lookParts) return;
+  Object.entries(target.lookParts.topStyles).forEach(([style, definition]) => {
+    definition.group.visible = style === normalizedLook.top;
+    setAvatarMeshColor(definition.meshes, topColors[style]);
   });
-  target.lookParts.frontArm.material.color.setHex(topColor);
-  target.lookParts.backArm.material.color.setHex(topColor);
-  target.lookParts.frontLeg.material.color.setHex(pantsColors[normalizedLook.pants]);
-  target.lookParts.backLeg.material.color.setHex(pantsColors[normalizedLook.pants]);
-  target.lookParts.frontShin.material.color.setHex(geometry.lowerLegsVisible ? colors.skin : pantsColors[normalizedLook.pants]);
-  target.lookParts.backShin.material.color.setHex(geometry.lowerLegsVisible ? colors.skin : pantsColors[normalizedLook.pants]);
+  setAvatarMeshColor(target.lookParts.armMeshes, topColors[normalizedLook.top]);
+  setAvatarMeshColor(target.lookParts.pantsMeshes, pantsColors[normalizedLook.pants]);
+  setAvatarMeshColor(target.lookParts.lowerLegMeshes, geometry.lowerLegsVisible ? colors.skin : pantsColors[normalizedLook.pants]);
   target.lookParts.hair.visible = normalizedLook.hair !== 'bald';
   target.lookParts.hair.scale.set(1, normalizedLook.hair === 'mohawk' ? 2.2 : 1, normalizedLook.hair === 'mohawk' ? .38 : 1);
   target.lookParts.hair.position.y = normalizedLook.hair === 'mohawk' ? 2.72 : 2.64;
   target.lookParts.mustache.visible = normalizedLook.face === 'mustache';
   target.lookParts.beard.visible = normalizedLook.face === 'beard';
-  target.lookParts.profileRightMustache.visible = normalizedLook.face === 'mustache';
-  target.lookParts.profileRightBeard.visible = normalizedLook.face === 'beard';
-  target.lookParts.profileLeftMustache.visible = normalizedLook.face === 'mustache';
-  target.lookParts.profileLeftBeard.visible = normalizedLook.face === 'beard';
-  applyAvatarViewLook(target, normalizedLook, geometry);
   updateFacePresentation(target);
 }
 
-function setMeshColor(meshes, color) {
+function setAvatarMeshColor(meshes, color) {
   meshes.forEach((mesh) => mesh.material.color.setHex(color));
 }
 
-function applyAvatarViewLook(target, look, geometry) {
-  if (!target.avatarViews) return;
-  const topColors = { tee: 0x6e7c74, hoodie: colors.hoodie, jacket: 0x2e5361 };
-  const pantsColors = { cargo: colors.pants, jeans: 0x303d63, shorts: 0x77715b };
-  Object.values(target.avatarViews).forEach((view) => {
-    setMeshColor(view.topMeshes, topColors[look.top]);
-    setMeshColor(view.pantsMeshes, pantsColors[look.pants]);
-    setMeshColor(view.lowerLegMeshes, geometry.lowerLegsVisible ? colors.skin : pantsColors[look.pants]);
-    view.lapels.visible = look.top === 'jacket' && view.id === 'front';
-    view.hoodiePouch.visible = look.top === 'hoodie' && view.id === 'front';
-    view.hood.visible = look.top === 'hoodie';
-    view.torso.scale.y = look.top === 'tee' ? .86 : 1;
-    view.hairMeshes.forEach((hair) => {
-      hair.visible = look.hair !== 'bald';
-      hair.scale.set(look.hair === 'mohawk' ? .72 : 1, look.hair === 'mohawk' ? 2.2 : 1, look.hair === 'mohawk' ? .38 : 1);
-      hair.position.y = look.hair === 'mohawk' ? 2.72 : 2.64;
-    });
-    if (view.mustache) view.mustache.visible = look.face === 'mustache';
-    if (view.beard) view.beard.visible = look.face === 'beard';
-  });
-}
-
-function copyLimbPose(source, destination) {
-  if (!source || !destination) return;
-  destination.pivot.rotation.z = source.pivot.rotation.z;
-  destination.lowerPivot.rotation.z = source.lowerPivot.rotation.z;
-}
-
-function syncAvatarViewPose(target) {
-  const view = target.activeAvatarView;
-  if (!view) return;
-  copyLimbPose(target.backArm, view.limbs.backArm);
-  copyLimbPose(target.frontArm, view.limbs.frontArm);
-  copyLimbPose(target.backLeg, view.limbs.backLeg);
-  copyLimbPose(target.frontLeg, view.limbs.frontLeg);
-}
-
 function updateFacePresentation(target) {
-  const parts = target.lookParts;
-  if (!parts?.frontFace || !parts.profileRightFace || !parts.profileLeftFace) return;
-  const presentation = avatarFacingForYaw(target.model.rotation.y);
-  if (target.avatarViewPanel) {
-    target.avatarViewPanel.rotation.y = presentation.billboardYaw;
-    Object.entries(target.avatarViews).forEach(([id, view]) => {
-      view.group.visible = id === presentation.face;
-    });
-    target.activeAvatarView = target.avatarViews[presentation.face];
-    syncAvatarViewPose(target);
-    return;
-  }
-  const rig = presentation.rig;
-  if (target.visual) {
-    target.visual.rotation.y = presentation.billboardYaw;
-    target.visual.scale.x = 1;
-  }
-  parts.head.scale.x = rig.headWidth;
-  parts.hair.scale.x = rig.headWidth;
-  parts.frontFace.visible = presentation.face === 'front';
-  parts.frontFaceHair.visible = presentation.face === 'front';
-  parts.profileRightFace.visible = presentation.face === 'profile-right';
-  parts.profileLeftFace.visible = presentation.face === 'profile-left';
-  Object.values(parts.topStyles).forEach((style) => {
-    style.torso.scale.x = rig.torsoWidth;
-    style.sleeves?.forEach((sleeve) => {
-      sleeve.visible = presentation.face === 'front' || presentation.face === 'back';
-    });
-    style.frontDetails?.forEach((detail) => {
-      detail.visible = rig.frontDetails;
-    });
-  });
-  target.backLeg.pivot.position.x = rig.legXs[0];
-  target.frontLeg.pivot.position.x = rig.legXs[1];
-  if (presentation.visibleArm === 'front') {
-    target.frontArm.pivot.position.x = rig.armXs[0];
-  } else if (presentation.visibleArm === 'back') {
-    target.backArm.pivot.position.x = rig.armXs[0];
-  } else {
-    target.backArm.pivot.position.x = rig.armXs[0];
-    target.frontArm.pivot.position.x = rig.armXs[1];
-  }
-  target.backArm.pivot.visible = presentation.visibleArm !== 'front';
-  target.frontArm.pivot.visible = presentation.visibleArm !== 'back';
+  if (!target.meshRig) return;
+  target.activeAvatarView = avatarFacingForYaw(target.model.rotation.y).face;
 }
 
 function createEggOpponent(parent, x = 3.75) {
@@ -1576,6 +1326,50 @@ const creatorPreviewActor = createCharacter(creatorPreviewScene, { x: 0 });
 anchorActorToFloor(creatorPreviewActor);
 creatorPreviewActor.model.rotation.y = profileFaceLayout().previewYaw;
 applyAvatarLook(creatorPreviewActor, creatorLook);
+
+let authoredApartment = null;
+let authoredAvatar = null;
+let authoredPreviewAvatar = null;
+
+function replaceBlockoutWithAuthoredApartment() {
+  return Promise.all([
+    loadApartmentScene({ scene }),
+    loadAvatarRig({ look: campaign.player?.look ?? creatorLook }),
+    loadAvatarRig({ look: creatorLook }),
+  ]).then(([apartment, worldAvatar, previewAvatar]) => {
+    // The earlier blockout stays in memory only as a fallback for a failed load.
+    // It is never drawn once the authored scene is ready.
+    roomGroup.visible = false;
+    actor.model.visible = false;
+    creatorPreviewActor.model.visible = false;
+
+    worldAvatar.root.position.y = -actorFootOffset;
+    previewAvatar.root.position.y = -actorFootOffset;
+    actor.group.add(worldAvatar.root);
+    creatorPreviewActor.group.add(previewAvatar.root);
+    actor.authoredRig = worldAvatar;
+    creatorPreviewActor.authoredRig = previewAvatar;
+    authoredAvatar = worldAvatar;
+    authoredPreviewAvatar = previewAvatar;
+    authoredApartment = apartment;
+
+    const chairSeat = apartment.root.getObjectByName('chair-seat');
+    if (chairSeat) {
+      const seatCenter = new THREE.Box3().setFromObject(chairSeat).getCenter(new THREE.Vector3());
+      actor.seatTargetX = seatCenter.x;
+      actor.seatTargetZ = seatCenter.z + .28;
+    }
+
+    interactiveObjects.splice(0, interactiveObjects.length, ...apartment.hitAreas);
+    Object.keys(actionHighlights).forEach((id) => { delete actionHighlights[id]; });
+    Object.assign(actionHighlights, apartment.highlights);
+  }).catch((error) => {
+    // The game stays playable with the local fallback when a model download fails.
+    console.error('Не удалось загрузить авторскую квартиру:', error);
+  });
+}
+
+replaceBlockoutWithAuthoredApartment();
 const battle = createBattleScene();
 let gameMode = 'apartment';
 let entryMode = 'start';
@@ -1615,6 +1409,26 @@ function setStatus() {
   status.textContent = 'Кликни по комнате, чтобы отправить героя в нужную точку.';
 }
 
+function resetLimbPose(performer) {
+  for (const limb of [performer.frontArm, performer.backArm, performer.frontLeg, performer.backLeg]) {
+    limb.pivot.rotation.x = 0;
+    limb.pivot.rotation.z = 0;
+    limb.lowerPivot.rotation.x = 0;
+    limb.lowerPivot.rotation.z = 0;
+  }
+}
+
+function applySideWalkPose(performer) {
+  const pose = sideWalkPose(performer.phase, performer.state.facing);
+  resetLimbPose(performer);
+  performer.frontLeg.pivot.rotation.x = pose.frontLeg;
+  performer.backLeg.pivot.rotation.x = pose.backLeg;
+  performer.frontLeg.lowerPivot.rotation.x = pose.frontKnee;
+  performer.backLeg.lowerPivot.rotation.x = pose.backKnee;
+  performer.frontArm.pivot.rotation.x = pose.frontArm;
+  performer.backArm.pivot.rotation.x = pose.backArm;
+}
+
 function updatePose(delta, elapsed) {
   if (actor.mode === 'typing') {
     applySeatPose(1, elapsed);
@@ -1624,32 +1438,14 @@ function updatePose(delta, elapsed) {
   actor.model.position.set(0, 0, 0);
   actor.model.rotation.z = 0;
   if (!actor.state.moving) {
-    const breath = Math.sin(elapsed * 2.4) * .035;
-    actor.model.position.y = breath;
-    actor.frontArm.pivot.rotation.z = -.06 + breath;
-    actor.backArm.pivot.rotation.z = .04 - breath;
-    actor.frontArm.lowerPivot.rotation.z = 0;
-    actor.backArm.lowerPivot.rotation.z = 0;
-    actor.frontLeg.pivot.rotation.z = 0;
-    actor.backLeg.pivot.rotation.z = 0;
-    actor.frontLeg.lowerPivot.rotation.z = 0;
-    actor.backLeg.lowerPivot.rotation.z = 0;
+    resetLimbPose(actor);
     actor.shadow.scale.set(1, 1, 1);
     return;
   }
 
-  actor.phase += delta * 13;
-  const stride = Math.sin(actor.phase) * .66;
-  actor.frontLeg.pivot.rotation.z = stride;
-  actor.backLeg.pivot.rotation.z = -stride;
-  actor.frontLeg.lowerPivot.rotation.z = Math.max(0, -stride) * .74;
-  actor.backLeg.lowerPivot.rotation.z = Math.max(0, stride) * .74;
-  actor.frontArm.pivot.rotation.z = -stride * .73;
-  actor.backArm.pivot.rotation.z = stride * .73;
-  actor.frontArm.lowerPivot.rotation.z = 0;
-  actor.backArm.lowerPivot.rotation.z = 0;
-  actor.model.position.y = Math.abs(Math.sin(actor.phase * 2)) * .055;
-  actor.shadow.scale.set(.96 + Math.abs(stride) * .16, .86, 1);
+  actor.phase += delta * 10;
+  applySideWalkPose(actor);
+  actor.shadow.scale.set(.98, .92, 1);
 }
 
 function startTurn(targetAngle, duration = .28) {
@@ -1673,6 +1469,7 @@ function updateTurn(delta) {
 function applySeatPose(progress, elapsed) {
   const pose = seatPose(progress);
   const arms = keyboardArmPose(progress, elapsed * 11);
+  resetLimbPose(actor);
   actor.model.position.y = pose.bodyY;
   actor.frontLeg.pivot.rotation.z = pose.thighAngle;
   actor.backLeg.pivot.rotation.z = pose.thighAngle * .92;
@@ -1685,13 +1482,32 @@ function applySeatPose(progress, elapsed) {
   actor.shadow.scale.set(1 + progress * .2, 1 - progress * .45, 1);
 }
 
+function playPoseFade({ cueId = 'chair-scrape', swap }) {
+  if (actor.isTransitioning) return;
+  actor.isTransitioning = true;
+  transitionFade.classList.add('is-active');
+  window.setTimeout(() => {
+    swap();
+    cue(cueId);
+    transitionFade.classList.remove('is-active');
+    window.setTimeout(() => { actor.isTransitioning = false; }, 180);
+  }, 180);
+}
+
 function beginSeatSequence() {
-  actor.mode = 'turningToDesk';
-  actor.actionElapsed = 0;
-  actor.seatStartX = actor.state.x;
-  actor.seatStartZ = actor.group.position.z;
+  actor.mode = 'fadingSeat';
   actor.state = { ...actor.state, moving: false };
-  startTurn(actionYaw('computer'), .34);
+  playPoseFade({
+    swap: () => {
+      actor.state = { ...actor.state, x: actor.seatTargetX, moving: false };
+      actor.group.position.set(actor.seatTargetX, actor.group.position.y, actor.seatTargetZ);
+      actor.mode = 'typing';
+      actor.actionElapsed = 0;
+      // Keep the settled pose visible long enough to read before the desktop UI covers it.
+      actor.seatRevealUntil = performance.now() + 820;
+      startTurn(actionYaw('computer'), .18);
+    },
+  });
 }
 
 function beginStandingSequence() {
@@ -1700,7 +1516,7 @@ function beginStandingSequence() {
   actor.standStartZ = actor.group.position.z;
 }
 
-function beginApartmentAction(actionId) {
+function beginApartmentAction(actionId, { skipFade = false } = {}) {
   const action = getApartmentAction(actionId);
   const availability = canStartApartmentAction(actionId, campaign.needs);
   if (!action || !availability.allowed) {
@@ -1711,9 +1527,18 @@ function beginApartmentAction(actionId) {
     beginSeatSequence();
     return;
   }
+  if (actionId === 'bed' && !skipFade) {
+    actor.mode = 'fadingBed';
+    actor.state = { ...actor.state, moving: false };
+    playPoseFade({
+      cueId: 'sleep',
+      swap: () => beginApartmentAction('bed', { skipFade: true }),
+    });
+    return;
+  }
   if (actionUsesDeskSeat(actionId)) {
     actor.activeApartmentAction = action;
-    actor.actionTransition = createActionTransition({ actionId, fromRoom: 'living', toRoom: 'living' });
+    actor.actionTransition = createActionTransition({ actionId, fromRoom: 'living', toRoom: 'living', transition: 'desk-fade' });
     actor.actionCuePlayed = false;
     actor.actionElapsed = 0;
     actor.seatStartX = actor.state.x;
@@ -1732,12 +1557,13 @@ function beginApartmentAction(actionId) {
     actionId: action.id,
     fromRoom: actor.pendingActionSourceRoom ?? targetRoom,
     toRoom: targetRoom,
+    transition: action.id === 'bed' ? 'bed-fade' : 'visible',
   });
   actor.pendingActionSourceRoom = null;
   actor.actionCuePlayed = false;
   actor.bubble = null;
   actor.mode = 'apartmentAction';
-  actor.actionElapsed = 0;
+  actor.actionElapsed = actionId === 'bed' && skipFade ? .64 : 0;
   actor.state = { ...actor.state, moving: false };
   actor.actionStartZ = actor.group.position.z;
   actor.actionTargetZ = action.id === 'bed' ? .14 : .02;
@@ -1789,12 +1615,7 @@ function completeApartmentAction(action) {
 
 function applyApartmentActionPose(action, elapsed) {
   actor.model.position.y = 0;
-  actor.frontLeg.pivot.rotation.z = 0;
-  actor.backLeg.pivot.rotation.z = 0;
-  actor.frontLeg.lowerPivot.rotation.z = 0;
-  actor.backLeg.lowerPivot.rotation.z = 0;
-  actor.frontArm.lowerPivot.rotation.z = 0;
-  actor.backArm.lowerPivot.rotation.z = 0;
+  resetLimbPose(actor);
   const beat = Math.sin(elapsed * 7);
   if (action.animation === 'sleep') {
     applySeatPose(.22, elapsed);
@@ -1843,6 +1664,10 @@ function applyApartmentActionStartPose(action, elapsed) {
 
 function requestMove(targetX, interaction = null) {
   if (actor.mode === 'typing') {
+    if (performance.now() < actor.seatRevealUntil) {
+      updatePose(0, elapsed);
+      return true;
+    }
     actor.pendingIntent = { type: 'walk', targetX, interaction };
     beginStandingSequence();
     return;
@@ -1871,7 +1696,9 @@ function requestFaceCamera() {
 }
 
 function updateApartmentCamera() {
-  const targetX = cameraTargetX(actor.state.x);
+  // The first apartment is one readable cutaway, not a close follow camera.
+  // Keeping both rooms in frame makes the doors and destinations clear.
+  const targetX = 0;
   camera.position.x = targetX;
   camera.lookAt(targetX, 2.15, 0);
 }
@@ -2080,17 +1907,34 @@ function updateApartment(delta, elapsed) {
   setStatus();
 }
 
+function updateAuthoredAvatar(target, delta, { preview = false } = {}) {
+  const rig = target.authoredRig;
+  if (!rig) return;
+  const action = target.activeApartmentAction;
+  const clip = preview
+    ? 'idle'
+    : target.state.moving
+      ? 'walk'
+      : target.mode === 'typing' || target.mode === 'sittingDown' || target.mode === 'turningToDesk' || target.mode === 'turningToRecordDesk' || target.mode === 'sittingToRecord' || action?.id === 'microphone'
+        ? 'desk-idle'
+        : action?.id === 'bed'
+          ? 'lie-down'
+          : action?.id === 'stove' || action?.id === 'sink' || action?.id === 'fridge'
+            ? 'kitchen-work'
+            : action?.id === 'door'
+              ? 'door-reach'
+              : 'idle';
+  rig.play(clip);
+  rig.root.position.copy(target.model.position);
+  rig.root.position.y -= actorFootOffset;
+  rig.root.rotation.copy(target.model.rotation);
+  rig.update(delta);
+}
+
 function resetStagePose(performer, facing) {
   performer.model.position.set(0, 0, 0);
   performer.model.rotation.set(0, facing === 1 ? 0 : -Math.PI, 0);
-  performer.frontArm.pivot.rotation.z = 0;
-  performer.backArm.pivot.rotation.z = 0;
-  performer.frontArm.lowerPivot.rotation.z = 0;
-  performer.backArm.lowerPivot.rotation.z = 0;
-  performer.frontLeg.pivot.rotation.z = 0;
-  performer.backLeg.pivot.rotation.z = 0;
-  performer.frontLeg.lowerPivot.rotation.z = 0;
-  performer.backLeg.lowerPivot.rotation.z = 0;
+  resetLimbPose(performer);
   performer.shadow.scale.set(1, 1, 1);
   updateFacePresentation(performer);
 }
@@ -2099,6 +1943,7 @@ function applyStageWalk(performer, delta, direction) {
   performer.phase += delta * 13;
   const stride = Math.sin(performer.phase) * .66;
   performer.model.rotation.y = direction > 0 ? 0 : -Math.PI;
+  resetLimbPose(performer);
   performer.frontLeg.pivot.rotation.z = stride;
   performer.backLeg.pivot.rotation.z = -stride;
   performer.frontLeg.lowerPivot.rotation.z = Math.max(0, -stride) * .74;
@@ -2279,7 +2124,7 @@ function render() {
   if (entryMode === 'apartment') {
     if (gameMode === 'apartment') updateApartment(delta, clock.elapsedTime);
     else updateBattle(delta, clock.elapsedTime);
-    syncAvatarViewPose(actor);
+    updateAuthoredAvatar(actor, delta);
     updateActorBubble();
   } else {
     renderActorBubble(null);
@@ -2289,6 +2134,7 @@ function render() {
     creatorPreviewActor.model.scale.x = 1;
     creatorPreviewActor.model.position.y = Math.sin(clock.elapsedTime * .65) * .025;
     updateFacePresentation(creatorPreviewActor);
+    updateAuthoredAvatar(creatorPreviewActor, delta, { preview: true });
     creatorPreviewRenderer.render(creatorPreviewScene, creatorPreviewCamera);
   }
   if (entryMode === 'apartment') renderer.render(scene, camera);
@@ -2305,13 +2151,13 @@ function resize() {
   const width = window.innerWidth;
   const height = window.innerHeight;
   const aspect = width / height;
-  const viewHeight = Math.max(5.3, 8.8 / aspect);
+  const viewHeight = Math.max(7.1, 14 / aspect);
   camera.left = -viewHeight * aspect / 2;
   camera.right = viewHeight * aspect / 2;
   camera.top = viewHeight / 2;
   camera.bottom = -viewHeight / 2;
   camera.updateProjectionMatrix();
-  camera.lookAt(camera.position.x, 2.15, 0);
+  camera.lookAt(0, 2.15, 0);
   renderer.setSize(width, height, false);
   resizeCreatorPreview();
 }
