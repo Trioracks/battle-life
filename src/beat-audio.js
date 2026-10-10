@@ -1,4 +1,6 @@
 import {drumById,loopSeconds} from './beat-catalog.js';
+import {beginnerById} from './beat-beginner-bank.js';
+import {resolveBeatPlayback} from './beat-playback.js';
 
 // Authored placeholder PCM, not a remix of third-party music. Sliders never enter here.
 export function primitiveSamples(kind,rate=44100){
@@ -21,32 +23,96 @@ export function primitiveSamples(kind,rate=44100){
  return data;
 }
 export class BeatAudio{
- constructor({contextFactory=()=>new (globalThis.AudioContext??globalThis.webkitAudioContext)(),fetchFn=(...a)=>fetch(...a)}={}){Object.assign(this,{contextFactory,fetchFn});this.cache=new Map();this.sources=[];this.generation=0;this.error='';this.disposed=false;}
- async unlock(){if(this.disposed)return;this.context??=this.contextFactory();if(this.context.state==='suspended')await this.context.resume();}
- async buffer(id){
+ constructor({contextFactory=()=>new (globalThis.AudioContext??globalThis.webkitAudioContext)(),fetchFn=(...a)=>fetch(...a)}={}){
+  Object.assign(this,{contextFactory,fetchFn});this.cache=new Map();this.sources=[];this.retiring=[];this.generation=0;this.error='';this.disposed=false;this.status='stopped';this.offset=0;this.startedAt=0;this.descriptor=null;this.pending=null;
+ }
+ async unlock(){
+  if(this.disposed)return;
+  this.context??=this.contextFactory();
+  if(this.context.state==='suspended')await this.context.resume();
+  if(this.context.state!=='running')throw Error('audio context unavailable');
+ }
+ current(token){return token===this.generation&&!this.disposed;}
+ async buffer(id,token=this.generation){
   if(this.cache.has(id))return this.cache.get(id);
   let buffer;
   if(['primitive','melody','bass'].includes(id)){
    const samples=primitiveSamples(id==='primitive'?'drums':id);buffer=this.context.createBuffer(1,samples.length,44100);buffer.copyToChannel(samples,0);
   }else{
-   const asset=drumById(id);if(!asset)throw Error('unknown asset');
-   const response=await this.fetchFn(asset.path);if(!response.ok)throw Error('missing asset');buffer=await this.context.decodeAudioData(await response.arrayBuffer());
+   const asset=beginnerById(id)||drumById(id);if(!asset)throw Error('unknown asset');
+   const response=await this.fetchFn(asset.path);if(!this.current(token))return null;
+   if(!response.ok)throw Error('missing asset');
+   const bytes=await response.arrayBuffer();if(!this.current(token))return null;
+   buffer=await this.context.decodeAudioData(bytes);if(!this.current(token))return null;
   }
-  if(buffer.duration<loopSeconds()-.02)throw Error('short loop');
+  if(buffer.duration<(beginnerById(id)?32/3:loopSeconds())-.02)throw Error('short loop');
   if(!this.disposed){if(this.cache.size>=8)this.cache.delete(this.cache.keys().next().value);this.cache.set(id,buffer);}return buffer;
  }
- async play({drumId='primitive',stage=1}={}){
-  this.stop();if(this.disposed)return false;const token=this.generation;this.error='';
-  try{
-   await this.unlock();if(token!==this.generation||this.disposed)return false;
-   const ids=[drumId,...(stage>=2?['melody']:[]),...(stage>=3?['bass']:[])],buffers=await Promise.all(ids.map(id=>this.buffer(id)));
-   if(token!==this.generation||this.disposed)return false;
-   this.gain=this.context.createGain();this.gain.gain.value=.7;this.gain.connect(this.context.destination);
-   const when=this.context.currentTime+.04;
-   for(const buffer of buffers){const source=this.context.createBufferSource();source.buffer=buffer;source.loop=true;source.loopStart=0;source.loopEnd=loopSeconds();source.connect(this.gain);this.sources.push(source);source.start(when);}
-   return true;
-  }catch{if(token===this.generation){this.stop();this.error='Не удалось воспроизвести звук. Файл может быть недоступен; проект сохранён.';}return false;}
+ play({drumId='primitive',stage=1}={}){
+  const ids=[drumId,...(stage>=2?['melody']:[]),...(stage>=3?['bass']:[])];
+  return this.playDescriptor({key:JSON.stringify(['preview',ids]),owner:'studio',durationSeconds:loopSeconds(),parts:ids.map(id=>({id,loopSeconds:loopSeconds()}))});
  }
- stop(){this.generation++;for(const source of this.sources){try{source.stop();source.disconnect();}catch{/* Already ended. */}}this.sources=[];this.gain?.disconnect();this.gain=null;}
+ playProject(beat,options){
+  if(this.disposed)return Promise.resolve(false);
+  const result=resolveBeatPlayback(beat,options);
+  if(!result.ok){this.stop();this.status='error';this.error=result.reason;return Promise.resolve(false);}
+  return this.playDescriptor(result.descriptor);
+ }
+ playDescriptor(descriptor){
+  if(this.disposed)return Promise.resolve(false);
+  if(this.descriptor?.key===descriptor.key){
+   if(this.status==='playing')return Promise.resolve(true);
+   if(this.status==='loading')return this.pending;
+  }
+  const offset=this.descriptor?.key===descriptor.key&&this.status==='paused'?this.offset:0;
+  this.stop();this.descriptor=descriptor;this.offset=offset;this.status='loading';this.error='';
+  const token=this.generation;this.pending=this.startDescriptor(descriptor,token,offset);return this.pending;
+ }
+ async startDescriptor(descriptor,token,offset){
+  try{
+   await this.unlock();if(!this.current(token))return false;
+   const buffers=await Promise.all(descriptor.parts.map(part=>this.buffer(part.id,token)));
+   if(!this.current(token))return false;
+   this.gain=this.context.createGain();this.gain.gain.value=.7;this.gain.connect(this.context.destination);
+   const when=this.context.currentTime+.04;this.startedAt=when;
+   buffers.forEach((buffer,index)=>{
+    const part=descriptor.parts[index],source=this.context.createBufferSource();source.buffer=buffer;source.loop=true;source.loopStart=0;source.loopEnd=part.loopSeconds;source.connect(this.gain);this.sources.push(source);source.start(when,offset%part.loopSeconds);
+   });
+   this.status='playing';this.pending=null;
+   return true;
+  }catch{
+   if(this.current(token)){this.stop();this.status='error';this.error='Не удалось воспроизвести звук. Файл может быть недоступен; проект сохранён.';}
+   return false;
+  }
+ }
+ getSnapshot(){
+  const durationSeconds=this.descriptor?.durationSeconds??0;
+  const elapsed=this.status==='playing'?Math.max(0,(this.context?.currentTime??0)-this.startedAt):0;
+  return {status:this.status,key:this.descriptor?.key??'',owner:this.descriptor?.owner??null,positionSeconds:durationSeconds?(this.offset+elapsed)%durationSeconds:0,durationSeconds,error:this.error};
+ }
+ pause(){
+  if(!['playing','loading'].includes(this.status))return;
+  const offset=this.getSnapshot().positionSeconds;
+  this.stop();this.offset=offset;this.status='paused';
+ }
+ release(voices,gain){
+  for(const source of voices){try{source.stop();}catch{/* Already ended. */}try{source.disconnect();}catch{/* Already disconnected. */}}
+  try{gain?.disconnect();}catch{/* Already disconnected. */}
+ }
+ clearRetiring(){
+  for(const item of this.retiring){clearTimeout(item.timer);this.release(item.voices,item.gain);}
+  this.retiring=[];
+ }
+ stop({fadeSeconds=0}={}){
+  this.generation++;this.pending=null;this.clearRetiring();
+  const voices=this.sources,gain=this.gain;this.sources=[];this.gain=null;
+  const fade=Math.min(.08,Math.max(0,Number(fadeSeconds)||0));
+  if(fade&&voices.length&&gain?.gain?.linearRampToValueAtTime){
+   const now=this.context.currentTime;gain.gain.setValueAtTime?.(gain.gain.value,now);gain.gain.linearRampToValueAtTime(0,now+fade);
+   for(const source of voices){try{source.stop(now+fade);}catch{/* Already ended. */}}
+   const item={voices,gain,timer:null};item.timer=setTimeout(()=>{this.release(voices,gain);this.retiring=this.retiring.filter(other=>other!==item);},fade*1000+20);this.retiring.push(item);
+  }else this.release(voices,gain);
+  this.offset=0;this.status='stopped';this.error='';
+ }
  dispose(){this.stop();this.disposed=true;this.cache.clear();Promise.resolve(this.context?.close()).catch(()=>{});}
 }
