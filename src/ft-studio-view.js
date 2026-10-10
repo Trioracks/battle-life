@@ -1,10 +1,24 @@
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=21';
+import {pcElement as el,pcButton as button,pcFind} from './virtual-pc-dom.js?rev=21';
 
 export const FT_TRACKS=Object.freeze([
  ...['Drum Kit','Bass','Percussion'].map(name=>({name,stage:0,color:'rhythm'})),
  ...['Lead','Atmosphere','Harmony'].map(name=>({name,stage:1,color:'theme'})),
  ...['Sound Design','Sub Bass','FX'].map(name=>({name,stage:2,color:'arrangement'})),
 ]);
+
+export function renderStudioTracks(root,beat){
+ const d=root.ownerDocument,stage=beat?.stages?.length??0;
+ const tracks=stage?FT_TRACKS.slice(0,stage*3):[{name:'Дорожка 01',stage:0,color:'empty'}];
+ const rows=pcFind(root,n=>n.dataset?.ftRole==='lanes');rows.replaceChildren();
+ pcFind(root,n=>n.dataset?.ftRole==='track-count').textContent=tracks.length+' TRACKS';
+ for(const track of tracks){
+  const row=el(d,'div',{className:'ft-lane',dataset:{stage:String(track.stage),color:track.color}}),label=el(d,'div',{className:'ft-lane-label'});
+  label.append(el(d,'i',{attributes:{'aria-hidden':'true'}}),el(d,'span',{text:track.name,dataset:{ftRole:'track-label'}}));
+  const lane=el(d,'div',{className:'ft-lane-grid',dataset:{ftRole:'lane'},attributes:{'aria-hidden':'true'}});
+  if(stage){const clip=el(d,'span',{className:'ft-audio-clip',text:track.name,dataset:{ftRole:'clip',color:track.color}});clip.style.marginLeft='0%';clip.style.width=(beat.version===3?25:12.5)+'%';lane.append(clip);}
+  row.append(label,lane);rows.append(row);
+ }
+}
 
 // Visual workspace only. Musical decisions will belong to the game simulation.
 export function createStudioWorkspace(document,{projectName='Сеанс без названия'}={}){
@@ -24,7 +38,9 @@ export function createStudioWorkspace(document,{projectName='Сеанс без �
  }
  library.append(el(document,'div',{className:'ft-library-foot',text:'FT / WORKSTATION 1.0'}));
  const main=el(document,'main',{className:'ft-main'}),arrangement=el(document,'section',{className:'ft-playlist',attributes:{'aria-label':'Дорожки проекта'}});
- const title=el(document,'div',{className:'ft-panel-heading'});title.append(el(document,'h2',{text:'Дорожки'}),el(document,'span',{text:'ARRANGEMENT 01'}),el(document,'small',{text:'9 TRACKS'}));arrangement.append(title);
+ const actions=el(document,'div',{className:'ft-project-actions',dataset:{ftRole:'project-actions'}});
+ const title=el(document,'div',{className:'ft-panel-heading'});title.append(el(document,'h2',{text:'Дорожки'}),el(document,'span',{text:'ARRANGEMENT 01'}),el(document,'small',{dataset:{ftRole:'track-count'}}));arrangement.append(actions,title);
+ arrangement.append(el(document,'div',{className:'ft-workflow',dataset:{ftRole:'workflow'}}));
  const transport=el(document,'div',{className:'ft-transport',dataset:{ftRole:'transport'},attributes:{'aria-label':'Воспроизведение'}});
  for(const [label,glyph]of [['Play','▶'],['Pause','Ⅱ'],['Stop','■']])transport.append(button(document,glyph,{dataset:{ftAction:label.toLowerCase()},attributes:{'aria-label':label,title:label}}));
  const transportStatus=el(document,'span',{className:'ft-transport-status',text:'Готов',dataset:{ftRole:'transport-status'},attributes:{role:'status'}});
@@ -34,10 +50,7 @@ export function createStudioWorkspace(document,{projectName='Сеанс без �
  const grid=el(document,'div',{className:'ft-grid-inner'});scroll.append(grid);
  const timeline=el(document,'div',{className:'ft-timeline'});timeline.append(el(document,'span',{className:'ft-track-corner',text:'ТАКТ'}));
  for(let bar=1;bar<=16;bar++)timeline.append(el(document,'span',{text:String(bar)}));grid.append(timeline);
- for(const track of FT_TRACKS){
-  const row=el(document,'div',{className:'ft-lane',dataset:{stage:String(track.stage),color:track.color}}),label=el(document,'div',{className:'ft-lane-label'});label.append(el(document,'i',{attributes:{'aria-hidden':'true'}}),el(document,'span',{text:track.name,dataset:{ftRole:'track-label'}}));
-  row.append(label,el(document,'div',{className:'ft-lane-grid',dataset:{ftRole:'lane'},attributes:{'aria-hidden':'true'}}));grid.append(row);
- }
+ grid.append(el(document,'div',{dataset:{ftRole:'lanes'}}));
  const playheadArea=el(document,'div',{className:'ft-playhead-area',attributes:{'aria-hidden':'true'}});
  playheadArea.append(el(document,'i',{className:'ft-playhead',dataset:{ftRole:'playhead'}}));grid.append(playheadArea);
  arrangement.append(scroll);
@@ -54,5 +67,5 @@ export function createStudioWorkspace(document,{projectName='Сеанс без �
  }
  rhythm.append(rack);main.append(arrangement,rhythm);body.append(library,main);
  const footer=el(document,'footer',{className:'ft-bottom'});footer.append(el(document,'span',{text:'●  СТУДИЯ ГОТОВА'}),el(document,'span',{text:'Рабочее пространство · музыкальные действия появятся позже'}),el(document,'span',{text:'44.1 kHz / 16 bit'}));
- root.append(header,body,footer);return root;
+ root.append(header,body,footer);renderStudioTracks(root,null);return root;
 }

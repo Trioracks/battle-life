@@ -2,7 +2,7 @@ import {PcTransition} from './virtual-pc-transition.js?rev=21';
 export const pcNeedsSceneFrame=(snapshot,mode)=>mode!=='pc'||snapshot.overlay<1;
 export function beginPcCutscene(motion){
  if(motion.busy||!motion.config.actions.computer)return false;
- motion.sleeping=false;motion.pending=null;motion.actionId='computer';motion.from=[...motion.position];motion.targetYaw=motion.config.actions.computer.yaw;motion.setPhase('fade-out');return true;
+ return motion.interact('computer');
 }
 export function pcActorVisible(motion,computerActive,workActor=false){
  if(workActor)return true;

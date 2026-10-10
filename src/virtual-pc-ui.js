@@ -1,5 +1,5 @@
 import { FtStudioAudio } from './ft-studio-audio.js?rev=4';
-import {mountPcShell} from './virtual-pc-shell.js?rev=21';
+import {mountPcShell} from './virtual-pc-shell.js?rev=22';
 import {mountExplorer} from './virtual-pc-explorer-view.js?rev=21';
 import {mountPcMenu} from './virtual-pc-menus.js?rev=21';
 import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=21';
@@ -13,10 +13,10 @@ import { cancelFtDownload, createVirtualPcState, diskUsage, FT_STUDIO_MB, PROJEC
 import { downloadPresentation } from './virtual-pc-runtime.js?rev=21';
 import {diskAmount} from './virtual-pc-disk-view.js?rev=21';
 import {pcPresentation} from './virtual-pc-presentation.js?rev=21';
-import {createStudioWorkspace} from './ft-studio-view.js?rev=21';
+import {createStudioWorkspace} from './ft-studio-view.js?rev=22';
 import {mountUnderweb} from './underweb-view.js?rev=21';
 import {applyToBattle} from './virtual-pc-state.js?rev=21';
-import {mountBeatStudio} from './beat-studio-view.js?rev=21';
+import {mountBeatStudio} from './beat-studio-view.js?rev=22';
 import {BeatAudio} from './beat-audio.js?rev=21';
 import {normalizeBeat} from './beat-production.js?rev=21';
 import {createBeatMarket} from './beat-market-view.js?rev=21';

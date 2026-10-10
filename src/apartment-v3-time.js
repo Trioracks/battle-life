@@ -1,3 +1,4 @@
+import {homeDateLabel} from './home-calendar.js';
 const KEY = 'battle-life-apartment-v3-time';
 const durations = { sink: 15, stove: 30, fridge: 5 };
 const smooth = (x) => { const t = Math.max(0, Math.min(1, x)); return t * t * (3 - 2 * t); };
@@ -128,6 +129,7 @@ export class ApartmentTime {
   get light() { return homeLight(this.minutes); }
   get period() { return this.light.period; }
   get label() { return timeLabel(this.minutes); }
+  get dateLabel() { return homeDateLabel(this.day); }
 }
 
 export function saveHomeTime(storage, clock) {

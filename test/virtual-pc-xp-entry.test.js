@@ -18,6 +18,14 @@ test('new game resets icons and windows alongside PC',()=>{
   const {c}=setup();c.showDesktop(createVirtualPcState({desktopIcons:{computer:{x:240,y:200}}}));c.open('computer');
   c.reset(createVirtualPcState());c.showDesktop(c.state);assert.deepEqual(c.state.desktopIcons,{});assert.equal(c.windows.windows.length,0);
 });
+
+test('computer date tracks the shared game day and leaves clock text readable',()=>{
+ const {c,root}=setup();c.showDesktop(createVirtualPcState());
+ c.syncHost({playerName:'Саша',clockLabel:'23:59',gameDay:30});
+ assert.equal(findPc(root,'clock').textContent,'23:59');assert.equal(findPc(root,'clock').getAttribute('title'),'30.09.2012');
+ c.syncHost({playerName:'Саша',clockLabel:'00:00',gameDay:31});
+ assert.equal(findPc(root,'clock').getAttribute('title'),'01.10.2012');c.dispose();
+});
 test('host controller owns the eleven second cold boot with no DOM timer',()=>{
   const timers=[];const {c,root}=setup({setTimeoutFn:(fn,delay)=>{timers.push({fn,delay});return timers.length;},clearTimeoutFn:()=>{}});
   c.boot(createVirtualPcState());const t=new PcTransition();t.enter();t.tick(3.6);c.presentTransition(t.snapshot);assert.ok(allPc(root).some(n=>n.textContent==='Windows HP'));
@@ -25,7 +33,7 @@ test('host controller owns the eleven second cold boot with no DOM timer',()=>{
 });
 test('entry loads versioned XP stylesheet and module, and host feeds game metadata',async()=>{
   const html=await readFile(new URL('../index.html',import.meta.url),'utf8'),app=await readFile(new URL('../src/apartment-app.js',import.meta.url),'utf8');
-  assert.match(html,/apartment-app\.js\?rev=21/);assert.match(html,/virtual-pc\.css\?rev=21/);
-  assert.match(html,/desktop-apps\.css\?rev=21/);
-  assert.match(app,/virtual-pc-ui\.js\?rev=21/);assert.match(app,/syncHost\(\{playerName:profile\?\.name/);
+  assert.match(html,/apartment-app\.js\?rev=22/);assert.match(html,/virtual-pc\.css\?rev=21/);
+  assert.match(html,/desktop-apps\.css\?rev=22/);
+  assert.match(app,/virtual-pc-ui\.js\?rev=22/);assert.match(app,/syncHost\(\{playerName:profile\?\.name/);
 });

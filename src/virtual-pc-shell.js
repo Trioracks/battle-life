@@ -1,5 +1,6 @@
 import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=21';
 import {createPcIcon} from './virtual-pc-icons.js?rev=21';
+import {homeDateLabel} from './home-calendar.js';
 
 export function mountPcShell(root,{onCommand}) {
   const d=root.ownerDocument,win=d.defaultView??globalThis;
@@ -105,7 +106,7 @@ export function mountPcShell(root,{onCommand}) {
   function render(next) {
     if(disposed)return;model=next;
     shell.style.setProperty('--pc-wallpaper','url("'+next.wallpaper+'")');
-    clock.textContent=next.metadata.clockLabel;clock.setAttribute('aria-label','Игровое время '+next.metadata.clockLabel);
+    clock.textContent=next.metadata.clockLabel;clock.setAttribute('title',homeDateLabel(next.metadata.gameDay));clock.setAttribute('aria-label','Игровое время '+next.metadata.clockLabel+', '+homeDateLabel(next.metadata.gameDay));
     warning.textContent=next.warning??'';warning.hidden=!next.warning;
     for(const [id,item]of icons)if(!next.apps.some(a=>a.id===id)){item.group.forEach(off=>off());item.node.remove();icons.delete(id);}
     for(const app of next.apps){

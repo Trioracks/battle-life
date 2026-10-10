@@ -1,16 +1,16 @@
 import {ApartmentMotion} from './apartment-v3-motion.js?rev=8';
-import {ApartmentTime,loadHomeTime,saveHomeTime} from './apartment-v3-time.js?rev=12';
+import {ApartmentTime,loadHomeTime,saveHomeTime} from './apartment-v3-time.js?rev=22';
 import {districts,getDistrictLocations} from './calikfornia.js';
 import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=21';
 import {playSoundCue} from './sound-cues.js';
 import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=12';
 import {DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,loadProfile} from './avatar-v3-profile.js?rev=10';
 import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=12';
-import {createNewGameSession} from './apartment-v3-new-game.js?rev=21';
+import {createNewGameSession} from './apartment-v3-new-game.js?rev=22';
 import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=21';
 import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=21';
-import {mountVirtualPc} from './virtual-pc-ui.js?rev=21';
-import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=21';
+import {mountVirtualPc} from './virtual-pc-ui.js?rev=22';
+import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=22';
 import {PcSounds} from './virtual-pc-sounds.js?rev=21';
 import {playIndoorFootstep} from './indoor-footsteps.js?rev=21';
 import {advanceBeatWork,restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=21';
@@ -82,7 +82,7 @@ try{
   function openComputer(){
     virtualPc.showDesktop(pcState);virtualPc.presentTransition(pcLifecycle.snapshot);
     setMode('pc');pcRoot.hidden=false;
-    virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,skills:profile?.skills});
+    virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,gameDay:homeTime.day,skills:profile?.skills});
     void pcLifecycle.seated();
   }
   pcRoot.addEventListener('click',event=>{const target=event.target.closest?.('button,[role="menuitem"]');if(target&&!target.disabled&&target.getAttribute('aria-disabled')!=='true'&&!pcLifecycle.snapshot.locked)void pcSounds.play('click');});
@@ -270,8 +270,8 @@ try{
     const door=motion.doorOpen>.3;if(door&&!lastDoor)cue('door');lastDoor=door;
     view.setRoomLights(homeTime.lights);view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));
     if(pcNeedsSceneFrame(pcLifecycle.snapshot,mode))view.render(motion,paused&&!step?0:dt*(pcLifecycle.snapshot.phase==='working'?4:1),{skeleton,paused:paused&&!step});$('#fade').style.opacity=motion.fade;
-    virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,skills:profile?.skills});
-    $('#home-time').textContent=`День ${homeTime.day} · ${homeTime.label} · ${homeTime.period} · Дом`;
+    virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,gameDay:homeTime.day,skills:profile?.skills});
+    $('#home-time').textContent=`${homeTime.dateLabel} · ${homeTime.label} · ${homeTime.period} · Дом`;
     if(now-lastTimeSave>(homeTime.isSleeping?500:15000)){saveHomeTime(storage,homeTime);persistPc(pcState);lastTimeSave=now;}
     $('#room').textContent=motion.position[0]<0?'КУХНЯ':'ЖИЛАЯ КОМНАТА';
     $('#state').textContent=`${motion.phase} · ${motion.clip} · x ${motion.position[0].toFixed(2)} · камера ${motion.cameraX.toFixed(2)} · ${Math.round(motion.yaw*180/Math.PI)}° · дверь ${Math.round(motion.doorOpen*100)}% · ${Math.round(frameRate)} FPS`;

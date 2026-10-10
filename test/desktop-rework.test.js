@@ -73,11 +73,13 @@ test('keyboard Tab reaches and wraps from the scrollable FT playlist',()=>{
  const s=setup();s.pc.open('ft-studio');s.finish();
  findButton(s.root,'Вернуться в студию').click();
  findButton(s.root,'Закрыть окно').focus();fire(s.root,'keydown',{key:'Tab'});
- assert.equal(s.d.activeElement,findButton(s.root,'Библиотека'));
- fire(s.root,'keydown',{key:'Tab'});assert.equal(s.d.activeElement,findButton(s.root,'Ритм-панель'));
+ assert.equal(s.d.activeElement.textContent,'Новый бит');
+ fire(s.root,'keydown',{key:'Tab'});assert.equal(s.d.activeElement.textContent,'Открыть проект');
+ fire(s.root,'keydown',{key:'Tab'});assert.equal(s.d.activeElement.textContent,'Библиотека');
+ fire(s.root,'keydown',{key:'Tab'});assert.equal(s.d.activeElement.textContent,'Ритм-панель');
  fire(s.root,'keydown',{key:'Tab'});
  assert.equal(s.d.activeElement.getAttribute('aria-label'),'Прокрутка дорожек');
- fire(s.root,'keydown',{key:'Tab'});assert.equal(s.d.activeElement,findButton(s.root,'Новый бит'));
+ fire(s.root,'keydown',{key:'Tab'});assert.equal(s.d.activeElement.getAttribute('aria-label'),'Свернуть окно');s.pc.dispose();
 });
 
 test('Underweb flows from home through search, catalogue, details and local application with history',()=>{

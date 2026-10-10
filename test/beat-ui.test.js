@@ -14,7 +14,10 @@ test('FT creates a beat without tempo editing and retains inputs across host tic
  findButton(s.root,'Начать проект').click();assert.equal(s.pc.state.projects[0].name,'Город');assert.match(s.pc.state.projects[0].drumId,/free/);
  assert.equal(allPc(s.root).filter(n=>n.type==='range').length,0);assert.equal(field(s.root,'BPM'),undefined);
  findButton(s.root,'Работать над этапом').click();assert.equal(s.work(),1);assert.ok(s.pc.state.music.job);
- s.pc.syncState(advanceBeatWork(s.pc.state,600).state);assert.ok(allPc(s.root).some(n=>n.textContent==='Музыкальная основа'));
+ s.pc.syncState(advanceBeatWork(s.pc.state,600).state);
+ const workflow=allPc(s.root).find(n=>n.dataset.ftRole==='workflow');
+ assert.ok(allPc(workflow).some(n=>n.textContent?.includes('Музыкальная основа')));
+ assert.equal(allPc(s.root).filter(n=>n.dataset.ftRole==='clip').length,3);s.pc.dispose();
 });
 test('local store buys a sample once and RIPLINE is installable',()=>{
  const s=setup();s.pc.open('underweb');s.pc.navigateUnderweb('underweb://samples');

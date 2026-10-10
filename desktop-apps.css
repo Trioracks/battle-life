@@ -125,8 +125,13 @@
 /* FT beginner workspace: grouped stems, not an editable DAW. */
 #virtual-pc .ft-workspace{position:relative}
 #virtual-pc .ft-workspace [hidden]{display:none!important}
-.ft-body.ft-producing{grid-template-columns:140px minmax(0,1fr) 280px}
-.ft-body.ft-producing[data-library-hidden=true]{grid-template-columns:minmax(0,1fr) 280px}
+.ft-body.ft-producing{grid-template-columns:140px minmax(0,1fr) 240px}
+.ft-body.ft-producing[data-library-hidden=true]{grid-template-columns:minmax(0,1fr) 240px}
+.ft-project-actions,.ft-workflow{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 10px;border-bottom:1px solid #202d22;flex-shrink:0}
+.ft-project-actions{background:#303a31}.ft-workflow{background:#28342b;font-size:11px;color:#b6c5ac;justify-content:space-between}
+.ft-project-name{display:flex;flex-wrap:wrap;gap:7px}.ft-project-name input{flex:1 1 230px}.ft-project-name button{flex:0 1 auto}
+#virtual-pc .ft-workspace .ft-project-actions button,#virtual-pc .ft-workspace .ft-workflow button{border:1px solid #647454!important;background:#424f38!important;color:#e2e6d5!important;padding:7px 12px!important;border-radius:3px!important;font:11px 'Segoe UI',sans-serif!important;cursor:pointer}
+.ft-stage-result{padding:9px 0;border-top:1px solid #414b3b}.ft-stage-result h3{font-size:11px;color:#c4cfb7;margin:0 0 5px}.ft-stage-result p{font-size:10px;color:#9aac98;line-height:1.5;margin:0 0 5px}.ft-stage-result small{font-size:10px;color:#b8a779}
 .ft-grid-inner{position:relative;min-width:740px}
 .ft-grid-inner .ft-timeline{grid-template-columns:110px repeat(16,minmax(0,1fr));min-width:0}
 .ft-grid-inner .ft-lane{grid-template-columns:110px minmax(0,1fr);min-width:0;height:42px}
