@@ -12,7 +12,7 @@ test('FT creates a beat without tempo editing and retains inputs across host tic
  const name=field(s.root,'Название бита');assert.ok(name);name.value='Город';fire(name,'input');name.focus();
  s.pc.syncHost({playerName:'Игрок',clockLabel:'10:01',skills:{beatmaking:40}});assert.equal(field(s.root,'Название бита'),name);assert.equal(name.value,'Город');
  findButton(s.root,'Начать проект').click();assert.equal(s.pc.state.projects[0].name,'Город');assert.match(s.pc.state.projects[0].drumId,/free/);
- assert.equal(allPc(s.root).filter(n=>n.type==='range').length,3);assert.equal(field(s.root,'BPM'),undefined);
+ assert.equal(allPc(s.root).filter(n=>n.type==='range').length,0);assert.equal(field(s.root,'BPM'),undefined);
  findButton(s.root,'Работать над этапом').click();assert.equal(s.work(),1);assert.ok(s.pc.state.music.job);
  s.pc.syncState(advanceBeatWork(s.pc.state,600).state);assert.ok(allPc(s.root).some(n=>n.textContent==='Музыкальная основа'));
 });
@@ -37,7 +37,7 @@ test('Projects navigation preserves live wallet, infection, recovered needs and 
  const s=setup();let state=createBeat(s.pc.state,{id:'live',name:'Живой',genre:'boombap'},{}).state;
  state=startBeatStage(state,'live',[5,5,5],{}).state;state.music.infected=true;s.pc.syncState(state);s.pc.open('ft-studio');s.launch();
  let live=advanceBeatWork(s.pc.state,9).state;live=restoreMusicNeeds(live,'meal');live.music.cash=4900;live.music.infected=false;
- s.pc.syncState(live);findButton(s.root,'Проекты').click();
+ s.pc.syncState(live);findButton(s.root,'Открыть проект').click();
  assert.deepEqual({...s.pc.state.music,activeBeatId:live.music.activeBeatId},live.music);assert.deepEqual(s.pc.state.projects,live.projects);
 });
 test('Explorer opening selects a saved beat even while the new-beat form is open',()=>{

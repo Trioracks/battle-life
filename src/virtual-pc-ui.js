@@ -96,6 +96,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     audio: callbacks.audio ?? new FtStudioAudio(),
     beatAudio: callbacks.beatAudio ?? new BeatAudio(),
     studioView:null,
+    pendingStudioProject:null,
     state: createVirtualPcState(),
     phase: 'off',
     windows: createWindowState({width:globalThis.innerWidth??1280,height:globalThis.innerHeight??720}),
@@ -242,7 +243,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.underwebView.update();return;
     }
     if(appId==='ft-studio'){
-      if(!pc.studioView)pc.studioView=mountBeatStudio(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onChange:next=>pc.persist(next),onWork:()=>callbacks.onWork?.()??false,audio:pc.beatAudio,legacyName:pc.project?.version===1?pc.project.name:undefined});
+      if(!pc.studioView){const initialProject=pc.pendingStudioProject;pc.pendingStudioProject=null;pc.studioView=mountBeatStudio(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onChange:next=>pc.persist(next),onWork:()=>callbacks.onWork?.()??false,audio:pc.beatAudio,initialProject});}
       pc.studioView.update();return;
     }
     if(appId==='computer'){
@@ -347,8 +348,9 @@ export function mountVirtualPc(root, callbacks = {}) {
     if(pc.state.download.status!=='installed'){pc.open('torent');return;}
     pc.project=normalized;pc.dirty=false;pc.confirmClose=false;
     if(pc.state.music.activeBeatId!==(beat?.id??null))pc.persist({...pc.state,music:{...pc.state.music,activeBeatId:beat?.id??null}});
+    if(!pc.studioView)pc.pendingStudioProject=normalized;
     pc.callbacks.onOpenProject(normalized);pc.open('ft-studio');pc.refreshApp('ft-studio',{replaceContent:true});
-    pc.studioView?.openProject(normalized);
+    if(pc.studioView){pc.pendingStudioProject=null;pc.studioView.openProject(normalized);}
   };
 
 
@@ -390,6 +392,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.renderDesktop(false);
     if(documents)pc.explorer?.navigate('documents');
     pc.shell.focusActive();
+    if(appId==='ft-studio')pc.studioView?.focus();
   };
   pc.open = appId => {
     if(pc.locked||!desktopApps(pc.state).some(app=>app.id===appId)||pc.confirmClose||pc.shutdownModal)return;
@@ -410,7 +413,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     if(busy){launchFeedback=el(document,'div',{className:'pc-launch-feedback',text:'Запуск FT Studio…',attributes:{role:'status'}});root.append(launchFeedback);}
     else{launchFeedback?.remove();launchFeedback=null;}
   };
-  pc.cancelStudioLaunch=()=>{pc.launchGeneration++;if(pc.studioLaunch!==null)pc.clearTimeoutFn(pc.studioLaunch);pc.studioLaunch=null;pc.setStudioBusy(false);};
+  pc.cancelStudioLaunch=()=>{pc.launchGeneration++;if(pc.studioLaunch!==null)pc.clearTimeoutFn(pc.studioLaunch);pc.studioLaunch=null;pc.pendingStudioProject=null;pc.setStudioBusy(false);};
   pc.closeNow = id => {
     if(id==='underweb'){pc.underwebView?.dispose();pc.underwebView=null;}
     pc.systemViews.get(id)?.dispose();pc.systemViews.delete(id);
