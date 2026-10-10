@@ -8,10 +8,9 @@ const browser=await chromium.launch({headless:true,executablePath:process.env.PL
 const key='battle-life-virtual-pc-v1';
 async function fixture(seed){
  const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage();page.setDefaultTimeout(60000);page.on('pageerror',e=>errors.push(e.message));
- await page.route('**/src/*.js?*',route=>route.continue({headers:{...route.request().headers(),'cache-control':'no-cache'}}));
  await page.route('**/__software-fixture',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><body>Isolated software fixture</body>'}));
  if(seed){await page.goto('http://127.0.0.1:4173/__software-fixture');await page.evaluate(async seed=>{
-  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js'),import('/src/virtual-pc-state.js')]);
+  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=23'),import('/src/virtual-pc-state.js?rev=23')]);
   localStorage.setItem('battle-life-apartment-v3',JSON.stringify(createProfile({name:'Software QA'})));
   const pc=createVirtualPcState(seed);if(seed.legacy)delete pc.software;
   localStorage.setItem('battle-life-virtual-pc-v1',JSON.stringify(pc));localStorage.setItem('battle-life-apartment-v3-time',JSON.stringify({day:1,minutes:720,initialRest:false}));

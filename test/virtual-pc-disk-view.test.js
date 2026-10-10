@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {pcDocument,allPc} from './helpers/virtual-pc-dom.js';
-import {diskUsage,createVirtualPcState} from '../src/virtual-pc-state.js';
+import {diskUsage,createVirtualPcState} from '../src/virtual-pc-state.js?rev=23';
 const api=await import('../src/virtual-pc-disk-view.js').catch(error=>{
   if(error.code==='ERR_MODULE_NOT_FOUND')return {};throw error;
 });

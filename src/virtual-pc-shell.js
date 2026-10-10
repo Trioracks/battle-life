@@ -1,6 +1,6 @@
 import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=21';
 import {createPcIcon} from './virtual-pc-icons.js?rev=21';
-import {homeDateLabel} from './home-calendar.js';
+import {homeDateLabel} from './home-calendar.js?rev=23';
 
 export function mountPcShell(root,{onCommand}) {
   const d=root.ownerDocument,win=d.defaultView??globalThis;

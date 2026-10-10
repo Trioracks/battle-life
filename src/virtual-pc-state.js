@@ -1,6 +1,6 @@
-import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=21';
-import {normalizeHousehold} from './home-food.js';
-import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js';
+import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=23';
+import {normalizeHousehold} from './home-food.js?rev=23';
+import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=23';
 export const VIRTUAL_PC_STORAGE_KEY = 'battle-life-virtual-pc-v1';
 export const VIRTUAL_DISK_MB = 16000;
 export const SYSTEM_RESERVED_MB = 14000;

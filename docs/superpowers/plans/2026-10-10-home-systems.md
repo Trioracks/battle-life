@@ -12,6 +12,8 @@
 
 Пользователь 10.10.2026 прямо поручил выполнить весь записанный список и смотреть результат после реализации. Повторные согласования спецификаций и плана не запрашиваются. Работа идёт в существующей ветке `codex/home-studio-polish`; новая рабочая копия не нужна по ранее выраженному выбору пользователя.
 
+**Status 10.10.2026:** Tasks 1–4 implemented and individually reviewed; Task 5 integration and required serial QA complete on revision 23. Final Node suite: 530/530. Results, exact ledger rulings and deferred limitations: [QA](../qa/2026-10-10-home-systems.md). Whole-branch independent review and integration decision follow the local Task 5 commit; no push or merge performed.
+
 ## Global Constraints
 
 - Все создаваемые рабочие данные, кэши, артефакты и временные файлы находятся на D:; новые зависимости без необходимости не устанавливать.
@@ -46,11 +48,11 @@
 - `createCharacterSpeech` manages text position/hold, queue-after-room, dedupe, hidden time and beep budget without scene/DOM assumptions. View exposes one live announcement and head position from scene.
 - `mountHomeNeedsView` exposes open/close/update/dispose and consume callback; no independent localStorage writes.
 
-- [ ] Write failing unit tests: consume at 50 => 80 and apple 0; at 85 => 100; at 100 unchanged; double eat unchanged; empty fridge survives save/load; missing field seeded once; invalid counts do not create food; backup failure never overwrites legacy JSON; hidden speech does not age or beep; latest speech replaces previous.
-- [ ] Run `node --test test/home-food.test.js test/home-needs-view.test.js test/character-speech.test.js` and capture expected RED.
-- [ ] Implement models and integrate popup only on started fridge action. Freeze interaction while dialog is open; remove prior automatic fridge-to-food shortcut so opening alone cannot restore hunger. Existing stove/dining remains. Blocked work queues exact food/sleep phrase until camera is back and actor visible. Immediate refusal repeats bubble without starting PC transition. 2D head anchor / first-person bottom caption, safe area, 2 second print + 3 second hold, max 10 beeps/s, no replay when resumed or audio denied.
-- [ ] Browser check distant approach, consume/count/reload, keyboard close/focus, PC off, starvation work exit, hidden-tab audio and 2D/3D anchor. Use isolated fixture/save and save screenshots to D:/Codex/Builds/Battle/home-systems-20261010.
-- [ ] Focused tests, full `node --test`, self-review, commit and detailed report with RED/GREEN and browser evidence.
+- [x] Write failing unit tests: consume at 50 => 80 and apple 0; at 85 => 100; at 100 unchanged; double eat unchanged; empty fridge survives save/load; missing field seeded once; invalid counts do not create food; backup failure never overwrites legacy JSON; hidden speech does not age or beep; latest speech replaces previous.
+- [x] Run `node --test test/home-food.test.js test/home-needs-view.test.js test/character-speech.test.js` and capture expected RED.
+- [x] Implement models and integrate popup only on started fridge action. Freeze interaction while dialog is open; remove prior automatic fridge-to-food shortcut so opening alone cannot restore hunger. Existing stove/dining remains. Blocked work queues exact food/sleep phrase until camera is back and actor visible. Immediate refusal repeats bubble without starting PC transition. 2D head anchor / first-person bottom caption, safe area, 2 second print + 3 second hold, max 10 beeps/s, no replay when resumed or audio denied.
+- [x] Browser check distant approach, consume/count/reload, keyboard close/focus, PC off, starvation work exit, hidden-tab audio and 2D/3D anchor. Use isolated fixture/save and save screenshots to D:/Codex/Builds/Battle/home-systems-20261010.
+- [x] Focused tests, full `node --test`, self-review, commit and detailed report with RED/GREEN and browser evidence.
 
 ### Task 2: Единый новичок и шкаф
 
@@ -65,12 +67,12 @@
 - `mountHomeWardrobeView` supports preview/apply/cancel with callbacks, keyboard/focus and locked alternatives. Cancel restores actual outfit, apply saves profile.
 - Runtime wardrobe scene group and hit action registered through a focused helper, at a verified free place in living room; visible in 2D and 3D. Existing exported assets need not be rebuilt merely to add interactive furniture, but the runtime/source ownership must be clear.
 
-- [ ] RED tests create without allocations => nine 10, ignored old allocation bonuses, practice progresses after one migration, repeated reload preserves new practice, failure after either key resumes same journal, new-game/cancel contracts remain.
-- [ ] RED tests only owned exact clothing/color can be applied, changed face rejected, cancel restores appearance, distant click waits for approach, locked options cannot trigger callback.
-- [ ] Implement one-time migration and simplify creator to name/appearance/clothing; remove allocation controls and validation, not the skill system. Update old tests whose required product behavior intentionally changed.
-- [ ] Add visible wardrobe, ordinary approach and window using existing motion and preview methods. Display unavailable alternatives clearly without creating a shop.
-- [ ] Browser fresh character + seeded old save, open wardrobe from distance, locked choices, cancel/apply/reload, 2D/3D view and narrow layout.
-- [ ] Focused tests, full `node --test`, self-review, commit and report.
+- [x] RED tests create without allocations => nine 10, ignored old allocation bonuses, practice progresses after one migration, repeated reload preserves new practice, failure after either key resumes same journal, new-game/cancel contracts remain.
+- [x] RED tests only owned exact clothing/color can be applied, changed face rejected, cancel restores appearance, distant click waits for approach, locked options cannot trigger callback.
+- [x] Implement one-time migration and simplify creator to name/appearance/clothing; remove allocation controls and validation, not the skill system. Update old tests whose required product behavior intentionally changed.
+- [x] Add visible wardrobe, ordinary approach and window using existing motion and preview methods. Display unavailable alternatives clearly without creating a shop.
+- [x] Browser fresh character + seeded old save, open wardrobe from distance, locked choices, cancel/apply/reload, 2D/3D view and narrow layout.
+- [x] Focused tests, full `node --test`, self-review, commit and report.
 
 ### Task 3: Форум, загрузки, торрент и установщики
 
@@ -89,12 +91,12 @@
 - Explorer lists Downloads artifacts and real installed application folder trees (FT: Data, Projects, Plugins, Presets; client executable/config). Download archives and installed sizes counted separately, no fake uninstall/delete needed.
 - All byte-producing operations share the disk capacity: replace `createBeat`'s legacy 590-project shortcut with the actual disk budget (touch `src/beat-production.js` and covering tests as needed). New projects and incoming transfer bytes cannot overfill C while another download is active; retain partial downloads and expose a clear no-space reason.
 
-- [ ] RED model tests new desktop lacks torrent, missing client cannot open metadata, duplicate metadata no duplicate job/bytes, direct client/FT install chain, disk double accounting, insufficient free space, pause/off/no offline gain, fractional interval and full-sleep equivalence, old installed FT/projects survive.
-- [ ] RED DOM tests forum→direct download→client wizard→empty client→FT metadata→torrent focus→progress→FT wizard→desktop icon/explorer folders; cancel/back keyboard and narrow window.
-- [ ] Implement model/catalog/runtime first; keep transfer mathematics out of DOM. No hard-coded two-minute finish or real network.
-- [ ] Implement forum and classic torrent-like window; reuse XP window management. Speed/seeds/peers change deterministically with game time, ETA matches model. Master installation window owns focus, actions disabled until appropriate state, disk errors shown.
-- [ ] Browser full chain via game clock/sleep, shutdown pause, reload, old save, disk full, final FT open; isolated save only.
-- [ ] Focused tests, full suite, self-review, commit and report. Rev cache wiring follows Task 5.
+- [x] RED model tests new desktop lacks torrent, missing client cannot open metadata, duplicate metadata no duplicate job/bytes, direct client/FT install chain, disk double accounting, insufficient free space, pause/off/no offline gain, fractional interval and full-sleep equivalence, old installed FT/projects survive.
+- [x] RED DOM tests forum→direct download→client wizard→empty client→FT metadata→torrent focus→progress→FT wizard→desktop icon/explorer folders; cancel/back keyboard and narrow window.
+- [x] Implement model/catalog/runtime first; keep transfer mathematics out of DOM. No hard-coded two-minute finish or real network.
+- [x] Implement forum and classic torrent-like window; reuse XP window management. Speed/seeds/peers change deterministically with game time, ETA matches model. Master installation window owns focus, actions disabled until appropriate state, disk errors shown.
+- [x] Browser full chain via game clock/sleep, shutdown pause, reload, old save, disk full, final FT open; isolated save only.
+- [x] Focused tests, full suite, self-review, commit and report. Rev cache wiring follows Task 5.
 
 ### Task 4: Материалы выключателя
 
@@ -106,10 +108,10 @@
 - Apply a narrowly scoped switch style to the known `switch-living-*` and `switch-kitchen-*` meshes: aged cream backplate/rocker, muted brown-gray recess, no near-black broad outline. Runtime materials must supersede dark baked maps only for switches, with explicit disposal; unrelated environment untouched.
 - Update source generator to matching values for later regeneration. Keep hit volumes, contact timing and rocker state animation unchanged.
 
-- [ ] RED test material application changes only switch meshes, retains transforms/hit behavior, repeated application does not leak owned materials, disposal preserves shared originals.
-- [ ] Implement style using existing geometry with small recess/rocker adjustments only where needed; no global brightening and no unrelated GLB re-export.
-- [ ] Browser screenshot daytime/nighttime, 2D and 3D, switch on/off. Verify new wardrobe from Task 2 does not occlude switches.
-- [ ] Focused geometry/light tests, full suite, self-review, commit and report.
+- [x] RED test material application changes only switch meshes, retains transforms/hit behavior, repeated application does not leak owned materials, disposal preserves shared originals.
+- [x] Implement style using existing geometry with small recess/rocker adjustments only where needed; no global brightening and no unrelated GLB re-export.
+- [x] Browser screenshot daytime/nighttime, 2D and 3D, switch on/off. Verify new wardrobe from Task 2 does not occlude switches.
+- [x] Focused geometry/light tests, full suite, self-review, commit and report.
 
 ### Task 5: Интеграция версии и итоговая проверка
 
@@ -117,7 +119,7 @@
 
 **Interfaces:** Runtime revision 23; only changed module chains/styles require invalidation. Preserve calendar and studio behavior from revision 22.
 
-- [ ] Add/adjust cache import test before bump, verify RED, update entry/style/module chain to rev=23, verify GREEN.
-- [ ] Run all Node tests serially, then new household/wardrobe/software/switch browser scripts and existing FT full scenario. Do not run heavy suites concurrently.
-- [ ] Inspect screenshots at 640/1280 and 2D/3D; verify no page errors, focus traps or loss of saves. Any regression gets a failing test and targeted fix.
-- [ ] Record truthful QA including limitations, update backlog statuses, commit. Whole-branch independent review follows before integration decision; do not silently push or merge.
+- [x] Add/adjust cache import test before bump, verify RED, update entry/style/module chain to rev=23, verify GREEN.
+- [x] Run all Node tests serially, then new household/wardrobe/software/switch browser scripts and existing FT full scenario. Do not run heavy suites concurrently.
+- [x] Inspect screenshots at 640/1280 and 2D/3D; verify no page errors, focus traps or loss of saves. Any regression gets a failing test and targeted fix.
+- [x] Record truthful QA including limitations, update backlog statuses, commit. Whole-branch independent review follows before integration decision; do not silently push or merge.

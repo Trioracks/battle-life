@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createVirtualPcState } from '../src/virtual-pc-state.js';
-import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from '../src/virtual-pc-catalog.js';
+import { createVirtualPcState } from '../src/virtual-pc-state.js?rev=23';
+import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from '../src/virtual-pc-catalog.js?rev=23';
 
 test('the fictional desktop exposes its own apps and reveals ft studio only after install', () => {
   const initialIds = desktopApps(createVirtualPcState()).map(app => app.id);

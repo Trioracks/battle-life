@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createStudioWorkspace} from '../src/ft-studio-view.js';
-import {mountBeatStudio} from '../src/beat-studio-view.js';
-import {mountVirtualPc} from '../src/virtual-pc-ui.js';
-import {createVirtualPcState} from '../src/virtual-pc-state.js';
-import {createBeat,startBeatStage,advanceBeatWork,restoreMusicNeeds} from '../src/beat-production.js';
+import {createStudioWorkspace} from '../src/ft-studio-view.js?rev=23';
+import {mountBeatStudio} from '../src/beat-studio-view.js?rev=23';
+import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=23';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=23';
+import {createBeat,startBeatStage,advanceBeatWork,restoreMusicNeeds} from '../src/beat-production.js?rev=23';
 import {pcDocument,allPc,findButton,fire} from './helpers/virtual-pc-dom.js';
 const role=(root,key)=>allPc(root).find(n=>n.dataset.ftRole===key);
 function setup(state=createVirtualPcState(),metadata={skills:{beatmaking:10},gameDay:1}){

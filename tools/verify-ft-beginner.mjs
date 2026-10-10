@@ -3,12 +3,13 @@ import {createRequire} from 'node:module';
 import {mkdir} from 'node:fs/promises';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'playwright-core');
 const output=process.env.FT_QA_DIR||'D:/Codex/Builds/Battle/ft-beginner-20261010';await mkdir(output,{recursive:true});
-const revision='22',browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
+const revision='23',browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
 const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage();page.setDefaultTimeout(60000);
 await context.addInitScript(()=>{
  const raw=sessionStorage.getItem('ft-seed');if(raw){sessionStorage.removeItem('ft-seed');for(const [k,v]of Object.entries(JSON.parse(raw)))localStorage.setItem(k,JSON.stringify(v));}
 });
 const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400&&/\/(assets|stems)\//.test(new URL(r.url()).pathname))errors.push(r.status()+' '+r.url());});
+const network=new Set();page.on('response',response=>{const url=new URL(response.url());if(url.pathname.startsWith('/src/')||url.pathname.endsWith('.css'))network.add(url.pathname+url.search);});
 const pc=page.locator('#virtual-pc'),ft=pc.locator('.pc-window[data-window-id="ft-studio"]'),dialog=ft.locator('[data-ft-role=dialog]');
 const saved=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('battle-life-virtual-pc-v1')));
 const shot=name=>page.screenshot({path:output+'/'+name+'.png'});
@@ -56,7 +57,7 @@ try{
  await page.waitForFunction(()=>document.querySelector('#state').textContent.startsWith('idle')&&document.body.dataset.mode==='game');
  state=await saved();assert.equal(state.projects[0].stages.length,2);assert.ok(state.music.job);assert.ok(state.music.needs.satiety<=20.00001);
  assert.equal(await page.evaluate(()=>window.ftAudioInstance.getSnapshot().status),'stopped');
- await page.locator('#actions [data-action=computer]').click();await page.getByText('Хочу поесть. Сейчас не могу работать.',{exact:true}).waitFor();await shot('06-hungry');
+ await page.locator('#actions [data-action=computer]').click();await page.locator('.character-speech [aria-live]').filter({hasText:'Не могу работать, хочу поесть.'}).waitFor();await shot('06-hungry');
  await page.locator('#actions [data-action=stove]').click();await page.waitForFunction(()=>document.querySelector('#state').textContent.startsWith('idle'));
  await page.locator('#actions [data-action=dining]').click();await page.waitForFunction(()=>document.querySelector('#state').textContent.startsWith('idle'));
  await page.locator('#actions [data-action=computer]').click();await phase('desktop');await ft.getByRole('button',{name:'Продолжить этап',exact:true}).click();await phase('working');await phase('desktop');
@@ -79,5 +80,10 @@ try{
   await shot('08-final-'+width);
  }
  const log=await page.evaluate(()=>window.ftAudioLog);assert.ok(log.filter(r=>r.stage!==null&&r.ok).every(r=>r.sources===1));assert.deepEqual(errors,[]);
+ const modules=`apartment-app apartment-switch-style apartment-v3-creator-session apartment-v3-creator apartment-v3-lighting apartment-v3-new-game apartment-v3-runtime apartment-v3-scene apartment-v3-time avatar-v3-profile beat-market-view beat-names beat-production beat-studio-view character-speech ft-studio-audio ft-studio-project ft-studio-view home-calendar home-food home-needs-view home-profile-migration home-wardrobe-view home-wardrobe pc-software-catalog pc-software-view pc-software sound-cues underweb-view virtual-pc-catalog virtual-pc-explorer-view virtual-pc-explorer virtual-pc-lifecycle virtual-pc-runtime virtual-pc-shell virtual-pc-state virtual-pc-system-windows virtual-pc-ui`.split(' ');
+ for(const module of modules){const urls=[...network].filter(url=>url.split('?')[0]==='/src/'+module+'.js');assert.deepEqual(urls,['/src/'+module+'.js?rev=23'],module+' must load one canonical revision without cache bypass');}
+ for(const style of ['apartment-v3','creator-v12','desktop-apps'])assert.ok(network.has('/'+style+'.css?rev=23'));
+ assert.ok(network.has('/virtual-pc.css?rev=21'));assert.ok(network.has('/src/beat-audio.js?rev=21'));
+ console.log('PASS actual network: 38 canonical rev23 modules, 3 changed rev23 styles, unchanged PC CSS/audio retain rev21; no source cache routes');
  console.log('PASS three audible stages, hidden/re-enable, reload mid-stage, hunger/food/resume, 9 lanes, real transport, 640/1280. AUDIO '+JSON.stringify(log));
 }catch(error){console.error('PAGE_ERRORS',errors);await shot('failure').catch(()=>{});throw error;}finally{await context.close();await browser.close();}

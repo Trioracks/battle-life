@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from '../vendor/three/three.module.js';
-import {createBackdropMaterial} from '../src/apartment-v3-lighting.js';
-import * as lighting from '../src/apartment-v3-lighting.js';
+import {createBackdropMaterial} from '../src/apartment-v3-lighting.js?rev=23';
+import * as lighting from '../src/apartment-v3-lighting.js?rev=23';
 
 test('lighting inspection can show noon without changing the actual wall clock at 03:55',()=>{
   assert.equal(typeof lighting.sceneTimeState,'function');

@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createVirtualPcState} from '../src/virtual-pc-state.js';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=23';
 import {DRUMS} from '../src/beat-catalog.js';
-import {createBeat,startBeatStage,advanceBeatWork,acquireDrum,restoreMusicNeeds,installRipline,cleanMusicVirus} from '../src/beat-production.js';
+import {createBeat,startBeatStage,advanceBeatWork,acquireDrum,restoreMusicNeeds,installRipline,cleanMusicVirus} from '../src/beat-production.js?rev=23';
 const seed=()=>createVirtualPcState({power:'on',download:{status:'installed'}});
 const make=(state=seed(),skill=10,assetId=null)=>createBeat(state,{id:'beat-1',name:'Ночной двор',genre:'boombap',assetId},{beatmaking:skill},()=>.4).state;
 test('catalog preserves fifteen original paths and 90 BPM; free unlock is 40',()=>{

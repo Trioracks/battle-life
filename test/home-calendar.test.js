@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {ApartmentTime,loadHomeTime,saveHomeTime} from '../src/apartment-v3-time.js';
+import {ApartmentTime,loadHomeTime,saveHomeTime} from '../src/apartment-v3-time.js?rev=23';
 
 test('game date follows game days, midnight and sleep rather than the host calendar',()=>{
  const clock=new ApartmentTime({day:1,minutes:1439});

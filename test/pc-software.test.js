@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import * as software from '../src/pc-software.js';
-import {createVirtualPcState,diskUsage,loadVirtualPcState} from '../src/virtual-pc-state.js';
-import {desktopApps} from '../src/virtual-pc-catalog.js';
-import {advanceVirtualPc,downloadPresentation} from '../src/virtual-pc-runtime.js';
-import {createBeat} from '../src/beat-production.js';
+import * as software from '../src/pc-software.js?rev=23';
+import {createVirtualPcState,diskUsage,loadVirtualPcState} from '../src/virtual-pc-state.js?rev=23';
+import {desktopApps} from '../src/virtual-pc-catalog.js?rev=23';
+import {advanceVirtualPc,downloadPresentation} from '../src/virtual-pc-runtime.js?rev=23';
+import {createBeat} from '../src/beat-production.js?rev=23';
 const fresh=()=>createVirtualPcState({power:'on'});
 function install(state,id){state=software.openInstaller(state,id).state;for(let i=0;i<5;i++)state=software.advanceInstaller(state).state;return state;}
 function client(){let s=software.downloadClient(fresh()).state;s=advanceVirtualPc(s,{day:1,minutes:0}).state;s=advanceVirtualPc(s,{day:1,minutes:2}).state;return install(s,'client');}

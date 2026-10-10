@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties} from '../src/virtual-pc-explorer.js';
-import {mountExplorer} from '../src/virtual-pc-explorer-view.js';
-import {createVirtualPcState} from '../src/virtual-pc-state.js';
-import {createStudioProject} from '../src/ft-studio-project.js';
+import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties} from '../src/virtual-pc-explorer.js?rev=23';
+import {mountExplorer} from '../src/virtual-pc-explorer-view.js?rev=23';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=23';
+import {createStudioProject} from '../src/ft-studio-project.js?rev=23';
 import {pcDocument,findButton,allPc,fire} from './helpers/virtual-pc-dom.js';
 test('history discards forward branch after new navigation and root disables up',()=>{
   let e=createExplorerState();assert.strictEqual(navigateExplorer(e,{type:'up'}),e);

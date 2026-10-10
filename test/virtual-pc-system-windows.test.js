@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mountSystemWindow} from '../src/virtual-pc-system-windows.js';
+import {mountSystemWindow} from '../src/virtual-pc-system-windows.js?rev=23';
 import {mountPcMenu} from '../src/virtual-pc-menus.js';
-import {mountVirtualPc} from '../src/virtual-pc-ui.js';
-import {createVirtualPcState} from '../src/virtual-pc-state.js';
-import {explorerProperties} from '../src/virtual-pc-explorer.js';
+import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=23';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=23';
+import {explorerProperties} from '../src/virtual-pc-explorer.js?rev=23';
 import {pcDocument,findButton,allPc,fire,findPc} from './helpers/virtual-pc-dom.js';
 function setup(kind='display',durable=true){
   const d=pcDocument(),root=d.createElement('section'),host=d.createElement('section');host.append(root);

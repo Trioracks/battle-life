@@ -1,6 +1,6 @@
 import {BEAT_RULES as R,BEAT_GENRES,DRUMS,drumById} from './beat-catalog.js';
 import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=21';
-import {softwareDiskBytes} from './pc-software.js';
+import {softwareDiskBytes} from './pc-software.js?rev=23';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
 const clamp=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,finite(v)));
 const text=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';

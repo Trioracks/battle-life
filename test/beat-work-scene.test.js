@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {PcTransition} from '../src/virtual-pc-transition.js';
-import {PcLifecycle,pcActorVisible,preparePcWorkPose} from '../src/virtual-pc-lifecycle.js';
-import {ApartmentTime} from '../src/apartment-v3-time.js';
+import {PcLifecycle,pcActorVisible,preparePcWorkPose} from '../src/virtual-pc-lifecycle.js?rev=23';
+import {ApartmentTime} from '../src/apartment-v3-time.js?rev=23';
 test('work camera pulls back, reveals seated character under black, returns to desktop',()=>{
  const t=new PcTransition();t.enter({alreadyOn:true});t.tick(3);t.drainEvents();assert.equal(t.work(),true);
  assert.equal(t.snapshot.phase,'work-out');t.tick(2.4);assert.equal(t.snapshot.phase,'work-reveal');assert.equal(t.snapshot.blackout,1);assert.equal(t.snapshot.workActor,true);
