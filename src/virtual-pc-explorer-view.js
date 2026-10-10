@@ -24,7 +24,10 @@ export function mountExplorer(root,{onOpenArtifact,onOpenApp,onOpenProject,onPro
   function openEntry(entry) {
     if(!entry)return;
     if(entry.targetPath){navigate(entry.targetPath);return;}
-    if(entry.kind==='artifact'){if(entry.action)onOpenArtifact?.(entry);return;}
+    if(entry.kind==='artifact'){
+      if(entry.action){const message=onOpenArtifact?.(entry);nav={...nav,error:typeof message==='string'?message:''};status.textContent=nav.error||'Объектов: '+entries().length;status.dataset.error=String(!!nav.error);}
+      return;
+    }
     if(entry.kind==='application'){onOpenApp?.(entry.appId);return;}
     if(entry.kind==='file')return;
     const raw=state.projects.find(p=>p.id===entry.projectId),p=normalizeBeat(raw)??normalizeStudioProject(raw);

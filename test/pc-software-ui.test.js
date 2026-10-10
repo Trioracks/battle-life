@@ -48,3 +48,12 @@ test('opening FT metadata without the client explains the prerequisite in the fo
  const {pc,root}=setup();pc.navigateUnderweb('underweb://dump/ft-studio');click(root,'Скачать FT-Studio.torrent');click(root,'Открыть FT-Studio.torrent');
  assert.ok(allPc(root).some(n=>n.textContent==='Сначала скачай и установи torent из темы клиента.'));assert.equal(pc.window,'underweb');assert.equal(pc.state.software.task,null);
 });
+
+test('opening Downloads metadata without the client announces the prerequisite inside Explorer',()=>{
+ const {pc,root}=setup();pc.navigateUnderweb('underweb://dump/ft-studio');click(root,'Скачать FT-Studio.torrent');
+ pc.open('computer');pc.openFolder('downloads');const explorer=pc.shell.getContentRoot('computer');
+ fire(findButton(explorer,'Открыть FT-Studio.torrent'),'keydown',{key:'Enter'});
+ assert.equal(pc.window,'computer');assert.equal(pc.state.software.task,null);
+ const status=allPc(explorer).find(n=>n.getAttribute?.('aria-live')==='polite');
+ assert.match(status.textContent,/Сначала.*установи torent/);assert.notEqual(status.hidden,true);
+});
