@@ -3,7 +3,7 @@ import {createRequire} from 'node:module';
 import {mkdir} from 'node:fs/promises';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'playwright-core');
 const output=process.env.FT_QA_DIR||'D:/Codex/Builds/Battle/ft-beginner-20261010';await mkdir(output,{recursive:true});
-const revision='23',browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
+const revision='24',browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
 const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage();page.setDefaultTimeout(60000);
 await context.addInitScript(()=>{
  const raw=sessionStorage.getItem('ft-seed');if(raw){sessionStorage.removeItem('ft-seed');for(const [k,v]of Object.entries(JSON.parse(raw)))localStorage.setItem(k,JSON.stringify(v));}
@@ -29,7 +29,7 @@ try{
  await page.locator('#new-game').click();await page.locator('#character-name').fill('Проверка FT');await page.locator('#clothing-tab').click();await page.locator('#start-game').click();await page.locator('#wake').click();
  await page.evaluate(async revision=>{const {createVirtualPcState}=await import('./src/virtual-pc-state.js?rev='+revision);sessionStorage.setItem('ft-seed',JSON.stringify({'battle-life-virtual-pc-v1':createVirtualPcState({power:'on',download:{status:'installed'}}),'battle-life-apartment-v3-time':{day:2,minutes:600,initialRest:false}}));},revision);
  await page.reload({waitUntil:'networkidle'});await probe();await enter();await start('FT Studio');
- await dialog.getByRole('button',{name:'Новый бит',exact:true}).click();await dialog.getByRole('textbox',{name:'Название бита'}).fill('Первый двор');await dialog.getByRole('button',{name:'Начать проект',exact:true}).click();
+ await dialog.getByRole('button',{name:'Новый проект',exact:true}).click();await dialog.getByRole('textbox',{name:'Название бита'}).fill('Первый двор');await dialog.getByRole('button',{name:'Начать проект',exact:true}).click();
  assert.equal(await ft.locator('select,input[type=range]').count(),0);
  await ft.getByRole('button',{name:'Работать над этапом',exact:true}).click();await phase('work-out');
  assert.equal((await saved()).music.job.elapsed,0,'camera departure does not charge work');
@@ -50,7 +50,7 @@ try{
  await page.waitForFunction(()=>window.ftAudioLog.some(r=>r.stage===1&&r.ok));await page.waitForFunction(()=>document.querySelector('.beat-work-hud progress').value>.2);await shot('05-working-theme');
  await page.reload({waitUntil:'networkidle'});const interrupted=await saved();assert.ok(interrupted.music.job.elapsed>0&&interrupted.music.job.elapsed<interrupted.music.job.total);
  const ids=structuredClone(interrupted.projects[0]);await probe();await enter();await chooseSaved();await ft.getByRole('button',{name:'Продолжить этап',exact:true}).click();await phase('working');await phase('desktop');
- let state=await saved();assert.equal(state.projects[0].stages.length,2);assert.equal(state.music.practice,2);assert.equal(state.projects[0].drumId,ids.drumId);assert.deepEqual(state.projects[0].audio,ids.audio);
+ let state=await saved();assert.equal(state.projects[0].stages.length,2);assert.equal(Math.abs(state.music.practice-2/3)<1e-9,true);assert.equal(state.projects[0].drumId,ids.drumId);assert.deepEqual(state.projects[0].audio,ids.audio);
  await page.evaluate(()=>{const s=JSON.parse(localStorage.getItem('battle-life-virtual-pc-v1'));s.music.needs={satiety:21,energy:72};sessionStorage.setItem('ft-seed',JSON.stringify({'battle-life-virtual-pc-v1':s}));});
  await page.reload({waitUntil:'networkidle'});await probe();await enter();await chooseSaved();await ft.getByRole('button',{name:'Работать над этапом',exact:true}).click();await phase('working');
  await page.waitForFunction(()=>window.ftAudioLog.some(r=>r.stage===2&&r.ok));
@@ -61,9 +61,9 @@ try{
  await page.locator('#actions [data-action=stove]').click();await page.waitForFunction(()=>document.querySelector('#state').textContent.startsWith('idle'));
  await page.locator('#actions [data-action=dining]').click();await page.waitForFunction(()=>document.querySelector('#state').textContent.startsWith('idle'));
  await page.locator('#actions [data-action=computer]').click();await phase('desktop');await ft.getByRole('button',{name:'Продолжить этап',exact:true}).click();await phase('working');await phase('desktop');
- state=await saved();assert.equal(state.projects[0].status,'ready');assert.equal(state.music.practice,3);assert.equal(await ft.locator('[data-ft-role=clip]').count(),9);
+ state=await saved();assert.equal(state.projects[0].status,'ready');assert.equal(Math.abs(state.music.practice-1)<1e-9,true);assert.equal(await ft.locator('[data-ft-role=clip]').count(),9);
  const startOffset=await ft.locator('[data-ft-role=clip]').first().evaluate(n=>n.getBoundingClientRect().left-n.parentElement.getBoundingClientRect().left);assert.ok(Math.abs(startOffset)<=1);
- await ft.getByRole('button',{name:'Развернуть окно',exact:true}).click();
+ assert.equal(await ft.getAttribute('data-mode'),'maximized');
  await ft.getByRole('button',{name:'Play',exact:true}).click();await page.waitForFunction(()=>window.ftAudioLog.some(r=>r.stage===null&&r.ok&&r.sources===3));
  const playing=await page.evaluate(()=>window.ftAudioInstance.getSnapshot());assert.equal(playing.status,'playing');await shot('07-complete');
  await ft.getByRole('button',{name:'Pause',exact:true}).click();const paused=await page.evaluate(()=>window.ftAudioInstance.getSnapshot().positionSeconds);
@@ -81,9 +81,9 @@ try{
  }
  const log=await page.evaluate(()=>window.ftAudioLog);assert.ok(log.filter(r=>r.stage!==null&&r.ok).every(r=>r.sources===1));assert.deepEqual(errors,[]);
  const modules=`apartment-app apartment-switch-style apartment-v3-creator-session apartment-v3-creator apartment-v3-lighting apartment-v3-new-game apartment-v3-runtime apartment-v3-scene apartment-v3-time avatar-v3-profile beat-market-view beat-names beat-production beat-studio-view character-speech ft-studio-audio ft-studio-project ft-studio-view home-calendar home-food home-needs-view home-profile-migration home-wardrobe-view home-wardrobe pc-software-catalog pc-software-view pc-software sound-cues underweb-view virtual-pc-catalog virtual-pc-explorer-view virtual-pc-explorer virtual-pc-lifecycle virtual-pc-runtime virtual-pc-shell virtual-pc-state virtual-pc-system-windows virtual-pc-ui`.split(' ');
- for(const module of modules){const urls=[...network].filter(url=>url.split('?')[0]==='/src/'+module+'.js');assert.deepEqual(urls,['/src/'+module+'.js?rev=23'],module+' must load one canonical revision without cache bypass');}
- for(const style of ['apartment-v3','creator-v12','desktop-apps'])assert.ok(network.has('/'+style+'.css?rev=23'));
+ for(const module of modules){const urls=[...network].filter(url=>url.split('?')[0]==='/src/'+module+'.js');assert.deepEqual(urls,['/src/'+module+'.js?rev=24'],module+' must load one canonical revision without cache bypass');}
+ for(const style of ['apartment-v3','creator-v12','desktop-apps'])assert.ok(network.has('/'+style+'.css?rev=24'));
  assert.ok(network.has('/virtual-pc.css?rev=21'));assert.ok(network.has('/src/beat-audio.js?rev=21'));
- console.log('PASS actual network: 38 canonical rev23 modules, 3 changed rev23 styles, unchanged PC CSS/audio retain rev21; no source cache routes');
+ console.log('PASS actual network: 38 canonical rev24 modules, 3 changed rev24 styles, unchanged PC CSS/audio retain rev21; no source cache routes');
  console.log('PASS three audible stages, hidden/re-enable, reload mid-stage, hunger/food/resume, 9 lanes, real transport, 640/1280. AUDIO '+JSON.stringify(log));
 }catch(error){console.error('PAGE_ERRORS',errors);await shot('failure').catch(()=>{});throw error;}finally{await context.close();await browser.close();}

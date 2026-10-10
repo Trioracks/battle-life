@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {SAVE_KEY,STAT_KEYS} from '../src/avatar-v3-profile.js?rev=23';
-import {createNewGameSession} from '../src/apartment-v3-new-game.js?rev=23';
-import {createVirtualPcState,VIRTUAL_PC_STORAGE_KEY as PC} from '../src/virtual-pc-state.js?rev=23';
-import {advanceBeatWork,createBeat,startBeatStage} from '../src/beat-production.js?rev=23';
-const migration=await import('../src/home-profile-migration.js?rev=23').catch(()=>({}));
+import {SAVE_KEY,STAT_KEYS} from '../src/avatar-v3-profile.js?rev=24';
+import {createNewGameSession} from '../src/apartment-v3-new-game.js?rev=24';
+import {createVirtualPcState,VIRTUAL_PC_STORAGE_KEY as PC} from '../src/virtual-pc-state.js?rev=24';
+import {advanceBeatWork,createBeat,startBeatStage} from '../src/beat-production.js?rev=24';
+const migration=await import('../src/home-profile-migration.js?rev=24').catch(()=>({}));
 const oldProfile={version:3,name:'Прежний',skills:Object.fromEntries(STAT_KEYS.map(k=>[k,30])),appearance:{hair:'shaggy',beard:'broad',mustache:'chevron',top:'hoodie',topColor:'red'},extra:{keep:true}};
 const oldPc={...createVirtualPcState({projects:[{id:'keep',sourceStems:['kick.wav']}],music:{cash:987,practice:14,genrePractice:{boom_bap:8}},household:{fridge:{apple:0,pear:2,banana:3}}}),extra:'untouched'};delete oldPc.noviceSchema;
 function fixture(){const values=new Map([[SAVE_KEY,JSON.stringify(oldProfile)],[PC,JSON.stringify(oldPc)]]);let fail='';return {values,set fail(v){fail=v;},getItem:k=>values.get(k)??null,setItem(k,v){if(k===fail){fail='';throw Error('write denied');}values.set(k,String(v));}};}
@@ -13,7 +13,7 @@ test('migration resets both skill sources once and preserves unrelated snapshot 
  assert.deepEqual(Object.values(p.skills),[10,10,10,10,10,10,10,10,10]);assert.equal(pc.music.practice,0);assert.ok(Object.values(pc.music.genrePractice).every(v=>v===0));assert.deepEqual(p.extra,{keep:true});
  assert.equal(p.appearance.hair,'bowl');assert.equal(p.appearance.beard,'full');assert.equal(p.appearance.mustache,'classic');assert.deepEqual(p.wardrobe.top,[{id:'hoodie',color:'red'}]);for(const key of ['projects','household','extra'])assert.deepEqual(pc[key],oldPc[key]);assert.equal(pc.music.cash,987);assert.equal(pc.noviceSchema,1);
  let practiced=createBeat(createVirtualPcState(pc),{id:'new',name:'Практика'},p.skills,()=>.1).state;practiced=startBeatStage(practiced,'new',undefined,p.skills,()=>.1).state;practiced=advanceBeatWork(practiced,practiced.music.job.total).state;
- assert.equal(practiced.music.practice,1);s.setItem(PC,JSON.stringify(practiced));p.skills.flow=12;s.setItem(SAVE_KEY,JSON.stringify(p));assert.equal(migration.migrateNoviceSave(s).ok,true);assert.equal(JSON.parse(s.getItem(PC)).music.practice,1);assert.equal(JSON.parse(s.getItem(SAVE_KEY)).skills.flow,12);
+ assert.equal(practiced.music.practice,1/3);s.setItem(PC,JSON.stringify(practiced));p.skills.flow=12;s.setItem(SAVE_KEY,JSON.stringify(p));assert.equal(migration.migrateNoviceSave(s).ok,true);assert.equal(JSON.parse(s.getItem(PC)).music.practice,1/3);assert.equal(JSON.parse(s.getItem(SAVE_KEY)).skills.flow,12);
 });
 test('backup and journal failure never overwrite either source',()=>{
  assert.equal(typeof migration.migrateNoviceSave,'function');for(const key of [migration.PROFILE_BACKUP_KEY,migration.PC_BACKUP_KEY,migration.NOVICE_JOURNAL_KEY]){const s=fixture(),before=[s.getItem(SAVE_KEY),s.getItem(PC)];s.fail=key;assert.equal(migration.migrateNoviceSave(s).ok,false);assert.deepEqual([s.getItem(SAVE_KEY),s.getItem(PC)],before);}

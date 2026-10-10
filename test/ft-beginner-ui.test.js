@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createStudioWorkspace} from '../src/ft-studio-view.js?rev=23';
-import {mountBeatStudio} from '../src/beat-studio-view.js?rev=23';
-import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=23';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=23';
-import {createBeat,startBeatStage,advanceBeatWork,restoreMusicNeeds} from '../src/beat-production.js?rev=23';
+import {createStudioWorkspace} from '../src/ft-studio-view.js?rev=24';
+import {mountBeatStudio} from '../src/beat-studio-view.js?rev=24';
+import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=24';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=24';
+import {createBeat,startBeatStage,advanceBeatWork,restoreMusicNeeds} from '../src/beat-production.js?rev=24';
 import {pcDocument,allPc,findButton,fire} from './helpers/virtual-pc-dom.js';
 const role=(root,key)=>allPc(root).find(n=>n.dataset.ftRole===key);
 function setup(state=createVirtualPcState(),metadata={skills:{beatmaking:10},gameDay:1}){
@@ -26,7 +26,7 @@ test('unrelated preview or project playback does not own this FT transport',()=>
 });
 
 test('random title uses current game date, rerolls two words, remains editable and is saved once',()=>{
- const metadata={skills:{beatmaking:10},gameDay:1},s=setup(undefined,metadata);findButton(s.root,'Новый бит').click();
+ const metadata={skills:{beatmaking:10},gameDay:1},s=setup(undefined,metadata);findButton(s.root,'Новый проект').click();
  const name=allPc(s.root).find(n=>n.getAttribute('aria-label')==='Название бита'),random=findButton(s.root,'Случайное название');
  assert.ok(random);random.click();const first=name.value;assert.match(first,/^01\.09\.2012 — [А-Яа-яё]+ [А-Яа-яё]+$/u);
  random.click();assert.notEqual(name.value,first);metadata.gameDay=31;random.click();assert.match(name.value,/^01\.10\.2012 — /);
@@ -42,10 +42,10 @@ test('empty workspace has one placeholder lane and top transport, panels toggle 
  findButton(root,'Ритм-панель').click();assert.equal(role(root,'rhythm').hidden,false);assert.equal(findButton(root,'Ритм-панель').getAttribute('aria-expanded'),'true');
 });
 test('launch menu, name-only form, cancel and host updates preserve input and focus',()=>{
- const s=setup();assert.ok(role(s.root,'dialog'));findButton(s.root,'Новый бит').click();
+ const s=setup();assert.ok(role(s.root,'dialog'));findButton(s.root,'Новый проект').click();
  const name=allPc(s.root).find(n=>n.getAttribute('aria-label')==='Название бита');name.value='Пыль';name.focus();s.view.update();
  assert.equal(s.d.activeElement,name);assert.equal(name.value,'Пыль');assert.equal(allPc(s.root).filter(n=>n.tagName==='SELECT'||n.type==='range').length,0);
- findButton(s.root,'Отмена').click();assert.equal(s.state.projects.length,0);findButton(s.root,'Новый бит').click();
+ findButton(s.root,'Отмена').click();assert.equal(s.state.projects.length,0);findButton(s.root,'Новый проект').click();
  allPc(s.root).find(n=>n.getAttribute('aria-label')==='Название бита').value='Пыль';findButton(s.root,'Начать проект').click();
  assert.equal(s.state.projects.length,1);assert.equal(role(s.root,'dialog'),undefined);assert.equal(s.state.projects[0].name,'Пыль');
  findButton(s.root,'Работать над этапом').click();assert.equal(s.work(),1);assert.equal(s.unlocks(),1);s.view.dispose();
@@ -66,10 +66,10 @@ test('project actions stay above lanes and analytics contain only results, not w
  const s=setup(createBeat(createVirtualPcState(),{id:'a',name:'Saved'},{}).state);s.view.openProject(s.state.projects[0]);
  const actions=role(s.root,'project-actions'),workflow=role(s.root,'workflow'),analytics=role(s.root,'analytics');
  assert.ok(actions);assert.ok(workflow);assert.ok(analytics);
- assert.ok(findButton(actions,'Новый бит'));assert.ok(findButton(actions,'Открыть проект'));
+ assert.ok(findButton(actions,'Новый проект'));assert.ok(findButton(actions,'Открыть проект'));
  assert.ok(findButton(workflow,'Работать над этапом'));
  assert.equal(allPc(analytics).filter(n=>n.tagName==='BUTTON').length,0);
- assert.equal(s.d.activeElement,findButton(actions,'Новый бит'),'project selection restores focus to a live control');
+ assert.equal(s.d.activeElement,findButton(actions,'Новый проект'),'project selection restores focus to a live control');
  assert.equal(analytics.contains(workflow),false);s.view.dispose();
 });
 

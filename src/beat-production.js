@@ -1,10 +1,11 @@
 import {BEAT_RULES as R,BEAT_GENRES,DRUMS,drumById} from './beat-catalog.js';
 import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=21';
-import {softwareDiskBytes} from './pc-software.js?rev=23';
+import {softwareDiskBytes} from './pc-software.js?rev=24';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
 const clamp=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,finite(v)));
 const text=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';
 const sliders=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite)?v.map(x=>Math.round(clamp(x,0,10))):null;
+const PRACTICE_PER_STAGE=1/3;
 export function normalizeBeat(p){
  if(![2,3].includes(p?.version)||p.kind!=='beat'||!text(p.id,100)||!text(p.name,64)||!BEAT_GENRES.some(g=>g.id===p.genre))return null;
  if(p.version===2&&!(p.drumId==='primitive'||drumById(p.drumId)))return null;
@@ -23,7 +24,9 @@ export function normalizeMusic(value,projects=[]){
  const m=value??{},seen=new Set(),owned=(Array.isArray(m.owned)?m.owned:[]).filter(a=>drumById(a?.id)?.bank==='shop'&&['buy','torrent','rip'].includes(a.method)&&!seen.has(a.id)&&seen.add(a.id)).map(a=>({id:a.id,method:a.method}));
  const job=m.job,beat=projects.map(normalizeBeat).find(p=>p?.id===job?.beatId),values=sliders(job?.sliders);
  const validJob=beat&&beat.stages.length<3&&job.stage===beat.stages.length&&values&&Number.isFinite(job.total)&&job.total>0&&job.total<=600&&Number.isFinite(job.elapsed)&&job.elapsed>=0&&job.elapsed<job.total;
- return {cash:clamp(finite(m.cash,R.startingCash),0,1e9),needs:{satiety:clamp(finite(m.needs?.satiety,68)),energy:clamp(finite(m.needs?.energy,72))},practice:clamp(m.practice),genrePractice:Object.fromEntries(BEAT_GENRES.map(g=>[g.id,clamp(m.genrePractice?.[g.id])])),owned,ripline:m.ripline===true,infected:m.infected===true,activeBeatId:typeof m.activeBeatId==='string'&&projects.some(p=>normalizeBeat(p)?.id===m.activeBeatId)?m.activeBeatId:null,job:validJob?{beatId:beat.id,stage:job.stage,sliders:values,total:job.total,elapsed:job.elapsed,skill:clamp(job.skill)}:null};
+ // Old partial jobs earned nothing until completion, so a missing credit ledger starts at zero.
+ const savedJob=validJob?{beatId:beat.id,stage:job.stage,sliders:values,total:job.total,elapsed:job.elapsed,skill:clamp(job.skill),genreSkill:clamp(finite(job.genreSkill,m.genrePractice?.[beat.genre])),practiceCredit:clamp(job.practiceCredit,0,job.elapsed/job.total*PRACTICE_PER_STAGE)}:null;
+ return {cash:clamp(finite(m.cash,R.startingCash),0,1e9),needs:{satiety:clamp(finite(m.needs?.satiety,68)),energy:clamp(finite(m.needs?.energy,72))},practice:clamp(m.practice),genrePractice:Object.fromEntries(BEAT_GENRES.map(g=>[g.id,clamp(m.genrePractice?.[g.id])])),owned,ripline:m.ripline===true,infected:m.infected===true,activeBeatId:typeof m.activeBeatId==='string'&&projects.some(p=>normalizeBeat(p)?.id===m.activeBeatId)?m.activeBeatId:null,job:savedJob};
 }
 const normalized=s=>({...s,projects:[...(s.projects??[])],music:normalizeMusic(s.music,s.projects)});
 const result=(state,ok=true,reason='')=>({state,ok,reason});
@@ -54,7 +57,7 @@ export function startBeatStage(input,id,values,skills={},random=Math.random){
   const v=values===undefined?Array.from({length:3},()=>Math.floor(clamp(random(),0,.999999)*11)):sliders(values);
   if(!v)return result(s,false,'Этот этап недоступен.');
   const skill=effectiveBeatSkill(s,skills),practice=s.music.genrePractice[beat.genre];
-  s.music.job={beatId:id,stage:beat.stages.length,sliders:v,total:Math.round(R.stageMinutes[beat.stages.length]*Math.max(.55,1-skill*.003-practice*.004)*(s.music.infected?1.35:1)),elapsed:0,skill};}
+  s.music.job={beatId:id,stage:beat.stages.length,sliders:v,total:Math.round(R.stageMinutes[beat.stages.length]*Math.max(.55,1-skill*.003-practice*.004)*(s.music.infected?1.35:1)),elapsed:0,skill,genreSkill:practice,practiceCredit:0};}
  s.music.activeBeatId=id;return result(s);
 }
 export function advanceBeatWork(input,requested){
@@ -65,13 +68,18 @@ export function advanceBeatWork(input,requested){
  const needs=s.music.needs,minutes=Math.max(0,Math.min(requested,job.total-job.elapsed,(needs.satiety-R.minSatiety)/R.satietyPerMinute,(needs.energy-R.minEnergy)/R.energyPerMinute));
  job.elapsed+=minutes;needs.satiety=clamp(needs.satiety-minutes*R.satietyPerMinute);needs.energy=clamp(needs.energy-minutes*R.energyPerMinute);
  const finished=job.total-job.elapsed<1e-7;
+ if(minutes>0){
+  const credit=(finished?1:job.elapsed/job.total)*PRACTICE_PER_STAGE,gain=Math.max(0,credit-job.practiceCredit);
+  s.music.practice=clamp(s.music.practice+gain);s.music.genrePractice[current.genre]=clamp(s.music.genrePractice[current.genre]+gain);job.practiceCredit=credit;
+ }
+ const practiceGained=Math.min(job.practiceCredit,100-job.skill);
  if(finished){
   const index=s.projects.findIndex(p=>p.id===job.beatId),beat=current;
   const fit=0,quality=Math.round(job.skill);
   beat.stages.push({sliders:job.sliders,fit,quality});beat.status=beat.stages.length===3?'ready':'draft';s.projects[index]=beat;
-  s.music.practice=clamp(s.music.practice+1);s.music.genrePractice[beat.genre]=clamp(s.music.genrePractice[beat.genre]+1);s.music.job=null;
+  s.music.job=null;
  }
- return {state:s,minutes,finished,blocked:!finished&&Boolean(workBlockReason(s))};
+ return {state:s,minutes,finished,practiceGained,blocked:!finished&&Boolean(workBlockReason(s))};
 }
 export function acquireDrum(input,id,method,random=Math.random){
  const s=normalized(input),asset=drumById(id);

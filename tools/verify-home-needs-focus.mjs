@@ -5,7 +5,7 @@ const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAY
 const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
 try{
  const context=await browser.newContext(),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.route('**/__home-needs-focus',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><link rel="stylesheet" href="/apartment-v3.css?rev=23"><button id="before">Outside before</button><section id="fridge"></section><button id="after">Outside after</button>'}));
+ await page.route('**/__home-needs-focus',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><link rel="stylesheet" href="/apartment-v3.css?rev=24"><button id="before">Outside before</button><section id="fridge"></section><button id="after">Outside after</button>'}));
  await page.goto('http://127.0.0.1:4173/__home-needs-focus');
  for(const [name,seed,want]of [
   ['stock remains',{music:{needs:{satiety:50}}},'Съесть: Груша'],
@@ -13,7 +13,7 @@ try{
   ['last portion',{music:{needs:{satiety:50}},household:{fridge:{apple:1,pear:0,banana:0}}},'Закрыть'],
  ]){
   await page.evaluate(async seed=>{
-   const [{mountHomeNeedsView},{consumeFood},{createVirtualPcState}]=await Promise.all([import('/src/home-needs-view.js?rev=23'),import('/src/home-food.js?rev=23'),import('/src/virtual-pc-state.js?rev=23')]);
+   const [{mountHomeNeedsView},{consumeFood},{createVirtualPcState}]=await Promise.all([import('/src/home-needs-view.js?rev=24'),import('/src/home-food.js?rev=24'),import('/src/virtual-pc-state.js?rev=24')]);
    window.fridgeView?.dispose();let state=createVirtualPcState(seed);const root=document.querySelector('#fridge');
    window.fridgeView=mountHomeNeedsView(root,{returnFocus:document.querySelector('#before'),onConsume:id=>{state=consumeFood(state,id).state;fridgeView.update(state);}});fridgeView.open(state);
   },seed);

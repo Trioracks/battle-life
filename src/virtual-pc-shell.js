@@ -1,6 +1,6 @@
 import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=21';
 import {createPcIcon} from './virtual-pc-icons.js?rev=21';
-import {homeDateLabel} from './home-calendar.js?rev=23';
+import {homeDateLabel} from './home-calendar.js?rev=24';
 
 export function mountPcShell(root,{onCommand}) {
   const d=root.ownerDocument,win=d.defaultView??globalThis;
@@ -90,6 +90,10 @@ export function mountPcShell(root,{onCommand}) {
     }
     const content=el(d,'div',{className:'pc-app-root',dataset:{pcRole:'app-content',windowId:w.id}});
     frame.append(titlebar,content);layer.append(frame);
+    if(w.appId==='ft-studio'){
+      frame.dataset.entering='true';
+      listen(frame,'animationend',event=>{if(event.target===frame)frame.dataset.entering='false';},group);
+    }
     listen(frame,'pointerdown',()=>{if(current(w.id)?.mode!=='minimized'&&model.windows.activeId!==w.id)windowCommand('activate',w.id);},group);
     const suppressed=gesture(titlebar,{group,getRect:()=>current(w.id)?.mode==='normal'?current(w.id).rect:null,onRect:rect=>windowCommand('geometry',w.id,{rect})});
     listen(titlebar,'dblclick',e=>{if(!e.target?.closest?.('button')&&!suppressed())windowCommand('toggle-maximize',w.id);},group);

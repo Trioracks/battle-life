@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=23';
-import {createVirtualPcState,saveVirtualPcState,loadVirtualPcState} from '../src/virtual-pc-state.js?rev=23';
-import {resolveUnderweb} from '../src/virtual-pc-catalog.js?rev=23';
-import {createStudioProject} from '../src/ft-studio-project.js?rev=23';
+import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=24';
+import {createVirtualPcState,saveVirtualPcState,loadVirtualPcState} from '../src/virtual-pc-state.js?rev=24';
+import {resolveUnderweb} from '../src/virtual-pc-catalog.js?rev=24';
+import {createStudioProject} from '../src/ft-studio-project.js?rev=24';
 import {pcDocument,allPc,findButton,fire} from './helpers/virtual-pc-dom.js';
 
 function setup(seed={}){
@@ -21,7 +21,7 @@ test('FT launches once after 2.5 seconds, exposes busy feedback, then the studio
  s.finish();assert.equal(s.pc.windows.windows.length,1);assert.equal(s.root.getAttribute('aria-busy'),'false');
  const content=s.pc.shell.getContentRoot('ft-studio'),nodes=allPc(content);
  for(const label of ['Библиотека','Дорожки','Ритм'])assert.ok(nodes.some(n=>n.textContent===label));
- assert.ok(findButton(content,'Новый бит'),'production entry is now available');
+ assert.ok(findButton(content,'Новый проект'),'production entry is now available');
  s.pc.open('underweb');s.pc.open('ft-studio');assert.equal(s.timers.size,0,'existing window restores immediately');
  assert.equal(s.pc.shell.getContentRoot('ft-studio'),content);
 });
@@ -71,9 +71,9 @@ test('long Cyrillic searches survive encoded URLs and browser history without co
 
 test('keyboard Tab reaches and wraps from the scrollable FT playlist',()=>{
  const s=setup();s.pc.open('ft-studio');s.finish();
- findButton(s.root,'Вернуться в студию').click();
+ findButton(s.root,'Закрыть').click();
  findButton(s.root,'Закрыть окно').focus();fire(s.root,'keydown',{key:'Tab'});
- assert.equal(s.d.activeElement.textContent,'Новый бит');
+ assert.equal(s.d.activeElement.textContent,'Новый проект');
  fire(s.root,'keydown',{key:'Tab'});assert.equal(s.d.activeElement.textContent,'Открыть проект');
  fire(s.root,'keydown',{key:'Tab'});assert.equal(s.d.activeElement.textContent,'Библиотека');
  fire(s.root,'keydown',{key:'Tab'});assert.equal(s.d.activeElement.textContent,'Ритм-панель');

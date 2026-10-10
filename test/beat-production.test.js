@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=23';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=24';
 import {DRUMS} from '../src/beat-catalog.js';
-import {createBeat,startBeatStage,advanceBeatWork,acquireDrum,restoreMusicNeeds,installRipline,cleanMusicVirus} from '../src/beat-production.js?rev=23';
+import {createBeat,startBeatStage,advanceBeatWork,acquireDrum,restoreMusicNeeds,installRipline,cleanMusicVirus} from '../src/beat-production.js?rev=24';
 const seed=()=>createVirtualPcState({power:'on',download:{status:'installed'}});
 const make=(state=seed(),skill=10,assetId=null)=>createBeat(state,{id:'beat-1',name:'Ночной двор',genre:'boombap',assetId},{beatmaking:skill},()=>.4).state;
 test('catalog preserves fifteen original paths and 90 BPM; free unlock is 40',()=>{
@@ -22,10 +22,60 @@ test('partial job survives normalization, resumes without reset and rewards once
  s=advanceBeatWork(s,10).state;const elapsed=s.music.job.elapsed;
  s=createVirtualPcState(JSON.parse(JSON.stringify(s)));s=startBeatStage(s,'beat-1',[0,0,0],{beatmaking:99}).state;
  assert.equal(s.music.job.elapsed,elapsed);assert.deepEqual(s.music.job.sliders,[9,3,2]);
- s=advanceBeatWork(s,600).state;assert.equal(s.projects[0].stages.length,1);assert.equal(s.music.practice,1);
+ s=advanceBeatWork(s,600).state;assert.equal(s.projects[0].stages.length,1);assert.ok(Math.abs(s.music.practice-1/3)<1e-10);
  assert.deepEqual(advanceBeatWork(s,600).state,s);
  for(let stage=1;stage<3;stage++){s=restoreMusicNeeds(s,'sleep',360);s=restoreMusicNeeds(s,'meal');s=startBeatStage(s,'beat-1',[5,5,5],{beatmaking:10}).state;s=advanceBeatWork(s,600).state;}
- assert.equal(s.projects[0].status,'ready');assert.equal(s.music.practice,3);assert.equal(startBeatStage(s,'beat-1',[5,5,5],{}).ok,false);
+ assert.equal(s.projects[0].status,'ready');assert.ok(Math.abs(s.music.practice-1)<1e-10);assert.ok(Math.abs(s.music.genrePractice.boombap-1)<1e-10);assert.equal(startBeatStage(s,'beat-1',[5,5,5],{}).ok,false);
+});
+
+test('working half a stage awards one sixth practice immediately and preserves its quality snapshot',()=>{
+ let s=make();s.music.practice=2.5;s.music.genrePractice.boombap=7.25;
+ s=startBeatStage(s,'beat-1',[5,5,5],{beatmaking:10}).state;
+ const r=advanceBeatWork(s,s.music.job.total/2);
+ assert.ok(Math.abs(r.state.music.practice-2.6666666666666665)<1e-10);
+ assert.ok(Math.abs(r.state.music.genrePractice.boombap-7.416666666666667)<1e-10);
+ assert.equal(r.state.music.job.skill,12.5);
+ s=createVirtualPcState(JSON.parse(JSON.stringify(r.state)));
+ s=startBeatStage(s,'beat-1',[0,0,0],{beatmaking:99}).state;
+ assert.ok(Math.abs(s.music.practice-2.6666666666666665)<1e-10);
+ const done=advanceBeatWork(s,600);
+ assert.ok(Math.abs(done.state.music.practice-2.8333333333333335)<1e-10);
+ assert.ok(Math.abs(done.state.music.genrePractice.boombap-7.583333333333333)<1e-10);
+ assert.ok(Math.abs(done.practiceGained-1/3)<1e-10);
+ assert.equal(done.state.projects[0].stages[0].quality,13);
+});
+
+test('legacy partial work keeps earned totals at load and credits its unawarded effort only once',()=>{
+ let s=make();s.music.practice=7.5;s.music.genrePractice.boombap=4.25;
+ s.music.job={beatId:'beat-1',stage:0,sliders:[5,5,5],total:60,elapsed:30,skill:17.5};
+ s=createVirtualPcState(JSON.parse(JSON.stringify(s)));
+ assert.equal(s.music.practice,7.5);assert.equal(s.music.genrePractice.boombap,4.25);
+ s=advanceBeatWork(s,15).state;
+ assert.equal(s.music.practice,7.75);assert.equal(s.music.genrePractice.boombap,4.5);
+ s=createVirtualPcState(JSON.parse(JSON.stringify(s)));
+ s=advanceBeatWork(s,15).state;
+ assert.ok(Math.abs(s.music.practice-7.833333333333333)<1e-10);
+ assert.ok(Math.abs(s.music.genrePractice.boombap-4.583333333333333)<1e-10);
+ assert.deepEqual(advanceBeatWork(s,60).state,s);
+});
+
+test('no elapsed work gives no practice and needs-limited work credits only successful minutes',()=>{
+ let s=startBeatStage(make(),'beat-1',[5,5,5],{beatmaking:10}).state;
+ for(const requested of [0,-1,NaN,Infinity])assert.equal(advanceBeatWork(s,requested).state.music.practice,0);
+ s.music.needs.satiety=20.12;s.music.job.total=60;
+ const r=advanceBeatWork(s,60);
+ assert.ok(Math.abs(r.minutes-1)<1e-10);assert.ok(Math.abs(r.state.music.practice-1/180)<1e-10);
+ assert.ok(Math.abs(r.state.music.genrePractice.boombap-1/180)<1e-10);
+ assert.equal(r.blocked,true);
+ assert.deepEqual(advanceBeatWork(r.state,60).state,r.state);
+});
+
+test('fractional training stays capped at 100 and completion reports only gained skill',()=>{
+ let s=make();s.music.practice=99.9;s.music.genrePractice.boombap=99.9;
+ s=startBeatStage(s,'beat-1',[5,5,5],{beatmaking:0}).state;
+ const r=advanceBeatWork(s,600);
+ assert.equal(r.state.music.practice,100);assert.equal(r.state.music.genrePractice.boombap,100);
+ assert.ok(Math.abs(r.practiceGained-.1)<1e-10);
 });
 test('needs stop work at threshold, charge only worked minutes and allow resume after food',()=>{
  let s=make();s.music.needs.satiety=21;s=startBeatStage(s,'beat-1',[5,5,5],{}).state;

@@ -1,19 +1,19 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {ApartmentAnimation} from './apartment-v3-animation.js?rev=8';
-import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=23';
-import {homeLight} from './apartment-v3-time.js?rev=23';
-import {createBackdropMaterial,sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=23';
+import {ApartmentAnimation} from './apartment-v3-animation.js?rev=24';
+import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=24';
+import {homeLight} from './apartment-v3-time.js?rev=24';
+import {createBackdropMaterial,sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=24';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=7';
 import {CameraModes,cameraPose,pickVisible} from './apartment-v3-camera.js?rev=21';
 import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=21';
 import {createSmoke} from './apartment-v3-smoke.js?rev=21';
 import {createRetroPass} from './apartment-v3-retro.js?rev=11';
 import {createComputerView} from './apartment-v3-computer.js?rev=21';
-import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=23';
+import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=24';
 import {pcPresentation} from './virtual-pc-presentation.js?rev=21';
-import {createWardrobeFurniture} from './home-wardrobe.js?rev=23';
-import {applySwitchStyle} from './apartment-switch-style.js?rev=23';
+import {createWardrobeFurniture} from './home-wardrobe.js?rev=24';
+import {applySwitchStyle} from './apartment-switch-style.js?rev=24';
 
 export async function createApartmentScene(canvas,config){
   const BASE=config.assetBase??'./assets/apartment/v3/';
@@ -213,7 +213,7 @@ export async function createApartmentScene(canvas,config){
     const exteriorProgress=Number.isFinite(threshold)?(state.position[0]-threshold)/1.75:(-state.position[2]-1.45)/.65;
     const thresholdShade=state.actionId==='entry'?1-.75*THREE.MathUtils.clamp(exteriorProgress,0,1):1;
     for(const [material,color] of actorColors)material.color.copy(color).multiplyScalar(thresholdShade);
-    animation.update(instant?{clip:state.clip,fade:1,walkDistance:state.walkDistance}:state,dt,paused);
+    animation.update({...state,fade:instant?1:state.fade,working:computerSnapshot.phase==='working'},dt,paused);
     // Follow the actual hero root, including during transitions; no room snapping.
     hinge('passage',state.doorOpen*config.passageOpenAngle);
     const inAction=['perform','approach-depth'].includes(state.phase),lerp=1-Math.exp(-dt*6);

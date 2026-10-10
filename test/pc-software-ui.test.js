@@ -1,13 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=23';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=23';
-import {advanceVirtualPc} from '../src/virtual-pc-runtime.js?rev=23';
-import {mountInstaller} from '../src/pc-software-view.js?rev=23';
+import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=24';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=24';
+import {advanceVirtualPc} from '../src/virtual-pc-runtime.js?rev=24';
+import {mountInstaller} from '../src/pc-software-view.js?rev=24';
+import * as software from '../src/pc-software.js?rev=24';
 import {pcDocument,findButton,allPc,fire} from './helpers/virtual-pc-dom.js';
 function setup(){const d=pcDocument(),root=d.createElement('section'),pc=mountVirtualPc(root);pc.showDesktop(createVirtualPcState({power:'on'}));pc.open('underweb');pc.navigateUnderweb('underweb://dump');return {pc,root,d};}
 function click(root,name){const b=findButton(root,name);assert.ok(b,'Missing '+name);b.click();}
-function wizard(root){for(const name of ['Далее >','Далее >','Установить','Завершить установку','Готово'])click(root,name);}
+function wizard(root,pc){for(const name of ['Далее >','Далее >','Установить'])click(root,name);pc.syncState(software.advanceInstallation(pc.state,pc.state.software.installer.appId==='client'?10:30).state);click(root,'Готово');}
 test('opening the installer cancels a pending FT launch and preserves its keyboard scope',()=>{
  const d=pcDocument(),root=d.createElement('section'),timers=new Map();let timerId=0;
  const pc=mountVirtualPc(root,{setTimeoutFn:fn=>{timers.set(++timerId,fn);return timerId;},clearTimeoutFn:id=>timers.delete(id)});
@@ -44,10 +45,10 @@ test('an inactive installer rebuild does not move focus into its inert window',(
 test('forum client download leads through wizard into an empty torrent client and FT metadata adds one task',()=>{
  const {pc,root}=setup();click(root,'torent — торрент-клиент');click(root,'Скачать установщик torent');
  pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:0}).state);pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:2}).state);
- click(root,'Открыть установщик torent');wizard(root);pc.open('torent');assert.ok(allPc(root).some(n=>n.textContent==='Нет задач. Открой файл .torrent из Загрузок.'));
+ click(root,'Открыть установщик torent');wizard(root,pc);pc.open('torent');assert.ok(allPc(root).some(n=>n.textContent==='Нет задач. Открой файл .torrent из Загрузок.'));
  pc.open('underweb');pc.navigateUnderweb('underweb://dump/ft-studio');click(root,'Скачать FT-Studio.torrent');click(root,'Открыть FT-Studio.torrent');
  assert.equal(pc.window,'torent');assert.equal(pc.state.software.task.appId,'ft');assert.equal(pc.windows.windows.filter(w=>w.id==='torent').length,1);
- pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:600}).state);click(root,'Открыть установщик FT Studio');wizard(root);assert.equal(pc.state.download.status,'installed');
+ pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:600}).state);click(root,'Открыть установщик FT Studio');wizard(root,pc);assert.equal(pc.state.download.status,'installed');
  assert.ok(findButton(root,'FT Studio'));pc.open('computer');pc.openFolder('C:\\Program Files\\Field Tone\\FT Studio');assert.ok(allPc(root).some(n=>n.textContent==='Plugins'));
 });
 test('wizard typing survives clock sync, back and Escape cancellation retain the downloaded installer',()=>{
@@ -90,4 +91,32 @@ test('opening Downloads metadata without the client announces the prerequisite i
  assert.equal(pc.window,'computer');assert.equal(pc.state.software.task,null);
  const status=allPc(explorer).find(n=>n.getAttribute?.('aria-live')==='polite');
  assert.match(status.textContent,/Сначала.*установи torent/);assert.notEqual(status.hidden,true);
+});
+
+test('running installer updates visible progress in place and cannot be completed with Next',()=>{
+ const d=pcDocument(),root=d.createElement('section');let state=createVirtualPcState({power:'on',software:{client:{receivedBytes:2000000},installer:{appId:'client',step:'summary'}}});
+ state=software.advanceInstaller(state).state;
+ const view=mountInstaller(root,{getState:()=>state,onAction:action=>{if(action==='next')state=software.advanceInstaller(state).state;}});
+ const progress=allPc(root).find(n=>n.tagName==='PROGRESS'),next=allPc(root).find(n=>n.tagName==='BUTTON'&&n.textContent!=='< Назад'&&n.textContent!=='Отмена'),cancel=findButton(root,'Отмена');
+ assert.equal(progress.value,0);assert.equal(next.disabled,true);cancel.focus();
+ state=software.advanceInstallation(state,2.5).state;view.update();
+ assert.equal(progress.value,25);assert.ok(allPc(root).some(n=>/25%/.test(n.textContent)));assert.equal(allPc(root).find(n=>n.tagName==='PROGRESS'),progress);assert.equal(findButton(root,'Отмена'),cancel);assert.equal(d.activeElement,cancel);assert.equal(next.disabled,true);
+ state=software.advanceInstallation(state,7.5).state;view.update();assert.ok(findButton(root,'Готово'));assert.equal(d.activeElement.tagName,'H2');view.dispose();
+});
+
+test('installation completion preserves focus outside a hidden or inert installer',()=>{
+ for(const hidden of [true,false]){
+  const d=pcDocument(),frame=d.createElement('section'),root=d.createElement('div'),outside=d.createElement('button');frame.append(root);
+  let state=createVirtualPcState({power:'on',software:{client:{receivedBytes:2000000},installer:{appId:'client',step:'install',elapsedSeconds:9}}});
+  const view=mountInstaller(root,{getState:()=>state,onAction(){}});findButton(root,'Отмена').focus();frame.hidden=hidden;frame.inert=!hidden;
+  state=software.advanceInstallation(state,1).state;view.update();assert.equal(d.activeElement,null);
+  outside.focus();view.update();assert.equal(d.activeElement,outside);view.dispose();
+ }
+});
+
+test('installer displays a saved capacity failure while retaining completed progress',()=>{
+ const d=pcDocument(),root=d.createElement('section');let state=createVirtualPcState({power:'on',software:{ft:{receivedBytes:800000000},installer:{appId:'ft',step:'install',elapsedSeconds:29}}});
+ const view=mountInstaller(root,{getState:()=>state,onAction(){}}),progress=allPc(root).find(n=>n.tagName==='PROGRESS');
+ state=software.advanceInstallation({...state,projects:Array.from({length:201},(_,i)=>({id:String(i)}))},1).state;view.update();
+ assert.equal(progress.value,100);assert.ok(allPc(root).some(n=>/Недостаточно места/.test(n.textContent)));assert.equal(findButton(root,'Готово'),undefined);view.dispose();
 });

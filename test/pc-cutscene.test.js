@@ -2,11 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {ApartmentMotion} from '../src/apartment-v3-motion.js';
-import {ApartmentTime} from '../src/apartment-v3-time.js?rev=23';
-import {prepareApartmentConfig,advanceHomeFrame} from '../src/apartment-v3-runtime.js?rev=23';
+import {ApartmentTime} from '../src/apartment-v3-time.js?rev=24';
+import {prepareApartmentConfig,advanceHomeFrame} from '../src/apartment-v3-runtime.js?rev=24';
 
 test('computer activation walks to the desk before transition and keeps seated actor hidden',async()=>{
- const {beginPcCutscene,pcActorVisible}=await import('../src/virtual-pc-lifecycle.js?rev=23');
+ const {beginPcCutscene,pcActorVisible}=await import('../src/virtual-pc-lifecycle.js?rev=24');
  assert.equal(typeof beginPcCutscene,'function');assert.equal(typeof pcActorVisible,'function');
  const config=prepareApartmentConfig(JSON.parse(readFileSync(new URL('../assets/apartment/v3/scene.json',import.meta.url))));
  const m=new ApartmentMotion(config),time=new ApartmentTime();

@@ -1,8 +1,8 @@
 import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=21';
 const button=pcButton;
-import {SOFTWARE} from './pc-software-catalog.js?rev=23';
-import {softwareDiskBytes} from './pc-software.js?rev=23';
-import {downloadPresentation} from './virtual-pc-runtime.js?rev=23';
+import {SOFTWARE} from './pc-software-catalog.js?rev=24';
+import {softwareDiskBytes} from './pc-software.js?rev=24';
+import {downloadPresentation} from './virtual-pc-runtime.js?rev=24';
 export const softwareMessage=reason=>({'client-required':'Сначала скачай и установи torent из темы клиента.','metadata-required':'Сначала скачай файл FT-Studio.torrent.','insufficient-space':'Недостаточно места на C:. Загрузка сохранена; освободи место или отмени задачу.','invalid-path':'Укажи папку на игровом C: без .. и специальных символов.','transfer-active':'Сначала заверши или отмени текущую загрузку.','archive-required':'Сначала дождись полной загрузки установщика.','already-installed':'Программа уже установлена.','installer-active':'Сначала закрой текущий мастер установки.','pc-off':'Включи игровой компьютер.'}[reason]??reason??'');
 export function softwareForum(d,{topic,state,navigate,onAction,message=''}){
  const button=(doc,text,options={},handler)=>pcButton(doc,text,{...options,className:'uw-control '+(options.className??'')},handler);
@@ -49,8 +49,15 @@ export function mountTorrent(root,{getState,onAction}){
  update();return {update,dispose(){root.replaceChildren();}};
 }
 export function mountInstaller(root,{getState,onAction,getMessage=()=>''}){
- const d=root.ownerDocument;let signature='',error=null;
- function update(){const state=getState(),w=state.software.installer;if(!w)return;const key=JSON.stringify(w);if(key===signature){if(error)error.textContent=getMessage();return;}signature=key;
+ const d=root.ownerDocument;let signature='',error=null,progress=null,status=null;
+ function updateProgress(state,w){
+  if(error)error.textContent=w.error?softwareMessage(w.error):getMessage();
+  if(!progress)return;
+  const duration=SOFTWARE[w.appId].installSeconds,elapsed=w.elapsedSeconds??0,percent=Math.min(100,elapsed/duration*100);
+  progress.value=percent;
+  status.textContent=`Установка файлов: ${Math.floor(percent)}% · осталось ${Math.ceil(Math.max(0,duration-elapsed))} с${state.power==='on'?'':' · Пауза: компьютер выключен'}`;
+ }
+ function update(){const state=getState(),w=state.software.installer;if(!w)return;const key=JSON.stringify([w.appId,w.step,w.path]);if(key===signature){updateProgress(state,w);return;}signature=key;progress=null;status=null;
   let restoreFocus=root.contains(d.activeElement);for(let node=root;restoreFocus&&node;node=node.parentElement)if(node.inert||node.hidden)restoreFocus=false;
   const app=SOFTWARE[w.appId],wrap=el(d,'section',{className:'pc-installer'}),banner=el(d,'aside',{className:'installer-banner'}),body=el(d,'div',{className:'installer-body'}),content=el(d,'div',{className:'installer-content'}),actions=el(d,'footer',{className:'installer-actions'});
   banner.append(el(d,'strong',{text:app.name}),el(d,'span',{text:'МАСТЕР\nУСТАНОВКИ'}));body.append(content,actions);wrap.append(banner,body);root.replaceChildren(wrap);
@@ -60,12 +67,13 @@ export function mountInstaller(root,{getState,onAction,getMessage=()=>''}){
   if(w.step==='destination'){const label=el(d,'label',{text:'Папка на диске C:'});input=el(d,'input',{value:w.path,attributes:{'aria-label':'Папка установки',maxlength:'180'}});label.append(input);content.append(label,el(d,'p',{text:'Можно выбрать собственную папку на виртуальном C:.'}));}
   if(['summary','install','finish'].includes(w.step))content.append(el(d,'p',{text:'Папка: '+w.path}));
   if(w.step==='summary')content.append(el(d,'p',{text:`Требуется: ${app.installedBytes/1000000} МБ · Свободно: ${(softwareDiskBytes(state).free/1000000).toFixed(2)} МБ`}),el(d,'p',{text:'Скачанный архив останется в Загрузках.'}));
-  if(w.step==='install')content.append(el(d,'p',{text:'Файлы подготовлены. Заверши установку, чтобы записать программу на C:.'}),el(d,'progress',{attributes:{max:'100',value:'100','aria-label':'Подготовка файлов'}}));
+  if(w.step==='install'){status=el(d,'p');progress=el(d,'progress',{attributes:{max:'100','aria-label':'Прогресс установки '+app.name}});content.append(status,progress);}
   if(w.step==='finish')content.append(el(d,'p',{text:'Программа установлена. Ярлык появился на рабочем столе.'}));
   error=el(d,'p',{className:'pc-error',text:getMessage(),attributes:{role:'status'}});content.append(error);
   const back=button(d,'< Назад',{},()=>onAction('back'));back.disabled=!['destination','summary'].includes(w.step);
-  const label={summary:'Установить',install:'Завершить установку',finish:'Готово'}[w.step]??'Далее >';
-  const next=button(d,label,{},()=>onAction('next',input?.value));actions.append(back,next,button(d,'Отмена',{},()=>onAction('cancel-installer')));
+  const label={summary:'Установить',install:'Установка…',finish:'Готово'}[w.step]??'Далее >';
+  const next=button(d,label,{},()=>onAction('next',input?.value));next.disabled=w.step==='install';actions.append(back,next,button(d,'Отмена',{},()=>onAction('cancel-installer')));
+  updateProgress(state,w);
   if(restoreFocus)(input??heading).focus();
  }
  update();return {update,dispose(){root.replaceChildren();}};

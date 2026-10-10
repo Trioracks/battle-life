@@ -15,8 +15,8 @@ import {
   startFtDownload,
   setDesktopIconPosition, resetDesktopIconPositions, layoutDesktopIcons,
   applyToBattle,
-} from '../src/virtual-pc-state.js?rev=23';
-import {openInstaller,advanceInstaller} from '../src/pc-software.js?rev=23';
+} from '../src/virtual-pc-state.js?rev=24';
+import {openInstaller,advanceInstaller,advanceInstallation} from '../src/pc-software.js?rev=24';
 
 test('applications reject invalid entries, trim names and never duplicate a battle',()=>{
   const state=createVirtualPcState({battleApplications:[null,{}, {battleId:'external',nickname:'MC'}, {battleId:'concrete-echo',nickname:'  Район  '}, {battleId:'concrete-echo',nickname:'Дубль'}, {battleId:'yard-cipher',nickname:' '}]});
@@ -115,7 +115,8 @@ test('cancelling an unfinished package frees its partial virtual payload', () =>
 test('installing a completed ft studio package retains its archive and consumes 800 MB once', () => {
   const completed = createVirtualPcState({power:'on',download:{status:'ready-to-install'}});
   let installed=openInstaller(completed,'ft').state;
-  for(let i=0;i<4;i++)installed=advanceInstaller(installed).state;
+  for(let i=0;i<3;i++)installed=advanceInstaller(installed).state;
+  installed=advanceInstallation(installed,30).state;
 
   assert.equal(completed.download.status, 'ready-to-install');
   assert.equal(diskUsage(completed).downloadMb, 800.012);

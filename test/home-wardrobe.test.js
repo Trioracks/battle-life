@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createProfile,DEFAULT_APPEARANCE,saveProfile,loadProfile} from '../src/avatar-v3-profile.js?rev=23';
+import {createProfile,DEFAULT_APPEARANCE,saveProfile,loadProfile} from '../src/avatar-v3-profile.js?rev=24';
 import {ApartmentMotion} from '../src/apartment-v3-motion.js';
-import {prepareApartmentConfig} from '../src/apartment-v3-runtime.js?rev=23';
+import {prepareApartmentConfig} from '../src/apartment-v3-runtime.js?rev=24';
 import {pcDocument,allPc,fire} from './helpers/virtual-pc-dom.js';
 import fs from 'node:fs';
 import * as THREE from '../vendor/three/three.module.js';
-const wardrobe=await import('../src/home-wardrobe.js?rev=23').catch(()=>({}));
-const views=await import('../src/home-wardrobe-view.js?rev=23').catch(()=>({}));
+const wardrobe=await import('../src/home-wardrobe.js?rev=24').catch(()=>({}));
+const views=await import('../src/home-wardrobe-view.js?rev=24').catch(()=>({}));
 test('new heroes start at ten without allocations and ignore old bonuses',()=>{
  const p=createProfile({name:'Новичок',allocations:{intelligence:999}});
  assert.deepEqual(Object.values(p.skills),[10,10,10,10,10,10,10,10,10]);assert.equal(p.version,4);assert.equal(p.noviceSchema,1);

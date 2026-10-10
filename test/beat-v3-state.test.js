@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=23';
-import {createBeat,startBeatStage,advanceBeatWork,normalizeBeat} from '../src/beat-production.js?rev=23';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=24';
+import {createBeat,startBeatStage,advanceBeatWork,normalizeBeat} from '../src/beat-production.js?rev=24';
 const seed=()=>createVirtualPcState({power:'on',download:{status:'installed'}});
 const make=(skill=25,random=()=>0)=>createBeat(seed(),{id:'a',name:'Первый'},{beatmaking:skill},random);
 
@@ -27,9 +27,9 @@ test('choices_survive_roundtrip_and_resume without hidden rerolls or duplicate p
  assert.equal(resumed.ok,true);assert.deepEqual(resumed.state.music.job,s.music.job);
  assert.deepEqual(resumed.state.projects[0],original);
  const done=advanceBeatWork(resumed.state,600);
- assert.equal(done.finished,true);assert.equal(done.state.music.practice,1);
+ assert.equal(done.finished,true);assert.equal(done.state.music.practice,1/3);
  assert.equal(done.state.projects[0].productionMode,'beginner');
- assert.equal(advanceBeatWork(done.state,600).state.music.practice,1);
+ assert.equal(advanceBeatWork(done.state,600).state.music.practice,1/3);
  assert.deepEqual(done.state.projects[0].audio,original.audio);
 });
 

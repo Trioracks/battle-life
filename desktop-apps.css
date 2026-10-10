@@ -1,4 +1,11 @@
 /* Original in-game applications: visual FT workspace and Underweb pages. */
+.installer-content progress{display:block;appearance:none;width:100%;height:19px;margin:20px 0;border:1px solid #7f9db9;border-radius:2px;background:#fff;box-shadow:inset 1px 1px 2px #7774;accent-color:#41b531}
+.installer-content progress::-webkit-progress-bar{background:#fff;box-shadow:inset 1px 1px 2px #7774}
+.installer-content progress::-webkit-progress-value{background:repeating-linear-gradient(90deg,transparent 0 9px,#ffffffdc 9px 11px),linear-gradient(#a2e871,#27ae27 48%,#58c33c)}
+.installer-content progress::-moz-progress-bar{background:repeating-linear-gradient(90deg,#42b934 0 9px,#fff 9px 11px)}
+.pc-window[data-window-id="ft-studio"][data-entering="true"]{transform-origin:50% 58%;animation:ft-window-arrive .58s cubic-bezier(.18,.72,.22,1) both}
+@keyframes ft-window-arrive{from{opacity:0;transform:translateY(35px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.pc-window[data-window-id="ft-studio"][data-entering="true"]{animation:none}}
 #virtual-pc .pc-app-root{container-type:inline-size}
 #virtual-pc[data-app-launching=true],#virtual-pc[data-app-launching=true] *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M2 1v21l5-5 4 9 4-2-4-9h8Z' fill='white' stroke='black' stroke-width='1.5'/%3E%3Cpath d='M21 8h9v4l-4 4 4 4v5h-9v-5l4-4-4-4Z' fill='%23f5f2dd' stroke='%23222222'/%3E%3Cpath d='M21 8h9M21 25h9M23 11h5l-2.5 3ZM23 23h5l-2.5-4Z' fill='%23a18442' stroke='%23222222'/%3E%3C/svg%3E") 2 1,progress!important}
 .pc-launch-feedback{position:absolute;right:12px;bottom:43px;padding:9px 15px;background:#fffddd;color:#17223a;border:1px solid #6d7997;box-shadow:2px 3px 7px #0005;z-index:9999;pointer-events:none;font:12px Tahoma,sans-serif}
@@ -16,7 +23,7 @@
 .ft-readout span{font:23px Consolas,monospace;letter-spacing:1px;color:#d4d9b4}
 .ft-tempo{display:flex;flex-direction:column;gap:4px;text-align:center;min-width:30px;color:#a3ae99}.ft-tempo strong{font:19px Consolas,monospace}.ft-tempo small{font-size:9px}
 .ft-body{display:grid;grid-template-columns:172px minmax(0,1fr);flex:1;min-height:0}
-.beat-work-hud{position:fixed;z-index:35;bottom:25px;left:50%;transform:translateX(-50%);width:min(580px,92vw);padding:20px 24px;display:grid;gap:12px;background:linear-gradient(120deg,#26302cf5,#16241ef5);border:1px solid #66755d;border-top:3px solid #b9a675;border-radius:5px;color:#d8dbc9;box-shadow:0 12px 50px #0008;font:12px 'Segoe UI',sans-serif;backdrop-filter:blur(8px)}
+.beat-work-hud{position:fixed;z-index:35;bottom:24px;left:24px;width:min(360px,calc(100vw - 48px));padding:16px 18px;display:grid;gap:10px;background:linear-gradient(120deg,#26302cf5,#16241ef5);border:1px solid #66755d;border-top:3px solid #b9a675;border-radius:5px;color:#d8dbc9;box-shadow:0 12px 50px #0008;font:12px 'Segoe UI',sans-serif;backdrop-filter:blur(8px)}
 .beat-work-hud [hidden],.beat-work-hud[hidden]{display:none!important}
 .beat-work-head{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px}
 .beat-work-stage{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#beae82}
@@ -26,12 +33,20 @@
 .beat-work-hud progress::-webkit-progress-bar{background:#0f1d15}.beat-work-hud progress::-webkit-progress-value{background:linear-gradient(90deg,#7b9266,#d1bb81);border-radius:8px}
 .beat-work-details{display:flex;align-items:center;flex-wrap:wrap;gap:12px;font-size:10px;color:#a8b49d}.beat-work-details>span:last-child{margin-left:auto}
 .beat-work-reward{color:#d4cd9b;font-weight:500}
+.beat-work-training{display:grid;gap:11px;padding:13px 14px;background:#14211b80;border:1px solid #53644a;border-radius:4px}
+.beat-work-training-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px 14px;color:#cbd4bc;font-size:11px}
+.beat-work-skill-meter{grid-column:1/-1;width:100%;height:10px}
+.beat-work-skill-meter::-webkit-meter-bar{background:#111c16;border:1px solid #3b4d38;border-radius:3px}
+.beat-work-skill-meter::-webkit-meter-optimum-value{background:linear-gradient(90deg,#4d927e,#bed18a);transition:width .12s linear}
+.beat-work-skill-gain{color:#bdd892;font:11px Consolas,monospace}
+.beat-work-time::before{content:'▶▶  ';font-size:12px;color:#9daa7c}
 .beat-work-needs{display:grid;grid-template-columns:1fr 1fr;gap:22px;padding-block:8px}
 .beat-work-needs label{display:grid;grid-template-columns:auto 1fr 22px;align-items:center;gap:9px;font-size:10px;color:#99aa91}
 .beat-work-needs meter{width:100%;height:7px}.beat-work-needs meter::-webkit-meter-bar{background:#132117;border:0}.beat-work-needs meter::-webkit-meter-optimum-value{background:#8a9d73}
 .beat-work-foot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-top:1px solid #41513d;padding-top:12px}
 .beat-work-audio{flex:1;font-size:9px;color:#83967b;min-width:140px}
 .beat-work-hud button{background:#303f30;color:#cfd6be;border:1px solid #627555;padding:7px 10px;border-radius:3px;font:10px 'Segoe UI',sans-serif;cursor:pointer}
+@media(max-width:800px){.beat-work-hud{left:12px;bottom:12px;width:calc(100vw - 24px);box-sizing:border-box;padding:10px 14px;gap:6px}.beat-work-head{gap:4px}.beat-work-head h2{font-size:16px}.beat-work-training{grid-template-columns:1fr 1fr;padding:8px;gap:12px}.beat-work-training-row{font-size:9px;gap:4px}.beat-work-skill-gain{font-size:9px}.beat-work-needs{padding:2px 0}.beat-work-foot{padding-top:6px}.beat-work-time{font-size:15px}}
 .ft-body.ft-producing{grid-template-columns:140px minmax(180px,1fr) 320px}
 #virtual-pc .ft-production{background:#252b27;border-left:1px solid #131b15;padding:16px;overflow:auto;min-width:0;color:#c6cec2;font:12px 'Segoe UI',sans-serif}
 .ft-production-actions{display:flex;gap:6px;margin-bottom:12px}.ft-production form{display:grid;gap:8px}.ft-production label{color:#bec3b4;margin-top:8px}

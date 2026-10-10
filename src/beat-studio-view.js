@@ -1,9 +1,9 @@
 import {pcElement as el,pcButton as button,pcFind,pcFocusable} from './virtual-pc-dom.js?rev=21';
-import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=23';
+import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=24';
 import {BEAT_STAGES} from './beat-catalog.js';
-import {randomBeatName} from './beat-names.js?rev=23';
+import {randomBeatName} from './beat-names.js?rev=24';
 import {resolveBeatPlayback} from './beat-playback.js?rev=21';
-import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=23';
+import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=24';
 
 export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio,legacyName,initialProject}){
  const d=root.ownerDocument,workspace=createStudioWorkspace(d,{projectName:legacyName});root.replaceChildren(workspace);
@@ -11,14 +11,14 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
  const body=pcFind(workspace,n=>n.className==='ft-body'),panel=el(d,'aside',{className:'ft-production',dataset:{ftRole:'analytics'},attributes:{'aria-label':'Анализ проекта'}});
  body.append(panel);body.className+=' ft-producing';
  const actions=find('project-actions'),workflow=find('workflow');
- actions.append(button(d,'Новый бит',{},()=>openDialog('new')),button(d,'Открыть проект',{},()=>openDialog('projects')));
+ actions.append(button(d,'Новый проект',{},()=>openDialog('new')),button(d,'Открыть проект',{},()=>openDialog('projects')));
  const footer=pcFind(workspace,n=>n.className==='ft-bottom');footer.replaceChildren(el(d,'span',{text:'●  FIELD TONE / HOME STUDIO'}),el(d,'span',{text:'Три этапа. Твой первый звук.'}),el(d,'span',{text:'44.1 kHz / 16 bit'}));
  const summary=el(d,'p',{className:'ft-needs'}),session=pcFind(workspace,n=>n.className==='ft-session').children[1],tempo=pcFind(workspace,n=>n.className==='ft-tempo').children[0];
  const readout=pcFind(workspace,n=>n.className==='ft-readout').children[1],transport=find('transport'),playhead=find('playhead'),status=find('transport-status');
  const controls=Object.fromEntries(['play','pause','stop'].map(key=>[key,pcFind(transport,n=>n.dataset?.ftAction===key)]));
- let signature='',message='',disposed=false,dialog=null,returnFocus=null,frame=null;
+ let signature='',message='',disposed=false,dialog=null,returnFocus=null,frame=null,sessionSelected=false;
  const win=d.defaultView??globalThis,requestFrame=win.requestAnimationFrame?.bind(win),cancelFrame=win.cancelAnimationFrame?.bind(win);
- const currentBeat=()=>normalizeBeat(getState().projects.find(p=>p.id===getState().music.activeBeatId));
+ const currentBeat=()=>sessionSelected?normalizeBeat(getState().projects.find(p=>p.id===getState().music.activeBeatId)):null;
  const stateSignature=()=>{const s=getState();return JSON.stringify([s.projects,s.music.activeBeatId,s.music.job?.beatId,s.music.job?.stage]);};
  function change(next){onChange(next);render();}
  function closeDialog({restore=true}={}){
@@ -29,7 +29,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
  function openDialog(mode='home'){
   returnFocus??=d.activeElement;closeDialog({restore:false});
   for(const child of workspace.children)child.inert=true;
-  dialog=el(d,'div',{className:'ft-dialog-backdrop',dataset:{ftRole:'dialog'},attributes:{role:'dialog','aria-modal':'true','aria-label':mode==='new'?'Новый бит':mode==='projects'?'Открыть проект':'FT Studio — начало работы'}});
+  dialog=el(d,'div',{className:'ft-dialog-backdrop',dataset:{ftRole:'dialog'},attributes:{role:'dialog','aria-modal':'true','aria-label':mode==='new'?'Новый проект':mode==='projects'?'Открыть проект':'FT Studio — начало работы'}});
   const card=el(d,'section',{className:'ft-dialog-card'});
   card.append(el(d,'span',{className:'ft-eyebrow',text:'FIELD TONE / STUDIO'}),el(d,'h2',{text:mode==='new'?'Как назовём бит?':mode==='projects'?'Твои проекты':'С чего начнём?'}));
   if(mode==='new'){
@@ -37,7 +37,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
    const create=()=>{
     const r=createBeat(getState(),{id:globalThis.crypto?.randomUUID?.()??'beat-'+Date.now(),name:name.value},getMetadata().skills);
     if(!r.ok){notice.textContent=r.reason;return;}
-    legacyName=undefined;message='';audio.stop();closeDialog({restore:false});change(r.state);pcFocusable(actions)[0]?.focus();
+    sessionSelected=true;legacyName=undefined;message='';audio.stop();closeDialog({restore:false});change(r.state);pcFocusable(actions)[0]?.focus();
    };
    const naming=el(d,'div',{className:'ft-project-name'});
    naming.append(name,button(d,'⚄ Случайное название',{attributes:{'aria-label':'Случайное название'}},()=>{name.value=randomBeatName(getMetadata().gameDay,name.value);name.focus();}));
@@ -48,11 +48,11 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
    if(!projects.length)card.append(el(d,'p',{className:'ft-production-note',text:'Пока нет сохранённых проектов.'}));
    const list=el(d,'div',{className:'ft-dialog-projects'});
    for(const p of projects)list.append(button(d,p.name+' · '+(p.kind==='beat'?(p.status==='ready'?'готов':p.stages.length+'/3'):'архив'),{className:'ft-project-item'},()=>selectProject(p)));
-   card.append(list,button(d,'Новый бит',{},()=>openDialog('new')));
+   card.append(list,button(d,'Новый проект',{},()=>openDialog('new')));
   }else{
-   card.append(el(d,'p',{className:'ft-production-note',text:'Чистый лист или работа, к которой хочется вернуться.'}),button(d,'Новый бит',{className:'ft-menu-choice'},()=>openDialog('new')),button(d,'Открыть проект',{className:'ft-menu-choice'},()=>openDialog('projects')));
+   card.append(el(d,'p',{className:'ft-production-note',text:'Чистый лист или работа, к которой хочется вернуться.'}),button(d,'Новый проект',{className:'ft-menu-choice'},()=>openDialog('new')),button(d,'Открыть проект',{className:'ft-menu-choice'},()=>openDialog('projects')));
   }
-  card.append(button(d,mode==='home'?'Вернуться в студию':'Отмена',{},()=>closeDialog()));
+  card.append(button(d,mode==='home'?'Закрыть':'Отмена',{},()=>closeDialog()));
   dialog.append(card);workspace.append(dialog);
   dialog.addEventListener('keydown',event=>{
    if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closeDialog();return;}
@@ -61,6 +61,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
   pcFocusable(dialog)[0]?.focus();
  }
  function selectProject(project){
+  sessionSelected=true;
   closeDialog({restore:false});legacyName=project.kind==='beat'?undefined:project.name;message='';audio.stop();
   const s=getState();change({...s,music:{...s.music,activeBeatId:project.kind==='beat'?project.id:null}});
   pcFocusable(actions)[0]?.focus();
@@ -103,7 +104,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
   }
   if(message)panel.append(el(d,'p',{className:'ft-warning',text:message,attributes:{role:'status'}}));updateSummary();updateTransport();
  }
- function updateSummary(){const s=getState();summary.textContent='Битмейкинг '+effectiveBeatSkill(s,getMetadata().skills)+' · сытость '+Math.round(s.music.needs.satiety)+' · энергия '+Math.round(s.music.needs.energy)+(s.music.infected?' · ⚠ вирус замедляет ПК':'');}
+ function updateSummary(){const s=getState();summary.textContent='Битмейкинг '+effectiveBeatSkill(s,getMetadata().skills).toFixed(2)+' · сытость '+Math.round(s.music.needs.satiety)+' · энергия '+Math.round(s.music.needs.energy)+(s.music.infected?' · ⚠ вирус замедляет ПК':'');}
  function updateTransport(){
   const beat=currentBeat(),available=!!beat?.stages.length&&!beat.audioIssue;
   const current=audio.getSnapshot?.(),expected=available?resolveBeatPlayback(beat):null;
