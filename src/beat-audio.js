@@ -50,7 +50,7 @@ export class BeatAudio{
  }
  play({drumId='primitive',stage=1}={}){
   const ids=[drumId,...(stage>=2?['melody']:[]),...(stage>=3?['bass']:[])];
-  return this.playDescriptor({key:JSON.stringify(['preview',ids]),owner:'studio',durationSeconds:loopSeconds(),parts:ids.map(id=>({id,loopSeconds:loopSeconds()}))});
+  return this.playDescriptor({key:JSON.stringify(['preview',ids]),owner:'preview',durationSeconds:loopSeconds(),parts:ids.map(id=>({id,loopSeconds:loopSeconds()}))});
  }
  playProject(beat,options){
   if(this.disposed)return Promise.resolve(false);

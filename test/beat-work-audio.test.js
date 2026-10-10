@@ -3,6 +3,14 @@ import assert from 'node:assert/strict';
 import {BeatAudio} from '../src/beat-audio.js';
 const module=await import('../src/beat-work-audio.js').catch(e=>{if(e.code==='ERR_MODULE_NOT_FOUND')return {};throw e;});
 const frame=(stage=0,phase='working',hidden=false)=>({phase,hidden,beat:{version:3,id:'a',drumId:'beginner-drums-01',stages:[],audio:{bankVersion:1,bars:4,themeId:'beginner-theme-01',arrangementId:'beginner-arrangement-01'}},job:{beatId:'a',stage}});
+test('hiding during departure or reveal requires a gesture before the work layer starts',async()=>{
+ for(const phase of ['work-out','work-reveal']){
+  let starts=0;const c=module.createBeatWorkAudio({playProject:async()=>{starts++;return true;},stop(){},unlock:async()=>{}});
+  c.sync(frame(0,'work-out'));c.sync(frame(0,phase,true));c.sync(frame(0,phase));const result=c.sync(frame());
+  assert.equal(starts,0,phase+' must not auto-start');assert.equal(result.needsGesture,true);
+  await c.enableAudio();assert.equal(starts,1);c.sync(frame(0,'work-cover'));c.sync(frame(1,'work-out'));c.sync(frame(1));assert.equal(starts,2,'a newly requested stage permits sound');c.dispose();
+ }
+});
 test('working plays exact stage once and finish/cancel/hidden stop audio',async()=>{
  assert.equal(typeof module.createBeatWorkAudio,'function');const calls=[],stops=[];let unlocks=0;
  const c=module.createBeatWorkAudio({playProject:async(b,o)=>{calls.push(o.workStage);return true;},stop:o=>stops.push(o),unlock:async()=>unlocks++});

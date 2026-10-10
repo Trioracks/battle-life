@@ -1,6 +1,7 @@
 import {pcElement as el,pcButton as button,pcFind,pcFocusable} from './virtual-pc-dom.js?rev=21';
 import {createStudioWorkspace,FT_TRACKS} from './ft-studio-view.js?rev=21';
 import {BEAT_STAGES} from './beat-catalog.js';
+import {resolveBeatPlayback} from './beat-playback.js?rev=21';
 import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=21';
 
 export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio,legacyName,initialProject}){
@@ -97,7 +98,9 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
  }
  function updateSummary(){const s=getState();summary.textContent='Битмейкинг '+effectiveBeatSkill(s,getMetadata().skills)+' · сытость '+Math.round(s.music.needs.satiety)+' · энергия '+Math.round(s.music.needs.energy)+(s.music.infected?' · ⚠ вирус замедляет ПК':'');}
  function updateTransport(){
-  const beat=currentBeat(),snapshot=audio.getSnapshot?.()??{status:'stopped',positionSeconds:0},available=!!beat?.stages.length&&!beat.audioIssue;
+  const beat=currentBeat(),available=!!beat?.stages.length&&!beat.audioIssue;
+  const current=audio.getSnapshot?.(),expected=available?resolveBeatPlayback(beat):null;
+  const snapshot=current?.owner==='studio'&&expected?.ok&&current.key===expected.descriptor.key?current:{status:'stopped',positionSeconds:0};
   controls.play.disabled=!available||snapshot.status==='loading'||snapshot.status==='playing';
   controls.pause.disabled=!['playing','loading'].includes(snapshot.status);controls.stop.disabled=!['playing','loading','paused'].includes(snapshot.status);
   const position=snapshot.owner==='work'?0:snapshot.positionSeconds??0,beatPosition=position*90/60;

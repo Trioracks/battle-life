@@ -5,6 +5,11 @@ const playback=await import('../src/beat-playback.js').catch(error=>{if(error.co
 const beat=(drumId='beginner-drums-01')=>({version:3,id:'one',name:'One',genre:'boombap',bpm:90,drumId,stages:[{},{},{}],audio:{bankVersion:1,bars:4,themeId:'beginner-theme-02',arrangementId:'beginner-arrangement-03'}});
 function context(){return {state:'running',currentTime:12,destination:{},sources:[],createGain(){return {gain:{value:0,setValueAtTime(){},linearRampToValueAtTime(){}},connect(){},disconnect(){}};},createBufferSource(){const s={connect(){},disconnect(){this.disconnected=true;},start(time,offset){Object.assign(this,{time,offset});},stop(time){this.stopped=true;this.stopTime=time;}};this.sources.push(s);return s;},decodeAudioData:async()=>({duration:32/3}),close(){}};}
 const make=(ctx,fetchFn=async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(8)}))=>new BeatAudio({contextFactory:()=>ctx,fetchFn});
+test('market preview has a distinct owner and project Play replaces it',async()=>{
+ const ctx=context(),audio=make(ctx);await audio.play({drumId:'free-01',stage:1});
+ assert.equal(audio.getSnapshot().owner,'preview');const preview=ctx.sources[0];
+ await audio.playProject(beat());assert.equal(audio.getSnapshot().owner,'studio');assert.equal(preview.stopped,true);audio.dispose();
+});
 test('descriptor resolves completed layers, work layers, legacy and rejects unknown IDs',()=>{
  assert.equal(typeof playback.resolveBeatPlayback,'function');const resolve=playback.resolveBeatPlayback;
  assert.equal(resolve(beat()).descriptor.parts.length,3);assert.equal(resolve(beat()).descriptor.durationSeconds,32/3);

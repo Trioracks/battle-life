@@ -11,8 +11,19 @@ function setup(state=createVirtualPcState()){
  const d=pcDocument(),root=d.createElement('section');let work=0,unlocks=0;
  const audio={unlock(){unlocks++;return Promise.resolve();},stop(){},pause(){},playProject:async()=>true,getSnapshot:()=>({status:'stopped',positionSeconds:0,durationSeconds:32/3}),dispose(){}};
  const view=mountBeatStudio(root,{getState:()=>state,getMetadata:()=>({skills:{beatmaking:10}}),onChange:next=>state=next,onWork:()=>{work++;return true;},audio});
- return {d,root,view,get state(){return state;},set state(next){state=next;view.update();},work:()=>work,unlocks:()=>unlocks};
+ return {d,root,view,audio,get state(){return state;},set state(next){state=next;view.update();},work:()=>work,unlocks:()=>unlocks};
 }
+test('unrelated preview or project playback does not own this FT transport',()=>{
+ let state=createBeat(createVirtualPcState(),{id:'a',name:'Current'},{}).state;
+ state=startBeatStage(state,'a',undefined,{}).state;state=advanceBeatWork(state,600).state;
+ const s=setup(state);s.view.openProject(state.projects[0]);let played=null;s.audio.playProject=async beat=>{played=beat.id;return true;};
+ for(const owner of ['preview','studio']){
+  s.audio.getSnapshot=()=>({status:'playing',owner,key:'another-sound',positionSeconds:4,durationSeconds:32/3});s.view.update();
+  assert.equal(findButton(s.root,'Play').disabled,false);assert.equal(findButton(s.root,'Pause').disabled,true);
+  assert.equal(role(s.root,'playhead').style.left,'0%');assert.equal(role(s.root,'transport-status').textContent,'Готов к прослушиванию');
+ }
+ findButton(s.root,'Play').click();assert.equal(played,'a');s.view.dispose();
+});
 test('nine named lanes and top transport, panels toggle independently',()=>{
  const root=createStudioWorkspace(pcDocument()),names=allPc(root).filter(n=>n.dataset.ftRole==='track-label').map(n=>n.textContent);
  assert.deepEqual(names,['Drum Kit','Bass','Percussion','Lead','Atmosphere','Harmony','Sound Design','Sub Bass','FX']);

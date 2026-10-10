@@ -35,6 +35,20 @@ try{
   let s=pc.state;for(let i=0;i<3;i++){s=production.restoreMusicNeeds(production.restoreMusicNeeds(s,'meal'),'sleep',360);s=production.startBeatStage(s,'saved',undefined,{}).state;s=production.advanceBeatWork(s,600).state;}pc.syncState(s);pc.openProject(s.projects.find(p=>p.id==='saved'));
  });
  await ft.getByRole('button',{name:'Развернуть окно',exact:true}).click();await page.screenshot({path:output+'/review-nine-lanes.png'});
+ // A market preview must not masquerade as this project's transport.
+ await page.evaluate(()=>pc.open('underweb'));const marketWindow=page.locator('.pc-window[data-window-id="underweb"]');
+ await marketWindow.locator('.uw-bookmarks').getByRole('button',{name:'Базар',exact:true}).click();
+ await marketWindow.getByRole('button',{name:'Слушать Архив / 01',exact:true}).click();
+ await page.waitForFunction(()=>pc.beatAudio.getSnapshot().owner==='preview'&&pc.beatAudio.getSnapshot().status==='playing');
+ await page.evaluate(()=>pc.open('ft-studio'));
+ assert.equal(await ft.getByRole('button',{name:'Play',exact:true}).isEnabled(),true);
+ assert.equal(await ft.getByRole('button',{name:'Pause',exact:true}).isEnabled(),false);
+ assert.equal(await ft.locator('[data-ft-role=transport-status]').textContent(),'Готов к прослушиванию');
+ assert.equal(await ft.locator('[data-ft-role=playhead]').evaluate(n=>n.style.left),'0%');
+ await ft.getByRole('button',{name:'Play',exact:true}).click();
+ await page.waitForFunction(()=>pc.beatAudio.getSnapshot().owner==='studio'&&pc.beatAudio.getSnapshot().status==='playing');
+ assert.equal(await page.evaluate(()=>pc.beatAudio.sources.length),3);
+ await ft.getByRole('button',{name:'Stop',exact:true}).click();
  // Delay a real decoder, then close FT before it resolves.
  await page.evaluate(async()=>{
   window.qaAudio=pc.beatAudio;qaAudio.cache.clear();await qaAudio.unlock();const decode=qaAudio.context.decodeAudioData.bind(qaAudio.context);

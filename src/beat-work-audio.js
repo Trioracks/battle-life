@@ -8,7 +8,7 @@ export function createBeatWorkAudio(audio){
   if(frame.phase==='work-out'&&lastPhase!=='work-out'){blocked=false;error='';}
   lastPhase=frame.phase;
   const valid=frame.phase==='working'&&frame.beat?.id===frame.job?.beatId&&[0,1,2].includes(frame.job?.stage);
-  if(frame.hidden){if(valid)blocked=true;stop();}
+  if(frame.hidden){if(frame.phase.startsWith('work'))blocked=true;stop();}
   else if(!valid)stop();
   else if(!blocked){
    const key=frame.beat.id+':'+frame.job.stage;

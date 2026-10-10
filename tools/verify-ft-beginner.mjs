@@ -31,7 +31,12 @@ try{
  await dialog.getByRole('button',{name:'Новый бит',exact:true}).click();await dialog.getByRole('textbox',{name:'Название бита'}).fill('Первый двор');await dialog.getByRole('button',{name:'Начать проект',exact:true}).click();
  assert.equal(await ft.locator('select,input[type=range]').count(),0);
  await ft.getByRole('button',{name:'Работать над этапом',exact:true}).click();await phase('work-out');
- assert.equal((await saved()).music.job.elapsed,0,'camera departure does not charge work');await phase('working');
+ assert.equal((await saved()).music.job.elapsed,0,'camera departure does not charge work');
+ await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});
+ await page.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));});await phase('working');
+ await page.locator('.beat-work-hud').getByRole('button',{name:'Включить звук',exact:true}).waitFor();
+ assert.equal(await page.evaluate(()=>window.ftAudioLog.length),0,'hiding during departure must not auto-start work sound');
+ await page.locator('.beat-work-hud').getByRole('button',{name:'Включить звук',exact:true}).click();
  await page.waitForFunction(()=>window.ftAudioLog.some(r=>r.stage===0&&r.ok));
  await shot('04-working-rhythm');
  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});
