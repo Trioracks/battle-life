@@ -2,16 +2,16 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {ApartmentAnimation} from './apartment-v3-animation.js?rev=8';
 import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=10';
-import {homeLight} from './apartment-v3-time.js?rev=20';
+import {homeLight} from './apartment-v3-time.js?rev=21';
 import {createBackdropMaterial,sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=8';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=7';
-import {CameraModes,cameraPose,pickVisible} from './apartment-v3-camera.js?rev=20';
-import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=20';
-import {createSmoke} from './apartment-v3-smoke.js?rev=20';
+import {CameraModes,cameraPose,pickVisible} from './apartment-v3-camera.js?rev=21';
+import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=21';
+import {createSmoke} from './apartment-v3-smoke.js?rev=21';
 import {createRetroPass} from './apartment-v3-retro.js?rev=11';
-import {createComputerView} from './apartment-v3-computer.js?rev=20';
-import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=20';
-import {pcPresentation} from './virtual-pc-presentation.js?rev=20';
+import {createComputerView} from './apartment-v3-computer.js?rev=21';
+import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=21';
+import {pcPresentation} from './virtual-pc-presentation.js?rev=21';
 
 export async function createApartmentScene(canvas,config){
   const BASE=config.assetBase??'./assets/apartment/v3/';
@@ -30,14 +30,14 @@ export async function createApartmentScene(canvas,config){
   const loader=new GLTFLoader();
   const textureLoader=new THREE.TextureLoader(),textureCache=new Map();
   function loadTexture(file){
-    if(!textureCache.has(file))textureCache.set(file,textureLoader.loadAsync(BASE+file+'?rev=20').then(texture=>{
+    if(!textureCache.has(file))textureCache.set(file,textureLoader.loadAsync(BASE+file+'?rev=21').then(texture=>{
       texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=renderer.capabilities.getMaxAnisotropy();return texture;
     }).catch(error=>{textureCache.delete(file);throw error;}));return textureCache.get(file);
   }
   const stateFiles=config.lightingStates??{both:{night:config.background,day:config.backgroundDay}};
   const [stateEntries,environment,model]=await Promise.all([
     Promise.all(Object.entries(stateFiles).map(async([name,files])=>[name,{night:await loadTexture(files.night),day:await loadTexture(files.day)}])),
-    loader.loadAsync(BASE+config.geometry+'?rev=20'),loader.loadAsync(BASE+config.rig+'?rev=20')
+    loader.loadAsync(BASE+config.geometry+'?rev=21'),loader.loadAsync(BASE+config.rig+'?rev=21')
   ]);
   const lightingStates=Object.fromEntries(stateEntries);
   backdropSets.set('2D',lightingStates);
@@ -48,7 +48,7 @@ export async function createApartmentScene(canvas,config){
   const courtyard=new THREE.Group(),outsideMask=new THREE.Group();scene.add(courtyard,outsideMask);
   let updateCourtyard=()=>{},smokeSeconds=0;
   if(config.exterior){
-    const [outside,mask]=await Promise.all([loader.loadAsync(BASE+config.exterior.geometry+'?rev=20'),loader.loadAsync(BASE+config.exterior.occluders+'?rev=20')]);
+    const [outside,mask]=await Promise.all([loader.loadAsync(BASE+config.exterior.geometry+'?rev=21'),loader.loadAsync(BASE+config.exterior.occluders+'?rev=21')]);
     courtyard.add(outside.scene);outsideMask.add(mask.scene);updateCourtyard=createCourtyardLighting(THREE,courtyard);
     outsideMask.traverse(o=>{if(o.isMesh){o.material=depthMaterial;o.renderOrder=-60;}});
   }
@@ -79,7 +79,7 @@ export async function createApartmentScene(canvas,config){
   async function loadMode(mode){
     if(mode==='3D'){
       if(staticScene)return;
-      staticPending??=loader.loadAsync(BASE+config.staticGeometry+'?rev=20').then(result=>{
+      staticPending??=loader.loadAsync(BASE+config.staticGeometry+'?rev=21').then(result=>{
         if(disposed){result.scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat().filter(Boolean))m.dispose();});return;}
         staticScene=result.scene;staticScene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});updateOutside=createOutsideLighting(staticScene);staticScene.visible=false;scene.add(staticScene);
       }).finally(()=>{staticPending=null;});return staticPending;

@@ -7,7 +7,7 @@ const seed=()=>createVirtualPcState({power:'on',download:{status:'installed'}});
 const make=(state=seed(),skill=10,assetId=null)=>createBeat(state,{id:'beat-1',name:'Ночной двор',genre:'boombap',assetId},{beatmaking:skill},()=>.4).state;
 test('catalog preserves fifteen original paths and 90 BPM; free unlock is 40',()=>{
  assert.equal(DRUMS.length,15);assert.ok(DRUMS.every(d=>d.bpm===90));
- assert.equal(make(seed(),39).projects[0].drumId,'primitive');
+ assert.match(make(seed(),39).projects[0].drumId,/^beginner-drums-/);
  assert.match(make(seed(),40).projects[0].drumId,/^free-/);
  assert.equal(make().projects[0].bpm,90);
 });

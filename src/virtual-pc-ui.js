@@ -1,25 +1,25 @@
 import { FtStudioAudio } from './ft-studio-audio.js?rev=4';
-import {mountPcShell} from './virtual-pc-shell.js?rev=20';
-import {mountExplorer} from './virtual-pc-explorer-view.js?rev=20';
-import {mountPcMenu} from './virtual-pc-menus.js?rev=20';
-import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=20';
-import {explorerProperties} from './virtual-pc-explorer.js?rev=20';
-import {createWindowState,reduceWindows} from './virtual-pc-window-state.js?rev=20';
-import {layoutDesktopIcons,setDesktopIconPosition,resetDesktopIconPositions} from './virtual-pc-state.js?rev=20';
-import {createPcIcon} from './virtual-pc-icons.js?rev=20';
+import {mountPcShell} from './virtual-pc-shell.js?rev=21';
+import {mountExplorer} from './virtual-pc-explorer-view.js?rev=21';
+import {mountPcMenu} from './virtual-pc-menus.js?rev=21';
+import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=21';
+import {explorerProperties} from './virtual-pc-explorer.js?rev=21';
+import {createWindowState,reduceWindows} from './virtual-pc-window-state.js?rev=21';
+import {layoutDesktopIcons,setDesktopIconPosition,resetDesktopIconPositions} from './virtual-pc-state.js?rev=21';
+import {createPcIcon} from './virtual-pc-icons.js?rev=21';
 import { normalizeStudioProject } from './ft-studio-project.js';
-import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js?rev=20';
-import { cancelFtDownload, createVirtualPcState, diskUsage, FT_STUDIO_MB, PROJECT_MB, installFtStudio, saveStudioProject, setWallpaper, startFtDownload } from './virtual-pc-state.js?rev=20';
-import { downloadPresentation } from './virtual-pc-runtime.js?rev=20';
-import {diskAmount} from './virtual-pc-disk-view.js?rev=20';
-import {pcPresentation} from './virtual-pc-presentation.js?rev=20';
-import {createStudioWorkspace} from './ft-studio-view.js?rev=20';
-import {mountUnderweb} from './underweb-view.js?rev=20';
-import {applyToBattle} from './virtual-pc-state.js?rev=20';
-import {mountBeatStudio} from './beat-studio-view.js';
-import {BeatAudio} from './beat-audio.js';
-import {normalizeBeat} from './beat-production.js';
-import {createBeatMarket} from './beat-market-view.js';
+import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js?rev=21';
+import { cancelFtDownload, createVirtualPcState, diskUsage, FT_STUDIO_MB, PROJECT_MB, installFtStudio, saveStudioProject, setWallpaper, startFtDownload } from './virtual-pc-state.js?rev=21';
+import { downloadPresentation } from './virtual-pc-runtime.js?rev=21';
+import {diskAmount} from './virtual-pc-disk-view.js?rev=21';
+import {pcPresentation} from './virtual-pc-presentation.js?rev=21';
+import {createStudioWorkspace} from './ft-studio-view.js?rev=21';
+import {mountUnderweb} from './underweb-view.js?rev=21';
+import {applyToBattle} from './virtual-pc-state.js?rev=21';
+import {mountBeatStudio} from './beat-studio-view.js?rev=21';
+import {BeatAudio} from './beat-audio.js?rev=21';
+import {normalizeBeat} from './beat-production.js?rev=21';
+import {createBeatMarket} from './beat-market-view.js?rev=21';
 
 const NOOP = () => {};
 
@@ -96,6 +96,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     audio: callbacks.audio ?? new FtStudioAudio(),
     beatAudio: callbacks.beatAudio ?? new BeatAudio(),
     studioView:null,
+    pendingStudioProject:null,
     state: createVirtualPcState(),
     phase: 'off',
     windows: createWindowState({width:globalThis.innerWidth??1280,height:globalThis.innerHeight??720}),
@@ -242,7 +243,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.underwebView.update();return;
     }
     if(appId==='ft-studio'){
-      if(!pc.studioView)pc.studioView=mountBeatStudio(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onChange:next=>pc.persist(next),onWork:()=>callbacks.onWork?.()??false,audio:pc.beatAudio,legacyName:pc.project?.version===1?pc.project.name:undefined});
+      if(!pc.studioView){const initialProject=pc.pendingStudioProject;pc.pendingStudioProject=null;pc.studioView=mountBeatStudio(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onChange:next=>pc.persist(next),onWork:()=>callbacks.onWork?.()??false,audio:pc.beatAudio,initialProject});}
       pc.studioView.update();return;
     }
     if(appId==='computer'){
@@ -347,8 +348,9 @@ export function mountVirtualPc(root, callbacks = {}) {
     if(pc.state.download.status!=='installed'){pc.open('torent');return;}
     pc.project=normalized;pc.dirty=false;pc.confirmClose=false;
     if(pc.state.music.activeBeatId!==(beat?.id??null))pc.persist({...pc.state,music:{...pc.state.music,activeBeatId:beat?.id??null}});
+    if(!pc.studioView)pc.pendingStudioProject=normalized;
     pc.callbacks.onOpenProject(normalized);pc.open('ft-studio');pc.refreshApp('ft-studio',{replaceContent:true});
-    pc.studioView?.openProject(normalized);
+    if(pc.studioView){pc.pendingStudioProject=null;pc.studioView.openProject(normalized);}
   };
 
 
@@ -390,6 +392,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.renderDesktop(false);
     if(documents)pc.explorer?.navigate('documents');
     pc.shell.focusActive();
+    if(appId==='ft-studio')pc.studioView?.focus();
   };
   pc.open = appId => {
     if(pc.locked||!desktopApps(pc.state).some(app=>app.id===appId)||pc.confirmClose||pc.shutdownModal)return;
@@ -410,7 +413,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     if(busy){launchFeedback=el(document,'div',{className:'pc-launch-feedback',text:'Запуск FT Studio…',attributes:{role:'status'}});root.append(launchFeedback);}
     else{launchFeedback?.remove();launchFeedback=null;}
   };
-  pc.cancelStudioLaunch=()=>{pc.launchGeneration++;if(pc.studioLaunch!==null)pc.clearTimeoutFn(pc.studioLaunch);pc.studioLaunch=null;pc.setStudioBusy(false);};
+  pc.cancelStudioLaunch=()=>{pc.launchGeneration++;if(pc.studioLaunch!==null)pc.clearTimeoutFn(pc.studioLaunch);pc.studioLaunch=null;pc.pendingStudioProject=null;pc.setStudioBusy(false);};
   pc.closeNow = id => {
     if(id==='underweb'){pc.underwebView?.dispose();pc.underwebView=null;}
     pc.systemViews.get(id)?.dispose();pc.systemViews.delete(id);

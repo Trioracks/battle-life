@@ -71,7 +71,11 @@ test('long Cyrillic searches survive encoded URLs and browser history without co
 
 test('keyboard Tab reaches and wraps from the scrollable FT playlist',()=>{
  const s=setup();s.pc.open('ft-studio');s.finish();
+ findButton(s.root,'Вернуться в студию').click();
  findButton(s.root,'Закрыть окно').focus();fire(s.root,'keydown',{key:'Tab'});
+ assert.equal(s.d.activeElement,findButton(s.root,'Библиотека'));
+ fire(s.root,'keydown',{key:'Tab'});assert.equal(s.d.activeElement,findButton(s.root,'Ритм-панель'));
+ fire(s.root,'keydown',{key:'Tab'});
  assert.equal(s.d.activeElement.getAttribute('aria-label'),'Прокрутка дорожек');
  fire(s.root,'keydown',{key:'Tab'});assert.equal(s.d.activeElement,findButton(s.root,'Новый бит'));
 });

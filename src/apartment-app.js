@@ -1,26 +1,28 @@
 import {ApartmentMotion} from './apartment-v3-motion.js?rev=8';
 import {ApartmentTime,loadHomeTime,saveHomeTime} from './apartment-v3-time.js?rev=12';
 import {districts,getDistrictLocations} from './calikfornia.js';
-import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=20';
+import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=21';
 import {playSoundCue} from './sound-cues.js';
 import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=12';
 import {DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,loadProfile} from './avatar-v3-profile.js?rev=10';
 import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=12';
-import {createNewGameSession} from './apartment-v3-new-game.js?rev=20';
-import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=20';
-import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=20';
-import {mountVirtualPc} from './virtual-pc-ui.js?rev=20';
-import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=20';
-import {PcSounds} from './virtual-pc-sounds.js?rev=20';
-import {playIndoorFootstep} from './indoor-footsteps.js?rev=20';
-import {advanceBeatWork,restoreMusicNeeds,workBlockReason} from './beat-production.js';
-import {BEAT_RULES,BEAT_STAGES} from './beat-catalog.js';
+import {createNewGameSession} from './apartment-v3-new-game.js?rev=21';
+import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=21';
+import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=21';
+import {mountVirtualPc} from './virtual-pc-ui.js?rev=21';
+import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=21';
+import {PcSounds} from './virtual-pc-sounds.js?rev=21';
+import {playIndoorFootstep} from './indoor-footsteps.js?rev=21';
+import {advanceBeatWork,restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=21';
+import {BEAT_RULES} from './beat-catalog.js';
+import {createBeatWorkPanel} from './beat-work-view.js?rev=21';
+import {createBeatWorkAudio} from './beat-work-audio.js?rev=21';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false,stepVariation=0;
 const cue=id=>{try{audio??=new AudioContext();if(audio.state==='suspended')audio.resume().catch(()=>{});if(id==='footstep')playIndoorFootstep(audio,stepVariation++);else playSoundCue(id,audio);}catch{/* Sound is optional. */}};
 try{
-  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=20');
+  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=21');
   const response=await fetch('./assets/apartment/v3/scene.json',{cache:'no-cache'});if(!response.ok)throw Error('Scene manifest '+response.status);
   const config=prepareApartmentConfig(await response.json()),view=await createApartmentScene(canvas,config);
   let motion=new ApartmentMotion(config),mode='menu',playing=false,previewYaw=0,previewTarget=0;
@@ -45,7 +47,7 @@ try{
   let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lightPreview='game';
   const pcRoot=$('#virtual-pc'),savedPc=loadVirtualPcState(storage);let pcState=savedPc.state;
   let pcStorageWarning=savedPc.ok?'':'Сохранение виртуального ПК недоступно.';
-  let virtualPc;
+  let virtualPc,workReward=0,lastWorkJob=null,lastWorkBeat=null;
   function persistPc(next){
     pcState=createVirtualPcState(next);
     const saved=saveVirtualPcState(storage,pcState);
@@ -54,7 +56,7 @@ try{
     return saved;
   }
   const pcSounds=new PcSounds();let pcPrepareError=false;
-  fetch('./assets/audio/pc/manifest.json?rev=20').then(r=>r.ok?r.json():{}).then(clips=>{pcSounds.clips=clips;}).catch(()=>{});
+  fetch('./assets/audio/pc/manifest.json?rev=21').then(r=>r.ok?r.json():{}).then(clips=>{pcSounds.clips=clips;}).catch(()=>{});
   function returnFromComputer(){
     pcRoot.hidden=true;
     if(pcState.power==='off')virtualPc.completeShutdown();
@@ -66,15 +68,17 @@ try{
     onPersist:next=>persistPc(next),
     onLeave:()=>pcLifecycle.leave(),
     onShutdown:()=>pcLifecycle.shutdown(),
-    onWork:()=>{if(!preparePcWorkPose(motion))return false;const started=pcLifecycle.work();if(started){resumeAnimation();saveHomeTime(storage,homeTime);persistPc(pcState);}return started;},
+    onWork:()=>{if(!preparePcWorkPose(motion))return false;const started=pcLifecycle.work();if(started){workReward=0;lastWorkJob=null;lastWorkBeat=null;resumeAnimation();saveHomeTime(storage,homeTime);persistPc(pcState);}return started;},
     onSaveProject:(state,project)=>saveStudioProject(state,project),
   });
   virtualPc.setPersistenceWarning(pcStorageWarning);
-  const workHud=document.createElement('section');workHud.className='beat-work-hud';workHud.hidden=true;
-  const workLabel=document.createElement('span'),workProgress=document.createElement('progress'),workCancel=document.createElement('button');
-  workProgress.max=1;workProgress.setAttribute('aria-label','Работа над битом');workCancel.textContent='Прервать работу';workCancel.type='button';
-  workCancel.addEventListener('click',()=>{if(pcLifecycle.finishWork({blocked:true})){saveHomeTime(storage,homeTime);persistPc(pcState);}});
-  workHud.append(workLabel,workProgress,workCancel);document.body.append(workHud);let lastWorkSave=0;
+  const workAudio=createBeatWorkAudio(virtualPc.beatAudio);
+  const syncWorkAudio=(hidden=document.hidden)=>workAudio.sync({phase:pcLifecycle.snapshot.phase,hidden,beat:pcState.projects.find(p=>p.id===pcState.music.job?.beatId),job:pcState.music.job});
+  const workPanel=createBeatWorkPanel(document,{
+    onCancel:()=>{if(pcLifecycle.finishWork({blocked:true})){syncWorkAudio();saveHomeTime(storage,homeTime);persistPc(pcState);}},
+    onEnableAudio:()=>workAudio.enableAudio(),
+  });
+  const workHud=workPanel.element;workHud.hidden=true;document.body.append(workHud);let lastWorkSave=0;
   function openComputer(){
     virtualPc.showDesktop(pcState);virtualPc.presentTransition(pcLifecycle.snapshot);
     setMode('pc');pcRoot.hidden=false;
@@ -222,11 +226,14 @@ try{
     if(mode==='peephole'){view.renderPeephole($('#peek-stage').getBoundingClientRect());return;}
     if(mode==='menu'||mode==='destinations'||mode==='door'){view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));view.render(motion,0,{paused:true});return;}
     let events=[];
+    syncWorkAudio();
     if((!paused||step)&&!document.hidden){
       if(mode==='pc'&&pcLifecycle.snapshot.phase.startsWith('work')){
         if(pcLifecycle.snapshot.phase==='working'&&pcState.music.job){
+          lastWorkJob={...pcState.music.job};lastWorkBeat=pcState.projects.find(p=>p.id===lastWorkJob.beatId);
           const r=advanceBeatWork(pcState,dt*pcState.music.job.total/BEAT_RULES.workSeconds);pcState=r.state;homeTime.advanceMinutes(r.minutes);pcState=advanceVirtualPc(pcState,homeTime).state;virtualPc.syncState(pcState);
-          if(r.finished||r.blocked){pcLifecycle.finishWork({blocked:r.blocked});if(r.blocked){message=workBlockReason(pcState);messageUntil=now+10000;}}
+          if(r.finished){workReward=1;lastWorkJob.elapsed=lastWorkJob.total;}
+          if(r.finished||r.blocked){pcLifecycle.finishWork({blocked:r.blocked});syncWorkAudio();if(r.blocked){message=r.reason||workBlockReason(pcState);messageUntil=now+10000;}}
           if(r.finished||r.blocked||now-lastWorkSave>1000){saveHomeTime(storage,homeTime);persistPc(pcState);lastWorkSave=now;}
         }
       }else if(mode==='pc'){
@@ -254,8 +261,9 @@ try{
     }
     pcLifecycle.tick(dt,{paused:paused&&!step,hidden:document.hidden});pcLifecycle.restore(motion.phase);
     $('#camera-fade').style.opacity=pcLifecycle.snapshot.blackout??0;
-    workHud.hidden=pcLifecycle.snapshot.phase!=='working';
-    if(!workHud.hidden&&pcState.music.job){const job=pcState.music.job;workLabel.textContent=`${BEAT_STAGES[job.stage].name} · ${Math.floor(job.elapsed)} / ${job.total} мин · ${homeTime.label} · сытость ${Math.round(pcState.music.needs.satiety)} · энергия ${Math.round(pcState.music.needs.energy)}`;workProgress.value=job.elapsed/job.total;}
+    const workSound=syncWorkAudio(),workPhase=pcLifecycle.snapshot.phase;
+    workHud.hidden=workPhase!=='working'&&!(workReward&&['work-cover','work-in'].includes(workPhase));
+    if(!workHud.hidden)workPanel.update({beat:lastWorkBeat??pcState.projects.find(p=>p.id===pcState.music.job?.beatId),job:pcState.music.job??lastWorkJob,needs:pcState.music.needs,skill:effectiveBeatSkill(pcState,profile?.skills),clockLabel:homeTime.label,reward:workReward,...workSound});
     virtualPc.presentTransition(pcLifecycle.snapshot);
     view.setComputerPresentation(pcLifecycle.snapshot,pcState,profile?.name??'Игрок');
     if(motion.clip==='walk'&&motion.walkDistance-lastStep>config.stride/2){cue('footstep');lastStep=motion.walkDistance;}
@@ -285,7 +293,7 @@ try{
   }
   loading.hidden=true;setMode('menu');view.render(motion,0);
   function frame(now){const raw=(now-last)/1000,dt=Math.min(raw,.25);if(raw>0)frameRate=frameRate*.9+Math.min(240,1/raw)*.1;last=now;update(dt,now);requestAnimationFrame(frame);}requestAnimationFrame(frame);
-  document.addEventListener('visibilitychange',()=>{last=performance.now();if(document.hidden){virtualPc.beatAudio.stop();saveHomeTime(storage,homeTime);persistPc(pcState);}});
-  window.addEventListener('pagehide',event=>{saveHomeTime(storage,homeTime);persistPc(pcState);virtualPc.beatAudio.stop();if(event.persisted){pcSounds.stop();return;}pcLifecycle.reset();pcSounds.dispose();virtualPc.dispose();view.dispose();});
+  document.addEventListener('visibilitychange',()=>{last=performance.now();if(document.hidden){syncWorkAudio(true);virtualPc.beatAudio.stop();saveHomeTime(storage,homeTime);persistPc(pcState);}});
+  window.addEventListener('pagehide',event=>{saveHomeTime(storage,homeTime);persistPc(pcState);syncWorkAudio(true);virtualPc.beatAudio.stop();if(event.persisted){pcSounds.stop();return;}workAudio.dispose();workPanel.dispose();pcLifecycle.reset();pcSounds.dispose();virtualPc.dispose();view.dispose();});
   window.addEventListener('pageshow',event=>{if(event.persisted)last=performance.now();});
 }catch(error){console.error(error);loading.querySelector('h2').textContent='Не удалось загрузить сцену';loading.querySelector('p').textContent=error.message;loading.classList.add('error');}
