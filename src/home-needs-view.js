@@ -22,8 +22,10 @@ export function mountHomeNeedsView(root,{onConsume=()=>{},onClose=()=>{},returnF
  }
  root.addEventListener('keydown',keydown);
  function update(state,message=''){
+  const focused=doc.activeElement;
   const fridge=normalizeHousehold(state.household).fridge; satiety.textContent='Сытость: '+Math.round(state.music.needs.satiety)+' / 100';warning.textContent=message;
   for(const {item,count,eat}of rows){count.textContent='Осталось: '+fridge[item.id];eat.disabled=!item.edibleRaw||fridge[item.id]<1||state.music.needs.satiety>=100;}
+  if(!root.hidden&&rows.some(({eat})=>eat===focused&&eat.disabled))(rows.find(({eat})=>!eat.disabled)?.eat??closeButton).focus();
  }
  return {get isOpen(){return !root.hidden;},open(state,message=''){update(state,message);root.hidden=false;(rows.find(r=>!r.eat.disabled)?.eat??closeButton).focus();},close,update,dispose(){root.removeEventListener('keydown',keydown);root.replaceChildren();root.hidden=true;}};
 }
