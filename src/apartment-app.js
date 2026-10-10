@@ -1,28 +1,28 @@
 import {ApartmentMotion} from './apartment-v3-motion.js?rev=8';
 import {ApartmentTime,loadHomeTime,saveHomeTime} from './apartment-v3-time.js?rev=12';
 import {districts,getDistrictLocations} from './calikfornia.js';
-import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=20';
+import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=21';
 import {playSoundCue} from './sound-cues.js';
 import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=12';
 import {DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,loadProfile} from './avatar-v3-profile.js?rev=10';
 import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=12';
-import {createNewGameSession} from './apartment-v3-new-game.js?rev=20';
-import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=20';
-import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=20';
-import {mountVirtualPc} from './virtual-pc-ui.js?rev=20';
-import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=20';
-import {PcSounds} from './virtual-pc-sounds.js?rev=20';
-import {playIndoorFootstep} from './indoor-footsteps.js?rev=20';
-import {advanceBeatWork,restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js';
+import {createNewGameSession} from './apartment-v3-new-game.js?rev=21';
+import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=21';
+import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=21';
+import {mountVirtualPc} from './virtual-pc-ui.js?rev=21';
+import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=21';
+import {PcSounds} from './virtual-pc-sounds.js?rev=21';
+import {playIndoorFootstep} from './indoor-footsteps.js?rev=21';
+import {advanceBeatWork,restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=21';
 import {BEAT_RULES} from './beat-catalog.js';
-import {createBeatWorkPanel} from './beat-work-view.js';
-import {createBeatWorkAudio} from './beat-work-audio.js';
+import {createBeatWorkPanel} from './beat-work-view.js?rev=21';
+import {createBeatWorkAudio} from './beat-work-audio.js?rev=21';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false,stepVariation=0;
 const cue=id=>{try{audio??=new AudioContext();if(audio.state==='suspended')audio.resume().catch(()=>{});if(id==='footstep')playIndoorFootstep(audio,stepVariation++);else playSoundCue(id,audio);}catch{/* Sound is optional. */}};
 try{
-  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=20');
+  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=21');
   const response=await fetch('./assets/apartment/v3/scene.json',{cache:'no-cache'});if(!response.ok)throw Error('Scene manifest '+response.status);
   const config=prepareApartmentConfig(await response.json()),view=await createApartmentScene(canvas,config);
   let motion=new ApartmentMotion(config),mode='menu',playing=false,previewYaw=0,previewTarget=0;
@@ -56,7 +56,7 @@ try{
     return saved;
   }
   const pcSounds=new PcSounds();let pcPrepareError=false;
-  fetch('./assets/audio/pc/manifest.json?rev=20').then(r=>r.ok?r.json():{}).then(clips=>{pcSounds.clips=clips;}).catch(()=>{});
+  fetch('./assets/audio/pc/manifest.json?rev=21').then(r=>r.ok?r.json():{}).then(clips=>{pcSounds.clips=clips;}).catch(()=>{});
   function returnFromComputer(){
     pcRoot.hidden=true;
     if(pcState.power==='off')virtualPc.completeShutdown();

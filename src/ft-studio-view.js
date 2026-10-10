@@ -1,4 +1,4 @@
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=20';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=21';
 
 export const FT_TRACKS=Object.freeze([
  ...['Drum Kit','Bass','Percussion'].map(name=>({name,stage:0,color:'rhythm'})),

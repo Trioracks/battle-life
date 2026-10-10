@@ -1,8 +1,8 @@
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=20';
-import {createPcIcon} from './virtual-pc-icons.js?rev=20';
-import {WALLPAPERS} from './virtual-pc-catalog.js?rev=20';
-import {setWallpaper,diskUsage} from './virtual-pc-state.js?rev=20';
-import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=20';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=21';
+import {createPcIcon} from './virtual-pc-icons.js?rev=21';
+import {WALLPAPERS} from './virtual-pc-catalog.js?rev=21';
+import {setWallpaper,diskUsage} from './virtual-pc-state.js?rev=21';
+import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=21';
 export function mountSystemWindow(root,{kind,getState,onPersist,onOpen,onClose,onConfirmShutdown,properties}) {
   const d=root.ownerDocument,wrap=el(d,'div',{className:'pc-system-content pc-dialog'});
   const status=el(d,'p',{className:'pc-system-status',dataset:{pcRole:'system-status'},attributes:{'aria-live':'polite'}});

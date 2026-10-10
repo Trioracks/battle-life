@@ -1,6 +1,6 @@
 import {drumById,loopSeconds} from './beat-catalog.js';
-import {beginnerById} from './beat-beginner-bank.js';
-import {resolveBeatPlayback} from './beat-playback.js';
+import {beginnerById} from './beat-beginner-bank.js?rev=21';
+import {resolveBeatPlayback} from './beat-playback.js?rev=21';
 
 // Authored placeholder PCM, not a remix of third-party music. Sliders never enter here.
 export function primitiveSamples(kind,rate=44100){
