@@ -2,7 +2,7 @@ import {createProfile,saveProfile,DEFAULT_APPEARANCE} from './avatar-v3-profile.
 
 export function validateCreatorDraft(draft){
  try{return {ok:true,profile:createProfile(draft),errors:{}};}
- catch(error){const name=typeof draft?.name==='string'&&draft.name.trim();return {ok:false,errors:{[name?'allocations':'name']:error.message}};}
+ catch(error){return {ok:false,errors:{name:error.message}};}
 }
 
 export function createCreatorSession(savedProfile,storage,{enter,restore}){

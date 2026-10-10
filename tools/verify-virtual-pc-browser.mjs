@@ -39,7 +39,7 @@ async function projects(){
 }
 try{
   await page.goto(url,{waitUntil:'networkidle'});await page.locator('#new-game').click();await page.locator('#character-name').fill('Проверка ПК');
-  await page.locator('#stats-tab').click();await page.locator('#distribute').click();await page.locator('#start-game').click();await page.locator('#wake').click();
+  await page.locator('#clothing-tab').click();await page.locator('#start-game').click();await page.locator('#wake').click();
   await page.waitForFunction(()=>document.querySelector('#state').textContent.startsWith('idle'));
   await page.screenshot({path:resolve(output,'room-off.png')});
   await page.locator('#actions [data-action="computer"]').click();

@@ -1,10 +1,10 @@
 import {ApartmentMotion} from './apartment-v3-motion.js?rev=8';
-import {ApartmentTime,loadHomeTime,saveHomeTime} from './apartment-v3-time.js?rev=22';
+import {ApartmentTime,loadHomeTime,saveHomeTime as saveHomeTimeRaw} from './apartment-v3-time.js?rev=22';
 import {districts,getDistrictLocations} from './calikfornia.js';
 import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=21';
 import {playSoundCue} from './sound-cues.js';
 import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=12';
-import {DEFAULT_APPEARANCE,STAT_KEYS,STAT_LABELS,loadProfile} from './avatar-v3-profile.js?rev=10';
+import {DEFAULT_APPEARANCE,loadProfile,saveProfile} from './avatar-v3-profile.js?rev=10';
 import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=12';
 import {createNewGameSession} from './apartment-v3-new-game.js?rev=22';
 import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=21';
@@ -20,6 +20,8 @@ import {createBeatWorkAudio} from './beat-work-audio.js?rev=21';
 import {consumeFood} from './home-food.js';
 import {createCharacterSpeech,workNeedSpeech} from './character-speech.js';
 import {mountHomeNeedsView,mountCharacterSpeech} from './home-needs-view.js';
+import {migrateNoviceSave} from './home-profile-migration.js';
+import {mountHomeWardrobeView} from './home-wardrobe-view.js';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false,stepVariation=0;
@@ -46,10 +48,12 @@ try{
   function stopLook(){lookInput.stop();}
   canvas.addEventListener('pointerup',stopLook);canvas.addEventListener('pointercancel',stopLook);canvas.addEventListener('lostpointercapture',stopLook);
   let storage;try{storage=window.localStorage;}catch{/* Browsers can deny local storage. */}
+  const migration=migrateNoviceSave(storage);let migrationReady=migration.ok;
+  function saveHomeTime(_storage,clock){return migrationReady&&saveHomeTimeRaw(storage,clock);}
   const saved=loadProfile(storage);let profile=saved.profile;
   let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lightPreview='game';
   const pcRoot=$('#virtual-pc'),savedPc=loadVirtualPcState(storage);let pcState=savedPc.state;
-  let pcStorageWarning=savedPc.ok?'':'Сохранение виртуального ПК недоступно.';
+  let pcStorageWarning=migration.ok?(savedPc.ok?'':'Сохранение виртуального ПК недоступно.'):migration.error;
   let virtualPc,workReward=0,lastWorkJob=null,lastWorkBeat=null;
   const fridgeRoot=document.createElement('section'),speechRoot=document.createElement('div');document.body.append(fridgeRoot,speechRoot);canvas.tabIndex=0;
   const speech=createCharacterSpeech({beep:()=>{if(audio?.state==='running'&&!document.hidden)playSoundCue('speech',audio);}}),speechView=mountCharacterSpeech(speechRoot);
@@ -57,10 +61,17 @@ try{
     returnFocus:canvas,onClose:()=>{if(motion.actionId==='fridge'&&motion.phase==='perform')motion.leaveAction();last=performance.now();},
     onConsume:id=>{const result=consumeFood(pcState,id);if(result.ok){persistPc(result.state);virtualPc.syncState(pcState);}fridgeView.update(pcState,pcStorageWarning);},
   });
+  const wardrobeRoot=document.createElement('section');document.body.append(wardrobeRoot);
+  const wardrobeView=mountHomeWardrobeView(wardrobeRoot,{
+    returnFocus:canvas,onPreview:look=>view.setAppearance(look),
+    onApply:next=>{if(!migrationReady)return {ok:false,error:migration.error||'Автосохранение отключено до восстановления.'};const saved=saveProfile(storage,next);if(saved.ok)profile=saved.profile;return saved;},
+    onClose:()=>{if(motion.actionId==='wardrobe'&&motion.phase==='perform')motion.leaveAction();last=performance.now();},
+  });
+  const homeModalOpen=()=>fridgeView.isOpen||wardrobeView.isOpen;
   function persistPc(next){
     pcState=createVirtualPcState(next);
-    const saved=saveVirtualPcState(storage,pcState);
-    pcStorageWarning=saved?'':'Сохранение виртуального ПК недоступно.';
+    const saved=migrationReady&&saveVirtualPcState(storage,pcState);
+    pcStorageWarning=saved?'':migrationReady?'Сохранение виртуального ПК недоступно.':migration.error||'Автосохранение отключено до восстановления.';
     virtualPc?.setPersistenceWarning(pcStorageWarning);
     if(fridgeView.isOpen)fridgeView.update(pcState,pcStorageWarning);
     return saved;
@@ -97,14 +108,14 @@ try{
   }
   pcRoot.addEventListener('click',event=>{const target=event.target.closest?.('button,[role="menuitem"]');if(target&&!target.disabled&&target.getAttribute('aria-disabled')!=='true'&&!pcLifecycle.snapshot.locked)void pcSounds.play('click');});
   if(profile)view.setAppearance(profile.appearance);
-  let appearance={...DEFAULT_APPEARANCE},allocations=Object.fromEntries(STAT_KEYS.map(k=>[k,0]));
-  const names={dining:'Ест за столом',computer:'За компьютером',bed:'Сон',sink:'Моет посуду',stove:'Готовит еду',fridge:'Берёт еду',entry:'Открывает дверь','light-living':'Нажимает выключатель в комнате','light-kitchen':'Нажимает выключатель на кухне'};
+  let appearance={...DEFAULT_APPEARANCE};
+  const names={wardrobe:'Выбирает одежду',dining:'Ест за столом',computer:'За компьютером',bed:'Сон',sink:'Моет посуду',stove:'Готовит еду',fridge:'Берёт еду',entry:'Открывает дверь','light-living':'Нажимает выключатель в комнате','light-kitchen':'Нажимает выключатель на кухне'};
   const sounds={dining:'dishes',computer:'chair-scrape',bed:'sleep',sink:'dishes',stove:'cook',fridge:'fridge',entry:'door'};
   const completed={dining:'Поел.',computer:'Работа за компьютером закончена.',bed:'Отдохнул. Можно идти дальше.',sink:'Посуда вымыта.',stove:'Еда приготовлена.',fridge:'Взял еду из холодильника.'};
   let message='',messageUntil=0,last=performance.now(),lastStep=0,lastDoor=false,frameRate=60;
   function setMode(next){
     lookInput.stop();
-    if(next!=='game')fridgeView.close();
+    if(next!=='game'){fridgeView.close();wardrobeView.close();}
     mode=next;document.body.dataset.mode=next;
     $('#main-menu').hidden=next!=='menu';$('#creator').hidden=next!=='creator';
     $('#destinations').hidden=next!=='destinations';
@@ -113,7 +124,7 @@ try{
     $('#game-header').hidden=next!=='game';$('#controls').hidden=next!=='game';
     $('#inspector').hidden=true;$('#rig-toggle').setAttribute('aria-expanded','false');$('#hover-label').textContent='';
     $('#fade').style.opacity=next==='destinations'?1:0;$('#continue-game').hidden=!profile&&!playing;
-    $('#save-note').textContent=playing?'Текущая игра на паузе.':profile?`Сохранён персонаж: ${profile.name}`:saved.ok?'Внешность и навыки сохраняются на этом устройстве.':'Сохранение недоступно. Можно играть без него.';
+    $('#save-note').textContent=!migrationReady?pcStorageWarning:playing?'Текущая игра на паузе.':profile?`Сохранён персонаж: ${profile.name}`:saved.ok?'Внешность и навыки сохраняются на этом устройстве.':'Сохранение недоступно. Можно играть без него.';
     if(next!=='creator'&&next!=='peephole'){view.setRoomLights(homeTime.lights);view.render(motion,0,{paused:true,instant:true});}
     last=performance.now();
   }
@@ -127,60 +138,39 @@ try{
     $('#player-name').textContent=profile.name;resumeAnimation();setMode('game');cue('sleep');
   }
   function selectCreatorSection(section){
-    creator.selectSection(section);const stats=section==='stats';
-    $('#appearance-panel').hidden=stats;$('#stats-panel').hidden=!stats;$('#next-step').hidden=stats;$('#start-game').hidden=!stats;
-    for(const name of ['appearance','clothing','stats'])$('#'+name+'-tab').setAttribute('aria-pressed',String(name===section));
-    $('#next-step').textContent=section==='appearance'?'Одежда →':'Характеристики →';
-    $('#creator-footer-note').textContent=stats?'Распредели 10 очков. Твоя история начнётся дома.':section==='clothing'?'Ткань, силуэт, цвет. Всё выбранное сохранится.':'Лицо, волосы и характер. Начни с главного.';
+    creator.selectSection(section);const clothing=section==='clothing';
+    $('#next-step').hidden=clothing;$('#start-game').hidden=!clothing;
+    for(const name of ['appearance','clothing'])$('#'+name+'-tab').setAttribute('aria-pressed',String(name===section));
+    $('#creator-footer-note').textContent=clothing?'Ткань, силуэт, цвет. Всё выбранное станет твоим.':'Лицо, волосы и характер. Все навыки начнут с 10.';
   }
   function updateStats(){
-    const remaining=10-Object.values(allocations).reduce((a,b)=>a+b,0);
-    $('#points-left').textContent=remaining;$('#points-badge').textContent=remaining;
-    for(const key of STAT_KEYS){
-      $(`#stat-${key}`).textContent=10+allocations[key]*10;
-      $(`[data-stat-summary="${key}"]`).textContent=10+allocations[key]*10;
-      $(`[data-increase="${key}"]`).disabled=remaining===0||allocations[key]>=4;
-      $(`[data-decrease="${key}"]`).disabled=allocations[key]===0;
-    }
-    $('#start-game').disabled=remaining!==0||!$('#character-name').value.trim();
+    $('#start-game').disabled=!$('#character-name').value.trim();
   }
   const creator=mountCreator($('#appearance-fields'),next=>{appearance=next;view.setAppearance(appearance);},{categoryRoot:$('#creator-categories')});
   let creatorSession=null;
-  for(const [id,icon] of [['appearance-tab','face'],['clothing-tab','top'],['stats-tab','stats'],['preview-body','rotate'],['cancel-creator','back'],['start-game','confirm']])decorateCreatorButton($('#'+id),icon);
-  for(const key of STAT_KEYS){
-    const term=document.createElement('dt'),summary=document.createElement('dd');term.textContent=STAT_LABELS[key];summary.dataset.statSummary=key;summary.textContent='10';$('#stats-overview').append(term,summary);
-    const row=document.createElement('div');row.className='stat-row';
-    const name=document.createElement('span');name.textContent=STAT_LABELS[key];
-    const minus=document.createElement('button');minus.type='button';minus.dataset.decrease=key;minus.textContent='−';minus.setAttribute('aria-label','Уменьшить: '+STAT_LABELS[key]);
-    const value=document.createElement('output');value.id='stat-'+key;value.textContent='10';value.setAttribute('aria-label',STAT_LABELS[key]);
-    const plus=document.createElement('button');plus.type='button';plus.dataset.increase=key;plus.textContent='+';plus.setAttribute('aria-label','Увеличить: '+STAT_LABELS[key]);
-    minus.addEventListener('click',()=>{if(allocations[key]>0)allocations[key]--;updateStats();});
-    plus.addEventListener('click',()=>{if(allocations[key]<4&&Object.values(allocations).reduce((a,b)=>a+b,0)<10)allocations[key]++;updateStats();});
-    row.append(name,minus,value,plus);$('#stat-fields').append(row);
-  }
+  for(const [id,icon] of [['appearance-tab','face'],['clothing-tab','top'],['preview-body','rotate'],['cancel-creator','back'],['start-game','confirm']])decorateCreatorButton($('#'+id),icon);
   $('#character-name').addEventListener('input',updateStats);
-  $('#distribute').addEventListener('click',()=>{allocations=Object.fromEntries(STAT_KEYS.map((k,i)=>[k,i===0?2:1]));updateStats();});
   $('#new-game').addEventListener('click',()=>{
     creatorSession=createNewGameSession(profile,storage,{enter(next,home){
-      homeTime=home.homeTime;pcState=home.pcState;virtualPc.reset(pcState);
+      homeTime=home.homeTime;pcState=home.pcState;migrationReady=home.migrationReady;virtualPc.reset(pcState);
       pcStorageWarning=home.pcSaved?'':'Сохранение виртуального ПК недоступно.';
       virtualPc.setPersistenceWarning(pcStorageWarning);enterApartment(next);
       if(!home.homeSaved||!home.pcSaved){message='Новая игра начата, но браузер не подтвердил сохранение.';messageUntil=performance.now()+8000;}
     },restore(look){view.setAppearance(look);setMode('menu');}});
-    $('#name-error').textContent=$('#allocations-error').textContent='';$('#character-name').setAttribute('aria-invalid','false');
-    creator.reset();appearance=creator.selection.appearance;$('#preview-zoom').value=1;allocations=Object.fromEntries(STAT_KEYS.map(k=>[k,0]));$('#character-name').value='';$('#creator-error').textContent='';
+    $('#name-error').textContent='';$('#character-name').setAttribute('aria-invalid','false');
+    creator.reset();appearance=creator.selection.appearance;$('#preview-zoom').value=1;$('#character-name').value='';$('#creator-error').textContent='';
     previewYaw=previewTarget=0;for(const b of $('#preview-angles').children){b.classList.toggle('active',b.dataset.yaw==='0');b.setAttribute('aria-pressed',String(b.dataset.yaw==='0'));}
     view.setAppearance(appearance);selectCreatorSection('appearance');creator.selection.frame('body');updateStats();setMode('creator');$('#character-name').focus();
   });
   $('#continue-game').addEventListener('click',()=>{if(playing){view.setAppearance(profile.appearance);setMode('game');}else if(profile)enterApartment(profile);});
   $('#cancel-creator').addEventListener('click',()=>creatorSession?.cancel());
-  $('#next-step').addEventListener('click',()=>selectCreatorSection(creator.selection.section==='appearance'?'clothing':'stats'));
-  for(const section of ['appearance','clothing','stats'])$('#'+section+'-tab').addEventListener('click',()=>selectCreatorSection(section));
+  $('#next-step').addEventListener('click',()=>selectCreatorSection('clothing'));
+  for(const section of ['appearance','clothing'])$('#'+section+'-tab').addEventListener('click',()=>selectCreatorSection(section));
   $('#creator-form').addEventListener('submit',e=>{
-    e.preventDefault();const result=creatorSession?.submit({name:$('#character-name').value,allocations,appearance});if(!result)return;
-    $('#name-error').textContent=result.errors?.name??'';$('#allocations-error').textContent=result.errors?.allocations??'';
+    e.preventDefault();const result=creatorSession?.submit({name:$('#character-name').value,appearance});if(!result)return;
+    $('#name-error').textContent=result.errors?.name??'';
     $('#character-name').setAttribute('aria-invalid',String(Boolean(result.errors?.name)));
-    if(result.errors?.name)$('#character-name').focus();else if(result.errors?.allocations)selectCreatorSection('stats');
+    if(result.errors?.name)$('#character-name').focus();
     if(result.ok&&!result.saved){message='Персонаж создан, но браузер не разрешил сохранение.';messageUntil=performance.now()+8000;}
   });
   for(const b of $('#preview-angles').children)b.addEventListener('click',()=>{previewTarget=Number(b.dataset.yaw);for(const other of $('#preview-angles').children){other.classList.toggle('active',other===b);other.setAttribute('aria-pressed',String(other===b));}});
@@ -204,19 +194,19 @@ try{
   for(const district of districts){const b=document.createElement('button');b.textContent=district.name;b.dataset.district=district.id;b.addEventListener('click',()=>showDistrict(district.id));$('#districts').append(b);}
   showDistrict('north-sloboda');
   $('#return-home').addEventListener('click',()=>{if(motion.returnHome()){setMode('game');resumeAnimation();cue('door');}});
-  function act(id){if(fridgeView.isOpen||pcLifecycle.pending||pcLifecycle.snapshot.phase!=='room')return;resumeAnimation();if(id==='computer'&&workBlockReason(pcState)){message=workBlockReason(pcState);messageUntil=performance.now()+6000;speech.say(workNeedSpeech(pcState));return;}if(id==='entry'){if(!motion.busy)setMode('door');return;}const result=id==='computer'?{allowed:beginPcCutscene(motion)}:startHomeAction(motion,homeTime,id);if(result.allowed){if(id==='computer'){pcPrepareError=false;virtualPc.prepareAudio();pcSounds.unlock().catch(()=>{});pcLifecycle.prepare();}else cue('footstep');}else if(result.reason){message=result.reason;messageUntil=performance.now()+5000;}}
+  function act(id){if(homeModalOpen()||pcLifecycle.pending||pcLifecycle.snapshot.phase!=='room')return;resumeAnimation();if(id==='computer'&&workBlockReason(pcState)){message=workBlockReason(pcState);messageUntil=performance.now()+6000;speech.say(workNeedSpeech(pcState));return;}if(id==='entry'){if(!motion.busy)setMode('door');return;}const result=id==='computer'?{allowed:beginPcCutscene(motion)}:startHomeAction(motion,homeTime,id);if(result.allowed){if(id==='computer'){pcPrepareError=false;virtualPc.prepareAudio();pcSounds.unlock().catch(()=>{});pcLifecycle.prepare();}else cue('footstep');}else if(result.reason){message=result.reason;messageUntil=performance.now()+5000;}}
   $('#door-peek').addEventListener('click',()=>{setMode('game');act('peephole');});
   $('#door-exit').addEventListener('click',()=>{setMode('game');resumeAnimation();motion.interact('entry');});
   $('#door-cancel').addEventListener('click',()=>setMode('game'));
   function stopPeeking(){setMode('game');if(motion.actionId==='peephole'&&motion.phase==='perform')motion.leaveAction();}
   $('#peek-close').addEventListener('click',stopPeeking);
-  for(const [id,label] of Object.entries({dining:'Обеденный стол',computer:'Компьютер',bed:'Кровать',sink:'Посуда',stove:'Плита',fridge:'Холодильник',passage:'Другая комната',entry:'Входная дверь','light-living':'Выключатель в комнате','light-kitchen':'Выключатель на кухне'})){
+  for(const [id,label] of Object.entries({dining:'Обеденный стол',computer:'Компьютер',wardrobe:'Шкаф',bed:'Кровать',sink:'Посуда',stove:'Плита',fridge:'Холодильник',passage:'Другая комната',entry:'Входная дверь','light-living':'Выключатель в комнате','light-kitchen':'Выключатель на кухне'})){
     if(!config.actions[id])continue;
     const b=document.createElement('button');b.textContent=label;b.dataset.action=id;b.addEventListener('click',()=>act(id));
     if(config.actions[id]?.lightRoom)b.setAttribute('aria-label',label);
     $('#actions').append(b);
   }
-  canvas.addEventListener('pointerdown',e=>{if(fridgeView.isOpen||!lookInput.canPick(e)||cameraFade||mode!=='game')return;const hit=view.pick(e);resumeAnimation();if(hit.id)act(hit.id);else if(hit.hero)motion.faceCamera();else if(Number.isFinite(hit.x)&&moveInRoom(motion,pcLifecycle,hit.x))cue('footstep');});
+  canvas.addEventListener('pointerdown',e=>{if(homeModalOpen()||!lookInput.canPick(e)||cameraFade||mode!=='game')return;const hit=view.pick(e);resumeAnimation();if(hit.id)act(hit.id);else if(hit.hero)motion.faceCamera();else if(Number.isFinite(hit.x)&&moveInRoom(motion,pcLifecycle,hit.x))cue('footstep');});
   canvas.addEventListener('pointermove',e=>{if(mode!=='game'){canvas.style.cursor='default';return;}const delta=lookInput.move(e);if(delta){view.modes.look(...delta);canvas.style.cursor='grabbing';$('#hover-label').textContent='';return;}const hit=view.pick(e);canvas.style.cursor=hit.id||hit.hero?'pointer':'crosshair';
     const action=config.actions[hit.id];$('#hover-label').textContent=action?.lightRoom?(homeTime.lights[action.lightRoom]?'Выключить':'Включить')+' свет '+(action.lightRoom==='living'?'в комнате':'на кухне'):action?.label??(hit.hero?'Повернуться к камере':'');});
   canvas.addEventListener('pointerleave',()=>$('#hover-label').textContent='');
@@ -236,11 +226,12 @@ try{
       $('#preview-zoom').value=creator.selection.zoom;
       view.renderPreview(dt,previewYaw,$('#preview-stage').getBoundingClientRect(),creator.selection.zone,creator.selection.zoom);return;
     }
+    if(wardrobeView.isOpen){view.renderPreview(dt,wardrobeView.yaw,wardrobeView.previewRect,'body',1);return;}
     if(mode==='peephole'){view.renderPeephole($('#peek-stage').getBoundingClientRect());return;}
     if(mode==='menu'||mode==='destinations'||mode==='door'){view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));view.render(motion,0,{paused:true});return;}
     let events=[];
     syncWorkAudio();
-    if((!paused||step)&&!document.hidden&&!fridgeView.isOpen){
+    if((!paused||step)&&!document.hidden&&!homeModalOpen()){
       if(mode==='pc'&&pcLifecycle.snapshot.phase.startsWith('work')){
         if(pcLifecycle.snapshot.phase==='working'&&pcState.music.job){
           lastWorkJob={...pcState.music.job};lastWorkBeat=pcState.projects.find(p=>p.id===lastWorkJob.beatId);
@@ -269,6 +260,7 @@ try{
       if(event.type==='completed'){if(!(event.id==='computer'&&pcPrepareError)){message=completed[event.id]??message;messageUntil=now+4000;}saveHomeTime(storage,homeTime);}
       if(event.type==='started'&&event.id==='bed')saveHomeTime(storage,homeTime);
       if(event.type==='started'&&event.id==='fridge')fridgeView.open(pcState,pcStorageWarning);
+      if(event.type==='started'&&event.id==='wardrobe')wardrobeView.open(profile,migrationReady?'':pcStorageWarning);
       if(event.type==='started'&&event.id==='computer')openComputer();
       if(event.type==='started'&&event.id==='peephole'){setMode('peephole');view.renderPeephole($('#peek-stage').getBoundingClientRect());return;}
       if(event.type==='exited'){saveHomeTime(storage,homeTime);setMode('destinations');}
@@ -283,9 +275,9 @@ try{
     if(motion.clip==='walk'&&motion.walkDistance-lastStep>config.stride/2){cue('footstep');lastStep=motion.walkDistance;}
     const door=motion.doorOpen>.3;if(door&&!lastDoor)cue('door');lastDoor=door;
     view.setRoomLights(homeTime.lights);view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));
-    if(pcNeedsSceneFrame(pcLifecycle.snapshot,mode))view.render(motion,(paused&&!step)||fridgeView.isOpen?0:dt*(pcLifecycle.snapshot.phase==='working'?4:1),{skeleton,paused:(paused&&!step)||fridgeView.isOpen});$('#fade').style.opacity=motion.fade;
+    if(pcNeedsSceneFrame(pcLifecycle.snapshot,mode))view.render(motion,(paused&&!step)||homeModalOpen()?0:dt*(pcLifecycle.snapshot.phase==='working'?4:1),{skeleton,paused:(paused&&!step)||homeModalOpen()});$('#fade').style.opacity=motion.fade;
     const headAnchor=view.getHeadScreenPosition(),firstPerson=view.modes.mode==='3D',roomReady=pcLifecycle.snapshot.phase==='room'&&motion.actionId!=='computer'&&motion.fade<.01;
-    speech.tick(paused?0:dt,{hidden:document.hidden,present:mode==='game'&&!cameraFade&&roomReady&&!fridgeView.isOpen&&(firstPerson||headAnchor.visible),roomReady,audioAllowed:audio?.state==='running'});
+    speech.tick(paused?0:dt,{hidden:document.hidden,present:mode==='game'&&!cameraFade&&roomReady&&!homeModalOpen()&&(firstPerson||headAnchor.visible),roomReady,audioAllowed:audio?.state==='running'});
     speechView.update(speech.snapshot,headAnchor,{firstPerson,width:innerWidth,height:innerHeight,bottomLimit:$('#controls').getBoundingClientRect().top-12});
     virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,gameDay:homeTime.day,skills:profile?.skills});
     $('#home-time').textContent=`${homeTime.dateLabel} · ${homeTime.label} · ${homeTime.period} · Дом`;
@@ -302,7 +294,7 @@ try{
     else if(motion.phase==='walk')status.textContent='Идёт '+(motion.targetX<motion.position[0]?'влево':'вправо');
     else status.textContent=now<messageUntil?message:`Клик по полу — идти. Сытость ${Math.round(pcState.music.needs.satiety)} · энергия ${Math.round(pcState.music.needs.energy)}.`;
     for(const b of $('#actions').children){
-      b.disabled=motion.busy||fridgeView.isOpen;b.classList.toggle('active',b.dataset.action===motion.actionId);
+      b.disabled=motion.busy||homeModalOpen();b.classList.toggle('active',b.dataset.action===motion.actionId);
       if(b.dataset.action==='passage')b.textContent=motion.position[0]<0?'Перейти в комнату':'Перейти на кухню';
       const room=config.actions[b.dataset.action]?.lightRoom;
       if(room){b.textContent=`Свет: ${room==='living'?'комната':'кухня'} · ${homeTime.lights[room]?'вкл.':'выкл.'}`;b.setAttribute('aria-pressed',String(homeTime.lights[room]));}
@@ -311,6 +303,6 @@ try{
   loading.hidden=true;setMode('menu');view.render(motion,0);
   function frame(now){const raw=(now-last)/1000,dt=Math.min(raw,.25);if(raw>0)frameRate=frameRate*.9+Math.min(240,1/raw)*.1;last=now;update(dt,now);requestAnimationFrame(frame);}requestAnimationFrame(frame);
   document.addEventListener('visibilitychange',()=>{last=performance.now();if(document.hidden){syncWorkAudio(true);virtualPc.beatAudio.stop();saveHomeTime(storage,homeTime);persistPc(pcState);}});
-  window.addEventListener('pagehide',event=>{saveHomeTime(storage,homeTime);persistPc(pcState);syncWorkAudio(true);virtualPc.beatAudio.stop();if(event.persisted){pcSounds.stop();return;}fridgeView.dispose();speechView.dispose();workAudio.dispose();workPanel.dispose();pcLifecycle.reset();pcSounds.dispose();virtualPc.dispose();view.dispose();});
+  window.addEventListener('pagehide',event=>{saveHomeTime(storage,homeTime);persistPc(pcState);syncWorkAudio(true);virtualPc.beatAudio.stop();if(event.persisted){pcSounds.stop();return;}wardrobeView.dispose();fridgeView.dispose();speechView.dispose();workAudio.dispose();workPanel.dispose();pcLifecycle.reset();pcSounds.dispose();virtualPc.dispose();view.dispose();});
   window.addEventListener('pageshow',event=>{if(event.persisted)last=performance.now();});
 }catch(error){console.error(error);loading.querySelector('h2').textContent='Не удалось загрузить сцену';loading.querySelector('p').textContent=error.message;loading.classList.add('error');}

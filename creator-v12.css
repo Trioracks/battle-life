@@ -1,4 +1,17 @@
 /* The character editor is deliberately separate from the pixel apartment HUD. */
+.novice-note{font:14px/1.5 Georgia,serif;color:#b8ac8d;margin-top:22px}
+.home-wardrobe{position:fixed;inset:0;z-index:100;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto;gap:10px;padding:26px max(22px,calc((100vw - 1080px)/2));color:#e3d5b4;font:16px/1.4 Arial,sans-serif;pointer-events:auto}
+body:has(.home-wardrobe:not([hidden])) :is(#game-header,#controls,#inspector,#hover-label,.character-speech){visibility:hidden}
+.home-wardrobe[hidden]{display:none}
+.home-wardrobe h2{margin:0;font-size:28px}.home-wardrobe>p{margin:0;max-width:750px}
+.wardrobe-layout{display:grid;grid-template-columns:minmax(220px,1fr) minmax(260px,1fr);gap:22px;min-height:0}
+.wardrobe-preview{min-height:250px;border:1px solid #7a6845;background:transparent}
+.wardrobe-options{overflow-y:auto;min-height:0;padding:12px;background:#171812f5;border:1px solid #7a6845;scrollbar-color:#8b7956 #171812}
+.wardrobe-options section{display:flex;flex-direction:column;gap:10px;margin:14px 0}.wardrobe-options h3{margin:0 0 5px}.wardrobe-options section[hidden],.wardrobe-locked[hidden]{display:none}.wardrobe-categories,.wardrobe-owned,.wardrobe-locked{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.wardrobe-categories{grid-template-columns:repeat(3,minmax(0,1fr));padding-bottom:14px;border-bottom:1px solid #61563e}
+.home-wardrobe button{font:14px/1.35 Arial,sans-serif;padding:8px;border:1px solid #796744;color:#ddcda9;background:#31291e;min-height:38px;overflow-wrap:anywhere}
+.home-wardrobe button[aria-pressed=true]{background:#705333;border-color:#e1bd78}.home-wardrobe button:disabled{color:#989389;background:#20221d;border-color:#404039;opacity:.7}
+.home-wardrobe button:focus-visible{outline:2px solid #f3d293;outline-offset:2px}.wardrobe-footer{display:flex;gap:12px;justify-content:flex-end}.wardrobe-warning{color:#ffc099}.wardrobe-warning:empty{display:none}
+@media(max-width:600px){.home-wardrobe{padding:12px;gap:6px;font-size:13px}.home-wardrobe h2{font-size:22px}.wardrobe-layout{grid-template-columns:1fr;grid-template-rows:minmax(170px,35%) minmax(0,1fr);gap:8px}.wardrobe-preview{min-height:0}.wardrobe-options{padding:8px}.wardrobe-footer{gap:6px}.home-wardrobe button{font-size:12px;padding:6px}}
 #creator{font:16px/1.35 Georgia,'Times New Roman',serif;color:#d8d0b9;padding:18px max(22px,calc((100vw - 1260px)/2));background:none;gap:12px;overflow:hidden;--creator-bronze:#8d794f;--creator-ink:#29241d}
 #creator *{min-width:0}
 #creator .creator-heading{margin:0;min-height:52px;padding:0 4px;border-bottom:1px solid #756440;background:linear-gradient(90deg,#14130ffc,transparent)}
@@ -11,7 +24,7 @@
 #creator :is(button,input):focus-visible{outline:2px solid #efd49a;outline-offset:3px}
 #creator button:disabled{opacity:.45}
 #creator button.primary{background:linear-gradient(#736039,#4d3a20);border-color:#b69b61;color:#f6e7c3}
-#creator .creator-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0;border:0;flex-shrink:0;background:#11110ee8}
+#creator .creator-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0;border:0;flex-shrink:0;background:#11110ee8}
 #creator .creator-tabs button{font-size:17px;letter-spacing:.02em;text-align:center}
 #creator #points-badge{font-size:13px;display:inline-grid;place-items:center;min-width:20px;min-height:20px;border:1px solid #a08953;color:#e1c784}
 #creator .creator-layout{display:grid;grid-template-columns:minmax(0,25fr) minmax(0,32fr) minmax(0,43fr);gap:18px;flex:1;min-height:0}

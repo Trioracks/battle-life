@@ -15,7 +15,7 @@ try{
  await page.route('**/static.glb?*',async route=>{await gate;await route.continue();});
  await page.goto(process.env.PC_QA_URL||'http://127.0.0.1:4173/?rev=18',{waitUntil:'networkidle'});
  await page.locator('#new-game').click();await page.locator('#character-name').fill('Регрессия ПК');
- await page.locator('#stats-tab').click();await page.locator('#distribute').click();await page.locator('#start-game').click();await page.locator('#wake').click();
+ await page.locator('#clothing-tab').click();await page.locator('#start-game').click();await page.locator('#wake').click();
  await page.locator('#actions [data-action="computer"]').click();
  const pc=page.locator('#virtual-pc');await pc.waitFor({state:'visible'});
  const pending=await pc.evaluate(root=>({opacity:root.style.opacity,pointer:root.style.pointerEvents,inert:root.firstElementChild.inert}));

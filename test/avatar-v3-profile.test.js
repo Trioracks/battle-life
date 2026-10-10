@@ -160,7 +160,7 @@ test('appearance switching preserves structural nodes and hides unsupported vari
 
 test('profile creation trims names and derives the nine skills without converting v3 appearance to legacy look', () => {
   const result = createProfile({ name: '  Миша  ', allocations, appearance: { face: 'long', top: 'shirt', bottom: 'jeans' } });
-  assert.deepEqual(result, profile({ appearance: { ...expectedDefault, face: 'long', top: 'shirt' } }));
+  assert.equal(result.name,'Миша');assert.equal(result.version,4);assert.deepEqual(Object.values(result.skills),[10,10,10,10,10,10,10,10,10]);assert.deepEqual(result.appearance,{...expectedDefault,face:'long',top:'shirt'});assert.deepEqual(result.wardrobe.top,[{id:'shirt',color:'blue'}]);
   assert.equal(Object.hasOwn(result, 'look'), false);
   assert.deepEqual(STAT_KEYS, Object.keys(expectedSkills));
   assert.equal(STAT_LABELS.writing, 'Письмо');
@@ -172,21 +172,12 @@ test('profile creation rejects blank and non-string names', () => {
   }
 });
 
-test('profile creation requires exactly ten allocated points and enforces the 50 skill cap', () => {
-  assert.throws(() => createProfile({ name: 'Миша', allocations: { ...allocations, intelligence: 1 } }), /10/);
-  assert.throws(() => createProfile({ name: 'Миша', allocations: { ...allocations, intelligence: 3 } }), /10/);
-  assert.throws(() => createProfile({ name: 'Миша', allocations: { ...allocations, intelligence: 5, writing: 0, musicality: 0 } }), /50/);
-  const result = createProfile({ name: 'Миша', allocations: { intelligence: 4, writing: 4, musicality: 2 } });
-  assert.equal(result.skills.intelligence, 50);
-  assert.equal(result.skills.resilience, 10);
-});
-
-test('profile creation rejects malformed point values instead of silently discarding them', () => {
+test('obsolete allocations of every shape cannot change the novice baseline', () => {
   for (const resilience of [-1, 0.5, '0', null, NaN, Infinity, false]) {
-    assert.throws(() => createProfile({ name: 'Миша', allocations: { ...allocations, resilience } }));
+    assert.deepEqual(Object.values(createProfile({ name: 'Миша', allocations: { ...allocations, resilience } }).skills),[10,10,10,10,10,10,10,10,10]);
   }
   for (const invalid of [null, undefined, [], 'points']) {
-    assert.throws(() => createProfile({ name: 'Миша', allocations: invalid }));
+    assert.deepEqual(Object.values(createProfile({ name: 'Миша', allocations: invalid }).skills),[10,10,10,10,10,10,10,10,10]);
   }
 });
 
@@ -238,10 +229,10 @@ test('loading revalidates stored names, versions, all skills, and total point bu
   }
 });
 
-test('loading normalizes cosmetic data and trims names without retaining unrelated saved properties', () => {
+test('loading normalizes legacy cosmetics and preserves unrelated snapshot properties', () => {
   const stored = profile({ name: '  Миша  ', appearance: { top: 'shirt', bottom: 'missing', cap: 'red' }, campaign: 'unrelated' });
   const result = loadProfile(memoryStorage({ 'battle-life-apartment-v3': JSON.stringify(stored) }));
-  assert.deepEqual(result, { ok: true, profile: profile({ appearance: { ...expectedDefault, top: 'shirt' } }) });
+  assert.deepEqual(result, { ok: true, profile: profile({ appearance: { ...expectedDefault, top: 'shirt' },campaign:'unrelated' }) });
 });
 
 test('missing saves and inaccessible storage are safe explicit results', () => {

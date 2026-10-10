@@ -1,7 +1,7 @@
 import {APPEARANCE_OPTIONS,DEFAULT_APPEARANCE,CLOTHING_COLORS,normalizeAppearance} from './avatar-v3-profile.js?rev=10';
 
 const categories=['face','hair','beard','mustache','top','bottom','footwear'];
-const sections={appearance:['face','hair','beard','mustache'],clothing:['top','bottom','footwear'],stats:[]};
+const sections={appearance:['face','hair','beard','mustache'],clothing:['top','bottom','footwear']};
 const zones={face:'head',hair:'head',beard:'head',mustache:'head',top:'top',bottom:'bottom',footwear:'footwear'};
 const descriptions={face:'Черты лица меняют силуэт челюсти, нос и скулы. Посмотри героя с разных сторон.',hair:'Выбранная причёска подогнана к форме лица. Поверни героя, чтобы увидеть затылок и пробор.',beard:'Борода выбирается отдельно от усов. Их цвет согласован с волосами.',mustache:'Тонкий акцент или заметный характер. Можно сочетать с любой бородой.',top:'Выбери покрой и цвет ткани. Манжеты, отделка и детали сохраняют свой оттенок.',bottom:'Свободный силуэт или строгая линия. Цвет низа не зависит от верха.',footwear:'Разная форма, высота и подошва. Цвет меняет верх обуви, а не все её детали.'};
 export function decorateCreatorButton(button,id){
@@ -14,7 +14,6 @@ export class CreatorSelection{
   selectSection(section){
     if(!Object.hasOwn(sections,section))return;
     this.section=section;
-    if(section==='stats'){this.frame('body');return;}
     this.category(this.lastCategory[section]);
   }
   categories(){return sections[this.section].map(id=>({id,label:APPEARANCE_OPTIONS[id].label}));}

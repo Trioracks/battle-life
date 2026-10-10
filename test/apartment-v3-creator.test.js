@@ -8,7 +8,7 @@ test('section navigation keeps selected garments, colour and last category',()=>
  ui.selectSection('clothing');assert.deepEqual(ui.categories().map(x=>x.id),['top','bottom','footwear']);
  ui.category('top');ui.select('top','hoodie');ui.select('topColor','red');ui.selectSection('appearance');ui.category('hair');ui.select('hair','parted');
  ui.selectSection('clothing');assert.equal(ui.selected,'top');assert.equal(ui.appearance.top,'hoodie');assert.equal(ui.appearance.topColor,'red');
- ui.selectSection('stats');assert.equal(ui.zone,'body');ui.selectSection('appearance');assert.equal(ui.selected,'hair');assert.equal(ui.appearance.hair,'parted');
+ ui.selectSection('appearance');assert.equal(ui.selected,'hair');assert.equal(ui.appearance.hair,'parted');
  const before=JSON.stringify(ui);ui.selectSection('bad');ui.category('bad');assert.equal(JSON.stringify(ui),before);
  ui.reset();assert.equal(ui.section,'appearance');assert.equal(ui.selected,'face');assert.equal(ui.appearance.topColor,'white');
 });

@@ -2,14 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DEFAULT_APPEARANCE,STAT_KEYS,createProfile} from '../src/avatar-v3-profile.js';
 const draft=()=>({name:'  Тест  ',appearance:{...DEFAULT_APPEARANCE,top:'hoodie',topColor:'red'},allocations:Object.fromEntries(STAT_KEYS.map((k,i)=>[k,i===0?2:1]))});
-test('invalid name or point budget cannot save or enter the apartment',async()=>{
+test('invalid name cannot save or enter; old allocation input no longer grants bonuses',async()=>{
  const {createCreatorSession}=await import('../src/apartment-v3-creator-session.js');let writes=0,entries=0;
  const session=createCreatorSession(null,{setItem(){writes++;}},{enter(){entries++;},restore(){}});
- for(const change of [{name:'  '},{allocations:Object.fromEntries(STAT_KEYS.map(k=>[k,1]))},{allocations:{...draft().allocations,[STAT_KEYS[0]]:3}}]){
+ for(const change of [{name:'  '},{name:17}]){
   const result=session.submit({...draft(),...change});assert.equal(result.ok,false);assert.ok(Object.keys(result.errors).length);
  }
  assert.equal(writes,0);assert.equal(entries,0);
- const result=session.submit(draft());assert.equal(result.ok,true);assert.equal(result.profile.name,'Тест');assert.equal(result.profile.version,3);assert.equal(entries,1);
+ const result=session.submit({...draft(),allocations:{intelligence:999}});assert.equal(result.ok,true);assert.equal(result.profile.name,'Тест');assert.equal(result.profile.version,4);assert.equal(entries,1);assert.deepEqual(Object.values(result.profile.skills),[10,10,10,10,10,10,10,10,10]);
 });
 test('repeated confirmation enters once, with the chosen wardrobe',async()=>{
  const {createCreatorSession}=await import('../src/apartment-v3-creator-session.js');let writes=0;const entries=[];

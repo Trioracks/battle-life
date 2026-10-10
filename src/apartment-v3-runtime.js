@@ -1,4 +1,5 @@
 import {advanceApartmentFrame} from './apartment-v3-frame.js';
+import {wardrobeAction} from './home-wardrobe.js';
 
 import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=21';
 
@@ -11,7 +12,7 @@ export function startHomeAction(motion,clock,id){
 }
 
 export function prepareApartmentConfig(exported){
-  const actions={...exported.actions,bed:{...exported.actions.bed,clockDriven:true}};
+  const actions={...exported.actions,bed:{...exported.actions.bed,clockDriven:true},wardrobe:wardrobeAction()};
   const entry=actions.entry;
   if(entry)actions.peephole={label:'Посмотреть в глазок',approach:[...entry.approach],pose:[...entry.pose],yaw:entry.yaw,clip:'idle',fade:false,duration:Infinity};
   return {...exported,actions};

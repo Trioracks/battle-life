@@ -12,6 +12,7 @@ import {createRetroPass} from './apartment-v3-retro.js?rev=11';
 import {createComputerView} from './apartment-v3-computer.js?rev=21';
 import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=21';
 import {pcPresentation} from './virtual-pc-presentation.js?rev=21';
+import {createWardrobeFurniture} from './home-wardrobe.js';
 
 export async function createApartmentScene(canvas,config){
   const BASE=config.assetBase??'./assets/apartment/v3/';
@@ -61,6 +62,7 @@ export async function createApartmentScene(canvas,config){
     const bulbRoom=o.name.match(/^lamp-(living|kitchen)-bulb/)?.[1];
     if(bulbRoom&&config.lampFixtures?.[bulbRoom]?.bakedBulb){o.visible=false;o.castShadow=false;}
   });scene.add(environment.scene);
+  const wardrobe=createWardrobeFurniture(THREE);environment.scene.add(wardrobe);
   const switchRockers=Object.fromEntries(['living','kitchen'].map(room=>{const o=environment.scene.getObjectByName('switch-'+room+'-rocker');return [room,{object:o,rotation:o?.rotation.x??0}];}));
   const bulbMaterials=Object.fromEntries(['living','kitchen'].map(room=>{const o=environment.scene.getObjectByName('lamp-'+room+'-bulb');return [room,o?(Array.isArray(o.material)?o.material:[o.material]):[]];}));
   const landing=environment.scene.getObjectByName('landing-root'),landingReveal=createLandingReveal(landing);

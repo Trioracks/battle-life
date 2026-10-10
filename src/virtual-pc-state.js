@@ -61,6 +61,8 @@ function normalizeSnapshot(value) {
   const projects = Array.isArray(source.projects) ? source.projects.map(normalizeProject).filter(Boolean) : [];
   return {
     version: 1,
+    noviceSchema: 1,
+    ...(typeof source.noviceMigration==='string'?{noviceMigration:source.noviceMigration}:{}),
     power: source.power === 'on' ? 'on' : 'off',
     wallpaper: wallpaperIds.has(source.wallpaper) ? source.wallpaper : 'courtyard',
     desktopIcons: normalizeIcons(source.desktopIcons),

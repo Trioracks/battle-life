@@ -152,7 +152,7 @@ test('saving a project does not overfill the virtual disk', () => {
 test('old powered save retains payloads and discards only obsolete shortcut placement',()=>{
   const old={version:1,power:'on',wallpaper:'factory',download:{status:'downloading',receivedBytes:123000000},projects:[{id:'p',name:'Бит'}],draft:{id:'draft',name:'Не потерять'},lastGameMinute:22,desktopIcons:{documents:{x:8,y:96},computer:{x:12,y:16}}};
   const loaded=loadVirtualPcState(mapStorage(new Map([[VIRTUAL_PC_STORAGE_KEY,JSON.stringify(old)]]))).state;
-  assert.deepEqual({...loaded,desktopIcons:old.desktopIcons},{...old,battleApplications:[],music:createVirtualPcState().music,household:{fridge:{apple:1,pear:1,banana:1}}});
+  assert.deepEqual({...loaded,desktopIcons:old.desktopIcons},{...old,noviceSchema:1,battleApplications:[],music:createVirtualPcState().music,household:{fridge:{apple:1,pear:1,banana:1}}});
   assert.deepEqual(loaded.desktopIcons,{computer:{x:12,y:16}});
   assert.equal(diskUsage(loaded).freeMb,1875);
 });

@@ -25,7 +25,7 @@ async function probe(){
 }
 try{
  await page.goto('http://127.0.0.1:4173/?rev='+revision,{waitUntil:'networkidle'});
- await page.locator('#new-game').click();await page.locator('#character-name').fill('Проверка FT');await page.locator('#stats-tab').click();await page.locator('#distribute').click();await page.locator('#start-game').click();await page.locator('#wake').click();
+ await page.locator('#new-game').click();await page.locator('#character-name').fill('Проверка FT');await page.locator('#clothing-tab').click();await page.locator('#start-game').click();await page.locator('#wake').click();
  await page.evaluate(async revision=>{const {createVirtualPcState}=await import('./src/virtual-pc-state.js?rev='+revision);sessionStorage.setItem('ft-seed',JSON.stringify({'battle-life-virtual-pc-v1':createVirtualPcState({power:'on',download:{status:'installed'}}),'battle-life-apartment-v3-time':{day:2,minutes:600,initialRest:false}}));},revision);
  await page.reload({waitUntil:'networkidle'});await probe();await enter();await start('FT Studio');
  await dialog.getByRole('button',{name:'Новый бит',exact:true}).click();await dialog.getByRole('textbox',{name:'Название бита'}).fill('Первый двор');await dialog.getByRole('button',{name:'Начать проект',exact:true}).click();

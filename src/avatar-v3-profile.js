@@ -1,4 +1,5 @@
 import { STAT_KEYS, validateAllocations } from './creator.js';
+import {createWardrobe,validWardrobe,canWear} from './home-wardrobe.js';
 
 export { STAT_KEYS, statLabels as STAT_LABELS } from './creator.js';
 
@@ -72,36 +73,33 @@ export function applyAppearance(model, appearance) {
 }
 
 export function createProfile(input = {}) {
-  const { name, allocations, appearance } = input ?? {};
+  const { name, appearance } = input ?? {};
   if (typeof name !== 'string' || !name.trim()) throw new Error('Нужно имя героя.');
-  if (!isRecord(allocations)) throw new Error('Распредели все 10 очков.');
-  const points = Object.fromEntries(STAT_KEYS.map((key) => {
-    const value = Object.hasOwn(allocations, key) ? allocations[key] : 0;
-    if (!Number.isInteger(value)) throw new Error('Очки характеристик должны быть целыми числами.');
-    return [key, value];
-  }));
-  const validation = validateAllocations(points);
-  if (!validation.valid) throw new Error(validation.message);
+  const look=normalizeAppearance(appearance);
   return {
-    version: 3,
+    version: 4,
+    noviceSchema: 1,
     name: name.trim(),
-    skills: Object.fromEntries(STAT_KEYS.map((key) => [key, 10 + points[key] * 10])),
-    appearance: normalizeAppearance(appearance),
+    skills: Object.fromEntries(STAT_KEYS.map((key) => [key, 10])),
+    appearance: look,
+    wardrobe: createWardrobe(look),
   };
 }
 
 function validateProfile(input) {
-  if (!isRecord(input) || input.version !== 3 || !isRecord(input.skills)) {
+  if (!isRecord(input) || ![3,4].includes(input.version) || !isRecord(input.skills) || typeof input.name!=='string' || !input.name.trim()) {
     throw new Error('Сохранение героя имеет неверный формат.');
   }
   const allocations = Object.fromEntries(STAT_KEYS.map((key) => {
     const value = input.skills[key];
-    if (!Object.hasOwn(input.skills, key) || !Number.isInteger(value) || value < 10 || value > 50 || value % 10 !== 0) {
+    if (!Object.hasOwn(input.skills, key) || !Number.isFinite(value) || value < 10 || value > (input.version===3?50:100) || (input.version===3&&(!Number.isInteger(value)||value%10!==0))) {
       throw new Error('Характеристики сохранённого героя должны быть от 10 до 50 с шагом 10.');
     }
     return [key, (value - 10) / 10];
   }));
-  return createProfile({ name: input.name, allocations, appearance: input.appearance });
+  if(input.version===3){const validation=validateAllocations(allocations);if(!validation.valid)throw Error(validation.message);}
+  else if(input.noviceSchema!==1||!validWardrobe(input.wardrobe)||!canWear(input,input.appearance))throw Error('Гардероб сохранённого героя имеет неверный формат.');
+  return {...input,name:input.name.trim(),skills:{...input.skills},appearance:normalizeAppearance(input.appearance),...(input.version===4?{wardrobe:JSON.parse(JSON.stringify(input.wardrobe))}:{})};
 }
 
 export function saveProfile(storage, profile) {
