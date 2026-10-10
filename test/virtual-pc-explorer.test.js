@@ -24,6 +24,14 @@ test('disk properties use existing accounting and empty projects remain empty',(
   assert.equal(explorerProperties(s,explorerEntries(s,'computer')[0]).rows.find(r=>r.label==='Свободно').value,'1,2 ГБ (1198 МБ)');
   assert.deepEqual(explorerEntries(createVirtualPcState(),'projects'),[]);
 });
+test('software Properties distinguish archives, metadata, executables and configuration from folders and projects',()=>{
+ const state=createVirtualPcState({software:{client:{installed:true,receivedBytes:2000000,path:'C:\\Tools\\torent'},ft:{installed:true,receivedBytes:800000000,path:'C:\\Tools\\FT'},metadata:true},projects:[{id:'type-project',name:'Бит'}]});
+ for(const [path,id,want]of [['downloads','archive:client','Приложение'],['downloads','archive:ft','Архив ZIP'],['downloads','ft-metadata','Файл метаданных BitTorrent'],['C:\\Tools\\torent','exe:client','Приложение'],['C:\\Tools\\FT','exe:ft','Приложение'],['C:\\Tools\\torent','config:client','Файл конфигурации'],['disk','downloads','Папка'],['projects','project:type-project','Проект FT Studio']]){
+  const entry=explorerEntries(state,path).find(e=>e.id===id);assert.ok(entry,id);
+  assert.equal(explorerProperties(state,entry).rows.find(r=>r.label==='Тип').value,want,id);
+ }
+ const partial=createVirtualPcState({software:{ft:{receivedBytes:1000000}}});assert.equal(explorerProperties(partial,explorerEntries(partial,'downloads')[0]).rows.find(r=>r.label==='Тип').value,'Незавершённая загрузка');
+});
 function setup(seed={}) {
   const document=pcDocument(),root=document.createElement('div'),opened=[],properties=[],menus=[];
   const view=mountExplorer(root,{onOpenProject:p=>opened.push(p),onProperties:p=>properties.push(p),onClose(){},onMenu:p=>menus.push(p)});

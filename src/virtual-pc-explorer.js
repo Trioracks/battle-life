@@ -63,5 +63,7 @@ export function explorerProperties(state,entry) {
     const u=diskUsage(state);return {kind:'disk',title:'Свойства: Локальный диск (C:)',rows:[{label:'Тип',value:'Локальный игровой диск'},{label:'Ёмкость',value:formatDiskGb(u.capacityMb)},{label:'Занято',value:diskAmount(u.usedMb)},{label:'Свободно',value:diskAmount(u.freeMb)}]};
   }
   const p=state.projects.find(p=>p.id===entry?.projectId);
-  return {title:'Свойства: '+(entry?.name??'Объект'),rows:[{label:'Имя',value:entry?.name??''},{label:'Тип',value:entry?.kind==='project'?'Проект FT Studio':'Папка'},...(p?[{label:'Размер',value:'2 МБ'},{label:'Баттл',value:BATTLE_BRIEFS.find(b=>b.id===p.battleId)?.title??'Не указан'}]:[])]};
+  let type=({project:'Проект FT Studio',folder:'Папка',application:'Приложение',file:'Файл конфигурации'})[entry?.kind]??'Файл';
+  if(entry?.kind==='artifact')type=({part:'Незавершённая загрузка',torrent:'Файл метаданных BitTorrent',zip:'Архив ZIP',exe:'Приложение'})[entry.name.split('.').pop().toLowerCase()]??'Файл';
+  return {title:'Свойства: '+(entry?.name??'Объект'),rows:[{label:'Имя',value:entry?.name??''},{label:'Тип',value:type},...(p?[{label:'Размер',value:'2 МБ'},{label:'Баттл',value:BATTLE_BRIEFS.find(b=>b.id===p.battleId)?.title??'Не указан'}]:[])]};
 }

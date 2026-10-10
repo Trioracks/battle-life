@@ -3,10 +3,44 @@ import assert from 'node:assert/strict';
 import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=23';
 import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=23';
 import {advanceVirtualPc} from '../src/virtual-pc-runtime.js?rev=23';
+import {mountInstaller} from '../src/pc-software-view.js?rev=23';
 import {pcDocument,findButton,allPc,fire} from './helpers/virtual-pc-dom.js';
 function setup(){const d=pcDocument(),root=d.createElement('section'),pc=mountVirtualPc(root);pc.showDesktop(createVirtualPcState({power:'on'}));pc.open('underweb');pc.navigateUnderweb('underweb://dump');return {pc,root,d};}
 function click(root,name){const b=findButton(root,name);assert.ok(b,'Missing '+name);b.click();}
 function wizard(root){for(const name of ['Далее >','Далее >','Установить','Завершить установку','Готово'])click(root,name);}
+test('opening the installer cancels a pending FT launch and preserves its keyboard scope',()=>{
+ const d=pcDocument(),root=d.createElement('section'),timers=new Map();let timerId=0;
+ const pc=mountVirtualPc(root,{setTimeoutFn:fn=>{timers.set(++timerId,fn);return timerId;},clearTimeoutFn:id=>timers.delete(id)});
+ pc.showDesktop(createVirtualPcState({power:'on',download:{status:'installed'},software:{client:{receivedBytes:2000000},ft:{installed:true}}}));
+ pc.open('ft-studio');const pending=timers.get(timerId);assert.equal(root.getAttribute('aria-busy'),'true');
+ pc.softwareAction('installer','client');pending();
+ assert.equal(pc.window,'installer');assert.equal(root.getAttribute('aria-busy'),'false');
+ assert.equal(pc.windows.windows.some(w=>w.id==='ft-studio'),false);
+ assert.equal(pc.focusScope().dataset.windowId,'installer');assert.ok(pc.focusScope().contains(d.activeElement));
+ fire(root,'keydown',{key:'Escape'});assert.equal(pc.state.software.installer,null);
+ pc.open('ft-studio');timers.get(timerId)();assert.equal(pc.window,'ft-studio');pc.dispose();
+});
+test('wizard step changes move focus into the next step and clock updates preserve its controls',()=>{
+ const {pc,root,d}=setup();pc.syncState(createVirtualPcState({power:'on',software:{client:{receivedBytes:2000000}}}));pc.softwareAction('installer','client');
+ const next=findButton(root,'Далее >');next.focus();next.click();
+ const input=allPc(root).find(n=>n.getAttribute?.('aria-label')==='Папка установки');assert.ok(d.activeElement===input,'Next focuses the destination input');
+ input.value='C:\\Keyboard\\torent';input.selectionStart=3;input.selectionEnd=11;
+ const destinationNext=findButton(root,'Далее >');pc.syncState({...pc.state,lastGameMinute:6});
+ assert.ok(d.activeElement===input,'clock sync preserves input focus');assert.ok(findButton(root,'Далее >')===destinationNext,'clock sync preserves Next identity');assert.equal(input.value,'C:\\Keyboard\\torent');assert.equal(input.selectionStart,3);assert.equal(input.selectionEnd,11);
+ destinationNext.focus();destinationNext.click();assert.ok(pc.focusScope().contains(d.activeElement));assert.equal(d.activeElement.tagName,'H2');
+ const back=findButton(root,'< Назад');back.focus();back.click();assert.ok(d.activeElement===allPc(root).find(n=>n.getAttribute?.('aria-label')==='Папка установки'),'Back focuses the destination input');
+ findButton(root,'< Назад').focus();click(root,'< Назад');assert.equal(d.activeElement.tagName,'H2');pc.dispose();
+});
+test('an installer rebuild does not steal focus from outside its view',()=>{
+ const d=pcDocument(),root=d.createElement('section'),outside=d.createElement('button');let state=createVirtualPcState({software:{client:{receivedBytes:2000000},installer:{appId:'client',step:'welcome'}}});
+ outside.focus();const view=mountInstaller(root,{getState:()=>state,onAction(){}});assert.equal(d.activeElement,outside);
+ state={...state,software:{...state.software,installer:{...state.software.installer,step:'destination'}}};view.update();assert.equal(d.activeElement,outside);view.dispose();
+});
+test('an inactive installer rebuild does not move focus into its inert window',()=>{
+ const d=pcDocument(),frame=d.createElement('section'),root=d.createElement('div');frame.append(root);let state=createVirtualPcState({software:{client:{receivedBytes:2000000},installer:{appId:'client',step:'welcome'}}});
+ const view=mountInstaller(root,{getState:()=>state,onAction(){}});findButton(root,'Далее >').focus();frame.inert=true;
+ state={...state,software:{...state.software,installer:{...state.software.installer,step:'destination'}}};view.update();assert.equal(d.activeElement,null);view.dispose();
+});
 test('forum client download leads through wizard into an empty torrent client and FT metadata adds one task',()=>{
  const {pc,root}=setup();click(root,'torent — торрент-клиент');click(root,'Скачать установщик torent');
  pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:0}).state);pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:2}).state);

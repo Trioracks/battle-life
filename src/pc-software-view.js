@@ -51,10 +51,11 @@ export function mountTorrent(root,{getState,onAction}){
 export function mountInstaller(root,{getState,onAction,getMessage=()=>''}){
  const d=root.ownerDocument;let signature='',error=null;
  function update(){const state=getState(),w=state.software.installer;if(!w)return;const key=JSON.stringify(w);if(key===signature){if(error)error.textContent=getMessage();return;}signature=key;
+  let restoreFocus=root.contains(d.activeElement);for(let node=root;restoreFocus&&node;node=node.parentElement)if(node.inert||node.hidden)restoreFocus=false;
   const app=SOFTWARE[w.appId],wrap=el(d,'section',{className:'pc-installer'}),banner=el(d,'aside',{className:'installer-banner'}),body=el(d,'div',{className:'installer-body'}),content=el(d,'div',{className:'installer-content'}),actions=el(d,'footer',{className:'installer-actions'});
   banner.append(el(d,'strong',{text:app.name}),el(d,'span',{text:'МАСТЕР\nУСТАНОВКИ'}));body.append(content,actions);wrap.append(banner,body);root.replaceChildren(wrap);
   const titles={welcome:'Добро пожаловать',destination:'Выбор папки установки',summary:'Всё готово к установке',install:'Установка',finish:'Установка завершена'};
-  content.append(el(d,'h2',{text:titles[w.step]}),el(d,'p',{text:app.name+' · Windows HP'}));let input=null;
+  const heading=el(d,'h2',{text:titles[w.step],attributes:{tabindex:'-1'}});content.append(heading,el(d,'p',{text:app.name+' · Windows HP'}));let input=null;
   if(w.step==='welcome')content.append(el(d,'p',{text:'Мастер поможет установить '+app.name+' на игровой компьютер.'}));
   if(w.step==='destination'){const label=el(d,'label',{text:'Папка на диске C:'});input=el(d,'input',{value:w.path,attributes:{'aria-label':'Папка установки',maxlength:'180'}});label.append(input);content.append(label,el(d,'p',{text:'Можно выбрать собственную папку на виртуальном C:.'}));}
   if(['summary','install','finish'].includes(w.step))content.append(el(d,'p',{text:'Папка: '+w.path}));
@@ -65,6 +66,7 @@ export function mountInstaller(root,{getState,onAction,getMessage=()=>''}){
   const back=button(d,'< Назад',{},()=>onAction('back'));back.disabled=!['destination','summary'].includes(w.step);
   const label={summary:'Установить',install:'Завершить установку',finish:'Готово'}[w.step]??'Далее >';
   const next=button(d,label,{},()=>onAction('next',input?.value));actions.append(back,next,button(d,'Отмена',{},()=>onAction('cancel-installer')));
+  if(restoreFocus)(input??heading).focus();
  }
  update();return {update,dispose(){root.replaceChildren();}};
 }

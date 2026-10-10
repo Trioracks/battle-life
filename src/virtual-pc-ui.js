@@ -180,7 +180,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     else {const actions={'download-client':software.downloadClient,'download-metadata':software.downloadMetadata,'open-metadata':software.openMetadata,installer:software.openInstaller,pause:software.pauseTransfer,resume:software.resumeTransfer,cancel:software.cancelTransfer,'cancel-installer':software.cancelInstaller};result=actions[action]?.(pc.state,id);}
     if(!result)return;
     pc.message=softwareMessage(result.reason);pc.persist(result.state);
-    if(action==='installer'&&result.ok){pc.windows=reduceWindows(pc.windows,{type:'open',id:'installer',appId:'installer',title:'Мастер установки — '+(id==='client'?'torent':'FT Studio')});pc.renderDesktop(false);pc.shell.focusActive();return;}
+    if(action==='installer'&&result.ok){pc.cancelStudioLaunch();pc.windows=reduceWindows(pc.windows,{type:'open',id:'installer',appId:'installer',title:'Мастер установки — '+(id==='client'?'torent':'FT Studio')});pc.renderDesktop(false);pc.shell.focusActive();return;}
     if(!pc.state.software.installer&&pc.windows.windows.some(w=>w.id==='installer'))pc.closeNow('installer');
     pc.renderDesktop(false);
     if(action==='open-metadata'&&result.ok)pc.open('torent');
