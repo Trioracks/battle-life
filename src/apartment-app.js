@@ -17,6 +17,9 @@ import {advanceBeatWork,restoreMusicNeeds,workBlockReason,effectiveBeatSkill} fr
 import {BEAT_RULES} from './beat-catalog.js';
 import {createBeatWorkPanel} from './beat-work-view.js?rev=21';
 import {createBeatWorkAudio} from './beat-work-audio.js?rev=21';
+import {consumeFood} from './home-food.js';
+import {createCharacterSpeech,workNeedSpeech} from './character-speech.js';
+import {mountHomeNeedsView,mountCharacterSpeech} from './home-needs-view.js';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false,stepVariation=0;
@@ -48,11 +51,18 @@ try{
   const pcRoot=$('#virtual-pc'),savedPc=loadVirtualPcState(storage);let pcState=savedPc.state;
   let pcStorageWarning=savedPc.ok?'':'Сохранение виртуального ПК недоступно.';
   let virtualPc,workReward=0,lastWorkJob=null,lastWorkBeat=null;
+  const fridgeRoot=document.createElement('section'),speechRoot=document.createElement('div');document.body.append(fridgeRoot,speechRoot);canvas.tabIndex=0;
+  const speech=createCharacterSpeech({beep:()=>{if(audio?.state==='running'&&!document.hidden)playSoundCue('speech',audio);}}),speechView=mountCharacterSpeech(speechRoot);
+  const fridgeView=mountHomeNeedsView(fridgeRoot,{
+    returnFocus:canvas,onClose:()=>{if(motion.actionId==='fridge'&&motion.phase==='perform')motion.leaveAction();last=performance.now();},
+    onConsume:id=>{const result=consumeFood(pcState,id);if(result.ok){persistPc(result.state);virtualPc.syncState(pcState);}fridgeView.update(pcState,pcStorageWarning);},
+  });
   function persistPc(next){
     pcState=createVirtualPcState(next);
     const saved=saveVirtualPcState(storage,pcState);
     pcStorageWarning=saved?'':'Сохранение виртуального ПК недоступно.';
     virtualPc?.setPersistenceWarning(pcStorageWarning);
+    if(fridgeView.isOpen)fridgeView.update(pcState,pcStorageWarning);
     return saved;
   }
   const pcSounds=new PcSounds();let pcPrepareError=false;
@@ -94,6 +104,7 @@ try{
   let message='',messageUntil=0,last=performance.now(),lastStep=0,lastDoor=false,frameRate=60;
   function setMode(next){
     lookInput.stop();
+    if(next!=='game')fridgeView.close();
     mode=next;document.body.dataset.mode=next;
     $('#main-menu').hidden=next!=='menu';$('#creator').hidden=next!=='creator';
     $('#destinations').hidden=next!=='destinations';
@@ -109,6 +120,7 @@ try{
   function resumeAnimation(){paused=false;$('#pause').textContent='Пауза';}
   function enterApartment(nextProfile){
     pcLifecycle.reset();
+    speech.clear();
     view.modes.mode='2D';view.modes.revision++;cameraLabel();
     profile=nextProfile;motion=new ApartmentMotion(config);if(homeTime.initialRest||homeTime.isSleeping)motion.startSleeping();view.setAppearance(profile.appearance);
     playing=true;lastStep=0;lastDoor=false;hold=false;skeleton=false;$('#hold').checked=false;$('#show-bones').checked=false;
@@ -192,7 +204,7 @@ try{
   for(const district of districts){const b=document.createElement('button');b.textContent=district.name;b.dataset.district=district.id;b.addEventListener('click',()=>showDistrict(district.id));$('#districts').append(b);}
   showDistrict('north-sloboda');
   $('#return-home').addEventListener('click',()=>{if(motion.returnHome()){setMode('game');resumeAnimation();cue('door');}});
-  function act(id){if(pcLifecycle.pending||pcLifecycle.snapshot.phase!=='room')return;resumeAnimation();if(id==='computer'&&workBlockReason(pcState)){message=workBlockReason(pcState);messageUntil=performance.now()+6000;return;}if(id==='entry'){if(!motion.busy)setMode('door');return;}const result=id==='computer'?{allowed:beginPcCutscene(motion)}:startHomeAction(motion,homeTime,id);if(result.allowed){if(id==='computer'){pcPrepareError=false;virtualPc.prepareAudio();pcSounds.unlock().catch(()=>{});pcLifecycle.prepare();}else cue('footstep');}else if(result.reason){message=result.reason;messageUntil=performance.now()+5000;}}
+  function act(id){if(fridgeView.isOpen||pcLifecycle.pending||pcLifecycle.snapshot.phase!=='room')return;resumeAnimation();if(id==='computer'&&workBlockReason(pcState)){message=workBlockReason(pcState);messageUntil=performance.now()+6000;speech.say(workNeedSpeech(pcState));return;}if(id==='entry'){if(!motion.busy)setMode('door');return;}const result=id==='computer'?{allowed:beginPcCutscene(motion)}:startHomeAction(motion,homeTime,id);if(result.allowed){if(id==='computer'){pcPrepareError=false;virtualPc.prepareAudio();pcSounds.unlock().catch(()=>{});pcLifecycle.prepare();}else cue('footstep');}else if(result.reason){message=result.reason;messageUntil=performance.now()+5000;}}
   $('#door-peek').addEventListener('click',()=>{setMode('game');act('peephole');});
   $('#door-exit').addEventListener('click',()=>{setMode('game');resumeAnimation();motion.interact('entry');});
   $('#door-cancel').addEventListener('click',()=>setMode('game'));
@@ -204,7 +216,7 @@ try{
     if(config.actions[id]?.lightRoom)b.setAttribute('aria-label',label);
     $('#actions').append(b);
   }
-  canvas.addEventListener('pointerdown',e=>{if(!lookInput.canPick(e)||cameraFade||mode!=='game')return;const hit=view.pick(e);resumeAnimation();if(hit.id)act(hit.id);else if(hit.hero)motion.faceCamera();else if(Number.isFinite(hit.x)&&moveInRoom(motion,pcLifecycle,hit.x))cue('footstep');});
+  canvas.addEventListener('pointerdown',e=>{if(fridgeView.isOpen||!lookInput.canPick(e)||cameraFade||mode!=='game')return;const hit=view.pick(e);resumeAnimation();if(hit.id)act(hit.id);else if(hit.hero)motion.faceCamera();else if(Number.isFinite(hit.x)&&moveInRoom(motion,pcLifecycle,hit.x))cue('footstep');});
   canvas.addEventListener('pointermove',e=>{if(mode!=='game'){canvas.style.cursor='default';return;}const delta=lookInput.move(e);if(delta){view.modes.look(...delta);canvas.style.cursor='grabbing';$('#hover-label').textContent='';return;}const hit=view.pick(e);canvas.style.cursor=hit.id||hit.hero?'pointer':'crosshair';
     const action=config.actions[hit.id];$('#hover-label').textContent=action?.lightRoom?(homeTime.lights[action.lightRoom]?'Выключить':'Включить')+' свет '+(action.lightRoom==='living'?'в комнате':'на кухне'):action?.label??(hit.hero?'Повернуться к камере':'');});
   canvas.addEventListener('pointerleave',()=>$('#hover-label').textContent='');
@@ -214,6 +226,7 @@ try{
   $('#step').addEventListener('click',()=>{paused=true;$('#pause').textContent='Продолжить';update(1/30,performance.now(),true);});$('#face').addEventListener('click',()=>motion.faceCamera());
   document.addEventListener('keydown',e=>{if(e.defaultPrevented||e.key!=='Escape')return;if(mode==='peephole')stopPeeking();else if(mode==='door')setMode('game');else if(mode==='pc')virtualPc.closeWindow();else if(mode==='game')setMode('menu');});
   function update(dt,now,step=false){
+    if(mode!=='game'||cameraFade||document.hidden){speech.tick(0,{present:false});speechView.update(speech.snapshot);}
     cameraLabel();
     view.setComputerPresentation(pcLifecycle.snapshot,pcState,profile?.name??'Игрок');
     if(cameraFade){view.render(motion,0,{paused:true});return;}
@@ -227,13 +240,13 @@ try{
     if(mode==='menu'||mode==='destinations'||mode==='door'){view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));view.render(motion,0,{paused:true});return;}
     let events=[];
     syncWorkAudio();
-    if((!paused||step)&&!document.hidden){
+    if((!paused||step)&&!document.hidden&&!fridgeView.isOpen){
       if(mode==='pc'&&pcLifecycle.snapshot.phase.startsWith('work')){
         if(pcLifecycle.snapshot.phase==='working'&&pcState.music.job){
           lastWorkJob={...pcState.music.job};lastWorkBeat=pcState.projects.find(p=>p.id===lastWorkJob.beatId);
           const r=advanceBeatWork(pcState,dt*pcState.music.job.total/BEAT_RULES.workSeconds);pcState=r.state;homeTime.advanceMinutes(r.minutes);pcState=advanceVirtualPc(pcState,homeTime).state;virtualPc.syncState(pcState);
           if(r.finished){workReward=1;lastWorkJob.elapsed=lastWorkJob.total;}
-          if(r.finished||r.blocked){pcLifecycle.finishWork({blocked:r.blocked});syncWorkAudio();if(r.blocked){message=r.reason||workBlockReason(pcState);messageUntil=now+10000;}}
+          if(r.finished||r.blocked){pcLifecycle.finishWork({blocked:r.blocked});syncWorkAudio();if(r.blocked){message=r.reason||workBlockReason(pcState);messageUntil=now+10000;speech.say(workNeedSpeech(pcState),{afterRoom:true});}}
           if(r.finished||r.blocked||now-lastWorkSave>1000){saveHomeTime(storage,homeTime);persistPc(pcState);lastWorkSave=now;}
         }
       }else if(mode==='pc'){
@@ -255,6 +268,7 @@ try{
       }
       if(event.type==='completed'){if(!(event.id==='computer'&&pcPrepareError)){message=completed[event.id]??message;messageUntil=now+4000;}saveHomeTime(storage,homeTime);}
       if(event.type==='started'&&event.id==='bed')saveHomeTime(storage,homeTime);
+      if(event.type==='started'&&event.id==='fridge')fridgeView.open(pcState,pcStorageWarning);
       if(event.type==='started'&&event.id==='computer')openComputer();
       if(event.type==='started'&&event.id==='peephole'){setMode('peephole');view.renderPeephole($('#peek-stage').getBoundingClientRect());return;}
       if(event.type==='exited'){saveHomeTime(storage,homeTime);setMode('destinations');}
@@ -269,7 +283,10 @@ try{
     if(motion.clip==='walk'&&motion.walkDistance-lastStep>config.stride/2){cue('footstep');lastStep=motion.walkDistance;}
     const door=motion.doorOpen>.3;if(door&&!lastDoor)cue('door');lastDoor=door;
     view.setRoomLights(homeTime.lights);view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));
-    if(pcNeedsSceneFrame(pcLifecycle.snapshot,mode))view.render(motion,paused&&!step?0:dt*(pcLifecycle.snapshot.phase==='working'?4:1),{skeleton,paused:paused&&!step});$('#fade').style.opacity=motion.fade;
+    if(pcNeedsSceneFrame(pcLifecycle.snapshot,mode))view.render(motion,(paused&&!step)||fridgeView.isOpen?0:dt*(pcLifecycle.snapshot.phase==='working'?4:1),{skeleton,paused:(paused&&!step)||fridgeView.isOpen});$('#fade').style.opacity=motion.fade;
+    const headAnchor=view.getHeadScreenPosition(),firstPerson=view.modes.mode==='3D',roomReady=pcLifecycle.snapshot.phase==='room'&&motion.actionId!=='computer'&&motion.fade<.01;
+    speech.tick(paused?0:dt,{hidden:document.hidden,present:mode==='game'&&!cameraFade&&roomReady&&!fridgeView.isOpen&&(firstPerson||headAnchor.visible),roomReady,audioAllowed:audio?.state==='running'});
+    speechView.update(speech.snapshot,headAnchor,{firstPerson,width:innerWidth,height:innerHeight,bottomLimit:$('#controls').getBoundingClientRect().top-12});
     virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,gameDay:homeTime.day,skills:profile?.skills});
     $('#home-time').textContent=`${homeTime.dateLabel} · ${homeTime.label} · ${homeTime.period} · Дом`;
     if(now-lastTimeSave>(homeTime.isSleeping?500:15000)){saveHomeTime(storage,homeTime);persistPc(pcState);lastTimeSave=now;}
@@ -285,7 +302,7 @@ try{
     else if(motion.phase==='walk')status.textContent='Идёт '+(motion.targetX<motion.position[0]?'влево':'вправо');
     else status.textContent=now<messageUntil?message:`Клик по полу — идти. Сытость ${Math.round(pcState.music.needs.satiety)} · энергия ${Math.round(pcState.music.needs.energy)}.`;
     for(const b of $('#actions').children){
-      b.disabled=motion.busy;b.classList.toggle('active',b.dataset.action===motion.actionId);
+      b.disabled=motion.busy||fridgeView.isOpen;b.classList.toggle('active',b.dataset.action===motion.actionId);
       if(b.dataset.action==='passage')b.textContent=motion.position[0]<0?'Перейти в комнату':'Перейти на кухню';
       const room=config.actions[b.dataset.action]?.lightRoom;
       if(room){b.textContent=`Свет: ${room==='living'?'комната':'кухня'} · ${homeTime.lights[room]?'вкл.':'выкл.'}`;b.setAttribute('aria-pressed',String(homeTime.lights[room]));}
@@ -294,6 +311,6 @@ try{
   loading.hidden=true;setMode('menu');view.render(motion,0);
   function frame(now){const raw=(now-last)/1000,dt=Math.min(raw,.25);if(raw>0)frameRate=frameRate*.9+Math.min(240,1/raw)*.1;last=now;update(dt,now);requestAnimationFrame(frame);}requestAnimationFrame(frame);
   document.addEventListener('visibilitychange',()=>{last=performance.now();if(document.hidden){syncWorkAudio(true);virtualPc.beatAudio.stop();saveHomeTime(storage,homeTime);persistPc(pcState);}});
-  window.addEventListener('pagehide',event=>{saveHomeTime(storage,homeTime);persistPc(pcState);syncWorkAudio(true);virtualPc.beatAudio.stop();if(event.persisted){pcSounds.stop();return;}workAudio.dispose();workPanel.dispose();pcLifecycle.reset();pcSounds.dispose();virtualPc.dispose();view.dispose();});
+  window.addEventListener('pagehide',event=>{saveHomeTime(storage,homeTime);persistPc(pcState);syncWorkAudio(true);virtualPc.beatAudio.stop();if(event.persisted){pcSounds.stop();return;}fridgeView.dispose();speechView.dispose();workAudio.dispose();workPanel.dispose();pcLifecycle.reset();pcSounds.dispose();virtualPc.dispose();view.dispose();});
   window.addEventListener('pageshow',event=>{if(event.persisted)last=performance.now();});
 }catch(error){console.error(error);loading.querySelector('h2').textContent='Не удалось загрузить сцену';loading.querySelector('p').textContent=error.message;loading.classList.add('error');}

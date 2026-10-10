@@ -1,4 +1,5 @@
 import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=21';
+import {normalizeHousehold} from './home-food.js';
 export const VIRTUAL_PC_STORAGE_KEY = 'battle-life-virtual-pc-v1';
 export const VIRTUAL_DISK_MB = 16000;
 export const SYSTEM_RESERVED_MB = 14000;
@@ -66,6 +67,7 @@ function normalizeSnapshot(value) {
     download: normalizeDownload(source.download),
     projects,
     music:normalizeMusic(source.music,projects),
+    household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),
     draft: isRecord(source.draft) ? clone(source.draft) : null,
     lastGameMinute: Number.isFinite(source.lastGameMinute) && source.lastGameMinute >= 0 ? source.lastGameMinute : null,
@@ -148,11 +150,19 @@ export function saveStudioProject(state, project) {
 export function saveVirtualPcState(storage, state) {
   try {
     if (!storage) return false;
+    const raw=storage.getItem?.(VIRTUAL_PC_STORAGE_KEY);
+    let parsed;try{parsed=raw?JSON.parse(raw):null;}catch{/* A fresh game may replace an unreadable save, as before. */}
+    if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'household'))reserveHouseholdBackup(storage,raw);
     storage.setItem(VIRTUAL_PC_STORAGE_KEY, JSON.stringify(normalizeSnapshot(state)));
     return true;
   } catch {
     return false;
   }
+}
+
+function reserveHouseholdBackup(storage,raw){
+  const key=VIRTUAL_PC_STORAGE_KEY+'-before-household';
+  if(storage.getItem(key)===null)storage.setItem(key,raw);
 }
 
 export function loadVirtualPcState(storage) {
@@ -162,6 +172,9 @@ export function loadVirtualPcState(storage) {
     if (raw === null) return { ok: true, state: createVirtualPcState() };
     const parsed = JSON.parse(raw);
     if (!isRecord(parsed) || parsed.version !== 1) return { ok: false, state: createVirtualPcState() };
+    if(!Object.hasOwn(parsed,'household')){
+      try{reserveHouseholdBackup(storage,raw);}catch{return {ok:false,reason:'household-backup-failed',state:createVirtualPcState(parsed)};}
+    }
     return { ok: true, state: createVirtualPcState(parsed) };
   } catch {
     return { ok: false, state: createVirtualPcState() };

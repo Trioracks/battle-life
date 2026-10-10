@@ -1,4 +1,5 @@
 const cues = Object.freeze({
+  speech: { id: 'speech', type: 'tick', frequency: 470, duration: .025, volume: .012 },
   footstep: { id: 'footstep', type: 'tick', frequency: 130, duration: .045 },
   computer: { id: 'computer', type: 'rise', frequency: 380, duration: .12 },
   'chair-scrape': { id: 'chair-scrape', type: 'noise', frequency: 96, duration: .17 },
@@ -24,7 +25,7 @@ export function playSoundCue(id, context = null) {
   oscillator.type = cue.type === 'noise' ? 'triangle' : 'sine';
   oscillator.frequency.setValueAtTime(cue.frequency, context.currentTime);
   if (cue.type === 'rise') oscillator.frequency.exponentialRampToValueAtTime(cue.frequency * 1.35, context.currentTime + cue.duration);
-  gain.gain.setValueAtTime(.035, context.currentTime);
+  gain.gain.setValueAtTime(cue.volume??.035, context.currentTime);
   gain.gain.exponentialRampToValueAtTime(.001, context.currentTime + cue.duration);
   oscillator.connect(gain).connect(context.destination);
   oscillator.start();

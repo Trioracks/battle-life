@@ -269,5 +269,10 @@ export async function createApartmentScene(canvas,config){
     for(const [material,color] of actorColors)if(material.userData.tintChannel)color.copy(material.color);
     return result;
   }
-  return {modes,loadMode,prepareComputerView,beginComputerView,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,clips:[...animation.actions.keys()],dispose(){disposed=true;computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,outsideMask])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
+  function getHeadScreenPosition(){
+    const rect=canvas.getBoundingClientRect(),point=head?head.getWorldPosition(new THREE.Vector3()):actor.localToWorld(new THREE.Vector3(0,eyeHeight,0));
+    point.y+=.24;point.project(modes.mode==='3D'?firstCamera:camera);
+    return {x:rect.left+(point.x+1)*rect.width/2,y:rect.top+(1-point.y)*rect.height/2,visible:actor.visible&&!computerActive&&modes.mode!=='3D'};
+  }
+  return {modes,loadMode,prepareComputerView,beginComputerView,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,getHeadScreenPosition,clips:[...animation.actions.keys()],dispose(){disposed=true;computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,outsideMask])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
 }
