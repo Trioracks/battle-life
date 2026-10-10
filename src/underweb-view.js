@@ -1,8 +1,8 @@
 import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=21';
-import {resolveUnderweb} from './virtual-pc-catalog.js?rev=24';
-import {createBeatMarket} from './beat-market-view.js?rev=24';
-import {softwareForum,softwareMessage} from './pc-software-view.js?rev=24';
-import {downloadPresentation} from './virtual-pc-runtime.js?rev=24';
+import {resolveUnderweb} from './virtual-pc-catalog.js?rev=25';
+import {createBeatMarket} from './beat-market-view.js?rev=25';
+import {softwareForum,softwareMessage} from './pc-software-view.js?rev=25';
+import {downloadPresentation} from './virtual-pc-runtime.js?rev=25';
 const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-control '+(options.className??'')},fn);
 
 export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,getSoftwareMessage=()=>''}){

@@ -1,5 +1,6 @@
 import {drumById,loopSeconds} from './beat-catalog.js';
 import {beginnerById} from './beat-beginner-bank.js?rev=21';
+import {normalizeBeatMix} from './beat-mix.js?rev=25';
 
 // A project has one musical clock, even when a legacy drum loop is shorter.
 export function resolveBeatPlayback(beat,{workStage=null}={}){
@@ -13,5 +14,6 @@ export function resolveBeatPlayback(beat,{workStage=null}={}){
  const chosen=workStage===null?ids.slice(0,Math.min(3,beat.stages.length)):[ids[workStage]];
  if(!chosen.length)return fail('Сначала завершите ритмическую основу.');
  const owner=workStage===null?'studio':'work',parts=chosen.map(id=>({id,loopSeconds:beginnerById(id)?32/3:loopSeconds()}));
- return {ok:true,reason:'',descriptor:{key:JSON.stringify([beat.id,owner,workStage,chosen]),owner,durationSeconds,parts}};
+ const mix=normalizeBeatMix(beat.mix);
+ return {ok:true,reason:'',descriptor:{key:JSON.stringify([beat.id,owner,workStage,chosen,mix]),owner,durationSeconds,parts,mix}};
 }

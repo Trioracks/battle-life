@@ -1,6 +1,7 @@
 import {drumById,loopSeconds} from './beat-catalog.js';
 import {beginnerById} from './beat-beginner-bank.js?rev=21';
-import {resolveBeatPlayback} from './beat-playback.js?rev=21';
+import {resolveBeatPlayback} from './beat-playback.js?rev=25';
+import {connectBeatMix} from './beat-mix.js?rev=25';
 
 // Authored placeholder PCM, not a remix of third-party music. Sliders never enter here.
 export function primitiveSamples(kind,rate=44100){
@@ -73,7 +74,8 @@ export class BeatAudio{
    await this.unlock();if(!this.current(token))return false;
    const buffers=await Promise.all(descriptor.parts.map(part=>this.buffer(part.id,token)));
    if(!this.current(token))return false;
-   this.gain=this.context.createGain();this.gain.gain.value=.7;this.gain.connect(this.context.destination);
+   this.gain=this.context.createGain();this.gain.gain.value=.7;
+   this.effects=connectBeatMix(this.context,descriptor.mix,this.context.destination);this.gain.connect(this.effects.input);
    const when=this.context.currentTime+.04;this.startedAt=when;
    buffers.forEach((buffer,index)=>{
     const part=descriptor.parts[index],source=this.context.createBufferSource();source.buffer=buffer;source.loop=true;source.loopStart=0;source.loopEnd=part.loopSeconds;source.connect(this.gain);this.sources.push(source);source.start(when,offset%part.loopSeconds);
@@ -95,23 +97,24 @@ export class BeatAudio{
   const offset=this.getSnapshot().positionSeconds;
   this.stop();this.offset=offset;this.status='paused';
  }
- release(voices,gain){
+ release(voices,gain,effects){
   for(const source of voices){try{source.stop();}catch{/* Already ended. */}try{source.disconnect();}catch{/* Already disconnected. */}}
   try{gain?.disconnect();}catch{/* Already disconnected. */}
+  effects?.dispose();
  }
  clearRetiring(){
-  for(const item of this.retiring){clearTimeout(item.timer);this.release(item.voices,item.gain);}
+  for(const item of this.retiring){clearTimeout(item.timer);this.release(item.voices,item.gain,item.effects);}
   this.retiring=[];
  }
  stop({fadeSeconds=0}={}){
   this.generation++;this.pending=null;this.clearRetiring();
-  const voices=this.sources,gain=this.gain;this.sources=[];this.gain=null;
+  const voices=this.sources,gain=this.gain,effects=this.effects;this.sources=[];this.gain=null;this.effects=null;
   const fade=Math.min(.08,Math.max(0,Number(fadeSeconds)||0));
   if(fade&&voices.length&&gain?.gain?.linearRampToValueAtTime){
    const now=this.context.currentTime;gain.gain.setValueAtTime?.(gain.gain.value,now);gain.gain.linearRampToValueAtTime(0,now+fade);
    for(const source of voices){try{source.stop(now+fade);}catch{/* Already ended. */}}
-   const item={voices,gain,timer:null};item.timer=setTimeout(()=>{this.release(voices,gain);this.retiring=this.retiring.filter(other=>other!==item);},fade*1000+20);this.retiring.push(item);
-  }else this.release(voices,gain);
+   const item={voices,gain,effects,timer:null};item.timer=setTimeout(()=>{this.release(voices,gain,effects);this.retiring=this.retiring.filter(other=>other!==item);},fade*1000+20);this.retiring.push(item);
+  }else this.release(voices,gain,effects);
   this.offset=0;this.status='stopped';this.error='';
  }
  dispose(){this.stop();this.disposed=true;this.cache.clear();Promise.resolve(this.context?.close()).catch(()=>{});}

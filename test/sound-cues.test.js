@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getSoundCue } from '../src/sound-cues.js?rev=24';
+import { getSoundCue } from '../src/sound-cues.js?rev=25';
 
 test('sound registry reserves stable replaceable keys for apartment feedback', () => {
   assert.deepEqual(getSoundCue('footstep'), { id: 'footstep', type: 'tick', frequency: 130, duration: .045 });

@@ -1,4 +1,4 @@
-import {createProfile,saveProfile,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=24';
+import {createProfile,saveProfile,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=25';
 
 export function validateCreatorDraft(draft){
  try{return {ok:true,profile:createProfile(draft),errors:{}};}

@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=24';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=24';
-import {advanceBeatWork,createBeat,startBeatStage,restoreMusicNeeds} from '../src/beat-production.js?rev=24';
-import {createStudioProject} from '../src/ft-studio-project.js?rev=24';
+import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=25';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=25';
+import {advanceBeatWork,createBeat,startBeatStage,restoreMusicNeeds} from '../src/beat-production.js?rev=25';
+import {createStudioProject} from '../src/ft-studio-project.js?rev=25';
 import {pcDocument,allPc,findButton,fire} from './helpers/virtual-pc-dom.js';
 function setup(){const d=pcDocument(),root=d.createElement('section');let launch,work=0;const pc=mountVirtualPc(root,{audio:{stop(){},dispose(){}},beatAudio:{play:async()=>true,stop(){},dispose(){}},setTimeoutFn:f=>(launch=f,1),clearTimeoutFn(){},onWork:()=>{work++;return true;}});pc.showDesktop(createVirtualPcState({power:'on',download:{status:'installed'}}));pc.syncHost({playerName:'Игрок',clockLabel:'10:00',skills:{beatmaking:40}});return {pc,root,launch:()=>launch(),work:()=>work};}
 const field=(root,label)=>allPc(root).find(n=>n.getAttribute('aria-label')===label);

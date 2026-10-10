@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mountHomeNeedsView,mountCharacterSpeech} from '../src/home-needs-view.js?rev=24';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=24';
-import {consumeFood} from '../src/home-food.js?rev=24';
+import {mountHomeNeedsView,mountCharacterSpeech} from '../src/home-needs-view.js?rev=25';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=25';
+import {consumeFood} from '../src/home-food.js?rev=25';
 import {pcDocument,allPc,fire} from './helpers/virtual-pc-dom.js';
 test('fridge delegates consume, updates stock, closes Escape and restores room focus',()=>{
  const doc=pcDocument(),root=doc.createElement('section'),focus=doc.createElement('canvas');let chosen='',closed=0;

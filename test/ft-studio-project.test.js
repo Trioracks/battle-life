@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { BATTLE_BRIEFS } from '../src/virtual-pc-catalog.js?rev=24';
+import { BATTLE_BRIEFS } from '../src/virtual-pc-catalog.js?rev=25';
 import {
   createStudioProject,
   normalizeStudioProject,
@@ -9,7 +9,7 @@ import {
   setBpm,
   setStudioStep,
   setTrackGain,
-} from '../src/ft-studio-project.js?rev=24';
+} from '../src/ft-studio-project.js?rev=25';
 
 const battleId = BATTLE_BRIEFS[0].id;
 

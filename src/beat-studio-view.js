@@ -1,9 +1,10 @@
 import {pcElement as el,pcButton as button,pcFind,pcFocusable} from './virtual-pc-dom.js?rev=21';
-import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=24';
+import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=25';
 import {BEAT_STAGES} from './beat-catalog.js';
-import {randomBeatName} from './beat-names.js?rev=24';
-import {resolveBeatPlayback} from './beat-playback.js?rev=21';
-import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=24';
+import {randomBeatName} from './beat-names.js?rev=25';
+import {resolveBeatPlayback} from './beat-playback.js?rev=25';
+import {describeBeatMix} from './beat-mix.js?rev=25';
+import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=25';
 
 export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio,legacyName,initialProject}){
  const d=root.ownerDocument,workspace=createStudioWorkspace(d,{projectName:legacyName});root.replaceChildren(workspace);
@@ -75,6 +76,10 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
    const stage=beat.stages.length,job=s.music.job?.beatId===beat.id?s.music.job:null;
    workflow.append(el(d,'span',{className:'ft-workflow-stage',text:stage===3?'Бит готов · 3 / 3':'Этап '+(stage+1)+' / 3 · '+BEAT_STAGES[stage].name}));
    panel.append(el(d,'h2',{text:beat.name}));
+   const sound=describeBeatMix(beat.mix),mixPanel=el(d,'section',{className:'ft-stage-result',dataset:{ftRole:'mix-character'}});
+   mixPanel.append(el(d,'h3',{text:sound.label}),el(d,'p',{text:sound.detail}));
+   if(sound.skill!==undefined)mixPanel.append(el(d,'small',{text:'Звук при создании: '+sound.skill+'/100 · сохранён с проектом'}));
+   panel.append(mixPanel);
    const steps=el(d,'ol',{className:'ft-stage-list'});BEAT_STAGES.forEach((item,i)=>steps.append(el(d,'li',{text:(i<stage?'✓ ':i===stage?'→ ':'○ ')+item.name,dataset:{complete:String(i<stage)}})));panel.append(steps);
    for(let i=0;i<stage;i++){
     const result=el(d,'section',{className:'ft-stage-result'});

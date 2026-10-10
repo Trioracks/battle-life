@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {ApartmentMotion} from '../src/apartment-v3-motion.js';
-import {ApartmentTime} from '../src/apartment-v3-time.js?rev=24';
+import {ApartmentTime} from '../src/apartment-v3-time.js?rev=25';
 
-async function runtime(){let module;try{module=await import('../src/apartment-v3-runtime.js?rev=24');}catch{}assert.equal(typeof module?.advanceHomeFrame,'function','game time and motion must share a tested frame integration');return module;}
+async function runtime(){let module;try{module=await import('../src/apartment-v3-runtime.js?rev=25');}catch{}assert.equal(typeof module?.advanceHomeFrame,'function','game time and motion must share a tested frame integration');return module;}
 const config={bounds:[-6,6.15],spawn:[2,0,.85],speed:1.1,doorX:0,actions:{
   bed:{approach:[2,0,.85],pose:[1.84,.95,-.8],yaw:Math.PI/2,clip:'sleep',fade:true,duration:5},
   entry:{label:'Выйти',approach:[5.98,0,.85],pose:[6.04,0,.675],yaw:Math.PI/2,clip:'open-door',fade:false,duration:3}

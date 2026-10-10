@@ -1,4 +1,4 @@
-import {FOOD_CATALOG,normalizeHousehold} from './home-food.js?rev=24';
+import {FOOD_CATALOG,normalizeHousehold} from './home-food.js?rev=25';
 export function mountHomeNeedsView(root,{onConsume=()=>{},onClose=()=>{},returnFocus=null}={}) {
  const doc=root.ownerDocument,make=(tag,text)=>{const n=doc.createElement(tag);if(text)n.textContent=text;return n;};
  root.className='home-fridge-overlay';root.hidden=true;root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-label','Холодильник');

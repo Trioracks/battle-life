@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {Group,Mesh,MeshStandardMaterial,Ray,Vector3,Triangle} from '../vendor/three/three.module.js';
-import {normalizeAppearance,applyAppearance,createProfile,saveProfile,loadProfile} from '../src/avatar-v3-profile.js?rev=24';
+import {normalizeAppearance,applyAppearance,createProfile,saveProfile,loadProfile} from '../src/avatar-v3-profile.js?rev=25';
 import {readGlb} from './helpers/glb-pose.js';
 test('new wardrobe choices and independent colors survive normalization; old shaggy retains bowl silhouette',()=>{
   for(const [key,ids] of Object.entries({hair:['bald','lake','buzz','crop','parted','bowl','messy','longshag'],beard:['none','stubble','short','full','goatee','chinstrap'],mustache:['none','pencil','classic','walrus','handlebar','horseshoe'],top:['tee','shirt','hoodie','sweater','tank','turtleneck'],bottom:['jeans','skinny','breeches','shorts','sports'],footwear:['sneakers','canvas','boots','sandals','flipflops']}))for(const id of ids)assert.equal(normalizeAppearance({[key]:id})[key],id);

@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=24';
-import {createVirtualPcState,saveVirtualPcState,loadVirtualPcState} from '../src/virtual-pc-state.js?rev=24';
-import {resolveUnderweb} from '../src/virtual-pc-catalog.js?rev=24';
-import {createStudioProject} from '../src/ft-studio-project.js?rev=24';
+import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=25';
+import {createVirtualPcState,saveVirtualPcState,loadVirtualPcState} from '../src/virtual-pc-state.js?rev=25';
+import {resolveUnderweb} from '../src/virtual-pc-catalog.js?rev=25';
+import {createStudioProject} from '../src/ft-studio-project.js?rev=25';
 import {pcDocument,allPc,findButton,fire} from './helpers/virtual-pc-dom.js';
 
 function setup(seed={}){
