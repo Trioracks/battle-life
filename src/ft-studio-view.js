@@ -9,11 +9,16 @@ export const FT_TRACKS=Object.freeze([
 export function renderStudioTracks(root,beat){
  const d=root.ownerDocument,stage=beat?.stages?.length??0;
  const tracks=stage?FT_TRACKS.slice(0,stage*3):[{name:'Дорожка 01',stage:0,color:'empty'}];
+ if(stage===3&&beat.recording?.draft){
+  tracks.push({name:'Draft Vocal',stage:3,color:'vocal',muted:Boolean(beat.recording.clean)});
+  if(beat.recording.clean)tracks.push({name:'Clean Vocal',stage:4,color:'vocal-clean'});
+ }
  const rows=pcFind(root,n=>n.dataset?.ftRole==='lanes');rows.replaceChildren();
  pcFind(root,n=>n.dataset?.ftRole==='track-count').textContent=tracks.length+' TRACKS';
  for(const track of tracks){
-  const row=el(d,'div',{className:'ft-lane',dataset:{stage:String(track.stage),color:track.color}}),label=el(d,'div',{className:'ft-lane-label'});
+  const row=el(d,'div',{className:'ft-lane',dataset:{stage:String(track.stage),color:track.color,muted:String(Boolean(track.muted))}}),label=el(d,'div',{className:'ft-lane-label'});
   label.append(el(d,'i',{attributes:{'aria-hidden':'true'}}),el(d,'span',{text:track.name,dataset:{ftRole:'track-label'}}));
+  if(track.muted)label.append(el(d,'small',{text:'OFF',attributes:{title:'Черновик заменён чистовой записью и больше не воспроизводится'}}));
   const lane=el(d,'div',{className:'ft-lane-grid',dataset:{ftRole:'lane'},attributes:{'aria-hidden':'true'}});
   if(stage){const clip=el(d,'span',{className:'ft-audio-clip',text:track.name,dataset:{ftRole:'clip',color:track.color}});clip.style.marginLeft='0%';clip.style.width=(beat.version===3?25:12.5)+'%';lane.append(clip);}
   row.append(label,lane);rows.append(row);

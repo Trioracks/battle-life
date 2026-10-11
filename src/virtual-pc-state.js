@@ -1,9 +1,10 @@
-import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=27';
-import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=27';
-import {normalizeCommunity} from './underweb-community.js?rev=27';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=27';
-import {normalizeHousehold} from './home-food.js?rev=27';
-import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=27';
+import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=28';
+import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=28';
+import {normalizeRecordingState} from './vocal-production.js?rev=28';
+import {normalizeCommunity} from './underweb-community.js?rev=28';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=28';
+import {normalizeHousehold} from './home-food.js?rev=28';
+import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=28';
 export const VIRTUAL_PC_STORAGE_KEY = 'battle-life-virtual-pc-v1';
 export const VIRTUAL_DISK_MB = 16000;
 export const SYSTEM_RESERVED_MB = 14000;
@@ -75,6 +76,7 @@ function normalizeSnapshot(value) {
     projects,
     music:normalizeMusic(source.music,projects),
     writing:normalizeWriting(source.writing,projects),
+    recording:normalizeRecordingState(source.recording,projects),
     community:normalizeCommunity(source.community),
     household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),

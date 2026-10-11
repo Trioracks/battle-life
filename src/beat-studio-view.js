@@ -1,10 +1,12 @@
 import {pcElement as el,pcButton as button,pcFind,pcFocusable} from './virtual-pc-dom.js?rev=21';
-import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=27';
+import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=28';
 import {BEAT_STAGES} from './beat-catalog.js';
-import {randomBeatName} from './beat-names.js?rev=27';
-import {resolveBeatPlayback} from './beat-playback.js?rev=27';
-import {describeBeatMix} from './beat-mix.js?rev=27';
-import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=27';
+import {randomBeatName} from './beat-names.js?rev=28';
+import {resolveBeatPlayback} from './beat-playback.js?rev=28';
+import {describeBeatMix} from './beat-mix.js?rev=28';
+import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=28';
+import {startVocalWork} from './vocal-production.js?rev=28';
+import {appendRecordingControls} from './recording-studio-view.js?rev=28';
 
 export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio,legacyName,initialProject}){
  const d=root.ownerDocument,workspace=createStudioWorkspace(d,{projectName:legacyName});root.replaceChildren(workspace);
@@ -20,7 +22,13 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
  let signature='',message='',disposed=false,dialog=null,returnFocus=null,frame=null,sessionSelected=false;
  const win=d.defaultView??globalThis,requestFrame=win.requestAnimationFrame?.bind(win),cancelFrame=win.cancelAnimationFrame?.bind(win);
  const currentBeat=()=>sessionSelected?normalizeBeat(getState().projects.find(p=>p.id===getState().music.activeBeatId)):null;
- const stateSignature=()=>{const s=getState();return JSON.stringify([s.projects,s.music.activeBeatId,s.music.job?.beatId,s.music.job?.stage]);};
+ const stateSignature=()=>{const s=getState();return JSON.stringify([s.projects,s.music.activeBeatId,s.music.job?.beatId,s.music.job?.stage,s.recording?.job?.beatId,s.recording?.job?.kind]);};
+ let vocalDecisions;
+ function startRecording(kind,textId,sliders){
+  const beat=currentBeat();if(!beat)return;
+  const r=startVocalWork(getState(),{beatId:beat.id,kind,textId,sliders},getMetadata().skills);message=r.reason??'';
+  if(r.ok){closeDialog({restore:false});Promise.resolve(audio.unlock?.()).catch(()=>{});audio.stop();onChange(r.state);if(onWork?.()===false)message='Запись сохранена. Вернись к ПК, чтобы продолжить.';}render();
+ }
  function change(next){onChange(next);render();}
  function closeDialog({restore=true}={}){
   dialog?.remove();dialog=null;
@@ -33,7 +41,12 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
   dialog=el(d,'div',{className:'ft-dialog-backdrop',dataset:{ftRole:'dialog'},attributes:{role:'dialog','aria-modal':'true','aria-label':mode==='new'?'Новый проект':mode==='projects'?'Открыть проект':'FT Studio — начало работы'}});
   const card=el(d,'section',{className:'ft-dialog-card'});
   card.append(el(d,'span',{className:'ft-eyebrow',text:'FIELD TONE / STUDIO'}),el(d,'h2',{text:mode==='new'?'Как назовём бит?':mode==='projects'?'Твои проекты':'С чего начнём?'}));
-  if(mode==='new'){
+  if(mode==='vocals'){
+   card.children[1].textContent='Текст для записи';dialog.setAttribute('aria-label','Выбрать готовый текст');
+   const texts=getState().projects.filter(p=>p.kind==='lyrics'&&p.status==='ready');
+   for(const p of texts)card.append(button(d,p.name,{className:'ft-project-item'},()=>startRecording('draft',p.id,vocalDecisions)));
+   if(!texts.length)card.append(el(d,'p',{text:'Сначала закончи текст в Рэпблокноте.'}));
+  }else if(mode==='new'){
    const form=el(d,'form'),name=el(d,'input',{attributes:{'aria-label':'Название бита',maxlength:'64',placeholder:'Например, «Первый двор»',required:'true'}}),notice=el(d,'p',{className:'ft-warning',attributes:{role:'status'}});
    const create=()=>{
     const r=createBeat(getState(),{id:globalThis.crypto?.randomUUID?.()??'beat-'+Date.now(),name:name.value},getMetadata().skills);
@@ -76,6 +89,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
    const stage=beat.stages.length,job=s.music.job?.beatId===beat.id?s.music.job:null;
    workflow.append(el(d,'span',{className:'ft-workflow-stage',text:stage===3?'Бит готов · 3 / 3':'Этап '+(stage+1)+' / 3 · '+BEAT_STAGES[stage].name}));
    panel.append(el(d,'h2',{text:beat.name}));
+   if(stage===3)appendRecordingControls({document:d,beat,state:s,skills:getMetadata().skills,workflow,panel,onStart:startRecording,onPickText:values=>{vocalDecisions=values;openDialog('vocals');}});
    const sound=describeBeatMix(beat.mix),mixPanel=el(d,'section',{className:'ft-stage-result',dataset:{ftRole:'mix-character'}});
    mixPanel.append(el(d,'h3',{text:sound.label}),el(d,'p',{text:sound.detail}));
    if(sound.skill!==undefined)mixPanel.append(el(d,'small',{text:'Звук при создании: '+sound.skill+'/100 · сохранён с проектом'}));

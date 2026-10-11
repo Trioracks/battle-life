@@ -1,8 +1,9 @@
 import {BEAT_RULES as R,BEAT_GENRES,DRUMS,drumById} from './beat-catalog.js';
-import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=21';
-import {softwareDiskBytes} from './pc-software.js?rev=27';
-import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=27';
-import {createBeatResult} from './beat-result.js?rev=27';
+import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=28';
+import {softwareDiskBytes} from './pc-software.js?rev=28';
+import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=28';
+import {createBeatResult} from './beat-result.js?rev=28';
+import {normalizeRecording} from './vocal-result.js?rev=28';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
 const clamp=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,finite(v)));
 const text=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';
@@ -15,6 +16,7 @@ export function normalizeBeat(p){
  for(const s of (Array.isArray(p.stages)?p.stages:[]).slice(0,3)){const values=sliders(s?.sliders);if(!values)break;stages.push({sliders:values,fit:clamp(s.fit),quality:clamp(s.quality,0,p.mix?.version===2?110:100)});}
  const beat={version:p.version,kind:'beat',id:text(p.id,100),name:text(p.name,64),genre:p.genre,bpm:90,drumId:text(p.drumId,100),stages,status:stages.length===3?'ready':'draft'};
  const mix=normalizeBeatMix(p.mix);if(mix)beat.mix=mix;
+ const recording=normalizeRecording(p.recording);if(recording&&beat.status==='ready')beat.recording=recording;
  if(p.version===3){
   beat.productionMode=p.productionMode==='beginner'?'beginner':'automatic';
   beat.audio={bankVersion:p.audio?.bankVersion===1?1:0,bars:p.audio?.bars===4?4:0,themeId:text(p.audio?.themeId,100),arrangementId:text(p.audio?.arrangementId,100)};
@@ -40,6 +42,7 @@ export function workBlockReason(state){
  return '';
 }
 export function createBeat(input,options={},skills={},random=Math.random){
+ if(input.recording?.job)return result(input,false,'Сначала заверши запись.');
  const s=normalized(input),id=text(options.id,100),name=text(options.name,64),genre=BEAT_GENRES.find(g=>g.id===(options.genre??'boombap')&&g.available);
  if(!id||!name||!genre||s.projects.some(p=>p.id===id))return result(s,false,'Укажи название и доступный жанр.');
  if(softwareDiskBytes(s).free<2000000)return result(s,false,'Недостаточно места для нового проекта.');
@@ -51,6 +54,7 @@ export function createBeat(input,options={},skills={},random=Math.random){
  s.projects.push(beat);s.music.activeBeatId=id;return result(s);
 }
 export function startBeatStage(input,id,values,skills={},random=Math.random){
+ if(input.recording?.job)return result(input,false,'Сначала заверши запись.');
  const s=normalized(input),beat=normalizeBeat(s.projects.find(p=>p.id===id)),blocked=workBlockReason(s);
  if(input.writing?.job)return result(s,false,'Сначала закончи текущий текст.');
  if(blocked)return result(s,false,blocked);

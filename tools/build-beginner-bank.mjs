@@ -1,12 +1,14 @@
-import {mkdir,writeFile} from 'node:fs/promises';
+import {mkdir,writeFile,readFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import {BEGINNER_BANK} from '../src/beat-beginner-bank.js';
 import {renderBeginnerPart} from './audio/beginner-patterns.mjs';
 
 const root=new URL('../assets/audio/ft/beginner-v1/',import.meta.url);
-const parts=[];
+const previous=await readFile(new URL('manifest.json',root),'utf8').then(JSON.parse).catch(()=>({parts:[]}));
+const parts=previous.parts.filter(p=>p.id.endsWith('-16'));
 for(const part of BEGINNER_BANK){
+  if(part.id.endsWith('-16'))continue; // User-derived extension is built by prepare-vocal-assets.mjs.
   const number=part.id.slice(-2),pcm=renderBeginnerPart(part.kind,Number(number)-1);
   const wav=Buffer.alloc(44+pcm.length*2);
   wav.write('RIFF');wav.writeUInt32LE(wav.length-8,4);wav.write('WAVE',8);

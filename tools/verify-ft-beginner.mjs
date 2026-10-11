@@ -3,7 +3,7 @@ import {createRequire} from 'node:module';
 import {mkdir} from 'node:fs/promises';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'playwright-core');
 const output=process.env.FT_QA_DIR||'D:/Codex/Builds/Battle/ft-beginner-20261010';await mkdir(output,{recursive:true});
-const revision='27',browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
+const revision='28',browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
 const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage();page.setDefaultTimeout(60000);
 await context.addInitScript(()=>{
  const raw=sessionStorage.getItem('ft-seed');if(raw){sessionStorage.removeItem('ft-seed');for(const [k,v]of Object.entries(JSON.parse(raw)))localStorage.setItem(k,JSON.stringify(v));}
@@ -19,7 +19,7 @@ const enter=async()=>{await page.locator('#continue-game').click();if(await page
 const chooseSaved=async()=>{await start('FT Studio');await dialog.getByRole('button',{name:'Открыть проект',exact:true}).click();await dialog.getByRole('button',{name:/Первый двор ·/}).click();};
 async function probe(){
  await page.evaluate(async()=>{
-  const {BeatAudio}=await import('./src/beat-audio.js?rev=27');window.ftAudioLog=[];window.ftAudioInstance=null;
+  const {BeatAudio}=await import('./src/beat-audio.js?rev=28');window.ftAudioLog=[];window.ftAudioInstance=null;
   const play=BeatAudio.prototype.playProject;
   BeatAudio.prototype.playProject=function(beat,options){window.ftAudioInstance=this;const row={name:beat.name,stage:options?.workStage??null};window.ftAudioLog.push(row);return play.call(this,beat,options).then(ok=>{Object.assign(row,{ok,ids:this.descriptor?.parts.map(p=>p.id),sources:this.sources.length});return ok;});};
  });
@@ -82,9 +82,9 @@ try{
  }
  const log=await page.evaluate(()=>window.ftAudioLog);assert.ok(log.filter(r=>r.stage!==null&&r.ok).every(r=>r.sources===1));assert.deepEqual(errors,[]);
  const modules=`apartment-app apartment-switch-style apartment-v3-creator-session apartment-v3-creator apartment-v3-lighting apartment-v3-new-game apartment-v3-runtime apartment-v3-scene apartment-v3-time avatar-v3-profile beat-market-view beat-names beat-production beat-studio-view character-speech ft-studio-audio ft-studio-project ft-studio-view home-calendar home-food home-needs-view home-profile-migration home-wardrobe-view home-wardrobe pc-software-catalog pc-software-view pc-software sound-cues underweb-view virtual-pc-catalog virtual-pc-explorer-view virtual-pc-explorer virtual-pc-lifecycle virtual-pc-runtime virtual-pc-shell virtual-pc-state virtual-pc-system-windows virtual-pc-ui`.split(' ');
- for(const module of modules){const urls=[...network].filter(url=>url.split('?')[0]==='/src/'+module+'.js');assert.deepEqual(urls,['/src/'+module+'.js?rev=27'],module+' must load one canonical revision without cache bypass');}
- for(const style of ['apartment-v3','creator-v12','desktop-apps'])assert.ok(network.has('/'+style+'.css?rev=27'));
- assert.ok(network.has('/virtual-pc.css?rev=21'));assert.ok(network.has('/src/beat-audio.js?rev=27'));
+ for(const module of modules){const urls=[...network].filter(url=>url.split('?')[0]==='/src/'+module+'.js');assert.deepEqual(urls,['/src/'+module+'.js?rev=28'],module+' must load one canonical revision without cache bypass');}
+ for(const style of ['apartment-v3','creator-v12','desktop-apps'])assert.ok(network.has('/'+style+'.css?rev=28'));
+ assert.ok(network.has('/virtual-pc.css?rev=21'));assert.ok(network.has('/src/beat-audio.js?rev=28'));
  console.log('PASS actual network: canonical rev27 modules/styles and audio; unchanged PC CSS retains rev21; no source cache routes');
  console.log('PASS three audible stages, hidden/re-enable, reload mid-stage, hunger/food/resume, 9 lanes, real transport, 640/1280. AUDIO '+JSON.stringify(log));
 }catch(error){console.error('PAGE_ERRORS',errors);await shot('failure').catch(()=>{});throw error;}finally{await context.close();await browser.close();}

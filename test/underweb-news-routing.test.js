@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {resolveUnderweb} from '../src/virtual-pc-catalog.js?rev=27';
-import {newsForDay,archiveForDay} from '../src/underweb-news.js?rev=27';
-import {mountUnderweb} from '../src/underweb-view.js?rev=27';
+import {resolveUnderweb} from '../src/virtual-pc-catalog.js?rev=28';
+import {newsForDay,archiveForDay} from '../src/underweb-news.js?rev=28';
+import {mountUnderweb} from '../src/underweb-view.js?rev=28';
 import {pcDocument,findButton,allPc} from './helpers/virtual-pc-dom.js';
 test('news articles and archive resolve locally with the current game date',()=>{
  const first=newsForDay(1),article=resolveUnderweb('underweb://iskra/news/'+first.id,{gameDay:1});assert.equal(article.type,'news');assert.deepEqual(article.issue,first);

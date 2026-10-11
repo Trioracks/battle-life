@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-const dsp=await import('../src/beat-result-dsp.js?rev=27').catch(e=>{if(e.code==='ERR_MODULE_NOT_FOUND')return {};throw e;});
+const dsp=await import('../src/beat-result-dsp.js?rev=28').catch(e=>{if(e.code==='ERR_MODULE_NOT_FOUND')return {};throw e;});
 const result=(quality,stage=0)=>({stage,seed:135,skills:{beatmaking:quality,sound:quality},sliders:[5,5,5],fit:50,quality});
 const rms=a=>Math.sqrt(a.reduce((s,x)=>s+x*x,0)/a.length);
 const input=(stage,rate=6000)=>Float32Array.from({length:64000},(_,i)=>{

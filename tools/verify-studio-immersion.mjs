@@ -16,14 +16,14 @@ try{
  await page.route('**/__immersion-fixture',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><body>Isolated acceptance fixture</body>'}));
  await page.goto('http://127.0.0.1:4173/__immersion-fixture');
  await page.evaluate(async()=>{
-  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=27'),import('/src/virtual-pc-state.js?rev=27')]);
+  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=28'),import('/src/virtual-pc-state.js?rev=28')]);
   localStorage.setItem('battle-life-apartment-v3',JSON.stringify(createProfile({name:'Проверка погружения'})));
   localStorage.setItem('battle-life-virtual-pc-v1',JSON.stringify(createVirtualPcState({power:'off',software:{client:{receivedBytes:2000000},ft:{receivedBytes:800000000}},music:{needs:{satiety:100,energy:100}}})));
   localStorage.setItem('battle-life-apartment-v3-time',JSON.stringify({day:1,minutes:600,initialRest:false}));
  });
- await page.goto('http://127.0.0.1:4173/?rev=27');await page.locator('#loading').waitFor({state:'hidden'});
+ await page.goto('http://127.0.0.1:4173/?rev=28');await page.locator('#loading').waitFor({state:'hidden'});
  await page.evaluate(async()=>{
-  const [{PcSounds},{ApartmentAnimation}]=await Promise.all([import('/src/virtual-pc-sounds.js?rev=27'),import('/src/apartment-v3-animation.js?rev=27')]);
+  const [{PcSounds},{ApartmentAnimation}]=await Promise.all([import('/src/virtual-pc-sounds.js?rev=28'),import('/src/apartment-v3-animation.js?rev=28')]);
   window.immersionCues=[];window.immersionAnimations=[];window.immersionTyping={first:null,max:0,frames:0};
   const play=PcSounds.prototype.play;PcSounds.prototype.play=async function(cue){const result=await play.call(this,cue);window.immersionCues.push({cue,...result,nodes:this.nodes.size,state:this.context?.state});return result;};
   const update=ApartmentAnimation.prototype.update;ApartmentAnimation.prototype.update=function(...args){update.apply(this,args);if(!args[0].working)return;const t=window.immersionTyping,q=this.workBones.filter(b=>b.kind==='arm').flatMap(b=>b.node.quaternion.toArray());t.first??=q;t.max=Math.max(t.max,...q.map((v,i)=>Math.abs(v-t.first[i])));t.frames++;};
