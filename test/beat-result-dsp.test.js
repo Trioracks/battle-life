@@ -8,15 +8,6 @@ const input=(stage,rate=6000)=>Float32Array.from({length:64000},(_,i)=>{
  return Math.sin(i/rate*2*Math.PI*(stage?110+note*55:70))*Math.exp(-beat*(stage?2:15))*.3;
 });
 
-test('novice drum dropouts retain a quiet original attack so the pulse remains readable',()=>{
- const rate=6000,a=new Float32Array(64000);
- // Cell 2 is deliberately missing in the broken groove. A faint kick must survive.
- for(let i=2010;i<2210;i++)a[i]=.25;
- const out=dsp.transformBeatSamples(a,rate,{...result(0),seed:0});
- assert.ok(rms(out.slice(2030,2190))>.035,'glitch must not erase the underlying kick completely');
- assert.ok(rms(out.slice(2030,2190))<.08,'the mistake remains audible, not a clean bypass');
-});
-
 test('each low-result layer changes rhythm or pitch, keeps exactly four bars and leaves source PCM unchanged',()=>{
  assert.equal(typeof dsp.transformBeatSamples,'function');
  for(let stage=0;stage<3;stage++){

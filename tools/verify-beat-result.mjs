@@ -15,11 +15,13 @@ try{
  await page.route('**/__result-check',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><title>Saved result audio verification</title>'}));
  await page.goto((process.env.BATTLE_URL||'http://127.0.0.1:4173')+'/__result-check');
  const result=await page.evaluate(async()=>{
-  const [{transformBeatBuffer,connectBeatResult,connectBeatResultMaster},{BeatAudio},{createBeat,startBeatStage,advanceBeatWork},{createVirtualPcState}]=await Promise.all([import('/src/beat-result-dsp.js?rev=31'),import('/src/beat-audio.js?rev=31'),import('/src/beat-production.js?rev=31'),import('/src/virtual-pc-state.js?rev=31')]);
+  const [{transformBeatBuffer,connectBeatResult,connectBeatResultMaster},{BeatAudio},{createBeat,startBeatStage,advanceBeatWork},{createVirtualPcState}]=await Promise.all([import('/src/beat-result-dsp.js?rev=32'),import('/src/beat-audio.js?rev=32'),import('/src/beat-production.js?rev=32'),import('/src/virtual-pc-state.js?rev=32')]);
   const rate=44100,length=470400,decoder=new OfflineAudioContext(2,length,rate),ids=['drums/04','theme/06','arrangement/02'];
   const buffers=await Promise.all(ids.map(async p=>decoder.decodeAudioData(await(await fetch('/assets/audio/ft/beginner-v1/'+p+'.wav')).arrayBuffer())));
   const original=buffers.map(b=>b.getChannelData(0).slice()),rms=a=>Math.sqrt(a.reduce((s,n)=>s+n*n,0)/a.length),peak=a=>a.reduce((s,n)=>Math.max(s,Math.abs(n)),0);
-  const profile=(quality,stage)=>({stage,seed:135,skills:{beatmaking:10,sound:10},sliders:[5,5,5],fit:50,quality});
+  // This sweep represents growing skill, not an impossible quality100/skill10 novice.
+  // Separate unit tests cover lucky decisions and the saved-skill effect gate.
+  const profile=(quality,stage)=>({stage,seed:135,skills:{beatmaking:Math.min(100,quality),sound:Math.min(100,quality)},sliders:[5,5,5],fit:50,quality});
   const render=async(quality,drumsOnly=false)=>{
    const c=new OfflineAudioContext(2,length,rate),master=c.createGain(),end=connectBeatResultMaster(c,c.destination),graphs=[];master.gain.value=.7;master.connect(end.input);
    for(let stage=0;stage<(drumsOnly?1:3);stage++){
@@ -72,6 +74,7 @@ try{
   return {metrics,files};
  });
  const m=result.metrics;
+ console.log('DSP diagnostics '+JSON.stringify(m));
  for(const q of [0,5,10,30,90,99,100,110]){assert.equal(m[q].length,470400);assert.ok(m[q].finite);assert.ok(m[q].peak<.981);assert.ok(m[q].rms>.01);}
  assert.ok(m[99].difference<m[90].difference*.25,'near 100 approaches dry: '+JSON.stringify({q99:m[99].difference,q90:m[90].difference}));
  assert.ok(m[10].difference>m[90].difference);assert.ok(m[30].difference>m[90].difference);assert.ok(m[110].difference<m[30].difference*.2,'creative bonus is small');assert.ok(m[110].difference>0,'110 is audible');

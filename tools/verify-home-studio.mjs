@@ -9,7 +9,7 @@ await page.route('**/__home-studio-fixture',r=>r.fulfill({contentType:'text/html
 try{
  await page.goto('http://127.0.0.1:4173/__home-studio-fixture');
  await page.evaluate(async()=>{
-  const [{mountVirtualPc},{createVirtualPcState},production]=await Promise.all([import('/src/virtual-pc-ui.js?rev=31'),import('/src/virtual-pc-state.js?rev=31'),import('/src/beat-production.js?rev=31')]);
+  const [{mountVirtualPc},{createVirtualPcState},production]=await Promise.all([import('/src/virtual-pc-ui.js?rev=32'),import('/src/virtual-pc-state.js?rev=32'),import('/src/beat-production.js?rev=32')]);
   window.production=production;window.pc=mountVirtualPc(document.querySelector('#virtual-pc'));
   pc.showDesktop(createVirtualPcState({power:'on',download:{status:'installed'}}));pc.syncHost({playerName:'QA',clockLabel:'12:00',gameDay:31,skills:{beatmaking:10}});pc.open('ft-studio');
  });

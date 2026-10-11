@@ -9,7 +9,7 @@ await page.route('**/__beat-review-fixture',route=>route.fulfill({contentType:'t
 try{
  await page.goto('http://127.0.0.1:4173/__beat-review-fixture');
  await page.evaluate(async()=>{
-  const [{mountVirtualPc},{createVirtualPcState},production,{createStudioProject}]=await Promise.all([import('/src/virtual-pc-ui.js?rev=31'),import('/src/virtual-pc-state.js?rev=31'),import('/src/beat-production.js?rev=31'),import('/src/ft-studio-project.js')]);
+  const [{mountVirtualPc},{createVirtualPcState},production,{createStudioProject}]=await Promise.all([import('/src/virtual-pc-ui.js?rev=32'),import('/src/virtual-pc-state.js?rev=32'),import('/src/beat-production.js?rev=32'),import('/src/ft-studio-project.js')]);
   let state=createVirtualPcState({power:'on',download:{status:'installed'}});state=production.createBeat(state,{id:'saved',name:'Сохранённый бит'},{}).state;
   state=production.startBeatStage(state,'saved',undefined,{}).state;state.music.infected=true;
   state.projects.push(createStudioProject({id:'old',name:'Архивный',battleId:'concrete-echo'}).project);
@@ -57,7 +57,7 @@ try{
  await ft.getByRole('button',{name:'Play',exact:true}).click();await page.waitForFunction(()=>window.decodePending);await ft.getByRole('button',{name:'Закрыть окно',exact:true}).click();
  await page.evaluate(()=>releaseDecode());await page.waitForTimeout(100);assert.equal(await page.evaluate(()=>qaAudio.sources.length),0);assert.equal(await page.evaluate(()=>qaAudio.getSnapshot().status),'stopped');
  const failures=await page.evaluate(async()=>{
-  const {BeatAudio}=await import('/src/beat-audio.js?rev=31'),project=pc.state.projects.find(p=>p.id==='saved'),before=JSON.stringify(project);
+  const {BeatAudio}=await import('/src/beat-audio.js?rev=32'),project=pc.state.projects.find(p=>p.id==='saved'),before=JSON.stringify(project);
   const denied=new BeatAudio({contextFactory:()=>({state:'suspended',resume:async()=>{},close(){}})});
   const deniedOK=await denied.playProject(project);denied.dispose();
   const missing=new BeatAudio({fetchFn:async()=>({ok:false})});const missingOK=await missing.playProject(project);const result={deniedOK,missingOK,unchanged:JSON.stringify(project)===before,sources:missing.sources.length};missing.dispose();return result;

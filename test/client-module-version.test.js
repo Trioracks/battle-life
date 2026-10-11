@@ -26,12 +26,15 @@ test('home integration invalidates every changed dependency and its importers wi
  const demoAffected=new Set(['apartment-app','beat-beginner-bank','beat-catalog','beat-production','beat-result-dsp','beat-work-view','underweb-view','virtual-pc-ui','vocal-catalog'].map(n=>'src/'+n+'.js'));
  do{size=demoAffected.size;for(const [file,imports]of graph)if(imports.some(dependency=>demoAffected.has(dependency.file)))demoAffected.add(file);}while(demoAffected.size!==size);
  for(const file of demoAffected)affected.add(file);
+ const drySongAffected=new Set(['audio-performance','beat-song-form','beat-mix','beat-result-dsp','vocal-result-dsp','beat-audio','beat-playback','ft-studio-view'].map(n=>'src/'+n+'.js'));
+ do{size=drySongAffected.size;for(const [file,imports]of graph)if(imports.some(dependency=>drySongAffected.has(dependency.file)))drySongAffected.add(file);}while(drySongAffected.size!==size);
+ for(const file of drySongAffected)affected.add(file);
  const html=await read('index.html');
- assert.match(html,/apartment-app\.js\?rev=31/);
+ assert.match(html,/apartment-app\.js\?rev=32/);
  for(const style of ['apartment-v3','creator-v12','desktop-apps','rap-notebook'])assert.ok(html.includes(style+'.css?rev=28'),style+' must invalidate changed styles');
  assert.ok((await read('desktop-apps.css')).includes('underweb-world.css?rev=28'));
  assert.match(html,/virtual-pc\.css\?rev=21/,'unchanged base PC styles retain their revision');
- for(const [file,imports]of graph)for(const dependency of imports)if(affected.has(dependency.file))assert.equal(dependency.query,demoAffected.has(dependency.file)?'rev=31':vocalDamageAffected.has(dependency.file)?'rev=30':'rev=28',file+' must load canonical '+dependency.file);
+ for(const [file,imports]of graph)for(const dependency of imports)if(affected.has(dependency.file))assert.equal(dependency.query,drySongAffected.has(dependency.file)?'rev=32':demoAffected.has(dependency.file)?'rev=31':vocalDamageAffected.has(dependency.file)?'rev=30':'rev=28',file+' must load canonical '+dependency.file);
  for(const file of changed)assert.ok(graph.has(file),file+' is covered by the live entry graph');
  // Work audio ownership stays at v28; the expanded sample catalog is invalidated.
  for(const [file,modules]of [

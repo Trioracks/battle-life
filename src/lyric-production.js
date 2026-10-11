@@ -1,7 +1,7 @@
 // Persisted, symbolic writing: no copyrighted lyrics or generated prose.
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=28';
 import {BEAT_RULES} from './beat-catalog.js?rev=31';
-import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=31';
+import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=32';
 import {softwareDiskBytes} from './pc-software.js?rev=28';
 import {homeDateLabel} from './home-calendar.js?rev=28';
 

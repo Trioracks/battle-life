@@ -7,7 +7,7 @@ const browser=await chromium.launch({headless:true,executablePath:process.env.PL
 try{
  const page=await browser.newPage();await page.route('**/__expanded-bank',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><title>Bank verification</title>'}));await page.goto('http://127.0.0.1:4173/__expanded-bank');
  const result=await page.evaluate(async()=>{
-  const [{BEGINNER_BANK,BEGINNER_RECIPES},{createBeat,startBeatStage,advanceBeatWork},{createVirtualPcState},{resolveBeatPlayback},{BeatAudio}]=await Promise.all([import('/src/beat-beginner-bank.js?rev=31'),import('/src/beat-production.js?rev=31'),import('/src/virtual-pc-state.js?rev=31'),import('/src/beat-playback.js?rev=31'),import('/src/beat-audio.js?rev=31')]);
+  const [{BEGINNER_BANK,BEGINNER_RECIPES},{createBeat,startBeatStage,advanceBeatWork},{createVirtualPcState},{resolveBeatPlayback},{BeatAudio}]=await Promise.all([import('/src/beat-beginner-bank.js?rev=31'),import('/src/beat-production.js?rev=32'),import('/src/virtual-pc-state.js?rev=32'),import('/src/beat-playback.js?rev=32'),import('/src/beat-audio.js?rev=32')]);
   const decoder=new OfflineAudioContext(2,470400,44100),buffers=new Map(),mixes=[],projects=[];
   for(const part of BEGINNER_BANK){const r=await fetch(part.path);if(!r.ok)throw Error(part.path);const buffer=await decoder.decodeAudioData(await r.arrayBuffer());if(buffer.length!==470400||buffer.sampleRate!==44100)throw Error('Invalid duration '+part.id);buffers.set(part.id,buffer);}
   for(let i=0;i<90;i++){

@@ -5,7 +5,7 @@ import {transformVocalSamples} from '../src/vocal-result-dsp.js';
 const rate=12000,frames=128000; // Exactly four bars at 90 BPM.
 const rms=a=>Math.sqrt(a.reduce((sum,x)=>sum+x*x,0)/a.length);
 const voice=Float32Array.from({length:frames},(_,i)=>.16*Math.sin(i/rate*2*Math.PI*230)+.09*Math.sin(i/rate*2*Math.PI*3100)+.06*Math.sin(i/rate*2*Math.PI*4300));
-const profile=(quality,seed=15,kind='draft')=>({quality,seed,kind,postGain:kind==='clean'?4:0});
+const profile=(quality,seed=15,kind='draft',postGain=0)=>({quality,seed,kind,postGain});
 function missingFraction(a){
  let missing=0,total=0;
  for(let i=240;i<a.length-240;i+=240){total++;if(rms(a.subarray(i,i+240))<1e-6)missing++;}
@@ -37,11 +37,12 @@ test('novice recording stays behind the beat and moves vocal attacks well off th
 
 // Better takes reduce mistakes, but neither post-processing nor max starter gear bypasses damage.
 test('clean and mastered takes repair some gaps without recovering the original',()=>{
- const draft=transformVocalSamples(voice,rate,profile(15)),clean=transformVocalSamples(voice,rate,profile(26,15,'clean')),ceiling=transformVocalSamples(voice,rate,profile(44,15,'clean'));
+ const draft=transformVocalSamples(voice,rate,profile(15)),clean=transformVocalSamples(voice,rate,profile(26,15,'clean')),ceiling=transformVocalSamples(voice,rate,profile(44,15,'clean')),mastered=transformVocalSamples(voice,rate,profile(30,15,'clean',4));
  assert.ok(missingFraction(clean)<missingFraction(draft));
  assert.ok(missingFraction(clean)>.1,'a novice clean take must still contain substantial misses');
  assert.ok(missingFraction(ceiling)<missingFraction(clean));
- for(const a of [draft,clean,ceiling]){
+ assert.notDeepEqual(mastered,clean,'post-production can add a quiet echo into a missed syllable');
+ for(const a of [draft,clean,ceiling,mastered]){
   assert.equal(a.length,frames);assert.equal(a[0],0);assert.equal(a.at(-1),0);
   assert.ok(a.every(x=>Number.isFinite(x)&&Math.abs(x)<=.3));
   assert.ok(rms(a)>.003&&rms(a)<.05);

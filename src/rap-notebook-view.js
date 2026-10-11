@@ -1,7 +1,7 @@
 // Notepad-style view of the persisted symbolic lyric projects.
 import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=21';
-import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill} from './lyric-production.js?rev=31';
-import {normalizeBeat} from './beat-production.js?rev=31';
+import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill} from './lyric-production.js?rev=32';
+import {normalizeBeat} from './beat-production.js?rev=32';
 
 export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,onWork=()=>false}={}){
  const d=root.ownerDocument;let panel=null,modal=null,returnFocusLabel='',message='',signature='',disposed=false,controls=[];

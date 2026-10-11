@@ -17,7 +17,7 @@ try{
  await page.route('**/__decision-check',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><title>Beat production decision verification</title><main id="studio"></main>'}));
  await page.goto((process.env.BATTLE_URL||'http://127.0.0.1:4173')+'/__decision-check');
  const result=await page.evaluate(async()=>{
-  const [{mountBeatStudio},{BeatAudio},{createBeatWorkAudio},{advanceBeatWork,restoreMusicNeeds,startBeatStage},{createVirtualPcState},{resolveBeatPlayback}]=await Promise.all([import('/src/beat-studio-view.js'),import('/src/beat-audio.js'),import('/src/beat-work-audio.js'),import('/src/beat-production.js'),import('/src/virtual-pc-state.js'),import('/src/beat-playback.js')]);
+  const [{mountBeatStudio},{BeatAudio},{createBeatWorkAudio},{advanceBeatWork,restoreMusicNeeds,startBeatStage},{createVirtualPcState},{resolveBeatPlayback}]=await Promise.all([import('/src/beat-studio-view.js?rev=32'),import('/src/beat-audio.js?rev=32'),import('/src/beat-work-audio.js'),import('/src/beat-production.js?rev=32'),import('/src/virtual-pc-state.js?rev=32'),import('/src/beat-playback.js?rev=32')]);
   const targets=[[9,3,2],[5,5,8],[9,4,2]],poor=[[0,10,10],[0,0,0],[0,10,10]],root=document.querySelector('#studio');
   const rate=44100,length=470400,lead=1764,rms=a=>Math.sqrt(a.reduce((sum,v)=>sum+v*v,0)/a.length),peak=a=>a.reduce((m,v)=>Math.max(m,Math.abs(v)),0),difference=(a,b)=>rms(a.map((v,i)=>v-b[i]));
   const wav=channels=>{

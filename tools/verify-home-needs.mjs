@@ -11,7 +11,7 @@ async function fixture({satiety=50,energy=72,job=false,denyAudio=false,denyBacku
  await page.route('**/__home-needs-fixture',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><body>Isolated fixture</body>'}));
  await page.goto('http://127.0.0.1:4173/__home-needs-fixture');
  await page.evaluate(async options=>{
-  const [{createProfile,STAT_KEYS,SAVE_KEY},{createVirtualPcState,VIRTUAL_PC_STORAGE_KEY},production]=await Promise.all([import('/src/avatar-v3-profile.js?rev=28'),import('/src/virtual-pc-state.js?rev=31'),import('/src/beat-production.js?rev=31')]);
+  const [{createProfile,STAT_KEYS,SAVE_KEY},{createVirtualPcState,VIRTUAL_PC_STORAGE_KEY},production]=await Promise.all([import('/src/avatar-v3-profile.js?rev=28'),import('/src/virtual-pc-state.js?rev=32'),import('/src/beat-production.js?rev=32')]);
   const profile=createProfile({name:'Проверка дома',allocations:Object.fromEntries(STAT_KEYS.map((k,i)=>[k,i===0?2:1]))});
   localStorage.setItem(SAVE_KEY,JSON.stringify(profile));localStorage.setItem('battle-life-apartment-v3-time',JSON.stringify({day:2,minutes:720,initialRest:false}));
   let state=createVirtualPcState({power:options.job?'on':'off',download:{status:options.job?'installed':'idle'},music:{needs:{satiety:options.satiety,energy:options.energy}}});
