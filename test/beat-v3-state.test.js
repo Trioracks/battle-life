@@ -9,7 +9,7 @@ test('v3_only_requires_name and skill_tier_is_pinned through the free-bank bound
  for(const skill of [0,24,25,26,39,40]){
   const r=make(skill);assert.equal(r.ok,true);
   const beat=r.state.projects[0];assert.equal(beat.version,3);assert.equal(beat.bpm,90);
-  assert.equal(beat.productionMode,skill<=25?'beginner':'automatic');
+  assert.equal(beat.productionMode,skill<25?'beginner':'automatic');
   assert.equal(beat.drumId,skill>=40?'free-01':'beginner-drums-17');
   assert.deepEqual(beat.audio,{bankVersion:1,bars:4,themeId:'beginner-theme-17',arrangementId:'beginner-arrangement-17'});
  }
@@ -29,7 +29,7 @@ test('choices_survive_roundtrip_and_resume without hidden rerolls or duplicate p
  assert.deepEqual(resumed.state.projects[0],original);
  const done=advanceBeatWork(resumed.state,600);
  assert.equal(done.finished,true);assert.equal(done.state.music.practice,1/3);
- assert.equal(done.state.projects[0].productionMode,'beginner');
+ assert.equal(done.state.projects[0].productionMode,'automatic');
  assert.equal(advanceBeatWork(done.state,600).state.music.practice,1/3);
  assert.deepEqual(done.state.projects[0].audio,original.audio);
 });

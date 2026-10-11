@@ -1,11 +1,14 @@
 import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=21';
-import {COMMUNITY_BOARDS,COMMUNITY_REPLY_LIMIT,normalizeCommunity,communityDay,topicsForDay,topicForDay,replyToTopic} from './underweb-community.js?rev=28';
+import {COMMUNITY_BOARDS,COMMUNITY_REPLY_LIMIT,normalizeCommunity,communityDay,topicsForDay,topicForDay,replyToTopic} from './underweb-community.js?rev=34';
 import {homeDateLabel} from './home-calendar.js?rev=28';
+import {createForumArchiveView} from './underweb-forum-archive-view.js?rev=34';
 const button=(d,text,fn,attributes={})=>pcButton(d,text,{className:'uw-control uw-forum-link',attributes},fn);
 export function createCommunityView(d,{route,getState,getMetadata,onChange,navigate}){
  const day=communityDay(getMetadata().gameDay),state=normalizeCommunity(getState().community);
+ if(route.type.startsWith('forum-archive'))return createForumArchiveView(d,{route,day,navigate});
  const site=el(d,'section',{className:'uw-community',attributes:{'aria-label':'Форум Подземка'}}),head=el(d,'header',{className:'uw-forum-header'});
  head.append(button(d,'подземка / forum',()=>navigate('underweb://forum')),el(d,'span',{text:'СЛОВО. ЗВУК. СПОР.'}),el(d,'small',{text:'Сейчас в игре: '+homeDateLabel(day)}));site.append(head);
+ const switcher=el(d,'nav',{className:'uw-forum-sections',attributes:{'aria-label':'Режим форума'}});switcher.append(button(d,'Игровой форум',()=>navigate('underweb://forum'),{'aria-current':'page'}),button(d,'Исторический архив Hip-Hop.ru',()=>navigate('underweb://forum/archive')));site.append(switcher);
  site.append(el(d,'p',{className:'uw-fiction-notice',text:'Вымышленный игровой форум. Ники и разговоры придуманы; ответы сохраняются только в твоей игре.'}));
  const topic=route.type==='forum-topic'?topicForDay(route.topic.id,day,state,route.page):null;
  const board=route.board??COMMUNITY_BOARDS.find(b=>b.id===topic?.boardId);
@@ -14,7 +17,7 @@ export function createCommunityView(d,{route,getState,getMetadata,onChange,navig
  if(topic)crumbs.append(el(d,'span',{text:'›'}),el(d,'span',{text:topic.title}));site.append(crumbs);
  if(topic){
   if((state.readTopics[topic.id]??0)<day)onChange?.({...getState(),community:{...state,readTopics:{...state.readTopics,[topic.id]:day}}});
-  const title=el(d,'div',{className:'uw-forum-title'});title.append(el(d,'h1',{text:topic.title}),button(d,'Сайт баттла →',()=>navigate('underweb://battles/'+board.id)));site.append(title);
+  const title=el(d,'div',{className:'uw-forum-title'});title.append(el(d,'h1',{text:topic.title}));if(board.category==='battles')title.append(button(d,'Сайт баттла →',()=>navigate('underweb://battles/'+board.id)));site.append(title);
   const pager=()=>{const nav=el(d,'nav',{className:'uw-forum-pagination',attributes:{'aria-label':'Страницы темы'}});nav.append(el(d,'span',{text:'Страница '+topic.page+' из '+topic.pages+' · '+topic.total+' сообщений'}));for(let i=1;i<=topic.pages;i++)if(i===1||i===topic.pages||Math.abs(i-topic.page)<=2){const b=button(d,String(i),()=>navigate('underweb://forum/topic/'+topic.id+'?page='+i),{'aria-label':'Страница темы '+i});if(i===topic.page){b.disabled=true;b.setAttribute('aria-current','page');}nav.append(b);}return nav;};
   site.append(pager());
   for(const [i,post]of topic.posts.entries()){
@@ -37,10 +40,12 @@ export function createCommunityView(d,{route,getState,getMetadata,onChange,navig
   input.addEventListener('input',persist);form.addEventListener('submit',event=>{event.preventDefault();submit();});
   form.append(el(d,'h2',{text:'Быстрый ответ'}),el(d,'small',{text:'От имени '+(getMetadata().playerName||'Участник')+' · '+homeDateLabel(day)}),el(d,'small',{text:'Ответов в сохранении: '+state.replies.length+' / '+COMMUNITY_REPLY_LIMIT+'. После достижения лимита история остаётся доступной, новые ответы не отправляются.'}),preview,input,error,button(d,'Отправить ответ',submit));site.append(form);showQuote();
  }else{
-  const title=el(d,'div',{className:'uw-forum-title'});title.append(el(d,'h1',{text:board?.title??'Баттлы и разговоры'}));if(board)title.append(button(d,'Сайт баттла →',()=>navigate('underweb://battles/'+board.id)));site.append(title);
+  const title=el(d,'div',{className:'uw-forum-title'});title.append(el(d,'h1',{text:board?.title??'Музыка, сцена и разговоры'}));if(board?.category==='battles')title.append(button(d,'Сайт баттла →',()=>navigate('underweb://battles/'+board.id)));site.append(title);
+  if(board)site.append(el(d,'p',{className:'uw-forum-board-description',text:board.description}));
   const table=el(d,'table',{className:'uw-forum-table'}),thead=el(d,'thead'),tr=el(d,'tr');for(const name of [board?'Тема':'Раздел','Ответы','Последнее сообщение'])tr.append(el(d,'th',{text:name}));thead.append(tr);table.append(thead);const tbody=el(d,'tbody');
   const groups=board?topicsForDay(board.id,day,state):COMMUNITY_BOARDS.map(b=>{const topics=topicsForDay(b.id,day,state),last=topics.map(t=>t.last).sort((a,b)=>b.gameDay-a.gameDay)[0];return {...b,replies:topics.reduce((n,t)=>n+t.replies,0),last,unread:topics.some(t=>t.unread)};});
-  for(const item of groups){const row=el(d,'tr'),info=el(d,'td'),summary=el(d,'td'),latest=el(d,'td');info.append(el(d,'span',{className:'uw-forum-indicator'+(item.unread?' unread':''),text:item.pinned?'!':'●',attributes:{'aria-label':item.unread?'Есть непрочитанные сообщения':'Прочитано'}}),button(d,(item.pinned?'Важно: ':'')+item.title,()=>navigate(board?'underweb://forum/topic/'+item.id:'underweb://forum/'+item.id)),el(d,'small',{text:board?'Автор: '+item.author:item.description}));summary.append(el(d,'strong',{text:String(item.replies)}));latest.append(el(d,'span',{text:homeDateLabel(item.last.gameDay)}),el(d,'strong',{text:item.last.author}),button(d,'К последнему →',()=>navigate('underweb://forum/topic/'+item.last.topicId+'?page=999')));row.append(info,summary,latest);tbody.append(row);}table.append(tbody);site.append(table);
+  const categories={battles:'Локальные баттлы',music:'Рэп и релизы',workshop:'Рабочая комната',culture:'Хип-хоп культура',lounge:'За пределами трека'};let category;
+  for(const item of groups){if(!board&&category!==item.category){category=item.category;const divider=el(d,'tr',{className:'uw-forum-category'});divider.append(el(d,'th',{text:categories[category],attributes:{colspan:'3',scope:'colgroup'}}));tbody.append(divider);}const row=el(d,'tr'),info=el(d,'td'),summary=el(d,'td'),latest=el(d,'td');info.append(el(d,'span',{className:'uw-forum-indicator'+(item.unread?' unread':''),text:item.pinned?'!':'●',attributes:{'aria-label':item.unread?'Есть непрочитанные сообщения':'Прочитано'}}),button(d,(item.pinned?'Важно: ':'')+item.title,()=>navigate(board?'underweb://forum/topic/'+item.id:'underweb://forum/'+item.id)),el(d,'small',{text:board?'Автор: '+item.author:item.description}));summary.append(el(d,'strong',{text:String(item.replies)}));if(item.last)latest.append(el(d,'span',{text:homeDateLabel(item.last.gameDay)}),el(d,'strong',{text:item.last.author}),button(d,'К последнему →',()=>navigate('underweb://forum/topic/'+item.last.topicId+'?page=999')));else latest.append(el(d,'small',{text:'Пока нет сообщений'}));row.append(info,summary,latest);tbody.append(row);}table.append(tbody);site.append(table);
  }
  site.append(el(d,'footer',{className:'uw-forum-footer',text:'Подземка · Локальная игровая сеть · Спорь о работе, уважай участников.'}));return site;
 }

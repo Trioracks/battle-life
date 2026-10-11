@@ -1,7 +1,7 @@
 // Deterministic recording damage, followed by the non-bypassable budget hardware.
 // Grain boundaries follow the 90 BPM clock; the source duration never changes.
 import {clampV,VOCAL_CEILING} from './vocal-result.js?rev=33';
-import {creativeEffectAmount} from './audio-performance.js?rev=32';
+import {creativeProfileAmount} from './audio-performance.js?rev=34';
 // Global balance: 30% less damage than rev29; saved take quality is unchanged.
 const DAMAGE_AMOUNT=.7;
 const mod=(x,n)=>((x%n)+n)%n;
@@ -21,7 +21,7 @@ export function transformVocalSamples(input,rate,profile){
  // Quality already includes the clean-take and post-production bonuses. Do not
  // subtract them a second time: starter gear must never recover the dry vocal.
  const quality=clampV(profile.quality,0,VOCAL_CEILING),severity=clampV((48-quality)/40,0,1);
- const skill=clampV(profile.skills?.flow??quality),creative=creativeEffectAmount(skill),post=clampV(profile.postGain,0,4);
+ const skill=clampV(profile.skills?.flow??quality),post=clampV(profile.postGain,0,4),creative=creativeProfileAmount(profile.genreProfile,skill,post);
  const mistakes=profile.skills?Math.min(severity,clampV((100-skill)/70,0,1)):severity;
  const timing=.12+.88*clampV((100-skill)/50,0,1);
  const out=new Float32Array(input.length),gates=new Float32Array(input.length),step=rate/3,edge=Math.max(1,rate*.005),seed=(profile.seed>>>0)||1;

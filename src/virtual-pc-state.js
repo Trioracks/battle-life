@@ -1,10 +1,10 @@
-import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=33';
-import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=33';
-import {normalizeRecordingState} from './vocal-production.js?rev=33';
-import {normalizeCommunity} from './underweb-community.js?rev=28';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=28';
+import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=34';
+import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=34';
+import {normalizeRecordingState} from './vocal-production.js?rev=34';
+import {normalizeCommunity} from './underweb-community.js?rev=34';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=34';
 import {normalizeHousehold} from './home-food.js?rev=33';
-import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=28';
+import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=34';
 export const VIRTUAL_PC_STORAGE_KEY = 'battle-life-virtual-pc-v1';
 export const VIRTUAL_DISK_MB = 16000;
 export const SYSTEM_RESERVED_MB = 14000;
@@ -163,6 +163,7 @@ export function saveVirtualPcState(storage, state) {
     const raw=storage.getItem?.(VIRTUAL_PC_STORAGE_KEY);
     let parsed;try{parsed=raw?JSON.parse(raw):null;}catch{/* A fresh game may replace an unreadable save, as before. */}
     if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'household'))reserveHouseholdBackup(storage,raw);
+    if(isRecord(parsed)&&parsed.version===1&&parsed.music?.genres?.version!==1)reserveGenreBackup(storage,raw);
     storage.setItem(VIRTUAL_PC_STORAGE_KEY, JSON.stringify(normalizeSnapshot(state)));
     return true;
   } catch {
@@ -172,6 +173,10 @@ export function saveVirtualPcState(storage, state) {
 
 function reserveHouseholdBackup(storage,raw){
   const key=VIRTUAL_PC_STORAGE_KEY+'-before-household';
+  if(storage.getItem(key)===null)storage.setItem(key,raw);
+}
+function reserveGenreBackup(storage,raw){
+  const key=VIRTUAL_PC_STORAGE_KEY+'-before-genres';
   if(storage.getItem(key)===null)storage.setItem(key,raw);
 }
 function restoredSnapshot(parsed){
@@ -189,6 +194,9 @@ export function loadVirtualPcState(storage) {
     if (!isRecord(parsed) || parsed.version !== 1) return { ok: false, state: createVirtualPcState() };
     if(!Object.hasOwn(parsed,'household')){
       try{reserveHouseholdBackup(storage,raw);}catch{return {ok:false,reason:'household-backup-failed',state:restoredSnapshot(parsed)};}
+    }
+    if(parsed.music?.genres?.version!==1){
+      try{reserveGenreBackup(storage,raw);}catch{return {ok:false,reason:'genre-backup-failed',state:restoredSnapshot(parsed)};}
     }
     return { ok: true, state: restoredSnapshot(parsed) };
   } catch {

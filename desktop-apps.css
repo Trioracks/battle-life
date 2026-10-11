@@ -1,4 +1,4 @@
-@import url('./underweb-world.css?rev=28');
+@import url('./underweb-world.css?rev=34');
 /* Original in-game applications: visual FT workspace and Underweb pages. */
 .installer-content progress{display:block;appearance:none;width:100%;height:19px;margin:20px 0;border:1px solid #7f9db9;border-radius:2px;background:#fff;box-shadow:inset 1px 1px 2px #7774;accent-color:#41b531}
 .installer-content progress::-webkit-progress-bar{background:#fff;box-shadow:inset 1px 1px 2px #7774}
@@ -149,6 +149,15 @@
 #virtual-pc .ft-workspace .ft-project-actions button,#virtual-pc .ft-workspace .ft-workflow button{border:1px solid #647454!important;background:#424f38!important;color:#e2e6d5!important;padding:7px 12px!important;border-radius:3px!important;font:11px 'Segoe UI',sans-serif!important;cursor:pointer}
 .ft-stage-result{padding:9px 0;border-top:1px solid #414b3b}.ft-stage-result h3{font-size:11px;color:#c4cfb7;margin:0 0 5px}.ft-stage-result p{font-size:10px;color:#9aac98;line-height:1.5;margin:0 0 5px}.ft-stage-result small{font-size:10px;color:#b8a779}
 .ft-grid-inner{position:relative;min-width:740px}
+.ft-timeline-header{position:sticky;top:0;z-index:2}
+.ft-section-markers{display:grid;grid-template-columns:110px repeat(16,minmax(0,1fr));height:25px;background:#263027}
+.ft-section-markers[hidden]{display:none}
+.ft-section-corner{position:sticky;left:0;background:#333d32}
+.ft-section-marker{overflow:hidden;white-space:nowrap;padding:5px 8px;border-left:1px solid #cdd6bd45;border-bottom:1px solid #16231b;font:10px 'Segoe UI',sans-serif}
+.ft-section-marker[data-section=intro]{background:#657349;color:#f1f0d5}
+.ft-section-marker[data-section=verse]{background:#4b6b7c;color:#e0edf2}
+.ft-section-marker[data-section=outro]{background:#786080;color:#f0e7f2}
+.ft-timeline-header .ft-timeline{position:static}
 .ft-grid-inner .ft-timeline{grid-template-columns:110px repeat(16,minmax(0,1fr));min-width:0}
 .ft-grid-inner .ft-lane{grid-template-columns:110px minmax(0,1fr);min-width:0;height:42px}
 .ft-grid-inner .ft-audio-clip{height:30px;margin-block:4px}
@@ -177,6 +186,8 @@
 .ft-dialog-card form{display:grid;gap:10px;margin-block:20px}
 .ft-dialog-card label{font-size:10px;color:#c0c8b6}
 #virtual-pc .ft-dialog-card input{width:100%;padding:11px;background:#1a241d;color:#ecebdc;border:1px solid #6d795e;font:14px 'Segoe UI',sans-serif}
+#virtual-pc .ft-dialog-card select{width:100%;padding:10px;background:#1a241d;color:#ecebdc;border:1px solid #6d795e;font:13px 'Segoe UI',sans-serif}
+#virtual-pc .ft-dialog-card select:focus-visible{outline:2px solid #dfcf96;outline-offset:2px}
 #virtual-pc .ft-dialog-card .ft-menu-choice{display:block;width:100%;text-align:left;margin:11px 0;padding:15px 16px!important;font-size:14px!important}
 #virtual-pc .ft-dialog-card .ft-primary{background:#b9a675!important;color:#1c271d!important;border-color:#d6c38e!important;font-weight:600!important}
 .ft-dialog-projects{max-height:260px;overflow:auto;margin:18px 0}
@@ -194,6 +205,8 @@
 .ft-vocal-analysis strong { display: block; color: #e1cca7; }
 .ft-vocal-decisions label { display: grid; gap: 4px; margin: 8px 0; }
 .ft-vocal-decisions input { width: 100%; }
+.ft-beat-decisions label { display: grid; gap: 4px; margin: 10px 0; }
+.ft-beat-decisions input { width: 100%; min-width: 0; }
 .ft-workflow { flex-wrap: wrap; }
 .ft-lane[data-color="vocal"] { --clip-color: #b48e59; }
 .ft-lane[data-color="vocal-clean"] { --clip-color: #699888; }

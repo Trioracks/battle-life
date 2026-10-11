@@ -1,10 +1,10 @@
 import {drumById,loopSeconds} from './beat-catalog.js?rev=31';
 import {beginnerById} from './beat-beginner-bank.js?rev=31';
-import {resolveBeatPlayback} from './beat-playback.js?rev=33';
-import {connectBeatMix} from './beat-mix.js?rev=32';
-import {transformBeatBuffer,connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=32';
+import {resolveBeatPlayback} from './beat-playback.js?rev=34';
+import {connectBeatMix} from './beat-mix.js?rev=34';
+import {transformBeatBuffer,connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=34';
 import {vocalById} from './vocal-catalog.js?rev=31';
-import {transformVocalBuffer} from './vocal-result-dsp.js?rev=33';
+import {transformVocalBuffer} from './vocal-result-dsp.js?rev=34';
 import {arrangeSongBuffer} from './beat-song-form.js?rev=32';
 
 // Authored placeholder PCM, not a remix of third-party music. Sliders never enter here.

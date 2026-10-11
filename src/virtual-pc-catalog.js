@@ -1,5 +1,6 @@
-import {COMMUNITY_BOARDS,COMMUNITY_TOPICS,communityDay} from './underweb-community.js?rev=28';
+import {COMMUNITY_BOARDS,COMMUNITY_TOPICS,communityDay} from './underweb-community.js?rev=34';
 import {newsIssue,archiveForDay} from './underweb-news.js?rev=28';
+import {FORUM_ARCHIVE_BOARDS,archiveTopicsForDay,archiveTopicForDay} from './underweb-forum-archive.js?rev=34';
 const apps = Object.freeze([
   { id: 'computer', label: 'Мой компьютер', iconId: 'computer', description: 'Диск C: и Мои проекты' },
   { id: 'underweb', label: 'Underweb', iconId: 'underweb', description: 'Локальная сеть баттлов' },
@@ -43,6 +44,17 @@ export function resolveUnderweb(address,metadata={}) {
   if(['underweb://forum','underweb://forum/','форум'].includes(normalized))return {type:'forum',url:'underweb://forum'};
   if(normalized.startsWith('underweb://forum/')){
    const url=new URL(normalized),parts=url.pathname.split('/').filter(Boolean),board=COMMUNITY_BOARDS.find(b=>b.id===parts[0]);
+   if(parts[0]==='archive'){
+    if(parts.length===1){
+     const archiveBoardId=url.searchParams.get('board');
+     if(!archiveBoardId||FORUM_ARCHIVE_BOARDS.some(b=>b.id===archiveBoardId))return {type:'forum-archive',url:'underweb://forum/archive'+(archiveBoardId?'?board='+archiveBoardId:''),archiveBoardId};
+    }
+    if(parts.length===3&&parts[1]==='topic'){
+     const n=Number(url.searchParams.get('page')),topic=archiveTopicForDay(parts[2],gameDay,Number.isSafeInteger(n)?n:1);
+     if(topic)return {type:'forum-archive-topic',url:'underweb://forum/archive/topic/'+topic.id+(topic.page>1?'?page='+topic.page:''),archiveTopicId:topic.id,page:topic.page};
+    }
+    return {type:'error',url:raw,message:'Материал архива недоступен на текущую игровую дату.'};
+   }
    if(board&&parts.length===1)return {type:'forum-board',url:'underweb://forum/'+board.id,board};
    const topic=parts[0]==='topic'&&parts.length===2?COMMUNITY_TOPICS.find(t=>t.id===parts[1]&&t.gameDay<=gameDay):null;
    if(topic){const n=Number(url.searchParams.get('page')),page=Number.isSafeInteger(n)&&n>0?n:1;return {type:'forum-topic',url:'underweb://forum/topic/'+topic.id+(page>1?'?page='+page:''),topic,page};}
@@ -63,6 +75,8 @@ export function resolveUnderweb(address,metadata={}) {
   pages.push({title:'Рэпблокнот — тексты и рифмы',url:'underweb://dump/notebook',site:'Файловая помойка / Программы',description:'Установщик Рэпблокнота: черновики, рифмы и работа над текстом для баттла.',keywords:'рэпблокнот блокнот notebook тексты скачать программа'}, {title:'Форум «Подземка»',url:'underweb://forum',site:'Подземка / Форум',description:'Вымышленный игровой форум. Баттлы, обсуждения, цитаты и ответы.',keywords:'рэп форум обсуждение баттлы'});
   for(const topic of COMMUNITY_TOPICS.filter(t=>t.gameDay<=gameDay))pages.push({title:topic.title+' — '+COMMUNITY_BOARDS.find(b=>b.id===topic.boardId).title,url:'underweb://forum/topic/'+topic.id,site:'Подземка / Форум',description:'Тема вымышленного игрового форума. Открыта с игрового дня '+topic.gameDay+'.',keywords:'форум обсуждение '+topic.title});
   for(const issue of archiveForDay(metadata.gameDay))pages.push({title:issue.title,url:'underweb://iskra/news/'+issue.id,site:'Искра / Новости / '+issue.publishDate,description:issue.body[0]??'',keywords:issue.category+' '+issue.sourceTitle});
+  pages.push({title:'Исторический архив Hip-Hop.ru',url:'underweb://forum/archive',site:'Hip-Hop.ru / Историческая подборка',description:'Реальные даты и авторы, краткие пересказы, короткие цитаты и ссылки на оригинал. Архив только для чтения.',keywords:'хип хоп hip hop ru форум архив 2012'});
+  for(const topic of archiveTopicsForDay(null,gameDay))pages.push({title:topic.title,url:'underweb://forum/archive/topic/'+topic.id,site:'Hip-Hop.ru / Архив / '+topic.date,description:topic.posts[0]?.body??'',keywords:'исторический архив 2012 '+topic.posts.map(p=>p.author).join(' ')});
   const results=words.length?pages.map(p=>({...p,score:words.reduce((n,w)=>n+(p.title+' '+p.description+' '+p.keywords).toLowerCase().replaceAll('ё','е').includes(w),0)})).filter(p=>p.score>0).sort((a,b)=>b.score-a.score).map(({keywords,score,...p})=>p):[];
   return {type:'search',url:'underweb://iskra/search?q='+encodeURIComponent(query),query,results};
 }

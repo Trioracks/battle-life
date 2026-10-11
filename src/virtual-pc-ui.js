@@ -1,29 +1,29 @@
-import { FtStudioAudio } from './ft-studio-audio.js?rev=28';
+import { FtStudioAudio } from './ft-studio-audio.js?rev=34';
 import {mountPcShell} from './virtual-pc-shell.js?rev=28';
-import {mountExplorer} from './virtual-pc-explorer-view.js?rev=33';
+import {mountExplorer} from './virtual-pc-explorer-view.js?rev=34';
 import {mountPcMenu} from './virtual-pc-menus.js?rev=28';
-import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=33';
-import {explorerProperties} from './virtual-pc-explorer.js?rev=33';
+import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=34';
+import {explorerProperties} from './virtual-pc-explorer.js?rev=34';
 import {createWindowState,reduceWindows} from './virtual-pc-window-state.js?rev=28';
-import {layoutDesktopIcons,setDesktopIconPosition,resetDesktopIconPositions} from './virtual-pc-state.js?rev=33';
+import {layoutDesktopIcons,setDesktopIconPosition,resetDesktopIconPositions} from './virtual-pc-state.js?rev=34';
 import {createPcIcon} from './virtual-pc-icons.js?rev=28';
-import { normalizeStudioProject } from './ft-studio-project.js?rev=28';
-import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js?rev=28';
-import { createVirtualPcState, diskUsage, saveStudioProject } from './virtual-pc-state.js?rev=33';
+import { normalizeStudioProject } from './ft-studio-project.js?rev=34';
+import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js?rev=34';
+import { createVirtualPcState, diskUsage, saveStudioProject } from './virtual-pc-state.js?rev=34';
 import {diskAmount} from './virtual-pc-disk-view.js?rev=21';
 import {pcPresentation} from './virtual-pc-presentation.js?rev=21';
-import {createStudioWorkspace} from './ft-studio-view.js?rev=32';
-import {mountUnderweb} from './underweb-view.js?rev=33';
-import {applyToBattle} from './virtual-pc-state.js?rev=33';
-import {mountBeatStudio} from './beat-studio-view.js?rev=33';
-import {BeatAudio} from './beat-audio.js?rev=33';
-import {normalizeBeat} from './beat-production.js?rev=33';
-import {createBeatMarket} from './beat-market-view.js?rev=33';
-import * as software from './pc-software.js?rev=28';
-import {mountTorrent,mountInstaller,softwareMessage} from './pc-software-view.js?rev=33';
-import {SOFTWARE} from './pc-software-catalog.js?rev=28';
-import {mountRapNotebook} from './rap-notebook-view.js?rev=33';
-import {normalizeLyric} from './lyric-production.js?rev=33';
+import {createStudioWorkspace} from './ft-studio-view.js?rev=34';
+import {mountUnderweb} from './underweb-view.js?rev=34';
+import {applyToBattle} from './virtual-pc-state.js?rev=34';
+import {mountBeatStudio} from './beat-studio-view.js?rev=34';
+import {BeatAudio} from './beat-audio.js?rev=34';
+import {normalizeBeat} from './beat-production.js?rev=34';
+import {createBeatMarket} from './beat-market-view.js?rev=34';
+import * as software from './pc-software.js?rev=34';
+import {mountTorrent,mountInstaller,softwareMessage} from './pc-software-view.js?rev=34';
+import {SOFTWARE} from './pc-software-catalog.js?rev=34';
+import {mountRapNotebook} from './rap-notebook-view.js?rev=34';
+import {normalizeLyric} from './lyric-production.js?rev=34';
 
 const NOOP = () => {};
 
@@ -183,11 +183,13 @@ export function mountVirtualPc(root, callbacks = {}) {
     }else if(action==='back')result=software.advanceInstaller(pc.state,{back:true});
     else {const actions={'download-notebook':software.downloadNotebook,'download-client':software.downloadClient,'download-metadata':software.downloadMetadata,'open-metadata':software.openMetadata,installer:software.openInstaller,pause:software.pauseTransfer,resume:software.resumeTransfer,cancel:software.cancelTransfer,'cancel-installer':software.cancelInstaller};result=actions[action]?.(pc.state,id);}
     if(!result)return;
+    const metadataAction=['download-notebook','download-metadata','open-metadata'].includes(action),metadataId=action==='download-notebook'?'notebook':id??'ft';
+    if(metadataAction&&action!=='open-metadata'&&result.ok)result=software.openMetadata(result.state,metadataId);
     pc.message=softwareMessage(result.reason);pc.persist(result.state);
     if(action==='installer'&&result.ok){pc.cancelStudioLaunch();pc.windows=reduceWindows(pc.windows,{type:'open',id:'installer',appId:'installer',title:'Мастер установки — '+SOFTWARE[id].name});pc.renderDesktop(false);pc.shell.focusActive();return;}
     if(!pc.state.software.installer&&pc.windows.windows.some(w=>w.id==='installer'))pc.closeNow('installer');
     pc.renderDesktop(false);
-    if(action==='open-metadata'&&result.ok)pc.open('torent');
+    if(metadataAction&&pc.state.power==='on'&&pc.state.software.client.installed&&pc.state.software[SOFTWARE[metadataId]?.metadataKey]){pc.cancelStudioLaunch();pc.open('torent');}
   };
 
   pc.refreshDynamicState = () => {
@@ -273,7 +275,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       }});
       pc.explorer.update(pc.state);return;
     }
-    if(appId==='torent'){if(!pc.torrentView)pc.torrentView=mountTorrent(target,{getState:()=>pc.state,onAction:pc.softwareAction});pc.torrentView.update();return;}
+    if(appId==='torent'){if(!pc.torrentView)pc.torrentView=mountTorrent(target,{getState:()=>pc.state,onAction:pc.softwareAction,getMessage:()=>pc.message});pc.torrentView.update();return;}
     if(appId==='installer'){if(!pc.installerView)pc.installerView=mountInstaller(target,{getState:()=>pc.state,onAction:pc.softwareAction,getMessage:()=>pc.message});pc.installerView.update();return;}
     if(appId.startsWith('system:')){
       if(!pc.systemViews.has(appId))pc.systemViews.set(appId,mountSystemWindow(target,{kind:appId.slice(7),getState:()=>pc.state,onPersist:next=>{const ok=pc.persist(next);pc.renderDesktop(false);return ok;},onOpen:kind=>pc.openSystem(kind),onClose:()=>pc.closeWindow(appId),properties:pc.properties}));

@@ -1,11 +1,18 @@
 // Original fictional conversations, inspired by the structure of 2007–2013 forums.
 // No post or quotation is attributed to a historical performer.
+import {LOCAL_MUSIC_BOARDS,LOCAL_MUSIC_TOPICS} from './underweb-community-data.js?rev=34';
 export const COMMUNITY_BOARDS=Object.freeze([
  {id:'concrete-echo',title:'Бетонное эхо',description:'Голос спального района. Отбор, звук и первые столкновения.',motto:'Слышно даже за стеной.',host:'Пыльный_Пульт'},
  {id:'open-mic-17',title:'Открытый микрофон 17',description:'Истории без припева. Для первых записей и упрямых рассказчиков.',motto:'Микрофон открыт. Слова за тобой.',host:'кассета_Б'},
  {id:'yard-cipher',title:'Шифр двора',description:'Восемь строк, один ответ. Здесь считают каждую строчку.',motto:'Восемь строк — восемь попаданий.',host:'Ключ_13'},
  {id:'makarevich-1',title:'Макаревич Батл №1',description:'Первый набор. Спорим о тексте, подаче и странных названиях.',motto:'Новый круг, старый магнитофон.',host:'Антенна_Внутри'},
-]);
+].map(b=>({...b,category:'battles'})).concat(LOCAL_MUSIC_BOARDS));
+const casts={
+ 'concrete-echo':['Пыльный_Пульт','Шум_Подъезда','Без_Запятой','Ржавый_Сэмпл','Щебень_88'],
+ 'open-mic-17':['кассета_Б','Ночная_Смена','Третий_Перрон','Лампа_В_Окне','Неровный_Почерк'],
+ 'yard-cipher':['Ключ_13','Восемь_Делений','Острый_Угол','Короткий_Выдох','Смотрящий_Круга'],
+ 'makarevich-1':['Антенна_Внутри','Радио_Чердак','Пульт_Без_Mute','Тихий_Припев','Ручной_Режим'],
+};
 const authors={
  'Пыльный_Пульт':{role:'организатор',signature:'Сначала файл. Потом разговоры.'},
  'кассета_Б':{role:'старожил',signature:'На обратной стороне ещё есть место.'},
@@ -57,13 +64,12 @@ const conversations={
   'Запомнил. На следующем круге принесу тебе сухой куплет. Без упаковки.',
  ],
 };
-const generalAuthors=['Пыльный_Пульт','Шум_Подъезда','Без_Запятой','Шум_Подъезда','кассета_Б','Шум_Подъезда','Ржавый_Сэмпл','Шум_Подъезда'];
 const generalDays=[1,1,1,2,4,6,8,11];
-export const COMMUNITY_TOPICS=Object.freeze(COMMUNITY_BOARDS.flatMap(board=>[
+export const COMMUNITY_TOPICS=Object.freeze(COMMUNITY_BOARDS.filter(b=>b.category==='battles').flatMap(board=>[
  {id:board.id+'-general',boardId:board.id,title:'Отбор · обсуждение и первые работы',author:board.host,gameDay:1,pinned:false,kind:'general'},
  {id:board.id+'-rules',boardId:board.id,title:'Регламент · вопросы организаторам',author:board.host,gameDay:1,pinned:true,kind:'rules'},
- {id:board.id+'-round',boardId:board.id,title:'Мастерская · разбираем черновики',author:'Ржавый_Сэмпл',gameDay:4,pinned:false,kind:'round'},
-]));
+ {id:board.id+'-round',boardId:board.id,title:'Мастерская · разбираем черновики',author:casts[board.id][3],gameDay:4,pinned:false,kind:'round'},
+]).concat(LOCAL_MUSIC_TOPICS));
 const topicIds=new Set(COMMUNITY_TOPICS.map(t=>t.id));
 const record=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 const text=(v,max)=>typeof v==='string'?v.slice(0,max):'';
@@ -79,18 +85,19 @@ export function normalizeCommunity(value){
 }
 function seededPosts(topic){
  const board=COMMUNITY_BOARDS.find(b=>b.id===topic.boardId);
- const entries=topic.kind==='general'?conversations[board.id].map((body,i)=>({body,author:i===0?board.host:generalAuthors[i],gameDay:generalDays[i]})):topic.kind==='rules'?[
+ const cast=casts[board.id],sequence=cast&&[cast[0],cast[1],cast[2],cast[1],cast[4],cast[1],cast[3],cast[1]];
+ const entries=topic.kind==='discussion'?topic.posts:topic.kind==='general'?conversations[board.id].map((body,i)=>({body,author:sequence[i],gameDay:generalDays[i]})):topic.kind==='rules'?[
   {body:'В этой теме спрашиваем про регламент. Заявка подаётся на сайте баттла. Отправка аудиотреков пока не открыта: наличие черновика в блокноте не означает сдачу.',author:board.host,gameDay:1},
-  {body:'Если начал текст до заявки, его придётся писать заново?',author:'Ключ_13',gameDay:2},
+  {body:'Если начал текст до заявки, его придётся писать заново?',author:cast[1],gameDay:2},
   {body:'Нет. Сначала прочитай тему и ограничения, затем регистрируйся. Черновик остаётся твоим; регистрация сама по себе его не отправляет.',author:board.host,gameDay:2},
-  {body:'Гостевые куплеты и публикация чужих личных данных запрещены. Разбирать слабые строки можно, устраивать травлю — нельзя.',author:'Антенна_Внутри',gameDay:5},
+  {body:'Гостевые куплеты и публикация чужих личных данных запрещены. Разбирать слабые строки можно, устраивать травлю — нельзя.',author:cast[4],gameDay:5},
  ]:[
-  {body:'Открыл мастерскую. Здесь разбираем структуру и ритм черновиков. Оценок судей нет: обсуждаем, что можно исправить до записи.',author:'Ржавый_Сэмпл',gameDay:4},
-  {body:'Сильное начало не обязывает давить всё оставшееся время. Оставьте паузу, чтобы следующая мысль хоть куда-нибудь поместилась.',author:'Без_Запятой',gameDay:4},
-  {body:'Проверяю текст под бит. На бумаге выглядел ровным, вслух половина слов мешает. Похоже, блокнот хитрее меня.',author:'Шум_Подъезда',gameDay:7},
-  {body:'Блокнот не хитрит. Он просто не дышит за тебя. Убирай лишнее и перечитывай.',author:'кассета_Б',gameDay:10},
+  {body:'Открыл мастерскую. Здесь разбираем структуру и ритм черновиков. Оценок судей нет: обсуждаем, что можно исправить до записи.',author:cast[3],gameDay:4},
+  {body:'Сильное начало не обязывает давить всё оставшееся время. Оставьте паузу, чтобы следующая мысль хоть куда-нибудь поместилась.',author:cast[2],gameDay:4},
+  {body:'Проверяю текст под бит. На бумаге выглядел ровным, вслух половина слов мешает. Похоже, блокнот хитрее меня.',author:cast[1],gameDay:7},
+  {body:'Блокнот не хитрит. Он просто не дышит за тебя. Убирай лишнее и перечитывай.',author:cast[4],gameDay:10},
  ];
- return entries.map((p,i)=>({...p,id:topic.id+'-'+(i+1),topicId:topic.id,quoteId:null,...authors[p.author]}));
+ return entries.map((p,i)=>({...p,id:topic.id+'-'+(i+1),topicId:topic.id,quoteId:null,role:p.author===board.host?'модератор раздела':'участник',signature:board.category==='battles'?board.motto:'Подземка · '+board.title,...authors[p.author]}));
 }
 export function topicsForDay(boardId,gameDay=1,value){
  const day=communityDay(gameDay),state=normalizeCommunity(value);

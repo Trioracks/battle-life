@@ -1,20 +1,22 @@
 import {BEAT_RULES as R,BEAT_PRACTICE,BEAT_GENRES,DRUMS,drumById} from './beat-catalog.js?rev=31';
 import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=31';
-import {softwareDiskBytes} from './pc-software.js?rev=28';
-import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=32';
-import {createBeatResult} from './beat-result.js?rev=28';
+import {softwareDiskBytes} from './pc-software.js?rev=34';
+import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=34';
+import {createBeatResult} from './beat-result.js?rev=34';
 import {normalizeRecording,effectiveSoundSkill} from './vocal-result.js?rev=33';
+import {genreById,normalizeGenreProgression,genreOptions,genreSnapshot,normalizeGenreSnapshot,addGenrePractice} from './genre-progression.js?rev=34';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
 const clamp=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,finite(v)));
 const text=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';
 const sliders=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite)?v.map(x=>Math.round(clamp(x,0,10))):null;
 const PRACTICE_PER_STAGE=1/3;
 export function normalizeBeat(p){
- if(![2,3].includes(p?.version)||p.kind!=='beat'||!text(p.id,100)||!text(p.name,64)||(p.genre!==BEAT_PRACTICE.id&&!BEAT_GENRES.some(g=>g.id===p.genre)))return null;
+ if(![2,3].includes(p?.version)||p.kind!=='beat'||!text(p.id,100)||!text(p.name,64)||(p.genre!==BEAT_PRACTICE.id&&!genreById(p.genre)))return null;
  if(p.version===2&&!(p.drumId==='primitive'||drumById(p.drumId)))return null;
  const stages=[];
  for(const s of (Array.isArray(p.stages)?p.stages:[]).slice(0,3)){const values=sliders(s?.sliders);if(!values)break;stages.push({sliders:values,fit:clamp(s.fit),quality:clamp(s.quality,0,p.mix?.version===2?110:100)});}
  const beat={version:p.version,kind:'beat',id:text(p.id,100),name:text(p.name,64),genre:p.genre,bpm:90,drumId:text(p.drumId,100),stages,status:stages.length===3?'ready':'draft'};
+ const genreProfile=normalizeGenreSnapshot(p.genreProfile);if(genreProfile&&genreProfile.id===beat.genre)beat.genreProfile=genreProfile;
  const mix=normalizeBeatMix(p.mix);if(mix)beat.mix=mix;
  const recording=normalizeRecording(p.recording);if(recording&&beat.status==='ready')beat.recording=recording;
  if(p.version===3){
@@ -31,7 +33,12 @@ export function normalizeMusic(value,projects=[]){
  const validJob=beat&&beat.stages.length<3&&job.stage===beat.stages.length&&values&&Number.isFinite(job.total)&&job.total>0&&job.total<=600&&Number.isFinite(job.elapsed)&&job.elapsed>=0&&job.elapsed<job.total;
  // Old partial jobs earned nothing until completion, so a missing credit ledger starts at zero.
  const savedJob=validJob?{beatId:beat.id,stage:job.stage,sliders:values,total:job.total,elapsed:job.elapsed,skill:clamp(job.skill),genreSkill:clamp(finite(job.genreSkill,m.genrePractice?.[beat.genre])),practiceCredit:clamp(job.practiceCredit,0,job.elapsed/job.total*PRACTICE_PER_STAGE)}:null;
- return {cash:clamp(finite(m.cash,R.startingCash),0,1e9),needs:{satiety:clamp(finite(m.needs?.satiety,68)),energy:clamp(finite(m.needs?.energy,72))},practice:clamp(m.practice),genrePractice:Object.fromEntries(BEAT_GENRES.map(g=>[g.id,clamp(m.genrePractice?.[g.id])])),owned,ripline:m.ripline===true,infected:m.infected===true,activeBeatId:typeof m.activeBeatId==='string'&&projects.some(p=>normalizeBeat(p)?.id===m.activeBeatId)?m.activeBeatId:null,job:savedJob};
+ if(savedJob){
+  // Missing genre ledger means pre-migration work: never award elapsed work again.
+  savedJob.genreCredit=clamp(finite(job.genreCredit,job.elapsed/job.total*PRACTICE_PER_STAGE),0,job.elapsed/job.total*PRACTICE_PER_STAGE);
+  const profile=normalizeGenreSnapshot(job.genreProfile);if(profile)savedJob.genreProfile=profile;
+ }
+ return {cash:clamp(finite(m.cash,R.startingCash),0,1e9),needs:{satiety:clamp(finite(m.needs?.satiety,68)),energy:clamp(finite(m.needs?.energy,72))},practice:clamp(m.practice),genres:normalizeGenreProgression(m.genres),genrePractice:Object.fromEntries(BEAT_GENRES.map(g=>[g.id,clamp(m.genrePractice?.[g.id])])),owned,ripline:m.ripline===true,infected:m.infected===true,activeBeatId:typeof m.activeBeatId==='string'&&projects.some(p=>normalizeBeat(p)?.id===m.activeBeatId)?m.activeBeatId:null,job:savedJob};
 }
 const normalized=s=>({...s,projects:[...(s.projects??[])],music:normalizeMusic(s.music,s.projects)});
 const result=(state,ok=true,reason='')=>({state,ok,reason});
@@ -43,14 +50,14 @@ export function workBlockReason(state){
 }
 export function createBeat(input,options={},skills={},random=Math.random){
  if(input.recording?.job)return result(input,false,'Сначала заверши запись.');
- const s=normalized(input),id=text(options.id,100),name=text(options.name,64),genre=options.genre??BEAT_PRACTICE.id;
+ const s=normalized(input),id=text(options.id,100),name=text(options.name,64),genre=!options.genre||options.genre===BEAT_PRACTICE.id?'experimental':options.genre;
  if(!id||!name||s.projects.some(p=>p.id===id))return result(s,false,'Укажи название проекта.');
- if(genre!==BEAT_PRACTICE.id&&!BEAT_GENRES.some(g=>g.id===genre&&g.available))return result(s,false,'Жанровая специализация пока недоступна.');
+ if(!genreOptions(s.music.genres,effectiveBeatSkill(s,skills)).available.includes(genre))return result(s,false,'Жанровая специализация пока недоступна.');
  if(softwareDiskBytes(s).free<2000000)return result(s,false,'Недостаточно места для нового проекта.');
  if(options.assetId&&!s.music.owned.some(a=>a.id===options.assetId))return result(s,false,'Этот луп ещё не получен.');
  const skill=effectiveBeatSkill(s,skills),parts=chooseBeginnerParts(random),free=DRUMS.filter(d=>d.bank==='free');
  const drumId=options.assetId||(skill>=R.freeSkill?free[Math.floor(clamp(random(),0,.999999)*free.length)].id:parts.drumsId);
- const beat=normalizeBeat({version:3,kind:'beat',id,name,genre:BEAT_PRACTICE.id,drumId,stages:[],mix:createBeatMix(id,{beatmaking:skill,sound:effectiveSoundSkill(s,skills)}),productionMode:skill<=25?'beginner':'automatic',
+ const beat=normalizeBeat({version:3,kind:'beat',id,name,genre,genreProfile:genreSnapshot(s.music.genres,genre),drumId,stages:[],mix:createBeatMix(id,{beatmaking:skill,sound:effectiveSoundSkill(s,skills)}),productionMode:skill<25?'beginner':'automatic',
   audio:{bankVersion:1,bars:4,themeId:parts.themeId,arrangementId:parts.arrangementId}});
  s.projects.push(beat);s.music.activeBeatId=id;return result(s);
 }
@@ -66,10 +73,11 @@ export function startBeatStage(input,id,values,skills={},random=Math.random){
   const v=values===undefined?Array.from({length:3},()=>Math.floor(clamp(random(),0,.999999)*11)):sliders(values);
   if(!v)return result(s,false,'Этот этап недоступен.');
   const skill=effectiveBeatSkill(s,skills);
-  s.music.job={beatId:id,stage:beat.stages.length,sliders:v,total:Math.round(R.stageMinutes[beat.stages.length]*Math.max(.55,1-skill*.003)*(s.music.infected?1.35:1)),elapsed:0,skill,genreSkill:0,practiceCredit:0};
+  const genreProfile=genreSnapshot(s.music.genres,beat.genreProfile?.id??'experimental');
+  s.music.job={beatId:id,stage:beat.stages.length,sliders:v,total:Math.round(R.stageMinutes[beat.stages.length]*Math.max(.55,1-skill*.003)*(s.music.infected?1.35:1)),elapsed:0,skill,genreSkill:genreProfile.xp,genreProfile,practiceCredit:0,genreCredit:0};
   if(beat.mix?.version===2){
-   const profile=beat.genre===BEAT_PRACTICE.id?BEAT_PRACTICE:BEAT_GENRES.find(g=>g.id===beat.genre);
-   beat.mix.layers[beat.stages.length]=createBeatResult({seed:beat.mix.seed,stage:beat.stages.length,skills:{beatmaking:skill,sound:effectiveSoundSkill(s,skills)},sliders:v,targets:profile.targets[beat.stages.length]});
+   const profile=beat.genre===BEAT_PRACTICE.id?BEAT_PRACTICE:genreById(beat.genre);
+   beat.mix.layers[beat.stages.length]=createBeatResult({seed:beat.mix.seed,stage:beat.stages.length,skills:{beatmaking:skill,sound:effectiveSoundSkill(s,skills)},sliders:v,targets:profile.targets[beat.stages.length],...(beat.genreProfile?{genreProfile}:{})});
    s.projects[s.projects.findIndex(p=>p.id===id)]=beat;
   }
  }
@@ -86,6 +94,7 @@ export function advanceBeatWork(input,requested){
  if(minutes>0){
   const credit=(finished?1:job.elapsed/job.total)*PRACTICE_PER_STAGE,gain=Math.max(0,credit-job.practiceCredit);
   s.music.practice=clamp(s.music.practice+gain);job.practiceCredit=credit;
+  s.music.genres=addGenrePractice(s.music.genres,job.genreProfile?.id??'experimental',Math.max(0,credit-job.genreCredit));job.genreCredit=credit;
  }
  const practiceGained=Math.min(job.practiceCredit,100-job.skill);
  if(finished){

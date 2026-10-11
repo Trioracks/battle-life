@@ -1,7 +1,7 @@
 import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=21';
 import {BEAT_STAGES} from './beat-catalog.js?rev=31';
-import {LYRIC_STAGES} from './lyric-production.js?rev=33';
-import {VOCAL_STAGES} from './vocal-production.js?rev=33';
+import {LYRIC_STAGES} from './lyric-production.js?rev=34';
+import {VOCAL_STAGES} from './vocal-production.js?rev=34';
 const trainingLevel=value=>Math.max(0,Math.min(100,Number.isFinite(value)?value:0));
 const formatLevel=value=>trainingLevel(value).toFixed(2);
 
@@ -16,6 +16,8 @@ export function createBeatWorkPanel(document,{onCancel=()=>{},onEnableAudio=()=>
  const training=el(document,'div',{className:'beat-work-training'});
  const row=el(document,'label',{className:'beat-work-training-row'}),bar=node('skill-progress','meter','beat-work-skill-meter');bar.min=0;bar.max=100;bar.setAttribute('aria-label','Битмейкинг');
  row.append(skill,node('skill-gain','span','beat-work-skill-gain'),bar);training.append(row);
+ const genreRow=el(document,'label',{className:'beat-work-training-row'}),genreLabel=node('genre','span'),genreGain=node('genre-gain','span','beat-work-skill-gain'),genreBar=node('genre-progress','meter','beat-work-skill-meter');
+ genreRow.append(genreLabel,genreGain,genreBar);
  const needs=el(document,'div',{className:'beat-work-needs'});
  for(const [key,label]of [['satiety','Сытость'],['energy','Энергия']]){
   const row=el(document,'label'),bar=node(key,'meter');bar.min=0;bar.max=100;bar.low=25;bar.high=70;bar.optimum=100;bar.setAttribute('aria-label',label);
@@ -23,7 +25,7 @@ export function createBeatWorkPanel(document,{onCancel=()=>{},onEnableAudio=()=>
  }
  const foot=el(document,'div',{className:'beat-work-foot'}),audioStatus=node('audio','span','beat-work-audio'),enable=button(document,'Включить звук',{},onEnableAudio),cancel=button(document,'Прервать работу',{},onCancel);
  foot.append(audioStatus,enable,cancel);root.append(head,progress,details,training,needs,foot);
- return {element:root,update({beat,job,needs:values={},skill:level=0,clockLabel='',reward:earned=0,finished=false,audioError='',needsGesture=false}={}){
+ return {element:root,update({beat,job,needs:values={},skill:level=0,genreProgress,clockLabel='',reward:earned=0,finished=false,audioError='',needsGesture=false}={}){
   const writing=beat?.kind==='lyrics',stages=writing?LYRIC_STAGES:BEAT_STAGES,extra=writing&&job?.kind!=='stage'?({diss:'Диссовая часть',story:'Сюжетный куплет',chorus:'Припев',adapt:'Адаптация под бит'})[job?.kind]:null;
   const vocal=job?.output?.draft?VOCAL_STAGES[job.kind]:null;
   title.textContent=beat?.name??'Работа над битом';stage.textContent=vocal?.name??extra??('ЭТАП '+((job?.stage??0)+1)+' / 3 · '+(stages[job?.stage??0]?.name??'Работа'));
@@ -36,6 +38,14 @@ export function createBeatWorkPanel(document,{onCancel=()=>{},onEnableAudio=()=>
   bar.setAttribute('aria-label',label);bar.setAttribute('aria-valuetext','Уровень '+formatLevel(value)+' из 100 · '+hint);
   skill.textContent=label+' '+formatLevel(value)+' · '+hint;
   nodes['skill-gain'].textContent='+'+formatLevel(value-trainingLevel(job?.skill??level))+' за этап';
+  if(genreProgress&&!writing&&!vocal){
+   if(!genreRow.parentNode)training.append(genreRow);
+   const xp=trainingLevel(genreProgress.xp),cap=genreProgress.cap===100?100:75;
+   genreBar.min=Math.min(cap-1,Math.floor(xp));genreBar.max=Math.min(cap,Math.floor(xp)+1);genreBar.value=xp;
+   genreBar.setAttribute('aria-label','Жанр '+genreProgress.name);genreBar.setAttribute('aria-valuetext',xp.toFixed(2)+' из '+cap);
+   genreLabel.textContent=genreProgress.name+' '+xp.toFixed(2)+' / '+cap;
+   genreGain.textContent='+'+formatLevel(xp-trainingLevel(job?.genreSkill??xp))+' за этап';
+  }else genreRow.remove();
   reward.hidden=!complete;reward.textContent=complete?(earned>0?'Практика +'+formatLevel(earned)+' · этап завершён':'Этап завершён · навык на максимуме'):'';
   nodes.minutes.textContent=Math.floor(job?.elapsed??0)+' / '+(job?.total??0)+' мин';
   for(const key of ['satiety','energy']){const value=Math.max(0,Math.min(100,values[key]??0));nodes[key].value=value;nodes[key+'-value'].textContent=String(Math.round(value));}

@@ -1,8 +1,9 @@
 import {drumById,loopSeconds} from './beat-catalog.js?rev=31';
 import {beginnerById} from './beat-beginner-bank.js?rev=31';
-import {normalizeBeatMix} from './beat-mix.js?rev=32';
+import {normalizeBeatMix} from './beat-mix.js?rev=34';
 import {normalizeRecording,vocalPlaybackProfile} from './vocal-result.js?rev=33';
 import {createBeatSongForm,songPartWindows} from './beat-song-form.js?rev=32';
+import {normalizeGenreSnapshot} from './genre-progression.js?rev=34';
 
 // A project has one musical clock, even when a legacy drum loop is shorter.
 export function resolveBeatPlayback(beat,{workStage=null,recordingPreview=null}={}){
@@ -26,6 +27,7 @@ export function resolveBeatPlayback(beat,{workStage=null,recordingPreview=null}=
   if(layer)part.result=post&&workStage===null?{...layer,quality:Math.min(110,layer.quality+post),postGain:post}:layer;
   if(form)part.windows=songPartWindows(form,index);return part;
  });
- if(recording&&workStage===null&&beat.stages.length===3){const vocal={id:recording.sourceId,loopSeconds:32/3,vocal:vocalPlaybackProfile(recording)};if(form)vocal.windows=songPartWindows(form,3);parts.push(vocal);}
- return {ok:true,reason:'',descriptor:{key:JSON.stringify([beat.id,owner,workStage,chosen,mix,recording]),owner,durationSeconds,parts,mix}};
+ const genreProfile=normalizeGenreSnapshot(beat.genreProfile);
+ if(recording&&workStage===null&&beat.stages.length===3){const vocal={id:recording.sourceId,loopSeconds:32/3,vocal:{...vocalPlaybackProfile(recording),...(genreProfile?{genreProfile}:{})}};if(form)vocal.windows=songPartWindows(form,3);parts.push(vocal);}
+ return {ok:true,reason:'',descriptor:{key:JSON.stringify([beat.id,owner,workStage,chosen,mix,recording,...(genreProfile?[genreProfile]:[])]),owner,durationSeconds,parts,mix}};
 }

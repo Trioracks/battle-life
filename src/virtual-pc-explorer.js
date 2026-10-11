@@ -1,7 +1,7 @@
-import {diskUsage} from './virtual-pc-state.js?rev=33';
+import {diskUsage} from './virtual-pc-state.js?rev=34';
 import {formatDiskGb,diskAmount} from './virtual-pc-disk-view.js?rev=21';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=28';
-import {SOFTWARE} from './pc-software-catalog.js?rev=28';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=34';
+import {SOFTWARE} from './pc-software-catalog.js?rev=34';
 export const EXPLORER_PATHS=Object.freeze({
   computer:{label:'Мой компьютер',address:'Мой компьютер',parent:null,iconId:'computer'},
   disk:{label:'Локальный диск (C:)',address:'C:\\',parent:'computer',iconId:'disk'},
@@ -51,7 +51,7 @@ export function explorerEntries(pcState,path) {
   const s=pcState.software;
   if(path==='downloads'&&s){
    for(const [id,definition]of Object.entries(SOFTWARE)){const app=s[id],total=definition.downloadBytes;if(app?.receivedBytes>0)entries.push({id:'archive:'+id,kind:'artifact',name:definition.archive+(app.receivedBytes<total?'.part':''),iconId:'project',sizeMb:app.receivedBytes/1000000,...(app.receivedBytes===total?{action:'installer',appId:id}:{})});}
-   if(s.metadata)entries.push({id:'ft-metadata',kind:'artifact',name:'FT-Studio.torrent',iconId:'torent',sizeMb:.012,action:'open-metadata'});
+   for(const [id,definition]of Object.entries(SOFTWARE))if(definition.metadataKey&&s[definition.metadataKey])entries.push({id:id+'-metadata',kind:'artifact',name:definition.torrent,iconId:'torent',sizeMb:.012,action:'open-metadata',appId:id});
   }
   for(const [id,app]of Object.entries(s??{}))if(SOFTWARE[id]&&app.installed&&paths[path]?.address.toLowerCase()===app.path.toLowerCase()){
    entries.push({id:'exe:'+id,kind:'application',name:SOFTWARE[id].name+'.exe',iconId:id==='ft'?'studio':id==='notebook'?'documents':'torent',appId:id==='ft'?'ft-studio':id==='notebook'?'rap-notebook':'torent'});

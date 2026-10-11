@@ -1,7 +1,7 @@
 import {VOCALS} from './vocal-catalog.js?rev=31';
 import {clampV,createVocalTake,normalizeRecording,recordingQuality,VOCAL_EQUIPMENT,effectiveSoundSkill} from './vocal-result.js?rev=33';
-import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=33';
-import {normalizeLyric} from './lyric-production.js?rev=33';
+import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=34';
+import {normalizeLyric} from './lyric-production.js?rev=34';
 import {BEAT_RULES as R} from './beat-catalog.js?rev=31';
 export {recordingQuality};
 export const VOCAL_STAGES=Object.freeze({draft:{name:'Черновая запись',minutes:60,skill:'flow'},clean:{name:'Чистовая запись',minutes:60,skill:'flow'},mix:{name:'Сведение',minutes:45,skill:'sound'},master:{name:'Мастеринг',minutes:30,skill:'sound'}});

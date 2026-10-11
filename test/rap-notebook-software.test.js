@@ -9,19 +9,19 @@ import {createPcIcon} from '../src/virtual-pc-icons.js';
 import {pcDocument} from './helpers/virtual-pc-dom.js';
 import {access} from 'node:fs/promises';
 
-test('notebook downloads without torrent and installs over ten active seconds with disk accounting',()=>{
- let s=createVirtualPcState({power:'on'});assert.equal(s.software.notebook?.installed,false);
+test('notebook downloads through torrent and installs over ten active seconds with disk accounting',()=>{
+ let s=createVirtualPcState({power:'on',software:{client:{installed:true}}});assert.equal(s.software.notebook?.installed,false);
  assert.equal(typeof software.downloadNotebook,'function');
- s=software.downloadNotebook(s).state;
+ s=software.openMetadata(software.downloadNotebook(s).state,'notebook').state;
  s=advanceVirtualPc(s,{day:1,minutes:0}).state;s=advanceVirtualPc(s,{day:1,minutes:5}).state;
- assert.equal(s.software.notebook.receivedBytes,4000000);assert.equal(diskUsage(s).usedMb,14004);
+ assert.equal(s.software.notebook.receivedBytes,4000000);assert.equal(diskUsage(s).usedMb,14012.012);
  assert.equal(explorerEntries(s,'downloads').find(e=>e.appId==='notebook').action,'installer');
  s=software.openInstaller(s,'notebook').state;
  for(let i=0;i<3;i++)s=software.advanceInstaller(s).state;
  s=software.advanceInstallation(s,9).state;assert.equal(s.software.notebook.installed,false);
  s=createVirtualPcState(JSON.parse(JSON.stringify(s)));
  s=software.advanceInstallation(s,1).state;assert.equal(s.software.notebook.installed,true);
- assert.equal(diskUsage(s).usedMb,14016);
+ assert.equal(diskUsage(s).usedMb,14024.012);
  const path=Object.keys(explorerPaths(s)).find(k=>explorerPaths(s)[k].address===s.software.notebook.path);
  assert.equal(explorerEntries(s,path).find(e=>e.kind==='application').appId,'rap-notebook');
 });

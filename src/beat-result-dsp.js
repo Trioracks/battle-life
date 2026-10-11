@@ -1,5 +1,5 @@
-import {normalizeBeatResult} from './beat-result.js?rev=28';
-import {creativeEffectAmount} from './audio-performance.js?rev=32';
+import {normalizeBeatResult} from './beat-result.js?rev=34';
+import {creativeProfileAmount} from './audio-performance.js?rev=34';
 const clamp=(v,lo=0,hi=1)=>Math.max(lo,Math.min(hi,v));
 const mod=(x,n)=>((x%n)+n)%n;
 const sample=(a,t)=>{const i=Math.floor(t),f=t-i;return a[mod(i,a.length)]*(1-f)+a[mod(i+1,a.length)]*f;};
@@ -20,8 +20,11 @@ const random=(seed,cell,salt=0)=>{let x=(seed^Math.imul(cell+1,374761393)^Math.i
 // Monotonic time warp: a novice hit moves once, never becomes repeated slices.
 // The endpoints stay fixed to four bars, even at fractional frame rates.
 export function transformBeatSamples(input,rate,value){
- const r=normalizeBeatResult(value);if(!r||r.quality>=100||!input.length||!Number.isFinite(rate)||rate<1000)return input;
- const amount=severity(r.quality),rough=clamp((30-r.quality)/25),medium=clamp((100-r.quality)/70),kind=r.stage,skill=r.skills.beatmaking,creative=creativeEffectAmount(skill);
+ const r=normalizeBeatResult(value);if(!r||!input.length||!Number.isFinite(rate)||rate<1000)return input;
+ const creative=creativeProfileAmount(r.genreProfile,r.skills.beatmaking,value.postGain);
+ // Archived layers predate genre snapshots and always bypassed slicing at 100+.
+ if(r.quality>=100&&(!r.genreProfile||!creative))return input;
+ const amount=severity(r.quality),rough=clamp((30-r.quality)/25),medium=clamp((100-r.quality)/70),kind=r.stage,skill=r.skills.beatmaking;
  const pitch=(kind===1?85:-120)*medium+(kind===1?100:-140)*rough;
  const a=kind?detune(input,rate,pitch*(.85+.15*(1-skill/100)),r.seed%17):input;
  const out=new Float32Array(a.length),step=rate/6,count=Math.ceil(a.length/step),edge=Math.max(1,rate*.003);
@@ -43,14 +46,15 @@ export function transformBeatSamples(input,rate,value){
     v=v*(1-wet)+sample(a,s*step+offset)*envelope*wet;
    }
   }
-  const seam=Math.min(1,i/(rate*.002*amount),(out.length-1-i)/(rate*.002*amount));
+  const seam=amount?Math.min(1,i/(rate*.002*amount),(out.length-1-i)/(rate*.002*amount)):1;
   out[i]=seam===0?0:clamp(v,-1,1)*seam;
  }
  return out;
 }
 
 export function transformBeatBuffer(context,buffer,result,seconds){
- if(!normalizeBeatResult(result)||result.quality>=100)return buffer;
+ const r=normalizeBeatResult(result);
+ if(!r||r.quality>=100&&(!r.genreProfile||!creativeProfileAmount(r.genreProfile,r.skills.beatmaking,result.postGain)))return buffer;
  const length=Math.round(seconds*buffer.sampleRate),out=context.createBuffer(buffer.numberOfChannels,length,buffer.sampleRate);
  for(let ch=0;ch<buffer.numberOfChannels;ch++){
   // MP3 encoders may pad; the saved musical loop is the only timeline transformed.
@@ -66,7 +70,7 @@ export function connectBeatResult(context,value,destination){
  const r=normalizeBeatResult(value),post=Number.isFinite(value?.postGain)?clamp(value.postGain,0,4):0;if(!r||r.quality===100&&!post)return disposable([],destination);
  const nodes=[],make=method=>{const n=context[method]();nodes.push(n);return n;};
  try{
-  const amount=severity(r.quality),buff=clamp((r.quality-100)/10),kind=r.stage,rough=clamp((30-r.quality)/25),medium=clamp((100-r.quality)/70),creative=creativeEffectAmount(r.skills.beatmaking);
+  const amount=severity(r.quality),buff=clamp((r.quality-100)/10),kind=r.stage,rough=clamp((30-r.quality)/25),medium=clamp((100-r.quality)/70),creative=creativeProfileAmount(r.genreProfile,r.skills.beatmaking,post);
   const colour=amount*(.8+.2*(1-r.skills.sound/100)),input=make('createGain');
   const hp=make('createBiquadFilter');hp.type='highpass';hp.frequency.value=20+([200,280,15][kind]*medium+[400,550,0][kind]*rough)*(.8+.2*(1-r.skills.sound/100));hp.Q.value=-3.0103;
   const lp=make('createBiquadFilter');lp.type='lowpass';lp.frequency.value=Math.min(context.sampleRate*.45,20000/(1+[3,2,11][kind]*colour+[2,4,10][kind]*rough));lp.Q.value=-3.0103;
