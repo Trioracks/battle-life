@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "authorship": "Original procedural compositions and synthesis for Battle. No sampled third-party recordings.",
+  "authorship": "Parts 01–15 and drums/bass 16: original procedural synthesis. Theme 16: user-recorded instrumental; source retained.",
   "bpm": 90,
   "bars": 4,
   "key": "A minor",
@@ -544,6 +544,41 @@
       "frames": 470400,
       "sampleRate": 44100,
       "sha256": "456b44e2efa5e3df5ea93605e09c3df0658035d2492bcfe7981a67c1504bc57b"
+    },
+    {
+      "id": "beginner-drums-16",
+      "kind": "drums",
+      "bpm": 90,
+      "bars": 4,
+      "key": "A minor",
+      "path": "./assets/audio/ft/beginner-v1/drums/16.wav",
+      "frames": 470400,
+      "sampleRate": 44100,
+      "sha256": "3ca44e98b3545e115fd0ec36589e8c42b849d60611893d1f2b21f1d898c34cf6"
+    },
+    {
+      "id": "beginner-theme-16",
+      "kind": "theme",
+      "bpm": 90,
+      "bars": 4,
+      "key": "A minor",
+      "path": "./assets/audio/ft/beginner-v1/theme/16.wav",
+      "source": "stems/untitled - Track 1.wav",
+      "sourceHash": "6ef5c459726746bca66df05e33438a2b05bcb489a09c11ba52edb1312a47fd26",
+      "sha256": "bc962172850c16d761f4e8153098f0f65a82f45b414eb636b9dd9f5f63461d06",
+      "frames": 470400,
+      "sampleRate": 44100
+    },
+    {
+      "id": "beginner-arrangement-16",
+      "kind": "arrangement",
+      "bpm": 90,
+      "bars": 4,
+      "key": "A minor",
+      "path": "./assets/audio/ft/beginner-v1/arrangement/16.wav",
+      "frames": 470400,
+      "sampleRate": 44100,
+      "sha256": "9b328c84668bdb7cf40b8c204cab45c77b9287bf9bfe7a26d8d02a45c4321934"
     }
   ]
 }

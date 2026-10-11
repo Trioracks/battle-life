@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {pcDocument,allPc,findButton} from './helpers/virtual-pc-dom.js';
-import * as view from '../src/underweb-news-view.js?rev=27';
+import * as view from '../src/underweb-news-view.js?rev=28';
 const issue={id:'fixture-only',publishDate:'2012-09-04',eventDate:'2012-09-02',title:'Проверочная новость',body:['Текст для проверки отображения.','<script>not executable</script>'],category:'Техника',sourceTitle:'Источник',sourceUrl:'https://example.com/source'};
 test('Iskra news panel shows distinct issue and event dates and navigates to a local article',()=>{
  assert.equal(typeof view.createNewsPanel,'function');const d=pcDocument();let address='';const panel=view.createNewsPanel(d,{issue,navigate:value=>address=value});

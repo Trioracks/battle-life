@@ -1,5 +1,5 @@
 import { STAT_KEYS, validateAllocations } from './creator.js';
-import {createWardrobe,validWardrobe,canWear} from './home-wardrobe.js?rev=27';
+import {createWardrobe,validWardrobe,canWear} from './home-wardrobe.js?rev=28';
 
 export { STAT_KEYS, statLabels as STAT_LABELS } from './creator.js';
 

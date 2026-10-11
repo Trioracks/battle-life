@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-const creator=await import('../src/apartment-v3-creator.js?rev=27').catch(()=>({}));
+const creator=await import('../src/apartment-v3-creator.js?rev=28').catch(()=>({}));
 import {creatorDocument} from './helpers/creator-dom.js';
 
 test('section navigation keeps selected garments, colour and last category',()=>{

@@ -1,7 +1,7 @@
 import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=21';
-import {createPcIcon} from './virtual-pc-icons.js?rev=27';
-import {WALLPAPERS} from './virtual-pc-catalog.js?rev=27';
-import {setWallpaper,diskUsage} from './virtual-pc-state.js?rev=27';
+import {createPcIcon} from './virtual-pc-icons.js?rev=28';
+import {WALLPAPERS} from './virtual-pc-catalog.js?rev=28';
+import {setWallpaper,diskUsage} from './virtual-pc-state.js?rev=28';
 import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=21';
 export function mountSystemWindow(root,{kind,getState,onPersist,onOpen,onClose,onConfirmShutdown,properties}) {
   const d=root.ownerDocument,wrap=el(d,'div',{className:'pc-system-content pc-dialog'});

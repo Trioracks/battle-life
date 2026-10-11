@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {mountPcShell} from '../src/virtual-pc-shell.js?rev=27';
+import {mountPcShell} from '../src/virtual-pc-shell.js?rev=28';
 import {createWindowState,reduceWindows} from '../src/virtual-pc-window-state.js';
 import {pcDocument,findPc,findButton,fire,allPc} from './helpers/virtual-pc-dom.js';
 function setup(){

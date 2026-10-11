@@ -1,22 +1,27 @@
 import {drumById,loopSeconds} from './beat-catalog.js';
-import {beginnerById} from './beat-beginner-bank.js?rev=21';
-import {normalizeBeatMix} from './beat-mix.js?rev=27';
+import {beginnerById} from './beat-beginner-bank.js?rev=28';
+import {normalizeBeatMix} from './beat-mix.js?rev=28';
+import {normalizeRecording,vocalPlaybackProfile} from './vocal-result.js?rev=28';
 
 // A project has one musical clock, even when a legacy drum loop is shorter.
-export function resolveBeatPlayback(beat,{workStage=null}={}){
+export function resolveBeatPlayback(beat,{workStage=null,recordingPreview=null}={}){
  const fail=reason=>({ok:false,reason});
  if(!beat||![2,3].includes(beat.version)||!Array.isArray(beat.stages))return fail('Этот проект пока нельзя прослушать.');
  if(workStage!==null&&(!Number.isInteger(workStage)||workStage<0||workStage>2))return fail('Неизвестный этап работы.');
- const modern=beat.version===3,durationSeconds=modern?32/3:loopSeconds();
+ const modern=beat.version===3,durationSeconds=modern||recordingPreview||beat.recording?32/3:loopSeconds();
  const ids=modern?[beat.drumId,beat.audio?.themeId,beat.audio?.arrangementId]:[beat.drumId,'melody','bass'];
  const validDrum=drumById(ids[0])||(!modern&&ids[0]==='primitive')||(modern&&beginnerById(ids[0])?.kind==='drums');
  if(!validDrum||modern&&(beat.audioIssue||beat.audio?.bankVersion!==1||beat.audio?.bars!==4||beginnerById(ids[1])?.kind!=='theme'||beginnerById(ids[2])?.kind!=='arrangement'))return fail('Не найден аудиобанк проекта. Проект сохранён.');
  const chosen=workStage===null?ids.slice(0,Math.min(3,beat.stages.length)):[ids[workStage]];
  if(!chosen.length)return fail('Сначала завершите ритмическую основу.');
  const mix=normalizeBeatMix(beat.mix);
- const owner=workStage===null?'studio':'work',parts=chosen.map((id,index)=>{
+ const recording=normalizeRecording(recordingPreview??beat.recording);
+ if((recordingPreview||beat.recording)&&!recording)return fail('Не найдена запись вокала. Проект сохранён.');
+ const post=(recording?.mix?2:0)+(recording?.master?2:0);
+ const owner=workStage===null&&!recordingPreview?'studio':'work',parts=chosen.map((id,index)=>{
   const part={id,loopSeconds:beginnerById(id)?32/3:loopSeconds()},layer=mix?.version===2?mix.layers[workStage??index]:null;
-  if(layer)part.result=layer;return part;
+  if(layer)part.result=post&&workStage===null?{...layer,quality:Math.min(110,layer.quality+post)}:layer;return part;
  });
- return {ok:true,reason:'',descriptor:{key:JSON.stringify([beat.id,owner,workStage,chosen,mix]),owner,durationSeconds,parts,mix}};
+ if(recording&&workStage===null&&beat.stages.length===3)parts.push({id:recording.sourceId,loopSeconds:32/3,vocal:vocalPlaybackProfile(recording)});
+ return {ok:true,reason:'',descriptor:{key:JSON.stringify([beat.id,owner,workStage,chosen,mix,recording]),owner,durationSeconds,parts,mix}};
 }

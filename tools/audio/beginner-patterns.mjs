@@ -2,7 +2,7 @@
 const KICKS=[
   [0,6,8],[0,3,8,10],[0,7,8,14],[0,2,8,11],[0,6,10],[0,8,15],
   [0,5,8,13],[0,3,10],[0,2,7,8],[0,6,8,11],[0,8,10,14],
-  [0,3,6,8],[0,7,10,15],[0,2,8,14],[0,5,8,10],
+  [0,3,6,8],[0,7,10,15],[0,2,8,14],[0,5,8,10],[0,3,8,11,14],
 ];
 const MOTIFS=[
   [57,60,64,62,60,57,64,60],[64,67,69,67,64,60,62,57],
@@ -12,7 +12,7 @@ const MOTIFS=[
   [60,64,69,67,64,62,60,64],[67,64,60,57,60,62,64,57],
   [57,64,57,60,62,60,67,64],[64,62,60,64,69,67,64,60],
   [60,57,62,64,60,67,69,64],[69,64,67,60,64,62,57,60],
-  [57,60,62,67,64,60,64,69],
+  [57,60,62,67,64,60,64,69],[57,64,60,57,62,64,67,60],
 ];
 const RHYTHMS=[
   [0,1,2.5,3,4,5.5,6,7],[0,.5,2,3.5,4.5,5,6,7.5],
@@ -23,7 +23,7 @@ const hz=midi=>440*2**((midi-69)/12);
 const TAU=2*Math.PI;
 
 export function renderBeginnerPart(kind,index,rate=44100){
-  if(!['drums','theme','arrangement'].includes(kind)||!Number.isInteger(index)||index<0||index>14||
+  if(!['drums','theme','arrangement'].includes(kind)||!Number.isInteger(index)||index<0||index>15||
     !Number.isInteger(rate)||rate<8000||rate>96000)throw new RangeError('Unsupported beginner part');
   const beat=2/3,length=Math.round(rate*32/3),pcm=new Float32Array(length);
   let seed=0x12a9+index*7919+['drums','theme','arrangement'].indexOf(kind)*65537;

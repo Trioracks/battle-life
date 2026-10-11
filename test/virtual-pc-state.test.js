@@ -15,8 +15,8 @@ import {
   startFtDownload,
   setDesktopIconPosition, resetDesktopIconPositions, layoutDesktopIcons,
   applyToBattle,
-} from '../src/virtual-pc-state.js?rev=27';
-import {openInstaller,advanceInstaller,advanceInstallation} from '../src/pc-software.js?rev=27';
+} from '../src/virtual-pc-state.js?rev=28';
+import {openInstaller,advanceInstaller,advanceInstallation} from '../src/pc-software.js?rev=28';
 
 test('applications reject invalid entries, trim names and never duplicate a battle',()=>{
   const state=createVirtualPcState({battleApplications:[null,{}, {battleId:'external',nickname:'MC'}, {battleId:'concrete-echo',nickname:'  Район  '}, {battleId:'concrete-echo',nickname:'Дубль'}, {battleId:'yard-cipher',nickname:' '}]});

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mountUnderweb} from '../src/underweb-view.js?rev=27';
+import {mountUnderweb} from '../src/underweb-view.js?rev=28';
 import {pcDocument,findButton,allPc,fire} from './helpers/virtual-pc-dom.js';
 const click=(root,name)=>{const b=findButton(root,name);assert.ok(b,'Missing '+name);b.click();};
 function setup(seed={}){const d=pcDocument(),root=d.createElement('div');let state={battleApplications:[],...seed},day=1;const view=mountUnderweb(root,{getState:()=>state,getMetadata:()=>({gameDay:day,playerName:'Проверка'}),onChange:s=>{state=s;},onApply:(id,nickname)=>{state={...state,battleApplications:[{battleId:id,nickname}]};}});return {root,d,view,get state(){return state;},set day(v){day=v;}};}

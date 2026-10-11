@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {ApartmentTime} from '../src/apartment-v3-time.js?rev=27';
+import {ApartmentTime} from '../src/apartment-v3-time.js?rev=28';
 import {ApartmentMotion} from '../src/apartment-v3-motion.js';
-import * as runtime from '../src/apartment-v3-runtime.js?rev=27';
+import * as runtime from '../src/apartment-v3-runtime.js?rev=28';
 import {CameraModes,cameraAllowsFirstPerson} from '../src/apartment-v3-camera.js';
 const config={bounds:[-8,8],spawn:[-7.25,0,.85],speed:1.326,doorX:0,actions:{dining:{approach:[-7.25,0,.85],pose:[-7.25,.045,-.02],yaw:Math.PI,clip:'eat',fade:true,duration:6}}};
 test('cooking stores one portion across reloads and dining consumes it at most once',()=>{

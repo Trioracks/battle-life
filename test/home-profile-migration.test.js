@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {SAVE_KEY,STAT_KEYS} from '../src/avatar-v3-profile.js?rev=27';
-import {createNewGameSession} from '../src/apartment-v3-new-game.js?rev=27';
-import {createVirtualPcState,VIRTUAL_PC_STORAGE_KEY as PC} from '../src/virtual-pc-state.js?rev=27';
-import {advanceBeatWork,createBeat,startBeatStage} from '../src/beat-production.js?rev=27';
-const migration=await import('../src/home-profile-migration.js?rev=27').catch(()=>({}));
+import {SAVE_KEY,STAT_KEYS} from '../src/avatar-v3-profile.js?rev=28';
+import {createNewGameSession} from '../src/apartment-v3-new-game.js?rev=28';
+import {createVirtualPcState,VIRTUAL_PC_STORAGE_KEY as PC} from '../src/virtual-pc-state.js?rev=28';
+import {advanceBeatWork,createBeat,startBeatStage} from '../src/beat-production.js?rev=28';
+const migration=await import('../src/home-profile-migration.js?rev=28').catch(()=>({}));
 const oldProfile={version:3,name:'Прежний',skills:Object.fromEntries(STAT_KEYS.map(k=>[k,30])),appearance:{hair:'shaggy',beard:'broad',mustache:'chevron',top:'hoodie',topColor:'red'},extra:{keep:true}};
 const oldPc={...createVirtualPcState({projects:[{id:'keep',sourceStems:['kick.wav']}],music:{cash:987,practice:14,genrePractice:{boom_bap:8}},household:{fridge:{apple:0,pear:2,banana:3}}}),extra:'untouched'};delete oldPc.noviceSchema;
 function fixture(){const values=new Map([[SAVE_KEY,JSON.stringify(oldProfile)],[PC,JSON.stringify(oldPc)]]);let fail='';return {values,set fail(v){fail=v;},getItem:k=>values.get(k)??null,setItem(k,v){if(k===fail){fail='';throw Error('write denied');}values.set(k,String(v));}};}

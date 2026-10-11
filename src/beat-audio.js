@@ -1,8 +1,10 @@
 import {drumById,loopSeconds} from './beat-catalog.js';
-import {beginnerById} from './beat-beginner-bank.js?rev=21';
-import {resolveBeatPlayback} from './beat-playback.js?rev=27';
-import {connectBeatMix} from './beat-mix.js?rev=27';
-import {transformBeatBuffer,connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=27';
+import {beginnerById} from './beat-beginner-bank.js?rev=28';
+import {resolveBeatPlayback} from './beat-playback.js?rev=28';
+import {connectBeatMix} from './beat-mix.js?rev=28';
+import {transformBeatBuffer,connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=28';
+import {vocalById} from './vocal-catalog.js?rev=28';
+import {transformVocalBuffer} from './vocal-result-dsp.js?rev=28';
 
 // Authored placeholder PCM, not a remix of third-party music. Sliders never enter here.
 export function primitiveSamples(kind,rate=44100){
@@ -41,13 +43,13 @@ export class BeatAudio{
   if(['primitive','melody','bass'].includes(id)){
    const samples=primitiveSamples(id==='primitive'?'drums':id);buffer=this.context.createBuffer(1,samples.length,44100);buffer.copyToChannel(samples,0);
   }else{
-   const asset=beginnerById(id)||drumById(id);if(!asset)throw Error('unknown asset');
+   const asset=beginnerById(id)||drumById(id)||vocalById(id);if(!asset)throw Error('unknown asset');
    const response=await this.fetchFn(asset.path);if(!this.current(token))return null;
    if(!response.ok)throw Error('missing asset');
    const bytes=await response.arrayBuffer();if(!this.current(token))return null;
    buffer=await this.context.decodeAudioData(bytes);if(!this.current(token))return null;
   }
-  if(buffer.duration<(beginnerById(id)?32/3:loopSeconds())-.02)throw Error('short loop');
+  if(buffer.duration<(beginnerById(id)||vocalById(id)?32/3:loopSeconds())-.02)throw Error('short loop');
   if(!this.disposed){if(this.cache.size>=8)this.cache.delete(this.cache.keys().next().value);this.cache.set(id,buffer);}return buffer;
  }
  play({drumId='primitive',stage=1}={}){
@@ -77,15 +79,25 @@ export class BeatAudio{
    if(!this.current(token))return false;
    this.gain=this.context.createGain();this.gain.gain.value=.7;
    const layerEffects=[];
-   const master=descriptor.mix?.version===2?connectBeatResultMaster(this.context,this.context.destination):connectBeatMix(this.context,descriptor.mix,this.context.destination);
+   const master=descriptor.mix?.version===2||descriptor.parts.some(p=>p.vocal)?connectBeatResultMaster(this.context,this.context.destination):connectBeatMix(this.context,descriptor.mix,this.context.destination);
    this.effects={input:master.input,dispose(){layerEffects.forEach(fx=>fx.dispose());master.dispose();}};this.gain.connect(master.input);
+   let beatInput=this.gain;
+   if(descriptor.mix?.version===1&&descriptor.parts.some(p=>p.vocal)){
+    const legacy=connectBeatMix(this.context,descriptor.mix,this.gain);layerEffects.push(legacy);beatInput=legacy.input;
+   }
    // Prepare all PCM before reading the shared scheduling clock.
    const prepared=buffers.map((buffer,index)=>{
-    const part=descriptor.parts[index];if(!part.result)return {buffer,input:this.gain};
+    const part=descriptor.parts[index];
+    if(part.vocal){
+     const key=JSON.stringify([part.id,part.loopSeconds,part.vocal]);let processed=this.resultCache.get(key);
+     if(!processed){processed=transformVocalBuffer(this.context,buffer,part.vocal,part.loopSeconds);if(this.resultCache.size>=8)this.resultCache.delete(this.resultCache.keys().next().value);this.resultCache.set(key,processed);}
+     return {buffer:processed,input:this.gain};
+    }
+    if(!part.result)return {buffer,input:beatInput};
     const key=JSON.stringify([part.id,part.loopSeconds,part.result]);
     let transformed=this.resultCache.get(key);
     if(!transformed){transformed=transformBeatBuffer(this.context,buffer,part.result,part.loopSeconds);if(this.resultCache.size>=8)this.resultCache.delete(this.resultCache.keys().next().value);this.resultCache.set(key,transformed);}
-    const fx=connectBeatResult(this.context,part.result,this.gain);layerEffects.push(fx);return {buffer:transformed,input:fx.input};
+    const fx=connectBeatResult(this.context,part.result,beatInput);layerEffects.push(fx);return {buffer:transformed,input:fx.input};
    });
    const when=this.context.currentTime+.04;this.startedAt=when;
    prepared.forEach(({buffer,input},index)=>{

@@ -1,9 +1,9 @@
 // Persisted, symbolic writing: no copyrighted lyrics or generated prose.
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=27';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=28';
 import {BEAT_RULES} from './beat-catalog.js';
-import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=27';
-import {softwareDiskBytes} from './pc-software.js?rev=27';
-import {homeDateLabel} from './home-calendar.js?rev=27';
+import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=28';
+import {softwareDiskBytes} from './pc-software.js?rev=28';
+import {homeDateLabel} from './home-calendar.js?rev=28';
 
 export const LYRIC_STAGES=Object.freeze([
  {name:'Общее создание',sliders:['Ясность мысли','Развитие темы','Личное отношение'],target:[8,7,6]},
@@ -39,6 +39,7 @@ function normalized(input){const projects=[...(input.projects??[])];return {...i
 export const effectiveWritingSkill=(state,skills={})=>clamp(number(skills.writing,10)+number(state.writing?.practice));
 export function lyricBattleOptions(state){return {registered:BATTLE_BRIEFS.filter(b=>state.battleApplications?.some(a=>a.battleId===b.id)),other:BATTLE_BRIEFS.filter(b=>!state.battleApplications?.some(a=>a.battleId===b.id))};}
 export function createLyric(input,options={},skills={},random=Math.random){
+ if(input.recording?.job)return {state:input,ok:false,reason:'Сначала заверши запись.'};
  const s=normalized(input),battle=BATTLE_BRIEFS.find(b=>b.id===options.battleId),id=text(options.id),name=battle?.theme??text(options.name,64);
  if(!id||!name||s.projects.some(p=>p.id===id)||options.battleId&&!battle)return outcome(s,false,'Укажи название и доступный баттл.');
  if(softwareDiskBytes(s).free<2000000)return outcome(s,false,'Недостаточно места для нового текста.');
@@ -47,6 +48,7 @@ export function createLyric(input,options={},skills={},random=Math.random){
  s.projects.push(p);s.writing.activeTextId=id;return outcome(s);
 }
 export function startLyricWork(input,{projectId,kind='stage',sliders,beatId,gameDay=1}={},skills={},random=Math.random){
+ if(input.recording?.job)return {state:input,ok:false,reason:'Сначала заверши запись.'};
  // Check the raw other job before normalization can discard unknown older projects.
  if(input.music?.job)return outcome(input,false,'Сначала закончи работу над битом.');
  const s=normalized(input),p=normalizeLyric(s.projects.find(p=>p.id===projectId)),blocked=workBlockReason(s);

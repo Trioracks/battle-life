@@ -1,5 +1,5 @@
-import {COMMUNITY_BOARDS,COMMUNITY_TOPICS,communityDay} from './underweb-community.js?rev=27';
-import {newsIssue,archiveForDay} from './underweb-news.js?rev=27';
+import {COMMUNITY_BOARDS,COMMUNITY_TOPICS,communityDay} from './underweb-community.js?rev=28';
+import {newsIssue,archiveForDay} from './underweb-news.js?rev=28';
 const apps = Object.freeze([
   { id: 'computer', label: 'Мой компьютер', iconId: 'computer', description: 'Диск C: и Мои проекты' },
   { id: 'underweb', label: 'Underweb', iconId: 'underweb', description: 'Локальная сеть баттлов' },

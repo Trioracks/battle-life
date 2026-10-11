@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import * as mix from '../src/beat-mix.js?rev=27';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=27';
-import {createBeat,startBeatStage,advanceBeatWork} from '../src/beat-production.js?rev=27';
-import {resolveBeatPlayback} from '../src/beat-playback.js?rev=27';
+import * as mix from '../src/beat-mix.js?rev=28';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=28';
+import {createBeat,startBeatStage,advanceBeatWork} from '../src/beat-production.js?rev=28';
+import {resolveBeatPlayback} from '../src/beat-playback.js?rev=28';
 const make=(skills={beatmaking:10,sound:10})=>createBeat(createVirtualPcState(),{id:'result',name:'Результат'},skills,()=>.2).state;
 
 test('new profiles save both skills, bounded novice decisions, and first work layer before completion',()=>{

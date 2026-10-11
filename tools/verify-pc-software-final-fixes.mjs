@@ -13,7 +13,7 @@ async function fixture(){
  await page.route('**/__software-final-fixture',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><body>Isolated final-fix fixture</body>'}));
  await page.goto('http://127.0.0.1:4173/__software-final-fixture');
  await page.evaluate(async()=>{
-  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=27'),import('/src/virtual-pc-state.js?rev=27')]);
+  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=28'),import('/src/virtual-pc-state.js?rev=28')]);
   localStorage.setItem('battle-life-apartment-v3',JSON.stringify(createProfile({name:'Final fix QA'})));
   const state=createVirtualPcState({power:'on',download:{status:'installed'}});delete state.software;
   localStorage.setItem('battle-life-virtual-pc-v1',JSON.stringify(state));localStorage.setItem('battle-life-apartment-v3-time',JSON.stringify({day:1,minutes:720,initialRest:false}));

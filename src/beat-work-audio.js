@@ -7,14 +7,15 @@ export function createBeatWorkAudio(audio){
   current=frame;
   if(frame.phase==='work-out'&&lastPhase!=='work-out'){blocked=false;error='';}
   lastPhase=frame.phase;
-  const valid=frame.phase==='working'&&frame.beat?.id===frame.job?.beatId&&[0,1,2].includes(frame.job?.stage);
+  const recording=Boolean(frame.job?.output?.draft);
+  const valid=frame.phase==='working'&&frame.beat?.id===frame.job?.beatId&&(recording||[0,1,2].includes(frame.job?.stage));
   if(frame.hidden){if(frame.phase.startsWith('work'))blocked=true;stop();}
   else if(!valid)stop();
   else if(!blocked){
-   const key=frame.beat.id+':'+frame.job.stage;
+   const key=frame.beat.id+':'+(recording?frame.job.kind+':'+frame.job.output.revision:frame.job.stage);
    if(key!==activeKey){
     stop();activeKey=key;error='';const token=generation;
-    Promise.resolve(audio.playProject(frame.beat,{workStage:frame.job.stage})).then(ok=>{
+    Promise.resolve(audio.playProject(frame.beat,recording?{recordingPreview:frame.job.output}:{workStage:frame.job.stage})).then(ok=>{
      if(!disposed&&token===generation&&!ok)error=audio.error||'Не удалось включить звук. Работа продолжается.';
     }).catch(()=>{if(!disposed&&token===generation)error='Не удалось включить звук. Работа продолжается.';});
    }

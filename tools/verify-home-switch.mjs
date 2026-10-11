@@ -9,8 +9,8 @@ const errors=[],context=await browser.newContext({viewport:{width:1280,height:90
 try{
  await page.route('**/__switch-fixture',route=>route.fulfill({contentType:'text/html',body:`<!doctype html><html><head><style>body{margin:0}canvas{display:block;width:100vw;height:100vh}</style><script type="importmap">{"imports":{"three":"/vendor/three/three.module.js","three/addons/":"/vendor/three/addons/"}}</script></head><body><canvas id="apartment"></canvas><script type="module">
  import * as THREE from 'three';
- import {createApartmentScene} from '/src/apartment-v3-scene.js?rev=27';
- import {prepareApartmentConfig} from '/src/apartment-v3-runtime.js?rev=27';
+ import {createApartmentScene} from '/src/apartment-v3-scene.js?rev=28';
+ import {prepareApartmentConfig} from '/src/apartment-v3-runtime.js?rev=28';
  import {ApartmentMotion} from '/src/apartment-v3-motion.js';
  const config=prepareApartmentConfig(await (await fetch('/assets/apartment/v3/scene.json')).json());config.assetBase='/assets/apartment/v3/';
  const view=await createApartmentScene(document.querySelector('canvas'),config),state=new ApartmentMotion(config);await view.loadMode('3D');

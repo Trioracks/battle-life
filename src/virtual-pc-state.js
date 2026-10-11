@@ -1,9 +1,10 @@
-import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=27';
-import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=27';
-import {normalizeCommunity} from './underweb-community.js?rev=27';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=27';
-import {normalizeHousehold} from './home-food.js?rev=27';
-import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=27';
+import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=28';
+import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=28';
+import {normalizeRecordingState} from './vocal-production.js?rev=28';
+import {normalizeCommunity} from './underweb-community.js?rev=28';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=28';
+import {normalizeHousehold} from './home-food.js?rev=28';
+import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=28';
 export const VIRTUAL_PC_STORAGE_KEY = 'battle-life-virtual-pc-v1';
 export const VIRTUAL_DISK_MB = 16000;
 export const SYSTEM_RESERVED_MB = 14000;
@@ -64,6 +65,10 @@ function normalizeDownload(value) {
 function normalizeSnapshot(value) {
   const source = isRecord(value) ? value : {};
   const projects = Array.isArray(source.projects) ? source.projects.map(normalizeProject).filter(Boolean) : [];
+  const music=normalizeMusic(source.music,projects),writing=normalizeWriting(source.writing,projects),recording=normalizeRecordingState(source.recording,projects);
+  // Damaged saves may contain several valid jobs. Recover one owner in stable
+  // schema order; completed projects and already credited practice are retained.
+  if(music.job){writing.job=null;recording.job=null;}else if(writing.job)recording.job=null;
   return withSoftware({
     version: 1,
     noviceSchema: 1,
@@ -73,8 +78,7 @@ function normalizeSnapshot(value) {
     desktopIcons: normalizeIcons(source.desktopIcons),
     download: normalizeDownload(source.download),
     projects,
-    music:normalizeMusic(source.music,projects),
-    writing:normalizeWriting(source.writing,projects),
+    music,writing,recording,
     community:normalizeCommunity(source.community),
     household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),
