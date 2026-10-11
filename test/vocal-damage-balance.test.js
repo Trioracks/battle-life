@@ -16,8 +16,8 @@ function missingFraction(a){
 test('novice vocals lose whole syllables, with no clean voice bleeding through the gaps',()=>{
  for(const seed of [1,15,24913,4294967295]){
   const a=transformVocalSamples(voice,rate,profile(15,seed));
-  assert.ok(missingFraction(a)>.28,'at least 28% of a novice draft must be genuinely missing');
-  assert.ok(missingFraction(a)<.6,'the voice must not disappear entirely');
+  assert.ok(missingFraction(a)>.2,'a novice draft still has real missing syllables');
+  assert.ok(missingFraction(a)<.3,'70% strength must leave more of the vocal than the previous 36% gaps');
   let run=0,longest=0;for(const x of a){run=Math.abs(x)<1e-7?run+1:0;longest=Math.max(longest,run);}
   assert.ok(longest/rate>.2,'dropouts must last a syllable, not just a tiny digital click');
  }
@@ -32,14 +32,14 @@ test('novice recording stays behind the beat and moves vocal attacks well off th
   assert.ok(rms(a)<.04,'the damaged recording must not be auto-boosted into a lead vocal');
   for(let i=0;i<a.length;i++){const phase=i/rate%(2/3);if(phase<.14||phase>.63)on+=a[i]*a[i];else off+=a[i]*a[i];}
  }
- assert.ok(off/(on+off)>.5,'more than half of attack energy should land away from its original beat positions');
+ assert.ok(off/(on+off)>.35,'timing mistakes remain substantial at 70% strength');
 });
 
 // Better takes reduce mistakes, but neither post-processing nor max starter gear bypasses damage.
 test('clean and mastered takes repair some gaps without recovering the original',()=>{
  const draft=transformVocalSamples(voice,rate,profile(15)),clean=transformVocalSamples(voice,rate,profile(26,15,'clean')),ceiling=transformVocalSamples(voice,rate,profile(44,15,'clean'));
  assert.ok(missingFraction(clean)<missingFraction(draft));
- assert.ok(missingFraction(clean)>.14,'a novice clean take must still contain substantial misses');
+ assert.ok(missingFraction(clean)>.1,'a novice clean take must still contain substantial misses');
  assert.ok(missingFraction(ceiling)<missingFraction(clean));
  for(const a of [draft,clean,ceiling]){
   assert.equal(a.length,frames);assert.equal(a[0],0);assert.equal(a.at(-1),0);

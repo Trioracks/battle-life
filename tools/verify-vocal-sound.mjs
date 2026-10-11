@@ -5,6 +5,7 @@ import {execFileSync} from 'node:child_process';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'D:/Codex/Caches/npm/_npx/48b1ca104c3549f4/node_modules/playwright-core');
 const output=process.env.VOCAL_AUDIO_OUTPUT||'D:/Codex/Builds/Battle/vocal-recording';await mkdir(output,{recursive:true});
 const beforeRef=process.env.VOCAL_COMPARE_REF;
+const softer=process.env.VOCAL_COMPARE_MODE==='softer';
 const beforeSource=beforeRef?execFileSync('git',['show',beforeRef+':src/vocal-result-dsp.js'],{encoding:'utf8'}).replace('./vocal-result.js?rev=28','/src/vocal-result.js?rev=28'):null;
 const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE||'D:/Codex/Caches/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-win64/chrome-headless-shell.exe',args:['--autoplay-policy=no-user-gesture-required']});
 try{
@@ -12,7 +13,7 @@ try{
  if(beforeSource)await page.route('**/__vocal-before.js',r=>r.fulfill({contentType:'text/javascript',body:beforeSource}));
  await page.goto('http://127.0.0.1:4173/__vocal-sound');
  const result=await page.evaluate(async compare=>{
-  const [{VOCALS},{createVocalTake,vocalPlaybackProfile},{transformVocalBuffer},{transformBeatBuffer,connectBeatResult,connectBeatResultMaster},{createBeatResult},{BeatAudio}]=await Promise.all([import('/src/vocal-catalog.js?rev=28'),import('/src/vocal-result.js?rev=28'),import('/src/vocal-result-dsp.js?rev=29'),import('/src/beat-result-dsp.js?rev=28'),import('/src/beat-result.js?rev=28'),import('/src/beat-audio.js?rev=29')]);
+  const [{VOCALS},{createVocalTake,vocalPlaybackProfile},{transformVocalBuffer},{transformBeatBuffer,connectBeatResult,connectBeatResultMaster},{createBeatResult},{BeatAudio}]=await Promise.all([import('/src/vocal-catalog.js?rev=28'),import('/src/vocal-result.js?rev=28'),import('/src/vocal-result-dsp.js?rev=30'),import('/src/beat-result-dsp.js?rev=28'),import('/src/beat-result.js?rev=28'),import('/src/beat-audio.js?rev=30')]);
   const rate=44100,frames=470400,decoder=new OfflineAudioContext(2,frames,rate),cache=new Map();
   const previous=compare?(await import('/__vocal-before.js')).transformVocalBuffer:null;
   const decode=async path=>{if(!cache.has(path)){const response=await fetch(path);if(!response.ok)throw Error(path);cache.set(path,await decoder.decodeAudioData(await response.arrayBuffer()));}return cache.get(path);};
@@ -56,14 +57,20 @@ try{
   const audio=new BeatAudio(),ok=await audio.playProject(beat),sources=audio.sources.length;audio.pause();const paused=audio.getSnapshot().positionSeconds;await audio.playProject(beat);const resumed=audio.getSnapshot().positionSeconds;audio.stop({fadeSeconds:.04});await new Promise(r=>setTimeout(r,100));const retired=audio.retiring.length;audio.dispose();
   return {outputs,metrics,spectrum,bands,player:{ok,sources,paused,resumed,retired},decoded:VOCALS.length};
  },Boolean(beforeSource));
+ console.log('Audio diagnostics '+JSON.stringify({metrics:result.metrics,bands:result.bands}));
  assert.equal(result.decoded,40);assert.ok(Object.values(result.metrics).every(m=>m.finite&&m.peak<=.99&&m.rms>.005));assert.ok(result.metrics.mastered.quality<=44);assert.equal(result.player.ok,true);assert.equal(result.player.sources,4);assert.equal(result.player.retired,0);assert.ok(Math.abs(result.player.paused-result.player.resumed)<.04);
- assert.ok(result.bands.high>result.bands.low*25);assert.ok(result.bands.high>result.bands.mid*8);
+ // The softened mic still rejects bass, but intentionally restores the vocal mids.
+ assert.ok(result.bands.high>result.bands.low*25);assert.ok(result.bands.mid>result.bands.low*25);
  assert.equal(new Set(Object.values(result.outputs)).size,Object.keys(result.outputs).length);
  if(beforeSource){
-  assert.ok(result.metrics.draft.vocal.rms<result.metrics.previous.vocal.rms*.5,'new vocal must sit substantially further behind the same beat');
-  assert.ok(result.metrics.draft.vocal.missingFraction>.28,'real vocal must lose whole syllables');
+  if(softer){
+   assert.ok(result.metrics.draft.vocal.missingFraction<result.metrics.previous.vocal.missingFraction*.8,'softening must bring back more syllables');
+   assert.ok(result.metrics.draft.vocal.rms>result.metrics.previous.vocal.rms,'softened voice must recover audibility over the same beat');
+   assert.ok(result.metrics.draft.vocal.missingFraction<.3,'70% damage must leave most of the vocal present');
+  }else assert.ok(result.metrics.draft.vocal.rms<result.metrics.previous.vocal.rms*.5,'new vocal must sit substantially further behind the same beat');
+  assert.ok(result.metrics.draft.vocal.missingFraction>.2,'real vocal must still lose whole syllables');
   assert.ok(result.metrics.clean.vocal.missingFraction<result.metrics.draft.vocal.missingFraction);
-  assert.ok(result.metrics.mastered.vocal.missingFraction>.14,'post processing cannot restore a novice recording');
+  assert.ok(result.metrics.mastered.vocal.missingFraction>.1,'post processing cannot restore a novice recording');
  }
  for(const [name,base64]of Object.entries(result.outputs))await writeFile(output+'/'+name+'.wav',Buffer.from(base64,'base64'));
  if(beforeSource){
