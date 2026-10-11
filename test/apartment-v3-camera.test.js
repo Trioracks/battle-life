@@ -55,8 +55,12 @@ test('right drag never picks, left click immediately works after release',()=>{
  assert.equal(input.start(right,true),true);assert.equal(input.canPick(right),false);assert.equal(input.canPick(left),false);
  assert.deepEqual(input.move({clientX:30,clientY:14}),[20,-6]);input.stop();assert.equal(input.canPick(left),true);assert.equal(input.move({clientX:100,clientY:100}),null);
 });
-test('side follow centers the hero at every approach depth',()=>{
- for(const z of [.85,-.3,-1.1]){const pose=cameraPose('2D',{cameraX:3,position:[3,0,z]},1.63);assert.equal(pose.target[0],3);assert.equal(pose.position[0],3);}
+test('overview follow keeps the hero in the central band at every approach depth',()=>{
+ for(const z of [.85,-.3,-1.1]){
+  const pose=cameraPose('2D',{cameraX:3,position:[3,0,z]},1.63),camera=new PerspectiveCamera(pose.fov,1280/900,pose.near,200);
+  camera.position.fromArray(pose.position);camera.lookAt(new Vector3(...pose.target));camera.updateMatrixWorld();
+  assert.ok(Math.abs(new Vector3(3,1,z).project(camera).x)<.5,'depth approach retains central actor coverage');
+ }
 });
 test('side perspective frames the whole avatar on wide and narrow viewports while distant objects shrink',()=>{
  for(const aspect of [1280/900,640/900]){
@@ -72,13 +76,16 @@ test('side perspective frames the whole avatar on wide and narrow viewports whil
   assert.ok(width(-31.5)<width(-1.72)*.25,'the courtyard keeps depth behind the room windows');
  }
 });
-test('side follow fills the vertical view with the room instead of exposing above-wall scenery or below-floor void',()=>{
+test('overview retains the authored wall, floor and standing hero with room for the action dock',()=>{
  for(const aspect of [1280/900,640/900]){
-  const pose=cameraPose('2D',{cameraX:3.4,position:[3.4,0,.85]},1.63),camera=new PerspectiveCamera(pose.fov,aspect,pose.near,200);
+  const pose=cameraPose('2D',{cameraX:3.4,position:[3.4,0,.85]},1.63,{aspect}),camera=new PerspectiveCamera(pose.fov,aspect,pose.near,200);
   camera.position.fromArray(pose.position);camera.lookAt(new Vector3(...pose.target));camera.updateMatrixWorld();
-  assert.ok(new Vector3(3.4,3,-1.72).project(camera).y>=1,'the authored rear wall reaches the top edge');
-  assert.ok(new Vector3(3.4,0,1.82).project(camera).y<=-1,'the authored floor extends below the bottom edge');
-  assert.ok(new Vector3(3.4,0,.85).project(camera).y>-.56,'hero feet leave room for the compact action dock');
+  const top=new Vector3(3.4,3,-1.72).project(camera),floor=new Vector3(3.4,0,1.82).project(camera);
+  assert.ok(top.y>.3&&top.y<.9,'the real wall top remains in the overview');
+  assert.ok(floor.y>-.9&&floor.y<-.25,'the real floor edge remains in the overview');
+  const feet=new Vector3(3.4,0,.85).project(camera),head=new Vector3(3.4,1.75,.85).project(camera);
+  assert.ok(feet.y>-.56,'hero feet leave room for the compact action dock');
+  assert.ok((head.y-feet.y)/2>.28&&(head.y-feet.y)/2<.4,'standing avatar occupies about half its former screen height');
  }
 });
 test('a computer swap invalidates a first-person load already in flight',async()=>{

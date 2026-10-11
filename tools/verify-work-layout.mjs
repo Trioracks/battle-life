@@ -8,7 +8,7 @@ const errors=[];page.on('pageerror',e=>errors.push(e.message));
 try{
  await page.route('**/__work-layout',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><body>Isolated layout fixture</body>'}));await page.goto('http://127.0.0.1:4173/__work-layout');
  await page.evaluate(async()=>{
-  const [{createProfile},{createVirtualPcState},{createBeat}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=28'),import('/src/virtual-pc-state.js?rev=32'),import('/src/beat-production.js?rev=32')]);
+  const [{createProfile},{createVirtualPcState},{createBeat}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=28'),import('/src/virtual-pc-state.js?rev=33'),import('/src/beat-production.js?rev=33')]);
   localStorage.setItem('battle-life-apartment-v3',JSON.stringify(createProfile({name:'Проверка композиции'})));
   const state=createBeat(createVirtualPcState({power:'on',download:{status:'installed'},music:{needs:{satiety:100,energy:100}}}),{id:'layout',name:'Рабочий вечер'},{}).state;
   localStorage.setItem('battle-life-virtual-pc-v1',JSON.stringify(state));localStorage.setItem('battle-life-apartment-v3-time',JSON.stringify({day:1,minutes:720,initialRest:false}));

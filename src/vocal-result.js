@@ -21,4 +21,4 @@ export function normalizeRecording(v){
  return {version:1,revision:v.revision,text:{id:text(v.text.id),name:text(v.text.name,64),revision:Math.max(1,Math.floor(clampV(v.text.revision,1,1e6)))},sourceId:v.sourceId,draft,clean,mix:post(v.mix),master:post(v.master)};
 }
 export function recordingQuality(value){const r=normalizeRecording(value);if(!r)return 0;const t=r.clean??r.draft;return Math.min(t.ceiling,t.quality+(r.mix?2:0)+(r.master?2:0));}
-export function vocalPlaybackProfile(value){const r=normalizeRecording(value);if(!r)return null;return {...(r.clean??r.draft),quality:recordingQuality(r),postGain:(r.mix?2:0)+(r.master?2:0)};}
+export function vocalPlaybackProfile(value){const r=normalizeRecording(value);if(!r)return null;return {...(r.clean??r.draft),quality:recordingQuality(r),postGain:(r.mix?2:0)+(r.master?2:0),vocalGainDb:(r.mix?3:0)+(r.master?1.5:0)};}

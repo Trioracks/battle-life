@@ -29,12 +29,15 @@ test('home integration invalidates every changed dependency and its importers wi
  const drySongAffected=new Set(['audio-performance','beat-song-form','beat-mix','beat-result-dsp','vocal-result-dsp','beat-audio','beat-playback','ft-studio-view'].map(n=>'src/'+n+'.js'));
  do{size=drySongAffected.size;for(const [file,imports]of graph)if(imports.some(dependency=>drySongAffected.has(dependency.file)))drySongAffected.add(file);}while(drySongAffected.size!==size);
  for(const file of drySongAffected)affected.add(file);
+ const comfortAffected=new Set(['apartment-v3-camera','apartment-v3-scene','home-food','home-needs-view','vocal-result','vocal-result-dsp'].map(n=>'src/'+n+'.js'));
+ do{size=comfortAffected.size;for(const [file,imports]of graph)if(imports.some(dependency=>comfortAffected.has(dependency.file)))comfortAffected.add(file);}while(comfortAffected.size!==size);
+ for(const file of comfortAffected)affected.add(file);
  const html=await read('index.html');
- assert.match(html,/apartment-app\.js\?rev=32/);
- for(const style of ['apartment-v3','creator-v12','desktop-apps','rap-notebook'])assert.ok(html.includes(style+'.css?rev=28'),style+' must invalidate changed styles');
+ assert.match(html,/apartment-app\.js\?rev=33/);
+ for(const style of ['apartment-v3','creator-v12','desktop-apps','rap-notebook'])assert.ok(html.includes(style+'.css?rev='+(style==='apartment-v3'?33:28)),style+' must invalidate changed styles');
  assert.ok((await read('desktop-apps.css')).includes('underweb-world.css?rev=28'));
  assert.match(html,/virtual-pc\.css\?rev=21/,'unchanged base PC styles retain their revision');
- for(const [file,imports]of graph)for(const dependency of imports)if(affected.has(dependency.file))assert.equal(dependency.query,drySongAffected.has(dependency.file)?'rev=32':demoAffected.has(dependency.file)?'rev=31':vocalDamageAffected.has(dependency.file)?'rev=30':'rev=28',file+' must load canonical '+dependency.file);
+ for(const [file,imports]of graph)for(const dependency of imports)if(affected.has(dependency.file))assert.equal(dependency.query,comfortAffected.has(dependency.file)?'rev=33':drySongAffected.has(dependency.file)?'rev=32':demoAffected.has(dependency.file)?'rev=31':vocalDamageAffected.has(dependency.file)?'rev=30':'rev=28',file+' must load canonical '+dependency.file);
  for(const file of changed)assert.ok(graph.has(file),file+' is covered by the live entry graph');
  // Work audio ownership stays at v28; the expanded sample catalog is invalidated.
  for(const [file,modules]of [

@@ -1,10 +1,10 @@
 import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=21';
 import {createPcIcon} from './virtual-pc-icons.js?rev=28';
-import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties,explorerPaths} from './virtual-pc-explorer.js?rev=32';
-import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=32';
+import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties,explorerPaths} from './virtual-pc-explorer.js?rev=33';
+import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=33';
 import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=21';
 import {normalizeStudioProject} from './ft-studio-project.js?rev=28';
-import {normalizeBeat} from './beat-production.js?rev=32';
+import {normalizeBeat} from './beat-production.js?rev=33';
 
 export function mountExplorer(root,{onOpenArtifact,onOpenApp,onOpenProject,onProperties,onClose,onMenu,onNavigate}) {
   const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',diskLabel=null,disposed=false;
