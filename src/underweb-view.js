@@ -1,8 +1,8 @@
 import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=21';
 import {resolveUnderweb} from './virtual-pc-catalog.js?rev=28';
-import {createBeatMarket} from './beat-market-view.js?rev=28';
-import {softwareForum,softwareMessage} from './pc-software-view.js?rev=28';
-import {downloadPresentation} from './virtual-pc-runtime.js?rev=28';
+import {createBeatMarket} from './beat-market-view.js?rev=31';
+import {softwareForum,softwareMessage} from './pc-software-view.js?rev=31';
+import {downloadPresentation} from './virtual-pc-runtime.js?rev=31';
 import {createCommunityView} from './underweb-community-view.js?rev=28';
 import {communityDay} from './underweb-community.js?rev=28';
 import {homeDateLabel} from './home-calendar.js?rev=28';
@@ -125,7 +125,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  function travel(delta){const next=index+delta;if(next<0||next>=history.length)return;index=next;route=resolveUnderweb(history[index],getMetadata());applicationOpen=false;render();}
  render();return {navigate,get snapshot(){return {route,index,history:[...history]};},update(){
   if(lastDay!==JSON.stringify([getMetadata().gameDay])){route=resolveUnderweb(history[index],getMetadata());render({resetScroll:false,preserveInputs:true});}
-  else if(lastApplications!==JSON.stringify(getState().battleApplications)&&['battle','battles'].includes(route.type)||route.type==='dump'&&lastSoftware!==softwareSignature())render({resetScroll:false});
+  else if(lastApplications!==JSON.stringify(getState().battleApplications)&&['battle','battles'].includes(route.type)||route.type==='dump'&&lastSoftware!==softwareSignature())render({resetScroll:false,preserveInputs:true});
   else if(route.type==='dump'){const node=pcFind(page,n=>n.dataset?.pcRole==='forum-transfer');if(node){const p=downloadPresentation(getState());node.textContent=`Загрузка: ${p.receivedMb.toFixed(2)} / ${p.totalMb} МБ · ${p.speedKbPerSecond} КБ/с${p.error?' · '+softwareMessage(p.error):''}`;}}
  },dispose(){root.replaceChildren();}};
 }

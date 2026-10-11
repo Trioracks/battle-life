@@ -16,14 +16,14 @@ test('new profiles save both skills, bounded novice decisions, and first work la
   assert.equal(resolveBeatPlayback(state.projects[0],{workStage:0}).descriptor.parts[0].result.quality,layer.quality);
  }
  assert.ok(Math.max(...qualities)<=35);assert.ok(qualities.filter(q=>q>=5&&q<=20).length>qualities.length*.85);
- const good=startBeatStage(initial,'result',[9,3,2],{beatmaking:10,sound:10}).state.projects[0].mix.layers[0];
+ const good=startBeatStage(initial,'result',[5,5,5],{beatmaking:10,sound:10}).state.projects[0].mix.layers[0];
  const bad=startBeatStage(initial,'result',[0,10,10],{beatmaking:10,sound:10}).state.projects[0].mix.layers[0];
- const trained=startBeatStage(make(),'result',[9,3,2],{beatmaking:70,sound:70}).state.projects[0].mix.layers[0];
+ const trained=startBeatStage(make(),'result',[5,5,5],{beatmaking:70,sound:70}).state.projects[0].mix.layers[0];
  assert.equal(good.fit,100);assert.ok(good.quality>bad.quality);assert.ok(trained.quality>good.quality);
 });
 
 test('excellent decisions cannot hide a novice sound skill behind expert beatmaking',()=>{
- const quality=skills=>startBeatStage(make(skills),'result',[9,3,2],skills).state.projects[0].mix.layers[0].quality;
+ const quality=skills=>startBeatStage(make(skills),'result',[5,5,5],skills).state.projects[0].mix.layers[0].quality;
  assert.ok(quality({beatmaking:100,sound:10})<80);
  assert.ok(quality({beatmaking:10,sound:100})<80);
  assert.ok(quality({beatmaking:100,sound:70})>quality({beatmaking:100,sound:10}));
@@ -31,7 +31,7 @@ test('excellent decisions cannot hide a novice sound skill behind expert beatmak
 });
 
 test('started layer result survives work, reload, and growth, with fit and quality in completed stage',()=>{
- let state=startBeatStage(make(),'result',[9,3,2],{beatmaking:10,sound:12}).state;
+ let state=startBeatStage(make(),'result',[5,5,5],{beatmaking:10,sound:12}).state;
  const snapshot=structuredClone(state.projects[0].mix);
  state=advanceBeatWork(state,10).state;state=createVirtualPcState(JSON.parse(JSON.stringify(state)));
  state=startBeatStage(state,'result',[0,0,0],{beatmaking:99,sound:99}).state;

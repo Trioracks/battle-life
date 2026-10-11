@@ -1,17 +1,39 @@
-export const BEGINNER_BANK = Object.freeze(['drums','theme','arrangement'].flatMap(kind =>
+const legacyBank = ['drums','theme','arrangement'].flatMap(kind =>
   Array.from({length:16}, (_,index) => {
     const number=String(index+1).padStart(2,'0');
     return Object.freeze({id:'beginner-'+kind+'-'+number,kind,bpm:90,bars:4,key:'A minor',
       name:({drums:'Ритм',theme:'Тема',arrangement:'Развитие'})[kind]+' / '+number,
       path:'./assets/audio/ft/beginner-v1/'+kind+'/'+number+'.wav'});
   })
+);
+export const BEGINNER_FAMILIES=Object.freeze([
+  'Прямой пульс','Offbeat','Вместе в долю','Без малого','Без бочки',
+  'Редкие удары','Половинный шаг','Ломаный грув','Свинг','Шестнадцатые',
+  'Длинный бас','Басовые ответы','Тёмный марш','Лёгкий гараж','Ночной минимал',
+]);
+const expandedBank=['drums','theme','arrangement'].flatMap(kind=>
+  Array.from({length:kind==='theme'?34:30},(_,index)=>{
+    const number=String(index+17).padStart(2,'0');
+    return Object.freeze({id:'beginner-'+kind+'-'+number,kind,bpm:90,bars:4,key:'A minor',
+      name:({drums:'Ритм',theme:'Тема',arrangement:'Развитие'})[kind]+' / '+number,
+      path:'./assets/audio/ft/beginner-v2/'+kind+'/'+number+'.wav'});
+  })
+);
+// Saved projects retain every legacy ID/path. Only new selections use the expanded bank.
+export const BEGINNER_BANK=Object.freeze([...legacyBank,...expandedBank]);
+const partId=(kind,index)=>'beginner-'+kind+'-'+String(index+17).padStart(2,'0');
+export const BEGINNER_RECIPES=Object.freeze(BEGINNER_FAMILIES.flatMap((name,family)=>
+  Array.from({length:6},(_,variant)=>Object.freeze({
+    id:'beginner-recipe-'+String(family*6+variant+1).padStart(2,'0'),family,name:name+' / '+(variant+1),
+    drumsId:partId('drums',family*2+variant%2),
+    themeId:family===10&&variant===5?'beginner-theme-16':partId('theme',family>=11&&variant>=4?30+family-11:(family*2+Math.floor(variant/2))%30),
+    arrangementId:partId('arrangement',family*2+(variant%3===0?0:1)),
+  }))
 ));
 const catalogue=new Map(BEGINNER_BANK.map(part=>[part.id,part]));
 export const beginnerById=id=>catalogue.get(id);
 export function chooseBeginnerParts(random=Math.random){
-  const select=kind=>{
-    const value=random(),unit=Number.isFinite(value)?Math.max(0,Math.min(.999999,value)):0;
-    return 'beginner-'+kind+'-'+String(1+Math.floor(unit*16)).padStart(2,'0');
-  };
-  return {drumsId:select('drums'),themeId:select('theme'),arrangementId:select('arrangement')};
+  const value=random(),unit=Number.isFinite(value)?Math.max(0,Math.min(.999999,value)):0;
+  const {drumsId,themeId,arrangementId}=BEGINNER_RECIPES[Math.floor(unit*BEGINNER_RECIPES.length)];
+  return {drumsId,themeId,arrangementId};
 }

@@ -1,30 +1,30 @@
 import {ApartmentMotion} from './apartment-v3-motion.js?rev=8';
 import {ApartmentTime,loadHomeTime,saveHomeTime as saveHomeTimeRaw} from './apartment-v3-time.js?rev=28';
 import {districts,getDistrictLocations} from './calikfornia.js';
-import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=28';
+import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=31';
 import {playSoundCue} from './sound-cues.js?rev=28';
 import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=28';
 import {DEFAULT_APPEARANCE,loadProfile,saveProfile} from './avatar-v3-profile.js?rev=28';
 import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=28';
-import {createNewGameSession} from './apartment-v3-new-game.js?rev=28';
-import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=28';
-import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=28';
-import {mountVirtualPc} from './virtual-pc-ui.js?rev=30';
+import {createNewGameSession} from './apartment-v3-new-game.js?rev=31';
+import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=31';
+import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=31';
+import {mountVirtualPc} from './virtual-pc-ui.js?rev=31';
 import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=28';
 import {PcSounds} from './virtual-pc-sounds.js?rev=28';
 import {playIndoorFootstep} from './indoor-footsteps.js?rev=21';
-import {restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=28';
+import {restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=31';
 import {advanceInstallation} from './pc-software.js?rev=28';
-import {createBeatWorkPanel} from './beat-work-view.js?rev=28';
+import {createBeatWorkPanel} from './beat-work-view.js?rev=31';
 import {createBeatWorkAudio} from './beat-work-audio.js?rev=28';
 import {createLyricWorkAudio} from './lyric-work-audio.js?rev=28';
-import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.js?rev=28';
-import {effectiveVocalSkill} from './vocal-production.js?rev=28';
-import {effectiveWritingSkill} from './lyric-production.js?rev=28';
+import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.js?rev=31';
+import {effectiveVocalSkill} from './vocal-production.js?rev=31';
+import {effectiveWritingSkill} from './lyric-production.js?rev=31';
 import {consumeFood} from './home-food.js?rev=28';
-import {createCharacterSpeech,workNeedSpeech} from './character-speech.js?rev=28';
+import {createCharacterSpeech,workNeedSpeech} from './character-speech.js?rev=31';
 import {mountHomeNeedsView,mountCharacterSpeech} from './home-needs-view.js?rev=28';
-import {migrateNoviceSave} from './home-profile-migration.js?rev=28';
+import {migrateNoviceSave} from './home-profile-migration.js?rev=31';
 import {mountHomeWardrobeView} from './home-wardrobe-view.js?rev=28';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
@@ -55,7 +55,7 @@ try{
   const migration=migrateNoviceSave(storage);let migrationReady=migration.ok;
   function saveHomeTime(_storage,clock){return migrationReady&&saveHomeTimeRaw(storage,clock);}
   const saved=loadProfile(storage);let profile=saved.profile;
-  let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lightPreview='game';
+  let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lastInstallationSave=0,lightPreview='game';
   const pcRoot=$('#virtual-pc'),savedPc=loadVirtualPcState(storage);let pcState=savedPc.state;
   let pcStorageWarning=migration.ok?(savedPc.ok?'':'Сохранение виртуального ПК недоступно.'):migration.error;
   let virtualPc,workReward=0,workFinished=false,lastWorkJob=null,lastWorkBeat=null;
@@ -229,6 +229,11 @@ try{
     if(mode!=='game'||cameraFade||document.hidden){speech.tick(0,{present:false});speechView.update(speech.snapshot);}
     cameraLabel();
     view.setComputerPresentation(pcLifecycle.snapshot,pcState,profile?.name??'Игрок');
+    // Installation belongs to the powered PC, including while room dialogs are open.
+    if(['game','pc'].includes(mode)&&(!paused||step)&&!document.hidden&&pcState.power==='on'&&pcState.software.installer?.step==='install'){
+      const installation=advanceInstallation(pcState,dt);pcState=installation.state;virtualPc.syncState(pcState);
+      if(installation.completed||!installation.ok||now-lastInstallationSave>=1000){persistPc(pcState);lastInstallationSave=now;}
+    }
     if(cameraFade){view.render(motion,0,{paused:true});return;}
     view.setRoomLights(homeTime.lights);
     if(mode==='creator'){
@@ -259,10 +264,6 @@ try{
         if(wasSleeping)pcState=restoreMusicNeeds(pcState,'sleep',homeTime.day*1440+homeTime.minutes-before);
         if(events.some(e=>e.type==='completed'&&e.id==='dining'))pcState=restoreMusicNeeds(pcState,'meal');
         pcState=advanceVirtualPc(pcState,homeTime).state;virtualPc.syncState(pcState);
-      }
-      if(pcState.software.installer?.step==='install'){
-        const installation=advanceInstallation(pcState,dt);pcState=installation.state;virtualPc.syncState(pcState);
-        if(installation.completed||!installation.ok)persistPc(pcState);
       }
     }
     for(const event of events){

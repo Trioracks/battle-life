@@ -6,14 +6,14 @@ const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAY
 const output=process.env.VOCAL_AUDIO_OUTPUT||'D:/Codex/Builds/Battle/vocal-recording';await mkdir(output,{recursive:true});
 const beforeRef=process.env.VOCAL_COMPARE_REF;
 const softer=process.env.VOCAL_COMPARE_MODE==='softer';
-const beforeSource=beforeRef?execFileSync('git',['show',beforeRef+':src/vocal-result-dsp.js'],{encoding:'utf8'}).replace('./vocal-result.js?rev=28','/src/vocal-result.js?rev=28'):null;
+const beforeSource=beforeRef?execFileSync('git',['show',beforeRef+':src/vocal-result-dsp.js'],{encoding:'utf8'}).replace('./vocal-result.js?rev=28','/src/vocal-result.js?rev=31'):null;
 const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE||'D:/Codex/Caches/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-win64/chrome-headless-shell.exe',args:['--autoplay-policy=no-user-gesture-required']});
 try{
  const page=await browser.newPage();await page.route('**/__vocal-sound',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><title>Vocal audio verification</title>'}));
  if(beforeSource)await page.route('**/__vocal-before.js',r=>r.fulfill({contentType:'text/javascript',body:beforeSource}));
  await page.goto('http://127.0.0.1:4173/__vocal-sound');
  const result=await page.evaluate(async compare=>{
-  const [{VOCALS},{createVocalTake,vocalPlaybackProfile},{transformVocalBuffer},{transformBeatBuffer,connectBeatResult,connectBeatResultMaster},{createBeatResult},{BeatAudio}]=await Promise.all([import('/src/vocal-catalog.js?rev=28'),import('/src/vocal-result.js?rev=28'),import('/src/vocal-result-dsp.js?rev=30'),import('/src/beat-result-dsp.js?rev=28'),import('/src/beat-result.js?rev=28'),import('/src/beat-audio.js?rev=30')]);
+  const [{VOCALS},{createVocalTake,vocalPlaybackProfile},{transformVocalBuffer},{transformBeatBuffer,connectBeatResult,connectBeatResultMaster},{createBeatResult},{BeatAudio}]=await Promise.all([import('/src/vocal-catalog.js?rev=31'),import('/src/vocal-result.js?rev=31'),import('/src/vocal-result-dsp.js?rev=31'),import('/src/beat-result-dsp.js?rev=31'),import('/src/beat-result.js?rev=28'),import('/src/beat-audio.js?rev=31')]);
   const rate=44100,frames=470400,decoder=new OfflineAudioContext(2,frames,rate),cache=new Map();
   const previous=compare?(await import('/__vocal-before.js')).transformVocalBuffer:null;
   const decode=async path=>{if(!cache.has(path)){const response=await fetch(path);if(!response.ok)throw Error(path);cache.set(path,await decoder.decodeAudioData(await response.arrayBuffer()));}return cache.get(path);};
@@ -58,7 +58,7 @@ try{
   return {outputs,metrics,spectrum,bands,player:{ok,sources,paused,resumed,retired},decoded:VOCALS.length};
  },Boolean(beforeSource));
  console.log('Audio diagnostics '+JSON.stringify({metrics:result.metrics,bands:result.bands}));
- assert.equal(result.decoded,40);assert.ok(Object.values(result.metrics).every(m=>m.finite&&m.peak<=.99&&m.rms>.005));assert.ok(result.metrics.mastered.quality<=44);assert.equal(result.player.ok,true);assert.equal(result.player.sources,4);assert.equal(result.player.retired,0);assert.ok(Math.abs(result.player.paused-result.player.resumed)<.04);
+ assert.equal(result.decoded,54);assert.ok(Object.values(result.metrics).every(m=>m.finite&&m.peak<=.99&&m.rms>.005));assert.ok(result.metrics.mastered.quality<=44);assert.equal(result.player.ok,true);assert.equal(result.player.sources,4);assert.equal(result.player.retired,0);assert.ok(Math.abs(result.player.paused-result.player.resumed)<.04);
  // The softened mic still rejects bass, but intentionally restores the vocal mids.
  assert.ok(result.bands.high>result.bands.low*25);assert.ok(result.bands.mid>result.bands.low*25);
  assert.equal(new Set(Object.values(result.outputs)).size,Object.keys(result.outputs).length);
@@ -79,5 +79,5 @@ try{
  }
  await writeFile(output+'/audio-evidence.json',JSON.stringify({...result,outputs:undefined},null,2));
  await writeFile(output+'/listen.html',`<!doctype html><meta charset="utf-8"><title>FT — проверка вокала</title><style>body{font:16px system-ui;background:#222b28;color:#e6e1ca;max-width:760px;margin:40px auto;padding:20px}audio{width:100%}section{padding:15px;border-bottom:1px solid #586255}p{line-height:1.5}</style><h1>Один голос, один бит — сравнение</h1><p>Твой вокал №1 и тема Track 1 с дополнительными барабанами и басом. Навыки — 10. В «было» и новом черновике инструментальная часть одинаковая: меняется только обработка голоса. Исходник дан отдельно для справки.</p>${[...(beforeSource?[['previous','Было · прежняя обработка']]:[]),['draft','Стало · сломанный черновик'],['clean','Чистовая · немного увереннее'],['mastered','Чистовая + сведение + мастеринг'],['original','Исходники без повреждения']].map(([id,label])=>`<section><h2>${label}</h2><audio controls src="${id}.wav"></audio></section>`).join('')}`);
- console.log('PASS 40 native decodes, bounded real renders, hardware EQ, four synchronized sources and cleanup. '+JSON.stringify({...result,outputs:undefined}));
+ console.log('PASS 54 native decodes, bounded real renders, hardware EQ, four synchronized sources and cleanup. '+JSON.stringify({...result,outputs:undefined}));
 }finally{await browser.close();}

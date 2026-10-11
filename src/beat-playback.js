@@ -1,7 +1,7 @@
-import {drumById,loopSeconds} from './beat-catalog.js';
-import {beginnerById} from './beat-beginner-bank.js?rev=28';
+import {drumById,loopSeconds} from './beat-catalog.js?rev=31';
+import {beginnerById} from './beat-beginner-bank.js?rev=31';
 import {normalizeBeatMix} from './beat-mix.js?rev=28';
-import {normalizeRecording,vocalPlaybackProfile} from './vocal-result.js?rev=28';
+import {normalizeRecording,vocalPlaybackProfile} from './vocal-result.js?rev=31';
 
 // A project has one musical clock, even when a legacy drum loop is shorter.
 export function resolveBeatPlayback(beat,{workStage=null,recordingPreview=null}={}){

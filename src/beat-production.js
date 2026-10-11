@@ -1,16 +1,16 @@
-import {BEAT_RULES as R,BEAT_GENRES,DRUMS,drumById} from './beat-catalog.js';
-import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=28';
+import {BEAT_RULES as R,BEAT_PRACTICE,BEAT_GENRES,DRUMS,drumById} from './beat-catalog.js?rev=31';
+import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=31';
 import {softwareDiskBytes} from './pc-software.js?rev=28';
 import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=28';
 import {createBeatResult} from './beat-result.js?rev=28';
-import {normalizeRecording,effectiveSoundSkill} from './vocal-result.js?rev=28';
+import {normalizeRecording,effectiveSoundSkill} from './vocal-result.js?rev=31';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
 const clamp=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,finite(v)));
 const text=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';
 const sliders=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite)?v.map(x=>Math.round(clamp(x,0,10))):null;
 const PRACTICE_PER_STAGE=1/3;
 export function normalizeBeat(p){
- if(![2,3].includes(p?.version)||p.kind!=='beat'||!text(p.id,100)||!text(p.name,64)||!BEAT_GENRES.some(g=>g.id===p.genre))return null;
+ if(![2,3].includes(p?.version)||p.kind!=='beat'||!text(p.id,100)||!text(p.name,64)||(p.genre!==BEAT_PRACTICE.id&&!BEAT_GENRES.some(g=>g.id===p.genre)))return null;
  if(p.version===2&&!(p.drumId==='primitive'||drumById(p.drumId)))return null;
  const stages=[];
  for(const s of (Array.isArray(p.stages)?p.stages:[]).slice(0,3)){const values=sliders(s?.sliders);if(!values)break;stages.push({sliders:values,fit:clamp(s.fit),quality:clamp(s.quality,0,p.mix?.version===2?110:100)});}
@@ -43,13 +43,14 @@ export function workBlockReason(state){
 }
 export function createBeat(input,options={},skills={},random=Math.random){
  if(input.recording?.job)return result(input,false,'Сначала заверши запись.');
- const s=normalized(input),id=text(options.id,100),name=text(options.name,64),genre=BEAT_GENRES.find(g=>g.id===(options.genre??'boombap')&&g.available);
- if(!id||!name||!genre||s.projects.some(p=>p.id===id))return result(s,false,'Укажи название и доступный жанр.');
+ const s=normalized(input),id=text(options.id,100),name=text(options.name,64),genre=options.genre??BEAT_PRACTICE.id;
+ if(!id||!name||s.projects.some(p=>p.id===id))return result(s,false,'Укажи название проекта.');
+ if(genre!==BEAT_PRACTICE.id&&!BEAT_GENRES.some(g=>g.id===genre&&g.available))return result(s,false,'Жанровая специализация пока недоступна.');
  if(softwareDiskBytes(s).free<2000000)return result(s,false,'Недостаточно места для нового проекта.');
  if(options.assetId&&!s.music.owned.some(a=>a.id===options.assetId))return result(s,false,'Этот луп ещё не получен.');
  const skill=effectiveBeatSkill(s,skills),parts=chooseBeginnerParts(random),free=DRUMS.filter(d=>d.bank==='free');
  const drumId=options.assetId||(skill>=R.freeSkill?free[Math.floor(clamp(random(),0,.999999)*free.length)].id:parts.drumsId);
- const beat=normalizeBeat({version:3,kind:'beat',id,name,genre:genre.id,drumId,stages:[],mix:createBeatMix(id,{beatmaking:skill,sound:effectiveSoundSkill(s,skills)}),productionMode:skill<=25?'beginner':'automatic',
+ const beat=normalizeBeat({version:3,kind:'beat',id,name,genre:BEAT_PRACTICE.id,drumId,stages:[],mix:createBeatMix(id,{beatmaking:skill,sound:effectiveSoundSkill(s,skills)}),productionMode:skill<=25?'beginner':'automatic',
   audio:{bankVersion:1,bars:4,themeId:parts.themeId,arrangementId:parts.arrangementId}});
  s.projects.push(beat);s.music.activeBeatId=id;return result(s);
 }
@@ -64,10 +65,11 @@ export function startBeatStage(input,id,values,skills={},random=Math.random){
  if(!s.music.job){
   const v=values===undefined?Array.from({length:3},()=>Math.floor(clamp(random(),0,.999999)*11)):sliders(values);
   if(!v)return result(s,false,'Этот этап недоступен.');
-  const skill=effectiveBeatSkill(s,skills),practice=s.music.genrePractice[beat.genre];
-  s.music.job={beatId:id,stage:beat.stages.length,sliders:v,total:Math.round(R.stageMinutes[beat.stages.length]*Math.max(.55,1-skill*.003-practice*.004)*(s.music.infected?1.35:1)),elapsed:0,skill,genreSkill:practice,practiceCredit:0};
+  const skill=effectiveBeatSkill(s,skills);
+  s.music.job={beatId:id,stage:beat.stages.length,sliders:v,total:Math.round(R.stageMinutes[beat.stages.length]*Math.max(.55,1-skill*.003)*(s.music.infected?1.35:1)),elapsed:0,skill,genreSkill:0,practiceCredit:0};
   if(beat.mix?.version===2){
-   beat.mix.layers[beat.stages.length]=createBeatResult({seed:beat.mix.seed,stage:beat.stages.length,skills:{beatmaking:skill,sound:effectiveSoundSkill(s,skills)},sliders:v,targets:BEAT_GENRES.find(g=>g.id===beat.genre).targets[beat.stages.length]});
+   const profile=beat.genre===BEAT_PRACTICE.id?BEAT_PRACTICE:BEAT_GENRES.find(g=>g.id===beat.genre);
+   beat.mix.layers[beat.stages.length]=createBeatResult({seed:beat.mix.seed,stage:beat.stages.length,skills:{beatmaking:skill,sound:effectiveSoundSkill(s,skills)},sliders:v,targets:profile.targets[beat.stages.length]});
    s.projects[s.projects.findIndex(p=>p.id===id)]=beat;
   }
  }
@@ -83,7 +85,7 @@ export function advanceBeatWork(input,requested){
  const finished=job.total-job.elapsed<1e-7;
  if(minutes>0){
   const credit=(finished?1:job.elapsed/job.total)*PRACTICE_PER_STAGE,gain=Math.max(0,credit-job.practiceCredit);
-  s.music.practice=clamp(s.music.practice+gain);s.music.genrePractice[current.genre]=clamp(s.music.genrePractice[current.genre]+gain);job.practiceCredit=credit;
+  s.music.practice=clamp(s.music.practice+gain);job.practiceCredit=credit;
  }
  const practiceGained=Math.min(job.practiceCredit,100-job.skill);
  if(finished){

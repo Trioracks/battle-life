@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=28';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=28';
+import {createVirtualPcState,diskUsage,loadVirtualPcState} from '../src/virtual-pc-state.js?rev=28';
 import {advanceVirtualPc} from '../src/virtual-pc-runtime.js?rev=28';
 import {mountInstaller} from '../src/pc-software-view.js?rev=28';
 import * as software from '../src/pc-software.js?rev=28';
@@ -62,10 +62,50 @@ test('live forum transfer keeps its cancel control and keyboard focus across byt
  const cancel=findButton(root,'Отменить загрузку');cancel.focus();pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:0}).state);pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:.25}).state);
  assert.equal(findButton(root,'Отменить загрузку'),cancel);assert.equal(d.activeElement,cancel);assert.ok(allPc(root).some(n=>n.textContent?.startsWith('Загрузка: 0.36')));
 });
-test('restored unfinished wizard opens as the master window and blocks other app controls',()=>{
+test('restored unfinished wizard keeps its path while other apps remain available',()=>{
  const {pc,root}=setup();pc.syncState(createVirtualPcState({power:'on',software:{client:{receivedBytes:2000000},installer:{appId:'client',step:'destination',path:'C:\\Custom\\torent'}}}));
- pc.showDesktop(pc.state);assert.equal(pc.window,'installer');assert.equal(pc.shell.getContentRoot('underweb').parentElement.inert,true);
- assert.equal(allPc(root).find(n=>n.getAttribute?.('aria-label')==='Папка установки').value,'C:\\Custom\\torent');pc.open('computer');assert.equal(pc.window,'installer');
+ pc.showDesktop(pc.state);assert.equal(pc.window,'installer');assert.equal(pc.shell.getContentRoot('underweb').parentElement.inert,false);
+ assert.equal(allPc(root).find(n=>n.getAttribute?.('aria-label')==='Папка установки').value,'C:\\Custom\\torent');pc.open('computer');assert.equal(pc.window,'computer');
+});
+
+for(const [id,duration,archive,installedMb]of [['client',10,2000000,8],['notebook',10,4000000,12],['ft',30,800000000,800]])test(`${id} installs while minimized without interrupting the browser`,()=>{
+ const {pc,root,d}=setup();pc.syncState(createVirtualPcState({power:'on',software:{[id]:{receivedBytes:archive}}}));pc.softwareAction('installer',id);
+ for(const name of ['Далее >','Далее >','Установить'])click(root,name);
+ const installer=pc.shell.getContentRoot('installer'),used=diskUsage(pc.state).usedMb;
+ assert.equal(findButton(installer.parentElement,'Свернуть окно').disabled,false);
+ findButton(installer.parentElement,'Свернуть окно').click();assert.equal(installer.parentElement.hidden,true);
+ const taskbar=allPc(root).find(n=>n.className==='pc-taskbar');assert.equal(taskbar.inert,false);
+ pc.open('underweb');pc.navigateUnderweb('underweb://dump');
+ const browser=pc.shell.getContentRoot('underweb'),address=allPc(browser).find(n=>n.tagName==='INPUT');address.focus();address.value='Незавершённый адрес';
+ pc.syncState(software.advanceInstallation(pc.state,duration/2).state);
+ assert.equal(pc.state.software.installer.elapsedSeconds,duration/2);assert.equal(pc.state.software[id].installed,false);assert.equal(diskUsage(pc.state).usedMb,used);
+ pc.syncState(software.advanceInstallation(pc.state,duration/2).state);
+ assert.equal(pc.state.software[id].installed,true);assert.equal(pc.state.software.installer.step,'finish');assert.equal(diskUsage(pc.state).usedMb,used+installedMb);
+ assert.equal(pc.window,'underweb');assert.equal(d.activeElement,address);assert.equal(address.value,'Незавершённый адрес');assert.equal(installer.parentElement.hidden,true);
+ const task=allPc(root).find(n=>n.dataset.pcRole==='task'&&n.dataset.windowId==='installer');task.click();assert.equal(pc.window,'installer');assert.equal(installer.parentElement.hidden,false);assert.ok(findButton(installer,'Готово'));
+ click(installer,'Готово');assert.equal(pc.state.software.installer,null);assert.equal(pc.state.software[id].installed,true);pc.dispose();
+});
+
+test('Escape and close in another app do not cancel a background installation',()=>{
+ const {pc,root}=setup();pc.syncState(createVirtualPcState({power:'on',software:{client:{receivedBytes:2000000},installer:{appId:'client',step:'install',elapsedSeconds:4}}}));pc.showDesktop(pc.state);
+ pc.open('underweb');fire(root,'keydown',{key:'Escape'});assert.equal(pc.state.software.installer?.elapsedSeconds,4);
+ pc.closeWindow('underweb');assert.equal(pc.shell.getContentRoot('underweb'),null);assert.equal(pc.state.software.installer.elapsedSeconds,4);
+ fire(root,'keydown',{key:'Escape'});assert.equal(pc.state.software.installer,null);assert.equal(pc.state.software.client.installed,false);assert.equal(pc.state.software.client.receivedBytes,2000000);pc.dispose();
+});
+
+test('Escape cancels the shutdown dialog before the active installer',()=>{
+ const {pc,root}=setup();pc.syncState(createVirtualPcState({power:'on',software:{client:{receivedBytes:2000000},installer:{appId:'client',step:'install',elapsedSeconds:4}}}));pc.showDesktop(pc.state);
+ pc.showShutdown();fire(root,'keydown',{key:'Escape'});assert.equal(pc.shutdownModal===null,true);assert.equal(pc.state.software.installer?.elapsedSeconds,4);pc.dispose();
+});
+
+test('leaving the PC saves installation progress and returning preserves minimized windows',()=>{
+ const d=pcDocument(),root=d.createElement('section');let saved=null,left=false;
+ const pc=mountVirtualPc(root,{onPersist:state=>{saved=JSON.stringify(state);return true;},onLeave:()=>{left=true;}});
+ pc.showDesktop(createVirtualPcState({power:'on',software:{ft:{receivedBytes:800000000},installer:{appId:'ft',step:'install'}}}));
+ pc.windowAction({type:'minimize',id:'installer'});pc.open('underweb');pc.syncState(software.advanceInstallation(pc.state,4).state);pc.requestLeave();
+ assert.equal(left,true);assert.ok(saved);assert.equal(loadVirtualPcState({getItem:()=>saved}).state.software.installer.elapsedSeconds,4);
+ pc.syncState(software.advanceInstallation(pc.state,3).state);pc.showDesktop(pc.state);
+ assert.equal(pc.window,'underweb');assert.equal(pc.windows.windows.find(w=>w.id==='installer').mode,'minimized');assert.equal(pc.state.software.installer.elapsedSeconds,7);pc.dispose();
 });
 test('torrent toolbar disables empty and finished queue actions and only resumes paused transfers',()=>{
  const {pc,root}=setup();pc.showDesktop(createVirtualPcState({power:'on',software:{client:{installed:true}}}));pc.open('torent');

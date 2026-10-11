@@ -23,7 +23,7 @@ test('FT project picker excludes notebook documents while keeping legacy music p
 });
 test('analytics show the saved layer result and sound skill after the character trains',()=>{
  let state=createBeat(createVirtualPcState(),{id:'audio',name:'Sound'},{sound:12}).state;
- state=startBeatStage(state,'audio',[9,3,2],{beatmaking:10,sound:12}).state;state=advanceBeatWork(state,600).state;
+ state=startBeatStage(state,'audio',[5,5,5],{beatmaking:10,sound:12}).state;state=advanceBeatWork(state,600).state;
  const s=setup(state,{skills:{beatmaking:10,sound:99},gameDay:1});s.view.openProject(state.projects[0]);
  const mix=role(s.root,'mix-character');assert.ok(mix);
  assert.ok(allPc(mix).some(n=>n.textContent?.includes('31.4/110')));

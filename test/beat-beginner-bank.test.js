@@ -7,17 +7,18 @@ const bank = await load('../src/beat-beginner-bank.js');
 const synth = await load('../tools/audio/beginner-patterns.mjs');
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 
-test('bank_has_fifteen_each and random selection never crosses families', () => {
+test('expanded bank preserves legacy IDs and selection never crosses part kinds', () => {
   assert.equal(typeof bank.chooseBeginnerParts, 'function', 'beginner catalogue is required');
-  assert.equal(bank.BEGINNER_BANK.length, 48);
+  assert.equal(bank.BEGINNER_BANK.length, 142);
   for(const kind of ['drums','theme','arrangement']) {
     const entries = bank.BEGINNER_BANK.filter(p => p.kind === kind);
-    assert.equal(entries.length, 16);
-    assert.equal(new Set(entries.map(p => p.id)).size, 16);
+    assert.equal(entries.length, kind==='theme'?50:46);
+    assert.equal(new Set(entries.map(p => p.id)).size, entries.length);
+    assert.equal(entries.filter(p=>p.path.includes('/beginner-v1/')).length,16);
     assert.ok(entries.every(p => p.bpm === 90 && p.bars === 4 && p.key === 'A minor'));
   }
-  assert.deepEqual(bank.chooseBeginnerParts(() => 0), {drumsId:'beginner-drums-01',themeId:'beginner-theme-01',arrangementId:'beginner-arrangement-01'});
-  assert.deepEqual(bank.chooseBeginnerParts(() => 1), {drumsId:'beginner-drums-16',themeId:'beginner-theme-16',arrangementId:'beginner-arrangement-16'});
+  assert.deepEqual(bank.chooseBeginnerParts(() => 0), {drumsId:'beginner-drums-17',themeId:'beginner-theme-17',arrangementId:'beginner-arrangement-17'});
+  assert.deepEqual(bank.chooseBeginnerParts(() => 1), {drumsId:'beginner-drums-46',themeId:'beginner-theme-50',arrangementId:'beginner-arrangement-46'});
   for(const value of [NaN,Infinity,-2,.43]) for(const id of Object.values(bank.chooseBeginnerParts(() => value))) assert.ok(bank.beginnerById(id));
   assert.equal(bank.beginnerById('../../evil'), undefined);
 });
@@ -52,6 +53,7 @@ test('shipped WAVs match deterministic manifest and decode as mono PCM16 four-ba
   const manifest = JSON.parse(await readFile(new URL('../assets/audio/ft/beginner-v1/manifest.json',import.meta.url),'utf8'));
   assert.equal(manifest.parts.length,48);
   for(const part of bank.BEGINNER_BANK) {
+    if(!part.path.includes('/beginner-v1/'))continue;
     const wav=await readFile(new URL('../'+part.path,import.meta.url));
     assert.equal(wav.toString('ascii',0,4),'RIFF');assert.equal(wav.toString('ascii',8,12),'WAVE');
     const channels=part.id==='beginner-theme-16'?2:1;

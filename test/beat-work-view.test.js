@@ -15,7 +15,7 @@ test('panel shows actual progress, needs, skill and reward only after completion
  findButton(panel.element,'Включить звук').click();findButton(panel.element,'Прервать работу').click();assert.equal(cancel,1);assert.equal(enable,1);panel.dispose();
 });
 
-test('training bars expose the actual fractional skill, genre practice and gains for this stage',()=>{
+test('training exposes fractional beatmaking and stage gains without a genre meter',()=>{
  const panel=module.createBeatWorkPanel(pcDocument());
  const model={beat:{name:'Наш двор',genre:'boombap'},job:{stage:0,elapsed:30,total:60,skill:10,genreSkill:2},skill:10+1/6,genrePractice:2+1/6};
  panel.update(model);const role=key=>allPc(panel.element).find(n=>n.dataset.workRole===key);
@@ -24,28 +24,22 @@ test('training bars expose the actual fractional skill, genre practice and gains
  assert.equal(role('skill-progress').getAttribute('aria-label'),'Битмейкинг');
  assert.match(role('skill-progress').getAttribute('aria-valuetext'),/10\.17.*до 11/);
  assert.match(role('skill-gain').textContent,/\+0\.17/);
- assert.match(role('genre').textContent,/Бум-бэп.*2\.17.*до 3/);
- assert.equal(role('genre-progress').value,2+1/6);assert.equal(role('genre-progress').min,2);assert.equal(role('genre-progress').max,3);
- assert.match(role('genre-progress').getAttribute('aria-label'),/Бум-бэп/);
- assert.match(role('genre-progress').getAttribute('aria-valuetext'),/2\.17.*до 3/);
- assert.match(role('genre-gain').textContent,/\+0\.17/);
+ assert.ok(!role('genre'));assert.ok(!role('genre-progress'));assert.ok(!role('genre-gain'));
  panel.update({...model,skill:10+1/3,genrePractice:2+1/3,job:{...model.job,elapsed:60},reward:1/3});
  assert.match(role('skill').textContent,/10\.33/);assert.match(role('skill-gain').textContent,/\+0\.33/);
- assert.match(role('genre-gain').textContent,/\+0\.33/);assert.match(role('reward').textContent,/\+0\.33\b/);
+ assert.match(role('reward').textContent,/\+0\.33\b/);
 });
 
 test('training at the skill cap shows no fictitious gain and a completed stage still closes work controls',()=>{
  const panel=module.createBeatWorkPanel(pcDocument());
  panel.update({beat:{genre:'boombap'},job:{skill:100,genreSkill:100,total:60,elapsed:60},skill:100,genrePractice:100,finished:true,reward:0});
  const role=key=>allPc(panel.element).find(n=>n.dataset.workRole===key);
- assert.ok(role('skill-progress'),'skill progress bar is visible');assert.ok(role('genre-progress'),'genre progress bar is visible');
- assert.equal(role('skill-progress').value,100);assert.equal(role('genre-progress').value,100);
- for(const key of ['skill','genre']){
-  assert.equal(role(key+'-progress').min,99);assert.equal(role(key+'-progress').max,100);
-  assert.match(role(key).textContent,/100\.00.*максимум/);
-  assert.match(role(key+'-progress').getAttribute('aria-valuetext'),/100\.00.*максимум/);
- }
- assert.match(role('skill-gain').textContent,/\+0\.00/);assert.match(role('genre-gain').textContent,/\+0\.00/);
+ assert.ok(role('skill-progress'),'skill progress bar is visible');assert.ok(!role('genre-progress'));
+ assert.equal(role('skill-progress').value,100);
+ assert.equal(role('skill-progress').min,99);assert.equal(role('skill-progress').max,100);
+ assert.match(role('skill').textContent,/100\.00.*максимум/);
+ assert.match(role('skill-progress').getAttribute('aria-valuetext'),/100\.00.*максимум/);
+ assert.match(role('skill-gain').textContent,/\+0\.00/);
  assert.equal(role('reward').hidden,false);assert.match(role('reward').textContent,/этап завершён/i);
  assert.equal(findButton(panel.element,'Прервать работу').hidden,true);
 });
@@ -57,7 +51,24 @@ test('crossing a whole skill level starts the next interval while keeping the ac
  panel.update({beat:{genre:'boombap'},job:{...job,elapsed:36},skill:11.1,genrePractice:3.1});
  const role=key=>allPc(panel.element).find(n=>n.dataset.workRole===key);
  assert.equal(role('skill-progress').min,11);assert.equal(role('skill-progress').max,12);assert.equal(role('skill-progress').value,11.1);
- assert.equal(role('genre-progress').min,3);assert.equal(role('genre-progress').max,4);assert.equal(role('genre-progress').value,3.1);
- assert.match(role('skill').textContent,/11\.10.*до 12/);assert.match(role('genre').textContent,/3\.10.*до 4/);
- assert.match(role('skill-gain').textContent,/\+0\.20/);assert.match(role('genre-gain').textContent,/\+0\.20/);
+ assert.ok(!role('genre-progress'));
+ assert.match(role('skill').textContent,/11\.10.*до 12/);
+ assert.match(role('skill-gain').textContent,/\+0\.20/);
+});
+
+test('shared work panel keeps writing, flow and sound training when genre practice is retired',()=>{
+ const panel=module.createBeatWorkPanel(pcDocument());
+ for(const [beat,job,label]of [
+  [{kind:'lyrics'},{kind:'stage',stage:0},'Письмо'],
+  [{kind:'beat'},{kind:'draft',output:{draft:{}}},'Флоу'],
+  [{kind:'beat'},{kind:'clean',output:{draft:{}}},'Флоу'],
+  [{kind:'beat'},{kind:'mix',output:{draft:{}}},'Звук'],
+  [{kind:'beat'},{kind:'master',output:{draft:{}}},'Звук'],
+ ]){
+  panel.update({beat,job:{...job,skill:10,total:60,elapsed:30},skill:10+1/6});
+  const role=key=>allPc(panel.element).find(n=>n.dataset.workRole===key);
+  assert.equal(role('skill-progress').getAttribute('aria-label'),label);
+  assert.equal(role('skill-progress').value,10+1/6);assert.match(role('skill-gain').textContent,/\+0\.17/);
+  assert.ok(!role('genre-progress'));
+ }
 });

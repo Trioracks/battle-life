@@ -10,14 +10,14 @@ test('v3_only_requires_name and skill_tier_is_pinned through the free-bank bound
   const r=make(skill);assert.equal(r.ok,true);
   const beat=r.state.projects[0];assert.equal(beat.version,3);assert.equal(beat.bpm,90);
   assert.equal(beat.productionMode,skill<=25?'beginner':'automatic');
-  assert.equal(beat.drumId,skill>=40?'free-01':'beginner-drums-01');
-  assert.deepEqual(beat.audio,{bankVersion:1,bars:4,themeId:'beginner-theme-01',arrangementId:'beginner-arrangement-01'});
+  assert.equal(beat.drumId,skill>=40?'free-01':'beginner-drums-17');
+  assert.deepEqual(beat.audio,{bankVersion:1,bars:4,themeId:'beginner-theme-17',arrangementId:'beginner-arrangement-17'});
  }
 });
 
 test('choices_survive_roundtrip_and_resume without hidden rerolls or duplicate practice',()=>{
  let calls=0;const random=()=>[0,.5,.99][calls++%3],made=make(25,random);
- assert.equal(made.ok,true);assert.equal(calls,3);
+ assert.equal(made.ok,true);assert.equal(calls,1);
  let s=made.state;
  s=startBeatStage(s,'a',undefined,{beatmaking:25},()=>.4).state;
  const original=structuredClone(s.projects[0]);
@@ -36,13 +36,12 @@ test('choices_survive_roundtrip_and_resume without hidden rerolls or duplicate p
 
 test('saved slider fit affects new result quality but cannot make a novice professional',()=>{
  const qualities=[];
- for(const values of [[0,0,0],[10,10,10],[9,3,2]]){
-  // Explicit genre keeps this regression executable against the previous implementation.
-  let s=createBeat(seed(),{id:'a',name:'Первый',genre:'boombap'},{beatmaking:25},()=>0).state;
+ for(const values of [[0,0,0],[10,10,10],[5,5,5]]){
+  let s=createBeat(seed(),{id:'a',name:'Первый'},{beatmaking:25},()=>0).state;
   s=startBeatStage(s,'a',values,{beatmaking:25}).state;
   s=advanceBeatWork(s,600).state;qualities.push(s.projects[0].stages[0].quality);
  }
- assert.ok(qualities[2]>qualities[0]);assert.ok(qualities[0]>qualities[1]);assert.ok(Math.max(...qualities)<50);
+ assert.ok(qualities[2]>qualities[0]);assert.equal(qualities[0],qualities[1]);assert.ok(Math.max(...qualities)<50);
 });
 
 test('legacy_job_keeps_sources_and_progress while new completions ignore sliders',()=>{

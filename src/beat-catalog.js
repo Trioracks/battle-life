@@ -5,6 +5,8 @@ export const BEAT_STAGES=Object.freeze([
  {name:'Музыкальная основа',sliders:['Мелодия','Гармония','Фактура']},
  {name:'Аранжировка',sliders:['Повторяемость','Контраст частей','Переходы']},
 ]);
+export const BEAT_PRACTICE=Object.freeze({id:'practice',targets:[[5,5,5],[5,5,5],[5,5,5]]});
+// Historical genres remain readable so saved projects keep their original decisions.
 export const BEAT_GENRES=Object.freeze([
  {id:'boombap',name:'Бум-бэп',available:true,targets:[[9,3,2],[5,5,8],[9,4,2]]},
  {id:'trap',name:'Трэп',targets:[[7,8,5],[4,3,9],[8,7,5]]},

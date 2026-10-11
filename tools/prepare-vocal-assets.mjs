@@ -19,7 +19,7 @@ async function convert(source,path){
  return {source,sourceHash:hash(before),sha256:hash(data),frames:470400,sampleRate:44100};
 }
 const parts=[];
-for(let i=0;i<VOCALS.length;i++){
+for(let i=0;i<40;i++){
  const a=VOCALS[i],source='stems/janres/non/vocal/untitled - '+(i===0?'REC.wav':'REC_'+(i+1)+'.wav');
  parts.push({...a,...await convert(source,a.path)});
 }

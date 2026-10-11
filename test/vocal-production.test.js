@@ -15,10 +15,18 @@ const finish=(s,kind,extra={})=>{s.music.needs={satiety:100,energy:100};const r=
 test('ready beat and ready text required; recording survives save and fixes one source',()=>{
  assert.equal(typeof v.startVocalWork,'function');let s=fixture();
  assert.equal(v.startVocalWork(s,{beatId:'b',kind:'draft',textId:'missing'}).ok,false);
- s=finish(s,'draft');const r=s.projects[0].recording;assert.ok(r.draft);assert.equal(r.clean,null);assert.equal(r.text.id,'t');assert.equal(r.sourceId,'vocal-09');
+ s=finish(s,'draft');const r=s.projects[0].recording;assert.ok(r.draft);assert.equal(r.clean,null);assert.equal(r.text.id,'t');assert.equal(r.sourceId,'vocal-11');
  assert.deepEqual(createVirtualPcState(JSON.parse(JSON.stringify(s))).projects[0].recording,r);
  s=finish(s,'clean');assert.equal(s.projects[0].recording.sourceId,r.sourceId);assert.ok(s.projects[0].recording.clean.quality>r.draft.quality);
  assert.equal(v.startVocalWork(s,{beatId:'b',kind:'draft'}).ok,false);assert.equal(v.startVocalWork(s,{beatId:'b',kind:'clean'}).ok,false);
+});
+
+test('new vocal exports can be selected and stay attached after saving and a clean take',()=>{
+ let s=fixture();const started=v.startVocalWork(s,{beatId:'b',textId:'t',kind:'draft'},{},()=>.999999);
+ assert.equal(started.ok,true);assert.equal(started.state.recording.job.output.sourceId,'vocal-54');
+ s=v.advanceVocalWork(started.state,1000).state;
+ s=createVirtualPcState(JSON.parse(JSON.stringify(s)));s=finish(s,'clean');
+ assert.equal(s.projects[0].recording.sourceId,'vocal-54');
 });
 test('post processing is optional, capped, one-time and reset by clean take',()=>{
  assert.equal(typeof v.startVocalWork,'function');let s=finish(fixture(),'draft');const q=s.projects[0].recording.draft.quality;
