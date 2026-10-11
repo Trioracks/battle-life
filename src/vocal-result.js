@@ -3,6 +3,7 @@ export const clampV=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,Number.isFinite(v)?
 const text=(v,n=100)=>typeof v==='string'?v.trim().slice(0,n):'';
 export const VOCAL_EQUIPMENT=Object.freeze({microphone:'desk-mic',interface:'onboard'});
 export const VOCAL_CEILING=44;
+export const effectiveSoundSkill=(state,skills={})=>clampV((Number.isFinite(skills.sound)?skills.sound:10)+clampV(state.recording?.practice?.sound));
 export function createVocalTake({kind='draft',seed=1,skills={},sliders=[5,5,5]}={}){
  if(!['draft','clean'].includes(kind)||!Array.isArray(sliders)||sliders.length!==3||!sliders.every(Number.isFinite))return null;
  const values=sliders.map(v=>clampV(v,0,10)),snapshot=Object.fromEntries(['flow','sound','musicality','confidence'].map(k=>[k,clampV(skills[k]??10)]));

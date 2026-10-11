@@ -65,6 +65,10 @@ function normalizeDownload(value) {
 function normalizeSnapshot(value) {
   const source = isRecord(value) ? value : {};
   const projects = Array.isArray(source.projects) ? source.projects.map(normalizeProject).filter(Boolean) : [];
+  const music=normalizeMusic(source.music,projects),writing=normalizeWriting(source.writing,projects),recording=normalizeRecordingState(source.recording,projects);
+  // Damaged saves may contain several valid jobs. Recover one owner in stable
+  // schema order; completed projects and already credited practice are retained.
+  if(music.job){writing.job=null;recording.job=null;}else if(writing.job)recording.job=null;
   return withSoftware({
     version: 1,
     noviceSchema: 1,
@@ -74,9 +78,7 @@ function normalizeSnapshot(value) {
     desktopIcons: normalizeIcons(source.desktopIcons),
     download: normalizeDownload(source.download),
     projects,
-    music:normalizeMusic(source.music,projects),
-    writing:normalizeWriting(source.writing,projects),
-    recording:normalizeRecordingState(source.recording,projects),
+    music,writing,recording,
     community:normalizeCommunity(source.community),
     household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),

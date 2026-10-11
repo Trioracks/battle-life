@@ -3,7 +3,7 @@ import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=28';
 import {softwareDiskBytes} from './pc-software.js?rev=28';
 import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=28';
 import {createBeatResult} from './beat-result.js?rev=28';
-import {normalizeRecording} from './vocal-result.js?rev=28';
+import {normalizeRecording,effectiveSoundSkill} from './vocal-result.js?rev=28';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
 const clamp=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,finite(v)));
 const text=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';
@@ -49,7 +49,7 @@ export function createBeat(input,options={},skills={},random=Math.random){
  if(options.assetId&&!s.music.owned.some(a=>a.id===options.assetId))return result(s,false,'Этот луп ещё не получен.');
  const skill=effectiveBeatSkill(s,skills),parts=chooseBeginnerParts(random),free=DRUMS.filter(d=>d.bank==='free');
  const drumId=options.assetId||(skill>=R.freeSkill?free[Math.floor(clamp(random(),0,.999999)*free.length)].id:parts.drumsId);
- const beat=normalizeBeat({version:3,kind:'beat',id,name,genre:genre.id,drumId,stages:[],mix:createBeatMix(id,{beatmaking:skill,sound:skills.sound}),productionMode:skill<=25?'beginner':'automatic',
+ const beat=normalizeBeat({version:3,kind:'beat',id,name,genre:genre.id,drumId,stages:[],mix:createBeatMix(id,{beatmaking:skill,sound:effectiveSoundSkill(s,skills)}),productionMode:skill<=25?'beginner':'automatic',
   audio:{bankVersion:1,bars:4,themeId:parts.themeId,arrangementId:parts.arrangementId}});
  s.projects.push(beat);s.music.activeBeatId=id;return result(s);
 }
@@ -67,7 +67,7 @@ export function startBeatStage(input,id,values,skills={},random=Math.random){
   const skill=effectiveBeatSkill(s,skills),practice=s.music.genrePractice[beat.genre];
   s.music.job={beatId:id,stage:beat.stages.length,sliders:v,total:Math.round(R.stageMinutes[beat.stages.length]*Math.max(.55,1-skill*.003-practice*.004)*(s.music.infected?1.35:1)),elapsed:0,skill,genreSkill:practice,practiceCredit:0};
   if(beat.mix?.version===2){
-   beat.mix.layers[beat.stages.length]=createBeatResult({seed:beat.mix.seed,stage:beat.stages.length,skills:{beatmaking:skill,sound:skills.sound},sliders:v,targets:BEAT_GENRES.find(g=>g.id===beat.genre).targets[beat.stages.length]});
+   beat.mix.layers[beat.stages.length]=createBeatResult({seed:beat.mix.seed,stage:beat.stages.length,skills:{beatmaking:skill,sound:effectiveSoundSkill(s,skills)},sliders:v,targets:BEAT_GENRES.find(g=>g.id===beat.genre).targets[beat.stages.length]});
    s.projects[s.projects.findIndex(p=>p.id===id)]=beat;
   }
  }

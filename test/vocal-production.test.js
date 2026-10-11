@@ -51,3 +51,20 @@ test('even unlucky clean decisions cannot make the take worse than its draft',()
  s=v.advanceVocalWork(v.startVocalWork(s,{beatId:'b',kind:'clean',sliders:[0,0,0]},{flow:30,sound:30},()=>.4).state,1000).state;
  assert.ok(s.projects[0].recording.clean.quality>=Math.min(44,q+3));
 });
+test('conflicting persisted jobs recover to one advancing job without losing projects or practice',()=>{
+ let s=fixture();const vocal=v.startVocalWork(s,{beatId:'b',textId:'t',kind:'draft'}).state.recording;
+ s=createBeat(s,{id:'b2',name:'Второй бит'},{}).state;s=startBeatStage(s,'b2',undefined,{},()=>.5).state;
+ const before=s.projects;s.recording={...vocal,practice:{flow:.2,sound:.4}};
+ s=createVirtualPcState(JSON.parse(JSON.stringify(s)));assert.ok(s.music.job);assert.equal(s.recording.job,null);assert.deepEqual(s.projects,before);assert.deepEqual(s.recording.practice,{flow:.2,sound:.4});
+ assert.ok(advanceBeatWork(s,1).minutes>0);
+ let t=fixture();t=startLyricWork(t,{projectId:'t',kind:'diss'},{}).state;t.recording=vocal;
+ t=createVirtualPcState(t);assert.ok(t.writing.job);assert.equal(t.recording.job,null);assert.ok(advanceLyricWork(t,1).minutes>0);
+});
+test('sound practice improves new beat and layer snapshots, never rewrites old layers',()=>{
+ let s=finish(fixture(),'draft');s=finish(s,'mix');s=finish(s,'master');const old=structuredClone(s.projects[0]);
+ assert.ok(Math.abs(s.recording.practice.sound-2/3)<1e-9);
+ s=createBeat(s,{id:'new',name:'После практики'},{beatmaking:10,sound:10},()=>.4).state;
+ assert.ok(Math.abs(s.projects.at(-1).mix.skills.sound-(10+2/3))<1e-9);
+ s.music.needs={satiety:100,energy:100};s=startBeatStage(s,'new',[5,5,5],{beatmaking:10,sound:10}).state;
+ assert.ok(Math.abs(s.projects.at(-1).mix.layers[0].skills.sound-(10+2/3))<1e-9);assert.deepEqual(s.projects[0],old);
+});
