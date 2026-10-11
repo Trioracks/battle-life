@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=26';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=26';
-import {createStudioProject} from '../src/ft-studio-project.js?rev=26';
+import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=27';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=27';
+import {createStudioProject} from '../src/ft-studio-project.js?rev=27';
 import {pcDocument,findButton,allPc,fire} from './helpers/virtual-pc-dom.js';
 const project=()=>createStudioProject({id:'song',name:'Архивная работа',battleId:'concrete-echo'}).project;
 function setup(){

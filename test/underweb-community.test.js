@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {resolveUnderweb,desktopApps} from '../src/virtual-pc-catalog.js?rev=26';
-import * as community from '../src/underweb-community.js?rev=26';
+import {resolveUnderweb,desktopApps} from '../src/virtual-pc-catalog.js?rev=27';
+import * as community from '../src/underweb-community.js?rev=27';
 const savedReplies=count=>Array.from({length:count},(_,i)=>({id:'local-'+(i+1),topicId:'concrete-echo-general',author:'Игрок',body:'Сохранённый ответ '+(i+1),gameDay:1,quoteId:i?'local-1':null}));
 test('the five hundredth reply is retained and a new reply at the limit is explicitly rejected',()=>{
  const state={replies:savedReplies(499)},last=community.replyToTopic(state,{topicId:'concrete-echo-general',author:'Игрок',body:'Ответ 500',quoteId:'local-1',gameDay:1});assert.equal(last.ok,true);assert.equal(last.community.replies.length,500);

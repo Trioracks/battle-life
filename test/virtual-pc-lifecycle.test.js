@@ -1,13 +1,13 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=26';import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=26';import {PcTransition} from '../src/virtual-pc-transition.js';import {pcDocument,allPc} from './helpers/virtual-pc-dom.js';
-const {PcLifecycle}=await import('../src/virtual-pc-lifecycle.js?rev=26').catch(()=>({}));
+import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=27';import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=27';import {PcTransition} from '../src/virtual-pc-transition.js';import {pcDocument,allPc} from './helpers/virtual-pc-dom.js';
+const {PcLifecycle}=await import('../src/virtual-pc-lifecycle.js?rev=27').catch(()=>({}));
 import {readFileSync} from 'node:fs';
 import {ApartmentMotion} from '../src/apartment-v3-motion.js';
-import {ApartmentTime} from '../src/apartment-v3-time.js?rev=26';
-import {prepareApartmentConfig,startHomeAction,advanceHomeFrame} from '../src/apartment-v3-runtime.js?rev=26';
+import {ApartmentTime} from '../src/apartment-v3-time.js?rev=27';
+import {prepareApartmentConfig,startHomeAction,advanceHomeFrame} from '../src/apartment-v3-runtime.js?rev=27';
 
 test('accepted floor move cancels PC preparation and permits a fresh approach',async()=>{
- const {moveInRoom}=await import('../src/virtual-pc-lifecycle.js?rev=26');
+ const {moveInRoom}=await import('../src/virtual-pc-lifecycle.js?rev=27');
  const config=prepareApartmentConfig(JSON.parse(readFileSync(new URL('../assets/apartment/v3/scene.json',import.meta.url))));
  const motion=new ApartmentMotion(config),time=new ApartmentTime();let done;
  const f=fixture(()=>new Promise(r=>done=r));
@@ -43,7 +43,7 @@ test('desktop focus is restored after removing inert, once for cold and warm ent
  t.leave();pc.presentTransition(t.snapshot);t.tick(2.4);t.enter({alreadyOn:true});pc.presentTransition(t.snapshot);d.activeElement=null;t.tick(2.4);pc.presentTransition(t.snapshot);
  assert.ok(pc.shell.getContentRoot('underweb').parentElement.contains(d.activeElement));
 });
-test('opaque PC screens do not repeatedly render the hidden full room',async()=>{const {pcNeedsSceneFrame}=await import('../src/virtual-pc-lifecycle.js?rev=26');assert.equal(typeof pcNeedsSceneFrame,'function');assert.equal(pcNeedsSceneFrame({overlay:1},'pc'),false);assert.equal(pcNeedsSceneFrame({overlay:.9},'pc'),true);assert.equal(pcNeedsSceneFrame({overlay:1},'game'),true);});
+test('opaque PC screens do not repeatedly render the hidden full room',async()=>{const {pcNeedsSceneFrame}=await import('../src/virtual-pc-lifecycle.js?rev=27');assert.equal(typeof pcNeedsSceneFrame,'function');assert.equal(pcNeedsSceneFrame({overlay:1},'pc'),false);assert.equal(pcNeedsSceneFrame({overlay:.9},'pc'),true);assert.equal(pcNeedsSceneFrame({overlay:1},'game'),true);});
 function fixture(prepare=async()=>{}){let state={power:'off'},room=0,begun=0;const modes={mode:'3D',yaw:1,pitch:.2},view={modes,prepareComputerView:prepare,beginComputerView(){begun++;},endComputerView(){}};const life=new PcLifecycle({view,getState:()=>state,setPower:power=>{state={power};},sounds:{play(){}},onRoom:()=>room++});return {life,modes,get state(){return state;},get begun(){return begun;},get room(){return room;}};}
 test('late prepare after reset cannot enter or persist power',async()=>{assert.equal(typeof PcLifecycle,'function');let done;const f=fixture(()=>new Promise(r=>done=r));f.life.prepare();const p=f.life.seated();f.life.reset();done();await p;assert.equal(f.begun,0);assert.equal(f.state.power,'off');});
 test('cold, warm, shutdown and hidden frames share one controller and safe camera restore',async()=>{assert.equal(typeof PcLifecycle,'function');const f=fixture();assert.equal(f.life.prepare(),true);assert.equal(f.life.prepare(),false);f.modes.mode='2D';await f.life.seated();assert.equal(f.state.power,'on');f.life.tick(5,{hidden:true});assert.equal(f.life.snapshot.phase,'power-on');f.life.tick(11);assert.equal(f.life.snapshot.phase,'desktop');f.life.leave();f.life.tick(2.4);assert.equal(f.room,1);f.life.restore('return-out');assert.equal(f.modes.mode,'2D');f.life.restore('return-in');assert.equal(f.modes.mode,'3D');assert.equal(f.modes.yaw,1);f.life.prepare();await f.life.seated();assert.equal(f.life.snapshot.phase,'zoom-in');f.life.tick(2.4);f.life.shutdown();assert.equal(f.state.power,'off');assert.equal(f.life.snapshot.phase,'shutdown');});

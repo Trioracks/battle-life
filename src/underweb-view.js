@@ -1,13 +1,13 @@
 import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=21';
-import {resolveUnderweb} from './virtual-pc-catalog.js?rev=26';
-import {createBeatMarket} from './beat-market-view.js?rev=26';
-import {softwareForum,softwareMessage} from './pc-software-view.js?rev=26';
-import {downloadPresentation} from './virtual-pc-runtime.js?rev=26';
-import {createCommunityView} from './underweb-community-view.js?rev=26';
-import {communityDay} from './underweb-community.js?rev=26';
-import {homeDateLabel} from './home-calendar.js?rev=26';
-import {newsForDay} from './underweb-news.js?rev=26';
-import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=26';
+import {resolveUnderweb} from './virtual-pc-catalog.js?rev=27';
+import {createBeatMarket} from './beat-market-view.js?rev=27';
+import {softwareForum,softwareMessage} from './pc-software-view.js?rev=27';
+import {downloadPresentation} from './virtual-pc-runtime.js?rev=27';
+import {createCommunityView} from './underweb-community-view.js?rev=27';
+import {communityDay} from './underweb-community.js?rev=27';
+import {homeDateLabel} from './home-calendar.js?rev=27';
+import {newsForDay} from './underweb-news.js?rev=27';
+import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=27';
 const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-control '+(options.className??'')},fn);
 
 export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,getSoftwareMessage=()=>''}){

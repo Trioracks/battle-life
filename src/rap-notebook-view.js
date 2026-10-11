@@ -1,7 +1,7 @@
 // Notepad-style view of the persisted symbolic lyric projects.
 import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=21';
-import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill} from './lyric-production.js?rev=26';
-import {normalizeBeat} from './beat-production.js?rev=26';
+import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill} from './lyric-production.js?rev=27';
+import {normalizeBeat} from './beat-production.js?rev=27';
 
 export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,onWork=()=>false}={}){
  const d=root.ownerDocument;let panel=null,modal=null,returnFocusLabel='',message='',signature='',disposed=false,controls=[];
@@ -52,16 +52,21 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
    const meta=el(d,'header',{className:'rn-meta'});meta.append(el(d,'h1',{text:p.name}),el(d,'p',{text:`Версия ${p.revision} · написан ${p.createdDate} · обновлён ${p.updatedDate}`}),el(d,'p',{text:`Баттл: ${p.battleName} · Раунд: ${p.battleId?p.round:'—'} · Оппонент: ${p.battleId?p.opponent:'—'}`}));
    if(p.adaptation)meta.append(el(d,'p',{text:'Бит: '+p.adaptation.beatName+' · '+p.adaptation.bpm+' BPM'}));sheet.append(meta);
    let number=1;
-   for(const section of p.sections){const part=el(d,'section',{className:'rn-section'});part.append(el(d,'h2',{text:section.title}));
-    for(const line of section.lines){const row=el(d,'div',{className:'rn-line'}),words=el(d,'span',{className:'rn-words'});row.append(el(d,'span',{className:'rn-line-number',text:String(number++),attributes:{'aria-hidden':'true'}}));for(const w of line.words)words.append(el(d,'span',{className:'rn-word'+(w.error?' rn-error':''),text:w.text+' ',attributes:w.error?{title:'Неточное слово: персонаж ещё учится писать'}:{}}));row.append(words);part.append(row);}sheet.append(part);
+   for(const section of p.sections){const part=el(d,'section',{className:'rn-section'});if(section.title)part.append(el(d,'h2',{text:section.title}));
+    for(const line of section.lines){
+     const row=el(d,'div',{className:'rn-line'+(line.gapBefore?' rn-line-gap':''),dataset:{unfinished:String(line.unfinished)}}),lineBody=el(d,'div',{className:'rn-line-body',dataset:{indent:String(line.indent)}}),words=el(d,'span',{className:'rn-words'});
+     row.append(el(d,'span',{className:'rn-line-number',text:String(number++),attributes:{'aria-hidden':'true'}}));
+     for(const w of line.words)words.append(el(d,'span',{className:'rn-word'+(w.error?' rn-error':''),text:w.text+' ',attributes:w.error?{title:'Неточное слово: персонаж ещё учится писать'}:{}}));
+     lineBody.append(words);if(line.note)lineBody.append(el(d,'span',{className:'rn-note',text:'// '+line.note}));row.append(lineBody);part.append(row);
+    }sheet.append(part);
    }
    if(!p.sections.length)sheet.append(el(d,'p',{className:'rn-empty',text:'|  Здесь появятся первые строки…'}));
-   side.append(el(d,'small',{text:'РАБОТА С ТЕКСТОМ'}),el(d,'h2',{text:p.status==='ready'?'Текст готов':LYRIC_STAGES[p.stages.length].name}));
+   side.append(el(d,'small',{text:'РАБОТА С ТЕКСТОМ'}),el(d,'h2',{text:p.status==='ready'?'Основа текста готова':LYRIC_STAGES[p.stages.length].name}));
    for(let i=0;i<3;i++)side.append(el(d,'p',{className:i<p.stages.length?'rn-done':'',text:(i<p.stages.length?'✓ ':'○ ')+LYRIC_STAGES[i].name}));
    if(p.status!=='ready'&&!job&&skill>=25)for(const label of LYRIC_STAGES[p.stages.length].sliders){const field=el(d,'label',{text:label}),input=el(d,'input',{type:'range',value:5,attributes:{min:'0',max:'10',step:'1','aria-label':label}});controls.push(input);field.append(input);side.append(field);}
    if(job?.projectId===p.id)side.append(el(d,'p',{text:'Незавершённая работа сохранена: '+Math.floor(job.elapsed)+' / '+job.total+' мин.'}),button(d,'Продолжить работу',{},()=>start(job.kind,{beatId:job.beatId})));
    else if(p.status!=='ready')side.append(button(d,'Начать работу',{},()=>start()));
-   else side.append(el(d,'p',{text:'Теперь можно добавить часть или подогнать строки под готовый бит. Запись вокала — следующий этап.'}));
+   else side.append(el(d,'p',{text:'Основная структура собрана. Остались шероховатости: добавь часть или адаптируй строки под бит. Запись вокала — следующий этап.'}));
   }else {sheet.append(el(d,'div',{className:'rn-welcome',text:'Рэпблокнот'}),el(d,'p',{className:'rn-empty',text:'Тема. Первая мысль. Первая строка. Создай текст для баттла или сохрани собственную идею.'}));side.append(el(d,'h2',{text:'Твой черновик'}),el(d,'p',{text:'Здесь герой пишет сам. Ты выбираешь направление работы; символы показывают ритм и стройность текста.'}));}
   side.append(el(d,'hr'),el(d,'p',{text:'Письмо '+skill.toFixed(2)+' / 100'}),el(d,'p',{text:'Сытость '+Math.round(s.music.needs.satiety)+' · энергия '+Math.round(s.music.needs.energy)}));
   body.append(sheet,side);wrap.append(toolbar,tab,body,el(d,'footer',{className:'rn-status',text:message||'UTF-8 · Символический текст · Сохраняется автоматически',attributes:{role:'status'}}));

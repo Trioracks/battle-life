@@ -7,7 +7,7 @@ import { Group, Mesh } from '../vendor/three/three.module.js';
 import {
   APPEARANCE_OPTIONS, DEFAULT_APPEARANCE, STAT_KEYS, STAT_LABELS, SAVE_KEY,
   normalizeAppearance, applyAppearance, createProfile, saveProfile, loadProfile,
-} from '../src/avatar-v3-profile.js?rev=26';
+} from '../src/avatar-v3-profile.js?rev=27';
 
 const allocations = {
   intelligence: 2, writing: 2, musicality: 1, flow: 1, beatmaking: 1,

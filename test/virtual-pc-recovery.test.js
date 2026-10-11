@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { pcDocument as creatorDocument, fire } from './helpers/virtual-pc-dom.js';
-import { mountVirtualPc } from '../src/virtual-pc-ui.js?rev=26';
-import { createVirtualPcState } from '../src/virtual-pc-state.js?rev=26';
-import { createStudioProject } from '../src/ft-studio-project.js?rev=26';
-import { BATTLE_BRIEFS } from '../src/virtual-pc-catalog.js?rev=26';
+import { mountVirtualPc } from '../src/virtual-pc-ui.js?rev=27';
+import { createVirtualPcState } from '../src/virtual-pc-state.js?rev=27';
+import { createStudioProject } from '../src/ft-studio-project.js?rev=27';
+import { BATTLE_BRIEFS } from '../src/virtual-pc-catalog.js?rev=27';
 
 const nodes = root => root.children.flatMap(child => [child, ...nodes(child)]);
 const find = (root, label) => nodes(root).find(node => node.getAttribute?.('aria-label') === label || node.textContent === label);

@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { DEFAULT_APPEARANCE, STAT_KEYS } from '../src/avatar-v3-profile.js?rev=26';
-import { loadHomeTime } from '../src/apartment-v3-time.js?rev=26';
-import { loadVirtualPcState, saveVirtualPcState, createVirtualPcState, setPcPower, startFtDownload } from '../src/virtual-pc-state.js?rev=26';
-import { advanceVirtualPc } from '../src/virtual-pc-runtime.js?rev=26';
+import { DEFAULT_APPEARANCE, STAT_KEYS } from '../src/avatar-v3-profile.js?rev=27';
+import { loadHomeTime } from '../src/apartment-v3-time.js?rev=27';
+import { loadVirtualPcState, saveVirtualPcState, createVirtualPcState, setPcPower, startFtDownload } from '../src/virtual-pc-state.js?rev=27';
+import { advanceVirtualPc } from '../src/virtual-pc-runtime.js?rev=27';
 
 const draft = { name: 'Новый герой', appearance: DEFAULT_APPEARANCE, allocations: Object.fromEntries(STAT_KEYS.map((key, i) => [key, i === 0 ? 2 : 1])) };
 function storage() {
@@ -11,7 +11,7 @@ function storage() {
   return { getItem(key) { return values.get(key) ?? null; }, setItem(key, value) { values.set(key, value); } };
 }
 async function factory() {
-  const module = await import('../src/apartment-v3-new-game.js?rev=26').catch(() => ({}));
+  const module = await import('../src/apartment-v3-new-game.js?rev=27').catch(() => ({}));
   assert.equal(typeof module.createNewGameSession, 'function', 'confirmed new game must own all home state resets');
   return module.createNewGameSession;
 }

@@ -6,6 +6,16 @@ test('canvas texture follows glTF UV orientation, never upside-down',()=>{
  const previous=globalThis.document;globalThis.document={createElement:()=>({width:0,height:0,getContext:()=>null})};
  try{const screen=new THREE.Mesh(new THREE.PlaneGeometry(.4,.3),new THREE.MeshBasicMaterial()),indicator=screen.clone();const v=createComputerView({THREE,screen,indicator,viewport:{width:1280,height:720}});assert.equal(screen.material.map.flipY,false);v.dispose();}finally{if(previous===undefined)delete globalThis.document;else globalThis.document=previous;}
 });
+test('monitor transition begins with the room perspective lens so narrow views do not jump',()=>{
+ for(const [width,height,fov] of [[1280,900,45],[640,900,76]]){
+  const screen=new THREE.Mesh(new THREE.PlaneGeometry(.465,.315),new THREE.MeshBasicMaterial()),indicator=screen.clone();screen.position.set(4,1.2,-.6);screen.updateMatrixWorld();
+  const source=new THREE.PerspectiveCamera(fov,width/height,.03,200);source.position.set(3.4,2.05,5);source.lookAt(3.4,1.35,0);source.updateMatrixWorld();
+  const view=createComputerView({THREE,screen,indicator,viewport:{width,height}});view.begin(source);
+  const corner=new THREE.Vector3(4.2,1.35,-.6);
+  const before=corner.clone().project(source),after=corner.clone().project(view.camera);
+  assert.ok(Math.hypot(before.x-after.x,before.y-after.y)<1e-10,'monitor entry preserves the visible room framing');view.dispose();
+ }
+});
 test('camera fits live transformed glass in landscape and portrait without mutating source',()=>{
  assert.equal(typeof createComputerView,'function');
  for(const size of [[1280,720],[640,900]])for(const ortho of [false,true]){

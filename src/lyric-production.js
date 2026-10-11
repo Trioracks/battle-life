@@ -1,9 +1,9 @@
 // Persisted, symbolic writing: no copyrighted lyrics or generated prose.
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=26';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=27';
 import {BEAT_RULES} from './beat-catalog.js';
-import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=26';
-import {softwareDiskBytes} from './pc-software.js?rev=26';
-import {homeDateLabel} from './home-calendar.js?rev=26';
+import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=27';
+import {softwareDiskBytes} from './pc-software.js?rev=27';
+import {homeDateLabel} from './home-calendar.js?rev=27';
 
 export const LYRIC_STAGES=Object.freeze([
  {name:'Общее создание',sliders:['Ясность мысли','Развитие темы','Личное отношение'],target:[8,7,6]},
@@ -15,13 +15,13 @@ const clamp=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,number(v)));
 const text=(v,n=100)=>typeof v==='string'?v.trim().slice(0,n):'';
 const values=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite)?v.map(x=>Math.round(clamp(x,0,10))):null;
 const kinds=new Set(['stage','diss','story','chorus','adapt']);
-const sectionTypes=new Set(['intro','verse','bridge','chorus','outro','diss','story']);
-const titles={intro:'Интро',verse:'Куплет',bridge:'Бридж',chorus:'Припев',outro:'Аутро',diss:'Диссовая часть',story:'Сюжетный куплет'};
+const sectionTypes=new Set(['draft','intro','verse','bridge','chorus','outro','diss','story']);
+const titles={draft:'',intro:'Интро',verse:'Куплет',bridge:'Бридж',chorus:'Припев',outro:'Аутро',diss:'Диссовая часть',story:'Сюжетный куплет'};
 const validDay=v=>Number.isSafeInteger(v)&&v>0&&v<100000?v:1;
 const outcome=(state,ok=true,reason='')=>({state,ok,reason});
 function generator(seed){let x=seed>>>0;return()=>{x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296;};}
 function normalizeSections(list){
- return (Array.isArray(list)?list:[]).slice(0,16).filter(s=>sectionTypes.has(s?.type)).map(s=>({type:s.type,title:text(s.title,64)||titles[s.type],lines:(Array.isArray(s.lines)?s.lines:[]).slice(0,32).map(l=>({words:(Array.isArray(l?.words)?l.words:[]).slice(0,24).filter(w=>text(w?.text,32)).map(w=>({text:text(w.text,32),error:w.error===true}))})).filter(l=>l.words.length)}));
+ return (Array.isArray(list)?list:[]).slice(0,16).filter(s=>sectionTypes.has(s?.type)).map(s=>({type:s.type,title:s.type==='draft'?'':text(s.title,64)||titles[s.type],lines:(Array.isArray(s.lines)?s.lines:[]).slice(0,32).map(l=>({words:(Array.isArray(l?.words)?l.words:[]).slice(0,24).filter(w=>text(w?.text,32)).map(w=>({text:text(w.text,32),error:w.error===true})),note:text(l?.note,96),unfinished:l?.unfinished===true,indent:Math.round(clamp(l?.indent,0,3)),gapBefore:l?.gapBefore===true})).filter(l=>l.words.length)}));
 }
 export function normalizeLyric(p){
  if(p?.schemaVersion!==1||p.kind!=='lyrics'||!text(p.id)||!text(p.name,64))return null;
@@ -63,24 +63,36 @@ export function startLyricWork(input,{projectId,kind='stage',sliders,beatId,game
  s.writing.job={projectId,kind,stage:p.stages.length,baseRevision:p.revision,sliders:v,total:kind==='stage'?60:45,elapsed:0,skill,practiceCredit:0,gameDay:validDay(gameDay),beatId:kind==='adapt'?beat.id:null};s.writing.activeTextId=projectId;return outcome(s);
 }
 function makeSections(p){
- const baseLevel=p.stages.reduce((n,s)=>n+s.quality,0)/Math.max(1,p.stages.length),r=generator(p.seed+p.revision*101),adapted=p.adaptation?Math.min(12,p.adaptation.skill*.15):0,baseCraft=Math.min(100,baseLevel+adapted);
- let types=baseCraft<25?['verse']:baseCraft<55?['verse','chorus','verse']:['intro','verse','bridge','chorus','verse','bridge','chorus','outro'];
+ const phase=p.stages.length,baseLevel=p.stages.reduce((n,s)=>n+s.quality,0)/Math.max(1,phase),adapted=p.adaptation?Math.min(12,p.adaptation.skill*.15):0,baseCraft=Math.min(100,baseLevel+adapted);
+ let types=phase===1?['draft']:baseCraft<25?['verse']:baseCraft<55||phase===2?['verse','chorus','verse']:['intro','verse','bridge','chorus','verse','bridge','chorus','outro'];
  if(p.battleId==='open-mic-17')types=types.filter(t=>t!=='chorus');
- if(p.battleId==='yard-cipher')types=['verse'];
+ if(p.battleId==='yard-cipher')types=[phase===1?'draft':'verse'];
  const baseSections=types.length;types.push(...p.additions.map(a=>a.kind));
- const glyphs=['˜','°','*','”','·','˘','¦','∴'];
+ const notes=['Придумать потом рифму','Тут надо придумать панч','Нужно сравнение…','Поправить, чтобы легло в бит','Поменять размерность','Закончить эту мысль','Найти другое слово'];
+ const topic=p.name+' '+p.battleName,motif=/ден(?:ьг|ег)|бабк|кэш|богат|cash|money|доллар/i.test(topic)?'$$$':/спальн|район|сон|ноч|двор/i.test(topic)?'Zzz…':null;
+ let lineIndex=0;
  return types.map((type,section)=>{
   const level=section>=baseSections?p.additions[section-baseSections].skill:baseLevel,craft=Math.min(100,level+adapted);
-  const count=p.battleId==='yard-cipher'?8:craft<25?3+Math.floor(r()*5):type==='verse'||type==='diss'||type==='story'?8:type==='chorus'?4:2;
+  const count=p.battleId==='yard-cipher'?8:type==='draft'||type==='verse'&&craft<25?12:['verse','diss','story'].includes(type)?8:type==='chorus'?4:2;
   const lines=Array.from({length:count},(_,line)=>{
-   const wordCount=craft<25?(p.adaptation?5+Math.floor(r()*4):3+Math.floor(r()*7)):craft<55?5+Math.floor(r()*3):7+(line%2);
+   const index=lineIndex++,r=generator(p.seed+Math.imul(index+1,2654435761)),rawCount=3+Math.floor(r()*8),target=7+index%2;
+   // Rework the same seeded words, not an unrelated document on every pass.
+   const regularity=p.adaptation ? .8+Math.min(.18,p.adaptation.skill*.0018) : phase===1 ? .03 : phase===2 ? .35+craft*.001 : .65+craft*.001;
+   const wordCount=Math.round(rawCount+(target-rawCount)*regularity);
+   const rank=(index*7+p.seed%10)%10,budget=p.adaptation?Math.max(0,2-Math.floor(p.adaptation.skill/40)):phase===1?8:phase===2?5:3;
+   const note=index<12&&rank<budget?notes[(index+Math.floor(p.seed/10))%notes.length]:'';
+   const unfinished=Boolean(note)&&index%2===0;
    const words=Array.from({length:wordCount},(_,word)=>{
-    const length=craft<25?(p.adaptation?3+Math.floor(r()*4):2+Math.floor(r()*7)):3+(word+line%2)%3;
-    const symbols=Array.from({length},()=>glyphs[Math.floor(r()*glyphs.length)]).join('');
-    const error=level<85&&r()<(1-level/85)*(.25-p.stages.length*.035);
+    const wr=generator(p.seed+Math.imul(index+1,7919)+Math.imul(word+1,104729)),length=2+Math.floor(wr()*6);
+    const symbols=Array.from({length},(_,i)=>i%2===0?'∎':'□').join('');
+    const error=level<85&&(wr()<(1-level/85)*(.25-phase*.035)||level<25&&index===0&&word===1);
     return {text:symbols,error};
-   });return {words};
-  });return {type,title:titles[type]+(['verse','bridge'].includes(type)?' '+(types.slice(0,section+1).filter(t=>t===type).length):''),lines};
+   });
+   if(motif&&index%6===0)words[Math.min(2,words.length-1)]={text:motif,error:false};
+   const punctuation=unfinished?'…':['.',',','!?',':','!','###','****'][Math.floor(r()*7)];
+   if(words.at(-1).text!==motif)words.at(-1).text+=punctuation;
+   return {words,note,unfinished,indent:phase===1?Math.floor(r()*4):phase===2&&index%4===1?1:0,gapBefore:phase===1?r()>.55:line>0&&line%4===0};
+  });return {type,title:type==='draft'?'':titles[type]+(['verse','bridge'].includes(type)?' '+(types.slice(0,section+1).filter(t=>t===type).length):''),lines};
  });
 }
 export function advanceLyricWork(input,requested,clock=null){

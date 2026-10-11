@@ -57,7 +57,7 @@ try{
  await ft.getByRole('button',{name:'Play',exact:true}).click();await page.waitForFunction(()=>window.decodePending);await ft.getByRole('button',{name:'Закрыть окно',exact:true}).click();
  await page.evaluate(()=>releaseDecode());await page.waitForTimeout(100);assert.equal(await page.evaluate(()=>qaAudio.sources.length),0);assert.equal(await page.evaluate(()=>qaAudio.getSnapshot().status),'stopped');
  const failures=await page.evaluate(async()=>{
-  const {BeatAudio}=await import('/src/beat-audio.js?rev=26'),project=pc.state.projects.find(p=>p.id==='saved'),before=JSON.stringify(project);
+  const {BeatAudio}=await import('/src/beat-audio.js?rev=27'),project=pc.state.projects.find(p=>p.id==='saved'),before=JSON.stringify(project);
   const denied=new BeatAudio({contextFactory:()=>({state:'suspended',resume:async()=>{},close(){}})});
   const deniedOK=await denied.playProject(project);denied.dispose();
   const missing=new BeatAudio({fetchFn:async()=>({ok:false})});const missingOK=await missing.playProject(project);const result={deniedOK,missingOK,unchanged:JSON.stringify(project)===before,sources:missing.sources.length};missing.dispose();return result;

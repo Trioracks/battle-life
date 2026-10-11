@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=26';
-import {createBeat,startBeatStage,advanceBeatWork,normalizeBeat} from '../src/beat-production.js?rev=26';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=27';
+import {createBeat,startBeatStage,advanceBeatWork,normalizeBeat} from '../src/beat-production.js?rev=27';
 const seed=()=>createVirtualPcState({power:'on',download:{status:'installed'}});
 const make=(skill=25,random=()=>0)=>createBeat(seed(),{id:'a',name:'Первый'},{beatmaking:skill},random);
 

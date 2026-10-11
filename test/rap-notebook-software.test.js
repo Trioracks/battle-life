@@ -4,6 +4,10 @@ import {createVirtualPcState,diskUsage} from '../src/virtual-pc-state.js';
 import * as software from '../src/pc-software.js';
 import {advanceVirtualPc} from '../src/virtual-pc-runtime.js';
 import {explorerEntries,explorerPaths} from '../src/virtual-pc-explorer.js';
+import {desktopApps} from '../src/virtual-pc-catalog.js';
+import {createPcIcon} from '../src/virtual-pc-icons.js';
+import {pcDocument} from './helpers/virtual-pc-dom.js';
+import {access} from 'node:fs/promises';
 
 test('notebook downloads without torrent and installs over ten active seconds with disk accounting',()=>{
  let s=createVirtualPcState({power:'on'});assert.equal(s.software.notebook?.installed,false);
@@ -31,4 +35,12 @@ test('cancelled notebook download and interrupted installation do not install or
  for(let i=0;i<3;i++)s=software.advanceInstaller(s).state;
  s=software.advanceInstallation(s,4).state;s=software.cancelInstaller(s).state;
  assert.equal(s.software.notebook.installed,false);assert.equal(diskUsage(s).installedMb,0);
+});
+
+test('installed rap notebook uses its own notepad icon instead of a documents folder',async()=>{
+ const app=desktopApps(createVirtualPcState({software:{notebook:{installed:true}}})).find(a=>a.id==='rap-notebook');
+ assert.equal(app.iconId,'notebook');
+ const icon=createPcIcon(pcDocument(),app.iconId);
+ assert.equal(icon.getAttribute('src'),'./assets/ui/virtual-pc/icons/notebook.svg');
+ await access(new URL('../assets/ui/virtual-pc/icons/notebook.svg',import.meta.url));
 });

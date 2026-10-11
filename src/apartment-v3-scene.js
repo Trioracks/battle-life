@@ -1,19 +1,19 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {ApartmentAnimation} from './apartment-v3-animation.js?rev=26';
-import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=26';
-import {homeLight} from './apartment-v3-time.js?rev=26';
-import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=26';
+import {ApartmentAnimation} from './apartment-v3-animation.js?rev=27';
+import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=27';
+import {homeLight} from './apartment-v3-time.js?rev=27';
+import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=27';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=7';
-import {CameraModes,cameraPose,pickVisible,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=26';
+import {CameraModes,cameraPose,pickVisible,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=27';
 import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=21';
 import {createSmoke} from './apartment-v3-smoke.js?rev=21';
 import {createRetroPass} from './apartment-v3-retro.js?rev=11';
-import {createComputerView} from './apartment-v3-computer.js?rev=21';
-import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=26';
+import {createComputerView} from './apartment-v3-computer.js?rev=27';
+import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=27';
 import {pcPresentation} from './virtual-pc-presentation.js?rev=21';
-import {createWardrobeFurniture} from './home-wardrobe.js?rev=26';
-import {applySwitchStyle} from './apartment-switch-style.js?rev=26';
+import {createWardrobeFurniture} from './home-wardrobe.js?rev=27';
+import {applySwitchStyle} from './apartment-switch-style.js?rev=27';
 
 export async function createApartmentScene(canvas,config){
   const BASE=config.assetBase??'./assets/apartment/v3/';
@@ -24,7 +24,7 @@ export async function createApartmentScene(canvas,config){
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   const scene=new THREE.Scene();scene.background=new THREE.Color('#141c20');
   const far=config.exterior?.farPlane??80;
-  const camera=new THREE.OrthographicCamera(-5,5,2.7,-2.7,.1,far);
+  const camera=new THREE.PerspectiveCamera(45,1,.03,far);
   const modes=new CameraModes(),firstCamera=new THREE.PerspectiveCamera(60,1,.03,far);
   let disposed=false;
   const basePosition=new THREE.Vector3(...config.camera.position),baseTarget=new THREE.Vector3(...config.camera.target);
@@ -86,7 +86,7 @@ export async function createApartmentScene(canvas,config){
     const fp=modes.mode==='3D',pose=cameraPose(modes.mode,state,eyeHeight,modes);
     if(fp){firstCamera.position.fromArray(pose.position);firstCamera.rotation.set(pose.pitch,pose.yaw,0,'YXZ');firstCamera.updateMatrixWorld();}
     else{
-      camera.position.fromArray(pose.position);camera.lookAt(new THREE.Vector3(...pose.target));camera.updateMatrixWorld();
+      camera.fov=pose.fov;camera.updateProjectionMatrix();camera.position.fromArray(pose.position);camera.lookAt(new THREE.Vector3(...pose.target));camera.updateMatrixWorld();
     }
     applySceneVisibility({mode:modes.mode,computerActive});
     actor.visible=!fp&&pcActorVisible(state,computerActive,computerSnapshot.workActor);shadowFloor.visible=actor.visible;shadow.visible=actor.visible&&shadow.visible;bones.visible=actor.visible&&bones.visible;
@@ -159,8 +159,8 @@ export async function createApartmentScene(canvas,config){
     if(blocker&&blocker.point.y<.12&&normal?.y>.7)return {x:blocker.point.x};
     if(ray.ray.intersectPlane(floor,point)&&ray.ray.origin.distanceTo(point)<=distance+.025)return {x:point.x};return {};
   }
-  function resize(){const r=canvas.getBoundingClientRect(),aspect=r.width/r.height,h=Math.max(4.1,5.6/aspect);
-    camera.left=-h*aspect/2;camera.right=h*aspect/2;camera.top=h/2;camera.bottom=-h/2;camera.updateProjectionMatrix();firstCamera.aspect=aspect;firstCamera.updateProjectionMatrix();computer?.resize(r.width,r.height);transitionFrame.setSize(Math.max(1,r.width),Math.max(1,r.height));retro.resize(r.width,r.height);}
+  function resize(){const r=canvas.getBoundingClientRect(),aspect=r.width/r.height;
+    camera.aspect=aspect;camera.updateProjectionMatrix();firstCamera.aspect=aspect;firstCamera.updateProjectionMatrix();computer?.resize(r.width,r.height);transitionFrame.setSize(Math.max(1,r.width),Math.max(1,r.height));retro.resize(r.width,r.height);}
   const observer=new ResizeObserver(resize);observer.observe(canvas);resize();
   let fridgeOpen=0,light=homeLight(1410),roomLights={living:true,kitchen:true},lightLevels={living:1,kitchen:1};
   function setRoomLights(lights){roomLights={living:lights.living!==false,kitchen:lights.kitchen!==false};}

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import * as time from '../src/apartment-v3-time.js?rev=26';
+import * as time from '../src/apartment-v3-time.js?rev=27';
 const {ApartmentTime,homeLight,loadHomeTime,saveHomeTime}=time;
 
 test('completing a bed action clears initial rest without instantly advancing seven hours',()=>{

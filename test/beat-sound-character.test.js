@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=26';
-import {createBeat,startBeatStage,advanceBeatWork} from '../src/beat-production.js?rev=26';
-import {resolveBeatPlayback} from '../src/beat-playback.js?rev=26';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=27';
+import {createBeat,startBeatStage,advanceBeatWork} from '../src/beat-production.js?rev=27';
+import {resolveBeatPlayback} from '../src/beat-playback.js?rev=27';
 const create=(sound=10)=>createBeat(createVirtualPcState(),{id:'sound-test',name:'Звучание'},{beatmaking:10,sound},()=>.1).state;
-const mixModule=await import('../src/beat-mix.js?rev=26');
+const mixModule=await import('../src/beat-mix.js?rev=27');
 
 test('a new beat saves its sound skill; training and reload never rewrite that snapshot',()=>{
  let state=create(12);

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {pcDocument,allPc,findButton,fire} from './helpers/virtual-pc-dom.js';
 import {createVirtualPcState,applyToBattle} from '../src/virtual-pc-state.js';
-import {createLyric,advanceLyricWork} from '../src/lyric-production.js';
+import {createLyric,startLyricWork,advanceLyricWork} from '../src/lyric-production.js';
 import * as view from '../src/rap-notebook-view.js';
 import {pcFocusable} from '../src/virtual-pc-dom.js';
 function fixture(seed){const d=pcDocument(),root=d.createElement('main');let s=createVirtualPcState(seed),works=0;const mounted=view.mountRapNotebook(root,{getState:()=>s,getMetadata:()=>({gameDay:1,skills:{writing:10}}),onChange:n=>s=createVirtualPcState(n),onWork:()=>{works++;return true;}});return {root,mounted,get state(){return s;},set state(n){s=n;},get works(){return works;}};}
@@ -38,4 +38,13 @@ test('text dialogs focus and trap controls, keep background inert, and restore f
  fire(cover,'keydown',{key:'Escape'});assert.ok(!allPc(f.root).some(n=>n.className==='rn-cover'));
  assert.equal(d.activeElement,findButton(f.root,'Новый текст'));assert.equal(f.works,0);
  assert.ok(pcFocusable(f.root).includes(findButton(f.root,'Начать работу')));
+});
+
+test('raw draft renders margin notes but never labels itself a completed verse',()=>{
+ let s=createLyric(createVirtualPcState({music:{needs:{satiety:100,energy:100}}}),{id:'raw',name:'Спальный район'},{writing:10},()=>.37).state;
+ s=startLyricWork(s,{projectId:'raw'},{writing:10},()=>.5).state;s=advanceLyricWork(s,1000).state;
+ const f=fixture(s),nodes=allPc(f.root);
+ assert.ok(nodes.some(n=>n.className==='rn-note'&&/рифму|панч|сравнение|бит|размерность/.test(n.textContent)));
+ assert.ok(!nodes.some(n=>n.tagName==='H2'&&/Куплет|Припев/.test(n.textContent)));
+ assert.ok(nodes.some(n=>n.className==='rn-line-body'),'line text and notes share a column outside the gutter');
 });

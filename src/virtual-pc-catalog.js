@@ -1,12 +1,12 @@
-import {COMMUNITY_BOARDS,COMMUNITY_TOPICS,communityDay} from './underweb-community.js?rev=26';
-import {newsIssue,archiveForDay} from './underweb-news.js?rev=26';
+import {COMMUNITY_BOARDS,COMMUNITY_TOPICS,communityDay} from './underweb-community.js?rev=27';
+import {newsIssue,archiveForDay} from './underweb-news.js?rev=27';
 const apps = Object.freeze([
   { id: 'computer', label: 'Мой компьютер', iconId: 'computer', description: 'Диск C: и Мои проекты' },
   { id: 'underweb', label: 'Underweb', iconId: 'underweb', description: 'Локальная сеть баттлов' },
   { id: 'torent', label: 'torent', iconId: 'torent', description: 'Каталог игровых загрузок' },
   { id: 'ft-studio', label: 'FT Studio', iconId: 'studio', description: 'Музыкальная станция' },
   { id: 'ripline', label: 'RIPLINE', iconId: 'torent', description: 'Игровое извлечение лупов из роликов' },
-  { id: 'rap-notebook', label: 'Рэпблокнот', iconId: 'documents', description: 'Тексты, рифмы и черновики' },
+  { id: 'rap-notebook', label: 'Рэпблокнот', iconId: 'notebook', description: 'Тексты, рифмы и черновики' },
 ]);
 
 export const WALLPAPERS = Object.freeze([

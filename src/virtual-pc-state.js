@@ -1,9 +1,9 @@
-import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=26';
-import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=26';
-import {normalizeCommunity} from './underweb-community.js?rev=26';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=26';
-import {normalizeHousehold} from './home-food.js?rev=26';
-import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=26';
+import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=27';
+import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=27';
+import {normalizeCommunity} from './underweb-community.js?rev=27';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=27';
+import {normalizeHousehold} from './home-food.js?rev=27';
+import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=27';
 export const VIRTUAL_PC_STORAGE_KEY = 'battle-life-virtual-pc-v1';
 export const VIRTUAL_DISK_MB = 16000;
 export const SYSTEM_RESERVED_MB = 14000;

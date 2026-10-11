@@ -22,9 +22,12 @@ export class CameraPointer{
 export function cameraAllowsFirstPerson(state){return !['sleep','seated','eat'].includes(state.clip)&&!(/^(fade|black|return-out|return-in|transfer|entry-)/.test(state.phase??''));}
 export function cameraPose(mode,state,eyeHeight,look={yaw:0,pitch:0}){
  if(mode==='3D')return {position:[state.position[0],state.position[1]+eyeHeight,state.position[2]],yaw:look.yaw,pitch:look.pitch,fov:60,near:.03};
- const yaw=0,pitch=8,distance=12;
+ const yaw=0,pitch=12,distance=3.5;
  const centerX=state.cameraX-Math.tan(yaw*DEG)*(state.position?.[2]??.85);
- return {position:[centerX+Math.sin(yaw*DEG)*distance,1.35+12*Math.tan(pitch*DEG),Math.cos(yaw*DEG)*distance],target:[centerX,1.35,0],yaw,pitch};
+ // Keep room/hero coverage vertically fixed; narrow screens crop horizontally
+ // and follow the actor. The wall and floor cover the cutaway frame edges.
+ const height=3.58,targetY=.6,fov=2*Math.atan(height/(2*distance/Math.cos(pitch*DEG)))/DEG;
+ return {position:[centerX+Math.sin(yaw*DEG)*distance,targetY+distance*Math.tan(pitch*DEG),Math.cos(yaw*DEG)*distance],target:[centerX,targetY,0],yaw,pitch,fov,near:.03};
 }
 export function pickVisible(targets,blockers,floor){
  const wall=blockers[0]?.distance??Infinity,hit=targets[0];

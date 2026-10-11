@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createCharacterSpeech,workNeedSpeech} from '../src/character-speech.js?rev=26';
+import {createCharacterSpeech,workNeedSpeech} from '../src/character-speech.js?rev=27';
 test('work refusal chooses food first and uses the current work thresholds',()=>{
  assert.equal(workNeedSpeech({music:{needs:{satiety:20,energy:72}}}),'Не могу работать, хочу поесть.');
  assert.equal(workNeedSpeech({music:{needs:{satiety:68,energy:15}}}),'Не могу работать, хочу поспать.');

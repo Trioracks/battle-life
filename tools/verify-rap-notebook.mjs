@@ -3,7 +3,7 @@ import {createRequire} from 'node:module';
 import {mkdir,writeFile} from 'node:fs/promises';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'D:/Codex/Caches/npm/_npx/48b1ca104c3549f4/node_modules/playwright-core');
 const output=process.env.NOTEBOOK_QA_DIR||'D:/Codex/Builds/Battle/rap-notebook-20261010';await mkdir(output,{recursive:true});
-const rev=process.env.BATTLE_REV||'26',browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE||'D:/Codex/Caches/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-win64/chrome-headless-shell.exe'});
+const rev=process.env.BATTLE_REV||'27',browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE||'D:/Codex/Caches/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-win64/chrome-headless-shell.exe'});
 const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage();page.setDefaultTimeout(60000);const errors=[];
 page.on('pageerror',e=>errors.push(e.message));
 await context.addInitScript(()=>{const raw=sessionStorage.getItem('notebook-seed');if(raw){sessionStorage.removeItem('notebook-seed');for(const [k,v]of Object.entries(JSON.parse(raw)))localStorage.setItem(k,JSON.stringify(v));}window.typingSources=0;const original=AudioContext.prototype.createBufferSource;AudioContext.prototype.createBufferSource=function(...args){if(document.querySelector('#virtual-pc')?.dataset.pcTransition==='working')window.typingSources++;return original.apply(this,args);};});

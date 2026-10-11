@@ -9,7 +9,7 @@ async function fixture({legacy=false,denied=false}={}){
  const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage();page.setDefaultTimeout(60000);page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/__wardrobe-fixture',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><body>Isolated wardrobe fixture</body>'}));await page.goto('http://127.0.0.1:4173/__wardrobe-fixture');
  if(legacy)await page.evaluate(async()=>{
-  const [{STAT_KEYS,DEFAULT_APPEARANCE},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=26'),import('/src/virtual-pc-state.js?rev=26')]);
+  const [{STAT_KEYS,DEFAULT_APPEARANCE},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=27'),import('/src/virtual-pc-state.js?rev=27')]);
   localStorage.setItem('battle-life-apartment-v3',JSON.stringify({version:3,name:'Прежний герой',skills:Object.fromEntries(STAT_KEYS.map((k,i)=>[k,i===0?30:20])),appearance:{...DEFAULT_APPEARANCE,hair:'shaggy',beard:'broad',mustache:'chevron',top:'hoodie',topColor:'red'}}));
   const pc=createVirtualPcState({projects:[{id:'preserved',name:'Мой проект',sourceStems:['kick.wav','bass.wav'],chosenAudio:'bass.wav'}],music:{cash:987,practice:23,genrePractice:{boom_bap:8}},household:{fridge:{apple:0,pear:2,banana:3}},download:{status:'installed'},lastGameMinute:6480});delete pc.noviceSchema;
   localStorage.setItem('battle-life-virtual-pc-v1',JSON.stringify(pc));localStorage.setItem('battle-life-apartment-v3-time',JSON.stringify({day:5,minutes:720,initialRest:false}));

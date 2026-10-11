@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {ApartmentTime,saveHomeTime,loadHomeTime} from '../src/apartment-v3-time.js?rev=26';
+import {ApartmentTime,saveHomeTime,loadHomeTime} from '../src/apartment-v3-time.js?rev=27';
 import {ApartmentMotion} from '../src/apartment-v3-motion.js';
-import {advanceHomeFrame} from '../src/apartment-v3-runtime.js?rev=26';
+import {advanceHomeFrame} from '../src/apartment-v3-runtime.js?rev=27';
 import * as THREE from '../vendor/three/three.module.js';
 import {readGlb} from './helpers/glb-pose.js';
-const style=await import('../src/apartment-switch-style.js?rev=26').catch(()=>({}));
+const style=await import('../src/apartment-switch-style.js?rev=27').catch(()=>({}));
 
 function switchFixture(){
   const {json:g}=readGlb('interaction.glb'),scene=new THREE.Group(),original=new THREE.MeshStandardMaterial({color:0x202018,map:new THREE.Texture()});

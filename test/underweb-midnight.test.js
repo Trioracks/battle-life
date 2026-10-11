@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=26';
-import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=26';
+import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=27';
+import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=27';
 import {pcDocument,allPc,findButton,fire} from './helpers/virtual-pc-dom.js';
 function setup(){const d=pcDocument(),root=d.createElement('section'),pc=mountVirtualPc(root,{audio:{stop(){},dispose(){}}});pc.showDesktop(createVirtualPcState({power:'on'}));pc.syncHost({gameDay:1,playerName:'Original'});pc.open('underweb');return {d,root,pc,day:day=>pc.syncHost({gameDay:day,playerName:'Original'})};}
 const field=(s,label)=>allPc(s.root).find(n=>n.getAttribute?.('aria-label')===label);
