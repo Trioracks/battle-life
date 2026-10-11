@@ -15,30 +15,57 @@ function filter(a,rate,type,frequency,q=.707,gain=0){
 }
 export function transformVocalSamples(input,rate,profile){
  if(!profile||!input.length||!Number.isFinite(rate)||rate<1000)return new Float32Array(input.length);
- const quality=clampV(profile.quality,0,VOCAL_CEILING),damage=(1-quality/100)**2,clean=profile.kind==='clean',post=clampV(profile.postGain,0,4),severity=Math.max(.1,damage-(clean?.08:0)-post*.012);
- const out=new Float32Array(input.length),step=rate/6,edge=Math.max(1,rate*.003),seed=(profile.seed>>>0)||1;
+ // Quality already includes the clean-take and post-production bonuses. Do not
+ // subtract them a second time: starter gear must never recover the dry vocal.
+ const quality=clampV(profile.quality,0,VOCAL_CEILING),severity=clampV((48-quality)/40,0,1);
+ const out=new Float32Array(input.length),gates=new Float32Array(input.length),step=rate/3,edge=Math.max(1,rate*.005),seed=(profile.seed>>>0)||1;
+ const hash=(cell,salt)=>{
+  let x=(seed^Math.imul(cell+1,374761393)^Math.imul(salt,668265263))>>>0;
+  x=Math.imul(x^(x>>>13),1274126177);return ((x^(x>>>16))>>>0)/4294967296;
+ };
+ const cells=Array.from({length:Math.ceil(out.length/step)},(_,cell)=>{
+  // Stratified misses: every two bars contain real lost syllables, including
+  // unlucky/fortunate seeds. No random seed can accidentally yield a clean take.
+  const rank=(mod(cell*5+(seed%16)+Math.floor(cell/16)*3,16)+.5)/16;
+  const phrase=Math.floor(cell/2);
+  return {missing:rank<.04+.4*severity,
+   shift:(hash(phrase,1)-.5)*rate*(.08+.85*severity)+(hash(cell,2)-.5)*rate*.2*severity,
+   pitch:2**(((hash(phrase,3)-.5)*(100+1200*severity))/1200),
+   stutter:hash(cell,4)<.38*severity,grain:rate*(.018+.03*hash(cell,5)),
+   level:1-severity*(.25+.5*hash(phrase,6))};
+ });
  let random=seed;const noise=()=>{random=(Math.imul(random,1664525)+1013904223)>>>0;return random/2147483648-1;};
+ const hold=2+Math.round(severity*7),levels=9+Math.round(quality*.6),drive=7+14*severity;
+ let held=0;
  for(let i=0;i<out.length;i++){
-  const cell=Math.floor(i/step),local=i-cell*step,code=((Math.imul(cell+seed,1103515245)>>>0)%101)/100;
-  const pitch=2**(((code-.5)*190*severity)/1200),late=(code-.5)*step*.7*severity;
-  let offset=local*pitch-late,envelope=1;
-  if(code<severity*.2){const grain=step/4;offset=local%grain;envelope=Math.min(1,(local%grain)/edge,(grain-local%grain)/edge);}
-  if(code>1-severity*.12)envelope=.12;
-  const wet=sample(input,cell*step+offset)*Math.max(0,envelope),v=sample(input,i)*(1-severity*.85)+wet*severity*.85;
-  const levels=24+(1-damage)*190,quantized=Math.round(v*levels)/levels;
-  // Noise is modest and source-gated: silence stays almost silent, not an endless blast.
-  out[i]=v*(1-damage*.65)+quantized*damage*.65+noise()*(.002+.004*damage)*Math.min(1,Math.abs(v)*25);
+  const cell=Math.floor(i/step),local=i-cell*step,c=cells[cell];
+  const fade=clampV(Math.min(local/edge,(step-local)/edge),0,1);
+  gates[i]=c.missing?0:fade;
+  if(c.missing){held=0;continue;}
+  const offset=c.stutter?local%c.grain:local;
+  const grainFade=c.stutter?clampV(Math.min(offset/edge,(c.grain-offset)/edge),0,1):1;
+  const flutter=Math.sin(i/rate*2*Math.PI*13+seed%19);
+  const cursor=cell*step+c.shift+step/2+(offset-step/2)*c.pitch;
+  // Fully wet: no undamaged source in parallel with the misplaced syllables.
+  const wet=sample(input,cursor)*c.level*grainFade*(1-severity*.35*(.5+.5*flutter));
+  if(i%hold===0)held=Math.tanh(wet*drive);
+  const quantized=Math.round(held*levels)/levels;
+  out[i]=(held*.2+quantized*.8+noise()*(.012+.026*severity)*Math.min(1,Math.abs(wet)*12))*fade;
  }
- filter(out,rate,'highpass',650+900*damage);
- filter(out,rate,'peaking',1250, .7,-12-6*damage);
- filter(out,rate,'peaking',4300,.8,4+3*damage);
- filter(out,rate,'lowpass',8500);
- // Limited auto-level after the severe EQ. Never normalise noise to full scale.
- let power=0;for(const x of out)power+=x*x;
- const gain=Math.min(5,.065/Math.max(.008,Math.sqrt(power/out.length))),drive=1.5+damage*2;
+ // Thin, overloaded desk-mic capture: no chest/body, recessed intelligibility,
+ // gritty upper band. This hardware colouring remains even at the skill ceiling.
+ filter(out,rate,'highpass',1300+800*severity);
+ filter(out,rate,'peaking',1800,.7,-22);
+ filter(out,rate,'peaking',4200,1,8);
+ filter(out,rate,'lowpass',6500);
+ let power=0,peak=0;
+ for(let i=0;i<out.length;i++){out[i]*=gates[i];power+=out[i]*out[i];peak=Math.max(peak,Math.abs(out[i]));}
+ // Downward-only levelling. The previous upward makeup gain exposed the vocal
+ // over weak beats; quiet takes and gaps now stay quiet, rather than being rescued.
+ const target=.018+.025*quality/VOCAL_CEILING,gain=Math.min(1,target/Math.max(1e-9,Math.sqrt(power/out.length)),.22/Math.max(1e-9,peak));
  for(let i=0;i<out.length;i++){
   const seam=Math.max(0,Math.min(1,i/(rate*.003),(out.length-1-i)/(rate*.012)));
-  out[i]=seam===0?0:Math.max(-.9,Math.min(.9,Math.tanh(out[i]*gain*drive)/Math.sqrt(drive)))*seam;
+  out[i]=seam===0?0:out[i]*gain*seam;
  }
  return out;
 }

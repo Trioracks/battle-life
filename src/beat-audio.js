@@ -4,7 +4,7 @@ import {resolveBeatPlayback} from './beat-playback.js?rev=28';
 import {connectBeatMix} from './beat-mix.js?rev=28';
 import {transformBeatBuffer,connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=28';
 import {vocalById} from './vocal-catalog.js?rev=28';
-import {transformVocalBuffer} from './vocal-result-dsp.js?rev=28';
+import {transformVocalBuffer} from './vocal-result-dsp.js?rev=29';
 
 // Authored placeholder PCM, not a remix of third-party music. Sliders never enter here.
 export function primitiveSamples(kind,rate=44100){
