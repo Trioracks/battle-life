@@ -1,8 +1,8 @@
 // Shared real-time work integration for the apartment camera.
-import {advanceBeatWork,effectiveBeatSkill} from './beat-production.js?rev=28';
-import {advanceLyricWork,effectiveWritingSkill} from './lyric-production.js?rev=28';
-import {BEAT_RULES} from './beat-catalog.js';
-import {advanceVocalWork,effectiveVocalSkill} from './vocal-production.js?rev=28';
+import {advanceBeatWork,effectiveBeatSkill} from './beat-production.js?rev=31';
+import {advanceLyricWork,effectiveWritingSkill} from './lyric-production.js?rev=31';
+import {BEAT_RULES} from './beat-catalog.js?rev=31';
+import {advanceVocalWork,effectiveVocalSkill} from './vocal-production.js?rev=31';
 export function creativeWorkDescriptor(state,skills={}){
  const writing=Boolean(state.writing?.job),recording=!writing&&Boolean(state.recording?.job),job=writing?state.writing.job:recording?state.recording.job:state.music?.job;
  const id=writing?job?.projectId:job?.beatId,project=state.projects.find(p=>p.id===id);

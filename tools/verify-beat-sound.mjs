@@ -34,7 +34,7 @@ try{
  assert.ok(measured.crushed.rms>.01,'digital effect does not silence the signal');
  console.log('PASS real OfflineAudioContext spectrum / clean bypass / bounded output',JSON.stringify(measured));
  const playback=await page.evaluate(async()=>{
-  const [{BeatAudio},{createBeat},{createVirtualPcState}]=await Promise.all([import('/src/beat-audio.js?rev=28'),import('/src/beat-production.js?rev=28'),import('/src/virtual-pc-state.js?rev=28')]);
+  const [{BeatAudio},{createBeat},{createVirtualPcState}]=await Promise.all([import('/src/beat-audio.js?rev=31'),import('/src/beat-production.js?rev=31'),import('/src/virtual-pc-state.js?rev=31')]);
   const beat=createBeat(createVirtualPcState(),{id:'proof',name:'Проверка'},{sound:10},()=>.2).state.projects[0];beat.stages=[{sliders:[5,5,5],fit:0,quality:10}];
   const audio=new BeatAudio();const ok=await audio.playProject(beat);const initial=audio.effects;
   const connected=audio.sources.length===1&&initial?.input!==audio.context.destination;
@@ -48,7 +48,7 @@ try{
  console.log('PASS real player graph / pause-resume / fading cleanup',JSON.stringify(playback));
  // One identical original beat through different saved mixes, not different compositions.
  const renders=await page.evaluate(async()=>{
-  const [{connectBeatMix},{beginnerById}]=await Promise.all([import('/src/beat-mix.js?rev=28'),import('/src/beat-beginner-bank.js?rev=28')]);
+  const [{connectBeatMix},{beginnerById}]=await Promise.all([import('/src/beat-mix.js?rev=28'),import('/src/beat-beginner-bank.js?rev=31')]);
   const rate=44100,length=Math.round(32/3*rate),parts=['beginner-drums-04','beginner-theme-06','beginner-arrangement-02'];
   const decoder=new OfflineAudioContext(1,length,rate),buffers=await Promise.all(parts.map(async id=>decoder.decodeAudioData(await (await fetch(beginnerById(id).path)).arrayBuffer())));
   const result={};

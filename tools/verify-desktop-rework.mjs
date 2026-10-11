@@ -16,7 +16,7 @@ const saved=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('battle-life-v
 try{
  await page.goto(url,{waitUntil:'networkidle'});await page.locator('#new-game').click();await page.locator('#character-name').fill('Голос района');await page.locator('#clothing-tab').click();await page.locator('#start-game').click();await page.locator('#wake').click();
  await page.evaluate(async()=>{
-  const {createVirtualPcState}=await import('./src/virtual-pc-state.js?rev=19');const {createStudioProject}=await import('./src/ft-studio-project.js');
+  const {createVirtualPcState}=await import('./src/virtual-pc-state.js?rev=31');const {createStudioProject}=await import('./src/ft-studio-project.js');
   const draft=createStudioProject({id:'preserved-draft',name:'Старый черновик',battleId:'concrete-echo'}).project;
   localStorage.setItem('battle-life-virtual-pc-v1',JSON.stringify(createVirtualPcState({power:'off',download:{status:'ready-to-install'},draft,projects:[{...draft,id:'saved-project',name:'Архивный проект'}]})));
  });

@@ -8,7 +8,7 @@ import {createLyric,startLyricWork} from '../src/lyric-production.js';
 test('writing HUD shows writing practice and keyboard rather than fictitious beat genre',()=>{
  const panel=createBeatWorkPanel(pcDocument());panel.update({beat:{kind:'lyrics',name:'Черновик'},job:{kind:'stage',stage:1,total:60,elapsed:30,skill:10},skill:10.16});
  const role=id=>allPc(panel.element).find(n=>n.dataset.workRole===id);
- assert.match(role('stage').textContent,/Написание рифм/);assert.match(role('skill').textContent,/Письмо/);assert.match(role('audio').textContent,/клавиатур/);assert.equal(role('genre').parentElement.hidden,true);
+ assert.match(role('stage').textContent,/Написание рифм/);assert.match(role('skill').textContent,/Письмо/);assert.match(role('audio').textContent,/клавиатур/);assert.ok(!role('genre'));
 });
 test('shared work advancement selects text job, consumes time and leaves beat practice untouched',()=>{
  assert.equal(typeof work.advanceCreativeWork,'function');

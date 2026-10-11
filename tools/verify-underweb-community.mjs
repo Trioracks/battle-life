@@ -6,8 +6,8 @@ import {resolve,extname,sep} from 'node:path';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'D:/Codex/Caches/npm/_npx/48b1ca104c3549f4/node_modules/playwright-core');
 const root=resolve(import.meta.dirname,'..'),output=process.env.PC_QA_OUTPUT||'D:/Codex/Builds/Battle/underweb-community-20261010';await mkdir(output,{recursive:true});
 const fixture=`<!doctype html><meta charset="utf-8"><title>Isolated Underweb verification</title><link rel="stylesheet" href="/virtual-pc.css"><link rel="stylesheet" href="/desktop-apps.css"><style>html,body{margin:0;height:100%;background:#172735}#virtual-pc{position:static!important;inset:auto!important;display:block!important;width:100%;height:100%;padding:16px;box-sizing:border-box}#virtual-pc .pc-window{position:static!important;width:100%!important;height:100%!important;max-width:1080px;margin:auto;display:block!important;container-type:inline-size}#app{height:100%}</style><section id="virtual-pc"><div class="pc-window"><div id="app"></div></div></section><script type="module">
-import {mountUnderweb} from '/src/underweb-view.js?rev=28';
-import {createVirtualPcState,applyToBattle} from '/src/virtual-pc-state.js?rev=28';
+import {mountUnderweb} from '/src/underweb-view.js?rev=31';
+import {createVirtualPcState,applyToBattle} from '/src/virtual-pc-state.js?rev=31';
 let state=createVirtualPcState(JSON.parse(localStorage.getItem('isolated-underweb')||'null'));window.gameDay=Number(localStorage.getItem('isolated-day')||1);
 window.view=mountUnderweb(document.querySelector('#app'),{getState:()=>state,getMetadata:()=>({gameDay:window.gameDay,playerName:'Браузерный_Тест'}),onChange:next=>{state=createVirtualPcState(next);localStorage.setItem('isolated-underweb',JSON.stringify(state));},onApply:(battleId,nickname)=>{state=applyToBattle(state,battleId,nickname);localStorage.setItem('isolated-underweb',JSON.stringify(state));}});
 window.saved=()=>state;window.setDay=day=>{window.gameDay=day;localStorage.setItem('isolated-day',day);view.update();};window.ready=true;
@@ -33,7 +33,7 @@ try{
  await page.evaluate(()=>setDay(731));await go('underweb://iskra/archive');const archiveCount=await page.evaluate(async()=>(await import('/src/underweb-news.js?rev=28')).archiveForDay(731).length);assert.equal(await page.locator('.uw-news-archive-row').count(),archiveCount);await shot('10-news-complete-archive-640');
  assert.equal(archiveCount,244,'All researched release slots render in the final archive');
  await page.route('**/__underweb-pc',route=>route.fulfill({contentType:'text/html',body:`<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/virtual-pc.css"><link rel="stylesheet" href="/desktop-apps.css"><style>html,body{margin:0;height:100%}</style><section id="virtual-pc"></section><script type="module">
- import {mountVirtualPc} from '/src/virtual-pc-ui.js?rev=28';import {createVirtualPcState} from '/src/virtual-pc-state.js?rev=28';
+ import {mountVirtualPc} from '/src/virtual-pc-ui.js?rev=31';import {createVirtualPcState} from '/src/virtual-pc-state.js?rev=31';
  window.pc=mountVirtualPc(document.querySelector('#virtual-pc'),{onPersist:state=>{localStorage.setItem('isolated-pc-midnight',JSON.stringify(state));return true;}});pc.showDesktop(createVirtualPcState(JSON.parse(localStorage.getItem('isolated-pc-midnight')||'{"power":"on"}')));
  window.setDay=day=>{localStorage.setItem('isolated-pc-day',day);pc.syncHost({gameDay:day,playerName:'Original',clockLabel:'00:00'});};setDay(Number(localStorage.getItem('isolated-pc-day')||1));pc.open('underweb');window.ready=true;
  </script>`}));

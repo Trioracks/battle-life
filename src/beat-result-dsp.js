@@ -3,6 +3,7 @@ const clamp=(v,lo=0,hi=1)=>Math.max(lo,Math.min(hi,v));
 const mod=(x,n)=>((x%n)+n)%n;
 const sample=(a,t)=>{const i=Math.floor(t),f=t-i;return a[mod(i,a.length)]*(1-f)+a[mod(i+1,a.length)]*f;};
 const severity=q=>clamp((100-q)/100);
+const DRUM_GLITCH_AMOUNT=.8;
 // Grain centres follow the original timeline. Only each grain's read pitch changes.
 function detune(a,rate,cents,phase){
  const out=new Float32Array(a.length),weight=new Float32Array(a.length),size=Math.round(rate*.08),hop=Math.max(1,Math.round(size/4)),half=Math.floor(size/2);
@@ -48,7 +49,7 @@ export function transformBeatSamples(input,rate,value){
   }
   const altered=from!==s||offset!==local||envelope!==1;
   if(altered)envelope*=clamp(Math.min(local/edge,(cellSize-1-local)/edge));
-  const wet=kind===0?clamp(.7*medium+.3*rough):medium;
+  const wet=kind===0?clamp(.7*medium+.3*rough)*DRUM_GLITCH_AMOUNT:medium;
   let v=a[i]*(1-wet)+sample(a,from*step+offset)*envelope*wet;
   if(kind===0){const levels=Math.round(24+(1-amount)*160);v=v*(1-amount)+Math.round(v*levels)/levels*amount;}
   const seam=Math.min(1,i/(rate*.002*amount),(out.length-1-i)/(rate*.002*amount));
@@ -94,7 +95,7 @@ export function connectBeatResult(context,value,destination){
   }
   const delay=make('createDelay'),feedback=make('createGain'),wet=make('createGain');
   delay.delayTime.value=[1/6,1/3,1/12][kind];feedback.gain.value=buff?0:Math.min(.65,[.4,.35,.26][kind]*medium+.22*rough);
-  wet.gain.value=buff?.045*buff:([.28,.35,.2][kind]*medium+[.55,.6,.3][kind]*rough);
+  wet.gain.value=buff?.045*buff:([.28,.35,.2][kind]*medium+[.55,.6,.3][kind]*rough)*(kind===0?DRUM_GLITCH_AMOUNT:1);
   (buff?input:balance).connect(delay);delay.connect(feedback);feedback.connect(delay);delay.connect(wet);wet.connect(destination);
   return disposable(nodes,input);
  }catch(error){disposable(nodes).dispose();throw error;}

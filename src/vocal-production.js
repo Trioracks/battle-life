@@ -1,8 +1,8 @@
-import {VOCALS} from './vocal-catalog.js?rev=28';
-import {clampV,createVocalTake,normalizeRecording,recordingQuality,VOCAL_EQUIPMENT,effectiveSoundSkill} from './vocal-result.js?rev=28';
-import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=28';
-import {normalizeLyric} from './lyric-production.js?rev=28';
-import {BEAT_RULES as R} from './beat-catalog.js';
+import {VOCALS} from './vocal-catalog.js?rev=31';
+import {clampV,createVocalTake,normalizeRecording,recordingQuality,VOCAL_EQUIPMENT,effectiveSoundSkill} from './vocal-result.js?rev=31';
+import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=31';
+import {normalizeLyric} from './lyric-production.js?rev=31';
+import {BEAT_RULES as R} from './beat-catalog.js?rev=31';
 export {recordingQuality};
 export const VOCAL_STAGES=Object.freeze({draft:{name:'Черновая запись',minutes:60,skill:'flow'},clean:{name:'Чистовая запись',minutes:60,skill:'flow'},mix:{name:'Сведение',minutes:45,skill:'sound'},master:{name:'Мастеринг',minutes:30,skill:'sound'}});
 export function canVocalStage(recording,kind){

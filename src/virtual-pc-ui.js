@@ -1,29 +1,29 @@
 import { FtStudioAudio } from './ft-studio-audio.js?rev=28';
 import {mountPcShell} from './virtual-pc-shell.js?rev=28';
-import {mountExplorer} from './virtual-pc-explorer-view.js?rev=28';
+import {mountExplorer} from './virtual-pc-explorer-view.js?rev=31';
 import {mountPcMenu} from './virtual-pc-menus.js?rev=28';
-import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=28';
-import {explorerProperties} from './virtual-pc-explorer.js?rev=28';
+import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=31';
+import {explorerProperties} from './virtual-pc-explorer.js?rev=31';
 import {createWindowState,reduceWindows} from './virtual-pc-window-state.js?rev=28';
-import {layoutDesktopIcons,setDesktopIconPosition,resetDesktopIconPositions} from './virtual-pc-state.js?rev=28';
+import {layoutDesktopIcons,setDesktopIconPosition,resetDesktopIconPositions} from './virtual-pc-state.js?rev=31';
 import {createPcIcon} from './virtual-pc-icons.js?rev=28';
 import { normalizeStudioProject } from './ft-studio-project.js?rev=28';
 import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js?rev=28';
-import { createVirtualPcState, diskUsage, saveStudioProject } from './virtual-pc-state.js?rev=28';
+import { createVirtualPcState, diskUsage, saveStudioProject } from './virtual-pc-state.js?rev=31';
 import {diskAmount} from './virtual-pc-disk-view.js?rev=21';
 import {pcPresentation} from './virtual-pc-presentation.js?rev=21';
 import {createStudioWorkspace} from './ft-studio-view.js?rev=28';
-import {mountUnderweb} from './underweb-view.js?rev=28';
-import {applyToBattle} from './virtual-pc-state.js?rev=28';
-import {mountBeatStudio} from './beat-studio-view.js?rev=28';
-import {BeatAudio} from './beat-audio.js?rev=30';
-import {normalizeBeat} from './beat-production.js?rev=28';
-import {createBeatMarket} from './beat-market-view.js?rev=28';
+import {mountUnderweb} from './underweb-view.js?rev=31';
+import {applyToBattle} from './virtual-pc-state.js?rev=31';
+import {mountBeatStudio} from './beat-studio-view.js?rev=31';
+import {BeatAudio} from './beat-audio.js?rev=31';
+import {normalizeBeat} from './beat-production.js?rev=31';
+import {createBeatMarket} from './beat-market-view.js?rev=31';
 import * as software from './pc-software.js?rev=28';
-import {mountTorrent,mountInstaller,softwareMessage} from './pc-software-view.js?rev=28';
+import {mountTorrent,mountInstaller,softwareMessage} from './pc-software-view.js?rev=31';
 import {SOFTWARE} from './pc-software-catalog.js?rev=28';
-import {mountRapNotebook} from './rap-notebook-view.js?rev=28';
-import {normalizeLyric} from './lyric-production.js?rev=28';
+import {mountRapNotebook} from './rap-notebook-view.js?rev=31';
+import {normalizeLyric} from './lyric-production.js?rev=31';
 
 const NOOP = () => {};
 
@@ -163,7 +163,6 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
   pc.windowAction = action => {
     if((pc.confirmClose||pc.shutdownModal)&&action.type!=='viewport')return;
-    if(pc.state.software.installer&&action.type!=='viewport'&&action.id!=='installer')return;
     if(action.type==='close'){pc.closeWindow(action.id);return;}
     pc.windows=reduceWindows(pc.windows,action);
     pc.renderDesktop(false);
@@ -237,7 +236,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     if(!pc.menu)pc.menu=mountPcMenu(pc.shell.getMenuRoot(),{onDismiss:()=>{pc.startOpen=false;}});
     const apps=desktopApps(pc.state),v=pc.windows.viewport;
     pc.shell.render({windows:pc.windows,apps,wallpaper:(WALLPAPERS.find(w=>w.id===pc.state.wallpaper)??WALLPAPERS[0]).path,
-      iconPositions:layoutDesktopIcons(apps.map(a=>a.id),pc.state.desktopIcons,{width:v.width,height:v.height-32}),metadata:pc.metadata,warning:pc.persistenceWarning,masterWindow:pc.state.software.installer?'installer':null});
+      iconPositions:layoutDesktopIcons(apps.map(a=>a.id),pc.state.desktopIcons,{width:v.width,height:v.height-32}),metadata:pc.metadata,warning:pc.persistenceWarning});
     for(const w of pc.windows.windows){
       const target=pc.shell.getContentRoot(w.id);
       if(!target.children.length||(replaceActive&&w.id===pc.windows.activeId))pc.refreshApp(w.id,{replaceContent:true});
@@ -376,7 +375,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.bootTimer = null;
     pc.state = createVirtualPcState(state);
     pc.phase = 'desktop';
-    if(pc.state.software.installer)pc.windows=reduceWindows(pc.windows,{type:'open',id:'installer',appId:'installer',title:'Мастер установки — '+SOFTWARE[pc.state.software.installer.appId].name});
+    if(pc.state.software.installer&&!pc.windows.windows.some(w=>w.id==='installer'))pc.windows=reduceWindows(pc.windows,{type:'open',id:'installer',appId:'installer',title:'Мастер установки — '+SOFTWARE[pc.state.software.installer.appId].name});
     pc.locked=false;root.style.opacity='1';root.style.pointerEvents='auto';
     pc.renderDesktop(false);
   };
@@ -397,7 +396,6 @@ export function mountVirtualPc(root, callbacks = {}) {
     }
   };
   pc.open = appId => {
-    if(pc.state.software.installer&&appId!=='installer')return;
     if(pc.locked||!desktopApps(pc.state).some(app=>app.id===appId)||pc.confirmClose||pc.shutdownModal)return;
     if(appId==='ft-studio'&&!pc.windows.windows.some(w=>w.id===appId)){
       pc.menu?.close();pc.startOpen=false;if(pc.studioLaunch!==null)return;
@@ -432,7 +430,6 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
   pc.closeWindow = (id=pc.windows.activeId) => {
     if(pc.locked||pc.confirmClose||!id)return;
-    if(pc.state.software.installer&&id!=='installer')return;
     pc.closeNow(id);
   };
 
@@ -440,6 +437,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (pc.locked||pc.confirmClose||pc.shutdownModal) return;
     pc.cancelStudioLaunch();
     pc.menu?.close();
+    pc.persist();
     pc.audio.stop();pc.beatAudio.stop();pc.callbacks.onLeave();
   };
 
@@ -462,12 +460,12 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (pc.locked || pc.phase !== 'desktop' || event.defaultPrevented) return;
     const scope = pc.focusScope();
     const controls = focusableControls(scope);
-    if(event.key==='Escape'&&pc.state.software.installer){event.preventDefault();event.stopPropagation();pc.softwareAction('cancel-installer');return;}
     if(event.key==='Escape'&&pc.shutdownModal){event.preventDefault();event.stopPropagation();pc.cancelShutdown();return;}
     if (event.key === 'Escape' && pc.startOpen) {
       event.preventDefault(); event.stopPropagation();
       pc.menu?.close(); return;
     }
+    if(event.key==='Escape'&&pc.window==='installer'&&pc.state.software.installer){event.preventDefault();event.stopPropagation();pc.softwareAction('cancel-installer');return;}
     // The shell owns Tab traversal; apartment Escape handling closes the active window.
   });
 

@@ -23,18 +23,21 @@ test('home integration invalidates every changed dependency and its importers wi
  do{size=affected.size;for(const [file,imports]of graph)if(imports.some(dependency=>affected.has(dependency.file)))affected.add(file);}while(affected.size!==size);
  const vocalDamageAffected=new Set(['src/vocal-result-dsp.js']);
  do{size=vocalDamageAffected.size;for(const [file,imports]of graph)if(imports.some(dependency=>vocalDamageAffected.has(dependency.file)))vocalDamageAffected.add(file);}while(vocalDamageAffected.size!==size);
+ const demoAffected=new Set(['apartment-app','beat-beginner-bank','beat-catalog','beat-production','beat-result-dsp','beat-work-view','underweb-view','virtual-pc-ui','vocal-catalog'].map(n=>'src/'+n+'.js'));
+ do{size=demoAffected.size;for(const [file,imports]of graph)if(imports.some(dependency=>demoAffected.has(dependency.file)))demoAffected.add(file);}while(demoAffected.size!==size);
+ for(const file of demoAffected)affected.add(file);
  const html=await read('index.html');
- assert.match(html,/apartment-app\.js\?rev=30/);
+ assert.match(html,/apartment-app\.js\?rev=31/);
  for(const style of ['apartment-v3','creator-v12','desktop-apps','rap-notebook'])assert.ok(html.includes(style+'.css?rev=28'),style+' must invalidate changed styles');
  assert.ok((await read('desktop-apps.css')).includes('underweb-world.css?rev=28'));
  assert.match(html,/virtual-pc\.css\?rev=21/,'unchanged base PC styles retain their revision');
- for(const [file,imports]of graph)for(const dependency of imports)if(affected.has(dependency.file))assert.equal(dependency.query,vocalDamageAffected.has(dependency.file)?'rev=30':'rev=28',file+' must load canonical '+dependency.file);
+ for(const [file,imports]of graph)for(const dependency of imports)if(affected.has(dependency.file))assert.equal(dependency.query,demoAffected.has(dependency.file)?'rev=31':vocalDamageAffected.has(dependency.file)?'rev=30':'rev=28',file+' must load canonical '+dependency.file);
  for(const file of changed)assert.ok(graph.has(file),file+' is covered by the live entry graph');
- // Work ownership and sample banks are unchanged; the mix/player use the new revision.
+ // Work audio ownership stays at v28; the expanded sample catalog is invalidated.
  for(const [file,modules]of [
   ['src/apartment-app.js',['beat-work-audio']],
   ['src/beat-audio.js',['beat-beginner-bank']],
- ])for(const module of modules)assert.ok((await read(file)).includes(module+'.js?rev=28'),file+' must invalidate '+module);
+ ])for(const module of modules)assert.ok((await read(file)).includes(module+'.js?rev='+(demoAffected.has('src/'+module+'.js')?31:28)),file+' must invalidate '+module);
 });
 
 test('HTML loads the new versioned apartment entry; legacy campaign remains accessible',async()=>{

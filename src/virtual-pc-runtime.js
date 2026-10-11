@@ -1,4 +1,4 @@
-import {createVirtualPcState} from './virtual-pc-state.js?rev=28';
+import {createVirtualPcState} from './virtual-pc-state.js?rev=31';
 import {softwareDiskBytes,withSoftware} from './pc-software.js?rev=28';
 import {SOFTWARE} from './pc-software-catalog.js?rev=28';
 const RATES=[24,31,37,28,35,26];

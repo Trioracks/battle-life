@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=30';
+import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=31';
 import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=28';
 import {PcTransition} from '../src/virtual-pc-transition.js';
 import {pcDocument,findPc,allPc,findButton} from './helpers/virtual-pc-dom.js';
@@ -32,8 +32,8 @@ test('host controller owns the eleven second cold boot with no DOM timer',()=>{
   assert.equal(timers.length,0);t.tick(7.4);c.presentTransition(t.snapshot);assert.equal(root.dataset.pcTransition,'desktop');assert.ok(findButton(root,'Пуск'));
 });
 test('entry loads versioned XP stylesheet and module, and host feeds game metadata',async()=>{
-  const html=await readFile(new URL('../index.html',import.meta.url),'utf8'),app=await readFile(new URL('../src/apartment-app.js?rev=30',import.meta.url),'utf8');
-  assert.match(html,/apartment-app\.js\?rev=30/);assert.match(html,/virtual-pc\.css\?rev=21/);
+  const html=await readFile(new URL('../index.html',import.meta.url),'utf8'),app=await readFile(new URL('../src/apartment-app.js?rev=31',import.meta.url),'utf8');
+  assert.match(html,/apartment-app\.js\?rev=31/);assert.match(html,/virtual-pc\.css\?rev=21/);
   assert.match(html,/desktop-apps\.css\?rev=28/);
-  assert.match(app,/virtual-pc-ui\.js\?rev=30/);assert.match(app,/syncHost\(\{playerName:profile\?\.name/);
+  assert.match(app,/virtual-pc-ui\.js\?rev=31/);assert.match(app,/syncHost\(\{playerName:profile\?\.name/);
 });
