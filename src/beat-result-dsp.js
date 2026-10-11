@@ -22,7 +22,8 @@ const random=(seed,cell,salt=0)=>{let x=(seed^Math.imul(cell+1,374761393)^Math.i
 export function transformBeatSamples(input,rate,value){
  const r=normalizeBeatResult(value);if(!r||!input.length||!Number.isFinite(rate)||rate<1000)return input;
  const creative=creativeProfileAmount(r.genreProfile,r.skills.beatmaking,value.postGain);
- if(r.quality>=100&&!creative)return input;
+ // Archived layers predate genre snapshots and always bypassed slicing at 100+.
+ if(r.quality>=100&&(!r.genreProfile||!creative))return input;
  const amount=severity(r.quality),rough=clamp((30-r.quality)/25),medium=clamp((100-r.quality)/70),kind=r.stage,skill=r.skills.beatmaking;
  const pitch=(kind===1?85:-120)*medium+(kind===1?100:-140)*rough;
  const a=kind?detune(input,rate,pitch*(.85+.15*(1-skill/100)),r.seed%17):input;
@@ -52,7 +53,8 @@ export function transformBeatSamples(input,rate,value){
 }
 
 export function transformBeatBuffer(context,buffer,result,seconds){
- if(!normalizeBeatResult(result)||result.quality>=100&&!creativeProfileAmount(result.genreProfile,result.skills.beatmaking,result.postGain))return buffer;
+ const r=normalizeBeatResult(result);
+ if(!r||r.quality>=100&&(!r.genreProfile||!creativeProfileAmount(r.genreProfile,r.skills.beatmaking,result.postGain)))return buffer;
  const length=Math.round(seconds*buffer.sampleRate),out=context.createBuffer(buffer.numberOfChannels,length,buffer.sampleRate);
  for(let ch=0;ch<buffer.numberOfChannels;ch++){
   // MP3 encoders may pad; the saved musical loop is the only timeline transformed.

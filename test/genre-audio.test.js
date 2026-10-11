@@ -3,13 +3,44 @@ import assert from 'node:assert/strict';
 import * as performance from '../src/audio-performance.js';
 import {createVirtualPcState} from '../src/virtual-pc-state.js';
 import {createBeat,startBeatStage,advanceBeatWork} from '../src/beat-production.js';
-import {normalizeBeatResult} from '../src/beat-result.js';
+import {createBeatResult,normalizeBeatResult} from '../src/beat-result.js';
 import {resolveBeatPlayback} from '../src/beat-playback.js';
 import {createVocalTake,VOCAL_CEILING} from '../src/vocal-result.js';
-import {transformBeatSamples} from '../src/beat-result-dsp.js';
+import {transformBeatBuffer,transformBeatSamples} from '../src/beat-result-dsp.js';
 import {transformVocalSamples} from '../src/vocal-result-dsp.js';
 const profile=(xp,id='experimental')=>({version:1,id,xp});
 const result={stage:0,seed:41,skills:{beatmaking:65,sound:65},sliders:[5,5,5],fit:50,quality:30};
+const archivedResult=createBeatResult({stage:0,seed:41,skills:{beatmaking:90,sound:90},sliders:[5,5,5],targets:[5,5,5]});
+
+test('legacy high-quality samples stay exactly dry even when saved skill would enable creative effects',()=>{
+ assert.equal(archivedResult.quality,104.5);
+ const input=Float32Array.from({length:64000},(_,i)=>.2*Math.sin(i*.15));
+ for(const quality of [100,archivedResult.quality])for(const genreProfile of [undefined,{version:0,id:'experimental',xp:50}]){
+  const output=transformBeatSamples(input,6000,{...archivedResult,quality,genreProfile,postGain:4});
+  assert.ok(output===input,`legacy quality ${quality} bypasses transformation`);
+ }
+});
+
+test('legacy high-quality buffers bypass allocation and preserve their original duration',()=>{
+ const buffer={sampleRate:6000,numberOfChannels:1};
+ const context={createBuffer(){assert.fail('legacy high-quality buffers must not be transformed');}};
+ for(const quality of [100,archivedResult.quality])for(const genreProfile of [undefined,{version:0,id:'experimental',xp:50}]){
+  assert.equal(transformBeatBuffer(context,buffer,{...archivedResult,quality,genreProfile,postGain:4},32/3),buffer);
+ }
+});
+
+test('new experimental high-quality profiles can still add intentional postproduction slices',()=>{
+ const input=Float32Array.from({length:64000},(_,i)=>.2*Math.sin(i*.15));
+ const buffer={sampleRate:6000,numberOfChannels:1,getChannelData(){return input;}};
+ const context={createBuffer(channels,length,rate){return {numberOfChannels:channels,length,sampleRate:rate,copyToChannel(data){this.data=data;}};}};
+ for(const quality of [100,archivedResult.quality]){
+  const value={...archivedResult,quality,genreProfile:profile(50),postGain:4};
+  const output=transformBeatSamples(input,6000,value);
+  assert.ok(output.some((v,i)=>v!==input[i]));assert.equal(output.length,input.length);assert.ok(output.every(Number.isFinite));
+  const rendered=transformBeatBuffer(context,buffer,value,32/3);
+  assert.notEqual(rendered,buffer);assert.equal(rendered.length,input.length);assert.deepEqual(rendered.data,output);
+ }
+});
 test('experimental creative amount follows saved genre curve only after postproduction',()=>{
  assert.equal(typeof performance.creativeProfileAmount,'function');
  for(const [xp,amount] of [[0,0],[24.99,0],[25,.2],[50,.8],[75,.5],[100,.3]]){
