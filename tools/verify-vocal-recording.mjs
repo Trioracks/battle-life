@@ -13,7 +13,7 @@ const phase=name=>page.waitForFunction(n=>document.querySelector('#virtual-pc').
 const shot=name=>page.screenshot({path:output+'/'+name+'.png'});
 async function enter(){await page.locator('#continue-game').click();if(await page.locator('#wake').isVisible())await page.locator('#wake').click();await page.waitForFunction(()=>document.querySelector('#state').textContent.startsWith('idle'));await page.locator('#actions [data-action=computer]').click();await phase('desktop');}
 async function open(){await pc.getByRole('button',{name:'Пуск',exact:true}).click();await pc.locator('.pc-start-menu').getByRole('menuitem',{name:'FT Studio',exact:true}).click();await dialog.getByRole('button',{name:'Открыть проект',exact:true}).click();await dialog.getByRole('button',{name:/Вокальный тест ·/}).click();}
-async function probe(){await page.evaluate(async()=>{const {BeatAudio}=await import('/src/beat-audio.js?rev=28');window.vocalAudioLog=[];const play=BeatAudio.prototype.playProject;BeatAudio.prototype.playProject=function(b,o){window.vocalAudio=this;return play.call(this,b,o).then(ok=>{window.vocalAudioLog.push({ok,owner:this.descriptor?.owner,parts:this.descriptor?.parts,sources:this.sources.length});return ok;});};});}
+async function probe(){await page.evaluate(async()=>{const {BeatAudio}=await import('/src/beat-audio.js?rev=29');window.vocalAudioLog=[];const play=BeatAudio.prototype.playProject;BeatAudio.prototype.playProject=function(b,o){window.vocalAudio=this;return play.call(this,b,o).then(ok=>{window.vocalAudioLog.push({ok,owner:this.descriptor?.owner,parts:this.descriptor?.parts,sources:this.sources.length});return ok;});};});}
 async function work(kind){
  await phase('working');await page.waitForFunction(()=>window.vocalAudioLog.some(r=>r.ok&&r.owner==='work'&&r.sources===4));
  if(kind==='draft'){
@@ -24,7 +24,7 @@ async function work(kind){
  await phase('desktop');const s=await saved();assert.equal(s.recording.job,null);assert.ok(s.projects.find(p=>p.id==='vocal-test').recording[kind]);
 }
 try{
- await page.goto('http://127.0.0.1:4173/?rev=28',{waitUntil:'networkidle'});await page.locator('#new-game').click();await page.locator('#character-name').fill('Проверка вокала');await page.locator('#clothing-tab').click();await page.locator('#start-game').click();await page.locator('#wake').click();
+ await page.goto('http://127.0.0.1:4173/?rev=29',{waitUntil:'networkidle'});await page.locator('#new-game').click();await page.locator('#character-name').fill('Проверка вокала');await page.locator('#clothing-tab').click();await page.locator('#start-game').click();await page.locator('#wake').click();
  await page.evaluate(async()=>{
   const [{createVirtualPcState},{createBeat,startBeatStage,advanceBeatWork},{createLyric,startLyricWork,advanceLyricWork}]=await Promise.all([import('/src/virtual-pc-state.js?rev=28'),import('/src/beat-production.js?rev=28'),import('/src/lyric-production.js?rev=28')]);
   let s=createVirtualPcState({power:'on',download:{status:'installed'}});s=createBeat(s,{id:'vocal-test',name:'Вокальный тест'},{},()=>.999).state;

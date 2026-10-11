@@ -21,12 +21,14 @@ test('home integration invalidates every changed dependency and its importers wi
  await visit('src/apartment-app.js');
  const affected=new Set(changed);let size;
  do{size=affected.size;for(const [file,imports]of graph)if(imports.some(dependency=>affected.has(dependency.file)))affected.add(file);}while(affected.size!==size);
+ const vocalDamageAffected=new Set(['src/vocal-result-dsp.js']);
+ do{size=vocalDamageAffected.size;for(const [file,imports]of graph)if(imports.some(dependency=>vocalDamageAffected.has(dependency.file)))vocalDamageAffected.add(file);}while(vocalDamageAffected.size!==size);
  const html=await read('index.html');
- assert.match(html,/apartment-app\.js\?rev=28/);
+ assert.match(html,/apartment-app\.js\?rev=29/);
  for(const style of ['apartment-v3','creator-v12','desktop-apps','rap-notebook'])assert.ok(html.includes(style+'.css?rev=28'),style+' must invalidate changed styles');
  assert.ok((await read('desktop-apps.css')).includes('underweb-world.css?rev=28'));
  assert.match(html,/virtual-pc\.css\?rev=21/,'unchanged base PC styles retain their revision');
- for(const [file,imports]of graph)for(const dependency of imports)if(affected.has(dependency.file))assert.equal(dependency.query,'rev=28',file+' must load canonical '+dependency.file+'?rev=28');
+ for(const [file,imports]of graph)for(const dependency of imports)if(affected.has(dependency.file))assert.equal(dependency.query,vocalDamageAffected.has(dependency.file)?'rev=29':'rev=28',file+' must load canonical '+dependency.file);
  for(const file of changed)assert.ok(graph.has(file),file+' is covered by the live entry graph');
  // Work ownership and sample banks are unchanged; the mix/player use the new revision.
  for(const [file,modules]of [
@@ -40,7 +42,7 @@ test('HTML loads the new versioned apartment entry; legacy campaign remains acce
   assert.match(html,/src="\.\/src\/apartment-app\.js\?rev=[^"]+"/);
   assert.match(html,/href="\.\/virtual-pc\.css\?rev=[^"]+"/);
   assert.match(html,/<section id="virtual-pc" hidden/);
-  await access(new URL('../src/apartment-app.js?rev=28',import.meta.url));
+  await access(new URL('../src/apartment-app.js?rev=29',import.meta.url));
   const legacy=await readFile(new URL('../legacy.html',import.meta.url),'utf8');
   assert.match(legacy,/id="creator-modal"/);
   assert.match(legacy,/src="\.\/src\/main\.js\?rev=[^"]+"/);
