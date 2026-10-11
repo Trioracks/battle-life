@@ -11,7 +11,7 @@ async function fixture({satiety=50,energy=72,job=false,denyAudio=false,denyBacku
  await page.route('**/__home-needs-fixture',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><body>Isolated fixture</body>'}));
  await page.goto('http://127.0.0.1:4173/__home-needs-fixture');
  await page.evaluate(async options=>{
-  const [{createProfile,STAT_KEYS,SAVE_KEY},{createVirtualPcState,VIRTUAL_PC_STORAGE_KEY},production]=await Promise.all([import('/src/avatar-v3-profile.js?rev=28'),import('/src/virtual-pc-state.js?rev=32'),import('/src/beat-production.js?rev=32')]);
+  const [{createProfile,STAT_KEYS,SAVE_KEY},{createVirtualPcState,VIRTUAL_PC_STORAGE_KEY},production]=await Promise.all([import('/src/avatar-v3-profile.js?rev=28'),import('/src/virtual-pc-state.js?rev=33'),import('/src/beat-production.js?rev=33')]);
   const profile=createProfile({name:'Проверка дома',allocations:Object.fromEntries(STAT_KEYS.map((k,i)=>[k,i===0?2:1]))});
   localStorage.setItem(SAVE_KEY,JSON.stringify(profile));localStorage.setItem('battle-life-apartment-v3-time',JSON.stringify({day:2,minutes:720,initialRest:false}));
   let state=createVirtualPcState({power:options.job?'on':'off',download:{status:options.job?'installed':'idle'},music:{needs:{satiety:options.satiety,energy:options.energy}}});
@@ -35,16 +35,16 @@ try{
   assert.equal((await stored(page)).music.needs.satiety,50,'opening alone cannot feed');
   await page.screenshot({path:output+'/fridge-arrived.png'});
   const stateBefore=await page.locator('#state').textContent();await page.waitForTimeout(500);assert.equal(await page.locator('#state').textContent().then(t=>t.split(' · ').slice(0,5).join(' · ')),stateBefore.split(' · ').slice(0,5).join(' · '));
-  await fridge.getByRole('button',{name:'Съесть: Яблоко',exact:true}).click();let saved=await stored(page);assert.equal(saved.household.fridge.apple,0);assert.equal(saved.music.needs.satiety,80);assert.equal(await fridge.getByRole('button',{name:'Съесть: Яблоко',exact:true}).isDisabled(),true);
+  await fridge.getByRole('button',{name:'Съесть: Яблоко',exact:true}).click();let saved=await stored(page);assert.equal(saved.household.fridge.apple,1);assert.equal(saved.music.needs.satiety,80);assert.equal(await fridge.getByRole('button',{name:'Съесть: Яблоко',exact:true}).isDisabled(),false);
   await page.keyboard.press('Escape');assert.equal(await fridge.isVisible(),false);assert.equal(await page.evaluate(()=>document.activeElement.id),'apartment');
-  await page.reload();await page.locator('#continue-game').click();await page.locator('#actions [data-action=fridge]').click();await fridge.waitFor({state:'visible'});assert.equal(await fridge.getByRole('button',{name:'Съесть: Яблоко',exact:true}).isDisabled(),true);
-  await fridge.getByRole('button',{name:'Съесть: Груша',exact:true}).click();saved=await stored(page);assert.equal(saved.music.needs.satiety,100);assert.equal(saved.household.fridge.pear,0);assert.equal(await fridge.getByRole('button',{name:'Съесть: Банан',exact:true}).isDisabled(),true);
+  await page.reload();await page.locator('#continue-game').click();await page.locator('#actions [data-action=fridge]').click();await fridge.waitFor({state:'visible'});assert.equal(await fridge.getByRole('button',{name:'Съесть: Яблоко',exact:true}).isDisabled(),false);
+  await fridge.getByRole('button',{name:'Съесть: Груша',exact:true}).click();saved=await stored(page);assert.equal(saved.music.needs.satiety,100);assert.equal(saved.household.fridge.pear,1);assert.equal(await fridge.getByRole('button',{name:'Съесть: Банан',exact:true}).isDisabled(),true);
   await page.screenshot({path:output+'/fridge-consumed-reloaded.png'});await context.close();console.log('PASS approach, PC off, consume/cap/count/reload, frozen actor, Escape/focus');
  }
  {
   const {context,page}=await fixture({denyBackup:true}),fridge=page.getByRole('dialog',{name:'Холодильник'});await page.locator('#actions [data-action=fridge]').click();await fridge.waitFor({state:'visible'});
   await fridge.getByRole('button',{name:'Съесть: Яблоко',exact:true}).click();assert.match(await fridge.getByRole('status').textContent(),/Сохранение.*недоступно/);
-  assert.equal(await fridge.getByRole('button',{name:'Съесть: Яблоко',exact:true}).isDisabled(),true);const original=await stored(page);assert.equal(original.household,undefined);assert.equal(original.music.needs.satiety,50);
+  assert.equal(await fridge.getByRole('button',{name:'Съесть: Яблоко',exact:true}).isDisabled(),false);const original=await stored(page);assert.equal(original.household,undefined);assert.equal(original.music.needs.satiety,50);
   await page.screenshot({path:output+'/fridge-backup-failure.png'});await context.close();console.log('PASS backup failure retains original JSON, in-memory consume and visible warning');
  }
  for(const [satiety,energy,phrase,denied]of [[20,72,'Не могу работать, хочу поесть.',false],[68,15,'Не могу работать, хочу поспать.',true]]){
@@ -75,7 +75,9 @@ try{
   const dialog=page.locator('[data-ft-role=dialog]');await dialog.getByRole('button',{name:'Открыть проект',exact:true}).click();await dialog.getByRole('button',{name:/Не потерять ·/}).click();
   await page.getByRole('button',{name:'Продолжить этап',exact:true}).click();
   await bubble.waitFor({state:'visible'});assert.equal(await page.locator('#virtual-pc').isVisible(),false);
-  const save=await stored(page);assert.equal(save.music.needs.satiety,20);assert.ok(save.music.job.elapsed>5);assert.deepEqual(save.projects[0],original);assert.equal(save.music.practice,0);
+  const save=await stored(page);assert.equal(save.music.needs.satiety,20);assert.ok(save.music.job.elapsed>5);assert.deepEqual(save.projects[0],original);
+  const earned=save.music.job.elapsed/save.music.job.total/3;
+  assert.ok(Math.abs(save.music.practice-earned)<1e-10,'interrupted work retains proportional practice');assert.equal(save.music.job.practiceCredit,save.music.practice);
   assert.equal(await bubble.locator('[aria-live]').textContent(),'Не могу работать, хочу поесть.');await page.screenshot({path:output+'/starvation-return-speech.png'});
   await context.close();console.log('PASS starvation exits work and retains partial job/project/audio choices');
  }

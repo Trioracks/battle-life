@@ -1,15 +1,28 @@
-import {FOOD_CATALOG,normalizeHousehold} from './home-food.js?rev=28';
-export function mountHomeNeedsView(root,{onConsume=()=>{},onClose=()=>{},returnFocus=null}={}) {
+import {FOOD_CATALOG,FOOD_TEST_MODE,normalizeHousehold} from './home-food.js?rev=33';
+export function mountHomeNeedsView(root,{onConsume=()=>{},onClose=()=>{},returnFocus=null,foodMode=FOOD_TEST_MODE}={}) {
  const doc=root.ownerDocument,make=(tag,text)=>{const n=doc.createElement(tag);if(text)n.textContent=text;return n;};
  root.className='home-fridge-overlay';root.hidden=true;root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-label','Холодильник');
- const panel=make('div');panel.className='home-fridge-panel';const title=make('h2','Холодильник'),satiety=make('p'),rows=[],warning=make('p'),closeButton=make('button','Закрыть');warning.setAttribute('role','status');closeButton.type='button';
- panel.append(title,satiety);
- for(const item of Object.values(FOOD_CATALOG)){
-  const row=make('div'),name=make('strong',item.name),count=make('span'),purpose=make('small','Можно съесть сразу · Ингредиент'),eat=make('button','Съесть');
-  row.className='home-food-row';eat.type='button';eat.dataset.foodId=item.id;eat.setAttribute('aria-label','Съесть: '+item.name);eat.addEventListener('click',()=>{if(!eat.disabled)onConsume(item.id);});
-  row.append(name,count,purpose,eat);panel.append(row);rows.push({item,count,eat});
+ const panel=make('div');panel.className='home-fridge-panel';const title=make('h2','Холодильник'),satiety=make('p'),mode=make('p',foodMode.infiniteFood?'Временный тестовый режим · Еда бесконечна':'Запасы продуктов'),rows=[],warning=make('p'),closeButton=make('button','Закрыть');warning.setAttribute('role','status');closeButton.type='button';satiety.className='home-fridge-satiety';mode.className='home-fridge-mode';
+ panel.append(title,satiety,mode);
+ const interior=make('div');interior.className='home-fridge-interior';
+ function emptySlot(parent,index,text='Пусто'){
+  const slot=make('div',text);slot.className='home-food-slot home-food-empty';slot.dataset.slot=String(index+1);parent.append(slot);
  }
- panel.append(warning,closeButton);root.append(panel);
+ const freezer=make('section'),freezerTitle=make('h3','Морозилка'),freezerNote=make('p','Место для замороженных ингредиентов');freezer.className='home-fridge-freezer';freezer.dataset.fridgeCompartment='freezer';freezer.setAttribute('aria-label','Морозилка');freezer.append(freezerTitle,freezerNote);
+ for(let index=0;index<3;index++)emptySlot(freezer,index);
+ interior.append(freezer);
+ const icons={apple:'🍎',pear:'🍐',banana:'🍌',sausage:'🌭',bread:'🍞',cheese:'🧀'};
+ for(const [index,ids]of [['apple','pear','banana'],[null,null,null],['sausage','bread','cheese']].entries()){
+  const shelf=make('section');shelf.className='home-fridge-shelf';shelf.dataset.fridgeShelf=String(index+1);shelf.setAttribute('aria-label','Полка '+(index+1));
+  for(const [slotIndex,id]of ids.entries()){
+   if(!id){emptySlot(shelf,slotIndex);continue;}
+   const item=FOOD_CATALOG[id],row=make('div'),icon=make('span',icons[id]),name=make('strong',item.name),count=make('span'),purpose=make('small','Сразу +30 сытости · Ингредиент'),eat=make('button','Съесть');
+   row.className='home-food-slot';row.dataset.slot=String(slotIndex+1);icon.className='home-food-icon';icon.setAttribute('aria-hidden','true');count.className='home-food-stock';eat.type='button';eat.dataset.foodId=item.id;eat.setAttribute('aria-label','Съесть: '+item.name);eat.addEventListener('click',()=>{if(!eat.disabled)onConsume(item.id);});
+   row.append(icon,name,count,purpose,eat);shelf.append(row);rows.push({item,count,eat});
+  }
+  interior.append(shelf);
+ }
+ panel.append(interior,warning,closeButton);root.append(panel);
  function close(){if(root.hidden)return;root.hidden=true;onClose();returnFocus?.focus();}
  closeButton.addEventListener('click',close);
  function keydown(event){
@@ -24,7 +37,7 @@ export function mountHomeNeedsView(root,{onConsume=()=>{},onClose=()=>{},returnF
  function update(state,message=''){
   const focused=doc.activeElement;
   const fridge=normalizeHousehold(state.household).fridge; satiety.textContent='Сытость: '+Math.round(state.music.needs.satiety)+' / 100';warning.textContent=message;
-  for(const {item,count,eat}of rows){count.textContent='Осталось: '+fridge[item.id];eat.disabled=!item.edibleRaw||fridge[item.id]<1||state.music.needs.satiety>=100;}
+  for(const {item,count,eat}of rows){count.textContent='Осталось: '+(foodMode.infiniteFood?'∞':fridge[item.id]);eat.disabled=!item.edibleRaw||(!foodMode.infiniteFood&&fridge[item.id]<1)||state.music.needs.satiety>=100;}
   if(!root.hidden&&rows.some(({eat})=>eat===focused&&eat.disabled))(rows.find(({eat})=>!eat.disabled)?.eat??closeButton).focus();
  }
  return {get isOpen(){return !root.hidden;},open(state,message=''){update(state,message);root.hidden=false;(rows.find(r=>!r.eat.disabled)?.eat??closeButton).focus();},close,update,dispose(){root.removeEventListener('keydown',keydown);root.replaceChildren();root.hidden=true;}};

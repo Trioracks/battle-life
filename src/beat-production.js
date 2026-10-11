@@ -3,7 +3,7 @@ import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=31';
 import {softwareDiskBytes} from './pc-software.js?rev=28';
 import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=32';
 import {createBeatResult} from './beat-result.js?rev=28';
-import {normalizeRecording,effectiveSoundSkill} from './vocal-result.js?rev=31';
+import {normalizeRecording,effectiveSoundSkill} from './vocal-result.js?rev=33';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
 const clamp=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,finite(v)));
 const text=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';

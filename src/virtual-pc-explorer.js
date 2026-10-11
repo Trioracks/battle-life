@@ -1,4 +1,4 @@
-import {diskUsage} from './virtual-pc-state.js?rev=32';
+import {diskUsage} from './virtual-pc-state.js?rev=33';
 import {formatDiskGb,diskAmount} from './virtual-pc-disk-view.js?rev=21';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=28';
 import {SOFTWARE} from './pc-software-catalog.js?rev=28';

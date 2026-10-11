@@ -15,7 +15,7 @@ try{
  await page.route('**/__result-check',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><title>Saved result audio verification</title>'}));
  await page.goto((process.env.BATTLE_URL||'http://127.0.0.1:4173')+'/__result-check');
  const result=await page.evaluate(async()=>{
-  const [{transformBeatBuffer,connectBeatResult,connectBeatResultMaster},{BeatAudio},{createBeat,startBeatStage,advanceBeatWork},{createVirtualPcState}]=await Promise.all([import('/src/beat-result-dsp.js?rev=32'),import('/src/beat-audio.js?rev=32'),import('/src/beat-production.js?rev=32'),import('/src/virtual-pc-state.js?rev=32')]);
+  const [{transformBeatBuffer,connectBeatResult,connectBeatResultMaster},{BeatAudio},{createBeat,startBeatStage,advanceBeatWork},{createVirtualPcState}]=await Promise.all([import('/src/beat-result-dsp.js?rev=32'),import('/src/beat-audio.js?rev=33'),import('/src/beat-production.js?rev=33'),import('/src/virtual-pc-state.js?rev=33')]);
   const rate=44100,length=470400,decoder=new OfflineAudioContext(2,length,rate),ids=['drums/04','theme/06','arrangement/02'];
   const buffers=await Promise.all(ids.map(async p=>decoder.decodeAudioData(await(await fetch('/assets/audio/ft/beginner-v1/'+p+'.wav')).arrayBuffer())));
   const original=buffers.map(b=>b.getChannelData(0).slice()),rms=a=>Math.sqrt(a.reduce((s,n)=>s+n*n,0)/a.length),peak=a=>a.reduce((s,n)=>Math.max(s,Math.abs(n)),0);

@@ -2,7 +2,7 @@ import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=21';
 const button=pcButton;
 import {SOFTWARE} from './pc-software-catalog.js?rev=28';
 import {softwareDiskBytes} from './pc-software.js?rev=28';
-import {downloadPresentation} from './virtual-pc-runtime.js?rev=32';
+import {downloadPresentation} from './virtual-pc-runtime.js?rev=33';
 export const softwareMessage=reason=>({'client-required':'Сначала скачай и установи torent из темы клиента.','metadata-required':'Сначала скачай файл FT-Studio.torrent.','insufficient-space':'Недостаточно места на C:. Загрузка сохранена; освободи место или отмени задачу.','invalid-path':'Укажи папку на игровом C: без .. и специальных символов.','transfer-active':'Сначала заверши или отмени текущую загрузку.','archive-required':'Сначала дождись полной загрузки установщика.','already-installed':'Программа уже установлена.','installer-active':'Сначала закрой текущий мастер установки.','pc-off':'Включи игровой компьютер.'}[reason]??reason??'');
 export function softwareForum(d,{topic,state,navigate,onAction,message=''}){
  const button=(doc,text,options={},handler)=>pcButton(doc,text,{...options,className:'uw-control '+(options.className??'')},handler);

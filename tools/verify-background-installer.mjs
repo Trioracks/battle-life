@@ -19,7 +19,7 @@ async function fixture(){
  const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage();page.setDefaultTimeout(45000);page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/__background-installer-fixture',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><body>Isolated installer fixture</body>'}));
  await page.goto(origin+'/__background-installer-fixture');await page.evaluate(async()=>{
-  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=28'),import('/src/virtual-pc-state.js?rev=32')]);
+  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=28'),import('/src/virtual-pc-state.js?rev=33')]);
   localStorage.setItem('battle-life-apartment-v3',JSON.stringify(createProfile({name:'Background installer QA'})));
   localStorage.setItem('battle-life-virtual-pc-v1',JSON.stringify(createVirtualPcState({power:'on',software:{client:{receivedBytes:2000000},ft:{receivedBytes:800000000}}})));
   localStorage.setItem('battle-life-apartment-v3-time',JSON.stringify({day:1,minutes:720,initialRest:false}));

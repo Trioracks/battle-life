@@ -1,6 +1,6 @@
 // Deterministic recording damage, followed by the non-bypassable budget hardware.
 // Grain boundaries follow the 90 BPM clock; the source duration never changes.
-import {clampV,VOCAL_CEILING} from './vocal-result.js?rev=31';
+import {clampV,VOCAL_CEILING} from './vocal-result.js?rev=33';
 import {creativeEffectAmount} from './audio-performance.js?rev=32';
 // Global balance: 30% less damage than rev29; saved take quality is unchanged.
 const DAMAGE_AMOUNT=.7;
@@ -69,11 +69,13 @@ export function transformVocalSamples(input,rate,profile){
  // over weak beats; quiet takes and gaps now stay quiet, rather than being rescued.
  const target=.014+.022*quality/VOCAL_CEILING,gain=Math.min(1,target/Math.max(1e-9,Math.sqrt(power/out.length)));
  const echo=.02*post+.035*creative,dry=echo?out.slice():null,delay=Math.round(rate/3);
+ // Mix and mastering lift the already damaged voice, never its source or score.
+ const vocalGain=10**(clampV(profile.vocalGainDb,0,4.5)/20);
  for(let i=0;i<out.length;i++){
   const seam=Math.max(0,Math.min(1,i/(rate*.003),(out.length-1-i)/(rate*.012)));
   // Tame isolated peaks locally, rather than turning down the entire recording.
   const v=out[i]+(dry&&i>=delay?dry[i-delay]*echo:0);
-  out[i]=seam===0?0:.22*Math.tanh(v*gain/.22)*seam;
+  out[i]=seam===0?0:.22*Math.tanh(v*gain/.22)*seam*vocalGain;
  }
  return out;
 }

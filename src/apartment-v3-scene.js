@@ -5,7 +5,7 @@ import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=28'
 import {homeLight} from './apartment-v3-time.js?rev=28';
 import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=28';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=7';
-import {CameraModes,cameraPose,pickVisible,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=28';
+import {CameraModes,cameraPose,pickVisible,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=33';
 import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=21';
 import {createSmoke} from './apartment-v3-smoke.js?rev=21';
 import {createRetroPass} from './apartment-v3-retro.js?rev=11';
@@ -83,7 +83,8 @@ export async function createApartmentScene(canvas,config){
   function setComputerPresentation(snapshot,pcState,playerName){computerSnapshot=snapshot;computer?.update(snapshot,pcPresentation(snapshot,pcState.power,playerName));}
   function endComputerView(){computerActive=false;computer?.end();transitionQuad.visible=false;}
   function applyCamera(state){
-    const fp=modes.mode==='3D',pose=cameraPose(modes.mode,state,eyeHeight,modes);
+    modes.onMotionState(state);
+    const fp=modes.mode==='3D',pose=cameraPose(modes.mode,state,eyeHeight,{yaw:modes.yaw,pitch:modes.pitch,aspect:camera.aspect});
     if(fp){firstCamera.position.fromArray(pose.position);firstCamera.rotation.set(pose.pitch,pose.yaw,0,'YXZ');firstCamera.updateMatrixWorld();}
     else{
       camera.fov=pose.fov;camera.updateProjectionMatrix();camera.position.fromArray(pose.position);camera.lookAt(new THREE.Vector3(...pose.target));camera.updateMatrixWorld();

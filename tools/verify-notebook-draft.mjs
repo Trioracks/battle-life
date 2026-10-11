@@ -7,7 +7,7 @@ const browser=await chromium.launch({headless:true,executablePath:process.env.PL
 const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage(),errors=[],metrics=[];
 page.on('pageerror',e=>errors.push(e.message));
 await page.route('**/__notebook-draft-qa',route=>route.fulfill({contentType:'text/html',body:`<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/virtual-pc.css"><link rel="stylesheet" href="/desktop-apps.css"><link rel="stylesheet" href="/rap-notebook.css"><style>html,body{height:100%;margin:0}</style><section id="virtual-pc"></section><script type="module">
-import {mountVirtualPc} from '/src/virtual-pc-ui.js?rev=32';import {createVirtualPcState} from '/src/virtual-pc-state.js?rev=32';import {advanceLyricWork} from '/src/lyric-production.js?rev=32';
+import {mountVirtualPc} from '/src/virtual-pc-ui.js?rev=33';import {createVirtualPcState} from '/src/virtual-pc-state.js?rev=33';import {advanceLyricWork} from '/src/lyric-production.js?rev=33';
 window.pc=mountVirtualPc(document.querySelector('#virtual-pc'),{onPersist:s=>{localStorage.setItem('isolated-notebook',JSON.stringify(s));return true;},onWork:()=>true});
 pc.showDesktop(createVirtualPcState(JSON.parse(localStorage.getItem('isolated-notebook')||'null')||{power:'on',software:{notebook:{installed:true}},music:{needs:{satiety:100,energy:100}}}));pc.syncHost({gameDay:1,playerName:'Проверка',skills:{writing:10},clockLabel:'12:00'});pc.open('rap-notebook');
 window.finish=()=>{const next=advanceLyricWork(pc.state,1000).state;pc.syncState(next);pc.persist(next);};window.ready=true;

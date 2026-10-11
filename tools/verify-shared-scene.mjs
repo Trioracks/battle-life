@@ -10,8 +10,8 @@ page.setDefaultTimeout(60000);page.on('pageerror',e=>errors.push(e.message));pag
 try{
  await page.route('**/__shared-scene-fixture',route=>route.fulfill({contentType:'text/html',body:`<!doctype html><html><head><style>body{margin:0}canvas{display:block;width:100vw;height:100vh}</style><script type="importmap">{"imports":{"three":"/vendor/three/three.module.js","three/addons/":"/vendor/three/addons/"}}</script></head><body><canvas id="apartment"></canvas><script type="module">
  import * as THREE from 'three';
- import {createApartmentScene} from '/src/apartment-v3-scene.js?rev=28';
- import {prepareApartmentConfig} from '/src/apartment-v3-runtime.js?rev=32';
+ import {createApartmentScene} from '/src/apartment-v3-scene.js?rev=33';
+ import {prepareApartmentConfig} from '/src/apartment-v3-runtime.js?rev=33';
  import {ApartmentMotion} from '/src/apartment-v3-motion.js?rev=28';
  // Observe the actual scene at its render boundary without a production debug API.
  const originalAdd=THREE.Scene.prototype.add;let graph,renderCamera;

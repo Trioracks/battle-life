@@ -1,37 +1,37 @@
 import {ApartmentMotion} from './apartment-v3-motion.js?rev=8';
 import {ApartmentTime,loadHomeTime,saveHomeTime as saveHomeTimeRaw} from './apartment-v3-time.js?rev=28';
 import {districts,getDistrictLocations} from './calikfornia.js';
-import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=32';
+import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=33';
 import {playSoundCue} from './sound-cues.js?rev=28';
-import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=28';
+import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=33';
 import {DEFAULT_APPEARANCE,loadProfile,saveProfile} from './avatar-v3-profile.js?rev=28';
 import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=28';
-import {createNewGameSession} from './apartment-v3-new-game.js?rev=32';
-import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=32';
-import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=32';
-import {mountVirtualPc} from './virtual-pc-ui.js?rev=32';
+import {createNewGameSession} from './apartment-v3-new-game.js?rev=33';
+import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=33';
+import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=33';
+import {mountVirtualPc} from './virtual-pc-ui.js?rev=33';
 import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=28';
 import {PcSounds} from './virtual-pc-sounds.js?rev=28';
 import {playIndoorFootstep} from './indoor-footsteps.js?rev=21';
-import {restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=32';
+import {restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=33';
 import {advanceInstallation} from './pc-software.js?rev=28';
-import {createBeatWorkPanel} from './beat-work-view.js?rev=32';
+import {createBeatWorkPanel} from './beat-work-view.js?rev=33';
 import {createBeatWorkAudio} from './beat-work-audio.js?rev=28';
 import {createLyricWorkAudio} from './lyric-work-audio.js?rev=28';
-import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.js?rev=32';
-import {effectiveVocalSkill} from './vocal-production.js?rev=32';
-import {effectiveWritingSkill} from './lyric-production.js?rev=32';
-import {consumeFood} from './home-food.js?rev=28';
+import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.js?rev=33';
+import {effectiveVocalSkill} from './vocal-production.js?rev=33';
+import {effectiveWritingSkill} from './lyric-production.js?rev=33';
+import {consumeFood} from './home-food.js?rev=33';
 import {createCharacterSpeech,workNeedSpeech} from './character-speech.js?rev=31';
-import {mountHomeNeedsView,mountCharacterSpeech} from './home-needs-view.js?rev=28';
-import {migrateNoviceSave} from './home-profile-migration.js?rev=32';
+import {mountHomeNeedsView,mountCharacterSpeech} from './home-needs-view.js?rev=33';
+import {migrateNoviceSave} from './home-profile-migration.js?rev=33';
 import {mountHomeWardrobeView} from './home-wardrobe-view.js?rev=28';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false,stepVariation=0;
 const cue=id=>{try{audio??=new AudioContext();if(audio.state==='suspended')audio.resume().catch(()=>{});if(id==='footstep')playIndoorFootstep(audio,stepVariation++);else playSoundCue(id,audio);}catch{/* Sound is optional. */}};
 try{
-  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=28');
+  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=33');
   const response=await fetch('./assets/apartment/v3/scene.json',{cache:'no-cache'});if(!response.ok)throw Error('Scene manifest '+response.status);
   const config=prepareApartmentConfig(await response.json()),view=await createApartmentScene(canvas,config);
   let motion=new ApartmentMotion(config),mode='menu',playing=false,previewYaw=0,previewTarget=0;
@@ -142,7 +142,7 @@ try{
   function enterApartment(nextProfile){
     pcLifecycle.reset();
     speech.clear();
-    view.modes.mode='2D';view.modes.revision++;cameraLabel();
+    view.modes.reset();cameraLabel();
     profile=nextProfile;motion=new ApartmentMotion(config);if(homeTime.initialRest||homeTime.isSleeping)motion.startSleeping();view.setAppearance(profile.appearance);
     playing=true;lastStep=0;lastDoor=false;hold=false;skeleton=false;$('#hold').checked=false;$('#show-bones').checked=false;
     $('#player-name').textContent=profile.name;resumeAnimation();setMode('game');cue('sleep');
@@ -295,7 +295,7 @@ try{
     if(motion.clip==='walk'&&motion.walkDistance-lastStep>config.stride/2){cue('footstep');lastStep=motion.walkDistance;}
     const door=motion.doorOpen>.3;if(door&&!lastDoor)cue('door');lastDoor=door;
     view.setRoomLights(homeTime.lights);view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));
-    if(pcNeedsSceneFrame(pcLifecycle.snapshot,mode))view.render(motion,(paused&&!step)||homeModalOpen()||document.hidden?0:dt,{skeleton,paused:(paused&&!step)||homeModalOpen()||document.hidden});$('#fade').style.opacity=motion.fade;
+    if(pcNeedsSceneFrame(pcLifecycle.snapshot,mode))view.render(motion,(paused&&!step)||homeModalOpen()||document.hidden?0:dt,{skeleton,paused:(paused&&!step)||homeModalOpen()||document.hidden});cameraLabel();$('#fade').style.opacity=motion.fade;
     const headAnchor=view.getHeadScreenPosition(),firstPerson=view.modes.mode==='3D',roomReady=pcLifecycle.snapshot.phase==='room'&&motion.actionId!=='computer'&&motion.fade<.01;
     speech.tick(paused?0:dt,{hidden:document.hidden,present:mode==='game'&&!cameraFade&&roomReady&&!homeModalOpen()&&(firstPerson||headAnchor.visible),roomReady,audioAllowed:audio?.state==='running'});
     speechView.update(speech.snapshot,headAnchor,{firstPerson,width:innerWidth,height:innerHeight,bottomLimit:$('#controls').getBoundingClientRect().top-12});

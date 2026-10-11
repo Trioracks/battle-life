@@ -34,7 +34,7 @@ try{
  assert.ok(measured.crushed.rms>.01,'digital effect does not silence the signal');
  console.log('PASS real OfflineAudioContext spectrum / clean bypass / bounded output',JSON.stringify(measured));
  const playback=await page.evaluate(async()=>{
-  const [{BeatAudio},{createBeat},{createVirtualPcState}]=await Promise.all([import('/src/beat-audio.js?rev=32'),import('/src/beat-production.js?rev=32'),import('/src/virtual-pc-state.js?rev=32')]);
+  const [{BeatAudio},{createBeat},{createVirtualPcState}]=await Promise.all([import('/src/beat-audio.js?rev=33'),import('/src/beat-production.js?rev=33'),import('/src/virtual-pc-state.js?rev=33')]);
   const beat=createBeat(createVirtualPcState(),{id:'proof',name:'Проверка'},{sound:10},()=>.2).state.projects[0];beat.stages=[{sliders:[5,5,5],fit:0,quality:10}];
   const audio=new BeatAudio();const ok=await audio.playProject(beat);const initial=audio.effects;
   const connected=audio.sources.length===1&&initial?.input!==audio.context.destination;
