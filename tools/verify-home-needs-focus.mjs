@@ -13,7 +13,7 @@ try{
   ['last portion',{music:{needs:{satiety:50}},household:{fridge:{apple:1,pear:0,banana:0}}},'Закрыть'],
  ]){
   await page.evaluate(async seed=>{
-   const [{mountHomeNeedsView},{consumeFood},{createVirtualPcState}]=await Promise.all([import('/src/home-needs-view.js?rev=28'),import('/src/home-food.js?rev=28'),import('/src/virtual-pc-state.js?rev=31')]);
+   const [{mountHomeNeedsView},{consumeFood},{createVirtualPcState}]=await Promise.all([import('/src/home-needs-view.js?rev=28'),import('/src/home-food.js?rev=28'),import('/src/virtual-pc-state.js?rev=32')]);
    window.fridgeView?.dispose();let state=createVirtualPcState(seed);const root=document.querySelector('#fridge');
    window.fridgeView=mountHomeNeedsView(root,{returnFocus:document.querySelector('#before'),onConsume:id=>{state=consumeFood(state,id).state;fridgeView.update(state);}});fridgeView.open(state);
   },seed);

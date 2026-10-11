@@ -16,7 +16,7 @@ try{
  await page.route('**/__immersion-fixture',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><body>Isolated acceptance fixture</body>'}));
  await page.goto('http://127.0.0.1:4173/__immersion-fixture');
  await page.evaluate(async()=>{
-  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=28'),import('/src/virtual-pc-state.js?rev=31')]);
+  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=28'),import('/src/virtual-pc-state.js?rev=32')]);
   localStorage.setItem('battle-life-apartment-v3',JSON.stringify(createProfile({name:'Проверка погружения'})));
   localStorage.setItem('battle-life-virtual-pc-v1',JSON.stringify(createVirtualPcState({power:'off',software:{client:{receivedBytes:2000000},ft:{receivedBytes:800000000}},music:{needs:{satiety:100,energy:100}}})));
   localStorage.setItem('battle-life-apartment-v3-time',JSON.stringify({day:1,minutes:600,initialRest:false}));

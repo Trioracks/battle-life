@@ -1,10 +1,11 @@
 import {drumById,loopSeconds} from './beat-catalog.js?rev=31';
 import {beginnerById} from './beat-beginner-bank.js?rev=31';
-import {resolveBeatPlayback} from './beat-playback.js?rev=31';
-import {connectBeatMix} from './beat-mix.js?rev=28';
-import {transformBeatBuffer,connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=31';
+import {resolveBeatPlayback} from './beat-playback.js?rev=32';
+import {connectBeatMix} from './beat-mix.js?rev=32';
+import {transformBeatBuffer,connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=32';
 import {vocalById} from './vocal-catalog.js?rev=31';
-import {transformVocalBuffer} from './vocal-result-dsp.js?rev=31';
+import {transformVocalBuffer} from './vocal-result-dsp.js?rev=32';
+import {arrangeSongBuffer} from './beat-song-form.js?rev=32';
 
 // Authored placeholder PCM, not a remix of third-party music. Sliders never enter here.
 export function primitiveSamples(kind,rate=44100){
@@ -99,9 +100,15 @@ export class BeatAudio{
     if(!transformed){transformed=transformBeatBuffer(this.context,buffer,part.result,part.loopSeconds);if(this.resultCache.size>=8)this.resultCache.delete(this.resultCache.keys().next().value);this.resultCache.set(key,transformed);}
     const fx=connectBeatResult(this.context,part.result,beatInput);layerEffects.push(fx);return {buffer:transformed,input:fx.input};
    });
+   const arranged=prepared.map(({buffer,input},index)=>{
+    const part=descriptor.parts[index];if(!part.windows)return {buffer,input};
+    const key=JSON.stringify(['song',part.id,part.loopSeconds,part.result,part.vocal,part.windows,descriptor.durationSeconds]);let complete=this.resultCache.get(key);
+    if(!complete){complete=arrangeSongBuffer(this.context,buffer,part.windows,descriptor.durationSeconds,part.loopSeconds);if(this.resultCache.size>=8)this.resultCache.delete(this.resultCache.keys().next().value);this.resultCache.set(key,complete);}
+    return {buffer:complete,input};
+   });
    const when=this.context.currentTime+.04;this.startedAt=when;
-   prepared.forEach(({buffer,input},index)=>{
-    const part=descriptor.parts[index],source=this.context.createBufferSource();source.buffer=buffer;source.loop=true;source.loopStart=0;source.loopEnd=part.loopSeconds;source.connect(input);this.sources.push(source);source.start(when,offset%part.loopSeconds);
+   arranged.forEach(({buffer,input},index)=>{
+    const part=descriptor.parts[index],loop=part.windows?descriptor.durationSeconds:part.loopSeconds,source=this.context.createBufferSource();source.buffer=buffer;source.loop=true;source.loopStart=0;source.loopEnd=loop;source.connect(input);this.sources.push(source);source.start(when,offset%loop);
    });
    this.status='playing';this.pending=null;
    return true;

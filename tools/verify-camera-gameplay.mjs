@@ -11,7 +11,7 @@ try{
  await page.route('**/__camera-seed',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><title>Isolated camera QA seed</title>'}));
  await page.goto('http://127.0.0.1:4173/__camera-seed');
  await page.evaluate(async()=>{
-  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js'),import('/src/virtual-pc-state.js')]);
+  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js'),import('/src/virtual-pc-state.js?rev=32')]);
   localStorage.setItem('battle-life-apartment-v3',JSON.stringify(createProfile({name:'Проверка камеры'})));
   localStorage.setItem('battle-life-virtual-pc-v1',JSON.stringify(createVirtualPcState({power:'off',music:{needs:{satiety:100,energy:100}}})));
   localStorage.setItem('battle-life-apartment-v3-time',JSON.stringify({day:1,minutes:720,initialRest:false}));

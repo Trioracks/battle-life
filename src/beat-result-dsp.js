@@ -1,9 +1,9 @@
 import {normalizeBeatResult} from './beat-result.js?rev=28';
+import {creativeEffectAmount} from './audio-performance.js?rev=32';
 const clamp=(v,lo=0,hi=1)=>Math.max(lo,Math.min(hi,v));
 const mod=(x,n)=>((x%n)+n)%n;
 const sample=(a,t)=>{const i=Math.floor(t),f=t-i;return a[mod(i,a.length)]*(1-f)+a[mod(i+1,a.length)]*f;};
 const severity=q=>clamp((100-q)/100);
-const DRUM_GLITCH_AMOUNT=.8;
 // Grain centres follow the original timeline. Only each grain's read pitch changes.
 function detune(a,rate,cents,phase){
  const out=new Float32Array(a.length),weight=new Float32Array(a.length),size=Math.round(rate*.08),hop=Math.max(1,Math.round(size/4)),half=Math.floor(size/2);
@@ -16,42 +16,33 @@ function detune(a,rate,cents,phase){
  }
  for(let i=0;i<a.length;i++)out[i]/=weight[i]||1;return out;
 }
-const brokenDrums=[0,0,-1,2,4,12,6,6,8,-1,9,1,12,12,15,-1];
-// Slice boundaries use the fractional 90 BPM grid, never cumulative rounded steps.
+const random=(seed,cell,salt=0)=>{let x=(seed^Math.imul(cell+1,374761393)^Math.imul(salt+1,668265263))>>>0;x=Math.imul(x^(x>>>13),1274126177);return ((x^(x>>>16))>>>0)/4294967296;};
+// Monotonic time warp: a novice hit moves once, never becomes repeated slices.
+// The endpoints stay fixed to four bars, even at fractional frame rates.
 export function transformBeatSamples(input,rate,value){
  const r=normalizeBeatResult(value);if(!r||r.quality>=100||!input.length||!Number.isFinite(rate)||rate<1000)return input;
- const amount=severity(r.quality),rough=clamp((30-r.quality)/25),medium=clamp((100-r.quality)/70),kind=r.stage;
+ const amount=severity(r.quality),rough=clamp((30-r.quality)/25),medium=clamp((100-r.quality)/70),kind=r.stage,skill=r.skills.beatmaking,creative=creativeEffectAmount(skill);
  const pitch=(kind===1?85:-120)*medium+(kind===1?100:-140)*rough;
- const a=kind?detune(input,rate,pitch*(.85+.15*(1-r.skills.beatmaking/100)),r.seed%17):input;
- const out=new Float32Array(a.length),step=rate/6,edge=Math.max(1,Math.round(rate*.0015));
+ const a=kind?detune(input,rate,pitch*(.85+.15*(1-skill/100)),r.seed%17):input;
+ const out=new Float32Array(a.length),step=rate/6,count=Math.ceil(a.length/step),edge=Math.max(1,rate*.003);
+ const jitter=Math.min(step*.42,rate*(.009+.085*(1-skill/100))*amount**1.5);
+ const boundaries=Array.from({length:count+1},(_,s)=>s===0?0:s===count?a.length:s*step+(random(r.seed,s,kind)-.5)*2*jitter);
+ let cell=0;
  for(let i=0;i<out.length;i++){
-  const s=Math.floor(i/step),start=Math.round(s*step),end=Math.round((s+1)*step),local=i-start,cell=s%16,bar=Math.floor(s/16),cellSize=end-start;
-  let from=s,offset=local,envelope=1;
-  if(kind===0){
-   // At 30, most groove survives; at 5, repeated/missing/reordered hits dominate.
-   if(rough>.001){
-    const mapped=brokenDrums[(cell+bar*3+r.seed%4)%16];
-    if(mapped<0)envelope=0;else from=bar*16+mapped;
-    if([1,6,12,13].includes(cell)){const size=Math.max(1,Math.round(step/(cell===6?8:4)));offset=local%size;envelope*=clamp(Math.min(offset/edge,(size-1-offset)/edge));}
-   }else if(cell===15&&bar%2===0)envelope=0;
-   else if(cell===6&&bar%2===1){const size=Math.max(1,Math.round(step/2));offset=local%size;envelope=clamp(Math.min(offset/edge,(size-1-offset)/edge));}
-   else if(cell===12&&bar%2===0)from=s+1;
-  }else if(kind===1){
-   if(cell===9||rough>.2&&[2,3,14].includes(cell))from=s+(rough>.2?3:1);
-   if(rough>.2&&[5,11].includes(cell))offset=cellSize-1-local;
-   if((cell===7&&bar===1)||rough>.2&&cell===12)envelope=0;
-  }else{
-   if(cell===10&&bar%2===0)from=s-1;
-   if(rough>.2&&cell%5===0)from=s-2;
-   if(rough>.2&&cell===10)envelope=0;
-   // Grid-locked late bass attacks, without changing the underlying loop clock.
-   offset-=step/2*medium;
+  while(cell<count-1&&i>=boundaries[cell+1])cell++;
+  const f=(i-boundaries[cell])/(boundaries[cell+1]-boundaries[cell]);
+  const sourceStart=cell*step,sourceEnd=Math.min(a.length,(cell+1)*step);
+  const cursor=sourceStart+f*(sourceEnd-sourceStart);
+  const strength=amount*.45,level=1-strength*(random(r.seed,cell,8)*(1-f)+random(r.seed,cell+1,8)*f);
+  let v=sample(a,cursor)*level;
+  if(creative>0){
+   const s=Math.floor(i/step),local=i-s*step;
+   if(s%16===15||s%32===22){
+    const grain=step/2,offset=local%grain,envelope=clamp(Math.min(offset/edge,(grain-offset)/edge));
+    const wet=creative*[.22,.14,.10][kind];
+    v=v*(1-wet)+sample(a,s*step+offset)*envelope*wet;
+   }
   }
-  const altered=from!==s||offset!==local||envelope!==1;
-  if(altered)envelope*=clamp(Math.min(local/edge,(cellSize-1-local)/edge));
-  const wet=kind===0?clamp(.7*medium+.3*rough)*DRUM_GLITCH_AMOUNT:medium;
-  let v=a[i]*(1-wet)+sample(a,from*step+offset)*envelope*wet;
-  if(kind===0){const levels=Math.round(24+(1-amount)*160);v=v*(1-amount)+Math.round(v*levels)/levels*amount;}
   const seam=Math.min(1,i/(rate*.002*amount),(out.length-1-i)/(rate*.002*amount));
   out[i]=seam===0?0:clamp(v,-1,1)*seam;
  }
@@ -72,17 +63,19 @@ export function transformBeatBuffer(context,buffer,result,seconds){
 function disposable(nodes,input){return {input,dispose(){for(const n of nodes){try{n.disconnect();}catch{/* Already released. */}}}};}
 // One graph per layer. All delay feedback is below unity, and all nodes are owned.
 export function connectBeatResult(context,value,destination){
- const r=normalizeBeatResult(value);if(!r||r.quality===100)return disposable([],destination);
+ const r=normalizeBeatResult(value),post=Number.isFinite(value?.postGain)?clamp(value.postGain,0,4):0;if(!r||r.quality===100&&!post)return disposable([],destination);
  const nodes=[],make=method=>{const n=context[method]();nodes.push(n);return n;};
  try{
-  const amount=severity(r.quality),buff=clamp((r.quality-100)/10),kind=r.stage,rough=clamp((30-r.quality)/25),medium=clamp((100-r.quality)/70);
+  const amount=severity(r.quality),buff=clamp((r.quality-100)/10),kind=r.stage,rough=clamp((30-r.quality)/25),medium=clamp((100-r.quality)/70),creative=creativeEffectAmount(r.skills.beatmaking);
   const colour=amount*(.8+.2*(1-r.skills.sound/100)),input=make('createGain');
   const hp=make('createBiquadFilter');hp.type='highpass';hp.frequency.value=20+([200,280,15][kind]*medium+[400,550,0][kind]*rough)*(.8+.2*(1-r.skills.sound/100));hp.Q.value=-3.0103;
   const lp=make('createBiquadFilter');lp.type='lowpass';lp.frequency.value=Math.min(context.sampleRate*.45,20000/(1+[3,2,11][kind]*colour+[2,4,10][kind]*rough));lp.Q.value=-3.0103;
-  const shape=make('createWaveShaper'),drive=1+[5,2.7,4][kind]*colour+[10,2.3,8][kind]*rough,levels=Math.round(1024/(1+50*colour+50*rough));
-  shape.curve=Float32Array.from({length:65537},(_,i)=>{const x=i/32768-1,y=Math.tanh(x*drive)/Math.sqrt(drive),quantized=Math.round(y*levels)/levels;return x*(1-colour)+quantized*colour;});
+  const shape=make('createWaveShaper'),drive=1+[2,1,3][kind]*colour,crush=creative*.12;
+  shape.curve=Float32Array.from({length:65537},(_,i)=>{const x=i/32768-1,y=clamp(x*drive,-.85,.85)/drive,quantized=Math.round(y*128)/128;return x*(1-colour)+(y*(1-crush)+quantized*crush)*colour;});
   shape.oversample='none';
-  const balance=make('createGain');balance.gain.value=medium/[1+.3*colour,1+.15*colour,1+.6*colour][kind];
+  // Partial fixed EQ makeup, not per-track normalization. Removing the old
+  // distortion gain must not leave the whole beat inaudible beneath the voice.
+  const balance=make('createGain');balance.gain.value=medium*(1+[3,1.3,1.1][kind]*colour)/[1+.3*colour,1+.15*colour,1+.6*colour][kind];
   if(buff){
    // Small musical lift: no damaged pitch, lost hits, overdrive or feedback.
    const eq=make('createBiquadFilter');eq.type='highshelf';eq.frequency.value=2500;eq.gain.value=.8*buff;
@@ -93,10 +86,12 @@ export function connectBeatResult(context,value,destination){
    const dry=make('createGain');dry.gain.value=1-medium;input.connect(dry);dry.connect(destination);
    input.connect(hp);hp.connect(shape);shape.connect(lp);lp.connect(balance);balance.connect(destination);
   }
-  const delay=make('createDelay'),feedback=make('createGain'),wet=make('createGain');
-  delay.delayTime.value=[1/6,1/3,1/12][kind];feedback.gain.value=buff?0:Math.min(.65,[.4,.35,.26][kind]*medium+.22*rough);
-  wet.gain.value=buff?.045*buff:([.28,.35,.2][kind]*medium+[.55,.6,.3][kind]*rough)*(kind===0?DRUM_GLITCH_AMOUNT:1);
-  (buff?input:balance).connect(delay);delay.connect(feedback);feedback.connect(delay);delay.connect(wet);wet.connect(destination);
+  const echo=(buff?.025*buff:creative*[.075,.11,.045][kind])+post*[.006,.009,.004][kind];
+  if(echo>0){
+   const delay=make('createDelay'),feedback=make('createGain'),wet=make('createGain');
+   delay.delayTime.value=post?1/3:[1/6,1/3,1/3][kind];feedback.gain.value=buff?0:.08+.08*creative;wet.gain.value=echo;
+   (buff||r.quality===100?input:balance).connect(delay);delay.connect(feedback);feedback.connect(delay);delay.connect(wet);wet.connect(destination);
+  }
   return disposable(nodes,input);
  }catch(error){disposable(nodes).dispose();throw error;}
 }

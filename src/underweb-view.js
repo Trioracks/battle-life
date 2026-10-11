@@ -1,8 +1,8 @@
 import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=21';
 import {resolveUnderweb} from './virtual-pc-catalog.js?rev=28';
-import {createBeatMarket} from './beat-market-view.js?rev=31';
-import {softwareForum,softwareMessage} from './pc-software-view.js?rev=31';
-import {downloadPresentation} from './virtual-pc-runtime.js?rev=31';
+import {createBeatMarket} from './beat-market-view.js?rev=32';
+import {softwareForum,softwareMessage} from './pc-software-view.js?rev=32';
+import {downloadPresentation} from './virtual-pc-runtime.js?rev=32';
 import {createCommunityView} from './underweb-community-view.js?rev=28';
 import {communityDay} from './underweb-community.js?rev=28';
 import {homeDateLabel} from './home-calendar.js?rev=28';

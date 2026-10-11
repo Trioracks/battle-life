@@ -1,12 +1,12 @@
 import {pcElement as el,pcButton as button,pcFind,pcFocusable} from './virtual-pc-dom.js?rev=21';
-import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=28';
+import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=32';
 import {BEAT_STAGES} from './beat-catalog.js?rev=31';
 import {randomBeatName} from './beat-names.js?rev=28';
-import {resolveBeatPlayback} from './beat-playback.js?rev=31';
-import {describeBeatMix} from './beat-mix.js?rev=28';
-import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=31';
-import {startVocalWork} from './vocal-production.js?rev=31';
-import {appendRecordingControls} from './recording-studio-view.js?rev=31';
+import {resolveBeatPlayback} from './beat-playback.js?rev=32';
+import {describeBeatMix} from './beat-mix.js?rev=32';
+import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=32';
+import {startVocalWork} from './vocal-production.js?rev=32';
+import {appendRecordingControls} from './recording-studio-view.js?rev=32';
 
 export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio,legacyName,initialProject}){
  const d=root.ownerDocument,workspace=createStudioWorkspace(d,{projectName:legacyName});root.replaceChildren(workspace);

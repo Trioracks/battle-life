@@ -1,4 +1,5 @@
 import {pcElement as el,pcButton as button,pcFind} from './virtual-pc-dom.js?rev=21';
+import {createBeatSongForm,songPartWindows} from './beat-song-form.js?rev=32';
 
 export const FT_TRACKS=Object.freeze([
  ...['Drum Kit','Bass','Percussion'].map(name=>({name,stage:0,color:'rhythm'})),
@@ -7,7 +8,7 @@ export const FT_TRACKS=Object.freeze([
 ]);
 
 export function renderStudioTracks(root,beat){
- const d=root.ownerDocument,stage=beat?.stages?.length??0;
+ const d=root.ownerDocument,stage=beat?.stages?.length??0,form=createBeatSongForm(beat);
  const tracks=stage?FT_TRACKS.slice(0,stage*3):[{name:'Дорожка 01',stage:0,color:'empty'}];
  if(stage===3&&beat.recording?.draft){
   tracks.push({name:'Draft Vocal',stage:3,color:'vocal',muted:Boolean(beat.recording.clean)});
@@ -20,7 +21,15 @@ export function renderStudioTracks(root,beat){
   label.append(el(d,'i',{attributes:{'aria-hidden':'true'}}),el(d,'span',{text:track.name,dataset:{ftRole:'track-label'}}));
   if(track.muted)label.append(el(d,'small',{text:'OFF',attributes:{title:'Черновик заменён чистовой записью и больше не воспроизводится'}}));
   const lane=el(d,'div',{className:'ft-lane-grid',dataset:{ftRole:'lane'},attributes:{'aria-hidden':'true'}});
-  if(stage){const clip=el(d,'span',{className:'ft-audio-clip',text:track.name,dataset:{ftRole:'clip',color:track.color}});clip.style.marginLeft='0%';clip.style.width=(beat.version===3?25:12.5)+'%';lane.append(clip);}
+  if(stage){
+   const windows=form?songPartWindows(form,Math.min(3,track.stage)):[{startBar:0,bars:beat.version===3?4:2}];
+   if(form)lane.style.position='relative';
+   for(const window of windows){
+    const clip=el(d,'span',{className:'ft-audio-clip',text:track.name,dataset:{ftRole:'clip',color:track.color,startBar:String(window.startBar+1),bars:String(window.bars)}});
+    clip.style.marginLeft=(window.startBar*6.25)+'%';clip.style.width=(window.bars*6.25)+'%';
+    if(form){clip.style.position='absolute';clip.style.top='2px';}lane.append(clip);
+   }
+  }
   row.append(label,lane);rows.append(row);
  }
 }

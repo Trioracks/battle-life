@@ -36,7 +36,7 @@ export function beatMixCurve(value){
  const levels=2**(Math.round(14-amount*8)-1),curve=new Float32Array(65537);
  for(let i=0;i<curve.length;i++){
   const x=i/(curve.length-1)*2-1,soft=Math.tanh(x*drive)/drive;
-  const shaped=crushed?Math.sign(soft)*Math.round(Math.abs(soft)*levels)/levels:soft;
+  const shaped=crushed&&profile.skill>50?Math.sign(soft)*Math.round(Math.abs(soft)*levels)/levels:soft;
   curve[i]=x*(1-wet)+shaped*wet;
  }
  return curve;

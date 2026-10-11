@@ -1,7 +1,7 @@
 import {BEAT_RULES as R,BEAT_PRACTICE,BEAT_GENRES,DRUMS,drumById} from './beat-catalog.js?rev=31';
 import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=31';
 import {softwareDiskBytes} from './pc-software.js?rev=28';
-import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=28';
+import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=32';
 import {createBeatResult} from './beat-result.js?rev=28';
 import {normalizeRecording,effectiveSoundSkill} from './vocal-result.js?rev=31';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;

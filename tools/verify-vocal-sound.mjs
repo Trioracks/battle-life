@@ -13,7 +13,7 @@ try{
  if(beforeSource)await page.route('**/__vocal-before.js',r=>r.fulfill({contentType:'text/javascript',body:beforeSource}));
  await page.goto('http://127.0.0.1:4173/__vocal-sound');
  const result=await page.evaluate(async compare=>{
-  const [{VOCALS},{createVocalTake,vocalPlaybackProfile},{transformVocalBuffer},{transformBeatBuffer,connectBeatResult,connectBeatResultMaster},{createBeatResult},{BeatAudio}]=await Promise.all([import('/src/vocal-catalog.js?rev=31'),import('/src/vocal-result.js?rev=31'),import('/src/vocal-result-dsp.js?rev=31'),import('/src/beat-result-dsp.js?rev=31'),import('/src/beat-result.js?rev=28'),import('/src/beat-audio.js?rev=31')]);
+  const [{VOCALS},{createVocalTake,vocalPlaybackProfile},{transformVocalBuffer},{transformBeatBuffer,connectBeatResult,connectBeatResultMaster},{createBeatResult},{BeatAudio}]=await Promise.all([import('/src/vocal-catalog.js?rev=31'),import('/src/vocal-result.js?rev=31'),import('/src/vocal-result-dsp.js?rev=32'),import('/src/beat-result-dsp.js?rev=32'),import('/src/beat-result.js?rev=28'),import('/src/beat-audio.js?rev=32')]);
   const rate=44100,frames=470400,decoder=new OfflineAudioContext(2,frames,rate),cache=new Map();
   const previous=compare?(await import('/__vocal-before.js')).transformVocalBuffer:null;
   const decode=async path=>{if(!cache.has(path)){const response=await fetch(path);if(!response.ok)throw Error(path);cache.set(path,await decoder.decodeAudioData(await response.arrayBuffer()));}return cache.get(path);};
