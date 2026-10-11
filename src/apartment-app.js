@@ -1,30 +1,31 @@
 import {ApartmentMotion} from './apartment-v3-motion.js?rev=8';
 import {ApartmentTime,loadHomeTime,saveHomeTime as saveHomeTimeRaw} from './apartment-v3-time.js?rev=28';
 import {districts,getDistrictLocations} from './calikfornia.js';
-import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=33';
+import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=34';
 import {playSoundCue} from './sound-cues.js?rev=28';
 import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=33';
 import {DEFAULT_APPEARANCE,loadProfile,saveProfile} from './avatar-v3-profile.js?rev=28';
 import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=28';
-import {createNewGameSession} from './apartment-v3-new-game.js?rev=33';
-import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=33';
-import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=33';
-import {mountVirtualPc} from './virtual-pc-ui.js?rev=33';
+import {createNewGameSession} from './apartment-v3-new-game.js?rev=34';
+import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=34';
+import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=34';
+import {mountVirtualPc} from './virtual-pc-ui.js?rev=34';
 import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=28';
 import {PcSounds} from './virtual-pc-sounds.js?rev=28';
 import {playIndoorFootstep} from './indoor-footsteps.js?rev=21';
-import {restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=33';
-import {advanceInstallation} from './pc-software.js?rev=28';
-import {createBeatWorkPanel} from './beat-work-view.js?rev=33';
+import {restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=34';
+import {advanceInstallation} from './pc-software.js?rev=34';
+import {createBeatWorkPanel} from './beat-work-view.js?rev=34';
+import {normalizeGenreProgression,genreById,genreCap} from './genre-progression.js?rev=34';
 import {createBeatWorkAudio} from './beat-work-audio.js?rev=28';
 import {createLyricWorkAudio} from './lyric-work-audio.js?rev=28';
-import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.js?rev=33';
-import {effectiveVocalSkill} from './vocal-production.js?rev=33';
-import {effectiveWritingSkill} from './lyric-production.js?rev=33';
+import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.js?rev=34';
+import {effectiveVocalSkill} from './vocal-production.js?rev=34';
+import {effectiveWritingSkill} from './lyric-production.js?rev=34';
 import {consumeFood} from './home-food.js?rev=33';
 import {createCharacterSpeech,workNeedSpeech} from './character-speech.js?rev=31';
 import {mountHomeNeedsView,mountCharacterSpeech} from './home-needs-view.js?rev=33';
-import {migrateNoviceSave} from './home-profile-migration.js?rev=33';
+import {migrateNoviceSave} from './home-profile-migration.js?rev=34';
 import {mountHomeWardrobeView} from './home-wardrobe-view.js?rev=28';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
@@ -288,7 +289,8 @@ try{
     if(!workHud.hidden){
       const creative=creativeWorkDescriptor(pcState,profile?.skills),beat=lastWorkBeat??creative.project;
       const shownJob=creative.job??lastWorkJob;
-      workPanel.update({beat,job:shownJob,needs:pcState.music.needs,skill:shownJob?.output?.draft?effectiveVocalSkill(pcState,profile?.skills,shownJob.kind):beat?.kind==='lyrics'?effectiveWritingSkill(pcState,profile?.skills):effectiveBeatSkill(pcState,profile?.skills),genrePractice:pcState.music.genrePractice[beat?.genre]??0,clockLabel:homeTime.label,reward:workReward,finished:workFinished,...workSound});
+      const genres=normalizeGenreProgression(pcState.music.genres),genreId=shownJob?.genreProfile?.id??beat?.genreProfile?.id??'experimental';
+      workPanel.update({beat,job:shownJob,needs:pcState.music.needs,skill:shownJob?.output?.draft?effectiveVocalSkill(pcState,profile?.skills,shownJob.kind):beat?.kind==='lyrics'?effectiveWritingSkill(pcState,profile?.skills):effectiveBeatSkill(pcState,profile?.skills),genreProgress:{name:genreById(genreId).name,xp:genres.xp[genreId],cap:genreCap(genres,genreId)},clockLabel:homeTime.label,reward:workReward,finished:workFinished,...workSound});
     }
     virtualPc.presentTransition(pcLifecycle.snapshot);
     view.setComputerPresentation(pcLifecycle.snapshot,pcState,profile?.name??'Игрок');

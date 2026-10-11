@@ -9,6 +9,14 @@ export const FT_TRACKS=Object.freeze([
 
 export function renderStudioTracks(root,beat){
  const d=root.ownerDocument,stage=beat?.stages?.length??0,form=createBeatSongForm(beat);
+ const sections=pcFind(root,n=>n.dataset?.ftRole==='section-markers');sections.replaceChildren();sections.hidden=!form;
+ if(form){
+  sections.append(el(d,'span',{className:'ft-section-corner',attributes:{'aria-hidden':'true'}}));
+  for(const [name,section,startBar,bars]of [['Интро','intro',1,2],['Куплет','verse',3,4],['Аутро','outro',7,2]]){
+   const marker=el(d,'span',{className:'ft-section-marker',text:name,dataset:{ftRole:'section-marker',section,startBar:String(startBar),bars:String(bars)},attributes:{title:'Такты '+startBar+'–'+(startBar+bars-1)}});
+   marker.style.gridColumn=(startBar+1)+' / span '+bars;sections.append(marker);
+  }
+ }
  const tracks=stage?FT_TRACKS.slice(0,stage*3):[{name:'Дорожка 01',stage:0,color:'empty'}];
  if(stage===3&&beat.recording?.draft){
   tracks.push({name:'Draft Vocal',stage:3,color:'vocal',muted:Boolean(beat.recording.clean)});
@@ -62,8 +70,10 @@ export function createStudioWorkspace(document,{projectName='Сеанс без �
  transport.append(transportStatus,toggles);arrangement.append(transport);
  const scroll=el(document,'div',{className:'ft-playlist-scroll',attributes:{tabindex:'0','aria-label':'Прокрутка дорожек'}});
  const grid=el(document,'div',{className:'ft-grid-inner'});scroll.append(grid);
+ const timelineHeader=el(document,'div',{className:'ft-timeline-header'});
+ timelineHeader.append(el(document,'div',{className:'ft-section-markers',dataset:{ftRole:'section-markers'},attributes:{role:'group','aria-label':'Части песни'}}));
  const timeline=el(document,'div',{className:'ft-timeline'});timeline.append(el(document,'span',{className:'ft-track-corner',text:'ТАКТ'}));
- for(let bar=1;bar<=16;bar++)timeline.append(el(document,'span',{text:String(bar)}));grid.append(timeline);
+ for(let bar=1;bar<=16;bar++)timeline.append(el(document,'span',{text:String(bar)}));timelineHeader.append(timeline);grid.append(timelineHeader);
  grid.append(el(document,'div',{dataset:{ftRole:'lanes'}}));
  const playheadArea=el(document,'div',{className:'ft-playhead-area',attributes:{'aria-hidden':'true'}});
  playheadArea.append(el(document,'i',{className:'ft-playhead',dataset:{ftRole:'playhead'}}));grid.append(playheadArea);

@@ -1,12 +1,13 @@
 import {pcElement as el,pcButton as button,pcFind,pcFocusable} from './virtual-pc-dom.js?rev=21';
-import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=32';
+import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=34';
 import {BEAT_STAGES} from './beat-catalog.js?rev=31';
 import {randomBeatName} from './beat-names.js?rev=28';
-import {resolveBeatPlayback} from './beat-playback.js?rev=33';
-import {describeBeatMix} from './beat-mix.js?rev=32';
-import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=33';
-import {startVocalWork} from './vocal-production.js?rev=33';
-import {appendRecordingControls} from './recording-studio-view.js?rev=33';
+import {resolveBeatPlayback} from './beat-playback.js?rev=34';
+import {describeBeatMix} from './beat-mix.js?rev=34';
+import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=34';
+import {startVocalWork} from './vocal-production.js?rev=34';
+import {appendRecordingControls} from './recording-studio-view.js?rev=34';
+import {normalizeGenreProgression,genreOptions,genreById,genreCap,chooseGenre,chooseSpecialization} from './genre-progression.js?rev=34';
 
 export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio,legacyName,initialProject}){
  const d=root.ownerDocument,workspace=createStudioWorkspace(d,{projectName:legacyName});root.replaceChildren(workspace);
@@ -15,6 +16,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
  body.append(panel);body.className+=' ft-producing';
  const actions=find('project-actions'),workflow=find('workflow');
  actions.append(button(d,'Новый проект',{},()=>openDialog('new')),button(d,'Открыть проект',{},()=>openDialog('projects')));
+ actions.append(button(d,'Жанры',{},()=>openDialog('genres')));
  const footer=pcFind(workspace,n=>n.className==='ft-bottom');footer.replaceChildren(el(d,'span',{text:'●  FIELD TONE / HOME STUDIO'}),el(d,'span',{text:'Три этапа. Твой первый звук.'}),el(d,'span',{text:'44.1 kHz / 16 bit'}));
  const summary=el(d,'p',{className:'ft-needs'}),session=pcFind(workspace,n=>n.className==='ft-session').children[1],tempo=pcFind(workspace,n=>n.className==='ft-tempo').children[0];
  const readout=pcFind(workspace,n=>n.className==='ft-readout').children[1],transport=find('transport'),playhead=find('playhead'),status=find('transport-status');
@@ -22,7 +24,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
  let signature='',message='',disposed=false,dialog=null,returnFocus=null,frame=null,sessionSelected=false;
  const win=d.defaultView??globalThis,requestFrame=win.requestAnimationFrame?.bind(win),cancelFrame=win.cancelAnimationFrame?.bind(win);
  const currentBeat=()=>sessionSelected?normalizeBeat(getState().projects.find(p=>p.id===getState().music.activeBeatId)):null;
- const stateSignature=()=>{const s=getState();return JSON.stringify([s.projects,s.music.activeBeatId,s.music.job?.beatId,s.music.job?.stage,s.recording?.job?.beatId,s.recording?.job?.kind]);};
+ const stateSignature=()=>{const s=getState();return JSON.stringify([s.projects,s.music.activeBeatId,s.music.job?.beatId,s.music.job?.stage,s.recording?.job?.beatId,s.recording?.job?.kind,s.music.genres,effectiveBeatSkill(s,getMetadata().skills)]);};
  let vocalDecisions;
  function startRecording(kind,textId,sliders){
   const beat=currentBeat();if(!beat)return;
@@ -35,21 +37,42 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
   for(const child of workspace.children)child.inert=false;
   if(restore){(returnFocus?.isConnected?returnFocus:pcFocusable(actions)[0])?.focus();returnFocus=null;}
  }
- function openDialog(mode='home'){
+ function openDialog(mode='home',choice=null){
   returnFocus??=d.activeElement;closeDialog({restore:false});
   for(const child of workspace.children)child.inert=true;
   dialog=el(d,'div',{className:'ft-dialog-backdrop',dataset:{ftRole:'dialog'},attributes:{role:'dialog','aria-modal':'true','aria-label':mode==='new'?'Новый проект':mode==='projects'?'Открыть проект':'FT Studio — начало работы'}});
   const card=el(d,'section',{className:'ft-dialog-card'});
   card.append(el(d,'span',{className:'ft-eyebrow',text:'FIELD TONE / STUDIO'}),el(d,'h2',{text:mode==='new'?'Как назовём бит?':mode==='projects'?'Твои проекты':'С чего начнём?'}));
-  if(mode==='vocals'){
+  if(mode==='genres'){
+   card.children[1].textContent='Жанры и специализация';dialog.setAttribute('aria-label','Жанры и специализация');
+   const g=normalizeGenreProgression(getState().music.genres),skill=effectiveBeatSkill(getState(),getMetadata().skills),options=genreOptions(g,skill);
+   card.append(el(d,'p',{text:'Битмейкинг '+skill.toFixed(2)+' · свободных слотов '+options.remaining+'. Новые слоты: 25, 50, 75.'}));
+   for(const id of options.available)card.append(el(d,'p',{text:genreById(id).name+' · '+g.xp[id].toFixed(2)+' / '+genreCap(g,id)+(g.primary===id?' · главная специализация':'')}));
+   if(options.remaining)for(const genre of options.candidates)card.append(button(d,'Выбрать: '+genre.name,{className:'ft-project-item'},()=>openDialog('genre-confirm',{id:genre.id,primary:false})));
+   if(options.canSpecialize)for(const id of options.available)card.append(button(d,'Специализация: '+genreById(id).name,{className:'ft-project-item'},()=>openDialog('genre-confirm',{id,primary:true})));
+   card.append(el(d,'p',{className:'ft-production-note',text:'Пока все жанры используют общий банк 90 BPM. Меняются цели решений и экспериментальная обработка; отдельные жанровые стемы появятся позже.'}));
+  }else if(mode==='genre-confirm'){
+   card.children[1].textContent=genreById(choice.id).name;dialog.setAttribute('aria-label','Подтверждение выбора жанра');
+   card.append(el(d,'p',{text:choice.primary?'Только этот жанр сможет вырасти до 100. Остальные останутся до 75. Выбор постоянный.':'Жанр займёт один из трёх дополнительных слотов навсегда. Новый опыт начнётся с нуля.'}));
+   card.append(button(d,'Подтвердить выбор',{className:'ft-primary'},()=>{
+    const state=getState(),skill=effectiveBeatSkill(state,getMetadata().skills),r=(choice.primary?chooseSpecialization:chooseGenre)(state.music.genres,choice.id,skill);
+    message=r.reason;closeDialog({restore:false});if(r.ok)change({...state,music:{...state.music,genres:r.value}});else render();pcFocusable(actions)[0]?.focus();
+   }));
+  }else if(mode==='vocals'){
    card.children[1].textContent='Текст для записи';dialog.setAttribute('aria-label','Выбрать готовый текст');
    const texts=getState().projects.filter(p=>p.kind==='lyrics'&&p.status==='ready');
    for(const p of texts)card.append(button(d,p.name,{className:'ft-project-item'},()=>startRecording('draft',p.id,vocalDecisions)));
    if(!texts.length)card.append(el(d,'p',{text:'Сначала закончи текст в Рэпблокноте.'}));
   }else if(mode==='new'){
    const form=el(d,'form'),name=el(d,'input',{attributes:{'aria-label':'Название бита',maxlength:'64',placeholder:'Например, «Первый двор»',required:'true'}}),notice=el(d,'p',{className:'ft-warning',attributes:{role:'status'}});
+   const options=genreOptions(getState().music.genres,effectiveBeatSkill(getState(),getMetadata().skills));let genre='experimental';
+   if(options.available.length>1){
+    const select=el(d,'select',{value:genre,attributes:{'aria-label':'Жанр проекта'}});
+    for(const id of options.available)select.append(el(d,'option',{value:id,text:genreById(id).name}));
+    select.value=genre;select.addEventListener('change',()=>{genre=select.value;});form.append(el(d,'label',{text:'Жанр проекта'}),select);
+   }else form.append(el(d,'p',{text:'Жанр: Экспериментальный'}));
    const create=()=>{
-    const r=createBeat(getState(),{id:globalThis.crypto?.randomUUID?.()??'beat-'+Date.now(),name:name.value},getMetadata().skills);
+    const r=createBeat(getState(),{id:globalThis.crypto?.randomUUID?.()??'beat-'+Date.now(),name:name.value,genre},getMetadata().skills);
     if(!r.ok){notice.textContent=r.reason;return;}
     sessionSelected=true;legacyName=undefined;message='';audio.stop();closeDialog({restore:false});change(r.state);pcFocusable(actions)[0]?.focus();
    };
@@ -83,6 +106,10 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
  function render(){
   if(disposed)return;const s=getState(),beat=currentBeat();signature=stateSignature();panel.replaceChildren();workflow.replaceChildren();
   panel.append(el(d,'small',{className:'ft-eyebrow',text:'АНАЛИЗ ПРОЕКТА'}),summary);
+  const genres=normalizeGenreProgression(s.music.genres),genreId=beat?.genreProfile?.id??'experimental',options=genreOptions(genres,effectiveBeatSkill(s,getMetadata().skills));
+  panel.append(el(d,'p',{className:'ft-production-note',dataset:{ftRole:'genre-summary'},text:(beat&&!beat.genreProfile?'Архивная экспериментальная работа · ':genreById(genreId).name+' · ')+genres.xp[genreId].toFixed(2)+' / '+genreCap(genres,genreId)}));
+  if(options.remaining)panel.append(button(d,'Доступен новый жанр · '+options.remaining,{},()=>openDialog('genres')));
+  if(options.canSpecialize)panel.append(button(d,'Выбрать главную специализацию',{},()=>openDialog('genres')));
   session.textContent=beat?.name??legacyName??'Сеанс без названия';tempo.textContent=beat?String(beat.bpm):'—';
   renderStudioTracks(workspace,beat);
   if(beat){
@@ -106,9 +133,9 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
     const blocked=beat.audioIssue?'Не найден аудиобанк проекта. Работа сохранена.':workBlockReason(s);
     if(blocked)panel.append(el(d,'p',{className:'ft-warning',text:blocked}));
     let decisions;
-    if(effectiveBeatSkill(s,getMetadata().skills)>25){
+    if(effectiveBeatSkill(s,getMetadata().skills)>=25){
      decisions=job?[...job.sliders]:[5,5,5];
-     const fields=el(d,'div',{className:'ft-stage-result'});
+     const fields=el(d,'div',{className:'ft-stage-result ft-beat-decisions'});
      BEAT_STAGES[stage].sliders.forEach((label,i)=>{
       const row=el(d,'label'),caption=el(d,'span',{text:label+' · '+decisions[i]}),input=el(d,'input',{type:'range',value:String(decisions[i]),attributes:{type:'range',min:'0',max:'10',step:'1','aria-label':label}});
       input.disabled=Boolean(job);input.addEventListener('input',()=>{decisions[i]=Number(input.value);caption.textContent=label+' · '+decisions[i];});row.append(caption,input);fields.append(row);

@@ -1,10 +1,10 @@
 import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=21';
-import {resolveUnderweb} from './virtual-pc-catalog.js?rev=28';
-import {createBeatMarket} from './beat-market-view.js?rev=33';
-import {softwareForum,softwareMessage} from './pc-software-view.js?rev=33';
-import {downloadPresentation} from './virtual-pc-runtime.js?rev=33';
-import {createCommunityView} from './underweb-community-view.js?rev=28';
-import {communityDay} from './underweb-community.js?rev=28';
+import {resolveUnderweb} from './virtual-pc-catalog.js?rev=34';
+import {createBeatMarket} from './beat-market-view.js?rev=34';
+import {softwareForum,softwareMessage} from './pc-software-view.js?rev=34';
+import {downloadPresentation} from './virtual-pc-runtime.js?rev=34';
+import {createCommunityView} from './underweb-community-view.js?rev=34';
+import {communityDay} from './underweb-community.js?rev=34';
 import {homeDateLabel} from './home-calendar.js?rev=28';
 import {newsForDay} from './underweb-news.js?rev=28';
 import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=28';
@@ -12,7 +12,7 @@ const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-c
 
 export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,getSoftwareMessage=()=>''}){
  const d=root.ownerDocument,history=['underweb://iskra'];let index=0,route=resolveUnderweb(history[0],getMetadata()),applicationOpen=false,lastApplications='',applicationFocus=null,lastSoftware='',lastDay=0;
- const softwareSignature=()=>{const s=getState().software;return JSON.stringify([s?.client?.installed,s?.client?.receivedBytes===2000000,s?.ft?.installed,s?.ft?.receivedBytes===800000000,s?.notebook?.installed,s?.notebook?.receivedBytes===4000000,s?.metadata,s?.task?.appId,s?.task?.paused,s?.task?.error,getSoftwareMessage()]);};
+ const softwareSignature=()=>{const s=getState().software;return JSON.stringify([s?.client?.installed,s?.client?.receivedBytes===2000000,s?.ft?.installed,s?.ft?.receivedBytes===800000000,s?.notebook?.installed,s?.notebook?.receivedBytes===4000000,s?.metadata,s?.notebookMetadata,s?.task?.appId,s?.task?.paused,s?.task?.error,getSoftwareMessage()]);};
  const browser=el(d,'section',{className:'uw-browser',attributes:{'aria-label':'Браузер Underweb'}}),toolbar=el(d,'form',{className:'uw-toolbar',attributes:{'aria-label':'Адрес Underweb'}});
  const back=button(d,'←',{attributes:{'aria-label':'Назад в Underweb'}},()=>travel(-1)),forward=button(d,'→',{attributes:{'aria-label':'Вперёд в Underweb'}},()=>travel(1));
  const home=button(d,'⌂',{attributes:{'aria-label':'Главная Underweb'}},()=>navigate('underweb://iskra'));

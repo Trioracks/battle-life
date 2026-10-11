@@ -1,4 +1,29 @@
-/* Independent fictional battle sites and a compact, period-inspired forum. */
+/* Independent fictional battle sites and a period-inspired forum. */
+.uw-community .uw-forum-sections{display:flex;gap:0;flex-wrap:wrap;margin:0 -19px 12px;background:#cbd7df;border-bottom:1px solid #a6b8c6}
+#virtual-pc .uw-community .uw-forum-sections button{padding:10px 15px;border-right:1px solid #a7b9c6;text-decoration:none;font-size:11px;font-weight:bold}
+#virtual-pc .uw-community .uw-forum-sections [aria-current=page]{background:#f5f7f9;color:#294d68}
+.uw-community .uw-forum-category th{padding:9px 12px;background:#9eafbb;color:#263e54;font-weight:bold;font-size:11px;border-top:3px solid #e7ebee;letter-spacing:.3px}
+#virtual-pc .uw-community .uw-forum-board-description{color:#687e8f;font-size:12px;line-height:1.7;margin:0 0 15px}
+.uw-historical-archive .uw-forum-header{background:linear-gradient(#655e53,#423e38);border-color:#b8ad97}
+#virtual-pc .uw-historical-archive .uw-forum-header button{font-size:28px}
+.uw-historical-archive .uw-forum-sections{background:#d9d5cb;border-color:#bdb6a5}
+.uw-historical-archive>h1{font:24px/1.3 Georgia,serif;color:#514d43;margin:14px 0}
+#virtual-pc .uw-historical-archive .uw-archive-summary{font:11px/1.8 Tahoma,Arial,sans-serif;color:#766f60;margin:0 0 16px}
+.uw-historical-archive .uw-archive-directory{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid #b7b4a8;margin-bottom:20px;background:#f4f3ed}
+.uw-historical-archive .uw-archive-directory>div{padding:14px;border:1px solid #e0ddd4}
+.uw-historical-archive .uw-archive-directory small{display:block;font-size:10px;line-height:1.7;margin-top:6px;color:#898272}
+.uw-historical-archive .uw-forum-table th{background:linear-gradient(#7c7668,#625b4d);border-color:#9a917f}
+.uw-historical-archive .uw-forum-table td:first-child{padding-left:14px}
+.uw-historical-archive .uw-forum-table td a{display:block;margin-top:5px;font-size:10px}
+.uw-historical-archive a{color:#5d6949;text-decoration:underline;line-height:1.6;overflow-wrap:anywhere}
+.uw-historical-archive a:focus-visible{outline:2px solid #697a4a;outline-offset:3px}
+.uw-historical-archive .uw-forum-post{border-color:#bfb9ab;border-top-color:#9e9481}
+.uw-historical-archive .uw-forum-author{background:#ebe7dc;border-color:#c8c0ad;color:#655f50}
+.uw-historical-archive .uw-archive-post-kind{display:block;margin:12px 0 0;color:#8c7d5a;font:10px Tahoma,Arial,sans-serif}
+.uw-historical-archive .uw-forum-message>a{font-size:10px}
+#virtual-pc .uw-historical-archive .uw-archive-readonly{background:#eee9db;border:1px solid #c9bea5;color:#7a6c51;font:11px/1.7 Tahoma,Arial,sans-serif;padding:12px 15px}
+@container (max-width:680px){.uw-community .uw-forum-sections{margin-inline:-12px}}
+@container (max-width:450px){.uw-historical-archive .uw-archive-directory{grid-template-columns:1fr}.uw-historical-archive>h1{font-size:21px}}
 .uw-news-panel{text-align:left;border-top:1px solid #c9d8ce;padding:19px 0;margin-top:18px}.uw-news-panel>header{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;gap:15px}.uw-news-panel h2{font:16px Georgia,serif;margin:0;color:#47655e}.uw-news-category{display:block;font:9px Tahoma,sans-serif;letter-spacing:1.3px;color:#9c814f;text-transform:uppercase;margin-bottom:7px}#virtual-pc .uw-browser .uw-news-link{color:#2d687b;text-align:left;font:12px Arial,sans-serif;line-height:1.5}#virtual-pc .uw-browser .uw-news-link:hover{text-decoration:underline}#virtual-pc .uw-browser .uw-news-headline{display:block;font-size:17px;font-weight:600}.uw-news-meta{font-size:10px!important;color:#87958b!important;line-height:1.7!important;margin:7px 0!important}.uw-news-snippet{font-size:12px!important;color:#6d7e74;line-height:1.7!important;margin:9px 0 2px!important}.uw-news-page{max-width:860px;margin:auto;padding:25px 38px;color:#36564c}.uw-news-masthead{display:flex;gap:19px;align-items:baseline;border-bottom:1px solid #b8ccc1;padding-bottom:18px}.uw-news-masthead>span{font:9px Tahoma,sans-serif;letter-spacing:1.8px;color:#9caa9c}#virtual-pc .uw-browser .uw-news-masthead>button{font:bold 29px Georgia,serif;color:#2c6267}.uw-news-breadcrumb{display:flex;justify-content:space-between;padding:15px 0 24px;font-size:11px}.uw-news-article h1,.uw-news-page>h1{font:32px/1.2 Georgia,serif;letter-spacing:-.5px;margin:13px 0 19px;color:#355b50}.uw-news-article .uw-news-meta{padding-bottom:18px;border-bottom:1px solid #d8e1d7;margin-bottom:24px!important}.uw-news-body{font:15px/1.9 Georgia,serif!important;margin:18px 0!important;color:#506b60}.uw-news-source{border-left:3px solid #b4be99;background:#eff2e8;padding:15px 18px;margin-top:27px;display:grid;gap:8px;overflow-wrap:anywhere}.uw-news-source>strong{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#899577}.uw-news-source a{color:#327389;font-size:13px}.uw-news-source small{font-size:10px;color:#8a9682}.uw-news-archive-intro{font-size:12px!important;color:#85967f;line-height:1.8!important}.uw-news-month{padding:11px 13px;background:#edf1e7;border-block:1px solid #d2ddcb;margin:24px 0 0;font:12px Consolas,monospace;color:#7c8e71}.uw-news-archive-row{display:grid;grid-template-columns:82px minmax(0,1fr);gap:6px 14px;padding:16px 12px;border-bottom:1px solid #e0e6dc}.uw-news-archive-row>time{font:10px Consolas,monospace;color:#93a187;padding-top:3px}.uw-news-archive-row>button{font-size:14px!important}.uw-news-archive-row>small{grid-column:2;color:#96a48a;font-size:10px;line-height:1.6}.uw-news-footer{margin-top:30px;padding-top:17px;border-top:1px solid #d1deca;color:#96a38b;text-align:center;font-size:9px;line-height:1.8}
 @container (max-width:600px){.uw-news-page{padding:20px}.uw-news-article h1,.uw-news-page>h1{font-size:26px}.uw-news-masthead>span{font-size:8px;letter-spacing:1px}.uw-news-archive-row{grid-template-columns:70px minmax(0,1fr);gap:7px}.uw-news-source{padding:13px}.uw-news-body{font-size:14px!important}}
 #virtual-pc .uw-home-directory{grid-template-columns:repeat(3,minmax(0,1fr))}

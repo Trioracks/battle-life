@@ -6,10 +6,10 @@ import {createBeat,startBeatStage,advanceBeatWork,acquireDrum,restoreMusicNeeds,
 const seed=()=>createVirtualPcState({power:'on',download:{status:'installed'}});
 const make=(state=seed(),skill=10,assetId=null)=>createBeat(state,{id:'beat-1',name:'Ночной двор',assetId},{beatmaking:skill},()=>.4).state;
 
-test('new beats stay general practice at every skill level, including legacy creation callers',()=>{
- for(const skill of [0,25,26,40,100])for(const genre of [undefined,'practice','boombap']){
+test('new beats default to experimental at every skill level, including practice alias',()=>{
+ for(const skill of [0,25,26,40,100])for(const genre of [undefined,'practice','experimental']){
   const r=createBeat(seed(),{id:'new',name:'Практика',genre},{beatmaking:skill},()=>.4);
-  assert.equal(r.ok,true,r.reason);assert.equal(r.state.projects[0].genre,'practice');
+  assert.equal(r.ok,true,r.reason);assert.equal(r.state.projects[0].genre,'experimental');
   const saved=createVirtualPcState(JSON.parse(JSON.stringify(r.state)));
   assert.deepEqual(saved.projects,r.state.projects);
   assert.equal(saved.music.activeBeatId,'new');
