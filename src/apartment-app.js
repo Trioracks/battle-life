@@ -282,7 +282,7 @@ try{
       const pending=nextSafeResultReaction(pcState,{atDesktop:true,creativeJob:creativeWorkDescriptor(pcState,profile?.skills).job,transitionPhase:pcLifecycle.snapshot.phase,modalOpen:Boolean(virtualPc.confirmClose||virtualPc.shutdownModal||virtualPc.submissionModal||virtualPc.uninstallModal)});
       if(pending&&pending.id!==failedReactionId&&pcLifecycle.react()){
         resultEpisode={reaction:pending,ui:captureDesktopReturn(pcRoot),speaking:false,elapsed:0,returning:false};
-        virtualPc.audioSession.stopAll();resumeAnimation();
+        resumeAnimation();
       }
     }
     syncWorkAudio();
@@ -342,7 +342,7 @@ try{
     }
     virtualPc.presentTransition(pcLifecycle.snapshot);
     if(resultEpisode?.returning&&pcLifecycle.snapshot.phase==='desktop'){
-      const done=completeResultReaction(pcState,resultEpisode.reaction.id);
+      const done=completeResultReaction(pcState,resultEpisode.reaction.id,{nowMinute:homeTime.day*1440+homeTime.minutes});
       if(done.ok&&persistPc(done.state,{atomic:true}))virtualPc.syncState(pcState);
       else failedReactionId=resultEpisode.reaction.id;
       resultEpisode.ui.restore();resultEpisode=null;
