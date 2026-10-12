@@ -212,6 +212,7 @@ export function saveVirtualPcState(storage, state) {
     if(isRecord(parsed)&&parsed.version===1&&parsed.software?.transferVersion!==2)reserveTransferBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'trackVersions'))reserveTrackVersionBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&parsed.socialRuntime?.version!==1)reserveSocialBackup(storage,raw);
+    if(isRecord(parsed)&&parsed.version===1&&(parsed.social?.schemaVersion??0)<2)reservePersonalBackup(storage,raw);
     storage.setItem(VIRTUAL_PC_STORAGE_KEY, JSON.stringify(normalizeSnapshot(state)));
     return true;
   } catch {
@@ -219,6 +220,10 @@ export function saveVirtualPcState(storage, state) {
   }
 }
 
+function reservePersonalBackup(storage,raw){
+  const key=VIRTUAL_PC_STORAGE_KEY+'-before-personal-dialogs-v2';
+  if(storage.getItem(key)===null)storage.setItem(key,raw);
+}
 function reserveSocialBackup(storage,raw){
   const key=VIRTUAL_PC_STORAGE_KEY+'-before-social-delivery';
   if(storage.getItem(key)===null)storage.setItem(key,raw);
@@ -281,6 +286,9 @@ export function loadVirtualPcState(storage) {
     }
     if(parsed.socialRuntime?.version!==1){
       try{reserveSocialBackup(storage,raw);}catch{return {ok:false,reason:'social-delivery-backup-failed',state:restoredSnapshot(parsed)};}
+    }
+    if((parsed.social?.schemaVersion??0)<2){
+      try{reservePersonalBackup(storage,raw);}catch{return {ok:false,reason:'personal-dialogs-backup-failed',state:restoredSnapshot(parsed)};}
     }
     return { ok: true, state: restoredSnapshot(parsed) };
   } catch {

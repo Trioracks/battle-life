@@ -18,7 +18,7 @@ function sentAt(end=false){
 test('ack works with PC off; typing only last minute; reload and repeated stamp cannot duplicate',()=>{
  let s=sentAt(),r=s.battleSubmissions[0];s.power='off';
  assert.equal(dialogIsTyping(s,'makarevich-1',r.ackAt-2),false);assert.equal(dialogIsTyping(s,'makarevich-1',r.ackAt-.5),true);
- const early=advanceSocial(s,r.ackAt-.1);assert.equal(early.events.length,0);
+ const early=advanceSocial(s,r.ackAt-.1);assert.equal(early.events.filter(e=>e.type==='submission-ack').length,0);
  const clock={day:Math.floor(r.ackAt/1440)+1,minutes:r.ackAt%1440};
  const done=advanceVirtualPc(createVirtualPcState(early.state),clock);assert.equal(done.state.social.dialogs['makarevich-1'].messages.length,2);
  assert.equal(done.state.social.dialogs['makarevich-1'].unread,true);assert.equal(done.state.battleSubmissions[0].status,'accepted');
@@ -28,7 +28,7 @@ test('ack works with PC off; typing only last minute; reload and repeated stamp 
 test('sleep through deadline then late ack publishes once in chronological order with frozen ID',()=>{
  const s=sentAt(true),row=s.battleSubmissions[0],deadline=s.battleWindows[0].closesAt;
  assert.ok(row.ackAt>deadline);assert.equal(Object.keys(s.communityAudio??{}).length,0);
- const jump=advanceSocial(s,row.ackAt+100);assert.deepEqual(jump.events.map(e=>e.type),['submission-published','submission-ack']);
+ const jump=advanceSocial(s,row.ackAt+100);assert.deepEqual(jump.events.filter(e=>e.type.startsWith('submission-')).map(e=>e.type),['submission-published','submission-ack']);
  assert.deepEqual(jump.state.communityAudio['makarevich-1'],[row.trackVersionId]);
  assert.equal(advanceSocial(createVirtualPcState(jump.state),row.ackAt+101).events.length,0);
  assert.equal(jump.state.social.dialogs['makarevich-1'].messages[0].trackVersionId,row.trackVersionId);
@@ -37,7 +37,7 @@ test('failed persistence publishes neither answer nor events; retry uses the ori
  const s=sentAt(),row=s.battleSubmissions[0],clock={day:1,minutes:row.ackAt};let attempts=0;
  const failed=advanceVirtualPcDurably(s,clock,()=>{attempts++;return false;});
  assert.equal(attempts,1);assert.equal(failed.state,s);assert.deepEqual(failed.events,[]);assert.equal(failed.saveFailed,true);
- const saved=advanceVirtualPcDurably(failed.state,clock,()=>true);assert.equal(saved.events.length,1);assert.equal(saved.events[0].dueAt,row.ackAt);assert.equal(saved.state.battleSubmissions[0].status,'accepted');
+ const saved=advanceVirtualPcDurably(failed.state,clock,()=>true),acks=saved.events.filter(e=>e.type==='submission-ack');assert.equal(acks.length,1);assert.equal(acks[0].dueAt,row.ackAt);assert.equal(saved.state.battleSubmissions[0].status,'accepted');
 });
 test('desktop frame also waits for durable acknowledgement before updating UI state',()=>{
  const s=sentAt(),minute=s.battleSubmissions[0].ackAt;

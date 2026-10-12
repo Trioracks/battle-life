@@ -6,6 +6,7 @@ import {validGameMinute} from './game-minute.js?rev=38';
 import {receivePhoneEvents} from './phone-notifications.js?rev=38';
 import {publishJudgeEvents} from './social-judging-events.js?rev=38';
 import {SOCIAL_IDENTITY} from './social-identity.js?rev=38';
+import {advancePersonalDialogs} from './social-personal.js?rev=38';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export function normalizeSocialRuntime(raw){
  const seen=new Set(),events=(Array.isArray(raw?.events)?raw.events:[]).filter(e=>e&&typeof e.id==='string'&&typeof e.type==='string'&&validGameMinute(e.dueAt)&&!seen.has(e.id)&&seen.add(e.id)).map(clone);
@@ -23,7 +24,7 @@ export function migrateLegacySocial(input,nowMinute){
   const id=ensured.windowId+':player',version=state.trackVersions?.byId?.[old.trackVersionId],recovery=Boolean(old.issue||!version);
   const row={version:2,id,windowId:ensured.windowId,battleId:old.battleId,communityId:c.id,roundId:'selection',playerId:'player',trackVersionId:old.trackVersionId??null,sentAt:null,...acknowledgementFor(id,nowMinute),status:recovery?'recovery':'pending',topicMatch:old.topicMatch??null,migration:{activatedAt:nowMinute,timePrecision:'day-only'},legacyArchive:clone(old)};
   const social=normalizeSocial(state.social);
-  social.dialogs[c.id]={messages:[{id:id+':sent',kind:'submission',sender:'player',at:null,trackVersionId:row.trackVersionId,body:recovery?'Старая работа сохранена, но её источник недоступен. Повторная сдача закрыта.':'Работа сохранена из предыдущей версии. Точное время отправки неизвестно.'}],unread:false,draftVersionId:null};
+  social.dialogs[c.id]={peer:{kind:'community',id:c.id},messages:[{id:id+':sent',kind:'submission',sender:'player',at:null,trackVersionId:row.trackVersionId,body:recovery?'Старая работа сохранена, но её источник недоступен. Повторная сдача закрыта.':'Работа сохранена из предыдущей версии. Точное время отправки неизвестно.'}],unread:false,draftVersionId:null};
   if(version)social.personalAudioIds=[...new Set([...social.personalAudioIds,version.id])];
   state={...state,social,battleSubmissions:state.battleSubmissions.map(s=>s===old?row:s)};
  }
@@ -36,7 +37,7 @@ export function activateSocial(state,nowMinute,battleId='makarevich-1'){
 export function advanceSocial(input,nowMinute){
  const runtime=normalizeSocialRuntime(input.socialRuntime);
  if(!validGameMinute(nowMinute)||runtime.lastMinute!==null&&nowMinute<runtime.lastMinute)return {state:input,events:[]};
- let state=migrateLegacySocial(input,nowMinute).state;
+ const personal=advancePersonalDialogs(migrateLegacySocial(input,nowMinute).state,nowMinute);let state=personal.state;
  const social=normalizeSocial(state.social),communityAudio=normalizeCommunityAudio(state.communityAudio),processed=new Set(runtime.events.map(e=>e.id)),due=[],submissions=(state.battleSubmissions??[]).map(clone);
  for(const s of submissions){
   if(s.version!==2||s.status==='recovery')continue;
@@ -50,10 +51,10 @@ export function advanceSocial(input,nowMinute){
   const submission=submissions.find(s=>s.id===e.entityId);
   if(e.type==='submission-ack'){
    submission.status='accepted';const dialog=social.dialogs[e.communityId]??{messages:[],draftVersionId:null};
-   social.dialogs[e.communityId]={...dialog,unread:true,messages:[...(dialog.messages??[]),{id:e.id,kind:'ack',sender:e.communityId,at:e.dueAt,body:e.text}]};
+   social.dialogs[e.communityId]={...dialog,peer:{kind:'community',id:e.communityId},unread:true,messages:[...(dialog.messages??[]),{id:e.id,kind:'ack',sender:e.communityId,at:e.dueAt,body:e.text}]};
   }else communityAudio[e.communityId]=[...new Set([...(communityAudio[e.communityId]??[]),e.trackVersionId])];
  }
- state={...state,social,communityAudio,battleSubmissions:submissions,phone:receivePhoneEvents(state.phone,events.filter(e=>e.type==='submission-ack')),socialRuntime:{version:1,lastMinute:nowMinute,events:[...runtime.events,...events]}};
+ state={...state,social,communityAudio,battleSubmissions:submissions,phone:receivePhoneEvents(state.phone,events.filter(e=>e.type==='submission-ack')),socialRuntime:{version:1,lastMinute:nowMinute,events:[...runtime.events,...personal.events,...events]}};
  const judged=publishJudgeEvents(state,nowMinute);
- return {state:judged.state,events:[...events,...judged.events]};
+ return {state:judged.state,events:[...personal.events,...events,...judged.events].sort((a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id))};
 }

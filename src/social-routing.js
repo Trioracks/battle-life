@@ -10,6 +10,7 @@ export function resolveSocialRoute(address){
   const view=u.searchParams.get('view')??'page';if(!['page','friends','photos','audio'].includes(view))return null;
   return {type:'social',section,profileId:p[1],view,url:'underweb://social/profile/'+p[1]+(view==='page'?'':'?view='+view)};
  }
- if(['community','dialog'].includes(section)&&communityById(p[1]))return {type:'social',section,communityId:p[1],url:'underweb://social/'+section+'/'+p[1]};
+ if(['community','dialog'].includes(section)&&communityById(p[1]))return {type:'social',section,communityId:p[1],...(section==='dialog'?{peer:{kind:'community',id:p[1]}}:{}),url:'underweb://social/'+section+'/'+p[1]};
+ if(section==='dialog'&&profileById(p[1]))return {type:'social',section,profileId:p[1],peer:{kind:'person',id:p[1]},url:'underweb://social/dialog/'+p[1]};
  return null;
 }

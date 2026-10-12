@@ -28,7 +28,7 @@ export function attachSubmissionTrack(state,{communityId,projectId,nowMinute}={}
  const candidate=submissionCandidates(state,c.battleId).find(p=>p.projectId===projectId);if(!candidate||candidate.issue)return fail(candidate?.issue??'Выбери готовый трек с вокалом.');
  const captured=captureTrackVersion(state,{projectId,nowMinute});if(!captured.ok)return captured;
  const social=normalizeSocial(captured.state.social);social.personalAudioIds=[...new Set([...social.personalAudioIds,captured.versionId])];
- social.dialogs[communityId]={messages:[],unread:false,...social.dialogs[communityId],draftVersionId:captured.versionId};
+ social.dialogs[communityId]={messages:[],unread:false,...social.dialogs[communityId],peer:{kind:'community',id:communityId},draftVersionId:captured.versionId};
  return {ok:true,state:{...captured.state,social},reason:'',versionId:captured.versionId};
 }
 export function sendSubmission(state,{communityId,nowMinute}={}){
