@@ -1,0 +1,12 @@
+.bl-phone-hud{position:fixed;left:14px;bottom:126px;width:58px;z-index:145;pointer-events:none;font:12px/1.4 Arial,sans-serif;color:#e6f0e9}
+.bl-phone-hud[hidden]{display:none!important}body[data-mode=pc] .bl-phone-hud{bottom:54px}
+.bl-phone-device{width:48px;height:79px;border-radius:9px 9px 12px 12px;border:2px solid #727e79;background:linear-gradient(110deg,#45524f,#182421);box-shadow:1px 4px 9px #0008;padding:13px 6px 5px;position:relative}
+.bl-phone-device:before{content:"";position:absolute;top:5px;left:17px;width:11px;height:2px;background:#111e1a;border-radius:2px}
+.bl-phone-screen{height:39px;background:#253b32;border:1px solid #0a1510;display:flex;align-items:center;justify-content:center;color:#415e4a;font-weight:bold;font-size:16px}
+.has-message .bl-phone-screen{background:#bad19b;color:#3d5835;box-shadow:0 0 12px #c8eaa94a}.bl-phone-key{display:block;margin:5px auto 0;width:12px;height:5px;background:#576b60;border-radius:3px}
+.bl-phone-notice{pointer-events:auto;position:absolute;left:0;bottom:89px;width:276px;max-width:calc(100vw - 28px);padding:10px 12px;background:#20312feF;border:1px solid #8b9f90;border-radius:5px;box-shadow:1px 4px 10px #0007;cursor:default}
+.bl-phone-notice[hidden]{display:none!important}.bl-phone-notice:after{content:"";position:absolute;left:19px;bottom:-7px;width:11px;height:11px;background:#20312f;border-right:1px solid #8b9f90;border-bottom:1px solid #8b9f90;transform:rotate(45deg)}
+.bl-phone-notice>small,.bl-phone-notice>strong{display:block}.bl-phone-notice>small{font-size:10px;color:#adbbaf}.bl-phone-notice>strong{font-size:12px;margin:2px 0 5px}.bl-phone-notice .bl-phone-body{font-size:12px;line-height:17px;margin:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;max-height:51px;overflow:hidden;text-overflow:ellipsis;overflow-wrap:anywhere}
+.bl-phone-notice .bl-phone-hint{font-size:9px;margin-top:7px;color:#95a79a}.bl-phone-notice:focus-visible{outline:2px solid #e8c879;outline-offset:3px}
+@media(max-height:640px){.bl-phone-hud{bottom:117px}.bl-phone-device{width:40px;height:67px;padding:11px 5px 3px}.bl-phone-screen{height:31px}.bl-phone-notice{bottom:76px;width:244px}}
+@media(prefers-reduced-motion:reduce){.bl-phone-device{animation:none!important;transition:none!important}}

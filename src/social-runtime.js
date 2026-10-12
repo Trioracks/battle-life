@@ -3,6 +3,7 @@ import {normalizeSocial} from './social-state.js?rev=36';
 import {ensureBattleWindow} from './battle-windows.js?rev=35';
 import {ACK_TEMPLATES,acknowledgementFor} from './social-submission.js?rev=36';
 import {validGameMinute} from './game-minute.js?rev=36';
+import {receivePhoneEvents} from './phone-notifications.js?rev=36';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export function normalizeSocialRuntime(raw){
  const seen=new Set(),events=(Array.isArray(raw?.events)?raw.events:[]).filter(e=>e&&typeof e.id==='string'&&typeof e.type==='string'&&validGameMinute(e.dueAt)&&!seen.has(e.id)&&seen.add(e.id)).map(clone);
@@ -50,6 +51,6 @@ export function advanceSocial(input,nowMinute){
    social.dialogs[e.communityId]={...dialog,unread:true,messages:[...(dialog.messages??[]),{id:e.id,kind:'ack',sender:e.communityId,at:e.dueAt,body:e.text}]};
   }else communityAudio[e.communityId]=[...new Set([...(communityAudio[e.communityId]??[]),e.trackVersionId])];
  }
- state={...state,social,communityAudio,battleSubmissions:submissions,socialRuntime:{version:1,lastMinute:nowMinute,events:[...runtime.events,...events]}};
+ state={...state,social,communityAudio,battleSubmissions:submissions,phone:receivePhoneEvents(state.phone,events.filter(e=>e.type==='submission-ack')),socialRuntime:{version:1,lastMinute:nowMinute,events:[...runtime.events,...events]}};
  return {state,events};
 }

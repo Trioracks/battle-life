@@ -29,6 +29,7 @@ import {createCharacterSpeech,workNeedSpeech} from './character-speech.js?rev=36
 import {mountHomeNeedsView,mountCharacterSpeech} from './home-needs-view.js?rev=35';
 import {migrateNoviceSave} from './home-profile-migration.js?rev=36';
 import {mountHomeWardrobeView} from './home-wardrobe-view.js?rev=28';
+import {mountPhoneHud} from './phone-hud.js?rev=36';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false,stepVariation=0;
@@ -104,6 +105,12 @@ try{
     onSaveProject:(state,project)=>saveStudioProject(state,project),
   });
   virtualPc.setPersistenceWarning(pcStorageWarning);
+  const phoneRoot=document.createElement('aside');phoneRoot.hidden=true;document.body.append(phoneRoot);
+  const phoneView=mountPhoneHud(phoneRoot,{
+    getState:()=>pcState.phone,
+    onChange:phone=>{const saved=persistPc({...pcState,phone},{atomic:true});if(saved)virtualPc.syncState(pcState);return saved;},
+    playVibration:()=>{if(audio?.state==='running'&&!document.hidden)playSoundCue('phone-vibrate',audio);},
+  });
   const workAudio=createBeatWorkAudio(virtualPc.beatAudio);
   const lyricWorkAudio=createLyricWorkAudio();
   const syncWorkAudio=(hidden=document.hidden)=>{
@@ -133,6 +140,7 @@ try{
     lookInput.stop();
     if(next!=='game'){fridgeView.close();wardrobeView.close();}
     mode=next;document.body.dataset.mode=next;
+    phoneRoot.hidden=!playing||!['game','pc'].includes(next);phoneView.update();
     $('#main-menu').hidden=next!=='menu';$('#creator').hidden=next!=='creator';
     $('#destinations').hidden=next!=='destinations';
     $('#door-choice').hidden=next!=='door';$('#peephole').hidden=next!=='peephole';
@@ -312,6 +320,7 @@ try{
     speechView.update(speech.snapshot,headAnchor,{firstPerson,width:innerWidth,height:innerHeight,bottomLimit:$('#controls').getBoundingClientRect().top-12});
     virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,gameDay:homeTime.day,gameMinutes:gameMinuteStamp(homeTime),skills:profile?.skills});
     $('#home-time').textContent=`${homeTime.dateLabel} · ${homeTime.label} · ${homeTime.period} · Дом`;
+    phoneRoot.hidden=!playing||!['game','pc'].includes(mode);phoneView.update();
     if(now-lastTimeSave>(homeTime.isSleeping?500:15000)){saveHomeTime(storage,homeTime);persistPc(pcState);lastTimeSave=now;}
     $('#room').textContent=motion.position[0]<0?'КУХНЯ':'ЖИЛАЯ КОМНАТА';
     $('#state').textContent=`${motion.phase} · ${motion.clip} · x ${motion.position[0].toFixed(2)} · камера ${motion.cameraX.toFixed(2)} · ${Math.round(motion.yaw*180/Math.PI)}° · дверь ${Math.round(motion.doorOpen*100)}% · ${Math.round(frameRate)} FPS`;
@@ -334,6 +343,7 @@ try{
   loading.hidden=true;setMode('menu');view.render(motion,0);
   function frame(now){const raw=(now-last)/1000,dt=Math.min(raw,.25);if(raw>0)frameRate=frameRate*.9+Math.min(240,1/raw)*.1;last=now;update(dt,now);requestAnimationFrame(frame);}requestAnimationFrame(frame);
   document.addEventListener('visibilitychange',()=>{last=performance.now();if(document.hidden){syncWorkAudio(true);virtualPc.beatAudio.stop();saveHomeTime(storage,homeTime);persistPc(pcState);}});
+  window.addEventListener('pagehide',event=>{if(!event.persisted)phoneView.dispose();});
   window.addEventListener('pagehide',event=>{saveHomeTime(storage,homeTime);persistPc(pcState);syncWorkAudio(true);virtualPc.beatAudio.stop();if(event.persisted){pcSounds.stop();return;}wardrobeView.dispose();fridgeView.dispose();speechView.dispose();workAudio.dispose();lyricWorkAudio.dispose();workPanel.dispose();pcLifecycle.reset();pcSounds.dispose();virtualPc.dispose();view.dispose();});
   window.addEventListener('pageshow',event=>{if(event.persisted)last=performance.now();});
 }catch(error){console.error(error);loading.querySelector('h2').textContent='Не удалось загрузить сцену';loading.querySelector('p').textContent=error.message;loading.classList.add('error');}

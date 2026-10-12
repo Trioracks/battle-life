@@ -7,6 +7,7 @@ import {normalizeTrackVersions,captureTrackVersion} from './track-version.js?rev
 import {normalizeSocial} from './social-state.js?rev=36';
 import {normalizeBattleWindows} from './battle-windows.js?rev=35';
 import {normalizeSocialRuntime,normalizeCommunityAudio} from './social-runtime.js?rev=36';
+import {normalizePhone} from './phone-notifications.js?rev=36';
 import {drumById} from './beat-catalog.js?rev=36';
 import {normalizeCommunity} from './underweb-community.js?rev=34';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=35';
@@ -113,6 +114,7 @@ function normalizeSnapshot(value) {
     battleWindows:normalizeBattleWindows(source.battleWindows),
     socialRuntime:normalizeSocialRuntime(source.socialRuntime),
     communityAudio:normalizeCommunityAudio(source.communityAudio),
+    phone:normalizePhone(source.phone),
     household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),
     battleSubmissions,trackVersions,
