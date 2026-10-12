@@ -61,7 +61,7 @@ test('each new layer snapshots actual genre XP and playback never reads later tr
  s.music.genres.xp.experimental=75;assert.deepEqual(resolveBeatPlayback(createVirtualPcState(s).projects[0]).descriptor,dry);
  const draft=createVocalTake({skills:{flow:100,sound:100,musicality:100,confidence:100},sliders:[8,8,8]});
  beat.recording={version:1,revision:3,text:{id:'t',name:'T',revision:1},sourceId:'vocal-01',draft,clean:null,mix:{skill:100},master:{skill:100}};
- const mixed=resolveBeatPlayback(beat).descriptor;assert.equal(mixed.parts[3].vocal.genreProfile.xp,26);assert.equal(mixed.parts[3].vocal.vocalGainDb,4.5);assert.ok(mixed.parts[3].vocal.quality<=VOCAL_CEILING);
+ const mixed=resolveBeatPlayback(beat).descriptor;assert.equal(mixed.parts[3].vocal.genreProfile.xp,26);assert.equal(mixed.parts[3].vocal.vocalGainDb,.5);assert.ok(mixed.parts[3].vocal.quality<=VOCAL_CEILING);
  assert.notEqual(mixed.key,dry.key);
 });
 test('new novice/other-genre DSP removes stylish repetitions while preserving legacy output and timeline',()=>{

@@ -7,7 +7,7 @@ import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './cre
 export function creativeWorkDescriptor(state,skills={}){
  const writing=Boolean(state.writing?.job),recording=!writing&&Boolean(state.recording?.job),job=writing?state.writing.job:recording?state.recording.job:state.music?.job;
  const id=writing?job?.projectId:job?.beatId,project=state.projects.find(p=>p.id===id);
- return {writing,recording,job,project,chainProgress:state.creativeWork?.activeId===id?creativeChainProgress(state,id):null,skill:writing?effectiveWritingSkill(state,skills):recording?effectiveVocalSkill(state,skills,job.kind):effectiveBeatSkill(state,skills)};
+ return {writing,recording,job,project,performance:recording&&['draft','clean'].includes(job.kind)?'rapping':'typing',chainProgress:state.creativeWork?.activeId===id?creativeChainProgress(state,id):null,skill:writing?effectiveWritingSkill(state,skills):recording?effectiveVocalSkill(state,skills,job.kind):effectiveBeatSkill(state,skills)};
 }
 export function advanceCreativeWork(state,seconds,clock=null,skills={}){
  let descriptor=creativeWorkDescriptor(state,skills);

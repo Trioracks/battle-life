@@ -192,7 +192,7 @@ export async function createApartmentScene(canvas,config){
     const exteriorProgress=Number.isFinite(threshold)?(state.position[0]-threshold)/1.75:(-state.position[2]-1.45)/.65;
     const thresholdShade=state.actionId==='entry'?1-.75*THREE.MathUtils.clamp(exteriorProgress,0,1):1;
     for(const [material,color] of actorColors)material.color.copy(color).multiplyScalar(thresholdShade);
-    animation.update({...state,fade:instant?1:state.fade,working:computerSnapshot.phase==='working'},dt,paused);
+    animation.update({...state,fade:instant?1:state.fade,working:computerSnapshot.phase==='working',workPerformance:state.workPerformance??'typing'},dt,paused);
     // Follow the actual hero root, including during transitions; no room snapping.
     hinge('passage',state.doorOpen*config.passageOpenAngle);
     const inAction=['perform','approach-depth'].includes(state.phase),lerp=1-Math.exp(-dt*6);

@@ -1,5 +1,6 @@
 import {pcElement as el,pcButton as button,pcFind} from './virtual-pc-dom.js?rev=21';
 import {createBeatSongForm,songPartWindows} from './beat-song-form.js?rev=32';
+import {createPcIcon} from './virtual-pc-icons.js?rev=28';
 
 export const FT_TRACKS=Object.freeze([
  ...['Drum Kit','Bass','Percussion'].map(name=>({name,stage:0,color:'rhythm'})),
@@ -26,7 +27,7 @@ export function renderStudioTracks(root,beat){
  pcFind(root,n=>n.dataset?.ftRole==='track-count').textContent=tracks.length+' TRACKS';
  for(const track of tracks){
   const row=el(d,'div',{className:'ft-lane',dataset:{stage:String(track.stage),color:track.color,muted:String(Boolean(track.muted))}}),label=el(d,'div',{className:'ft-lane-label'});
-  label.append(el(d,'i',{attributes:{'aria-hidden':'true'}}),el(d,'span',{text:track.name,dataset:{ftRole:'track-label'}}));
+  label.append(track.stage>=3?createPcIcon(d,'microphone',{size:14}):el(d,'i',{attributes:{'aria-hidden':'true'}}),el(d,'span',{text:track.name,dataset:{ftRole:'track-label'}}));
   if(track.muted)label.append(el(d,'small',{text:'OFF',attributes:{title:'Черновик заменён чистовой записью и больше не воспроизводится'}}));
   const lane=el(d,'div',{className:'ft-lane-grid',dataset:{ftRole:'lane'},attributes:{'aria-hidden':'true'}});
   if(stage){

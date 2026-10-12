@@ -70,7 +70,7 @@ export function transformVocalSamples(input,rate,profile){
  const target=.014+.022*quality/VOCAL_CEILING,gain=Math.min(1,target/Math.max(1e-9,Math.sqrt(power/out.length)));
  const echo=.02*post+.035*creative,dry=echo?out.slice():null,delay=Math.round(rate/3);
  // Mix and mastering lift the already damaged voice, never its source or score.
- const vocalGain=10**(clampV(profile.vocalGainDb,0,4.5)/20);
+ const vocalGain=10**(clampV(Number.isFinite(profile.vocalGainDb)?profile.vocalGainDb:0,-12,6)/20);
  for(let i=0;i<out.length;i++){
   const seam=Math.max(0,Math.min(1,i/(rate*.003),(out.length-1-i)/(rate*.012)));
   // Tame isolated peaks locally, rather than turning down the entire recording.

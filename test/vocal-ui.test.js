@@ -11,6 +11,7 @@ test('studio progressively shows draft then locked muted draft and clean vocal l
  let s=fixture(),root=createStudioWorkspace(pcDocument());renderStudioTracks(root,s.projects[0]);const rows=()=>allPc(root).filter(n=>n.dataset.ftRole==='track-label');assert.equal(rows().length,9);
  s=advanceVocalWork(startVocalWork(s,{beatId:'b',textId:'t',kind:'draft'}).state,1000).state;renderStudioTracks(root,s.projects[0]);assert.equal(rows().length,10);
  s=advanceVocalWork(startVocalWork(s,{beatId:'b',kind:'clean'}).state,1000).state;renderStudioTracks(root,s.projects[0]);assert.equal(rows().length,11);assert.ok(allPc(root).some(n=>n.dataset.muted==='true'));assert.ok(rows().some(n=>n.textContent.includes('Clean Vocal')));
+ assert.equal(allPc(root).filter(n=>n.tagName==='IMG'&&n.getAttribute('src')?.endsWith('/microphone.svg')).length,2);
 });
 test('add vocal picks completed text and begins a real saved work job',()=>{
  let state=fixture(),work=0;const d=pcDocument(),root=d.createElement('section');
@@ -21,7 +22,17 @@ test('add vocal picks completed text and begins a real saved work job',()=>{
 test('work routing advances recording, displays flow meter and no genre practice',()=>{
  let s=startVocalWork(fixture(),{beatId:'b',textId:'t',kind:'draft'}).state;
  const descriptor=creativeWorkDescriptor(s,{flow:10});assert.equal(descriptor.recording,true);assert.equal(descriptor.skill,10);
+ assert.equal(descriptor.performance,'rapping');
  const r=advanceCreativeWork(s,1);assert.ok(r.state.recording.job.elapsed>0);assert.ok(r.state.recording.practice.flow>0);
  const panel=createBeatWorkPanel(pcDocument());panel.update({beat:descriptor.project,job:descriptor.job,skill:10.04});
  assert.ok(allPc(panel.element).some(n=>n.textContent?.includes('Флоу 10.04')));assert.ok(allPc(panel.element).some(n=>n.textContent==='Черновая запись'));panel.dispose();
+});
+
+test('only draft and clean recording use a mic performance',()=>{
+ let s=fixture();
+ for(const kind of ['draft','clean','mix','master']){
+  s=startVocalWork(s,{beatId:'b',textId:'t',kind}).state;
+  assert.equal(creativeWorkDescriptor(s).performance,['draft','clean'].includes(kind)?'rapping':'typing');
+  s=advanceVocalWork(s,1000).state;s.music.needs={satiety:100,energy:100};
+ }
 });

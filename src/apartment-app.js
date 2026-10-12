@@ -300,6 +300,7 @@ try{
     if(motion.clip==='walk'&&motion.walkDistance-lastStep>config.stride/2){cue('footstep');lastStep=motion.walkDistance;}
     const door=motion.doorOpen>.3;if(door&&!lastDoor)cue('door');lastDoor=door;
     view.setRoomLights(homeTime.lights);view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));
+    motion.workPerformance=creativeWorkDescriptor(pcState,profile?.skills).performance;
     if(pcNeedsSceneFrame(pcLifecycle.snapshot,mode))view.render(motion,(paused&&!step)||homeModalOpen()||document.hidden?0:dt,{skeleton,paused:(paused&&!step)||homeModalOpen()||document.hidden});cameraLabel();$('#fade').style.opacity=motion.fade;
     const headAnchor=view.getHeadScreenPosition(),firstPerson=view.modes.mode==='3D',roomReady=pcLifecycle.snapshot.phase==='room'&&motion.actionId!=='computer'&&motion.fade<.01;
     speech.tick(paused?0:dt,{hidden:document.hidden,present:mode==='game'&&!cameraFade&&roomReady&&!homeModalOpen()&&(firstPerson||headAnchor.visible),roomReady,audioAllowed:audio?.state==='running'});

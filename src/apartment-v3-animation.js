@@ -8,7 +8,7 @@ export class ApartmentAnimation{
     mixer.getRoot().traverse(node=>{
       if(!node.isBone)return;
       const name=node.name.replace(/[._]/g,'');
-      const kind=name.startsWith('forearm')?'arm':name.startsWith('hand')?'hand':name==='chest'?'chest':null;
+      const kind=name.startsWith('forearm')?'arm':name.startsWith('hand')?'hand':name==='chest'?'chest':name==='head'?'head':null;
       if(kind)this.workBones.push({node,kind,phase:name.endsWith('R')?1.7:0,base:null});
     });
   }
@@ -24,7 +24,8 @@ export class ApartmentAnimation{
       this.active=next;this.current=state.clip;
     }
     const working=state.working&&state.clip==='seated';
-    this.mixer.update(paused?0:dt*(working?3:1));
+    const rapping=working&&state.workPerformance==='rapping';
+    this.mixer.update(paused?0:dt*(working&&!rapping?3:1));
     if(this.current==='walk'&&!paused){
       const duration=this.active.getClip().duration;
       this.active.time=(state.walkDistance/this.stride*duration)%duration;
@@ -34,8 +35,19 @@ export class ApartmentAnimation{
       if(!paused)this.workTime+=dt;
       for(const bone of this.workBones){
         bone.base=bone.node.quaternion.clone();
-        const tap=Math.sin(this.workTime*32+bone.phase);
-        bone.node.rotateX(bone.kind==='chest'?Math.sin(this.workTime*7)*.014:tap*(bone.kind==='arm'?.10:.13));
+        if(rapping){
+          const blend=Math.min(1,this.workTime/.25),gesture=Math.sin(this.workTime*5.4+bone.phase);
+          if(bone.kind==='chest'||bone.kind==='head'){
+            bone.node.rotateY(-blend*(bone.kind==='chest'?.3:.22));
+            bone.node.rotateX(blend*(bone.kind==='chest'?.1:.04+gesture*.025));
+          }else{
+            bone.node.rotateX(blend*(bone.kind==='arm'?-.24+gesture*.18:gesture*.09));
+            bone.node.rotateZ(blend*Math.sin(this.workTime*3.1+bone.phase)*.09);
+          }
+        }else if(bone.kind!=='head'){
+          const tap=Math.sin(this.workTime*32+bone.phase);
+          bone.node.rotateX(bone.kind==='chest'?Math.sin(this.workTime*7)*.014:tap*(bone.kind==='arm'?.10:.13));
+        }
       }
     }else this.workTime=0;
   }
