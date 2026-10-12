@@ -18,6 +18,7 @@ import {mountUnderweb} from './underweb-view.js?rev=38';
 import {applyToBattle} from './virtual-pc-state.js?rev=38';
 import {mountBeatStudio} from './beat-studio-view.js?rev=38';
 import {BeatAudio} from './beat-audio.js?rev=38';
+import {createPcAudioSession} from './pc-audio-session.js?rev=38';
 import {normalizeBeat} from './beat-production.js?rev=38';
 import {createBeatMarket} from './beat-market-view.js?rev=38';
 import * as software from './pc-software.js?rev=38';
@@ -140,6 +141,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     bootStep: 0,
   };
 
+  pc.audioSession=createPcAudioSession(pc.beatAudio);
   pc.persist = (state = pc.state,options={}) => {
     const next=createVirtualPcState(state);
     const result = pc.callbacks.onPersist(next,options);
@@ -289,11 +291,11 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.notebookView.update();return;
     }
     if(appId==='underweb'){
-      if(!pc.underwebView)pc.underwebView=mountUnderweb(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onApply:(id,name)=>pc.persist(applyToBattle(pc.state,id,name)),onSubmitTrack:id=>pc.showSubmission(id),onResultViewed:callbacks.onResultViewed,onSoftware:pc.softwareAction,getSoftwareMessage:()=>pc.message,onChange:next=>{const saved=pc.persist(next,{atomic:true});pc.renderDesktop(false);return saved;},audio:pc.beatAudio});
+      if(!pc.underwebView)pc.underwebView=mountUnderweb(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onApply:(id,name)=>pc.persist(applyToBattle(pc.state,id,name)),onSubmitTrack:id=>pc.showSubmission(id),onResultViewed:callbacks.onResultViewed,onSoftware:pc.softwareAction,getSoftwareMessage:()=>pc.message,onChange:next=>{const saved=pc.persist(next,{atomic:true});pc.renderDesktop(false);return saved;},audio:pc.audioSession.forOwner('underweb')});
       pc.underwebView.update();return;
     }
     if(appId==='ft-studio'){
-      if(!pc.studioView){const initialProject=pc.pendingStudioProject;pc.pendingStudioProject=null;pc.studioView=mountBeatStudio(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onChange:next=>pc.persist(next),onWork:()=>callbacks.onWork?.()??false,audio:pc.beatAudio,initialProject});}
+      if(!pc.studioView){const initialProject=pc.pendingStudioProject;pc.pendingStudioProject=null;pc.studioView=mountBeatStudio(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onChange:next=>pc.persist(next),onWork:()=>callbacks.onWork?.()??false,audio:pc.audioSession.forOwner('ft-studio'),initialProject});}
       pc.studioView.update();return;
     }
     if(appId==='computer'){
@@ -393,7 +395,7 @@ export function mountVirtualPc(root, callbacks = {}) {
 
 
   pc.renderWindow = (appId=pc.windows.activeId) => {
-    if(appId==='ripline')return createBeatMarket(document,{getState:()=>pc.state,onChange:next=>pc.persist(next),audio:pc.beatAudio,ripline:true});
+    if(appId==='ripline')return createBeatMarket(document,{getState:()=>pc.state,onChange:next=>pc.persist(next),audio:pc.audioSession.forOwner('ripline'),ripline:true});
     if(appId==='ft-studio')return createStudioWorkspace(document,{projectName:pc.project?.name});
     return el(document,'p',{text:'Приложение недоступно.'});
   };
@@ -463,7 +465,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.systemViews.get(id)?.dispose();pc.systemViews.delete(id);
     if(id==='computer'){pc.explorer?.dispose();pc.explorer=null;}
     if(id==='ft-studio'){pc.audio.stop();pc.studioView?.dispose();pc.studioView=null;}
-    if(['ft-studio','underweb','ripline'].includes(id))pc.beatAudio.stop();
+    if(['ft-studio','underweb','ripline'].includes(id))pc.audioSession.stopOwner(id);
     pc.windows=reduceWindows(pc.windows,{type:'close',id});
     pc.confirmClose=false;pc.pendingAction=null;
     pc.renderDesktop(false);
@@ -479,17 +481,17 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.cancelStudioLaunch();
     pc.menu?.close();
     pc.persist(pauseCreativeChain(pc.state));
-    pc.audio.stop();pc.beatAudio.stop();pc.callbacks.onLeave();
+    pc.audio.stop();pc.audioSession.stopOwner('creative-work');pc.callbacks.onLeave();
   };
 
   pc.requestShutdown = () => {
     if (pc.locked||pc.confirmClose) return;
     pc.persist(pauseCreativeChain(pc.state));
     pc.cancelStudioLaunch();
-    pc.audio.stop();pc.beatAudio.stop();pc.callbacks.onShutdown();
+    pc.audio.stop();pc.audioSession.stopAll();pc.callbacks.onShutdown();
   };
 
-  pc.completeShutdown=()=>{pc.cancelStudioLaunch();pc.clearViews();pc.windows=reduceWindows(pc.windows,{type:'clear'});pc.renderDesktop(false);};
+  pc.completeShutdown=()=>{pc.cancelStudioLaunch();pc.audioSession.stopAll();pc.clearViews();pc.windows=reduceWindows(pc.windows,{type:'clear'});pc.renderDesktop(false);};
 
 
   pc.focusScope = () => {
@@ -516,7 +518,7 @@ export function mountVirtualPc(root, callbacks = {}) {
 
   pc.reset = state => {
     pc.cancelStudioLaunch();
-    pc.beatAudio.stop();
+    pc.audioSession.stopAll();
     if (pc.bootTimer !== null) pc.clearTimeoutFn(pc.bootTimer);
     pc.bootTimer = null;
     pc.audio.stop();
@@ -545,7 +547,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (pc.bootTimer !== null) pc.clearTimeoutFn(pc.bootTimer);
     pc.bootTimer = null;
     pc.audio.dispose();
-    pc.beatAudio.dispose();
+    pc.audioSession.dispose();
     pc.clearViews();pc.menu?.dispose();pc.menu=null;
     pc.shell?.dispose();pc.shell=null;
     pc.phase = 'off';

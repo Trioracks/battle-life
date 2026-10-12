@@ -37,8 +37,8 @@ test('group search focus stays on clock ticks, subscription is persisted before 
  const c=setup('community/makarevich-1');findButton(c.root,'Подписаться').click();assert.equal(c.state.social.subscriptions.length,1);assert.ok(findButton(c.root,'Вы подписаны'));c.view.dispose();
  const fail=setup('community/makarevich-1',{fail:true});findButton(fail.root,'Подписаться').click();assert.equal(fail.state.social.subscriptions.length,0);assert.ok(allPc(fail.root).some(n=>n.textContent?.includes('Не удалось сохранить')));fail.view.dispose();
 });
-test('saved audio plays one frozen version, catches errors and disposes pending playback',async()=>{
+test('saved audio catches errors without stopping the app session on page disposal',async()=>{
  let stopped=0,played=[];const audio={stop(){stopped++;},playDescriptor:async d=>{played.push(d);throw Error('network');}};
  const s=setup('audio',{state:subscriptionFixture(),audio});const b=allPc(s.root).find(n=>n.dataset?.socialAudio);b.click();await new Promise(r=>setImmediate(r));
- assert.equal(played.length,1);assert.equal(played[0].owner,'social');assert.ok(allPc(s.root).some(n=>n.textContent?.includes('Не удалось')));s.view.dispose();assert.ok(stopped>0);
+ assert.equal(played.length,1);assert.equal(played[0].owner,'social');assert.ok(allPc(s.root).some(n=>n.textContent?.includes('Не удалось')));const before=stopped;s.view.dispose();assert.equal(stopped,before);
 });

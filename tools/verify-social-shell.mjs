@@ -32,7 +32,9 @@ try{
  await page.locator('[data-social-audio]').first().click();
  await page.waitForFunction(()=>socialQA.audio.status==='playing'||socialQA.audio.status==='error');
  assert.equal(await page.evaluate(()=>socialQA.audio.status),'playing');
- await page.getByRole('button',{name:'Мои фотографии',exact:true}).click();assert.equal(await page.evaluate(()=>socialQA.audio.status),'stopped');
+ await page.getByRole('button',{name:'Мои фотографии',exact:true}).click();assert.equal(await page.evaluate(()=>socialQA.audio.status),'playing');
+ await page.evaluate(()=>socialQA.pc.closeNow('ft-studio'));assert.equal(await page.evaluate(()=>socialQA.audio.status),'playing');
+ await page.evaluate(()=>socialQA.pc.closeNow('underweb'));assert.equal(await page.evaluate(()=>socialQA.audio.status),'stopped');
  await page.evaluate(()=>socialQA.pc.dispose());assert.deepEqual(errors,[]);
- console.log('PASS six-section navigation, subscriptions, private profiles, native background playback, route cancellation, three viewport widths');
+ console.log('PASS six-section navigation, subscriptions, private profiles, native playback survives navigation and unrelated close; owner close stops; three viewport widths');
 }finally{await browser.close();}

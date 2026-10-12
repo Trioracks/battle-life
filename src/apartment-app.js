@@ -114,7 +114,7 @@ try{
     onChange:phone=>{const saved=persistPc({...pcState,phone},{atomic:true});if(saved)virtualPc.syncState(pcState);return saved;},
     playVibration:()=>{if(audio?.state==='running'&&!document.hidden)playSoundCue('phone-vibrate',audio);},
   });
-  const workAudio=createBeatWorkAudio(virtualPc.beatAudio);
+  const workAudio=createBeatWorkAudio(virtualPc.audioSession.forOwner('creative-work'));
   const lyricWorkAudio=createLyricWorkAudio();
   const syncWorkAudio=(hidden=document.hidden)=>{
     const {writing,project,job}=creativeWorkDescriptor(pcState,profile?.skills),phase=pcLifecycle.snapshot.phase;
@@ -267,7 +267,7 @@ try{
       const pending=nextSafeResultReaction(pcState,{atDesktop:true,creativeJob:creativeWorkDescriptor(pcState,profile?.skills).job,transitionPhase:pcLifecycle.snapshot.phase,modalOpen:Boolean(virtualPc.confirmClose||virtualPc.shutdownModal||virtualPc.submissionModal||virtualPc.uninstallModal)});
       if(pending&&pending.id!==failedReactionId&&pcLifecycle.react()){
         resultEpisode={reaction:pending,ui:captureDesktopReturn(pcRoot),speaking:false,elapsed:0,returning:false};
-        virtualPc.beatAudio.stop();resumeAnimation();
+        virtualPc.audioSession.stopAll();resumeAnimation();
       }
     }
     syncWorkAudio();
@@ -366,8 +366,8 @@ try{
   }
   loading.hidden=true;setMode('menu');view.render(motion,0);
   function frame(now){const raw=(now-last)/1000,dt=Math.min(raw,.25);if(raw>0)frameRate=frameRate*.9+Math.min(240,1/raw)*.1;last=now;update(dt,now);requestAnimationFrame(frame);}requestAnimationFrame(frame);
-  document.addEventListener('visibilitychange',()=>{last=performance.now();if(document.hidden){syncWorkAudio(true);virtualPc.beatAudio.stop();saveHomeTime(storage,homeTime);persistPc(pcState);}});
+  document.addEventListener('visibilitychange',()=>{last=performance.now();if(document.hidden){syncWorkAudio(true);virtualPc.audioSession.stopAll();saveHomeTime(storage,homeTime);persistPc(pcState);}});
   window.addEventListener('pagehide',event=>{if(!event.persisted)phoneView.dispose();});
-  window.addEventListener('pagehide',event=>{saveHomeTime(storage,homeTime);persistPc(pcState);syncWorkAudio(true);virtualPc.beatAudio.stop();if(event.persisted){pcSounds.stop();return;}wardrobeView.dispose();fridgeView.dispose();speechView.dispose();workAudio.dispose();lyricWorkAudio.dispose();workPanel.dispose();pcLifecycle.reset();pcSounds.dispose();virtualPc.dispose();view.dispose();});
+  window.addEventListener('pagehide',event=>{saveHomeTime(storage,homeTime);persistPc(pcState);syncWorkAudio(true);virtualPc.audioSession.stopAll();if(event.persisted){pcSounds.stop();return;}wardrobeView.dispose();fridgeView.dispose();speechView.dispose();workAudio.dispose();lyricWorkAudio.dispose();workPanel.dispose();pcLifecycle.reset();pcSounds.dispose();virtualPc.dispose();view.dispose();});
   window.addEventListener('pageshow',event=>{if(event.persisted)last=performance.now();});
 }catch(error){console.error(error);loading.querySelector('h2').textContent='Не удалось загрузить сцену';loading.querySelector('p').textContent=error.message;loading.classList.add('error');}

@@ -133,7 +133,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   const scrollTop=resetScroll?0:page.scrollTop;applicationFocus=null;
   lastDay=JSON.stringify([getMetadata().gameDay]);
   if(!preserveInputs)address.value=route.url;back.disabled=index===0;forward.disabled=index===history.length-1;
-  socialView?.dispose();socialView=null;audio?.stop();
+  socialView?.dispose();socialView=null;
   if(route.type==='social'){
    const host=el(d,'div');page.replaceChildren(host);
    socialView=mountSocial(host,{route,getState,getMetadata,onChange,navigate,audio,onResultViewed});
@@ -157,5 +157,5 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   if(lastDay!==JSON.stringify([getMetadata().gameDay])){route=resolveUnderweb(history[index],getMetadata());render({resetScroll:false,preserveInputs:true});}
   else if(lastApplications!==JSON.stringify([getState().battleApplications,getState().battleSubmissions])&&['home','battle','battles'].includes(route.type)||route.type==='dump'&&lastSoftware!==softwareSignature())render({resetScroll:false,preserveInputs:true});
   else if(route.type==='dump'){const node=pcFind(page,n=>n.dataset?.pcRole==='forum-transfer');if(node){const p=downloadPresentation(getState(),'client');node.textContent=`Загрузка: ${p.receivedMb.toFixed(2)} / ${p.totalMb} МБ · ${p.speedKbPerSecond} КБ/с${p.error?' · '+softwareMessage(p.error):''}`;}}
- },dispose(){socialView?.dispose();audio?.stop();root.replaceChildren();}};
+ },dispose(){socialView?.dispose();root.replaceChildren();}};
 }
