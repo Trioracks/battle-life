@@ -1,0 +1,752 @@
+{
+  "eparhiya": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "literature",
+      "film",
+      "history"
+    ],
+    "sourceIds": [
+      "alice",
+      "oz",
+      "carol",
+      "crusoe",
+      "frankenstein",
+      "matrix",
+      "backfuture",
+      "terminator",
+      "groundhog",
+      "truman",
+      "odyssey",
+      "heracles",
+      "orpheus",
+      "norse",
+      "apollo"
+    ]
+  },
+  "klim-propavshiy": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "music",
+      "film",
+      "everyday"
+    ],
+    "sourceIds": [
+      "matrix",
+      "backfuture",
+      "terminator",
+      "groundhog",
+      "truman",
+      "turntable",
+      "drummachine",
+      "sampling",
+      "beatbox",
+      "mixtape",
+      "payphone",
+      "kommunalka",
+      "khrushchevka",
+      "vending",
+      "filmstock"
+    ]
+  },
+  "svinoferma": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "literature",
+      "internet",
+      "history"
+    ],
+    "sourceIds": [
+      "alice",
+      "oz",
+      "carol",
+      "crusoe",
+      "frankenstein",
+      "odyssey",
+      "heracles",
+      "orpheus",
+      "norse",
+      "apollo",
+      "rickroll",
+      "icq",
+      "forum",
+      "chainletter",
+      "leet"
+    ]
+  },
+  "thirty-third": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "music",
+      "film",
+      "games"
+    ],
+    "sourceIds": [
+      "matrix",
+      "backfuture",
+      "terminator",
+      "groundhog",
+      "truman",
+      "turntable",
+      "drummachine",
+      "sampling",
+      "beatbox",
+      "mixtape",
+      "minecraft",
+      "portal",
+      "halflife",
+      "mario",
+      "tetris"
+    ]
+  },
+  "corpse-attack": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "film",
+      "everyday"
+    ],
+    "sourceIds": [
+      "matrix",
+      "backfuture",
+      "terminator",
+      "groundhog",
+      "truman",
+      "payphone",
+      "kommunalka",
+      "khrushchevka",
+      "vending",
+      "filmstock"
+    ]
+  },
+  "hexmalysh": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "games",
+      "internet",
+      "music"
+    ],
+    "sourceIds": [
+      "turntable",
+      "drummachine",
+      "sampling",
+      "beatbox",
+      "mixtape",
+      "minecraft",
+      "portal",
+      "halflife",
+      "mario",
+      "tetris",
+      "rickroll",
+      "icq",
+      "forum",
+      "chainletter",
+      "leet"
+    ]
+  },
+  "geshul": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "literature",
+      "everyday"
+    ],
+    "sourceIds": [
+      "alice",
+      "oz",
+      "carol",
+      "crusoe",
+      "frankenstein",
+      "payphone",
+      "kommunalka",
+      "khrushchevka",
+      "vending",
+      "filmstock"
+    ]
+  },
+  "dobbro": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "music",
+      "animation",
+      "everyday"
+    ],
+    "sourceIds": [
+      "turntable",
+      "drummachine",
+      "sampling",
+      "beatbox",
+      "mixtape",
+      "lionking",
+      "toystory",
+      "spirited",
+      "walle",
+      "nupogodi",
+      "payphone",
+      "kommunalka",
+      "khrushchevka",
+      "vending",
+      "filmstock"
+    ]
+  },
+  "kozachok": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "history",
+      "everyday",
+      "music"
+    ],
+    "sourceIds": [
+      "turntable",
+      "drummachine",
+      "sampling",
+      "beatbox",
+      "mixtape",
+      "odyssey",
+      "heracles",
+      "orpheus",
+      "norse",
+      "apollo",
+      "payphone",
+      "kommunalka",
+      "khrushchevka",
+      "vending",
+      "filmstock"
+    ]
+  },
+  "mc-varg-pinochetskiy": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "history",
+      "literature",
+      "music"
+    ],
+    "sourceIds": [
+      "alice",
+      "oz",
+      "carol",
+      "crusoe",
+      "frankenstein",
+      "turntable",
+      "drummachine",
+      "sampling",
+      "beatbox",
+      "mixtape",
+      "odyssey",
+      "heracles",
+      "orpheus",
+      "norse",
+      "apollo"
+    ]
+  },
+  "mc-onegin": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "literature",
+      "film",
+      "animation"
+    ],
+    "sourceIds": [
+      "alice",
+      "oz",
+      "carol",
+      "crusoe",
+      "frankenstein",
+      "matrix",
+      "backfuture",
+      "terminator",
+      "groundhog",
+      "truman",
+      "lionking",
+      "toystory",
+      "spirited",
+      "walle",
+      "nupogodi"
+    ]
+  },
+  "nagvalny": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "internet",
+      "history",
+      "everyday"
+    ],
+    "sourceIds": [
+      "odyssey",
+      "heracles",
+      "orpheus",
+      "norse",
+      "apollo",
+      "rickroll",
+      "icq",
+      "forum",
+      "chainletter",
+      "leet",
+      "payphone",
+      "kommunalka",
+      "khrushchevka",
+      "vending",
+      "filmstock"
+    ]
+  },
+  "ok-unconfirmed": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "film",
+      "music"
+    ],
+    "sourceIds": [
+      "matrix",
+      "backfuture",
+      "terminator",
+      "groundhog",
+      "truman",
+      "turntable",
+      "drummachine",
+      "sampling",
+      "beatbox",
+      "mixtape"
+    ]
+  },
+  "ohuyenno-kulturny": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "literature",
+      "animation",
+      "history"
+    ],
+    "sourceIds": [
+      "alice",
+      "oz",
+      "carol",
+      "crusoe",
+      "frankenstein",
+      "lionking",
+      "toystory",
+      "spirited",
+      "walle",
+      "nupogodi",
+      "odyssey",
+      "heracles",
+      "orpheus",
+      "norse",
+      "apollo"
+    ]
+  },
+  "tavern-knight": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "games",
+      "history",
+      "film"
+    ],
+    "sourceIds": [
+      "matrix",
+      "backfuture",
+      "terminator",
+      "groundhog",
+      "truman",
+      "minecraft",
+      "portal",
+      "halflife",
+      "mario",
+      "tetris",
+      "odyssey",
+      "heracles",
+      "orpheus",
+      "norse",
+      "apollo"
+    ]
+  },
+  "herova-zhest": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "music",
+      "internet",
+      "film"
+    ],
+    "sourceIds": [
+      "matrix",
+      "backfuture",
+      "terminator",
+      "groundhog",
+      "truman",
+      "turntable",
+      "drummachine",
+      "sampling",
+      "beatbox",
+      "mixtape",
+      "rickroll",
+      "icq",
+      "forum",
+      "chainletter",
+      "leet"
+    ]
+  },
+  "abstract-postmodern": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "film",
+      "literature"
+    ],
+    "sourceIds": [
+      "alice",
+      "oz",
+      "carol",
+      "crusoe",
+      "frankenstein",
+      "matrix",
+      "backfuture",
+      "terminator",
+      "groundhog",
+      "truman"
+    ]
+  },
+  "alx-beats": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "music",
+      "games"
+    ],
+    "sourceIds": [
+      "turntable",
+      "drummachine",
+      "sampling",
+      "beatbox",
+      "mixtape",
+      "minecraft",
+      "portal",
+      "halflife",
+      "mario",
+      "tetris"
+    ]
+  },
+  "benarfa": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "everyday",
+      "film",
+      "internet"
+    ],
+    "sourceIds": [
+      "matrix",
+      "backfuture",
+      "terminator",
+      "groundhog",
+      "truman",
+      "rickroll",
+      "icq",
+      "forum",
+      "chainletter",
+      "leet",
+      "payphone",
+      "kommunalka",
+      "khrushchevka",
+      "vending",
+      "filmstock"
+    ]
+  },
+  "cenobite": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "film",
+      "history",
+      "literature"
+    ],
+    "sourceIds": [
+      "alice",
+      "oz",
+      "carol",
+      "crusoe",
+      "frankenstein",
+      "matrix",
+      "backfuture",
+      "terminator",
+      "groundhog",
+      "truman",
+      "odyssey",
+      "heracles",
+      "orpheus",
+      "norse",
+      "apollo"
+    ]
+  },
+  "cyber-olegi": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "games",
+      "internet",
+      "music"
+    ],
+    "sourceIds": [
+      "turntable",
+      "drummachine",
+      "sampling",
+      "beatbox",
+      "mixtape",
+      "minecraft",
+      "portal",
+      "halflife",
+      "mario",
+      "tetris",
+      "rickroll",
+      "icq",
+      "forum",
+      "chainletter",
+      "leet"
+    ]
+  },
+  "dead-rave": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "music",
+      "film",
+      "animation"
+    ],
+    "sourceIds": [
+      "matrix",
+      "backfuture",
+      "terminator",
+      "groundhog",
+      "truman",
+      "turntable",
+      "drummachine",
+      "sampling",
+      "beatbox",
+      "mixtape",
+      "lionking",
+      "toystory",
+      "spirited",
+      "walle",
+      "nupogodi"
+    ]
+  },
+  "jakorja": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "everyday",
+      "literature",
+      "music"
+    ],
+    "sourceIds": [
+      "alice",
+      "oz",
+      "carol",
+      "crusoe",
+      "frankenstein",
+      "turntable",
+      "drummachine",
+      "sampling",
+      "beatbox",
+      "mixtape",
+      "payphone",
+      "kommunalka",
+      "khrushchevka",
+      "vending",
+      "filmstock"
+    ]
+  },
+  "kosh-spacecave": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "animation",
+      "games",
+      "history"
+    ],
+    "sourceIds": [
+      "minecraft",
+      "portal",
+      "halflife",
+      "mario",
+      "tetris",
+      "lionking",
+      "toystory",
+      "spirited",
+      "walle",
+      "nupogodi",
+      "odyssey",
+      "heracles",
+      "orpheus",
+      "norse",
+      "apollo"
+    ]
+  },
+  "nedonebo": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "literature",
+      "animation",
+      "everyday"
+    ],
+    "sourceIds": [
+      "alice",
+      "oz",
+      "carol",
+      "crusoe",
+      "frankenstein",
+      "lionking",
+      "toystory",
+      "spirited",
+      "walle",
+      "nupogodi",
+      "payphone",
+      "kommunalka",
+      "khrushchevka",
+      "vending",
+      "filmstock"
+    ]
+  },
+  "pavel-underground": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "music",
+      "everyday",
+      "history"
+    ],
+    "sourceIds": [
+      "turntable",
+      "drummachine",
+      "sampling",
+      "beatbox",
+      "mixtape",
+      "odyssey",
+      "heracles",
+      "orpheus",
+      "norse",
+      "apollo",
+      "payphone",
+      "kommunalka",
+      "khrushchevka",
+      "vending",
+      "filmstock"
+    ]
+  },
+  "prikolchique": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "internet",
+      "games",
+      "animation"
+    ],
+    "sourceIds": [
+      "minecraft",
+      "portal",
+      "halflife",
+      "mario",
+      "tetris",
+      "lionking",
+      "toystory",
+      "spirited",
+      "walle",
+      "nupogodi",
+      "rickroll",
+      "icq",
+      "forum",
+      "chainletter",
+      "leet"
+    ]
+  },
+  "svetokron": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "history",
+      "literature",
+      "film"
+    ],
+    "sourceIds": [
+      "alice",
+      "oz",
+      "carol",
+      "crusoe",
+      "frankenstein",
+      "matrix",
+      "backfuture",
+      "terminator",
+      "groundhog",
+      "truman",
+      "odyssey",
+      "heracles",
+      "orpheus",
+      "norse",
+      "apollo"
+    ]
+  },
+  "whitespruce": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "film",
+      "music",
+      "everyday"
+    ],
+    "sourceIds": [
+      "matrix",
+      "backfuture",
+      "terminator",
+      "groundhog",
+      "truman",
+      "turntable",
+      "drummachine",
+      "sampling",
+      "beatbox",
+      "mixtape",
+      "payphone",
+      "kommunalka",
+      "khrushchevka",
+      "vending",
+      "filmstock"
+    ]
+  },
+  "zoo-in-space": {
+    "version": 2,
+    "status": "fictional_game_configuration",
+    "topics": [
+      "animation",
+      "games",
+      "internet"
+    ],
+    "sourceIds": [
+      "minecraft",
+      "portal",
+      "halflife",
+      "mario",
+      "tetris",
+      "lionking",
+      "toystory",
+      "spirited",
+      "walle",
+      "nupogodi",
+      "rickroll",
+      "icq",
+      "forum",
+      "chainletter",
+      "leet"
+    ]
+  }
+}

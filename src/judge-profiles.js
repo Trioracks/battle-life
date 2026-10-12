@@ -1,4 +1,5 @@
 import data from '../data/judges/profiles.json' with { type:'json' };
+import {judgeReferenceKnowledge} from './cultural-references.js';
 
 function freeze(value) {
   if (value && typeof value === 'object') {
@@ -7,7 +8,7 @@ function freeze(value) {
   }
   return value;
 }
-export const JUDGE_PROFILES = freeze(data.profiles);
+export const JUDGE_PROFILES = freeze(data.profiles.map(profile=>({...profile,knowledge:judgeReferenceKnowledge(profile.id)})));
 const profilesById = new Map(JUDGE_PROFILES.map(p=>[p.id,p]));
 
 export function judgeProfile(id) {
