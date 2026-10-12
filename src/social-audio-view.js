@@ -14,7 +14,7 @@ export function createSocialAudio(audio){
  const stop=()=>{generation++;audio?.stop?.();};
  return {
   row(d,{version,item}){
-   const row=el(d,'div',{className:'sn-audio'}),title=version?.name??item?.title??'Сохранённая работа недоступна';
+   const row=el(d,'div',{className:'sn-audio'}),title=version?.name??(item?[(item.archive?item.author:null),item.title].filter(Boolean).join(' — '):'Сохранённая работа недоступна');
    const status=el(d,'small',{attributes:{'aria-live':'polite'}}),play=button(d,'▶',async()=>{
     if(disposed)return;const token=++generation;status.textContent='Загрузка…';
     try{

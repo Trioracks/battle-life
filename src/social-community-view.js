@@ -22,10 +22,10 @@ export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),na
  }
  side.append(socialHeading(d,'Участники',c.memberCount+Number(subscribed)));
  for(const id of c.members){const p=profileById(id);if(!p)continue;const member=el(d,'div',{className:'sn-member'});member.append(socialAvatar(d,p.avatar,p.name),socialButton(d,p.name,()=>navigate('underweb://social/profile/'+id),{className:'sn-link'}));side.append(member);}
- const versions=state.communityAudio?.[id]??[];wall.append(socialHeading(d,'Аудиозаписи',versions.length+c.audio.length));
+ const versions=state.communityAudio?.[id]??[];wall.append(socialHeading(d,'Работы текущего сезона',versions.length));
  for(const submission of state.battleSubmissions??[])if(submission.communityId===id&&submission.status!=='recovery')wall.append(createSocialResultView(d,{submission,getState,commit,expandedResults,onResultViewed}));
  for(const versionId of versions)wall.append(audio.row(d,{version:state.trackVersions?.byId?.[versionId]}));
- if(c.audio.length)wall.append(el(d,'p',{className:'sn-note',text:'Фоновый архив · домашние демо до начала текущего отбора. Не заявки и не записи реальных участников.'}));
+ if(c.audio.length)wall.append(socialHeading(d,'Игровые фоновые записи · прошлый сезон',c.audio.length),el(d,'p',{className:'sn-note',text:'Вымышленные авторы и домашние демо. Это не заявки текущего отбора и не записи реальных участников.'}));
  for(const item of c.audio)wall.append(audio.row(d,{item}));
  if(c.battleId)wall.append(el(d,'p',{className:'sn-note',text:'Новые работы участников публикуются после окончания приёма. Прикрепление и ответ администратора не публикуют трек.'}));
  wall.append(socialHeading(d,'Стена сообщества',c.history.length));for(const post of [...c.history].reverse())wall.append(socialPost(d,post,{author:c.name,navigate,profileById}));

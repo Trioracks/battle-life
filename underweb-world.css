@@ -1,4 +1,7 @@
 /* Independent fictional battle sites and a period-inspired forum. */
+.uw-social-entry{padding:20px 22px;margin:0 0 22px;border:1px solid #bbcbd2;border-left:5px solid #536f87;background:#eef3f5}
+#virtual-pc .uw-browser .uw-social-entry button{font-size:19px;font-weight:700;color:#345772;border:0;background:none;box-shadow:none;padding:0;text-align:left}
+.uw-social-entry p{margin:10px 0 0;color:#6c8090;font-size:12px}
 .uw-community .uw-forum-sections{display:flex;gap:0;flex-wrap:wrap;margin:0 -19px 12px;background:#cbd7df;border-bottom:1px solid #a6b8c6}
 #virtual-pc .uw-community .uw-forum-sections button{padding:10px 15px;border-right:1px solid #a7b9c6;text-decoration:none;font-size:11px;font-weight:bold}
 #virtual-pc .uw-community .uw-forum-sections [aria-current=page]{background:#f5f7f9;color:#294d68}

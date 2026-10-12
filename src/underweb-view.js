@@ -25,11 +25,10 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  toolbar.append(back,forward,home,el(d,'span',{className:'uw-address-label',text:'Адрес'}),address,button(d,'Перейти',{},()=>navigate(address.value)));
  toolbar.addEventListener('submit',e=>{e.preventDefault();navigate(address.value);});
  const bookmarks=el(d,'nav',{className:'uw-bookmarks',attributes:{'aria-label':'Избранное Underweb'}});
- bookmarks.append(el(d,'strong',{text:'UNDERWEB'}),button(d,'Искра',{},()=>navigate('underweb://iskra')),button(d,'Баттлы',{},()=>navigate('underweb://battles')),button(d,'FT Studio',{},()=>navigate('underweb://software/ft-studio')));
+ bookmarks.append(el(d,'strong',{text:'UNDERWEB'}),button(d,'Искра',{},()=>navigate('underweb://iskra')),button(d,SOCIAL_IDENTITY.name,{},()=>navigate('underweb://social/me')),button(d,'Баттлы',{},()=>navigate('underweb://battles')),button(d,'FT Studio',{},()=>navigate('underweb://software/ft-studio')));
  bookmarks.append(button(d,'Базар',{},()=>navigate('underweb://samples')),button(d,'RIPLINE',{},()=>navigate('underweb://ripline')));
  bookmarks.append(button(d,'Файловая помойка',{},()=>navigate('underweb://dump')));
  bookmarks.append(button(d,'Форум',{},()=>navigate('underweb://forum')));
- bookmarks.append(button(d,SOCIAL_IDENTITY.name,{},()=>navigate('underweb://social/me')));
  const page=el(d,'div',{className:'uw-page'}),status=el(d,'footer',{className:'uw-status',text:'Готово · Локальная сеть'});
  browser.append(toolbar,bookmarks,page,status);root.replaceChildren(browser);
  function searchForm(query=''){
@@ -47,7 +46,9 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
    const card=el(d,'article');card.append(el(d,'small',{text:number}),button(d,title,{},()=>navigate(url)),el(d,'p',{text}));directory.append(card);
   }
   const columns=el(d,'div',{className:'uw-home-columns'}),main=el(d,'div',{className:'uw-home-main'}),side=el(d,'aside',{className:'uw-my-battles',attributes:{'aria-label':'Мои баттлы'}});
-  main.append(createNewsPanel(d,{issue:newsForDay(getMetadata().gameDay),navigate}),directory,button(d,SOCIAL_IDENTITY.name+' — друзья и сообщества',{},()=>navigate('underweb://social/me')));
+  const socialEntry=el(d,'section',{className:'uw-social-entry'});
+  socialEntry.append(button(d,SOCIAL_IDENTITY.name+' — найди друзей и одноклассников',{},()=>navigate('underweb://social/me')),el(d,'p',{text:'Знакомые лица, личные фотографии и разговоры обо всём. Твой круг общения — рядом.'}));
+  main.append(socialEntry,createNewsPanel(d,{issue:newsForDay(getMetadata().gameDay),navigate}),directory);
   side.append(el(d,'h2',{text:'Мои баттлы'}));
   const registered=BATTLE_BRIEFS.filter(b=>isApplied(b.id));
   for(const b of registered){const saved=getState().battleSubmissions?.find(s=>s.battleId===b.id);side.append(button(d,b.title,{},()=>navigate('underweb://battles/'+b.id)),el(d,'small',{text:saved?.issue?'Проверь сохранённую работу':saved?'Ожидает проверки':'Зарегистрирован · можно сдать трек'}));}

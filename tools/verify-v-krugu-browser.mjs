@@ -43,7 +43,15 @@ try{
    assert.equal(await page.locator('.uw-page').evaluate(n=>n.scrollWidth>n.clientWidth+1),false,'overflow '+width+' '+route);
    await page.screenshot({path:out+'/browser-'+width+'-'+route+'.png'});
   }
-  await go('underweb://iskra');await page.screenshot({path:out+'/browser-'+width+'-iskra.png'});
+  await go('underweb://social/community/makarevich-1');assert.equal(await page.locator('.sn-audio').count(),6);assert.equal(await page.locator('.sn-brandmark').innerText(),'в');
+  assert.ok((await page.locator('.sn-community').innerText()).includes('Игровые фоновые записи · прошлый сезон'));
+  await page.screenshot({path:out+'/browser-'+width+'-archive.png'});
+  await go('underweb://social/community/concrete-echo');assert.equal(await page.locator('.sn-audio').count(),0);
+  await go('underweb://iskra');const entry=page.getByRole('button',{name:'В кругу — найди друзей и одноклассников',exact:true});
+  assert.ok((await entry.boundingBox()).y<(await page.locator('.uw-news-panel').boundingBox()).y);
+  assert.equal(await entry.evaluate(n=>getComputedStyle(n).fontSize),'19px');
+  assert.deepEqual(await page.locator('.uw-bookmarks button').allTextContents().then(x=>x.slice(0,2)),['Искра','В кругу']);
+  await page.screenshot({path:out+'/browser-'+width+'-iskra.png'});
  }
  assert.deepEqual(errors,[]);await page.evaluate(()=>qa.pc.dispose());
  console.log('PASS real PC shell: search/download/installer/registration, six social pages, focus and 800/1280/1920 widths');

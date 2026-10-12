@@ -17,3 +17,4 @@
 .sn-review p{grid-column:1/-1;margin:0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}
 .sn-grade{font-variant-numeric:tabular-nums;color:#385d7b}
 .sn-graffiti{display:block;width:min(260px,100%);height:auto;margin-top:12px}
+.sn-brand{display:flex;align-items:center;gap:10px}.sn-top .sn-brandmark{display:grid!important;place-items:center;width:34px;height:34px;border:2px solid #dbe6ea;border-radius:50%;font-size:26px;color:#fff;line-height:1}.sn-brand b{font-weight:700}.sn-network .sn-audio{grid-template-columns:29px minmax(0,1fr) 29px 29px 38px}.sn-network .sn-audio>small{grid-column:2/6}
