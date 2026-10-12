@@ -59,12 +59,12 @@ test('overview follow keeps the hero in the central band at every approach depth
  for(const z of [.85,-.3,-1.1]){
   const pose=cameraPose('2D',{cameraX:3,position:[3,0,z]},1.63),camera=new PerspectiveCamera(pose.fov,1280/900,pose.near,200);
   camera.position.fromArray(pose.position);camera.lookAt(new Vector3(...pose.target));camera.updateMatrixWorld();
-  assert.ok(Math.abs(new Vector3(3,1,z).project(camera).x)<.5,'depth approach retains central actor coverage');
+  assert.ok(Math.abs(new Vector3(3,1,z).project(camera).x)<.6,'depth approach retains central actor coverage and doorway context');
  }
 });
 test('side perspective frames the whole avatar on wide and narrow viewports while distant objects shrink',()=>{
  for(const aspect of [1280/900,640/900]){
-  const pose=cameraPose('2D',{cameraX:3.4,position:[3.4,0,.85]},1.63);
+  const pose=cameraPose('2D',{cameraX:3.4,position:[3.4,0,.85]},1.63,{aspect});
   assert.ok(Number.isFinite(pose.fov),'side view supplies a perspective lens');
   const camera=new PerspectiveCamera(pose.fov,aspect,pose.near,200);camera.position.fromArray(pose.position);camera.lookAt(new Vector3(...pose.target));camera.updateMatrixWorld();
   const positions=[[3.4,0,.85],[3.4,1.75,.85]];
@@ -76,16 +76,16 @@ test('side perspective frames the whole avatar on wide and narrow viewports whil
   assert.ok(width(-31.5)<width(-1.72)*.25,'the courtyard keeps depth behind the room windows');
  }
 });
-test('overview retains the authored wall, floor and standing hero with room for the action dock',()=>{
+test('closer overview hides the roof cut while retaining floor and hero above the action dock',()=>{
  for(const aspect of [1280/900,640/900]){
   const pose=cameraPose('2D',{cameraX:3.4,position:[3.4,0,.85]},1.63,{aspect}),camera=new PerspectiveCamera(pose.fov,aspect,pose.near,200);
   camera.position.fromArray(pose.position);camera.lookAt(new Vector3(...pose.target));camera.updateMatrixWorld();
   const top=new Vector3(3.4,3,-1.72).project(camera),floor=new Vector3(3.4,0,1.82).project(camera);
-  assert.ok(top.y>.3&&top.y<.9,'the real wall top remains in the overview');
+  assert.ok(top.y>1,'the roof cut stays above the overview');
   assert.ok(floor.y>-.9&&floor.y<-.25,'the real floor edge remains in the overview');
   const feet=new Vector3(3.4,0,.85).project(camera),head=new Vector3(3.4,1.75,.85).project(camera);
   assert.ok(feet.y>-.56,'hero feet leave room for the compact action dock');
-  assert.ok((head.y-feet.y)/2>.28&&(head.y-feet.y)/2<.4,'standing avatar occupies about half its former screen height');
+  assert.ok((head.y-feet.y)/2>.46&&(head.y-feet.y)/2<.52,'standing avatar occupies roughly half the viewport height');
  }
 });
 test('a computer swap invalidates a first-person load already in flight',async()=>{

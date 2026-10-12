@@ -5,7 +5,7 @@ import {PcLifecycle,pcActorVisible,preparePcWorkPose} from '../src/virtual-pc-li
 import {ApartmentTime} from '../src/apartment-v3-time.js?rev=28';
 test('work camera pulls back, reveals seated character under black, returns to desktop',()=>{
  const t=new PcTransition();t.enter({alreadyOn:true});t.tick(3);t.drainEvents();assert.equal(t.work(),true);
- assert.equal(t.snapshot.phase,'work-out');t.tick(2.4);assert.equal(t.snapshot.phase,'work-reveal');assert.equal(t.snapshot.blackout,1);assert.equal(t.snapshot.workActor,true);
+ assert.equal(t.snapshot.phase,'work-out');t.tick(.8);assert.equal(t.snapshot.phase,'work-reveal');assert.equal(t.snapshot.blackout,1);assert.equal(t.snapshot.workActor,true);
  t.tick(.4);assert.equal(t.snapshot.phase,'working');assert.equal(t.snapshot.overlay,0);
  t.finishWork();t.tick(.35);assert.equal(t.snapshot.phase,'work-in');assert.equal(t.snapshot.workActor,false);assert.equal(t.snapshot.blackout,1);
  t.tick(3);assert.equal(t.snapshot.phase,'desktop');assert.equal(t.snapshot.locked,false);

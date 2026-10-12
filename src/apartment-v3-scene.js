@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {ApartmentAnimation} from './apartment-v3-animation.js?rev=38';
 import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=38';
+import {headCameraPose} from './apartment-head-pose.js?rev=38';
 import {homeLight} from './apartment-v3-time.js?rev=38';
 import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=38';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=38';
@@ -80,7 +81,17 @@ export async function createApartmentScene(canvas,config){
   const transitionBackdrop=new THREE.ShaderMaterial({uniforms:{frame:{value:transitionFrame.texture},pcBlend:{value:1}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:'uniform sampler2D frame;uniform float pcBlend;varying vec2 vUv;void main(){gl_FragColor=vec4(texture2D(frame,vUv).rgb,pcBlend);}',transparent:true,depthTest:false,depthWrite:false,toneMapped:false});
   const transitionQuad=new THREE.Mesh(new THREE.PlaneGeometry(2,2),transitionBackdrop);transitionQuad.frustumCulled=false;transitionQuad.renderOrder=1000;transitionQuad.visible=false;scene.add(transitionQuad);
   async function prepareComputerView(){if(!computer)throw Error('Computer surfaces are missing');await loadMode('3D');if(disposed)throw Error('Scene disposed');}
-  function beginComputerView(){if(!staticScene||!computer||disposed)throw Error('Computer view is not prepared');computer.begin(modes.mode==='3D'?firstCamera:camera);computerActive=true;}
+  const headViewCamera=new THREE.PerspectiveCamera(60,rect.width/rect.height,.03,far);
+  function getHeadCameraPose(){
+    actor.updateMatrixWorld(true);
+    const anchor=head??actor;
+    return headCameraPose({position:anchor.getWorldPosition(new THREE.Vector3()).toArray(),quaternion:anchor.getWorldQuaternion(new THREE.Quaternion()).toArray(),eyeOffset:head?[0,.09,.1]:[0,eyeHeight,.1]});
+  }
+  function beginComputerView(){
+    if(!staticScene||!computer||disposed)throw Error('Computer view is not prepared');
+    const pose=getHeadCameraPose();headViewCamera.position.fromArray(pose.position);headViewCamera.quaternion.fromArray(pose.quaternion);headViewCamera.aspect=camera.aspect;headViewCamera.updateProjectionMatrix();headViewCamera.updateMatrixWorld(true);
+    computer.begin(headViewCamera);computerActive=true;
+  }
   function setComputerPresentation(snapshot,pcState,playerName){computerSnapshot=snapshot;computer?.update(snapshot,pcPresentation(snapshot,pcState.power,playerName));}
   function endComputerView(){computerActive=false;computer?.end();transitionQuad.visible=false;}
   function applyCamera(state){
@@ -208,7 +219,8 @@ export async function createApartmentScene(canvas,config){
     if(computerActive&&(computerSnapshot.zoom??0)<.10){
       // Capture the actual room/actor frame, not a scaled backdrop photograph.
       const target=renderer.getRenderTarget();computerActive=false;transitionQuad.visible=false;applyCamera(state);
-      renderer.setRenderTarget(transitionFrame);renderer.render(scene,modes.mode==='3D'?firstCamera:camera);renderer.setRenderTarget(target);computerActive=true;
+      actor.visible=shadowFloor.visible=shadow.visible=bones.visible=false;
+      renderer.setRenderTarget(transitionFrame);renderer.render(scene,computer.camera);renderer.setRenderTarget(target);computerActive=true;
     }
     applyCamera(state);retro.render(scene,computerActive?computer.camera:modes.mode==='3D'?firstCamera:camera);
   }
@@ -258,5 +270,5 @@ export async function createApartmentScene(canvas,config){
     point.y+=.24;point.project(modes.mode==='3D'?firstCamera:camera);
     return {x:rect.left+(point.x+1)*rect.width/2,y:rect.top+(1-point.y)*rect.height/2,visible:actor.visible&&!computerActive&&modes.mode!=='3D'};
   }
-  return {modes,loadMode,prepareComputerView,beginComputerView,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,getHeadScreenPosition,clips:[...animation.actions.keys()],dispose(){disposed=true;switchStyle.dispose();computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,staticScene])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
+  return {modes,loadMode,prepareComputerView,beginComputerView,getHeadCameraPose,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,getHeadScreenPosition,clips:[...animation.actions.keys()],dispose(){disposed=true;switchStyle.dispose();computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,staticScene])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
 }

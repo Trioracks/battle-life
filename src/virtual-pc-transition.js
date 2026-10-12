@@ -1,4 +1,4 @@
-const DURATION=Object.freeze({'power-on':1.2,'zoom-in':2.4,loading:6,welcome:1.4,shutdown:2.5,'fade-out':.5,'zoom-out':2.4,'work-out':2.4,'work-reveal':.35,'work-cover':.35,'work-in':2.4,'reaction-out':2.4,'reaction-reveal':.35,'reaction-cover':.35,'reaction-in':2.4});
+const DURATION=Object.freeze({'power-on':1.2,'zoom-in':.8,loading:6,welcome:1.4,shutdown:2.5,'fade-out':.5,'zoom-out':.8,'work-out':.8,'work-reveal':.35,'work-cover':.35,'work-in':.8,'reaction-out':.8,'reaction-reveal':.35,'reaction-cover':.35,'reaction-in':.8});
 const clamp=value=>Math.max(0,Math.min(1,value));
 
 // Owns presentation time only. Durable power and the game clock belong to the host.
@@ -10,7 +10,7 @@ export class PcTransition {
     const reactionActor=['reaction-reveal','reaction-speaking','reaction-cover'].includes(phase);
     const zoomingIn=['zoom-in','work-in','reaction-in'].includes(phase),zoomingOut=['zoom-out','work-out','reaction-out'].includes(phase),workActor=['work-reveal','working','work-cover'].includes(phase)||reactionActor;
     const zoom=zoomingIn?progress:zoomingOut?1-progress:['room','power-on'].includes(phase)||workActor?0:1;
-    const overlay=zoomingIn?clamp((this.elapsed-2.25)/.15):zoomingOut?1-clamp(this.elapsed/.15):['room','power-on'].includes(phase)||workActor?0:1;
+    const overlay=zoomingIn?clamp((progress-.9375)/.0625):zoomingOut?1-clamp(progress/.0625):['room','power-on'].includes(phase)||workActor?0:1;
     const visual=phase.replace('reaction-','work-');
     const blackout=visual==='work-out'?clamp((progress-.88)/.12):visual==='work-reveal'?1-progress:visual==='work-cover'?progress:visual==='work-in'?1-clamp(progress/.12):0;
     return {phase,progress,zoom,overlay,blackout,workActor,reactionActor,locked:!['room','desktop'].includes(phase),coldStart:this.coldStart};

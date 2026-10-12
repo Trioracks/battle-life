@@ -4,10 +4,18 @@ const api=await import('../src/virtual-pc-transition.js').catch(e=>{if(e.code===
 function controller(){assert.equal(typeof api.PcTransition,'function','PC lifecycle controller exists');return new api.PcTransition();}
 const events=c=>c.drainEvents().map(e=>e.type);
 
-test('cold boot crosses four stages once and reaches desktop at eleven seconds',()=>{
+test('all monitor flights take 0.8 seconds and reveal UI only in the final sixteenth',()=>{
+ const c=controller();c.enter({alreadyOn:true});c.tick(.4);assert.equal(c.snapshot.zoom,.5);assert.equal(c.snapshot.overlay,0);c.tick(.375);assert.ok(c.snapshot.overlay>0&&c.snapshot.overlay<1);c.tick(.025);assert.equal(c.snapshot.phase,'desktop');
+ for(const action of ['leave','work','react']){
+  const t=controller();t.enter({alreadyOn:true});t.tick(.8);assert.equal(t[action](),true);t.tick(.8);assert.equal(t.snapshot.phase,action==='leave'?'room':action==='work'?'work-reveal':'reaction-reveal');
+  if(action==='leave')continue;t.tick(.35);action==='work'?t.finishWork():t.finishReaction();t.tick(.35);t.tick(.8);assert.equal(t.snapshot.phase,'desktop');
+ }
+});
+
+test('cold boot keeps BIOS/loading/welcome durations and only shortens the camera flight',()=>{
   const c=controller();assert.equal(c.enter({alreadyOn:false}),true);
   assert.equal(c.snapshot.phase,'power-on');assert.deepEqual(events(c),['power-on','bios']);
-  for(const [dt,phase] of [[1.2,'zoom-in'],[2.4,'loading'],[6,'welcome'],[1.4,'desktop']]){c.tick(dt);assert.equal(c.snapshot.phase,phase);}
+  for(const [dt,phase] of [[1.2,'zoom-in'],[.8,'loading'],[6,'welcome'],[1.4,'desktop']]){c.tick(dt);assert.equal(c.snapshot.phase,phase);}
   assert.deepEqual(events(c),['startup','desktop-ready']);c.tick(20);assert.deepEqual(events(c),[]);
   assert.equal(c.snapshot.locked,false);assert.equal(c.snapshot.overlay,1);
 });
@@ -43,8 +51,8 @@ test('cancel clears pending events and later frames cannot resurrect a cancelled
 });
 test('zoom and overlay remain continuous monotonic and blend only near the screen',()=>{
   const c=controller();c.enter({alreadyOn:true});let previous=0;
-  for(let i=0;i<240;i++){c.tick(.01);assert.ok(c.snapshot.zoom>=previous);previous=c.snapshot.zoom;if(i<223)assert.equal(c.snapshot.overlay,0);}
+  for(let i=0;i<80;i++){c.tick(.01);assert.ok(c.snapshot.zoom>=previous);previous=c.snapshot.zoom;if(i<74)assert.equal(c.snapshot.overlay,0);}
   assert.equal(c.snapshot.phase,'desktop');assert.equal(c.snapshot.zoom,1);
-  c.leave();for(let i=0;i<240;i++){c.tick(.01);assert.ok(c.snapshot.zoom<=previous);previous=c.snapshot.zoom;if(i>15)assert.equal(c.snapshot.overlay,0);}
+  c.leave();for(let i=0;i<80;i++){c.tick(.01);assert.ok(c.snapshot.zoom<=previous);previous=c.snapshot.zoom;if(i>5)assert.equal(c.snapshot.overlay,0);}
   assert.equal(c.snapshot.phase,'room');assert.equal(previous,0);
 });

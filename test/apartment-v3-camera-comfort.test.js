@@ -17,10 +17,13 @@ test('new game defaults to 3D, temporarily sleeps in 2D and restores after stand
  camera.reset({initialMode:'2D'});assert.equal(camera.mode,'2D');
  camera.onMotionEvent({type:'started',id:'bed'});camera.onMotionState({clip:'idle',phase:'idle'});assert.equal(camera.mode,'2D');
 });
-test('medium framing uses 75 percent of the previous overview height, not another scene',()=>{
+test('closer overview enlarges the actual actor by 25–30 percent without moving the room',()=>{
  const pose=cameraPose('2D',new ApartmentMotion(config),1.63,{aspect:1280/900});
- const expected=2*Math.atan(5.025/(2*8/Math.cos(8*Math.PI/180)))*180/Math.PI;
- assert.ok(Math.abs(pose.fov-expected)<1e-10);assert.equal(pose.position[2],8);
+ const previous=new PerspectiveCamera(2*Math.atan(5.025/(2*8/Math.cos(8*Math.PI/180)))*180/Math.PI,1280/900,.03,200);
+ previous.position.set(pose.position[0],1.15+8*Math.tan(8*Math.PI/180),8);previous.lookAt(pose.target[0],1.15,0);previous.updateMatrixWorld();
+ const next=new PerspectiveCamera(pose.fov,1280/900,.03,200);next.position.fromArray(pose.position);next.lookAt(new Vector3(...pose.target));next.updateMatrixWorld();
+ const size=c=>Math.abs(new Vector3(3.4,1.75,.85).project(c).y-new Vector3(3.4,0,.85).project(c).y);
+ const scale=size(next)/size(previous);assert.ok(scale>=1.25&&scale<=1.30,String(scale));assert.equal(pose.position[2],8);
 });
 function fixture(mode){
  const motion=new ApartmentMotion(config),clock=new ApartmentTime({day:2,minutes:720}),camera=new CameraModes();camera.mode=mode;
@@ -110,10 +113,14 @@ test('the medium overview retains the doorway and whole actor from the living-ro
 test('overview follow keeps the actor on screen without following beyond apartment ends',()=>{
  const left=cameraPose('2D',{cameraX:-7.7,position:[-7.7,0,.85],config},1.63,{aspect:1280/900});
  const right=cameraPose('2D',{cameraX:8.1,position:[8.1,0,.85],config},1.63,{aspect:1280/900});
- assert.ok(left.target[0]>-6,'left end stops following before exposing the exterior side');
- assert.ok(right.target[0]<6,'right end stops following before exposing the exterior side');
  for(const [pose,x] of [[left,-7.7],[right,8.1]]){
   const c=new PerspectiveCamera(pose.fov,1280/900,.03,200);c.position.fromArray(pose.position);c.lookAt(new Vector3(...pose.target));c.updateMatrixWorld();
   assert.ok(Math.abs(new Vector3(x,1,.85).project(c).x)<.96,'edge actor remains in the usable view');
+  const boundary=new Vector3(x<0?-8:8.5,1,.85).project(c).x;assert.ok(Math.abs(boundary)>=.95,'room boundary fills the edge rather than exposing outside');
  }
+});
+
+for(const aspect of [800/600,1280/900,1920/1080])test('closer frame keeps the cutaway roof above the visible edge at '+aspect,()=>{
+ const pose=cameraPose('2D',new ApartmentMotion(config),1.63,{aspect}),c=new PerspectiveCamera(pose.fov,aspect,.03,200);c.position.fromArray(pose.position);c.lookAt(new Vector3(...pose.target));c.updateMatrixWorld();
+ assert.ok(new Vector3(pose.target[0],3,-1.72).project(c).y>=1,'nothing outside above the rear wall');
 });

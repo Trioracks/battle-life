@@ -25,13 +25,13 @@ export function cameraPose(mode,state,eyeHeight,look={yaw:0,pitch:0}){
  const yaw=0,pitch=8,distance=8;
  // Intermediate framing between the original close view and the wide overview.
  // Follow and edge limits still operate on the exact same furnished scene.
- const height=5.025,targetY=1.15,fov=2*Math.atan(height/(2*distance/Math.cos(pitch*DEG)))/DEG;
+ const height=5.025/1.275,targetY=.83,fov=2*Math.atan(height/(2*distance/Math.cos(pitch*DEG)))/DEG;
  const aspect=look.aspect??1280/900,z=state.position?.[2]??.85;
  const depth=distance/Math.cos(pitch*DEG)-z*Math.cos(pitch*DEG)-(1-targetY)*Math.sin(pitch*DEG);
  const halfWidth=depth*Math.tan(fov*DEG/2)*aspect;
  const rooms=state.config?.layout?.rooms,left=rooms?.kitchen.x[0]??-8,right=rooms?.living.x[1]??8.5;
  const midpoint=(left+right)/2,actorX=state.cameraX??state.position?.[0]??midpoint;
- const follow=Math.max(actorX-halfWidth*.4,Math.min(actorX+halfWidth*.4,midpoint));
+ const follow=Math.max(actorX-halfWidth*.55,Math.min(actorX+halfWidth*.55,midpoint));
  const inset=Math.min(halfWidth*.95,(right-left)/2);
  const centerX=Math.max(left+inset,Math.min(right-inset,follow));
  return {position:[centerX+Math.sin(yaw*DEG)*distance,targetY+distance*Math.tan(pitch*DEG),Math.cos(yaw*DEG)*distance],target:[centerX,targetY,0],yaw,pitch,fov,near:.03};
