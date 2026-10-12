@@ -4,6 +4,7 @@ import {ApartmentAnimation} from './apartment-v3-animation.js?rev=38';
 import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=38';
 import {headCameraPose} from './apartment-head-pose.js?rev=38';
 import {segmentIntersectsBox} from './pc-room-audio.js?rev=38';
+import {workCameraPose} from './work-camera.js?rev=38';
 import {homeLight} from './apartment-v3-time.js?rev=38';
 import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=38';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=38';
@@ -83,6 +84,10 @@ export async function createApartmentScene(canvas,config){
   const transitionQuad=new THREE.Mesh(new THREE.PlaneGeometry(2,2),transitionBackdrop);transitionQuad.frustumCulled=false;transitionQuad.renderOrder=1000;transitionQuad.visible=false;scene.add(transitionQuad);
   async function prepareComputerView(){if(!computer)throw Error('Computer surfaces are missing');await loadMode('3D');if(disposed)throw Error('Scene disposed');}
   const headViewCamera=new THREE.PerspectiveCamera(60,rect.width/rect.height,.03,far);
+  const workViewCamera=new THREE.PerspectiveCamera(55,rect.width/rect.height,.03,far);let workCamera=null;
+  function setWorkCamera(value){workCamera=value?{kind:value.kind,progress:value.progress}:null;}
+  const living=config.layout?.rooms.living??{x:[0,8.5],height:3,rearZ:-1.72,frontZ:1.82};
+  const workBounds={min:[living.x[0]+.25,1.05,living.rearZ+.2],max:[living.x[1]-.25,living.height-.3,living.frontZ-.2],obstacles:['computer','bed','wardrobe'].map(id=>config.actions[id]?.hit).filter(Boolean).map(([center,size])=>({min:center.map((v,i)=>v-size[i]/2),max:center.map((v,i)=>v+size[i]/2)}))};
   // Exported depth proxies are the exact solid sides of the middle partition.
   const acousticWalls=['depth-middle-wall','depth-middle-front-wall'].map(name=>environment.scene.getObjectByName(name)).filter(Boolean);
   const speakerAnchor=environment.scene.getObjectByName(config.computer?.screen);
@@ -186,7 +191,7 @@ export async function createApartmentScene(canvas,config){
     if(ray.ray.intersectPlane(floor,point)&&ray.ray.origin.distanceTo(point)<=distance+.025)return {x:point.x};return {};
   }
   function resize(){const r=canvas.getBoundingClientRect(),aspect=r.width/r.height;
-    camera.aspect=aspect;camera.updateProjectionMatrix();firstCamera.aspect=aspect;firstCamera.updateProjectionMatrix();computer?.resize(r.width,r.height);transitionFrame.setSize(Math.max(1,r.width),Math.max(1,r.height));retro.resize(r.width,r.height);}
+    camera.aspect=aspect;camera.updateProjectionMatrix();firstCamera.aspect=aspect;firstCamera.updateProjectionMatrix();workViewCamera.aspect=aspect;workViewCamera.updateProjectionMatrix();computer?.resize(r.width,r.height);transitionFrame.setSize(Math.max(1,r.width),Math.max(1,r.height));retro.resize(r.width,r.height);}
   const observer=new ResizeObserver(resize);observer.observe(canvas);resize();
   let fridgeOpen=0,light=homeLight(1410),roomLights={living:true,kitchen:true},lightLevels={living:1,kitchen:1};
   function setRoomLights(lights){roomLights={living:lights.living!==false,kitchen:lights.kitchen!==false};}
@@ -235,7 +240,15 @@ export async function createApartmentScene(canvas,config){
       actor.visible=shadowFloor.visible=shadow.visible=bones.visible=false;
       renderer.setRenderTarget(transitionFrame);renderer.render(scene,computer.camera);renderer.setRenderTarget(target);computerActive=true;
     }
-    applyCamera(state);retro.render(scene,computerActive?computer.camera:modes.mode==='3D'?firstCamera:camera);
+    applyCamera(state);let activeCamera=computerActive?computer.camera:modes.mode==='3D'?firstCamera:camera;
+    if(workCamera&&!computerActive&&computerSnapshot.workActor&&!computerSnapshot.reactionActor){
+      applySceneVisibility({mode:'3D',computerActive:false});
+      const headPose=getHeadCameraPose(),pose=workCameraPose({...workCamera,headPose,desk:config.actions.computer.pose,bed:config.actions.bed.pose,lamp:config.lampFixtures?.living?.lightPosition??[4.05,2.37,-.1],bounds:workBounds});
+      workViewCamera.position.fromArray(pose.position);workViewCamera.up.set(0,1,0);workViewCamera.lookAt(new THREE.Vector3(...pose.target));workViewCamera.rotateZ(pose.roll);workViewCamera.updateMatrixWorld(true);activeCamera=workViewCamera;
+      // Never move the lens through a visible head on the final approach.
+      actor.visible=workViewCamera.position.distanceTo(new THREE.Vector3(...headPose.position))>.38;
+    }
+    retro.render(scene,activeCamera);
   }
   const previewCamera=new THREE.OrthographicCamera(-1,1,1.1,-1.1,.1,20);
   previewCamera.position.set(0,1.08,5);previewCamera.lookAt(0,.94,0);
@@ -283,5 +296,5 @@ export async function createApartmentScene(canvas,config){
     point.y+=.24;point.project(modes.mode==='3D'?firstCamera:camera);
     return {x:rect.left+(point.x+1)*rect.width/2,y:rect.top+(1-point.y)*rect.height/2,visible:actor.visible&&!computerActive&&modes.mode!=='3D'};
   }
-  return {modes,loadMode,prepareComputerView,beginComputerView,getHeadCameraPose,getComputerAudioFrame,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,getHeadScreenPosition,clips:[...animation.actions.keys()],dispose(){disposed=true;switchStyle.dispose();computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,staticScene])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
+  return {modes,loadMode,prepareComputerView,beginComputerView,getHeadCameraPose,getComputerAudioFrame,setWorkCamera,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,getHeadScreenPosition,clips:[...animation.actions.keys()],dispose(){disposed=true;switchStyle.dispose();computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,staticScene])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
 }

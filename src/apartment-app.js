@@ -21,6 +21,7 @@ import {normalizeGenreProgression,genreById,genreCap} from './genre-progression.
 import {createBeatWorkAudio} from './beat-work-audio.js?rev=38';
 import {createLyricWorkAudio} from './lyric-work-audio.js?rev=38';
 import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.js?rev=38';
+import {workCameraFrame} from './work-camera.js?rev=38';
 import {pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=38';
 import {effectiveVocalSkill} from './vocal-production.js?rev=38';
 import {effectiveWritingSkill} from './lyric-production.js?rev=38';
@@ -65,7 +66,7 @@ try{
   let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lastInstallationSave=0,lightPreview='game';
   const pcRoot=$('#virtual-pc'),savedPc=loadVirtualPcState(storage);let pcState=savedPc.state;
   let pcStorageWarning=migration.ok?(savedPc.ok?'':'Сохранение виртуального ПК недоступно.'):migration.error;
-  let virtualPc,workReward=0,workFinished=false,lastWorkJob=null,lastWorkBeat=null,resultEpisode=null,failedReactionId=null;
+  let virtualPc,workReward=0,workFinished=false,lastWorkJob=null,lastWorkBeat=null,lastWorkCamera=null,resultEpisode=null,failedReactionId=null;
   const fridgeRoot=document.createElement('section'),speechRoot=document.createElement('div');document.body.append(fridgeRoot,speechRoot);canvas.tabIndex=0;
   const speech=createCharacterSpeech({beep:()=>{if(audio?.state==='running'&&!document.hidden)playSoundCue('speech',audio);}}),speechView=mountCharacterSpeech(speechRoot);
   const fridgeView=mountHomeNeedsView(fridgeRoot,{
@@ -103,7 +104,7 @@ try{
     onLeave:()=>pcLifecycle.leave(),
     onShutdown:()=>pcLifecycle.shutdown(),
     onAppSound:cue=>pcSounds.play(cue),
-    onWork:()=>{if(!preparePcWorkPose(motion))return false;const started=pcLifecycle.work();if(started){if(pcState.writing.job)void lyricWorkAudio.unlock();workReward=0;workFinished=false;lastWorkJob=null;lastWorkBeat=null;resumeAnimation();saveHomeTime(storage,homeTime);persistPc(pcState);}return started;},
+    onWork:()=>{if(!preparePcWorkPose(motion))return false;const started=pcLifecycle.work();if(started){if(pcState.writing.job)void lyricWorkAudio.unlock();workReward=0;workFinished=false;lastWorkJob=null;lastWorkBeat=null;lastWorkCamera=null;resumeAnimation();saveHomeTime(storage,homeTime);persistPc(pcState);}return started;},
     onSaveProject:(state,project)=>saveStudioProject(state,project),
     onResultViewed:()=>{failedReactionId=null;},
   });
@@ -333,6 +334,9 @@ try{
       resultEpisode.ui.restore();resultEpisode=null;
     }
     view.setComputerPresentation(pcLifecycle.snapshot,pcState,profile?.name??'Игрок');
+    const cameraWork=workCameraFrame(creativeWorkDescriptor(pcState,profile?.skills));
+    if(cameraWork)lastWorkCamera=cameraWork;else if(workFinished&&lastWorkCamera)lastWorkCamera={...lastWorkCamera,progress:1};
+    view.setWorkCamera(['work-reveal','working','work-cover'].includes(workPhase)?lastWorkCamera:null);
     if(footsteps.update({clip:motion.clip,walkDistance:motion.walkDistance,paused:mode!=='game'||(paused&&!step)||document.hidden||homeModalOpen()}))cue('footstep');
     const door=motion.doorOpen>.3;if(door&&!lastDoor)cue('door');lastDoor=door;
     view.setRoomLights(homeTime.lights);view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));

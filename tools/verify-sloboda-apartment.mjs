@@ -6,7 +6,7 @@ const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAY
 const output=process.env.FT_QA_DIR||'D:/Codex/Builds/Battle/sloboda-track';await mkdir(output+'/browser-temp',{recursive:true});process.env.TEMP=process.env.TMP=output+'/browser-temp';
 const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
 const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage(),errors=[];
-page.setDefaultTimeout(60000);page.on('pageerror',e=>errors.push(e.message));const base=process.env.BATTLE_QA_URL||'http://127.0.0.1:4175',key='battle-life-virtual-pc-v1';
+page.setDefaultTimeout(60000);page.on('pageerror',e=>{errors.push(e.message);console.log('PAGEERROR',e.stack);});const base=process.env.BATTLE_QA_URL||'http://127.0.0.1:4175',key='battle-life-virtual-pc-v1';
 const shot=async n=>{await page.screenshot({path:output+'/'+n+'.png'});console.log('SHOT '+n);};
 const idle=()=>page.waitForFunction(()=>document.querySelector('#state').textContent.startsWith('idle'));
 const desktop=()=>page.waitForFunction(()=>document.querySelector('#virtual-pc')?.dataset.pcTransition==='desktop');
