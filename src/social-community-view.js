@@ -1,10 +1,10 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=38';
-import {communityById,profileById} from './social-catalog.js?rev=38';
-import {normalizeSocial,subscribeCommunity} from './social-state.js?rev=38';
-import {socialAvatar,socialButton,socialHeading,socialPost} from './social-dom.js?rev=38';
-import {revealBattleKnowledge,battleKnowledgeHints} from './battle-knowledge.js?rev=38';
-import {createSocialResultView} from './social-result-view.js?rev=38';
-import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=38';
+import {pcElement as el} from './virtual-pc-dom.js?rev=39';
+import {communityById,profileById} from './social-catalog.js?rev=39';
+import {normalizeSocial,subscribeCommunity} from './social-state.js?rev=39';
+import {socialAvatar,socialButton,socialHeading,socialPost} from './social-dom.js?rev=39';
+import {revealBattleKnowledge,battleKnowledgeHints} from './battle-knowledge.js?rev=39';
+import {createSocialResultView} from './social-result-view.js?rev=39';
+import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=39';
 export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),navigate,commit,audio,expandedResults=new Set(),onResultViewed,onRegistered=()=>{}}){
  const c=communityById(id),root=el(d,'section',{className:'sn-community'});if(!c)return root;
  const state=getState(),subscribed=normalizeSocial(state.social).subscriptions.includes(id),header=el(d,'header',{className:'sn-community-header'});

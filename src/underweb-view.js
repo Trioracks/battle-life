@@ -1,19 +1,19 @@
-import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=38';
-import {resolveUnderweb,BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=38';
-import {createBeatMarket} from './beat-market-view.js?rev=38';
-import {softwareForum,softwareMessage} from './pc-software-view.js?rev=38';
-import {downloadPresentation} from './virtual-pc-runtime.js?rev=38';
-import {createCommunityView} from './underweb-community-view.js?rev=38';
-import {communityDay} from './underweb-community.js?rev=38';
-import {homeDateLabel} from './home-calendar.js?rev=38';
-import {newsForDay} from './underweb-news.js?rev=38';
-import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=38';
-import {mountSocial} from './social-view.js?rev=38';
-import {activateSocial} from './social-runtime.js?rev=38';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=38';
-import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=38';
-import {ensureBattleWindow} from './battle-windows.js?rev=38';
-import {showRegistrationNotice} from './social-dom.js?rev=38';
+import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=39';
+import {resolveUnderweb,BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=39';
+import {createBeatMarket} from './beat-market-view.js?rev=39';
+import {softwareForum,softwareMessage} from './pc-software-view.js?rev=39';
+import {downloadPresentation} from './virtual-pc-runtime.js?rev=39';
+import {createCommunityView} from './underweb-community-view.js?rev=39';
+import {communityDay} from './underweb-community.js?rev=39';
+import {homeDateLabel} from './home-calendar.js?rev=39';
+import {newsForDay} from './underweb-news.js?rev=39';
+import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=39';
+import {mountSocial} from './social-view.js?rev=39';
+import {activateSocial} from './social-runtime.js?rev=39';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=39';
+import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=39';
+import {ensureBattleWindow} from './battle-windows.js?rev=39';
+import {showRegistrationNotice} from './social-dom.js?rev=39';
 const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-control '+(options.className??'')},fn);
 
 export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,onSubmitTrack=()=>{},onResultViewed=()=>{},getSoftwareMessage=()=>'',isVisible=()=>true}){

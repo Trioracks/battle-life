@@ -9,7 +9,7 @@ try{
  await page.route('**/__social-send-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/desktop-apps.css?rev=37"><link rel="stylesheet" href="/social-network.css?rev=37"><style>body{margin:0}#qa{height:100vh}</style><div id="qa"></div>'}));
  await page.goto((process.env.BATTLE_QA_URL||'http://127.0.0.1:4175')+'/__social-send-qa');
  await page.evaluate(async()=>{
-  const [{submissionFixture},{mountUnderweb},{advanceVirtualPcDurably,createSubmissionTransferClock},{BeatAudio},{saveVirtualPcState,loadVirtualPcState}]=await Promise.all([import('/test/helpers/submission-fixtures.js'),import('/src/underweb-view.js?rev=38'),import('/src/virtual-pc-runtime.js?rev=38'),import('/src/beat-audio.js?rev=38'),import('/src/virtual-pc-state.js?rev=38')]);
+  const [{submissionFixture},{mountUnderweb},{advanceVirtualPcDurably,createSubmissionTransferClock},{BeatAudio},{saveVirtualPcState,loadVirtualPcState}]=await Promise.all([import('/test/helpers/submission-fixtures.js'),import('/src/underweb-view.js?rev=39'),import('/src/virtual-pc-runtime.js?rev=39'),import('/src/beat-audio.js?rev=39'),import('/src/virtual-pc-state.js?rev=39')]);
   const q=window.sendQA={state:submissionFixture(),minute:600,fail:false,audio:new BeatAudio()};
   q.persist=next=>{if(q.fail||q.failSend&&next.battleSubmissions.length>q.state.battleSubmissions.length)return false;const saved=saveVirtualPcState(localStorage,next);if(saved)q.state=next;return saved;};
   q.reload=()=>{q.state=loadVirtualPcState(localStorage).state;};

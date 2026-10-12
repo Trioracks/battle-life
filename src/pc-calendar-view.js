@@ -1,5 +1,5 @@
-import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=38';
-import {gameMonthGrid,homeDateLabel} from './home-calendar.js?rev=38';
+import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=39';
+import {gameMonthGrid,homeDateLabel} from './home-calendar.js?rev=39';
 const MONTHS=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 export function mountPcCalendar({document:d,anchor,getGameDay,onClose=()=>{}}){
  const root=el(d,'section',{className:'pc-calendar',attributes:{role:'dialog','aria-label':'Игровой календарь',tabindex:'-1'}}),title=el(d,'h2'),today=el(d,'p'),grid=el(d,'div',{className:'pc-calendar-grid'});let last='',disposed=false;

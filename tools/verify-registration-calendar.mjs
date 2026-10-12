@@ -7,9 +7,9 @@ await mkdir(out+'/browser-temp',{recursive:true});process.env.TEMP=process.env.T
 const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
 const page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
 try{
- await page.route('**/__registration-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8">'+['virtual-pc','desktop-apps','social-network'].map(n=>'<link rel="stylesheet" href="/'+n+'.css?rev=38">').join('')+'<style>body{margin:0}</style><section id="virtual-pc"></section>'}));
+ await page.route('**/__registration-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8">'+['virtual-pc','desktop-apps','social-network'].map(n=>'<link rel="stylesheet" href="/'+n+'.css?rev=39">').join('')+'<style>body{margin:0}</style><section id="virtual-pc"></section>'}));
  await page.goto((process.env.BATTLE_QA_URL||'http://127.0.0.1:4175')+'/__registration-qa');
- await page.evaluate(async()=>{document.body.dataset.mode='pc';const [{mountVirtualPc},{createVirtualPcState}]=await Promise.all([import('/src/virtual-pc-ui.js?rev=38'),import('/src/virtual-pc-state.js?rev=38')]);window.qa={allow:true};qa.pc=mountVirtualPc(document.querySelector('#virtual-pc'),{onPersist:()=>qa.allow});qa.reset=()=>{qa.allow=true;qa.pc.showDesktop(createVirtualPcState({power:'on'}));qa.pc.syncHost({playerName:'Проверка',gameDay:1,gameMinutes:600,clockLabel:'10:00'});qa.pc.openNow('underweb');};qa.reset();});
+ await page.evaluate(async()=>{document.body.dataset.mode='pc';const [{mountVirtualPc},{createVirtualPcState}]=await Promise.all([import('/src/virtual-pc-ui.js?rev=39'),import('/src/virtual-pc-state.js?rev=39')]);window.qa={allow:true};qa.pc=mountVirtualPc(document.querySelector('#virtual-pc'),{onPersist:()=>qa.allow});qa.reset=()=>{qa.allow=true;qa.pc.showDesktop(createVirtualPcState({power:'on'}));qa.pc.syncHost({playerName:'Проверка',gameDay:1,gameMinutes:600,clockLabel:'10:00'});qa.pc.openNow('underweb');};qa.reset();});
  const go=route=>page.evaluate(route=>qa.pc.underwebView.navigate(route),route);
  for(const [width,height]of [[800,600],[1280,900],[1920,1080]]){
   await page.setViewportSize({width,height});await page.evaluate(()=>qa.reset());

@@ -9,7 +9,7 @@ const browser=await chromium.launch({headless:true,executablePath:process.env.PL
 try{
  const page=await browser.newPage();await page.goto((process.env.BATTLE_QA_URL||'http://127.0.0.1:4175')+'/src/beat-audio.js');
  const results=await page.evaluate(async frames=>{
-  const [{BeatAudio},{createPcRoomOutput,roomAudioParameters}]=await Promise.all([import('/src/beat-audio.js?rev=38'),import('/src/pc-room-audio.js?rev=38')]);
+  const [{BeatAudio},{createPcRoomOutput,roomAudioParameters}]=await Promise.all([import('/src/beat-audio.js?rev=39'),import('/src/pc-room-audio.js?rev=39')]);
   const renders=[];
   for(const [name,frame]of Object.entries(frames)){
    const rate=22050,context=new OfflineAudioContext(2,rate*4,rate),audio=new BeatAudio({outputFactory:createPcRoomOutput});audio.context=context;

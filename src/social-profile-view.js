@@ -1,7 +1,7 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=38';
-import {profileById} from './social-catalog.js?rev=38';
-import {normalizeSocial,profileAccess,addSocialFriend} from './social-state.js?rev=38';
-import {socialAvatar,socialButton,socialHeading,socialPhoto,socialPost} from './social-dom.js?rev=38';
+import {pcElement as el} from './virtual-pc-dom.js?rev=39';
+import {profileById} from './social-catalog.js?rev=39';
+import {normalizeSocial,profileAccess,addSocialFriend} from './social-state.js?rev=39';
+import {socialAvatar,socialButton,socialHeading,socialPhoto,socialPost} from './social-dom.js?rev=39';
 export function playerSocialProfile(state,metadata={}){
  const social=normalizeSocial(state.social),portrait=social.playerPortrait&&(!metadata.portraitKey||social.playerPortrait.key===metadata.portraitKey)?social.playerPortrait:null;
  return {id:'me',name:metadata.playerName??'Игрок',avatar:{mark:'Я',color:'#648577',src:portrait?.url},description:'Своя комната. Первые записи. Всё ещё впереди.',birthday:null,education:'скрыто',languages:['ru'],friends:social.friends,photos:portrait?[{id:'room',title:'Дома, за своим столом',date:'2012-09-01',src:portrait.url}]:[],audio:social.personalAudioIds,wall:social.posts};

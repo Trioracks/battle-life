@@ -1,4 +1,4 @@
-import {PC_IDENTITY} from './pc-identity.js?rev=38';
+import {PC_IDENTITY} from './pc-identity.js?rev=39';
 // Owns only its camera, canvas texture and cloned materials; authored meshes stay owned by the scene.
 export function createComputerView({THREE,screen,indicator,viewport}){
  if(!screen?.geometry||!indicator)throw Error('Missing live CRT surfaces');

@@ -1,4 +1,4 @@
-import {normalizeAppearance} from './avatar-v3-profile.js?rev=38';
+import {normalizeAppearance} from './avatar-v3-profile.js?rev=39';
 export const portraitKey=appearance=>'portrait-v1:'+JSON.stringify(normalizeAppearance(appearance));
 const PREFIX='data:image/jpeg;base64,',MAX_BYTES=96*1024;
 export function normalizePlayerPortrait(raw){

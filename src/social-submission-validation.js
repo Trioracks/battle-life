@@ -1,10 +1,10 @@
-import {communityById} from './social-catalog.js?rev=38';
-import {normalizeSocial} from './social-state.js?rev=38';
-import {attemptForWindow} from './battle-windows.js?rev=38';
-import {validGameMinute} from './game-minute.js?rev=38';
-import {TRACK_DSP_VERSION} from './track-version.js?rev=38';
-import {submissionCandidates} from './battle-submission.js?rev=38';
-import {normalizeOutgoingUpload} from './social-upload.js?rev=38';
+import {communityById} from './social-catalog.js?rev=39';
+import {normalizeSocial} from './social-state.js?rev=39';
+import {attemptForWindow} from './battle-windows.js?rev=39';
+import {validGameMinute} from './game-minute.js?rev=39';
+import {TRACK_DSP_VERSION} from './track-version.js?rev=39';
+import {submissionCandidates} from './battle-submission.js?rev=39';
+import {normalizeOutgoingUpload} from './social-upload.js?rev=39';
 export function submissionSendContext(state,{communityId,nowMinute}={}){
  const fail=reason=>({ok:false,state,reason}),c=communityById(communityId),window=state.battleWindows?.find(w=>w.battleId===c?.battleId&&w.roundId==='selection'&&!w.issue),upload=normalizeOutgoingUpload(state.outgoingUpload,state.trackVersions);
  if(upload?.issue)return fail(upload.issue);

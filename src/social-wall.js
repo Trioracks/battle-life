@@ -1,7 +1,7 @@
 import templates from '../data/social/post-templates.json' with {type:'json'};
-import {normalizeSocial} from './social-state.js?rev=38';
-import {judgeProfile} from './judge-profiles.js?rev=38';
-import {JUDGE_COMMENTS} from './judge-comments.js?rev=38';
+import {normalizeSocial} from './social-state.js?rev=39';
+import {judgeProfile} from './judge-profiles.js?rev=39';
+import {JUDGE_COMMENTS} from './judge-comments.js?rev=39';
 export const POST_TEMPLATES=Object.freeze(templates);
 export const AUDIENCE_RULES=Object.freeze({likeProbability:.08,commentProbability:.01,maxSimulatedAudience:5000,maxVisibleComments:40});
 export function socialSeed(value){let h=2166136261;for(const c of String(value))h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0;}

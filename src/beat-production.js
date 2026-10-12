@@ -1,10 +1,10 @@
-import {BEAT_RULES as R,BEAT_PRACTICE,BEAT_GENRES,drumById,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=38';
-import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=38';
-import {softwareDiskBytes} from './pc-software.js?rev=38';
-import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=38';
-import {createBeatResult} from './beat-result.js?rev=38';
-import {normalizeRecording,effectiveSoundSkill} from './vocal-result.js?rev=38';
-import {genreById,normalizeGenreProgression,genreOptions,genreSnapshot,normalizeGenreSnapshot,addGenrePractice} from './genre-progression.js?rev=38';
+import {BEAT_RULES as R,BEAT_PRACTICE,BEAT_GENRES,drumById,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=39';
+import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=39';
+import {softwareDiskBytes} from './pc-software.js?rev=39';
+import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=39';
+import {createBeatResult} from './beat-result.js?rev=39';
+import {normalizeRecording,effectiveSoundSkill} from './vocal-result.js?rev=39';
+import {genreById,normalizeGenreProgression,genreOptions,genreSnapshot,normalizeGenreSnapshot,addGenrePractice} from './genre-progression.js?rev=39';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
 const clamp=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,finite(v)));
 const text=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';

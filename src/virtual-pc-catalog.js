@@ -1,9 +1,9 @@
-import {COMMUNITY_BOARDS,COMMUNITY_TOPICS,communityDay} from './underweb-community.js?rev=38';
-import {newsIssue,archiveForDay} from './underweb-news.js?rev=38';
-import {resolveSocialRoute} from './social-routing.js?rev=38';
-import {SOCIAL_COMMUNITIES} from './social-catalog.js?rev=38';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=38';
-import {FORUM_ARCHIVE_BOARDS,archiveTopicsForDay,archiveTopicForDay} from './underweb-forum-archive.js?rev=38';
+import {COMMUNITY_BOARDS,COMMUNITY_TOPICS,communityDay} from './underweb-community.js?rev=39';
+import {newsIssue,archiveForDay} from './underweb-news.js?rev=39';
+import {resolveSocialRoute} from './social-routing.js?rev=39';
+import {SOCIAL_COMMUNITIES} from './social-catalog.js?rev=39';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=39';
+import {FORUM_ARCHIVE_BOARDS,archiveTopicsForDay,archiveTopicForDay} from './underweb-forum-archive.js?rev=39';
 const apps = Object.freeze([
   { id: 'computer', label: 'Мой компьютер', iconId: 'computer', description: 'Диск C: и Мои проекты' },
   { id: 'underweb', label: 'Underweb', iconId: 'underweb', description: 'Локальная сеть баттлов' },

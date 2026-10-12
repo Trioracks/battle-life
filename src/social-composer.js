@@ -1,6 +1,6 @@
-import {communityById} from './social-catalog.js?rev=38';
-import {TRACK_DSP_VERSION} from './track-version.js?rev=38';
-import {submissionSendContext} from './social-submission-validation.js?rev=38';
+import {communityById} from './social-catalog.js?rev=39';
+import {TRACK_DSP_VERSION} from './track-version.js?rev=39';
+import {submissionSendContext} from './social-submission-validation.js?rev=39';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export const SUBMISSION_MESSAGE_SECONDS=6;
 export function submissionMessageBody(version){

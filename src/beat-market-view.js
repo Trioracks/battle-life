@@ -1,6 +1,6 @@
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=38';
-import {DRUMS,BEAT_RULES} from './beat-catalog.js?rev=38';
-import {acquireDrum,installRipline,cleanMusicVirus} from './beat-production.js?rev=38';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=39';
+import {DRUMS,BEAT_RULES} from './beat-catalog.js?rev=39';
+import {acquireDrum,installRipline,cleanMusicVirus} from './beat-production.js?rev=39';
 export function createBeatMarket(d,{getState,onChange,audio,navigate,ripline=false}){
  const root=el(d,'section',{className:'beat-market'+(ripline?' ripline':'')}),status=el(d,'p',{className:'beat-market-status',attributes:{role:'status'}});
  function render(){

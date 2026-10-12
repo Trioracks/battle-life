@@ -1,4 +1,4 @@
-import { normalizeLook } from './creator.js?rev=38';
+import { normalizeLook } from './creator.js?rev=39';
 
 const SAVE_KEY = 'battle-life-campaign-v1';
 

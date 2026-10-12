@@ -8,7 +8,7 @@ const context=await browser.newContext({recordVideo:{dir:out+'/camera-video',siz
 page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(60000);
 try{
  await page.route('**/__v-krugu-camera',r=>r.fulfill({contentType:'text/html',body:`<!doctype html><style>body{margin:0}canvas{width:100vw;height:100vh;display:block}</style><script type="importmap">{"imports":{"three":"/vendor/three/three.module.js","three/addons/":"/vendor/three/addons/"}}</script><canvas></canvas><script type="module">
- import * as THREE from 'three';import {createApartmentScene} from '/src/apartment-v3-scene.js?rev=38';import {ApartmentMotion} from '/src/apartment-v3-motion.js';import {prepareApartmentConfig} from '/src/apartment-v3-runtime.js?rev=38';
+ import * as THREE from 'three';import {createApartmentScene} from '/src/apartment-v3-scene.js?rev=39';import {ApartmentMotion} from '/src/apartment-v3-motion.js';import {prepareApartmentConfig} from '/src/apartment-v3-runtime.js?rev=39';
  let camera;const add=THREE.Scene.prototype.add;THREE.Scene.prototype.add=function(...o){if(o.some(x=>x.name==='player'))this.onBeforeRender=(_r,_s,c)=>camera=c;return add.apply(this,o);};
  const config=prepareApartmentConfig(await(await fetch('/assets/apartment/v3/scene.json')).json());config.assetBase='/assets/apartment/v3/';
  const view=await createApartmentScene(document.querySelector('canvas'),config);THREE.Scene.prototype.add=add;let motion=new ApartmentMotion(config);view.setTime(720);

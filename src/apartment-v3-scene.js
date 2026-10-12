@@ -1,23 +1,23 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {ApartmentAnimation} from './apartment-v3-animation.js?rev=38';
-import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=38';
-import {headCameraPose} from './apartment-head-pose.js?rev=38';
-import {segmentIntersectsBox} from './pc-room-audio.js?rev=38';
-import {workCameraPose} from './work-camera.js?rev=38';
-import {renderAvatarPortrait} from './avatar-portrait-renderer.js?rev=38';
-import {homeLight} from './apartment-v3-time.js?rev=38';
-import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=38';
-import {createLandingReveal} from './apartment-v3-landing.js?rev=38';
-import {CameraModes,cameraPose,pickVisible,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=38';
-import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=38';
-import {createSmoke} from './apartment-v3-smoke.js?rev=38';
-import {createRetroPass} from './apartment-v3-retro.js?rev=38';
-import {createComputerView} from './apartment-v3-computer.js?rev=38';
-import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=38';
-import {pcPresentation} from './virtual-pc-presentation.js?rev=38';
-import {createWardrobeFurniture} from './home-wardrobe.js?rev=38';
-import {applySwitchStyle} from './apartment-switch-style.js?rev=38';
+import {ApartmentAnimation} from './apartment-v3-animation.js?rev=39';
+import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=39';
+import {headCameraPose} from './apartment-head-pose.js?rev=39';
+import {segmentIntersectsBox} from './pc-room-audio.js?rev=39';
+import {workCameraPose} from './work-camera.js?rev=39';
+import {renderAvatarPortrait} from './avatar-portrait-renderer.js?rev=39';
+import {homeLight} from './apartment-v3-time.js?rev=39';
+import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=39';
+import {createLandingReveal} from './apartment-v3-landing.js?rev=39';
+import {CameraModes,cameraPose,pickVisible,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=39';
+import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=39';
+import {createSmoke} from './apartment-v3-smoke.js?rev=39';
+import {createRetroPass} from './apartment-v3-retro.js?rev=39';
+import {createComputerView} from './apartment-v3-computer.js?rev=39';
+import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=39';
+import {pcPresentation} from './virtual-pc-presentation.js?rev=39';
+import {createWardrobeFurniture} from './home-wardrobe.js?rev=39';
+import {applySwitchStyle} from './apartment-switch-style.js?rev=39';
 
 export async function createApartmentScene(canvas,config){
   const BASE=config.assetBase??'./assets/apartment/v3/';
@@ -35,7 +35,7 @@ export async function createApartmentScene(canvas,config){
   camera.position.copy(basePosition);camera.lookAt(baseTarget);
   const loader=new GLTFLoader();
   const [environment,model,staticModel]=await Promise.all([
-    loader.loadAsync(BASE+config.geometry+'?rev=21'),loader.loadAsync(BASE+config.rig+'?rev=21'),loader.loadAsync(BASE+config.staticGeometry+'?rev=21')
+    loader.loadAsync(BASE+config.geometry+'?rev=39'),loader.loadAsync(BASE+config.rig+'?rev=39'),loader.loadAsync(BASE+config.staticGeometry+'?rev=21')
   ]);
   const staticScene=staticModel.scene;
   staticScene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});

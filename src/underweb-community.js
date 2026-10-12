@@ -1,6 +1,6 @@
 // Original fictional conversations, inspired by the structure of 2007–2013 forums.
 // No post or quotation is attributed to a historical performer.
-import {LOCAL_MUSIC_BOARDS,LOCAL_MUSIC_TOPICS} from './underweb-community-data.js?rev=38';
+import {LOCAL_MUSIC_BOARDS,LOCAL_MUSIC_TOPICS} from './underweb-community-data.js?rev=39';
 export const COMMUNITY_BOARDS=Object.freeze([
  {id:'concrete-echo',title:'Бетонное эхо',description:'Голос спального района. Отбор, звук и первые столкновения.',motto:'Слышно даже за стеной.',host:'Пыльный_Пульт'},
  {id:'open-mic-17',title:'Открытый микрофон 17',description:'Истории без припева. Для первых записей и упрямых рассказчиков.',motto:'Микрофон открыт. Слова за тобой.',host:'кассета_Б'},

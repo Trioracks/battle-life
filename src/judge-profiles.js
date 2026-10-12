@@ -1,5 +1,5 @@
 import data from '../data/judges/profiles.json' with { type:'json' };
-import {judgeReferenceKnowledge} from './cultural-references.js?rev=38';
+import {judgeReferenceKnowledge} from './cultural-references.js?rev=39';
 
 function freeze(value) {
   if (value && typeof value === 'object') {

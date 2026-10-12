@@ -1,12 +1,12 @@
-import {communityById} from './social-catalog.js?rev=38';
-import {normalizeSocial} from './social-state.js?rev=38';
-import {ensureBattleWindow} from './battle-windows.js?rev=38';
-import {ACK_TEMPLATES,acknowledgementFor} from './social-submission.js?rev=38';
-import {validGameMinute} from './game-minute.js?rev=38';
-import {receivePhoneEvents} from './phone-notifications.js?rev=38';
-import {publishJudgeEvents} from './social-judging-events.js?rev=38';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=38';
-import {advancePersonalDialogs} from './social-personal.js?rev=38';
+import {communityById} from './social-catalog.js?rev=39';
+import {normalizeSocial} from './social-state.js?rev=39';
+import {ensureBattleWindow} from './battle-windows.js?rev=39';
+import {ACK_TEMPLATES,acknowledgementFor} from './social-submission.js?rev=39';
+import {validGameMinute} from './game-minute.js?rev=39';
+import {receivePhoneEvents} from './phone-notifications.js?rev=39';
+import {publishJudgeEvents} from './social-judging-events.js?rev=39';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=39';
+import {advancePersonalDialogs} from './social-personal.js?rev=39';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export function normalizeSocialRuntime(raw){
  const seen=new Set(),events=(Array.isArray(raw?.events)?raw.events:[]).filter(e=>e&&typeof e.id==='string'&&typeof e.type==='string'&&validGameMinute(e.dueAt)&&!seen.has(e.id)&&seen.add(e.id)).map(clone);
