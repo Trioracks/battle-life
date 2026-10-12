@@ -4,6 +4,7 @@ import {encodePcSave,decodePcSave} from '../src/pc-save-codec.js';
 import {createVirtualPcState,saveVirtualPcState,loadVirtualPcState,VIRTUAL_PC_STORAGE_KEY} from '../src/virtual-pc-state.js';
 import {migrateNoviceSave} from '../src/home-profile-migration.js';
 import {SAVE_KEY} from '../src/avatar-v3-profile.js';
+import {ensureBattleWindow} from '../src/battle-windows.js';
 test('large Unicode save is lossless and compact; small and legacy JSON remain readable',()=>{
  const small={version:1,text:'Привет 🙂'};assert.equal(encodePcSave(small),JSON.stringify(small));assert.deepEqual(decodePcSave(JSON.stringify(small)),small);
  const big={rows:Array.from({length:12000},(_,i)=>({id:'result:'+i,text:'Старый неизменяемый отзыв, вокал и барабаны 🎙',facts:['text.contentMix','audio.rhythm'],value:i/19}))};
@@ -15,4 +16,9 @@ test('large saved projects survive real persistence and novice migration; reject
  assert.equal(saveVirtualPcState(storage,state),true);assert.deepEqual(loadVirtualPcState(storage).state.projects,state.projects);
  map.set(SAVE_KEY,JSON.stringify({version:4,noviceSchema:1,name:'Игрок',skills:{}}));assert.equal(migrateNoviceSave(storage).ok,true);
  const raw=map.get(VIRTUAL_PC_STORAGE_KEY);assert.equal(saveVirtualPcState({...storage,setItem(){throw Error('quota');}},state),false);assert.equal(map.get(VIRTUAL_PC_STORAGE_KEY),raw);
+});
+test('first tournament policy migration reserves exact old save once; failed backup prevents overwrite',()=>{
+ const old=ensureBattleWindow(createVirtualPcState(),{battleId:'makarevich-1',nowMinute:600}).state,raw=JSON.stringify(old),key=VIRTUAL_PC_STORAGE_KEY+'-before-tournament-v2',map=new Map([[VIRTUAL_PC_STORAGE_KEY,raw]]),storage={getItem:k=>map.get(k)??null,setItem:(k,v)=>map.set(k,v)},next=ensureBattleWindow(old,{battleId:'makarevich-1',nowMinute:700,judgingPolicyVersion:2}).state;
+ assert.equal(saveVirtualPcState({...storage,setItem(k,v){if(k===key)throw Error('quota');map.set(k,v);}},next),false);assert.equal(map.get(VIRTUAL_PC_STORAGE_KEY),raw);
+ assert.equal(saveVirtualPcState(storage,next),true);assert.equal(map.get(key),raw);assert.equal(saveVirtualPcState(storage,next),true);assert.equal(map.get(key),raw);
 });

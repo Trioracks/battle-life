@@ -223,6 +223,9 @@ export function saveVirtualPcState(storage, state) {
     if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'trackVersions'))reserveTrackVersionBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&parsed.socialRuntime?.version!==1)reserveSocialBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&(parsed.social?.schemaVersion??0)<2)reservePersonalBackup(storage,raw);
+    if(isRecord(parsed)&&Array.isArray(parsed.battleWindows)&&parsed.battleWindows.some(w=>w?.battleId==='makarevich-1'&&w.judgingPolicyVersion!==2)&&state.battleWindows?.some(w=>w.battleId==='makarevich-1'&&w.judgingPolicyVersion===2)){
+      const key=VIRTUAL_PC_STORAGE_KEY+'-before-tournament-v2';if(storage.getItem(key)===null)storage.setItem(key,raw);
+    }
     storage.setItem(VIRTUAL_PC_STORAGE_KEY, encodePcSave(normalizeSnapshot(state)));
     return true;
   } catch {

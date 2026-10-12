@@ -14,6 +14,7 @@ import {SOCIAL_IDENTITY} from './social-identity.js?rev=39';
 import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=39';
 import {ensureBattleWindow,currentBattleWindow,attemptForWindow} from './battle-windows.js?rev=39';
 import {showRegistrationNotice} from './social-dom.js?rev=39';
+import {publicRoundTable,ROUND_LABELS} from './battle-results-table.js?rev=39';
 const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-control '+(options.className??'')},fn);
 
 export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,onSubmitTrack=()=>{},onResultViewed=()=>{},getSoftwareMessage=()=>'',isVisible=()=>true}){
@@ -87,6 +88,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   const nav=el(d,'nav',{className:'uw-battle-tabs',attributes:{'aria-label':'Разделы сайта баттла'}});for(const [id,title]of [['home','Главная'],['rules','Правила'],['rounds','Раунды'],['players','Участники']])nav.append(button(d,title,{attributes:route.tab===id?{'aria-current':'page'}:{}},()=>navigate('underweb://battles/'+b.id+'/'+id)));nav.append(button(d,'Обсуждение на форуме',{},()=>navigate('underweb://forum/'+b.id)));site.append(nav);
   const back=button(d,'← Каталог баттлов',{className:'uw-breadcrumb'},()=>navigate('underweb://battles'));site.append(back);
   site.append(button(d,'Сообщество баттла →',{className:'uw-text-link'},()=>navigate('underweb://social/community/'+b.id)));
+  site.append(button(d,'Таблица судейства →',{className:'uw-text-link'},()=>navigate('underweb://social/results/'+b.id+'/'+(window?.roundId??'selection'))));
   const hero=el(d,'div',{className:'uw-detail-hero'}),text=el(d,'div');text.append(el(d,'small',{className:'uw-badge',text:b.season}),el(d,'h1',{text:b.title}),el(d,'p',{text:b.description}));hero.append(poster(b,true),text);site.append(hero);
   const columns=el(d,'div',{className:'uw-detail-columns'}),rules=el(d,'section',{className:'uw-battle-content'});
   if(route.tab==='home'){
@@ -95,7 +97,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   }else if(route.tab==='rules'){
    rules.append(el(d,'h2',{text:'Регламент отбора'}),el(d,'p',{className:'uw-theme',text:b.theme}));const list=el(d,'ul');for(const text of b.rules)list.append(el(d,'li',{text}));rules.append(list,el(d,'p',{text:'Участие бесплатно. Чужие куплеты, публикация личных данных и травля участников запрещены. Заявки и тексты остаются в игровом мире.'}),button(d,'Задать вопрос о правилах →',{},()=>navigate('underweb://forum/topic/'+b.id+'-rules')));
   }else if(route.tab==='rounds'){
-   rules.append(el(d,'h2',{text:'Ход турнира'}));for(const [n,title,text]of [['01','Отбор · «'+b.theme+'»',deadline.text],['02','Парные раунды','Пары, темы и сроки пока не объявлены. Оппонент не назначен.'],['03','Итоги','Появятся после проведения турнира.']]){const round=el(d,'article',{className:'uw-round-row'});round.append(el(d,'b',{text:n}),el(d,'h3',{text:title}),el(d,'p',{text}));rules.append(round);}
+   rules.append(el(d,'h2',{text:'Ход турнира'}));const table=publicRoundTable(getState(),{battleId:b.id,roundId:window?.roundId??'selection',nowMinute:metadataGameMinute(getMetadata())});for(const r of table.availableRounds){const row=el(d,'article',{className:'uw-round-row'});row.append(button(d,r.title,{},()=>navigate('underweb://social/results/'+b.id+'/'+r.id)));rules.append(row);}if(!table.availableRounds.length)rules.append(el(d,'p',{text:deadline.text}));rules.append(el(d,'p',{text:'Пары сохраняют объявленную сетку. Следующий раунд начинается через сутки после последнего судьи; на сдачу даётся семь дней.'}));
   }else{
    rules.append(el(d,'h2',{text:'Участники'}));const applications=getState().battleApplications?.filter(a=>a.battleId===b.id)??[];rules.append(el(d,'p',{text:'Подтверждённые заявки в этой игре: '+applications.length}));
    for(const a of applications){const row=el(d,'article',{className:'uw-participant'});row.append(el(d,'strong',{text:a.nickname}),el(d,'span',{text:'Зарегистрирован · отбор · оппонент не назначен'}));rules.append(row);}if(!applications.length)rules.append(el(d,'p',{text:'Твоей заявки ещё нет. Зарегистрируйся ниже, чтобы появиться в списке.'}));

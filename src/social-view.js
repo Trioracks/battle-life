@@ -11,6 +11,8 @@ import {mountSocialMessages} from './social-messages-view.js?rev=39';
 import {unreadDialogCount} from './social-personal.js?rev=39';
 import {markDialogRead} from './social-submission.js?rev=39';
 import {battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=39';
+import {publicRoundTable} from './battle-results-table.js?rev=39';
+import {createBattleResultsTableView} from './battle-results-table-view.js?rev=39';
 export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,navigate,audio,onResultViewed=()=>{},isVisible=()=>true}){
  const d=root.ownerDocument,shell=el(d,'section',{className:'sn-network',attributes:{'aria-label':SOCIAL_IDENTITY.name}}),head=el(d,'header',{className:'sn-top'});
  const brand=el(d,'strong',{className:'sn-brand'});brand.append(el(d,'span',{className:'sn-brandmark',text:SOCIAL_IDENTITY.mark}),el(d,'b',{text:SOCIAL_IDENTITY.name}));
@@ -44,6 +46,7 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
   const options={getState,getMetadata,navigate,commit,audio:playback,isVisible,onRegistered:id=>{closeRegistration?.();closeRegistration=showRegistrationNotice(shell,getState().battleApplications.find(a=>a.battleId===id).nickname,()=>navigate('underweb://social/dialog/'+id));},onRead:id=>commit(markDialogRead(getState(),id)),onResultViewed:id=>{pcFind(content,n=>n.dataset?.resultSummary===id)?.focus?.({preventScroll:true});onResultViewed(id);},expandedResults};
   let node;
   if(route.section==='groups')node=groups();
+  else if(route.section==='results')node=createBattleResultsTableView(d,{...options,table:publicRoundTable(getState(),{battleId:route.battleId,roundId:route.roundId,nowMinute:metadataGameMinute(getMetadata())})});
   else if(route.section==='community')node=createSocialCommunityView(d,{...options,id:route.communityId});
   else if(route.section==='messages'){messagesView=mountSocialMessages(d,options);node=messagesView.root;}
   else if(route.section==='dialog'){dialogView=mountSocialDialog(d,{...options,peer:route.peer,id:route.communityId??route.profileId});node=dialogView.root;}

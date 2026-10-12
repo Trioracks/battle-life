@@ -1,0 +1,33 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {publicRoundTable} from '../src/battle-results-table.js';
+import {createBattleResultsTableView} from '../src/battle-results-table-view.js';
+import {tableFixture} from './helpers/tournament-table-fixture.js';
+import {pcDocument,allPc,findButton} from './helpers/virtual-pc-dom.js';
+import {resolveSocialRoute} from '../src/social-routing.js';
+import {mountUnderweb} from '../src/underweb-view.js';
+import {createSocialResultView} from '../src/social-result-view.js';
+const options={battleId:'makarevich-1',roundId:'selection',nowMinute:12000,viewerId:'player'};
+test('public table reveals only due reviews, hero always and qualifiers only after completed panel',()=>{
+ const s=tableFixture(),early=publicRoundTable(s,{...options,nowMinute:11500});assert.equal(early.complete,false);assert.equal(early.rows.find(r=>r.participantId==='player').reviews.length,2);assert.equal(early.rows.filter(r=>r.masked).length,2);assert.ok(early.rows.every(r=>r.total===null));
+ const done=publicRoundTable(s,options);assert.equal(done.complete,true);assert.equal(done.rows.find(r=>r.participantId==='mak-npc-01').name.length>0,true);assert.equal(done.rows.filter(r=>r.masked).length,1);
+ const hidden=done.rows.find(r=>r.masked);assert.equal(hidden.participantId,undefined);assert.equal(hidden.trackVersionId,undefined);assert.equal(hidden.reviews.length,0);
+ assert.equal(done.awards.length,3);assert.ok(done.awards.every(a=>a.name&&a.profileUrl===null));
+ assert.ok(!/rawScore|personalQuality|knownFacts|private|skills/.test(JSON.stringify(done)));assert.equal(publicRoundTable(s,{...options,nowMinute:599}).rows.length,0);
+});
+test('double no-show shows both known names in red, no zero grades, same history after reload',()=>{
+ const s=tableFixture(),t=s.tournaments.byId[options.battleId],r={...t.rounds.selection,id:'makarevich-1:round-2:1',roundId:'round-2',opensAt:13440,closesAt:23520,completedAt:24500,submissions:{},judgeBatches:{},pairs:[{nodeId:'node-r-0',participantIds:['player','mak-npc-01'],technical:{kind:'double_no_show',winnerId:null},winnerId:null}],status:'complete'};t.rounds['round-2']=r;t.currentRoundId='round-2';
+ const table=publicRoundTable(s,{...options,roundId:'round-2',nowMinute:24500});assert.equal(table.rows.length,2);for(const row of table.rows){assert.equal(row.status,'no_show');assert.equal(row.tone,'danger');assert.equal(row.total,null);assert.ok(row.name);assert.ok(row.scores.every(s=>s.value===null));}
+ assert.deepEqual(publicRoundTable(JSON.parse(JSON.stringify(s)),{...options,roundId:'round-2',nowMinute:24500}),table);
+});
+test('table view passes specific published sources to analysis and browser route returns to community',()=>{
+ const d=pcDocument(),table=publicRoundTable(tableFixture(),options),requests=[],root=createBattleResultsTableView(d,{table,navigate:()=>{},onAnalyze:r=>requests.push(r)});findButton(root,'Изучить: Герой').click();assert.deepEqual(requests[0].reviewIds,table.rows[0].reviews.map(r=>r.id));assert.equal(requests[0].trackVersionId,'track:player');
+ const text=allPc(root).map(n=>n.textContent).join(' ');assert.ok(!text.includes('8.59'));assert.ok(text.includes('LTR'));
+ const address='underweb://social/results/makarevich-1/selection';assert.equal(resolveSocialRoute(address).section,'results');assert.equal(resolveSocialRoute(address+'/extra'),null);
+ const host=d.createElement('div');let state=tableFixture();const browser=mountUnderweb(host,{getState:()=>state,getMetadata:()=>({gameMinutes:12000,gameDay:9}),onChange:s=>{state=s;return true;}});browser.navigate(address);assert.ok(findButton(host,'← Сообщество'));findButton(host,'← Сообщество').click();assert.equal(browser.snapshot.route.section,'community');browser.dispose();
+});
+test('community hero panel uses binary votes rather than out-of-ten grades in a pair',()=>{
+ const s=tableFixture(),submission={id:'pair-submit',battleId:options.battleId,roundId:'round-2',windowId:'pair-window',playerId:'player',trackVersionId:'track:player'};s.battleSubmissions=[submission];s.battleWindows=[{id:'pair-window',judgeIds:['eparhiya']}];const review=s.judging.results['player:eparhiya'];review.roundId='round-2';review.decision={kind:'pair_vote',winnerId:'track:player'};
+ s.socialRuntime.events=[{id:'r',type:'judge-review',entityId:submission.id,resultId:review.id,dueAt:1},{id:'p',type:'judge-panel-complete',entityId:submission.id,total:1,qualification:'qualified',dueAt:2}];
+ const d=pcDocument(),view=createSocialResultView(d,{submission,getState:()=>s,commit:()=>true,expandedResults:new Set(['p'])}),text=allPc(view).map(n=>n.textContent).join(' ');assert.ok(text.includes('1 голос'));assert.ok(!text.includes('/ 10'));assert.ok(text.includes('Голоса: 1 / 1'));
+});
