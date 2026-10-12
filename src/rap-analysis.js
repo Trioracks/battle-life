@@ -8,6 +8,7 @@ import {beatResultSeed} from './beat-result.js?rev=39';
 import {battleRandom} from './battle-seeding.js?rev=39';
 import {publicTournamentTrackIds} from './battle-results-table.js?rev=39';
 import {publicCharacterProfile} from './npc-social-profiles.js?rev=39';
+import {completeJudgeEvidence} from './judge-dossier-analysis.js?rev=39';
 export const STUDY_POLICY=Object.freeze({...config.study});
 export const ANALYSIS_AXES=['text','performance','music','sound'];
 export const ANALYSIS_LABELS=['Ужасно','Очень плохо','Плохо','Средне','Хорошо','Очень хорошо','Отлично','Легендарно'];
@@ -23,7 +24,7 @@ export function normalizeRapAnalysis(raw){
   else recovery.push({type:'report',id,recoveryData:clone(r),reason:'Повреждённый отчёт сохранён отдельно.'});
  }
  let job=null;
- if(j){if(typeof j.id==='string'&&typeof j.trackVersionId==='string'&&typeof j.subjectId==='string'&&validSnapshot(j.heroSnapshot)&&Number.isFinite(j.elapsed)&&j.elapsed>=0&&j.elapsed<j.total&&j.total===STUDY_POLICY.durationGameMinutes&&['active','paused'].includes(j.status)&&strings(j.reviewIds)&&Number.isSafeInteger(j.seed)&&Number.isSafeInteger(j.diversity)&&j.diversity>=0&&validGameMinute(j.startedAt))job=clone(j);else recovery.push({type:'job',recoveryData:clone(j),reason:'Повреждённая работа не завершена автоматически.'});}
+ if(j){const kindValid=j.kind==='study'||j.kind==='judge-study'&&typeof j.judgeId==='string'&&reports[j.analysisReportId]?.trackVersionId===j.trackVersionId;if(kindValid&&typeof j.id==='string'&&typeof j.trackVersionId==='string'&&typeof j.subjectId==='string'&&validSnapshot(j.heroSnapshot)&&Number.isFinite(j.elapsed)&&j.elapsed>=0&&j.elapsed<j.total&&j.total===STUDY_POLICY.durationGameMinutes&&['active','paused'].includes(j.status)&&strings(j.reviewIds)&&Number.isSafeInteger(j.seed)&&Number.isSafeInteger(j.diversity)&&j.diversity>=0&&validGameMinute(j.startedAt))job=clone(j);else recovery.push({type:'job',recoveryData:clone(j),reason:'Повреждённая работа не завершена автоматически.'});}
  return {version:1,job,reports,sourceIds:[...new Set(strings(raw?.sourceIds)?raw.sourceIds:[])],nextSequence:Math.max(1,Number.isSafeInteger(raw?.nextSequence)?raw.nextSequence:1),recovery};
 }
 export function publishedStudyReviews(state,{trackVersionId,nowMinute}={}){
@@ -70,9 +71,11 @@ export function advanceStudy(state,{gameMinutes,nowMinute}={}){
  const v=state.trackVersions?.byId?.[j.trackVersionId];if(!v)return {...idle,state:pauseStudy(state),blocked:true,reason:'Источник недоступен; изучение сохранено на паузе.'};
  const n=state.music.needs,r=BEAT_RULES,minutes=Math.max(0,Math.min(gameMinutes,j.total-j.elapsed,(n.satiety-r.minSatiety)/r.satietyPerMinute,(n.energy-r.minEnergy)/r.energyPerMinute));
  j.elapsed+=minutes;const needs={satiety:clamp(n.satiety-minutes*r.satietyPerMinute),energy:clamp(n.energy-minutes*r.energyPerMinute)},finished=j.total-j.elapsed<1e-7,events=[];let practiceGained=0;
- if(finished){const report=finishReport(v,j,nowMinute-gameMinutes+minutes);a.reports[report.id]=report;if(!a.sourceIds.includes(j.trackVersionId)){a.sourceIds.push(j.trackVersionId);practiceGained=1;}a.job=null;events.push({type:'study-completed',reportId:report.id,dueAt:report.createdAt});}
+ let report=null;const endedAt=nowMinute-gameMinutes+minutes;
+ if(finished){report=j.kind==='judge-study'?a.reports[j.analysisReportId]:finishReport(v,j,endedAt);if(!report)return {...idle,state:pauseStudy(state),blocked:true,reason:'Исходный разбор недоступен; изучение сохранено на паузе.'};if(j.kind!=='judge-study'){a.reports[report.id]=report;if(!a.sourceIds.includes(j.trackVersionId)){a.sourceIds.push(j.trackVersionId);practiceGained=1;}}a.job=null;events.push({type:'study-completed',reportId:report.id,dueAt:endedAt});}
  const blocked=!finished&&(needs.satiety<=r.minSatiety+1e-7||needs.energy<=r.minEnergy+1e-7);if(blocked)j.status='paused';
- return {state:{...state,music:{...state.music,needs},rapAnalysis:a},minutes,events,finished,blocked,practiceGained,reason:blocked?'Нужно поесть или отдохнуть. Изучение сохранено.':''};
+ let next={...state,music:{...state.music,needs},rapAnalysis:a};if(finished)next=completeJudgeEvidence(next,{job:j,report,nowMinute:endedAt});
+ return {state:next,minutes,events,finished,blocked,practiceGained,reason:blocked?'Нужно поесть или отдохнуть. Изучение сохранено.':''};
 }
 export function publicAnalysisReport(report){
  if(!report)return null;const labels={},segments={};
