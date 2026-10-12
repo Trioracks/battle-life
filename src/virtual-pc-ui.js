@@ -1,3 +1,4 @@
+import {PC_IDENTITY} from './pc-identity.js?rev=35';
 import { FtStudioAudio } from './ft-studio-audio.js?rev=34';
 import {mountPcShell} from './virtual-pc-shell.js?rev=28';
 import {mountExplorer} from './virtual-pc-explorer-view.js?rev=34';
@@ -221,7 +222,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       transitionLayer=el(document,'section',{className:'pc-transition',attributes:{'aria-live':'polite'}});
       add(transitionLayer,createPcIcon(document,'start',{size:72}));
       transitionTitle=add(transitionLayer,el(document,'h2'));transitionSubtitle=add(transitionLayer,el(document,'p'));
-      transitionProgress=add(transitionLayer,el(document,'progress',{attributes:{max:'1','aria-label':'Загрузка Windows HP'}}));root.append(transitionLayer);
+      transitionProgress=add(transitionLayer,el(document,'progress',{attributes:{max:'1','aria-label':'Загрузка '+PC_IDENTITY.name}}));root.append(transitionLayer);
     }
     transitionLayer.hidden=p.screen==='desktop'||(p.screen==='off'&&snapshot.phase==='room');transitionLayer.dataset.screen=p.screen;
     transitionLayer.style.opacity='1';transitionLayer.style.filter=`brightness(${p.brightness})`;transitionTitle.textContent=p.title;transitionSubtitle.textContent=p.subtitle;

@@ -112,7 +112,7 @@ test('projects are opened by navigating through the virtual disk and folder', ()
   assert.ok(!find(root, 'Открыть проект on-disk'));
   assert.ok(find(root, 'Открыть диск C:'));
   fire(find(root, 'Открыть диск C:'),'dblclick');
-  fire(find(root, 'Открыть папку Windows'),'dblclick');
+  fire(find(root, 'Открыть папку Система'),'dblclick');
   assert.ok(!find(root, 'Открыть проект on-disk'));
   find(root, 'Назад').click();
   fire(find(root, 'Открыть папку Мои документы'),'dblclick');

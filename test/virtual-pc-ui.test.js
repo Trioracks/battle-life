@@ -48,7 +48,7 @@ test('my computer shows an empty projects folder before a project exists', () =>
   controller.showDesktop(state);
   controller.open('computer');
   fire(find(root, element => element.getAttribute?.('aria-label') === 'Открыть диск C:'),'dblclick');
-  assert.equal(hasText(root, 'Windows'), true);
+  assert.equal(hasText(root, 'Система'), true);
   fire(find(root, element => element.getAttribute?.('aria-label') === 'Открыть папку Мои документы'),'dblclick');
   fire(find(root, element => element.getAttribute?.('aria-label') === 'Открыть папку Мои проекты'),'dblclick');
   assert.equal(hasText(root, 'Объектов: 0'), true);

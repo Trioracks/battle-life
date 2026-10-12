@@ -1,3 +1,4 @@
+import {PC_IDENTITY} from './pc-identity.js?rev=35';
 import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=21';
 const button=pcButton;
 import {SOFTWARE} from './pc-software-catalog.js?rev=34';
@@ -21,7 +22,7 @@ export function softwareForum(d,{topic,state,navigate,onAction,message=''}){
  }else if(topic==='notebook'){
   const app=SOFTWARE.notebook,installed=state.software.notebook,post=el(d,'article',{className:'dump-post'}),body=el(d,'div'),actions=el(d,'div',{className:'dump-attachments'});
   site.append(el(d,'h1',{text:'Рэпблокнот — тексты и рифмы'}));post.append(el(d,'aside',{text:'slogoman\nУчастник\nС нами с 2011'}));
-  body.append(el(d,'small',{text:'Бесплатный редактор · Windows HP'}),el(d,'h2',{text:'Не потеряй первую мысль'}),el(d,'p',{text:'Черновики для баттлов и собственных треков. Три этапа письма, доработка куплетов и адаптация под бит. Сначала установи torent. Файл .torrent откроет клиент и добавит установщик Рэпблокнота.'}),el(d,'p',{text:'Метаданные: 12 КБ · Установщик: 4 МБ · Программа: 12 МБ · Установка: 10 секунд'}));
+  body.append(el(d,'small',{text:'Бесплатный редактор · '+PC_IDENTITY.name}),el(d,'h2',{text:'Не потеряй первую мысль'}),el(d,'p',{text:'Черновики для баттлов и собственных треков. Три этапа письма, доработка куплетов и адаптация под бит. Сначала установи torent. Файл .torrent откроет клиент и добавит установщик Рэпблокнота.'}),el(d,'p',{text:'Метаданные: 12 КБ · Установщик: 4 МБ · Программа: 12 МБ · Установка: 10 секунд'}));
   const download=button(d,'Скачать '+app.torrent,{},()=>onAction('download-metadata','notebook'));download.disabled=state.software.notebookMetadata;actions.append(download);
   if(state.software.notebookMetadata)actions.append(button(d,'Открыть '+app.torrent,{},()=>onAction('open-metadata','notebook')));
   if(installed.receivedBytes===app.downloadBytes&&!installed.installed)actions.append(button(d,'Открыть установщик Рэпблокнот',{},()=>onAction('installer','notebook')));
@@ -31,7 +32,7 @@ export function softwareForum(d,{topic,state,navigate,onAction,message=''}){
  }else{
   const client=topic==='client',id=client?'client':'ft',app=SOFTWARE[id],post=el(d,'article',{className:'dump-post'}),body=el(d,'div');
   site.append(el(d,'h1',{text:client?'torent — торрент-клиент':'FT Studio — домашняя студия'}));
-  post.append(el(d,'aside',{text:'sysop\nМодератор\nС нами с 2010'}));body.append(el(d,'small',{text:'Закреплённая тема · Windows HP'}),el(d,'h2',{text:client?'Клиент для файлов .torrent':'Студия для первого бита'}),el(d,'p',{text:client?'Скачай установщик, выбери папку на C: и заверши мастер. После установки клиент откроется с пустым списком.':'Сначала установи torent из соседней темы. Скачай файл .torrent и открой его: клиент добавит архив FT Studio в очередь.'}),el(d,'p',{text:client?'Установщик: 2 МБ · Программа на диске: 8 МБ':'Метаданные: 12 КБ · Архив: 800 МБ · Установка: ещё 800 МБ'}));
+  post.append(el(d,'aside',{text:'sysop\nМодератор\nС нами с 2010'}));body.append(el(d,'small',{text:'Закреплённая тема · '+PC_IDENTITY.name}),el(d,'h2',{text:client?'Клиент для файлов .torrent':'Студия для первого бита'}),el(d,'p',{text:client?'Скачай установщик, выбери папку на C: и заверши мастер. После установки клиент откроется с пустым списком.':'Сначала установи torent из соседней темы. Скачай файл .torrent и открой его: клиент добавит архив FT Studio в очередь.'}),el(d,'p',{text:client?'Установщик: 2 МБ · Программа на диске: 8 МБ':'Метаданные: 12 КБ · Архив: 800 МБ · Установка: ещё 800 МБ'}));
   const actions=el(d,'div',{className:'dump-attachments'});
   if(client){const b=button(d,'Скачать установщик torent',{},()=>onAction('download-client'));b.disabled=state.software.client.installed||state.software.client.receivedBytes===2000000||Boolean(state.software.task?.appId==='client');actions.append(b);}
   else {const b=button(d,'Скачать FT-Studio.torrent',{},()=>onAction('download-metadata'));b.disabled=state.software.metadata;actions.append(b);if(state.software.metadata)actions.append(button(d,'Открыть FT-Studio.torrent',{},()=>onAction('open-metadata')));}
@@ -74,7 +75,7 @@ export function mountInstaller(root,{getState,onAction,getMessage=()=>''}){
   const app=SOFTWARE[w.appId],wrap=el(d,'section',{className:'pc-installer'}),banner=el(d,'aside',{className:'installer-banner'}),body=el(d,'div',{className:'installer-body'}),content=el(d,'div',{className:'installer-content'}),actions=el(d,'footer',{className:'installer-actions'});
   banner.append(el(d,'strong',{text:app.name}),el(d,'span',{text:'МАСТЕР\nУСТАНОВКИ'}));body.append(content,actions);wrap.append(banner,body);root.replaceChildren(wrap);
   const titles={welcome:'Добро пожаловать',destination:'Выбор папки установки',summary:'Всё готово к установке',install:'Установка',finish:'Установка завершена'};
-  const heading=el(d,'h2',{text:titles[w.step],attributes:{tabindex:'-1'}});content.append(heading,el(d,'p',{text:app.name+' · Windows HP'}));let input=null;
+  const heading=el(d,'h2',{text:titles[w.step],attributes:{tabindex:'-1'}});content.append(heading,el(d,'p',{text:app.name+' · '+PC_IDENTITY.name}));let input=null;
   if(w.step==='welcome')content.append(el(d,'p',{text:'Мастер поможет установить '+app.name+' на игровой компьютер.'}));
   if(w.step==='destination'){const label=el(d,'label',{text:'Папка на диске C:'});input=el(d,'input',{value:w.path,attributes:{'aria-label':'Папка установки',maxlength:'180'}});label.append(input);content.append(label,el(d,'p',{text:'Можно выбрать собственную папку на виртуальном C:.'}));}
   if(['summary','install','finish'].includes(w.step))content.append(el(d,'p',{text:'Папка: '+w.path}));

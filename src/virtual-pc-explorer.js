@@ -1,3 +1,4 @@
+import {PC_IDENTITY} from './pc-identity.js?rev=35';
 import {diskUsage} from './virtual-pc-state.js?rev=34';
 import {formatDiskGb,diskAmount} from './virtual-pc-disk-view.js?rev=21';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=34';
@@ -5,7 +6,7 @@ import {SOFTWARE} from './pc-software-catalog.js?rev=34';
 export const EXPLORER_PATHS=Object.freeze({
   computer:{label:'Мой компьютер',address:'Мой компьютер',parent:null,iconId:'computer'},
   disk:{label:'Локальный диск (C:)',address:'C:\\',parent:'computer',iconId:'disk'},
-  windows:{label:'Windows',address:'C:\\Windows',parent:'disk',iconId:'folder'},
+  windows:{label:PC_IDENTITY.systemLabel,address:PC_IDENTITY.systemAddress,parent:'disk',iconId:'folder'},
   documents:{label:'Мои документы',address:'C:\\Мои документы',parent:'disk',iconId:'documents'},
   projects:{label:'Мои проекты',address:'C:\\Мои документы\\Мои проекты',parent:'documents',iconId:'folder'},
   downloads:{label:'Загрузки',address:'C:\\Загрузки',parent:'disk',iconId:'folder'},

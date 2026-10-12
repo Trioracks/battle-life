@@ -1,3 +1,4 @@
+import {PC_IDENTITY} from './pc-identity.js?rev=35';
 import {pcElement as el} from './virtual-pc-dom.js?rev=21';
 
 export function formatDiskGb(mb) {
@@ -22,7 +23,7 @@ export function mountDiskUsage(root) {
       capacity.textContent='Ёмкость '+formatDiskGb(usage.capacityMb);
       used.textContent='Занято '+diskAmount(usage.usedMb);
       free.textContent='Свободно '+diskAmount(usage.freeMb);
-      system.textContent='Windows HP: '+formatDiskGb(usage.systemMb);
+      system.textContent=PC_IDENTITY.name+': '+formatDiskGb(usage.systemMb);
       meter.setAttribute('aria-valuemax',String(usage.capacityMb));
       meter.setAttribute('aria-valuenow',String(occupied));
       meter.setAttribute('aria-valuetext',`${used.textContent}; ${free.textContent}`);

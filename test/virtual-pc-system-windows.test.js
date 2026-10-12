@@ -14,7 +14,7 @@ function setup(kind='display',durable=true){
 }
 test('Start has no duplicate documents shortcut but Explorer still opens its folder',()=>{
   const root=pcDocument().createElement('section'),c=mountVirtualPc(root,{audio:{stop(){},dispose(){}}});
-  c.showDesktop(createVirtualPcState());findButton(root,'Пуск').click();
+  c.showDesktop(createVirtualPcState());findButton(root,'Слобода').click();
   const start=findPc(root,'start-menu');assert.equal(Boolean(findButton(start,'Мои документы')),false);findButton(start,'Мой компьютер').click();
   fire(findButton(root,'Открыть диск C:'),'dblclick');assert.ok(findButton(root,'Открыть папку Мои документы'));
   c.dispose();
@@ -58,9 +58,9 @@ test('outside click and Escape dismiss only menu; keyboard skips disabled items 
 test('desktop menus open singleton display and modal restores initiating focus',()=>{
   const d=pcDocument(),root=d.createElement('section'),c=mountVirtualPc(root,{audio:{stop(){},dispose(){}}});c.showDesktop(createVirtualPcState());
   c.openSystem('display');c.openSystem('display');assert.equal(c.windows.windows.length,1);
-  c.closeWindow();findButton(root,'Пуск').click();assert.ok(findPc(root,'start-menu'));
+  c.closeWindow();findButton(root,'Слобода').click();assert.ok(findPc(root,'start-menu'));
   findButton(root,'Выключение').click();assert.equal(c.shutdownModal!==null,true);
-  findButton(root,'Отмена').click();assert.equal(c.shutdownModal,null);assert.equal(d.activeElement,findButton(root,'Пуск'));
+  findButton(root,'Отмена').click();assert.equal(c.shutdownModal,null);assert.equal(d.activeElement,findButton(root,'Слобода'));
 });
 test('host persistence warning becomes visible without a shell repaint',()=>{
   const d=pcDocument(),root=d.createElement('section'),c=mountVirtualPc(root,{audio:{stop(){},dispose(){}}});c.showDesktop(createVirtualPcState());
@@ -69,7 +69,7 @@ test('host persistence warning becomes visible without a shell repaint',()=>{
 test('reset tears down menus and system windows before the next session',()=>{
   const d=pcDocument(),root=d.createElement('section'),c=mountVirtualPc(root,{audio:{stop(){},dispose(){}}});c.showDesktop(createVirtualPcState());
   c.openSystem('display');c.reset(createVirtualPcState());c.showDesktop(c.state);c.openSystem('display');
-  assert.ok(findButton(root,'Применить'));findButton(root,'Пуск').click();assert.ok(findPc(root,'start-menu'));
+  assert.ok(findButton(root,'Применить'));findButton(root,'Слобода').click();assert.ok(findPc(root,'start-menu'));
 });
 test('clock refresh does not steal focus inside shutdown confirmation',()=>{
   const d=pcDocument(),root=d.createElement('section'),c=mountVirtualPc(root,{audio:{stop(){},dispose(){}}});c.showDesktop(createVirtualPcState());

@@ -1,3 +1,4 @@
+import {PC_IDENTITY} from './pc-identity.js?rev=35';
 import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=21';
 import {createPcIcon} from './virtual-pc-icons.js?rev=28';
 import {WALLPAPERS} from './virtual-pc-catalog.js?rev=34';
@@ -25,13 +26,13 @@ export function mountSystemWindow(root,{kind,getState,onPersist,onOpen,onClose,o
     apply=button(d,'Применить',{},persist);
     actions.append(button(d,'ОК',{},()=>{persist();onClose();}),button(d,'Отмена',{},onClose),apply);wrap.append(status,actions);drawPreview();
   }else if(kind==='control-panel'){
-    wrap.append(el(d,'h3',{text:'Панель управления'}),el(d,'p',{text:'Настройки игрового компьютера'}));
+    wrap.append(el(d,'h3',{text:'Панель управления'}),el(d,'p',{text:'Настройки '+PC_IDENTITY.name}));
     for(const [id,label]of [['display','Экран'],['disk','Локальный диск (C:)']]){
       const b=button(d,'',{className:'pc-control-item',attributes:{'aria-label':label}},()=>onOpen(id));b.append(createPcIcon(d,id,{size:32}),el(d,'span',{text:label}));wrap.append(b);
     }
   }else if(kind==='shutdown'){
     wrap.className+=' pc-shutdown';wrap.setAttribute('role','dialog');wrap.setAttribute('aria-modal','true');wrap.setAttribute('aria-label','Выключение компьютера');
-    const header=el(d,'h3',{text:'Выключение компьютера'});wrap.append(header,createPcIcon(d,'power',{size:48}),el(d,'p',{text:'Завершить работу игрового компьютера?'}));
+    const header=el(d,'h3',{text:'Выключение компьютера'});wrap.append(header,createPcIcon(d,'power',{size:48}),el(d,'p',{text:'Завершить работу '+PC_IDENTITY.name+'?'}));
     const actions=el(d,'footer',{className:'pc-dialog-actions'});actions.append(button(d,'Выключить',{},onConfirmShutdown),button(d,'Отмена',{},onClose));wrap.append(actions);
   }else{
     wrap.append(createPcIcon(d,'settings',{size:32}),el(d,'h3',{text:properties?.title??'Свойства'}));

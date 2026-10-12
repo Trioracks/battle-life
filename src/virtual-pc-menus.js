@@ -1,3 +1,4 @@
+import {PC_IDENTITY} from './pc-identity.js?rev=35';
 import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=21';
 import {createPcIcon} from './virtual-pc-icons.js?rev=28';
 
@@ -17,7 +18,7 @@ export function mountPcMenu(root,{onDismiss=()=>{}}={}) {
   function build(items,x,y,anchor,level=0,options={}){
     while(stack.length>level)stack.pop().node.remove();
     const isStart=options.variant==='start';
-    const node=el(d,'aside',{className:'pc-popup'+(isStart?' pc-start-menu':''),dataset:{pcRole:isStart?'start-menu':'context-menu'},attributes:{role:'menu','aria-label':isStart?'Меню Пуск':'Контекстное меню'}});
+    const node=el(d,'aside',{className:'pc-popup'+(isStart?' pc-start-menu':''),dataset:{pcRole:isStart?'start-menu':'context-menu'},attributes:{role:'menu','aria-label':isStart?'Меню '+PC_IDENTITY.menuLabel:'Контекстное меню'}});
     const record={node,items,buttons:[],anchor};stack.push(record);root.append(node);
     let left=node,right=node,footer=node;
     if(isStart){

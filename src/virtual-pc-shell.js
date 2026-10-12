@@ -1,3 +1,4 @@
+import {PC_IDENTITY} from './pc-identity.js?rev=35';
 import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=21';
 import {createPcIcon} from './virtual-pc-icons.js?rev=28';
 import {homeDateLabel} from './home-calendar.js?rev=28';
@@ -7,13 +8,13 @@ export function mountPcShell(root,{onCommand}) {
   let model=null,disposed=false,selected=null,modalNode=null;
   const cleanups=new Set(),frames=new Map(),icons=new Map();
   const shell=el(d,'section',{className:'pc-shell pc-desktop'});
-  const workspace=el(d,'div',{className:'pc-workspace',attributes:{'aria-label':'Рабочий стол Windows XP'}});
+  const workspace=el(d,'div',{className:'pc-workspace',attributes:{'aria-label':'Рабочий стол '+PC_IDENTITY.name}});
   const iconRoot=el(d,'nav',{className:'pc-icons',dataset:{pcRole:'icons'},attributes:{'aria-label':'Приложения компьютера'}});
   const layer=el(d,'div',{className:'pc-window-layer'});
   workspace.append(iconRoot,layer);
   const taskbar=el(d,'footer',{className:'pc-taskbar'});
-  const start=el(d,'button',{className:'pc-start',text:'',type:'button',attributes:{'aria-label':'Пуск'}});
-  start.append(createPcIcon(d,'start',{size:24}),el(d,'span',{text:'пуск'}));
+  const start=el(d,'button',{className:'pc-start',text:'',type:'button',attributes:{'aria-label':PC_IDENTITY.menuLabel}});
+  start.append(createPcIcon(d,'start',{size:24}),el(d,'span',{text:PC_IDENTITY.menuLabel}));
   const tasks=el(d,'div',{className:'pc-tasks'}),clock=el(d,'time',{className:'pc-clock',dataset:{pcRole:'clock'}});
   taskbar.append(start,tasks,clock);
   const warning=el(d,'div',{className:'pc-storage-warning',dataset:{pcRole:'persistence-warning'},attributes:{'aria-live':'polite'}});

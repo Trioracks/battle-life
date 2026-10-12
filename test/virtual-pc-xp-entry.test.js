@@ -12,7 +12,7 @@ test('host metadata updates clock without touching inputs or leave-return forms'
   c.syncHost({playerName:'Саша',clockLabel:'16:00'});assert.equal(findPc(root,'clock').textContent,'16:00');
   assert.equal(allPc(root).find(n=>n.tagName==='INPUT')===input,true);
   c.requestLeave();c.showDesktop(c.state);assert.equal(allPc(root).find(n=>n.tagName==='INPUT')===input,true);
-  assert.equal(input.value,'Незавершённый ввод');findButton(root,'Пуск').click();assert.ok(allPc(root).some(n=>n.textContent==='Саша'));
+  assert.equal(input.value,'Незавершённый ввод');findButton(root,'Слобода').click();assert.ok(allPc(root).some(n=>n.textContent==='Саша'));
 });
 test('new game resets icons and windows alongside PC',()=>{
   const {c}=setup();c.showDesktop(createVirtualPcState({desktopIcons:{computer:{x:240,y:200}}}));c.open('computer');
@@ -28,8 +28,8 @@ test('computer date tracks the shared game day and leaves clock text readable',(
 });
 test('host controller owns the eleven second cold boot with no DOM timer',()=>{
   const timers=[];const {c,root}=setup({setTimeoutFn:(fn,delay)=>{timers.push({fn,delay});return timers.length;},clearTimeoutFn:()=>{}});
-  c.boot(createVirtualPcState());const t=new PcTransition();t.enter();t.tick(3.6);c.presentTransition(t.snapshot);assert.ok(allPc(root).some(n=>n.textContent==='Windows HP'));
-  assert.equal(timers.length,0);t.tick(7.4);c.presentTransition(t.snapshot);assert.equal(root.dataset.pcTransition,'desktop');assert.ok(findButton(root,'Пуск'));
+  c.boot(createVirtualPcState());const t=new PcTransition();t.enter();t.tick(3.6);c.presentTransition(t.snapshot);assert.ok(allPc(root).some(n=>n.textContent==='Слобода OS'));
+  assert.equal(timers.length,0);t.tick(7.4);c.presentTransition(t.snapshot);assert.equal(root.dataset.pcTransition,'desktop');assert.ok(findButton(root,'Слобода'));
 });
 test('entry loads versioned XP stylesheet and module, and host feeds game metadata',async()=>{
   const html=await readFile(new URL('../index.html',import.meta.url),'utf8'),app=await readFile(new URL('../src/apartment-app.js?rev=32',import.meta.url),'utf8');

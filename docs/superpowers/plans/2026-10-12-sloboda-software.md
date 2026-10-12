@@ -25,7 +25,7 @@
 - Finish while player reads forum or leaves never forces camera — C3.
 - Duplicate setup/Done never installs or opens twice — C3.
 
-## Task C1 Original desktop identity
+## Task 1 C1 Original desktop identity
 
 **Files:** create `src/pc-identity.js`, `test/sloboda-shell.test.js`; modify `src/virtual-pc-shell.js`, `src/virtual-pc-presentation.js`, `src/virtual-pc-system-windows.js`, `src/virtual-pc-explorer.js`, `src/virtual-pc-icons.js`, `src/apartment-v3-computer.js`, `virtual-pc.css`; replace relevant authored SVGs in `assets/ui/virtual-pc/icons/` (start/computer/documents/folder/disk/settings/display/power/window controls).
 
@@ -37,7 +37,7 @@
 - [ ] Rerun to PASS; visually inspect desktop/menu/installer/browser/FT/notebook/explorer/boot/shutdown/3D monitor. Missing brand text alone is not evidence of a distinct design.
 - [ ] Commit `feat: replace desktop branding with Sloboda OS`.
 
-## Task C2 Transfer collection and shared bandwidth
+## Task 2 C2 Transfer collection and shared bandwidth
 
 **Files:** create `src/pc-transfer-runtime.js`, `test/pc-transfer-runtime.test.js`; modify `src/pc-software.js`, `src/virtual-pc-runtime.js`, `src/virtual-pc-state.js`, `src/pc-software-view.js`, `src/virtual-pc-ui.js`; tests `test/pc-software.test.js`, `test/virtual-pc-runtime.test.js`, `test/torrent-routing.test.js`.
 
@@ -49,7 +49,7 @@
 - [ ] Rerun to PASS; selected-row pause/resume/cancel, unknown id, both paused, midnight, disk full, large multi-day intervals without per-frame iteration, load with no offline bonus. Compute ETA using the same scheduler on a copy, accounting for another transfer completing.
 - [ ] Commit `feat: share torrent bandwidth across downloads`.
 
-## Task C3 Installer controls and lifecycle
+## Task 3 C3 Installer controls and lifecycle
 
 **Files:** modify `src/pc-software.js`, `src/pc-software-view.js`, `src/virtual-pc-ui.js`, `src/virtual-pc-explorer.js`, `src/virtual-pc-explorer-view.js`, `src/pc-software-catalog.js`; tests `test/pc-software-ui.test.js`, `test/virtual-pc-explorer.test.js`, `test/virtual-pc-lifecycle.test.js`.
 
@@ -61,7 +61,7 @@
 - [ ] Rerun to PASS; real10/30-second progress, forum use/leave, disk error, cancelled wizard, repeated finish after reload, keyboard checkbox. If away, prepare app on virtual desktop, do not return player to PC.
 - [ ] Commit `feat: improve installer and app lifecycle controls`.
 
-## Task C4 Distinct software tracker
+## Task 4 C4 Distinct software tracker
 
 **Files:** modify `src/pc-software-view.js`, `underweb-world.css`; extend `test/pc-software-ui.test.js`, `test/torrent-routing.test.js`.
 

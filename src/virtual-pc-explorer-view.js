@@ -1,3 +1,4 @@
+import {PC_IDENTITY} from './pc-identity.js?rev=35';
 import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=21';
 import {createPcIcon} from './virtual-pc-icons.js?rev=28';
 import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties,explorerPaths} from './virtual-pc-explorer.js?rev=34';
@@ -64,7 +65,7 @@ export function mountExplorer(root,{onOpenArtifact,onOpenApp,onOpenProject,onPro
     }
     diskLabel?.dispose();files.replaceChildren();files.dataset.view=nav.view;diskLabel=null;
     if(nav.view==='details')files.append(el(d,'div',{className:'pc-details-head',text:'Имя                                      Тип                 Размер'}));
-    if(nav.path==='windows')files.append(el(d,'p',{className:'pc-system-note',text:'Windows — системная папка игрового компьютера. Доступна только для просмотра.'}));
+    if(nav.path==='windows')files.append(el(d,'p',{className:'pc-system-note',text:PC_IDENTITY.name+' — системные файлы. Доступны только для просмотра.'}));
     for(const entry of entries()){
       const label=entry.kind==='project'?'Открыть проект '+entry.name:entry.kind==='disk'?'Открыть диск C:':entry.kind==='folder'?'Открыть папку '+entry.name:'Открыть '+entry.name;
       const b=button(d,'',{className:'pc-file',dataset:{entryId:entry.id},attributes:{'aria-label':label,'aria-pressed':String(nav.selection===entry.id)}},()=>{
