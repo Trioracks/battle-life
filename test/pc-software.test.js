@@ -33,7 +33,7 @@ test('fractional frames and a full sleep integrate identical periodic transfer r
 });
 test('incoming bytes stop at shared capacity and beat creation respects retained archives',()=>{
  let s=software.openMetadata(software.downloadMetadata(client()).state).state;s={...s,projects:Array.from({length:994},(_,i)=>({id:String(i)}))};s=advanceVirtualPc(s,{day:1,minutes:100}).state;
- assert.equal(diskUsage(s).usedMb,16000);assert.equal(s.software.task.error,'insufficient-space');assert.equal(createBeat(s,{id:'new',name:'Beat'}).ok,false);
+ assert.equal(diskUsage(s).usedMb,16000);assert.equal(s.software.transfers.ft.error,'insufficient-space');assert.equal(createBeat(s,{id:'new',name:'Beat'}).ok,false);
  const partial=s.download.receivedBytes;assert.equal(advanceVirtualPc(s,{day:1,minutes:200}).state.download.receivedBytes,partial);
 });
 test('installer cancellation preserves archive, rejects unsafe paths and checks free space',()=>{

@@ -47,7 +47,7 @@ test('forum client download leads through wizard into an empty torrent client an
  pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:0}).state);pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:2}).state);
  click(root,'Открыть установщик torent');wizard(root,pc);pc.open('torent');assert.ok(allPc(root).some(n=>n.textContent==='Нет задач. Открой файл .torrent из Загрузок.'));
  pc.open('underweb');pc.navigateUnderweb('underweb://dump/ft-studio');click(root,'Скачать FT-Studio.torrent');
- assert.equal(pc.window,'torent');assert.equal(pc.state.software.task.appId,'ft');assert.equal(pc.windows.windows.filter(w=>w.id==='torent').length,1);
+ assert.equal(pc.window,'torent');assert.equal(pc.state.software.transfers.ft.appId,'ft');assert.equal(pc.windows.windows.filter(w=>w.id==='torent').length,1);
  pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:600}).state);click(root,'Открыть установщик FT Studio');wizard(root,pc);assert.equal(pc.state.download.status,'installed');
  assert.ok(findButton(root,'FT Studio'));pc.open('computer');pc.openFolder('C:\\Program Files\\Field Tone\\FT Studio');assert.ok(allPc(root).some(n=>n.textContent==='Plugins'));
 });
@@ -121,14 +121,14 @@ test('forum has muted graphics, games and system categories without download con
 });
 test('opening FT metadata without the client explains the prerequisite in the forum',()=>{
  const {pc,root}=setup();pc.navigateUnderweb('underweb://dump/ft-studio');click(root,'Скачать FT-Studio.torrent');click(root,'Открыть FT-Studio.torrent');
- assert.ok(allPc(root).some(n=>n.textContent==='Сначала скачай и установи torent из темы клиента.'));assert.equal(pc.window,'underweb');assert.equal(pc.state.software.task,null);
+ assert.ok(allPc(root).some(n=>n.textContent==='Сначала скачай и установи torent из темы клиента.'));assert.equal(pc.window,'underweb');assert.deepEqual(pc.state.software.transfers,{});
 });
 
 test('opening Downloads metadata without the client announces the prerequisite inside Explorer',()=>{
  const {pc,root}=setup();pc.navigateUnderweb('underweb://dump/ft-studio');click(root,'Скачать FT-Studio.torrent');
  pc.open('computer');pc.openFolder('downloads');const explorer=pc.shell.getContentRoot('computer');
  fire(findButton(explorer,'Открыть FT-Studio.torrent'),'keydown',{key:'Enter'});
- assert.equal(pc.window,'computer');assert.equal(pc.state.software.task,null);
+ assert.equal(pc.window,'computer');assert.deepEqual(pc.state.software.transfers,{});
  const status=allPc(explorer).find(n=>n.getAttribute?.('aria-live')==='polite');
  assert.match(status.textContent,/Сначала.*установи torent/);assert.notEqual(status.hidden,true);
 });

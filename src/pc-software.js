@@ -13,16 +13,16 @@ export function normalizeSoftware(value,legacy={}){
  const source=value&&typeof value==='object'?value:null,old=legacy.status;
  const app=id=>({installed:source?source[id]?.installed===true:id==='ft'&&old==='installed',receivedBytes:source?bytes(source[id]?.receivedBytes,SOFTWARE[id].downloadBytes):id==='ft'&&['downloading','ready-to-install'].includes(old)?(old==='ready-to-install'?800000000:bytes(legacy.receivedBytes,800000000)):0,path:normalizeInstallPath(source?.[id]?.path)??SOFTWARE[id].path});
  const client=app('client'),ft=app('ft');if(!source&&['downloading','ready-to-install'].includes(old))client.installed=true;
- let task=null;const t=source?.task;
- if(t&&SOFTWARE[t.appId]&&app(t.appId).receivedBytes<SOFTWARE[t.appId].downloadBytes)task={appId:t.appId,paused:t.paused===true,error:t.error==='insufficient-space'?t.error:'',baseMinute:Number.isFinite(t.baseMinute)?t.baseMinute:null,baseBytes:bytes(t.baseBytes,SOFTWARE[t.appId].downloadBytes)};
- else if(!source&&old==='downloading'&&ft.receivedBytes<800000000)task={appId:'ft',paused:false,error:'',baseMinute:null,baseBytes:ft.receivedBytes};
+ const transfers={},legacyTask=source?.task;
+ const candidates=source?.transferVersion===2?source.transfers:legacyTask?{[legacyTask.appId]:legacyTask}:!source&&old==='downloading'?{ft:{appId:'ft'}}:{};
+ for(const id of Object.keys(SOFTWARE)){const t=candidates?.[id];if(t&&app(id).receivedBytes<SOFTWARE[id].downloadBytes)transfers[id]={appId:id,paused:t.paused===true,error:t.error==='insufficient-space'?t.error:''};}
  const wizard=source?.installer,id=wizard?.appId,step=wizard?.step;
  const installer=SOFTWARE[id]&&['welcome','destination','summary','install','finish'].includes(step)&&app(id).receivedBytes===SOFTWARE[id].downloadBytes&&(!app(id).installed||step==='finish')?{appId:id,step:step==='finish'&&!app(id).installed?'welcome':step,path:normalizeInstallPath(wizard.path)??SOFTWARE[id].path,elapsedSeconds:step==='install'?bytes(wizard.elapsedSeconds,SOFTWARE[id].installSeconds):step==='finish'&&app(id).installed?SOFTWARE[id].installSeconds:0,error:step==='install'&&wizard.error==='insufficient-space'?'insufficient-space':''}:null;
- return {client,ft,notebook:app('notebook'),metadata:source?source.metadata===true:['downloading','ready-to-install'].includes(old),notebookMetadata:source?.notebookMetadata===true,task,installer};
+ return {client,ft,notebook:app('notebook'),metadata:source?source.metadata===true:['downloading','ready-to-install'].includes(old),notebookMetadata:source?.notebookMetadata===true,transferVersion:2,transfers,installer};
 }
 export function withSoftware(state,software){
  const ft=software.ft;
- const download={status:ft.installed?'installed':ft.receivedBytes===800000000?'ready-to-install':software.task?.appId==='ft'?'downloading':'idle',receivedBytes:ft.installed?0:ft.receivedBytes};
+ const download={status:ft.installed?'installed':ft.receivedBytes===800000000?'ready-to-install':software.transfers.ft?'downloading':'idle',receivedBytes:ft.installed?0:ft.receivedBytes};
  return {...state,software,download};
 }
 export function softwareDiskBytes(state){
@@ -36,9 +36,9 @@ export function downloadClient(input){
  const s=copy(input),soft=s.software;
  if(s.power!=='on')return result(s,false,'pc-off');
  if(soft.client.installed||soft.client.receivedBytes===2000000)return result(s);
- if(soft.task)return result(s,soft.task.appId==='client',soft.task.appId==='client'?'':'transfer-active');
+ if(soft.transfers.client)return result(s);
  if(softwareDiskBytes(s).free<2000000-soft.client.receivedBytes)return result(s,false,'insufficient-space');
- soft.task={appId:'client',paused:false,error:'',baseMinute:s.lastGameMinute??null,baseBytes:soft.client.receivedBytes};return result(withSoftware(s,soft));
+ soft.transfers.client={appId:'client',paused:false,error:''};return result(withSoftware(s,soft));
 }
 export function downloadNotebook(input){
  return downloadMetadata(input,'notebook');
@@ -51,13 +51,13 @@ export function downloadMetadata(input,id='ft'){
 export function openMetadata(input,id='ft'){
  const s=copy(input),soft=s.software,app=SOFTWARE[id];if(!app?.metadataKey)return result(s,false,'unknown-app');
  if(s.power!=='on')return result(s,false,'pc-off');if(!soft.client.installed)return result(s,false,'client-required');if(!soft[app.metadataKey])return result(s,false,'metadata-required');
- if(soft[id].installed||soft[id].receivedBytes===app.downloadBytes||soft.task?.appId===id)return result(s);
- if(soft.task)return result(s,false,'transfer-active');
- soft.task={appId:id,paused:false,error:'',baseMinute:s.lastGameMinute??null,baseBytes:soft[id].receivedBytes};return result(withSoftware(s,soft));
+ if(soft[id].installed||soft[id].receivedBytes===app.downloadBytes||soft.transfers[id])return result(s);
+ soft.transfers[id]={appId:id,paused:false,error:''};return result(withSoftware(s,soft));
 }
-export function pauseTransfer(input){const s=copy(input);if(s.software.task)s.software.task.paused=true;return result(s);}
-export function resumeTransfer(input){const s=copy(input),t=s.software.task;if(t){if(softwareDiskBytes(s).free<=0)return result(s,false,'insufficient-space');t.paused=false;t.error='';t.baseMinute=s.lastGameMinute;t.baseBytes=s.software[t.appId].receivedBytes;}return result(s);}
-export function cancelTransfer(input){const s=copy(input),t=s.software.task;if(t){s.software[t.appId].receivedBytes=0;s.software.task=null;}return result(withSoftware(s,s.software));}
+function transferId(s,id){const ids=Object.keys(s.software.transfers);return id??(ids.length===1?ids[0]:null);}
+export function pauseTransfer(input,id){const s=copy(input),t=s.software.transfers[transferId(s,id)];if(!t)return result(s,false,'select-transfer');t.paused=true;return result(s);}
+export function resumeTransfer(input,id){const s=copy(input),t=s.software.transfers[transferId(s,id)];if(!t)return result(s,false,'select-transfer');if(softwareDiskBytes(s).free<=0)return result(s,false,'insufficient-space');t.paused=false;t.error='';return result(s);}
+export function cancelTransfer(input,id){const s=copy(input);id=transferId(s,id);if(!s.software.transfers[id])return result(s,false,'select-transfer');s.software[id].receivedBytes=0;delete s.software.transfers[id];return result(withSoftware(s,s.software));}
 export function openInstaller(input,appId){
  const s=copy(input),app=SOFTWARE[appId];if(!app)return result(s,false,'unknown-app');
  if(s.software[appId].installed)return result(s,false,'already-installed');if(s.software[appId].receivedBytes!==app.downloadBytes)return result(s,false,'archive-required');

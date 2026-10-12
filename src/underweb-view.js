@@ -12,7 +12,7 @@ const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-c
 
 export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,onSubmitTrack=()=>{},getSoftwareMessage=()=>''}){
  const d=root.ownerDocument,history=['underweb://iskra'];let index=0,route=resolveUnderweb(history[0],getMetadata()),applicationOpen=false,lastApplications='',applicationFocus=null,lastSoftware='',lastDay=0;
- const softwareSignature=()=>{const s=getState().software;return JSON.stringify([s?.client?.installed,s?.client?.receivedBytes===2000000,s?.ft?.installed,s?.ft?.receivedBytes===800000000,s?.notebook?.installed,s?.notebook?.receivedBytes===4000000,s?.metadata,s?.notebookMetadata,s?.task?.appId,s?.task?.paused,s?.task?.error,getSoftwareMessage()]);};
+ const softwareSignature=()=>{const s=getState().software;return JSON.stringify([s?.client?.installed,s?.client?.receivedBytes===2000000,s?.ft?.installed,s?.ft?.receivedBytes===800000000,s?.notebook?.installed,s?.notebook?.receivedBytes===4000000,s?.metadata,s?.notebookMetadata,s?.transfers,getSoftwareMessage()]);};
  const browser=el(d,'section',{className:'uw-browser',attributes:{'aria-label':'Браузер Underweb'}}),toolbar=el(d,'form',{className:'uw-toolbar',attributes:{'aria-label':'Адрес Underweb'}});
  const back=button(d,'←',{attributes:{'aria-label':'Назад в Underweb'}},()=>travel(-1)),forward=button(d,'→',{attributes:{'aria-label':'Вперёд в Underweb'}},()=>travel(1));
  const home=button(d,'⌂',{attributes:{'aria-label':'Главная Underweb'}},()=>navigate('underweb://iskra'));
@@ -137,6 +137,6 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  render();return {navigate,get snapshot(){return {route,index,history:[...history]};},update(){
   if(lastDay!==JSON.stringify([getMetadata().gameDay])){route=resolveUnderweb(history[index],getMetadata());render({resetScroll:false,preserveInputs:true});}
   else if(lastApplications!==JSON.stringify([getState().battleApplications,getState().battleSubmissions])&&['home','battle','battles'].includes(route.type)||route.type==='dump'&&lastSoftware!==softwareSignature())render({resetScroll:false,preserveInputs:true});
-  else if(route.type==='dump'){const node=pcFind(page,n=>n.dataset?.pcRole==='forum-transfer');if(node){const p=downloadPresentation(getState());node.textContent=`Загрузка: ${p.receivedMb.toFixed(2)} / ${p.totalMb} МБ · ${p.speedKbPerSecond} КБ/с${p.error?' · '+softwareMessage(p.error):''}`;}}
+  else if(route.type==='dump'){const node=pcFind(page,n=>n.dataset?.pcRole==='forum-transfer');if(node){const p=downloadPresentation(getState(),'client');node.textContent=`Загрузка: ${p.receivedMb.toFixed(2)} / ${p.totalMb} МБ · ${p.speedKbPerSecond} КБ/с${p.error?' · '+softwareMessage(p.error):''}`;}}
  },dispose(){root.replaceChildren();}};
 }

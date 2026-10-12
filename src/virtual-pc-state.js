@@ -119,7 +119,6 @@ export function diskUsage(state) {
 export function setPcPower(state, power) {
   const normalized = normalizeSnapshot(state);
   if(power!=='on'&&power!=='off')return normalized;
-  if(normalized.software.task){normalized.software.task.baseMinute=null;normalized.software.task.baseBytes=normalized.software[normalized.software.task.appId].receivedBytes;}
   return {...normalized,power,lastGameMinute:null};
 }
 
@@ -135,14 +134,14 @@ export function startFtDownload(state) {
 
 export function cancelFtDownload(state) {
   const normalized = normalizeSnapshot(state);
-  return normalized.software.task?.appId==='ft'?cancelTransfer(normalized).state:normalized;
+  return normalized.software.transfers.ft?cancelTransfer(normalized,'ft').state:normalized;
 }
 
 export function markFtDownloadComplete(state) {
   const normalized = normalizeSnapshot(state);
-  return normalized.download.status === 'downloading'
-    ? withSoftware(normalized,{...normalized.software,ft:{...normalized.software.ft,receivedBytes:FT_STUDIO_BYTES},task:null})
-    : normalized;
+  if(normalized.download.status!=='downloading')return normalized;
+  delete normalized.software.transfers.ft;
+  return withSoftware(normalized,{...normalized.software,ft:{...normalized.software.ft,receivedBytes:FT_STUDIO_BYTES}});
 }
 
 export function installFtStudio(state) {
@@ -173,6 +172,7 @@ export function saveVirtualPcState(storage, state) {
     if(isRecord(parsed)&&parsed.version===1&&parsed.music?.genres?.version!==1)reserveGenreBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&parsed.creativeWork?.version!==1)reserveCreativeBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'battleSubmissions'))reserveSubmissionBackup(storage,raw);
+    if(isRecord(parsed)&&parsed.version===1&&parsed.software?.transferVersion!==2)reserveTransferBackup(storage,raw);
     storage.setItem(VIRTUAL_PC_STORAGE_KEY, JSON.stringify(normalizeSnapshot(state)));
     return true;
   } catch {
@@ -197,9 +197,13 @@ function reserveSubmissionBackup(storage,raw){
   if(storage.getItem(key)===null)storage.setItem(key,raw);
 }
 function restoredSnapshot(parsed){
-  const restored=createVirtualPcState(parsed),task=restored.software.task;
-  if(task){restored.lastGameMinute=null;task.baseMinute=null;task.baseBytes=restored.software[task.appId].receivedBytes;}
+  const restored=createVirtualPcState(parsed);
+  if(Object.keys(restored.software.transfers).length)restored.lastGameMinute=null;
   return restored;
+}
+function reserveTransferBackup(storage,raw){
+  const key=VIRTUAL_PC_STORAGE_KEY+'-before-parallel-transfers';
+  if(storage.getItem(key)===null)storage.setItem(key,raw);
 }
 
 export function loadVirtualPcState(storage) {
@@ -220,6 +224,9 @@ export function loadVirtualPcState(storage) {
     }
     if(!Object.hasOwn(parsed,'battleSubmissions')){
       try{reserveSubmissionBackup(storage,raw);}catch{return {ok:false,reason:'battle-submissions-backup-failed',state:restoredSnapshot(parsed)};}
+    }
+    if(parsed.software?.transferVersion!==2){
+      try{reserveTransferBackup(storage,raw);}catch{return {ok:false,reason:'parallel-transfers-backup-failed',state:restoredSnapshot(parsed)};}
     }
     return { ok: true, state: restoredSnapshot(parsed) };
   } catch {
