@@ -128,7 +128,7 @@ function normalizeSnapshot(value) {
     npcSocialProfiles:normalizeNpcSocialProfiles(source.npcSocialProfiles),
     rapAnalysis:normalizeRapAnalysis(source.rapAnalysis),
     rapDossier:normalizeDossier(source.rapDossier),
-    judgeDossier:normalizeJudgeDossier(source.judgeDossier),
+    roundThemes:normalizeRoundThemes(source.roundThemes),judgeDossier:normalizeJudgeDossier(source.judgeDossier),
     battleWindows:normalizeBattleWindows(source.battleWindows),
     socialRuntime:normalizeSocialRuntime(source.socialRuntime),
     communityAudio:normalizeCommunityAudio(source.communityAudio),
@@ -316,3 +316,4 @@ export function loadVirtualPcState(storage) {
     return { ok: false, state: createVirtualPcState() };
   }
 }
+import {normalizeRoundThemes} from './round-topics.js?rev=39';

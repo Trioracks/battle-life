@@ -39,3 +39,5 @@
 .sn-analysis-segments {display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px;margin-top:6px;font-size:10px}
 .sn-analysis-segments span {padding:6px 3px;background:#e1e6e8;overflow-wrap:anywhere}
 .sn-analysis-segments .selected {background:#496e80;color:white;font-weight:bold}
+.sn-round-cover { min-height:110px;display:flex;align-items:flex-end;padding:20px;background:linear-gradient(145deg,#293e44,#718078);color:#f4e8c5;border:5px solid #d4cbb7;box-sizing:border-box;font:700 26px Georgia,serif; }
+.sn-round-announcement>button { margin:4px 6px 4px 0; }

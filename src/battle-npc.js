@@ -30,7 +30,7 @@ export function ensureNpcRoundTrack(state,{characterId,battleId,roundId,nowMinut
  const skills=Object.fromEntries(Object.entries(person.skills).map(([k,v])=>[k,Math.round(clamp(v+form))]));
  const decisions=(targets,skill)=>targets.map(target=>skill<25?Math.floor(random()*11):Math.max(0,Math.min(10,Math.round(target+(random()*2-1)*(1-skill/100)*6))));
  // Work in an isolated production state: no player time, inventory or practice is changed.
- let work={projects:[],music:{needs:{satiety:100,energy:100},genres:{version:1,chosen:person.style==='experimental'?[]:[person.style],primary:person.style,xp:{[person.style]:Math.min(100,skills.beatmaking)}}},writing:{practice:0},recording:{practice:{flow:0,sound:0}}};
+ let work={roundThemes:state.roundThemes,tournaments:{byId:{[battleId]:{rounds:{[roundId]:{roundId,opensAt:0}}}}},projects:[],music:{needs:{satiety:100,energy:100},genres:{version:1,chosen:person.style==='experimental'?[]:[person.style],primary:person.style,xp:{[person.style]:Math.min(100,skills.beatmaking)}}},writing:{practice:0},recording:{practice:{flow:0,sound:0}}};
  const check=r=>{if(!r.ok)throw new Error(r.reason);return r.state;};
  const lyricId=key+':lyrics',beatId=key+':beat',day=Math.floor(nowMinute/1440)+1;
  try{

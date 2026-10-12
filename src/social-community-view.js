@@ -7,6 +7,8 @@ import {createSocialResultView} from './social-result-view.js?rev=39';
 import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=39';
 import {currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=39';
 import {publicTournamentTrackIds} from './battle-results-table.js?rev=39';
+import {publicRoundAnnouncements} from './round-topics.js?rev=39';
+import {createRoundAnnouncementView} from './round-announcement-view.js?rev=39';
 export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),navigate,commit,audio,expandedResults=new Set(),onResultViewed,onRegistered=()=>{}}){
  const c=communityById(id),root=el(d,'section',{className:'sn-community'});if(!c)return root;
  const state=getState(),subscribed=normalizeSocial(state.social).subscriptions.includes(id),header=el(d,'header',{className:'sn-community-header'});
@@ -18,13 +20,14 @@ export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),na
   const window=currentBattleWindow(state,c.battleId,metadataGameMinute(getMetadata()));
   root.append(socialButton(d,'Таблица судейства',()=>navigate('underweb://social/results/'+c.battleId+'/'+(window?.roundId??'selection'))));
   root.append(el(d,'p',{className:'sn-note',text:battleDeadlineLabel(window,metadataGameMinute(getMetadata())).text}));
-  const options={battleId:c.battleId,roundId:'selection'},known=battleKnowledgeHints(state.battleKnowledge,options);
+  const options={battleId:c.battleId,roundId:window?.roundId??'selection'},known=battleKnowledgeHints(state.battleKnowledge,options);
   side.append(socialHeading(d,'О площадке'),el(d,'p',{text:'Уверенность: '+known.confidence}));
   for(const hint of known.hints)side.append(el(d,'p',{className:'sn-note',text:hint}));
   side.append(socialButton(d,'Изучить площадку',()=>{const current=getState(),skills=getMetadata().skills;return commit({ok:true,state:{...current,battleKnowledge:revealBattleKnowledge(current.battleKnowledge,{...options,analysisSkill:skills?.analysis??skills?.intelligence??0,evidenceId:'rules:v1'})}});}));
  }
  side.append(socialHeading(d,'Участники',c.memberCount+Number(subscribed)));
  for(const id of c.members){const p=profileById(id);if(!p)continue;const member=el(d,'div',{className:'sn-member'});member.append(socialAvatar(d,p.avatar,p.name),socialButton(d,p.name,()=>navigate('underweb://social/profile/'+id),{className:'sn-link'}));side.append(member);}
+ for(const post of publicRoundAnnouncements(state,{battleId:c.battleId,nowMinute:metadataGameMinute(getMetadata())}).reverse())wall.append(createRoundAnnouncementView(d,post,{navigate}));
  const publicIds=publicTournamentTrackIds(state,{battleId:c.battleId,nowMinute:metadataGameMinute(getMetadata())}),versions=(state.communityAudio?.[id]??[]).filter(id=>!state.trackVersions?.byId?.[id]?.npc||publicIds.has(id));wall.append(socialHeading(d,'Работы текущего сезона',versions.length));
  for(const submission of state.battleSubmissions??[])if(submission.communityId===id&&submission.status!=='recovery')wall.append(createSocialResultView(d,{submission,getState,commit,expandedResults,onResultViewed}));
  for(const versionId of versions)wall.append(audio.row(d,{version:state.trackVersions?.byId?.[versionId]}));

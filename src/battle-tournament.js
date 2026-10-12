@@ -8,6 +8,8 @@ import {effectiveWritingSkill} from './lyric-production.js?rev=39';
 import {effectiveBeatSkill} from './beat-production.js?rev=39';
 import {effectiveVocalSkill} from './vocal-production.js?rev=39';
 import {validGameMinute} from './game-minute.js?rev=39';
+import {ensureRoundTheme} from './round-topics.js?rev=39';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=39';
 export const TOURNAMENT_ROUNDS=Object.freeze(['selection','round-2','round-3','round-4','round-5','final']);
 const clone=v=>structuredClone(v),record=v=>v!==null&&typeof v==='object'&&!Array.isArray(v),battleId=DEMO_BATTLE.battleId;
 function validRoundInternals(r){
@@ -32,7 +34,9 @@ export function ensureTournament(state,{battleId:id=battleId,nowMinute}={}){
  if(tournaments.recovery.some(r=>r.battleId===id))return fail('Сохранённый турнир требует восстановления.');
  const window=state.battleWindows?.find(w=>w.battleId===id&&w.roundId==='selection'&&!w.issue);if(!window)return fail('Сначала нужны сохранённые сроки отбора.');
  tournaments.byId[id]={battleId:id,policyVersion:2,seed:beatResultSeed(window.id+':'+window.opensAt),status:'active',currentRoundId:'selection',participantIds:DEMO_PARTICIPANTS.map(p=>p.characterId),rounds:{selection:newRound(window)},bracket:null,qualifiedIds:[],events:[],nextRoundAt:null,winnerId:null};
- return {ok:true,state:{...state,tournaments},reason:''};
+ const themed=ensureRoundTheme({...state,tournaments},{battleId:id,roundId:'selection',judgeIds:window.judgeIds,opensAt:window.opensAt,legacyTitle:BATTLE_BRIEFS.find(b=>b.id===id)?.theme});
+ if(themed.theme)tournaments.byId[id].events.push(eventFor(window,'round-announced',window.opensAt,{themeId:themed.theme.id,publicationKind:'round-organized',text:'Открыт отбор. Тема и сроки опубликованы.'}));
+ return {ok:true,state:themed.state,reason:''};
 }
 function historyEntry(round,participantId,status,at,trackVersionId=null){return {id:[battleId,round.roundId,participantId,status].join(':'),participantId,battleId,roundId:round.roundId,status,trackVersionId,resultId:null,occurredAt:at};}
 function eventFor(round,type,at,payload={}){return {id:[battleId,round.roundId,type].join(':'),battleId,communityId:battleId,roundId:round.roundId,type,dueAt:at,...payload};}
@@ -64,7 +68,8 @@ function announceNext(state,t,heroSkills){
   round.noShows[id]=decideNoShow({characterId:id,pairId:battleId+':'+roundId+':'+pair.nodeId,roundId,ownMean:npcMeanSkill(own),opponentMean:opponent?npcMeanSkill(opponent):npcMeanSkill(own),basePercent:other?DEMO_BATTLE.noShow.basePercent:0,seed:t.seed,isPlayer:id==='player'});
  }
  t.rounds[roundId]=round;t.currentRoundId=roundId;t.nextRoundAt=null;
- return {state:{...state,battleWindows:[...(state.battleWindows??[]),window]},round};
+ const themed=ensureRoundTheme({...state,battleWindows:[...(state.battleWindows??[]),window]},{battleId,roundId,judgeIds,opensAt});
+ return {state:themed.state,round};
 }
 export function advanceTournament(input,nowMinute,{heroSkills={}}={}){
  const unchanged={state:input,events:[],changed:false};if(!validGameMinute(nowMinute))return unchanged;
@@ -73,7 +78,7 @@ export function advanceTournament(input,nowMinute,{heroSkills={}}={}){
  try{
   for(let steps=0;steps<TOURNAMENT_ROUNDS.length*2;steps++){
    let round=t.rounds[t.currentRoundId];
-   if(round.status==='complete'&&t.nextRoundAt!==null&&t.nextRoundAt<=nowMinute){const next=announceNext(state,t,heroSkills);if(!next)break;state=next.state;round=next.round;changed=true;addEvent(t,eventFor(round,'round-announced',round.opensAt,{text:'Объявлены новые пары. Приём работ открыт на семь дней.'}),events);}
+   if(round.status==='complete'&&t.nextRoundAt!==null&&t.nextRoundAt<=nowMinute){const next=announceNext(state,t,heroSkills);if(!next)break;state=next.state;round=next.round;changed=true;addEvent(t,eventFor(round,'round-announced',round.opensAt,{themeId:state.roundThemes?.[battleId+':'+round.roundId]?.id,publicationKind:'round-organized',text:'Объявлены новые пары. Приём работ открыт на семь дней.'}),events);}
    if(round.status==='accepting'&&round.closesAt<=nowMinute){state=closeRound(state,t,round);changed=true;addEvent(t,eventFor(round,'round-closed',round.closesAt,{text:'Приём работ закрыт. Начинается судейство.'}),events);}else break;
    // Only the judging clock may complete the round. Never invent a winner here.
    if(round.status==='awaiting_judges')break;
