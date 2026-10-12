@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "battleId": "makarevich-1",
+  "sourceUrl": "https://docs.google.com/spreadsheets/d/169iocNcf92Ay2we8zweD-AkuxRYPRNMZxS1yhqwQmTo/edit?gid=215411653",
+  "retrieved": "2026-10-12",
+  "inputs": [
+    {
+      "path": "battle-judging-source.json",
+      "sha256": "022c9c088c5d5af2147b69da4d36f29d1895a64623bad0ab4fd6a2ce65126218"
+    },
+    {
+      "path": "battle-judging-analysis.json",
+      "sha256": "00ff278bd573305d9c286d056f49eb85e781ed4b8860ab3e7add4018c49bc2dd"
+    },
+    {
+      "path": "battle-participants-source.json",
+      "sha256": "a6b98d59cc150c84d1da4cac103f21ad87ed255316a45612fe3f2b56f55bc6e3"
+    },
+    {
+      "path": "judge-observations.json",
+      "sha256": "66c793e9afa46a007c88965067a17230965efd81df5124d33840d955f69e1964"
+    },
+    {
+      "path": "judge-review-corpus.json",
+      "sha256": "300b2e5d5cd8f8163022065c88ab122943329c2af38904cb6dfeb5f147e22833"
+    },
+    {
+      "path": "judge-comment-attribution.json",
+      "sha256": "a50a86458c6422e3bce0b7a98d7ff916b399b216cfbe0fc1f98b5a7a59543901"
+    },
+    {
+      "path": "judge-profiles.json",
+      "sha256": "5778c0da687190955336b111133a04d4ed8e3a87107226c61d7a8c0f7f020b8d"
+    },
+    {
+      "path": "../../demo-opponent-pool-v0.1.json",
+      "sha256": "3191b8f5e115eb4efb35a5d5dbe0fdc42df16de8e3dd027b363c08468fc1b826"
+    }
+  ],
+  "archiveSha256": "fe0971d8db31392b341f3860b5481edba17ac157a02ef5f19b285a2208f31fa6",
+  "counts": {
+    "rounds": 6,
+    "participations": 263,
+    "rawNotes": 1430,
+    "canonicalReviews": 1031,
+    "generalNotes": 6
+  }
+}
