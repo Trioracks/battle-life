@@ -1,5 +1,6 @@
 import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=34';
 import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=34';
+import {normalizeCreativeWork} from './creative-workflow.js?rev=34';
 import {normalizeRecordingState} from './vocal-production.js?rev=34';
 import {normalizeCommunity} from './underweb-community.js?rev=34';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=34';
@@ -44,8 +45,11 @@ export function layoutDesktopIcons(ids,positions,{width,height}) {
 }
 
 function normalizeProject(value) {
-  if(value?.kind==='lyrics')return normalizeLyric(value);
-  if(value?.kind==='beat')return normalizeBeat(value);
+  if(value?.recoveryIssue&&value.recoveryData)return clone(value);
+  if(value?.kind==='lyrics'||value?.kind==='beat'){
+    const valid=value.kind==='lyrics'?normalizeLyric(value):normalizeBeat(value);
+    return valid??{id:typeof value.id==='string'?value.id:'recovered-project',kind:value.kind,name:value.name??'Повреждённый проект',recoveryIssue:'Не удалось прочитать проект. Исходные данные сохранены.',recoveryData:clone(value)};
+  }
   return isRecord(value) && typeof value.id === 'string' && value.id.trim() ? clone(value) : null;
 }
 
@@ -79,6 +83,7 @@ function normalizeSnapshot(value) {
     download: normalizeDownload(source.download),
     projects,
     music,writing,recording,
+    creativeWork:normalizeCreativeWork(source.creativeWork,projects),
     community:normalizeCommunity(source.community),
     household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),
@@ -164,6 +169,7 @@ export function saveVirtualPcState(storage, state) {
     let parsed;try{parsed=raw?JSON.parse(raw):null;}catch{/* A fresh game may replace an unreadable save, as before. */}
     if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'household'))reserveHouseholdBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&parsed.music?.genres?.version!==1)reserveGenreBackup(storage,raw);
+    if(isRecord(parsed)&&parsed.version===1&&parsed.creativeWork?.version!==1)reserveCreativeBackup(storage,raw);
     storage.setItem(VIRTUAL_PC_STORAGE_KEY, JSON.stringify(normalizeSnapshot(state)));
     return true;
   } catch {
@@ -177,6 +183,10 @@ function reserveHouseholdBackup(storage,raw){
 }
 function reserveGenreBackup(storage,raw){
   const key=VIRTUAL_PC_STORAGE_KEY+'-before-genres';
+  if(storage.getItem(key)===null)storage.setItem(key,raw);
+}
+function reserveCreativeBackup(storage,raw){
+  const key=VIRTUAL_PC_STORAGE_KEY+'-before-creative-work';
   if(storage.getItem(key)===null)storage.setItem(key,raw);
 }
 function restoredSnapshot(parsed){
@@ -197,6 +207,9 @@ export function loadVirtualPcState(storage) {
     }
     if(parsed.music?.genres?.version!==1){
       try{reserveGenreBackup(storage,raw);}catch{return {ok:false,reason:'genre-backup-failed',state:restoredSnapshot(parsed)};}
+    }
+    if(parsed.creativeWork?.version!==1){
+      try{reserveCreativeBackup(storage,raw);}catch{return {ok:false,reason:'creative-work-backup-failed',state:restoredSnapshot(parsed)};}
     }
     return { ok: true, state: restoredSnapshot(parsed) };
   } catch {

@@ -61,7 +61,7 @@ export function createBeat(input,options={},skills={},random=Math.random){
   audio:{bankVersion:1,bars:4,themeId:parts.themeId,arrangementId:parts.arrangementId}});
  s.projects.push(beat);s.music.activeBeatId=id;return result(s);
 }
-export function startBeatStage(input,id,values,skills={},random=Math.random){
+export function startBeatStage(input,id,values,skills={},random=Math.random,plan=null){
  if(input.recording?.job)return result(input,false,'Сначала заверши запись.');
  const s=normalized(input),beat=normalizeBeat(s.projects.find(p=>p.id===id)),blocked=workBlockReason(s);
  if(input.writing?.job)return result(s,false,'Сначала закончи текущий текст.');
@@ -70,11 +70,12 @@ export function startBeatStage(input,id,values,skills={},random=Math.random){
  if(beat.audioIssue)return result(s,false,'Не найден аудиобанк проекта. Работа сохранена.');
  if(s.music.job&&s.music.job.beatId!==id)return result(s,false,'Сначала закончи текущую работу.');
  if(!s.music.job){
-  const v=values===undefined?Array.from({length:3},()=>Math.floor(clamp(random(),0,.999999)*11)):sliders(values);
+  const v=plan?sliders(plan.sliders):values===undefined?Array.from({length:3},()=>Math.floor(clamp(random(),0,.999999)*11)):sliders(values);
   if(!v)return result(s,false,'Этот этап недоступен.');
   const skill=effectiveBeatSkill(s,skills);
   const genreProfile=genreSnapshot(s.music.genres,beat.genreProfile?.id??'experimental');
   s.music.job={beatId:id,stage:beat.stages.length,sliders:v,total:Math.round(R.stageMinutes[beat.stages.length]*Math.max(.55,1-skill*.003)*(s.music.infected?1.35:1)),elapsed:0,skill,genreSkill:genreProfile.xp,genreProfile,practiceCredit:0,genreCredit:0};
+  if(Number.isFinite(plan?.total)&&plan.total>0&&plan.total<=600)s.music.job.total=plan.total;
   if(beat.mix?.version===2){
    const profile=beat.genre===BEAT_PRACTICE.id?BEAT_PRACTICE:genreById(beat.genre);
    beat.mix.layers[beat.stages.length]=createBeatResult({seed:beat.mix.seed,stage:beat.stages.length,skills:{beatmaking:skill,sound:effectiveSoundSkill(s,skills)},sliders:v,targets:profile.targets[beat.stages.length],...(beat.genreProfile?{genreProfile}:{})});

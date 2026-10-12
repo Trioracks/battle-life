@@ -47,7 +47,7 @@ export function createLyric(input,options={},skills={},random=Math.random){
  const day=validDay(options.gameDay),p=normalizeLyric({schemaVersion:1,kind:'lyrics',id,name,battleId:battle?.id,seed:Math.floor(clamp(random(),0,.999999999)*4294967296),revision:1,createdDay:day,updatedDay:day,stages:[],sections:[],additions:[]});
  s.projects.push(p);s.writing.activeTextId=id;return outcome(s);
 }
-export function startLyricWork(input,{projectId,kind='stage',sliders,beatId,gameDay=1}={},skills={},random=Math.random){
+export function startLyricWork(input,{projectId,kind='stage',sliders,beatId,gameDay=1}={},skills={},random=Math.random,plan=null){
  if(input.recording?.job)return {state:input,ok:false,reason:'Сначала заверши запись.'};
  // Check the raw other job before normalization can discard unknown older projects.
  if(input.music?.job)return outcome(input,false,'Сначала закончи работу над битом.');
@@ -60,9 +60,9 @@ export function startLyricWork(input,{projectId,kind='stage',sliders,beatId,game
  if(kind==='chorus'&&p.battleId==='open-mic-17')return outcome(s,false,'В этом баттле требуется история без припева.');
  const beat=normalizeBeat(s.projects.find(b=>b.id===beatId));
  if(kind==='adapt'&&(!beat||beat.status!=='ready'))return outcome(s,false,'Выбери готовый бит.');
- const skill=effectiveWritingSkill(s,skills),v=skill<25||sliders===undefined?Array.from({length:3},()=>Math.floor(clamp(random(),0,.999999)*11)):values(sliders);
+ const skill=effectiveWritingSkill(s,skills),v=plan?values(plan.sliders):skill<25||sliders===undefined?Array.from({length:3},()=>Math.floor(clamp(random(),0,.999999)*11)):values(sliders);
  if(!v)return outcome(s,false,'Проверь настройки этапа.');
- s.writing.job={projectId,kind,stage:p.stages.length,baseRevision:p.revision,sliders:v,total:kind==='stage'?60:45,elapsed:0,skill,practiceCredit:0,gameDay:validDay(gameDay),beatId:kind==='adapt'?beat.id:null};s.writing.activeTextId=projectId;return outcome(s);
+ s.writing.job={projectId,kind,stage:p.stages.length,baseRevision:p.revision,sliders:v,total:Number.isFinite(plan?.total)&&plan.total>0&&plan.total<=600?plan.total:kind==='stage'?60:45,elapsed:0,skill,practiceCredit:0,gameDay:validDay(gameDay),beatId:kind==='adapt'?beat.id:null};s.writing.activeTextId=projectId;return outcome(s);
 }
 function makeSections(p){
  const phase=p.stages.length,baseLevel=p.stages.reduce((n,s)=>n+s.quality,0)/Math.max(1,phase),adapted=p.adaptation?Math.min(12,p.adaptation.skill*.15):0,baseCraft=Math.min(100,baseLevel+adapted);

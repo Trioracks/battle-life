@@ -24,7 +24,7 @@
 - Switching projects after pausing preserves the first project — A1–A2.
 - Stored prose/word errors survive normalization without becoming poetry — A3.
 
-## Task A1 Persisted plans and pause
+## Task 1 A1 Persisted plans and pause
 
 **Files:** create `src/creative-workflow.js`, `test/creative-workflow.test.js`, `test/helpers/creative-fixtures.js`; modify `src/beat-production.js`, `src/lyric-production.js`, `src/virtual-pc-state.js`, `test/virtual-pc-recovery.test.js`.
 
@@ -36,7 +36,7 @@
 - [ ] Rerun to PASS; test idempotent repeated normalization and JSON round-trip. A paused project can be resumed after working on another; conflicting active work fails without losing either.
 - [ ] Commit `feat: persist resumable creative workflows` with only task files.
 
-## Task A2 Continuous runtime and two progress bars
+## Task 2 A2 Continuous runtime and two progress bars
 
 **Files:** modify `src/home-creative-work.js`, `src/apartment-app.js`, `src/beat-studio-view.js`, `src/rap-notebook-view.js`, `src/beat-work-view.js`, `src/virtual-pc-ui.js`, `apartment-v3.css`; create `test/creative-chain-runtime.test.js`; extend `test/beat-work-view.test.js`, `test/studio-immersion.test.js`.
 
@@ -48,7 +48,7 @@
 - [ ] Rerun to PASS; check zero/negative/NaN delta, repeated cancellation, reload during every stage, credits at skill100 and exact-boundary hunger. UI resumes the same project and shows partial stage progress before starting.
 - [ ] Commit `feat: run text and beat stages continuously`.
 
-## Task A3 Novice prose and clear actions
+## Task 3 A3 Novice prose and clear actions
 
 **Files:** modify `src/lyric-production.js`, `src/rap-notebook-view.js`, `rap-notebook.css`, `src/beat-studio-view.js`; extend `test/lyric-draft.test.js`, `test/rap-notebook-view.test.js`, `test/genre-ui.test.js`.
 

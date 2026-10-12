@@ -37,7 +37,7 @@
 
 Пересекающиеся `src/virtual-pc-state.js`, `src/virtual-pc-ui.js`, `src/apartment-app.js` изменять последовательно. Рекомендуемый способ — Native: один исполнитель в этой сессии и независимое ревью всей ветки в конце.
 
-## Task E1 Проверка полного пути и доставка
+## Task 1 E1 Проверка полного пути и доставка
 
 **Files:** создать `test/sloboda-track-journey.test.js`, `docs/qa/2026-10-12-sloboda-track-patch.md`; изменить `test/client-module-version.test.js`, `index.html` и ссылки на изменённые модули/стили.
 
