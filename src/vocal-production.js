@@ -26,6 +26,7 @@ export function normalizeRecordingState(value,projects=[]){
 export const effectiveVocalSkill=(s,skills={},kind='draft')=>{const k=VOCAL_STAGES[kind]?.skill??'flow';return k==='sound'?effectiveSoundSkill(s,skills):clampV((skills[k]??10)+(s.recording?.practice?.[k]??0));};
 const normalized=input=>{const projects=(input.projects??[]).map(p=>p.kind==='beat'&&!p.recoveryIssue?normalizeBeat(p):p).filter(Boolean);return {...input,projects,music:normalizeMusic(input.music,projects),recording:normalizeRecordingState(input.recording,projects)};};
 export function startVocalWork(input,{beatId,textId,kind='draft',sliders}={},skills={},random=Math.random){
+ if(input.rapAnalysis?.job?.status==='active')return {ok:false,state:input,reason:'Сначала приостанови изучение трека.'};
  const s=normalized(input),fail=reason=>({ok:false,reason,state:s}),beat=s.projects.find(p=>p.id===beatId&&p.kind==='beat');
  if(input.music?.job||input.writing?.job)return fail('Сначала заверши текущую работу.');
  if(beat?.audioIssue==='retired-source')return fail(RETIRED_DRUM_MESSAGE);

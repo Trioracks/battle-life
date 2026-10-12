@@ -55,5 +55,7 @@ export function createBeatWorkPanel(document,{onCancel=()=>{},onEnableAudio=()=>
   for(const key of ['satiety','energy']){const value=Math.max(0,Math.min(100,values[key]??0));nodes[key].value=value;nodes[key+'-value'].textContent=String(Math.round(value));}
   audioStatus.textContent=audioError||(needsGesture?'Звук приостановлен':writing?'Слышно, как герой печатает на клавиатуре':vocal?'Бит и вокал · '+vocal.name:'Сейчас звучит партия этого этапа');
   enable.hidden=!needsGesture&&!audioError;cancel.hidden=complete;
+  const studying=beat?.kind==='study'||job?.kind==='study';training.hidden=studying;
+  if(studying){title.textContent=beat?.name??'Изучение трека';stage.textContent='ИЗУЧЕНИЕ · 45 игровых минут';root.setAttribute('aria-label','Изучение трека');progress.setAttribute('aria-label','Изучение трека');genreRow.remove();reward.hidden=!finished;reward.textContent=finished?'Разбор сохранён'+(earned>0?' · новый источник наслушанности':''):'';audioStatus.textContent='Герой разбирает сохранённую запись';enable.hidden=true;}
  },dispose(){root.remove();}};
 }

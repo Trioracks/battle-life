@@ -4,7 +4,10 @@ import {advanceLyricWork,effectiveWritingSkill} from './lyric-production.js?rev=
 import {BEAT_RULES} from './beat-catalog.js?rev=39';
 import {advanceVocalWork,effectiveVocalSkill} from './vocal-production.js?rev=39';
 import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=39';
+import {advanceStudy} from './rap-analysis.js?rev=39';
+import {gameMinuteStamp} from './game-minute.js?rev=39';
 export function creativeWorkDescriptor(state,skills={}){
+ if(state.rapAnalysis?.job?.status==='active'){const job=state.rapAnalysis.job;return {studying:true,writing:false,recording:false,job,project:{id:job.id,kind:'study',name:job.trackName},performance:'typing',chainProgress:null,skill:job.heroSnapshot.intelligence};}
  const writing=Boolean(state.writing?.job),recording=!writing&&Boolean(state.recording?.job),job=writing?state.writing.job:recording?state.recording.job:state.music?.job;
  const id=writing?job?.projectId:job?.beatId,project=state.projects.find(p=>p.id===id);
  return {writing,recording,job,project,performance:recording&&['draft','clean'].includes(job.kind)?'rapping':'typing',chainProgress:state.creativeWork?.activeId===id?creativeChainProgress(state,id):null,skill:writing?effectiveWritingSkill(state,skills):recording?effectiveVocalSkill(state,skills,job.kind):effectiveBeatSkill(state,skills)};
@@ -12,6 +15,7 @@ export function creativeWorkDescriptor(state,skills={}){
 export function advanceCreativeWork(state,seconds,clock=null,skills={}){
  let descriptor=creativeWorkDescriptor(state,skills);
  if(!descriptor.job||!Number.isFinite(seconds)||seconds<=0)return {state,minutes:0,finished:false,blocked:false,practiceGained:0,stageFinished:false};
+ if(descriptor.studying){const request=Math.min(seconds*descriptor.job.total/BEAT_RULES.workSeconds,descriptor.job.total-descriptor.job.elapsed),start=gameMinuteStamp(clock)??descriptor.job.startedAt+descriptor.job.elapsed;return advanceStudy(state,{gameMinutes:request,nowMinute:start+request});}
  const projectId=descriptor.project?.id,chain=state.creativeWork?.activeId===projectId;
  const key=descriptor.writing?'writing':'music',before=state[key]?.practice??0;
  let remaining=seconds,minutes=0,stageFinished=false,practiceGained=0,finished=false,blocked=false,reason='';

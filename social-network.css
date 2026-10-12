@@ -34,3 +34,8 @@
 .bt-track{border-top:1px solid #dce2e8;padding:14px 0;margin-top:14px}
 .bt-review{margin:10px 0;padding:10px 14px;border-left:3px solid #96acbd;background:#f3f6f9}
 .bt-review p{white-space:pre-wrap}
+.sn-analysis-report {margin:12px 0;padding:14px;background:#f4f4ea;border:1px solid #b9c6cc;color:#36505e}
+.sn-analysis-aspect {margin:10px 0}
+.sn-analysis-segments {display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px;margin-top:6px;font-size:10px}
+.sn-analysis-segments span {padding:6px 3px;background:#e1e6e8;overflow-wrap:anywhere}
+.sn-analysis-segments .selected {background:#496e80;color:white;font-weight:bold}

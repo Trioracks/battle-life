@@ -12,7 +12,7 @@ export function backgroundAudioDescriptor(item){
  const parts=chooseBeginnerParts(()=>((item.seed??0)*37%997)/997);
  return {key:'social-background:'+item.id,owner:'social',durationSeconds:32/3,parts:Object.values(parts).map(id=>({id,loopSeconds:32/3})),mix:null};
 }
-export function createSocialAudio(audio,{getState,getMetadata,navigate}={}){
+export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze}={}){
  let disposed=false,generation=0;const listeners=[];
  const button=(d,text,handler,options)=>{const node=socialButton(d,text,handler,options);listeners.push([node,handler]);return node;};
  const stop=()=>{generation++;audio?.stop?.();};
@@ -39,6 +39,7 @@ export function createSocialAudio(audio,{getState,getMetadata,navigate}={}){
      catch{if(!disposed&&token===generation)status.textContent='Не удалось воспроизвести бит.';}
     },{attributes:{'aria-label':'Предпросмотр бита — без голоса'}}));
    }
+   if(version&&onAnalyze)row.append(button(d,'Изучить трек · 45 мин',()=>onAnalyze({trackVersionId:version.id,reviewIds:[]})));
    return row;
   },stop,dispose(){disposed=true;generation++;for(const [node,handler]of listeners)node.removeEventListener('click',handler);listeners.length=0;}
  };

@@ -72,6 +72,7 @@ export function createLyricContentRevision(input,{projectId,id,gameDay=1}={},ski
  return r;
 }
 export function startLyricWork(input,{projectId,kind='stage',sliders,beatId,gameDay=1}={},skills={},random=Math.random,plan=null){
+ if(input.rapAnalysis?.job?.status==='active')return {ok:false,state:input,reason:'Сначала приостанови изучение трека.'};
  if(input.recording?.job)return {state:input,ok:false,reason:'Сначала заверши запись.'};
  // Check the raw other job before normalization can discard unknown older projects.
  if(input.music?.job)return outcome(input,false,'Сначала закончи работу над битом.');

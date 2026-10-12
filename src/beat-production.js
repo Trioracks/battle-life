@@ -65,6 +65,7 @@ export function createBeat(input,options={},skills={},random=Math.random){
  s.projects.push(beat);s.music.activeBeatId=id;return result(s);
 }
 export function startBeatStage(input,id,values,skills={},random=Math.random,plan=null){
+ if(input.rapAnalysis?.job?.status==='active')return result(input,false,'Сначала приостанови изучение трека.');
  if(input.recording?.job)return result(input,false,'Сначала заверши запись.');
  const s=normalized(input),beat=normalizeBeat(s.projects.find(p=>p.id===id)),blocked=workBlockReason(s);
  if(input.writing?.job)return result(s,false,'Сначала закончи текущий текст.');

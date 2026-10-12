@@ -23,6 +23,7 @@ import {createLyricWorkAudio} from './lyric-work-audio.js?rev=39';
 import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.js?rev=39';
 import {workCameraFrame} from './work-camera.js?rev=39';
 import {pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=39';
+import {pauseStudy} from './rap-analysis.js?rev=39';
 import {effectiveVocalSkill} from './vocal-production.js?rev=39';
 import {effectiveWritingSkill} from './lyric-production.js?rev=39';
 import {consumeFood} from './home-food.js?rev=39';
@@ -133,7 +134,7 @@ try{
     const textSound=lyricWorkAudio.sync({phase:writing?phase:'idle',hidden,job:writing?job:null});return writing?textSound:beatSound;
   };
   const workPanel=createBeatWorkPanel(document,{
-    onCancel:()=>{if(pcLifecycle.finishWork({blocked:true})){pcState=pauseCreativeChain(pcState);virtualPc.syncState(pcState);syncWorkAudio();saveHomeTime(storage,homeTime);persistPc(pcState);}},
+    onCancel:()=>{if(pcLifecycle.finishWork({blocked:true})){pcState=pauseStudy(pauseCreativeChain(pcState));virtualPc.syncState(pcState);syncWorkAudio();saveHomeTime(storage,homeTime);persistPc(pcState);}},
     onEnableAudio:()=>pcState.writing.job?lyricWorkAudio.enableAudio():workAudio.enableAudio(),
   });
   const workHud=workPanel.element;workHud.hidden=true;document.body.append(workHud);let lastWorkSave=0;

@@ -21,6 +21,7 @@ export function normalizeCreativeWork(value,projects=[]){
 
 export function startCreativeChain(input,{kind,projectId,stageSliders,gameDay=1}={},skills={},random=Math.random){
  const fail=reason=>({state:input,ok:false,reason});
+ if(input.rapAnalysis?.job?.status==='active')return fail('Сначала приостанови изучение трека.');
  const p=input.projects?.find(p=>p.id===projectId&&p.kind===kind);
  if(!p||p.recoveryIssue||!['beat','lyrics'].includes(kind)||p.stages?.length>=3)return fail('Эта работа недоступна.');
  if(kind==='beat'&&normalizeBeat(p)?.audioIssue==='retired-source')return fail(RETIRED_DRUM_MESSAGE);

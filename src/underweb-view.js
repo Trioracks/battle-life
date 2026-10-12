@@ -17,7 +17,7 @@ import {showRegistrationNotice} from './social-dom.js?rev=39';
 import {publicRoundTable,ROUND_LABELS} from './battle-results-table.js?rev=39';
 const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-control '+(options.className??'')},fn);
 
-export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,onSubmitTrack=()=>{},onResultViewed=()=>{},getSoftwareMessage=()=>'',isVisible=()=>true}){
+export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,onWork=()=>false,onSubmitTrack=()=>{},onResultViewed=()=>{},getSoftwareMessage=()=>'',isVisible=()=>true}){
  let socialView=null,closeRegistration=null,lastWindows='';
  const windowSignature=()=>JSON.stringify((getState().battleWindows??[]).map(w=>[w.id,battleDeadlineLabel(w,metadataGameMinute(getMetadata()))]));
  const d=root.ownerDocument,history=['underweb://iskra'];let index=0,route=resolveUnderweb(history[0],getMetadata()),applicationOpen=false,lastApplications='',applicationFocus=null,lastSoftware='',lastDay=0;
@@ -144,7 +144,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   socialView?.dispose();socialView=null;
   if(route.type==='social'){
    const host=el(d,'div');page.replaceChildren(host);
-   socialView=mountSocial(host,{route,getState,getMetadata,onChange,navigate,audio,onResultViewed,isVisible});
+   socialView=mountSocial(host,{route,getState,getMetadata,onChange,navigate,audio,onWork,onResultViewed,isVisible});
   }else
   page.replaceChildren(route.type.startsWith('news')?createNewsPage(d,{route,navigate}):route.type.startsWith('forum')?createCommunityView(d,{route,getState,getMetadata,onChange,navigate}):['samples','ripline'].includes(route.type)?createBeatMarket(d,{getState,onChange,audio,navigate,ripline:route.type==='ripline'}):route.type==='home'?homePage():route.type==='search'?resultsPage():route.type==='battles'?catalogPage():route.type==='battle'?detailPage():route.type==='dump'?softwareForum(d,{topic:route.topic,state:getState(),navigate,onAction:onSoftware,message:getSoftwareMessage()}):el(d,'p',{className:'uw-error',text:route.message}));
   lastSoftware=softwareSignature();lastWindows=windowSignature();

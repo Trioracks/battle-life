@@ -19,6 +19,7 @@ import {normalizeTournaments} from './battle-tournament.js?rev=39';
 import {normalizeBattleHistory} from './battle-history.js?rev=39';
 import {encodePcSave,decodePcSave} from './pc-save-codec.js?rev=39';
 import {normalizeNpcSocialProfiles} from './npc-social-profiles.js?rev=39';
+import {normalizeRapAnalysis} from './rap-analysis.js?rev=39';
 import {drumById} from './beat-catalog.js?rev=39';
 import {normalizeCommunity} from './underweb-community.js?rev=39';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=39';
@@ -123,6 +124,7 @@ function normalizeSnapshot(value) {
     community:normalizeCommunity(source.community),
     social:normalizeSocial(source.social),
     npcSocialProfiles:normalizeNpcSocialProfiles(source.npcSocialProfiles),
+    rapAnalysis:normalizeRapAnalysis(source.rapAnalysis),
     battleWindows:normalizeBattleWindows(source.battleWindows),
     socialRuntime:normalizeSocialRuntime(source.socialRuntime),
     communityAudio:normalizeCommunityAudio(source.communityAudio),
