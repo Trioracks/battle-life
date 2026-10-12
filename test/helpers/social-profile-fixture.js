@@ -1,0 +1,2 @@
+import {tableFixture} from './tournament-table-fixture.js';
+export function opponentFixture(){const s=tableFixture(),t=s.tournaments.byId['makarevich-1'];t.rounds['round-2']={...t.rounds.selection,id:'makarevich-1:round-2:1',roundId:'round-2',opensAt:13440,closesAt:23520,completedAt:null,status:'accepting',judgeBatches:{},submissions:{},pairs:[{nodeId:'pair',participantIds:['player','mak-npc-01']}]};t.currentRoundId='round-2';t.events=[{id:'announce',type:'round-announced',roundId:'round-2',dueAt:13440}];return s;}
