@@ -4,9 +4,27 @@ import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=28';
 import {createVirtualPcState,diskUsage,loadVirtualPcState} from '../src/virtual-pc-state.js?rev=28';
 import {advanceVirtualPc} from '../src/virtual-pc-runtime.js?rev=28';
 import {mountInstaller} from '../src/pc-software-view.js?rev=28';
+import {softwareForum} from '../src/pc-software-view.js';
+import {SOFTWARE} from '../src/pc-software-catalog.js';
 import * as software from '../src/pc-software.js?rev=28';
 import {pcDocument,findButton,allPc,fire} from './helpers/virtual-pc-dom.js';
 function setup(){const d=pcDocument(),root=d.createElement('section'),pc=mountVirtualPc(root);pc.showDesktop(createVirtualPcState({power:'on'}));pc.open('underweb');pc.navigateUnderweb('underweb://dump');return {pc,root,d};}
+test('tracker opens available software immediately with categories and three own release posters',()=>{
+ const d=pcDocument(),state=createVirtualPcState({power:'on'}),navigate=()=>{},onAction=()=>{};
+ const home=softwareForum(d,{state,navigate,onAction});
+ assert.ok(allPc(home).some(n=>n.className==='dump-categories'));
+ assert.ok(allPc(home).some(n=>n.getAttribute?.('aria-current')==='page'&&n.textContent==='Доступный софт'));
+ for(const title of ['torent — торрент-клиент','FT Studio — домашняя студия','Рэпблокнот — тексты и рифмы'])assert.ok(findButton(home,title));
+ for(const [topic,id]of [['client','client'],['ft-studio','ft'],['notebook','notebook']]){
+  const calls=[],page=softwareForum(d,{topic,state,navigate,onAction:(...a)=>calls.push(a)});
+  const poster=allPc(page).find(n=>n.className==='dump-release-poster');assert.ok(poster,topic);
+  assert.ok(allPc(poster).some(n=>n.tagName==='IMG'&&n.getAttribute('src').endsWith('/'+SOFTWARE[id].iconId+'.svg')));
+  assert.ok(allPc(page).some(n=>n.textContent==='Загрузка: '+SOFTWARE[id].downloadBytes/1000000+' МБ'));
+  assert.ok(allPc(page).some(n=>n.textContent==='После установки: '+SOFTWARE[id].installedBytes/1000000+' МБ'));
+  const label=id==='client'?'Скачать установщик torent':'Скачать '+SOFTWARE[id].torrent;
+  findButton(page,label).click();assert.equal(calls[0][0],id==='client'?'download-client':'download-metadata');
+ }
+});
 function click(root,name){const b=findButton(root,name);assert.ok(b,'Missing '+name);b.click();}
 function wizard(root,pc){root=pc.shell.getContentRoot('installer');for(const name of ['Далее >','Далее >','Установить'])click(root,name);pc.syncState(software.advanceInstallation(pc.state,pc.state.software.installer.appId==='client'?10:30).state);click(root,'Готово');}
 test('opening the installer cancels a pending FT launch and preserves its keyboard scope',()=>{

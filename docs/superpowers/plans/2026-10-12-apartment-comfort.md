@@ -25,7 +25,7 @@
 - Teleport/fade/pause/new game never emit accumulated bursts — D2.
 - Visible shelf heading does not displace third food slot on narrow screens — D2.
 
-## Task D1 Framing and waking
+## Task 1 D1 Framing and waking
 
 **Files:** modify `src/apartment-v3-camera.js`, `src/apartment-app.js`, where needed `src/apartment-v3-new-game.js`; tests `test/apartment-v3-camera-comfort.test.js`, `test/apartment-new-game.test.js`, `test/apartment-shared-scene.test.js`.
 
@@ -37,7 +37,7 @@
 - [ ] Rerun to PASS; visually inspect bed/desk/kitchen, windows, adjacent room, small/wide screens and mode switches. Record before/after framing in QA; numeric correctness alone does not prove comfortable framing.
 - [ ] Commit `fix: balance apartment framing and wake camera`.
 
-## Task D2 Softer footsteps and shelf labels
+## Task 2 D2 Softer footsteps and shelf labels
 
 **Files:** modify `src/indoor-footsteps.js`, `src/apartment-app.js`, `src/home-needs-view.js`, `apartment-v3.css`; create `src/footstep-cadence.js`, `test/footstep-cadence.test.js`; extend `test/indoor-footsteps.test.js`, `test/home-needs-view.test.js`.
 
