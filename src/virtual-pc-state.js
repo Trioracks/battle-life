@@ -128,7 +128,7 @@ function normalizeSnapshot(value) {
     npcSocialProfiles:normalizeNpcSocialProfiles(source.npcSocialProfiles),
     rapAnalysis:normalizeRapAnalysis(source.rapAnalysis),
     rapDossier:normalizeDossier(source.rapDossier),
-    roundThemes:normalizeRoundThemes(source.roundThemes),judgeDossier:normalizeJudgeDossier(source.judgeDossier),
+    socialReactions:normalizeSocialReactions(source.socialReactions),roundThemes:normalizeRoundThemes(source.roundThemes),judgeDossier:normalizeJudgeDossier(source.judgeDossier),
     battleWindows:normalizeBattleWindows(source.battleWindows),
     socialRuntime:normalizeSocialRuntime(source.socialRuntime),
     communityAudio:normalizeCommunityAudio(source.communityAudio),
@@ -317,3 +317,4 @@ export function loadVirtualPcState(storage) {
   }
 }
 import {normalizeRoundThemes} from './round-topics.js?rev=39';
+import {normalizeSocialReactions} from './social-reactions.js?rev=39';

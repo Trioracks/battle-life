@@ -5,6 +5,8 @@ import {createForumArchiveView} from './underweb-forum-archive-view.js?rev=39';
 import {publicRoundAnnouncements} from './round-topics.js?rev=39';
 import {metadataGameMinute} from './social-registration.js?rev=39';
 import {createRoundAnnouncementView} from './round-announcement-view.js?rev=39';
+import {publicSeedingPosts} from './social-reactions.js?rev=39';
+import {createPostReactionsView} from './social-reactions-view.js?rev=39';
 const button=(d,text,fn,attributes={})=>pcButton(d,text,{className:'uw-control uw-forum-link',attributes},fn);
 export function createCommunityView(d,{route,getState,getMetadata,onChange,navigate}){
  const day=communityDay(getMetadata().gameDay),state=normalizeCommunity(getState().community);
@@ -15,7 +17,7 @@ export function createCommunityView(d,{route,getState,getMetadata,onChange,navig
  site.append(el(d,'p',{className:'uw-fiction-notice',text:'Вымышленный игровой форум. Ники и разговоры придуманы; ответы сохраняются только в твоей игре.'}));
  const topic=route.type==='forum-topic'?topicForDay(route.topic.id,day,state,route.page):null;
  const board=route.board??COMMUNITY_BOARDS.find(b=>b.id===topic?.boardId);
- if(board?.id==='makarevich-1')for(const post of publicRoundAnnouncements(getState(),{nowMinute:metadataGameMinute(getMetadata())}).reverse())site.append(createRoundAnnouncementView(d,post,{navigate}));
+ if(board?.id==='makarevich-1'){const s=getState(),nowMinute=metadataGameMinute(getMetadata()),reaction=postId=>createPostReactionsView(d,{postId:postId+':forum',state:s,nowMinute});for(const post of publicRoundAnnouncements(s,{nowMinute}).reverse()){const node=createRoundAnnouncementView(d,post,{navigate});node.append(reaction(post.id));site.append(node);}for(const p of publicSeedingPosts(s,nowMinute)){const node=el(d,'article',{className:'uw-forum-post'});node.append(el(d,'div',{text:p.body}),reaction(p.id));site.append(node);}}
  const crumbs=el(d,'nav',{className:'uw-forum-crumbs',attributes:{'aria-label':'Путь по форуму'}});crumbs.append(button(d,'Подземка',()=>navigate('underweb://forum')));
  if(board)crumbs.append(el(d,'span',{text:'›'}),button(d,board.title,()=>navigate('underweb://forum/'+board.id)));
  if(topic)crumbs.append(el(d,'span',{text:'›'}),el(d,'span',{text:topic.title}));site.append(crumbs);

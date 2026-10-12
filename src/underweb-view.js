@@ -20,7 +20,7 @@ const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-c
 export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,onWork=()=>false,onSubmitTrack=()=>{},onResultViewed=()=>{},getSoftwareMessage=()=>'',isVisible=()=>true}){
  let socialView=null,closeRegistration=null,lastWindows='';
  const windowSignature=()=>JSON.stringify((getState().battleWindows??[]).map(w=>[w.id,battleDeadlineLabel(w,metadataGameMinute(getMetadata()))]));
- const d=root.ownerDocument,history=['underweb://iskra'];let index=0,route=resolveUnderweb(history[0],getMetadata()),applicationOpen=false,lastApplications='',applicationFocus=null,lastSoftware='',lastDay=0;
+ const d=root.ownerDocument,history=['underweb://iskra'];let index=0,route=resolveUnderweb(history[0],getMetadata()),applicationOpen=false,lastApplications='',applicationFocus=null,lastSoftware='',lastDay=0,lastReactions='';
  const softwareSignature=()=>{const s=getState().software;return JSON.stringify([s?.client?.installed,s?.client?.receivedBytes===2000000,s?.ft?.installed,s?.ft?.receivedBytes===800000000,s?.notebook?.installed,s?.notebook?.receivedBytes===4000000,s?.metadata,s?.notebookMetadata,s?.transfers,getSoftwareMessage()]);};
  const browser=el(d,'section',{className:'uw-browser',attributes:{'aria-label':'Браузер Underweb'}}),toolbar=el(d,'form',{className:'uw-toolbar',attributes:{'aria-label':'Адрес Underweb'}});
  const back=button(d,'←',{attributes:{'aria-label':'Назад в Underweb'}},()=>travel(-1)),forward=button(d,'→',{attributes:{'aria-label':'Вперёд в Underweb'}},()=>travel(1));
@@ -147,7 +147,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
    socialView=mountSocial(host,{route,getState,getMetadata,onChange,navigate,audio,onWork,onResultViewed,isVisible});
   }else
   page.replaceChildren(route.type.startsWith('news')?createNewsPage(d,{route,navigate}):route.type.startsWith('forum')?createCommunityView(d,{route,getState,getMetadata,onChange,navigate}):['samples','ripline'].includes(route.type)?createBeatMarket(d,{getState,onChange,audio,navigate,ripline:route.type==='ripline'}):route.type==='home'?homePage():route.type==='search'?resultsPage():route.type==='battles'?catalogPage():route.type==='battle'?detailPage():route.type==='dump'?softwareForum(d,{topic:route.topic,state:getState(),navigate,onAction:onSoftware,message:getSoftwareMessage()}):el(d,'p',{className:'uw-error',text:route.message}));
-  lastSoftware=softwareSignature();lastWindows=windowSignature();
+  lastSoftware=softwareSignature();lastWindows=windowSignature();lastReactions=reactionVisibilitySignature(getState(),metadataGameMinute(getMetadata()));
   restore?.();page.scrollTop=scrollTop;if(focusApplication)applicationFocus?.focus();
   status.textContent='Готово · '+(route.type==='home'||route.type==='search'?'Искра':'Локальная сеть');lastApplications=JSON.stringify([getState().battleApplications,getState().battleSubmissions]);
  }
@@ -162,8 +162,10 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  render();return {navigate,tickOutgoingMessage:(dt,options)=>socialView?.tickOutgoingMessage(dt,options),get snapshot(){return {route,index,history:[...history]};},update(){
   if(route.type==='social'){socialView?.update();return;}
   if(lastDay!==JSON.stringify([getMetadata().gameDay])){route=resolveUnderweb(history[index],getMetadata());render({resetScroll:false,preserveInputs:true});}
+  else if(route.type==='forum'&&lastReactions!==reactionVisibilitySignature(getState(),metadataGameMinute(getMetadata())))render({resetScroll:false,preserveInputs:true});
   else if(lastApplications!==JSON.stringify([getState().battleApplications,getState().battleSubmissions])&&['home','battle','battles'].includes(route.type)||route.type==='battle'&&lastWindows!==windowSignature()||route.type==='dump'&&lastSoftware!==softwareSignature())render({resetScroll:false,preserveInputs:true});
   else if(route.type==='dump'){const node=pcFind(page,n=>n.dataset?.pcRole==='forum-transfer');if(node){const p=downloadPresentation(getState(),'client');node.textContent=`Загрузка: ${p.receivedMb.toFixed(2)} / ${p.totalMb} МБ · ${p.speedKbPerSecond} КБ/с${p.error?' · '+softwareMessage(p.error):''}`;}}
  },dispose(){closeRegistration?.();socialView?.dispose();root.replaceChildren();}};
 }
 import {currentRoundTopic} from './round-topics.js?rev=39';
+import {reactionVisibilitySignature} from './social-reactions-view.js?rev=39';

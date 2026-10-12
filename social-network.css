@@ -41,3 +41,4 @@
 .sn-analysis-segments .selected {background:#496e80;color:white;font-weight:bold}
 .sn-round-cover { min-height:110px;display:flex;align-items:flex-end;padding:20px;background:linear-gradient(145deg,#293e44,#718078);color:#f4e8c5;border:5px solid #d4cbb7;box-sizing:border-box;font:700 26px Georgia,serif; }
 .sn-round-announcement>button { margin:4px 6px 4px 0; }
+.sn-live-reactions {border-top:1px solid #d8e0e5;margin-top:12px;padding-top:8px}.sn-live-reactions .sn-post-reactions {display:flex;align-items:center;gap:10px;flex-wrap:wrap}.sn-live-reactions .sn-comment {display:block;padding:10px;background:#f5f7f9;margin-top:5px}.sn-live-reactions .sn-comment small {display:block;color:#71808f}.sn-live-reactions .sn-comment p {margin:6px 0;line-height:1.45}

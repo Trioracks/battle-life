@@ -9,6 +9,8 @@ import {currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?r
 import {publicTournamentTrackIds} from './battle-results-table.js?rev=39';
 import {publicRoundAnnouncements} from './round-topics.js?rev=39';
 import {createRoundAnnouncementView} from './round-announcement-view.js?rev=39';
+import {publicSeedingPosts,publicJudgeAnnouncements} from './social-reactions.js?rev=39';
+import {createPostReactionsView} from './social-reactions-view.js?rev=39';
 export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),navigate,commit,audio,expandedResults=new Set(),onResultViewed,onRegistered=()=>{}}){
  const c=communityById(id),root=el(d,'section',{className:'sn-community'});if(!c)return root;
  const state=getState(),subscribed=normalizeSocial(state.social).subscriptions.includes(id),header=el(d,'header',{className:'sn-community-header'});
@@ -27,7 +29,9 @@ export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),na
  }
  side.append(socialHeading(d,'Участники',c.memberCount+Number(subscribed)));
  for(const id of c.members){const p=profileById(id);if(!p)continue;const member=el(d,'div',{className:'sn-member'});member.append(socialAvatar(d,p.avatar,p.name),socialButton(d,p.name,()=>navigate('underweb://social/profile/'+id),{className:'sn-link'}));side.append(member);}
- for(const post of publicRoundAnnouncements(state,{battleId:c.battleId,nowMinute:metadataGameMinute(getMetadata())}).reverse())wall.append(createRoundAnnouncementView(d,post,{navigate}));
+ const nowMinute=metadataGameMinute(getMetadata()),reactions=postId=>createPostReactionsView(d,{postId,state,getState,nowMinute,commit});
+ for(const post of publicRoundAnnouncements(state,{battleId:c.battleId,nowMinute}).reverse()){const node=createRoundAnnouncementView(d,post,{navigate});node.append(reactions(post.id));wall.append(node);}
+ if(c.battleId==='makarevich-1'){for(const p of publicSeedingPosts(state,nowMinute).reverse()){const node=el(d,'article',{className:'sn-post'});node.append(socialHeading(d,'Объявлена сетка'),el(d,'small',{text:p.date}),el(d,'p',{text:p.body}),reactions(p.id));wall.append(node);}for(const p of publicJudgeAnnouncements(state,nowMinute).reverse()){const node=el(d,'article',{className:'sn-post'});node.append(socialButton(d,'Судья · '+p.name,()=>navigate('underweb://social/profile/'+p.judgeId)),el(d,'small',{text:p.date}),el(d,'p',{text:p.body}),reactions(p.id));wall.append(node);}}
  const publicIds=publicTournamentTrackIds(state,{battleId:c.battleId,nowMinute:metadataGameMinute(getMetadata())}),versions=(state.communityAudio?.[id]??[]).filter(id=>!state.trackVersions?.byId?.[id]?.npc||publicIds.has(id));wall.append(socialHeading(d,'Работы текущего сезона',versions.length));
  for(const submission of state.battleSubmissions??[])if(submission.communityId===id&&submission.status!=='recovery')wall.append(createSocialResultView(d,{submission,getState,commit,expandedResults,onResultViewed}));
  for(const versionId of versions)wall.append(audio.row(d,{version:state.trackVersions?.byId?.[versionId]}));

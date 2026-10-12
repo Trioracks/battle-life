@@ -8,6 +8,7 @@ import {publishJudgeEvents} from './social-judging-events.js?rev=39';
 import {SOCIAL_IDENTITY} from './social-identity.js?rev=39';
 import {advancePersonalDialogs} from './social-personal.js?rev=39';
 import {advanceBattleLifecycle} from './battle-judging-clock.js?rev=39';
+import {ensureSocialReactionPlans} from './social-reactions.js?rev=39';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export function normalizeSocialRuntime(raw){
  const seen=new Set(),events=(Array.isArray(raw?.events)?raw.events:[]).filter(e=>e&&typeof e.id==='string'&&typeof e.type==='string'&&validGameMinute(e.dueAt)&&!seen.has(e.id)&&seen.add(e.id)).map(clone);
@@ -63,5 +64,6 @@ export function advanceSocial(input,nowMinute,options={}){
  const publishedAudio={...state.communityAudio};for(const e of battleEvents.filter(e=>e.type==='round-closed')){const round=state.tournaments.byId[e.battleId].rounds[e.roundId];publishedAudio[e.communityId]=[...new Set([...(publishedAudio[e.communityId]??[]),...Object.values(round.submissions)])];}
  state={...state,communityAudio:publishedAudio,phone:receivePhoneEvents(state.phone,notices),socialRuntime:{...state.socialRuntime,events:[...state.socialRuntime.events,...battleEvents].sort((a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id))}};
  const judged=publishJudgeEvents(state,nowMinute);
- return {state:judged.state,domainChanged:lifecycle.changed,events:[...personal.events,...events,...battleEvents,...judged.events].sort((a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id))};
+ const reacted=ensureSocialReactionPlans(judged.state,nowMinute);
+ return {state:reacted.state,domainChanged:lifecycle.changed||reacted.changed,events:[...personal.events,...events,...battleEvents,...judged.events].sort((a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id))};
 }

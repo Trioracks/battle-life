@@ -22,15 +22,16 @@ export function socialPhoto(d,photo){
  else fig.append(el(d,'span',{className:'sn-photo-pending',text:'Фото ещё не готово'}));
  fig.append(el(d,'figcaption',{text:photo.title}),el(d,'small',{text:photo.date}));return fig;
 }
-export function socialPost(d,post,{author='',navigate,profileById}={}){
+export function socialPost(d,post,{author='',navigate,profileById,reactions=null}={}){
  const article=el(d,'article',{className:'sn-post'});
  article.append(el(d,'strong',{text:author}),el(d,'small',{text:post.date??''}),el(d,'p',{text:post.body}));
+ if(reactions)article.append(reactions);else{
  const likes=el(d,'div',{className:'sn-post-reactions',text:'Нравится: '+(post.likes??0)+' · Комментарии: '+(post.comments?.length??0)});article.append(likes);
  for(const c of post.comments??[]){const row=el(d,'div',{className:'sn-comment'}),person=profileById?.(c.authorId);
   if(person&&navigate)row.append(socialButton(d,person.name,()=>navigate('underweb://social/profile/'+person.id),{className:'sn-link'}));
   row.append(el(d,'span',{text:c.body}));article.append(row);
  }
- if(post.graffiti)article.append(socialGraffiti(d,post.graffiti));return article;
+ }if(post.graffiti)article.append(socialGraffiti(d,post.graffiti));return article;
 }
 export function socialGraffiti(d,graffiti){
  const make=(tag,attrs={})=>{const node=d.createElementNS?d.createElementNS('http://www.w3.org/2000/svg',tag):d.createElement(tag);for(const [k,v]of Object.entries(attrs))node.setAttribute(k,v);return node;};
