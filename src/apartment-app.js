@@ -7,7 +7,7 @@ import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?re
 import {DEFAULT_APPEARANCE,loadProfile,saveProfile} from './avatar-v3-profile.js?rev=38';
 import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=38';
 import {createNewGameSession} from './apartment-v3-new-game.js?rev=38';
-import {advanceVirtualPcDurably,gameMinuteStamp} from './virtual-pc-runtime.js?rev=38';
+import {advanceVirtualPcDurably,gameMinuteStamp,createSubmissionTransferClock} from './virtual-pc-runtime.js?rev=38';
 import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=38';
 import {mountVirtualPc} from './virtual-pc-ui.js?rev=38';
 import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=38';
@@ -68,6 +68,12 @@ try{
   const pcRoot=$('#virtual-pc'),savedPc=loadVirtualPcState(storage);let pcState=savedPc.state;
   let pcStorageWarning=migration.ok?(savedPc.ok?'':'Сохранение виртуального ПК недоступно.'):migration.error;
   let virtualPc,workReward=0,workFinished=false,lastWorkJob=null,lastWorkBeat=null,lastWorkCamera=null,resultEpisode=null,failedReactionId=null;
+  const submissionTransferClock=createSubmissionTransferClock();
+  function advanceOutgoingTransfer(activeSeconds=0,forcePhase=null){
+    const phase=forcePhase??[mode,pcLifecycle.snapshot.phase,pcState.power,paused,document.hidden].join(':');
+    const transfer=submissionTransferClock.tick(pcState,{activeSeconds,powered:pcState.power==='on',paused:paused||document.hidden||!['game','pc'].includes(mode),phase},next=>persistPc(next,{atomic:true}));
+    if(transfer.changed){pcState=transfer.state;virtualPc.syncState(pcState);}
+  }
   const fridgeRoot=document.createElement('section'),speechRoot=document.createElement('div');document.body.append(fridgeRoot,speechRoot);canvas.tabIndex=0;
   const speech=createCharacterSpeech({beep:()=>{if(audio?.state==='running'&&!document.hidden)playSoundCue('speech',audio);}}),speechView=mountCharacterSpeech(speechRoot);
   const fridgeView=mountHomeNeedsView(fridgeRoot,{
@@ -249,6 +255,7 @@ try{
   $('#step').addEventListener('click',()=>{paused=true;$('#pause').textContent='Продолжить';update(1/30,performance.now(),true);});$('#face').addEventListener('click',()=>motion.faceCamera());
   document.addEventListener('keydown',e=>{if(e.defaultPrevented||e.key!=='Escape')return;if(mode==='peephole')stopPeeking();else if(mode==='door')setMode('game');else if(mode==='pc')virtualPc.closeWindow();else if(mode==='game')setMode('menu');});
   function update(dt,now,step=false){
+    advanceOutgoingTransfer(dt);
     if(mode!=='game'||cameraFade||document.hidden||(paused&&!step)||homeModalOpen())footsteps.reset();
     if(mode!=='game'||cameraFade||document.hidden){speech.tick(0,{present:false});speechView.update(speech.snapshot);}
     cameraLabel();
@@ -376,8 +383,8 @@ try{
   }
   loading.hidden=true;setMode('menu');view.render(motion,0);
   function frame(now){const raw=(now-last)/1000,dt=Math.min(raw,.25);if(raw>0)frameRate=frameRate*.9+Math.min(240,1/raw)*.1;last=now;update(dt,now);requestAnimationFrame(frame);}requestAnimationFrame(frame);
-  document.addEventListener('visibilitychange',()=>{last=performance.now();if(document.hidden){syncWorkAudio(true);virtualPc.audioSession.stopAll();saveHomeTime(storage,homeTime);persistPc(pcState);}});
-  window.addEventListener('pagehide',event=>{if(!event.persisted)phoneView.dispose();});
+  document.addEventListener('visibilitychange',()=>{last=performance.now();if(document.hidden){advanceOutgoingTransfer(0,'hidden');syncWorkAudio(true);virtualPc.audioSession.stopAll();saveHomeTime(storage,homeTime);persistPc(pcState);}});
+  window.addEventListener('pagehide',event=>{advanceOutgoingTransfer(0,'pagehide');if(!event.persisted)phoneView.dispose();});
   window.addEventListener('pagehide',event=>{saveHomeTime(storage,homeTime);persistPc(pcState);syncWorkAudio(true);virtualPc.audioSession.stopAll();if(event.persisted){pcSounds.stop();return;}wardrobeView.dispose();fridgeView.dispose();speechView.dispose();workAudio.dispose();lyricWorkAudio.dispose();workPanel.dispose();pcLifecycle.reset();pcSounds.dispose();virtualPc.dispose();view.dispose();});
   window.addEventListener('pageshow',event=>{if(event.persisted)last=performance.now();});
 }catch(error){console.error(error);loading.querySelector('h2').textContent='Не удалось загрузить сцену';loading.querySelector('p').textContent=error.message;loading.classList.add('error');}

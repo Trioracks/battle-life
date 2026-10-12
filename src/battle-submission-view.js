@@ -1,7 +1,7 @@
 import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=38';
 import {submissionCandidates} from './battle-submission.js?rev=38';
 import {attachSubmissionTrack} from './social-submission.js?rev=38';
-// File picker only attaches a frozen version. Sending is a separate dialog action.
+// Choosing a frozen version starts an upload; sending remains a separate action.
 export function mountBattleSubmissionPicker(root,{getState,battleId,communityId=battleId,getGameMinute=()=>null,onChange,onClose=()=>{}}){
  const d=root.ownerDocument,box=el(d,'section',{className:'battle-submit',attributes:{role:'dialog','aria-modal':'true','aria-label':'Прикрепить трек'}}),list=el(d,'div',{className:'battle-submit-files'}),details=el(d,'p'),status=el(d,'p',{attributes:{role:'status'}});
  let selected=null,signature='',disposed=false;
@@ -11,7 +11,7 @@ export function mountBattleSubmissionPicker(root,{getState,battleId,communityId=
   if(saved===false||saved?.ok===false){status.textContent='Вложение не сохранено. Освободи место для сохранения и попробуй снова.';return;}
   onClose();
  });
- box.append(el(d,'h2',{text:'Мои проекты · выбор трека'}),el(d,'small',{text:'Только игровые аудиофайлы · прикрепление ещё не отправляет работу'}),list,details,status,attach,button(d,'Отмена',{},onClose));root.replaceChildren(box);
+ box.append(el(d,'h2',{text:'Мои проекты · выбор трека'}),el(d,'small',{text:'Игровой MP3 · 192 кбит/с · отдача 10 КБ/с. Прикрепление начнёт фоновую загрузку, но ещё не отправит работу.'}),list,details,status,attach,button(d,'Отмена',{},onClose));root.replaceChildren(box);
  function selection(){
   const c=submissionCandidates(getState(),battleId).find(p=>p.projectId===selected);for(const row of list.children)row.setAttribute('aria-pressed',String(row.dataset.projectId===selected));
   attach.disabled=!c||Boolean(c.issue);details.textContent=c?c.issue||c.seconds.toFixed(2)+' сек. · '+c.postStage+' · '+(c.topicMatch===null?'Связь с темой не подтверждена.':c.topicMatch?'Текст написан для этого баттла.':'Трек для другой темы. Отправка разрешена.'):'Выбери готовый бит с вокалом.';

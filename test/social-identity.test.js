@@ -8,7 +8,7 @@ import {resolveSocialRoute} from '../src/social-routing.js';
 import {ensureBattleWindow} from '../src/battle-windows.js';
 import {attachSubmissionTrack,sendSubmission} from '../src/social-submission.js';
 import {advanceSocial} from '../src/social-runtime.js';
-import {submissionFixture} from './helpers/submission-fixtures.js';
+import {submissionFixture,completeSubmissionUpload} from './helpers/submission-fixtures.js';
 import {pcDocument,allPc,findButton} from './helpers/virtual-pc-dom.js';
 test('V krugu identity is shared by header, search and new notifications',()=>{
  assert.deepEqual(SOCIAL_IDENTITY,{name:'В кругу',mark:'в',year:2012});
@@ -18,7 +18,7 @@ test('V krugu identity is shared by header, search and new notifications',()=>{
  assert.ok(allPc(root).some(n=>n.className==='sn-brandmark'&&n.textContent==='в'));
  assert.ok(resolveUnderweb('В кругу').results.some(r=>r.url==='underweb://social/me'&&r.title.includes('друзья')));
  state=attachSubmissionTrack(state,{communityId:'makarevich-1',projectId:'beat',nowMinute:601}).state;
- state=sendSubmission(state,{communityId:'makarevich-1',nowMinute:601}).state;
+ state=sendSubmission(completeSubmissionUpload(state),{communityId:'makarevich-1',nowMinute:601}).state;
  const next=advanceSocial(state,state.battleSubmissions[0].ackAt);assert.equal(next.events[0].source,'В кругу');
 });
 test('general social network is above news and second in browser bookmarks',()=>{
