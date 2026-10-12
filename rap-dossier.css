@@ -1,0 +1,15 @@
+#virtual-pc .rap-dossier{height:100%;display:flex;flex-direction:column;background:#d3c7a8;color:#362e25;font:13px/1.55 Georgia,serif;overflow:auto}
+#virtual-pc .rd-head{padding:16px 20px;border-bottom:3px double #807458;background:#333d3c;color:#ede4cc;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+#virtual-pc .rd-head h1{margin:0;font-size:24px;letter-spacing:1px}
+#virtual-pc .rd-head .sn-button{margin-left:auto}
+#virtual-pc .rd-body{display:grid;grid-template-columns:180px minmax(0,1fr);flex:1;min-height:0;overflow:auto}
+#virtual-pc .rd-list{padding:16px 10px;background:#b7af97;border-right:1px solid #8b8169;overflow:auto}
+#virtual-pc .rd-list button{display:block;width:100%;margin:0 0 8px;text-align:left}
+#virtual-pc .rd-list [aria-current]{background:#5d6654;color:#fff3d5}
+#virtual-pc .rd-card{padding:20px 28px;background:#eee7d5;overflow:auto}
+#virtual-pc .rd-card h2{font-size:24px;margin:0 0 12px}
+#virtual-pc .rd-card h3{margin:24px 0 10px;border-bottom:1px solid #b7aa89;padding-bottom:4px;text-transform:uppercase;font-size:12px;letter-spacing:1px}
+#virtual-pc .rd-card small{display:block;color:#776b55}
+#virtual-pc .rd-card blockquote{margin:12px 0;border-left:3px solid #9c7754;padding:8px 16px;background:#f9f4e7}
+#virtual-pc .rd-card .sn-analysis-report{background:#f7f1df;border-color:#c7b890}
+@media(max-width:700px){#virtual-pc .rd-body{grid-template-columns:125px minmax(0,1fr)}#virtual-pc .rd-card{padding:12px}#virtual-pc .rd-head{gap:10px;padding:10px}}

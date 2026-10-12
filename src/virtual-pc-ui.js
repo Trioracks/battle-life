@@ -26,6 +26,7 @@ import * as software from './pc-software.js?rev=39';
 import {mountTorrent,mountInstaller,softwareMessage} from './pc-software-view.js?rev=39';
 import {SOFTWARE} from './pc-software-catalog.js?rev=39';
 import {mountRapNotebook} from './rap-notebook-view.js?rev=39';
+import {mountRapDossier} from './rap-dossier-view.js?rev=39';
 import {normalizeLyric} from './lyric-production.js?rev=39';
 import {pauseCreativeChain} from './creative-workflow.js?rev=39';
 import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=39';
@@ -107,6 +108,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     beatAudio: callbacks.beatAudio ?? new BeatAudio({outputFactory:createPcRoomOutput}),
     studioView:null,
     notebookView:null,
+    dossierView:null,
     pendingStudioProject:null,
     state: createVirtualPcState(),
     phase: 'off',
@@ -277,6 +279,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.underwebView?.update();pc.torrentView?.update();pc.installerView?.update();
     pc.studioView?.update();
     pc.notebookView?.update();pc.submissionModal?.view.update();
+    pc.dossierView?.update();
     for(const view of pc.systemViews.values())view.update();
     const guard=pc.confirmClose?findByDataset(root,'pcRole','close-guard'):null;
     pc.shell.setModal(pc.uninstallModal?.node??pc.submissionModal?.node??pc.shutdownModal?.node??guard,pc.returnFocus);
@@ -287,6 +290,10 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
   pc.refreshApp = (appId,{replaceContent=false}={}) => {
     const target=pc.shell?.getContentRoot(appId);if(!target)return;
+    if(appId==='rap-dossier'){
+      if(!pc.dossierView)pc.dossierView=mountRapDossier(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,navigate:url=>{pc.open('underweb');pc.navigateUnderweb(url);},commit:result=>result.ok&&pc.persist(result.state,{atomic:true})});
+      pc.dossierView.update();return;
+    }
     if(appId==='rap-notebook'){
       if(!pc.notebookView)pc.notebookView=mountRapNotebook(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onChange:next=>pc.persist(next),onWork:()=>callbacks.onWork?.()??false});
       pc.notebookView.update();return;
@@ -363,6 +370,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.shutdownModal={node,view};pc.shell.setModal(node,pc.returnFocus);
   };
   pc.clearViews = () => {
+    pc.dossierView?.dispose();pc.dossierView=null;
     pc.submissionModal?.view.dispose();pc.submissionModal=null;
     pc.notebookView?.dispose();pc.notebookView=null;
     pc.torrentView?.dispose();pc.torrentView=null;pc.installerView?.dispose();pc.installerView=null;
@@ -460,6 +468,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
   pc.cancelStudioLaunch=()=>{pc.launchGeneration++;if(pc.studioLaunch!==null)pc.clearTimeoutFn(pc.studioLaunch);pc.studioLaunch=null;pc.pendingStudioProject=null;pc.setStudioBusy(false);};
   pc.closeNow = id => {
+    if(id==='rap-dossier'){pc.dossierView?.dispose();pc.dossierView=null;}
     if(id==='rap-notebook'){pc.notebookView?.dispose();pc.notebookView=null;}
     if(id==='installer'){if(pc.state.software.installer)pc.persist(software.cancelInstaller(pc.state).state);pc.installerView?.dispose();pc.installerView=null;}
     if(id==='torent'){pc.torrentView?.dispose();pc.torrentView=null;}

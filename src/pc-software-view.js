@@ -8,9 +8,9 @@ import {downloadPresentation} from './virtual-pc-runtime.js?rev=39';
 export const softwareMessage=reason=>({'select-transfer':'Выбери загрузку.','recording-in-progress':'Сначала заверши текущую запись вокала, сведение или мастеринг.','work-in-progress':'Сначала заверши текущую доработку.','downloads-in-progress':'Сначала заверши или отмени загрузки в torent.','client-required':'Сначала скачай и установи torent из темы клиента.','metadata-required':'Сначала скачай файл .torrent нужной программы.','insufficient-space':'Недостаточно места на C:. Загрузка сохранена; освободи место или отмени задачу.','invalid-path':'Укажи папку на игровом C: без .. и специальных символов.','transfer-active':'Сначала заверши или отмени текущую загрузку.','archive-required':'Сначала дождись полной загрузки установщика.','already-installed':'Программа уже установлена.','installer-active':'Сначала закрой текущий мастер установки.','pc-off':'Включи игровой компьютер.'}[reason]??reason??'');
 export function softwareForum(d,{topic,state,navigate,onAction,message=''}){
  const button=(doc,text,options={},handler)=>pcButton(doc,text,{...options,className:'uw-control '+(options.className??'')},handler);
- const titles={client:'torent — торрент-клиент',ft:'FT Studio — домашняя студия',notebook:'Рэпблокнот — тексты и рифмы'};
- const summaries={client:'Маленький клиент для больших файлов. Открывает .torrent и распределяет канал между загрузками.',ft:'Драм-машина, басы, мелодии и запись голоса. Собери первый трек в своей комнате.',notebook:'От первой мысли до законченного текста. Черновики для баттлов, рифмы, образы и адаптация под бит.'};
- const routes={client:'client',ft:'ft-studio',notebook:'notebook'},id=Object.keys(routes).find(id=>routes[id]===topic);
+ const titles={client:'torent — торрент-клиент',ft:'FT Studio — домашняя студия',notebook:'Рэпблокнот — тексты и рифмы',dossier:'Рэп-досье — наблюдения и источники'};
+ const summaries={dossier:'Карточки участников и судей. Сохраняй собственные разборы, сравнивай источники и не путай догадки с фактами.',client:'Маленький клиент для больших файлов. Открывает .torrent и распределяет канал между загрузками.',ft:'Драм-машина, басы, мелодии и запись голоса. Собери первый трек в своей комнате.',notebook:'От первой мысли до законченного текста. Черновики для баттлов, рифмы, образы и адаптация под бит.'};
+ const routes={client:'client',ft:'ft-studio',notebook:'notebook',dossier:'dossier'},id=Object.keys(routes).find(id=>routes[id]===topic);
  const site=el(d,'section',{className:'uw-dump dump-tracker'}),head=el(d,'header',{className:'dump-header'});
  head.append(el(d,'small',{text:'ЛОКАЛЬНЫЙ ТРЕКЕР / 2012'}),button(d,'Файловая помойка',{},()=>navigate('underweb://dump')),el(d,'p',{text:'Найди. Скачай. Сделай своё.'}));
  const layout=el(d,'div',{className:'dump-layout'}),side=el(d,'nav',{className:'dump-categories',attributes:{'aria-label':'Категории файлов'}}),main=el(d,'main',{className:'dump-catalog'});
@@ -20,7 +20,7 @@ export function softwareForum(d,{topic,state,navigate,onAction,message=''}){
  const crumbs=el(d,'nav',{className:'dump-crumbs'});crumbs.append(button(d,'Каталог программ',{},()=>navigate('underweb://dump')),el(d,'span',{text:id?' / '+SOFTWARE[id].name:' / Доступный софт'}));main.append(crumbs);
  function poster(app){const panel=el(d,'div',{className:'dump-release-poster',dataset:{software:app.id}});panel.append(createPcIcon(d,app.iconId,{size:72}),el(d,'strong',{text:app.name}),el(d,'small',{text:PC_IDENTITY.name+' / HOME EDITION'}));return panel;}
  if(!id){
-  main.append(el(d,'h1',{text:'Программы и утилиты'}),el(d,'p',{className:'dump-catalog-caption',text:'3 проверенные раздачи · Всё для домашней студии'}));
+  main.append(el(d,'h1',{text:'Программы и утилиты'}),el(d,'p',{className:'dump-catalog-caption',text:Object.keys(SOFTWARE).length+' проверенные раздачи · Всё для домашней студии'}));
   for(const app of Object.values(SOFTWARE)){
    const card=el(d,'article',{className:'dump-release-card'}),info=el(d,'div');
    info.append(button(d,titles[app.id],{},()=>navigate('underweb://dump/'+routes[app.id])),el(d,'p',{text:summaries[app.id]}),el(d,'small',{text:app.downloadBytes/1000000+' МБ · '+(app.id==='client'?'Прямая загрузка':'Через torent')}));
@@ -57,7 +57,7 @@ export function mountTorrent(root,{getState,onAction,getMessage=()=>''}){
  const message=el(d,'p',{attributes:{role:'status'}});
  table.append(head,row);main.append(table,progress,details,controls,message);body.append(side,main);wrap.append(toolbar,body);root.replaceChildren(wrap);let signature='';
  function update(){
-  const s=getState(),ids=['ft','notebook'].filter(id=>s.software[id].receivedBytes>0||s.software[id].installed||s.software.transfers[id]);
+  const s=getState(),ids=Object.keys(SOFTWARE).filter(id=>id!=='client').filter(id=>s.software[id].receivedBytes>0||s.software[id].installed||s.software.transfers[id]);
   if(!ids.includes(selected))selected=ids[0]??null;
   for(const [id,b]of rows)if(!ids.includes(id)){b.remove();rows.delete(id);}
   if(!ids.length)row.textContent='Нет задач. Открой файл .torrent из Загрузок.';

@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mountRapDossier} from '../src/rap-dossier-view.js';
+import {analysisFixture,studySkills} from './helpers/analysis-fixture.js';
+import {startTrackStudy,advanceStudy} from '../src/rap-analysis.js';
+import {saveAnalysisToDossier} from '../src/rap-dossier.js';
+import {pcDocument,findButton,allPc} from './helpers/virtual-pc-dom.js';
+import {mountVirtualPc} from '../src/virtual-pc-ui.js';
+test('installed app opens its own dossier view and preserves card across close/open with source navigation',()=>{let s=advanceStudy(startTrackStudy(analysisFixture(),{trackVersionId:'weak',heroSnapshot:studySkills(10),nowMinute:100}).state,{gameMinutes:45,nowMinute:145}).state;s=saveAnalysisToDossier(s,'study:1').state;s.software.dossier={installed:true};const d=pcDocument(),root=d.createElement('main'),pc=mountVirtualPc(root);pc.showDesktop(s);pc.syncHost({gameMinutes:150});pc.open('rap-dossier');assert.ok(allPc(root).some(n=>n.getAttribute('aria-label')==='Рэп-досье'));assert.ok(findButton(root,'Открыть профиль'));findButton(root,'Открыть профиль').click();assert.equal(pc.window,'underweb');pc.open('rap-dossier');pc.closeWindow('rap-dossier');pc.open('rap-dossier');assert.ok(allPc(root).some(n=>n.textContent==='Первая демка'));assert.equal(pc.state.rapDossier.cards.player.reportIds.length,1);pc.dispose();});
+test('dossier separates observations from public facts and does not offer a closed profile link',()=>{let s=analysisFixture(),root=pcDocument().createElement('main');s=advanceStudy(startTrackStudy(s,{trackVersionId:'weak',heroSnapshot:studySkills(10),nowMinute:100}).state,{gameMinutes:45,nowMinute:145}).state;s.rapAnalysis.reports['study:1'].subjectId='mak-npc-02';s=saveAnalysisToDossier(s,'study:1').state;const ui=mountRapDossier(root,{getState:()=>s,getMetadata:()=>({gameMinutes:150}),navigate:()=>{},commit:()=>true});assert.ok(!findButton(root,'Открыть профиль'));assert.ok(allPc(root).some(n=>n.textContent==='Наблюдения героя'));assert.ok(allPc(root).some(n=>n.textContent==='Публичные факты'));ui.dispose();});

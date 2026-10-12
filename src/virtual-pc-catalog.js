@@ -5,6 +5,7 @@ import {SOCIAL_COMMUNITIES} from './social-catalog.js?rev=39';
 import {SOCIAL_IDENTITY} from './social-identity.js?rev=39';
 import {FORUM_ARCHIVE_BOARDS,archiveTopicsForDay,archiveTopicForDay} from './underweb-forum-archive.js?rev=39';
 const apps = Object.freeze([
+  {id:'rap-dossier',label:'Рэп-досье',iconId:'dossier',description:'Карточки людей, источники и наблюдения'},
   { id: 'computer', label: 'Мой компьютер', iconId: 'computer', description: 'Диск C: и Мои проекты' },
   { id: 'underweb', label: 'Underweb', iconId: 'underweb', description: 'Локальная сеть баттлов' },
   { id: 'torent', label: 'torent', iconId: 'torent', description: 'Каталог игровых загрузок' },
@@ -28,7 +29,7 @@ export const BATTLE_BRIEFS = Object.freeze([
 
 export function desktopApps(state) {
   const installed = state?.download?.status === 'installed';
-  return apps.filter(app => (app.id !== 'ft-studio' || installed)&&(app.id!=='torent'||state?.software?.client?.installed)&&(app.id!=='ripline'||state?.music?.ripline)&&(app.id!=='rap-notebook'||state?.software?.notebook?.installed)).map(app => ({ ...app }));
+  return apps.filter(app => (app.id !== 'ft-studio' || installed)&&(app.id!=='torent'||state?.software?.client?.installed)&&(app.id!=='ripline'||state?.music?.ripline)&&(app.id!=='rap-notebook'||state?.software?.notebook?.installed)&&(app.id!=='rap-dossier'||state?.software?.dossier?.installed)).map(app => ({ ...app }));
 }
 
 export function resolveUnderweb(address,metadata={}) {
@@ -66,7 +67,7 @@ export function resolveUnderweb(address,metadata={}) {
   }
   if(normalized==='underweb://software/ft-studio')return {type:'dump',url:'underweb://dump/ft-studio',topic:'ft-studio'};
   if(['underweb://dump','underweb://dump/','файловая помойка'].includes(normalized))return {type:'dump',url:'underweb://dump',topic:null};
-  if(['underweb://dump/client','underweb://dump/ft-studio','underweb://dump/notebook'].includes(normalized))return {type:'dump',url:normalized,topic:normalized.split('/').at(-1)};
+  if(['underweb://dump/client','underweb://dump/ft-studio','underweb://dump/notebook','underweb://dump/dossier'].includes(normalized))return {type:'dump',url:normalized,topic:normalized.split('/').at(-1)};
   if(['underweb://samples','underweb://ripline'].includes(normalized))return {type:normalized.endsWith('samples')?'samples':'ripline',url:normalized};
   if(normalized.includes('://')&&!normalized.startsWith('underweb://iskra/search?'))return {type:'error',url:raw,message:'Такой адрес в Underweb не найден.'};
   let query=raw;
@@ -81,6 +82,7 @@ export function resolveUnderweb(address,metadata={}) {
   for(const issue of archiveForDay(metadata.gameDay))pages.push({title:issue.title,url:'underweb://iskra/news/'+issue.id,site:'Искра / Новости / '+issue.publishDate,description:issue.body[0]??'',keywords:issue.category+' '+issue.sourceTitle});
   pages.push({title:'Исторический архив Hip-Hop.ru',url:'underweb://forum/archive',site:'Hip-Hop.ru / Историческая подборка',description:'Реальные даты и авторы, краткие пересказы, короткие цитаты и ссылки на оригинал. Архив только для чтения.',keywords:'хип хоп hip hop ru форум архив 2012'});
   for(const topic of archiveTopicsForDay(null,gameDay))pages.push({title:topic.title,url:'underweb://forum/archive/topic/'+topic.id,site:'Hip-Hop.ru / Архив / '+topic.date,description:topic.posts[0]?.body??'',keywords:'исторический архив 2012 '+topic.posts.map(p=>p.author).join(' ')});
+  pages.push({title:'Рэп-досье — карточки и наблюдения',url:'underweb://dump/dossier',site:'Файловая помойка / Программы',description:'Собирай разборы работ, историю участников и опубликованные отзывы судей.',keywords:'рэп досье dossier анализ исследование скачать программа'});
   const results=words.length?pages.map(p=>({...p,score:words.reduce((n,w)=>n+(p.title+' '+p.description+' '+p.keywords).toLowerCase().replaceAll('ё','е').includes(w),0)})).filter(p=>p.score>0).sort((a,b)=>b.score-a.score).map(({keywords,score,...p})=>p):[];
   const socialPages=[{title:SOCIAL_IDENTITY.name+' — друзья и одноклассники',url:'underweb://social/me',site:SOCIAL_IDENTITY.name,description:'Друзья, фотографии, аудио, сообщения и сообщества.',keywords:SOCIAL_IDENTITY.name+' соцсеть социальная сеть друзья одноклассники'},...SOCIAL_COMMUNITIES.map(c=>({title:c.name,url:'underweb://social/community/'+c.id,site:SOCIAL_IDENTITY.name+' / Сообщества',description:c.description,keywords:SOCIAL_IDENTITY.name+' сообщество '+c.category}))];
   for(const {keywords,...p} of socialPages)if(words.some(w=>(p.title+' '+p.description+' '+keywords).toLowerCase().replaceAll('ё','е').includes(w)))results.push(p);

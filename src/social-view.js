@@ -43,7 +43,7 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
  }
  function render(){
   updateBadge();
-  analysisRoot.replaceChildren(createRapAnalysisView(d,{getState,onStart:startAnalysis,commit,selectedReportId}));
+  analysisRoot.replaceChildren(createRapAnalysisView(d,{getState,onStart:startAnalysis,commit,selectedReportId,navigate}));
   if(dialogView){dialogView.update();last=signature();return;}
   if(messagesView){messagesView.update();last=signature();return;}
   const focus=content.contains(d.activeElement)?d.activeElement:null,label=focus?.getAttribute?.('aria-label'),start=focus?.selectionStart,end=focus?.selectionEnd;

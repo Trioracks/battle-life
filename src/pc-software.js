@@ -18,7 +18,7 @@ export function normalizeSoftware(value,legacy={}){
  for(const id of Object.keys(SOFTWARE)){const t=candidates?.[id];if(t&&app(id).receivedBytes<SOFTWARE[id].downloadBytes)transfers[id]={appId:id,paused:t.paused===true,error:t.error==='insufficient-space'?t.error:''};}
  const wizard=source?.installer,id=wizard?.appId,step=wizard?.step;
  const installer=SOFTWARE[id]&&['welcome','destination','summary','install','finish'].includes(step)&&app(id).receivedBytes===SOFTWARE[id].downloadBytes&&(!app(id).installed||step==='finish')?{appId:id,openAfterInstall:wizard.openAfterInstall!==false,step:step==='finish'&&!app(id).installed?'welcome':step,path:normalizeInstallPath(wizard.path)??SOFTWARE[id].path,elapsedSeconds:step==='install'?bytes(wizard.elapsedSeconds,SOFTWARE[id].installSeconds):step==='finish'&&app(id).installed?SOFTWARE[id].installSeconds:0,error:step==='install'&&wizard.error==='insufficient-space'?'insufficient-space':''}:null;
- return {client,ft,notebook:app('notebook'),metadata:source?source.metadata===true:['downloading','ready-to-install'].includes(old),notebookMetadata:source?.notebookMetadata===true,transferVersion:2,transfers,installer};
+ return {client,ft,notebook:app('notebook'),dossier:app('dossier'),dossierMetadata:source?.dossierMetadata===true,metadata:source?source.metadata===true:['downloading','ready-to-install'].includes(old),notebookMetadata:source?.notebookMetadata===true,transferVersion:2,transfers,installer};
 }
 export function withSoftware(state,software){
  const ft=software.ft;

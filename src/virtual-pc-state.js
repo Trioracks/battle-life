@@ -20,6 +20,7 @@ import {normalizeBattleHistory} from './battle-history.js?rev=39';
 import {encodePcSave,decodePcSave} from './pc-save-codec.js?rev=39';
 import {normalizeNpcSocialProfiles} from './npc-social-profiles.js?rev=39';
 import {normalizeRapAnalysis} from './rap-analysis.js?rev=39';
+import {normalizeDossier} from './rap-dossier.js?rev=39';
 import {drumById} from './beat-catalog.js?rev=39';
 import {normalizeCommunity} from './underweb-community.js?rev=39';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=39';
@@ -46,7 +47,7 @@ const wallpaperIds = new Set(['courtyard', 'factory', 'room']);
 const downloadStates = new Set(['idle', 'downloading', 'ready-to-install', 'installed']);
 const isRecord = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const clone = value => JSON.parse(JSON.stringify(value));
-const iconIds = new Set(['computer','underweb','torent','ft-studio','ripline','rap-notebook']);
+const iconIds = new Set(['computer','underweb','torent','ft-studio','ripline','rap-notebook','rap-dossier']);
 function normalizeIcons(value) {
   return Object.fromEntries(Object.entries(isRecord(value)?value:{}).filter(([id,p])=>iconIds.has(id)&&Number.isFinite(p?.x)&&Number.isFinite(p?.y)).map(([id,p])=>[id,{x:Math.max(0,p.x),y:Math.max(0,p.y)}]));
 }
@@ -125,6 +126,7 @@ function normalizeSnapshot(value) {
     social:normalizeSocial(source.social),
     npcSocialProfiles:normalizeNpcSocialProfiles(source.npcSocialProfiles),
     rapAnalysis:normalizeRapAnalysis(source.rapAnalysis),
+    rapDossier:normalizeDossier(source.rapDossier),
     battleWindows:normalizeBattleWindows(source.battleWindows),
     socialRuntime:normalizeSocialRuntime(source.socialRuntime),
     communityAudio:normalizeCommunityAudio(source.communityAudio),
