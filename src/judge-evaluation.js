@@ -1,10 +1,12 @@
 import {formatMismatch,checkHardRules} from './battle-format.js?rev=39';
+import {normalizeContentMix,textMixRetention} from './text-content-mix.js?rev=39';
 const axes=['text','performance','music','sound'],clamp=(v,max=1)=>Math.max(0,Math.min(max,v));
 /** JudgeResult: decision is fixed from raw quality; display rounding and comments never decide a pair. */
 export function evaluateTrack(version,judge,format,{opponent=null}={}){
  const weights=judge?.weights??{},known=axes.filter(k=>Number.isFinite(version?.qualities?.[k])&&Number.isFinite(weights[k])&&weights[k]>0);
  if(!known.length)return {ok:false,reason:'Недостаточно сохранённых данных для оценки.',trackVersionId:version?.id,judgeId:judge?.id};
- const sum=known.reduce((s,k)=>s+weights[k],0),personalQuality=known.reduce((s,k)=>s+clamp(version.qualities[k],10)*weights[k],0)/sum;
+ const contentMix=normalizeContentMix(version.facts?.find(f=>f.key==='text.contentMix')?.value),retention=textMixRetention(contentMix,judge.preferredContentMix,judge.contentMixSensitivity);
+ const sum=known.reduce((s,k)=>s+weights[k],0),personalQuality=known.reduce((s,k)=>s+clamp(version.qualities[k],10)*weights[k]*(k==='text'?retention:1),0)/sum;
  const mismatch=formatMismatch(version,format),formatPenalty=clamp(Number(judge.formatAdherence)||0)*Math.min(1.5,Math.max(0,format?.maxPenalty??0))*mismatch.value,raw=personalQuality-formatPenalty;
  const result={ok:true,judgeId:judge.id,battleId:format?.battleId??null,roundId:format?.roundId??null,trackVersionId:version.id,opponentTrackVersionId:opponent?.id??null,personalQuality,formatPenalty,raw,grade:Math.round(clamp(raw+(Number(judge.strictnessOffset)||0),10)*2)/2,decision:{kind:'grade'},evidenceIds:mismatch.evidenceIds,formatMismatch:mismatch,hardRules:checkHardRules(version,format),limitedEvidence:known.length<4||mismatch.limitedEvidence};
  if(opponent){

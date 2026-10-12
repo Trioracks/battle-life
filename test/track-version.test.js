@@ -6,6 +6,14 @@ import {legacySubmissionFixture} from './helpers/submission-fixtures.js';
 import {startVocalWork,advanceVocalWork} from '../src/vocal-production.js';
 const api=await import('../src/track-version.js').catch(()=>({}));
 function capture(state){assert.equal(typeof api.captureTrackVersion,'function');return api.captureTrackVersion(state,{projectId:'beat',nowMinute:600});}
+
+test('content mix belongs to the recorded snapshot, not a later editable text or skill',()=>{
+ const first=capture(submissionFixture()),old=first.state.trackVersions.byId[first.versionId],before=JSON.stringify(old);
+ const mix=old.facts.find(f=>f.key==='text.contentMix');assert.ok(mix);assert.deepEqual(mix.value,old.recipe.lyrics.contentMix);
+ first.state.projects.find(p=>p.id==='lyrics').contentMix={topic:100,diss:0,lyric:0};first.state.writing.practice=80;
+ const restored=createVirtualPcState(JSON.parse(JSON.stringify(first.state))),again=capture(restored);
+ assert.equal(again.versionId,first.versionId);assert.equal(JSON.stringify(again.state.trackVersions.byId[first.versionId]),before);
+});
 test('equal audio recipes cannot reuse a snapshot with different saved facts or qualities',()=>{
  for(const field of ['facts','qualities']){
   const first=capture(submissionFixture()),old=first.state.trackVersions.byId[first.versionId];

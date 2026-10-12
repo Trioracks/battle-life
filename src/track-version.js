@@ -57,7 +57,7 @@ export function captureTrackVersion(state,{projectId,nowMinute}={}){
  const version={schemaVersion:1,id,trackId:beat.id,name:beat.name,createdAtMinute:nowMinute,
   sourceRevision:{beat:digest(canonicalTrackSignature(beat)),lyrics:savedLyrics?.revision??null,vocal:beat.recording.revision},
   signature,recipe,qualities:outcome.qualities,facts:outcome.facts,availability:outcome.availability,
-  legacy:{limitedEvidence:Object.values(outcome.qualities).some(v=>v===null),missingText:!savedLyrics,performanceUnavailable:outcome.qualities.performance===null}};
+  legacy:{limitedEvidence:Object.values(outcome.qualities).some(v=>v===null)||!savedLyrics?.contentMix,missingContentMix:!savedLyrics?.contentMix,missingText:!savedLyrics,performanceUnavailable:outcome.qualities.performance===null}};
  trackVersions.byId[id]=clone(version);
  return {ok:true,state:{...state,trackVersions},versionId:id,reason:''};
 }

@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "provenance": "calibration",
+  "contentMix": {"step": 10, "manualWritingThreshold": 25, "automaticDistribution": "uniform-66-triples", "distance": "L1/200", "legacyRetention": 1},
+  "study": {"durationGameMinutes": 45, "revealTrueNumbers": false},
+  "tournament": {"selectionPlaces": 32, "pairWindowMinutes": 10080, "pairing": "neighbors", "noShowBasePercent": 5, "noShowSkillGapDivisor": 2, "nextAnnouncementDelayMinutes": 1440},
+  "judging": {"quietHours": 6, "hourlyProbabilityPoints": 3, "guaranteedHour": 40},
+  "profiles": {"personalCount": 6, "poolSize": 32}
+}

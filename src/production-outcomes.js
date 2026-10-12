@@ -1,5 +1,6 @@
 // Realized production results. No current character skill is read during judging.
 import {creativeProfileAmount} from './audio-performance.js?rev=39';
+import {normalizeContentMix} from './text-content-mix.js?rev=39';
 export const PRODUCTION_FAMILIES=Object.freeze([
  'text.clarity','text.theme','text.personal','text.rhymes','text.line_rhythm','text.complexity','text.images','text.originality','text.image_density',
  'music.groove','music.movement','music.fills','music.melody','music.harmony','music.texture','music.repetition','music.development','music.transitions',
@@ -43,6 +44,8 @@ export function lyricOutcomes({project,stage=null,referenceUses=project?.referen
   const key=addition.kind==='story'?'text.story':addition.kind==='diss'?'text.addressing':null;
   if(key){out.facts=out.facts.filter(f=>f.key!==key);add(out,key,clamp(addition.skill),'production-simulation',[{path:'additions',action:addition.kind}],'lyrics:'+project.id+':'+key);}
  }
+ const mix=normalizeContentMix(project?.contentMix);
+ if(mix)add(out,'text.contentMix',mix,'production-simulation',[{path:'contentMix',policyVersion:project.contentPolicyVersion??2}],'lyrics:'+project.id+':content-mix');
  if(referenceUses.length)add(out,'text.reference',clone(referenceUses),'production-simulation',[{path:'referenceUses',count:referenceUses.length}],'lyrics:'+project.id+':references');
  return out;
 }

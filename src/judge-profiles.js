@@ -1,4 +1,5 @@
 import data from '../data/judges/profiles.json' with { type:'json' };
+import contentPolicy from '../data/judges/content-policy-v2.json' with { type:'json' };
 import {judgeReferenceKnowledge} from './cultural-references.js?rev=39';
 
 function freeze(value) {
@@ -8,7 +9,12 @@ function freeze(value) {
   }
   return value;
 }
-export const JUDGE_PROFILES = freeze(data.profiles.map(profile=>({...profile,knowledge:judgeReferenceKnowledge(profile.id)})));
+function contentCalibration(id){
+ let seed=2166136261;for(const c of id)seed=Math.imul(seed^c.charCodeAt(0),16777619)>>>0;
+ const index=seed%contentPolicy.preferredMixes.length;
+ return {preferredContentMix:{...contentPolicy.preferredMixes[index]},contentMixSensitivity:contentPolicy.sensitivities[index],competence:{...contentPolicy.competencePresets[seed%contentPolicy.competencePresets.length]},contentPolicy:{version:contentPolicy.version,provenance:contentPolicy.provenance}};
+}
+export const JUDGE_PROFILES = freeze(data.profiles.map(profile=>({...profile,...contentCalibration(profile.id),knowledge:judgeReferenceKnowledge(profile.id)})));
 const profilesById = new Map(JUDGE_PROFILES.map(p=>[p.id,p]));
 
 export function judgeProfile(id) {

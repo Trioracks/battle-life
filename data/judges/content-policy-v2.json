@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "provenance": "calibration",
+  "note": "Gameplay tuning, not measurements inferred from archive comments. Stable ID selects a taste preset; competence is authored initial calibration.",
+  "preferredMixes": [
+    {"topic": 50, "diss": 30, "lyric": 20},
+    {"topic": 60, "diss": 10, "lyric": 30},
+    {"topic": 30, "diss": 50, "lyric": 20},
+    {"topic": 40, "diss": 20, "lyric": 40},
+    {"topic": 30, "diss": 10, "lyric": 60}
+  ],
+  "sensitivities": [0.35, 0.5, 0.65, 0.4, 0.55],
+  "competencePresets": [
+    {"text": 0.8, "performance": 0.65, "music": 0.6, "sound": 0.55},
+    {"text": 0.7, "performance": 0.8, "music": 0.65, "sound": 0.6},
+    {"text": 0.65, "performance": 0.7, "music": 0.85, "sound": 0.75}
+  ]
+}

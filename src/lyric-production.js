@@ -6,6 +6,7 @@ import {softwareDiskBytes} from './pc-software.js?rev=39';
 import {homeDateLabel} from './home-calendar.js?rev=39';
 import {lyricOutcomes,normalizeProductionOutcome} from './production-outcomes.js?rev=39';
 import {chooseTrackReferences,STARTING_REFERENCE_TOPICS,REFERENCE_CATALOG} from './cultural-references.js?rev=39';
+import {normalizeContentMix,createAutomaticContentMix,redistributeContentMix,CONTENT_POLICY_VERSION} from './text-content-mix.js?rev=39';
 
 export const LYRIC_STAGES=Object.freeze([
  {name:'Общее создание',sliders:['Ясность мысли','Развитие темы','Личное отношение'],target:[8,7,6]},
@@ -29,9 +30,9 @@ export function normalizeLyric(p){
  if(p?.schemaVersion!==1||p.kind!=='lyrics'||!text(p.id)||!text(p.name,64))return null;
  const battle=BATTLE_BRIEFS.find(b=>b.id===p.battleId),stages=[];
  for(const s of (Array.isArray(p.stages)?p.stages:[]).slice(0,3)){const v=values(s?.sliders);if(!v)break;stages.push({sliders:v,skill:clamp(s.skill),quality:clamp(s.quality),...(s.resultVersion===1?{resultVersion:1}:{})});}
- const produced=normalizeProductionOutcome(p.productionOutcome);
+ const produced=normalizeProductionOutcome(p.productionOutcome),contentMix=normalizeContentMix(p.contentMix);
  const references=(Array.isArray(p.referenceUses)?p.referenceUses:[]).slice(0,2).filter(use=>REFERENCE_CATALOG.some(r=>r.id===use.referenceId&&r.sourceId===use.sourceId)&&Number.isFinite(use.fit)&&Number.isFinite(use.clarity)).map(use=>({referenceId:use.referenceId,sourceId:use.sourceId,fit:clamp(use.fit,0,1),clarity:clamp(use.clarity,0,1),placement:use.placement==='ending'?'ending':'body',origin:'production-simulation'}));
- return {schemaVersion:1,kind:'lyrics',id:text(p.id),name:text(p.name,64),seed:Math.floor(clamp(p.seed,0,4294967295)),revision:Math.max(1,Math.floor(clamp(p.revision,1,10000))),createdDay:validDay(p.createdDay),updatedDay:validDay(p.updatedDay??p.createdDay),createdDate:homeDateLabel(validDay(p.createdDay)),updatedDate:homeDateLabel(validDay(p.updatedDay??p.createdDay)),battleId:battle?.id??null,battleName:battle?.title??'Вне баттла',round:'Отбор',opponent:'Не назначен',stages,status:stages.length===3?'ready':'draft',sections:normalizeSections(p.sections),additions:(Array.isArray(p.additions)?p.additions:[]).slice(0,6).filter(a=>['diss','story','chorus'].includes(a?.kind)).map(a=>({kind:a.kind,skill:clamp(a.skill),...(a.resultVersion===1?{resultVersion:1}:{})})),adaptation:p.adaptation&&text(p.adaptation.beatId)?{beatId:text(p.adaptation.beatId),beatName:text(p.adaptation.beatName,64),bpm:90,skill:clamp(p.adaptation.skill)}:null,...(produced?{productionOutcome:produced}:{}),...(references.length?{referenceUses:references}:{})};
+ return {...(contentMix?{contentMix,contentPolicyVersion:CONTENT_POLICY_VERSION,contentEvidence:'known'}:{contentEvidence:'legacy'}),...(text(p.contentSource?.id)?{contentSource:{id:text(p.contentSource.id),revision:Math.max(1,Math.floor(number(p.contentSource.revision,1)))}}:{}),schemaVersion:1,kind:'lyrics',id:text(p.id),name:text(p.name,64),seed:Math.floor(clamp(p.seed,0,4294967295)),revision:Math.max(1,Math.floor(clamp(p.revision,1,10000))),createdDay:validDay(p.createdDay),updatedDay:validDay(p.updatedDay??p.createdDay),createdDate:homeDateLabel(validDay(p.createdDay)),updatedDate:homeDateLabel(validDay(p.updatedDay??p.createdDay)),battleId:battle?.id??null,battleName:battle?.title??'Вне баттла',round:'Отбор',opponent:'Не назначен',stages,status:stages.length===3?'ready':'draft',sections:normalizeSections(p.sections),additions:(Array.isArray(p.additions)?p.additions:[]).slice(0,6).filter(a=>['diss','story','chorus'].includes(a?.kind)).map(a=>({kind:a.kind,skill:clamp(a.skill),...(a.resultVersion===1?{resultVersion:1}:{})})),adaptation:p.adaptation&&text(p.adaptation.beatId)?{beatId:text(p.adaptation.beatId),beatName:text(p.adaptation.beatName,64),bpm:90,skill:clamp(p.adaptation.skill)}:null,...(produced?{productionOutcome:produced}:{}),...(references.length?{referenceUses:references}:{})};
 }
 export function normalizeWriting(value,projects=[]){
  const w=value??{},texts=projects.map(normalizeLyric).filter(Boolean),j=w.job,p=texts.find(p=>p.id===j?.projectId),v=values(j?.sliders);
@@ -50,8 +51,25 @@ export function createLyric(input,options={},skills={},random=Math.random){
  if(!id||!name||s.projects.some(p=>p.id===id)||options.battleId&&!battle)return outcome(s,false,'Укажи название и доступный баттл.');
  if(softwareDiskBytes(s).free<2000000)return outcome(s,false,'Недостаточно места для нового текста.');
  if(s.writing.job||s.music.job)return outcome(s,false,'Сначала закончи текущую работу.');
- const day=validDay(options.gameDay),p=normalizeLyric({schemaVersion:1,kind:'lyrics',id,name,battleId:battle?.id,seed:Math.floor(clamp(random(),0,.999999999)*4294967296),revision:1,createdDay:day,updatedDay:day,stages:[],sections:[],additions:[]});
+ const day=validDay(options.gameDay),seed=Math.floor(clamp(random(),0,.999999999)*4294967296),p=normalizeLyric({schemaVersion:1,kind:'lyrics',id,name,battleId:battle?.id,seed,contentMix:createAutomaticContentMix(seed),contentPolicyVersion:CONTENT_POLICY_VERSION,revision:1,createdDay:day,updatedDay:day,stages:[],sections:[],additions:[]});
  s.projects.push(p);s.writing.activeTextId=id;return outcome(s);
+}
+export function canEditLyricContentMix(state,project){
+ return Boolean(project?.contentMix&&project.stages.length===0&&!state.writing?.job&&!state.recording?.job&&!state.creativeWork?.items.some(i=>i.projectId===project.id));
+}
+export function setLyricContentMix(input,{projectId,key,value}={},skills={}){
+ const p=normalizeLyric(input.projects?.find(p=>p.id===projectId));
+ if(effectiveWritingSkill(input,skills)<25)return outcome(input,false,'Распределение содержания откроется на Письме 25.');
+ if(!canEditLyricContentMix(input,p))return outcome(input,false,'Создай новую содержательную версию: эта работа уже начата.');
+ const contentMix=redistributeContentMix(p.contentMix,{key,value,step:10});if(!contentMix)return outcome(input,false,'Проверь доли содержания.');
+ return outcome({...input,projects:input.projects.map(item=>item.id===projectId?{...p,contentMix}:item)});
+}
+export function createLyricContentRevision(input,{projectId,id,gameDay=1}={},skills={}){
+ const p=normalizeLyric(input.projects?.find(p=>p.id===projectId));if(!p)return outcome(input,false,'Текст не найден.');
+ if(input.writing?.job||input.music?.job||input.recording?.job)return outcome(input,false,'Сначала прерви текущую работу.');
+ const r=createLyric(input,{id,name:p.name,battleId:p.battleId,gameDay},skills,()=>p.seed/4294967296);if(!r.ok)return r;
+ r.state.projects=r.state.projects.map(item=>item.id===id?{...item,revision:p.revision+1,contentSource:{id:p.id,revision:p.revision},...(p.contentMix?{contentMix:{...p.contentMix}}:{})}:item);
+ return r;
 }
 export function startLyricWork(input,{projectId,kind='stage',sliders,beatId,gameDay=1}={},skills={},random=Math.random,plan=null){
  if(input.recording?.job)return {state:input,ok:false,reason:'Сначала заверши запись.'};

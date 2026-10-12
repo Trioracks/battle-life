@@ -1,6 +1,6 @@
 // Notepad-style view of the persisted symbolic lyric projects.
 import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=39';
-import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill} from './lyric-production.js?rev=39';
+import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill,canEditLyricContentMix,setLyricContentMix,createLyricContentRevision} from './lyric-production.js?rev=39';
 import {normalizeBeat} from './beat-production.js?rev=39';
 import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=39';
 
@@ -72,6 +72,20 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
    side.append(el(d,'small',{text:'РАБОТА С ТЕКСТОМ'}),el(d,'h2',{text:p.status==='ready'?'Основа текста готова':LYRIC_STAGES[p.stages.length].name}));
    for(let i=0;i<3;i++)side.append(el(d,'p',{className:i<p.stages.length?'rn-done':'',text:(i<p.stages.length?'✓ ':'○ ')+LYRIC_STAGES[i].name}));
    const planned=s.creativeWork?.items.some(i=>i.projectId===p.id);
+   const budget=el(d,'section',{className:'rn-content-budget',attributes:{'aria-label':'Содержание текста'}});
+   budget.append(el(d,'h3',{text:'Содержание · 100%'}));
+   if(skill>=25&&canEditLyricContentMix(s,p)){
+    for(const [key,label]of [['topic','Тема'],['diss','Дисс'],['lyric','Лирика']]){
+     const field=el(d,'label',{text:label+' '+p.contentMix[key]+'%'}),input=el(d,'input',{type:'range',value:p.contentMix[key],dataset:{contentMixKey:key},attributes:{min:'0',max:'100',step:'10','aria-label':'Доля: '+label}});
+     input.addEventListener('change',()=>{const r=setLyricContentMix(getState(),{projectId:p.id,key,value:Number(input.value)},getMetadata().skills);if(r.ok)onChange(r.state);else message=r.reason;render();});field.append(input);budget.append(field);
+    }
+   }else budget.append(el(d,'p',{text:p.contentMix?(skill<25?'Пока содержание складывается само. Доли сохраняются вместе с текстом.':`Тема ${p.contentMix.topic}% · Дисс ${p.contentMix.diss}% · Лирика ${p.contentMix.lyric}%`):'Старый текст: доли содержания неизвестны. Он не переоценивается.'}));
+   if((!canEditLyricContentMix(s,p)||!p.contentMix)&&!s.writing.job&&!s.music.job&&!s.recording?.job){
+    budget.append(el(d,'p',{text:'Новая содержательная версия потребует заново пройти три этапа. Старая работа сохранится.'}),button(d,'Новая содержательная версия',{},()=>{
+     const id='text-'+(globalThis.crypto?.randomUUID?.()??Date.now().toString(36)),r=createLyricContentRevision(getState(),{projectId:p.id,id,gameDay:getMetadata().gameDay},getMetadata().skills);if(r.ok)onChange(r.state);else message=r.reason;render();
+    }));
+   }
+   side.append(budget);
    if(p.status!=='ready'&&!job&&!planned&&skill>=25)for(let stage=p.stages.length;stage<3;stage++){
     const inputs=[];side.append(el(d,'h3',{text:LYRIC_STAGES[stage].name}));
     for(const label of LYRIC_STAGES[stage].sliders){const field=el(d,'label',{text:label}),input=el(d,'input',{type:'range',value:5,attributes:{min:'0',max:'10',step:'1','aria-label':label}});inputs.push(input);field.append(input);side.append(field);}controls.push({stage,inputs});
