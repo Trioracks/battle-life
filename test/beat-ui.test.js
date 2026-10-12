@@ -12,9 +12,9 @@ test('FT creates a beat without tempo editing and retains inputs across host tic
  const name=field(s.root,'Название бита');assert.ok(name);name.value='Город';fire(name,'input');name.focus();
  s.pc.syncHost({playerName:'Игрок',clockLabel:'10:01',skills:{beatmaking:40}});assert.equal(field(s.root,'Название бита'),name);assert.equal(name.value,'Город');
  findButton(s.root,'Начать проект').click();assert.equal(s.pc.state.projects[0].name,'Город');assert.match(s.pc.state.projects[0].drumId,/free/);
- assert.equal(allPc(s.root).filter(n=>n.type==='range').length,3);assert.equal(field(s.root,'BPM'),undefined);
+ assert.equal(allPc(s.root).filter(n=>n.type==='range').length,9);assert.equal(field(s.root,'BPM'),undefined);
  const groove=field(s.root,'Ровный грув');groove.value='9';fire(groove,'input');
- findButton(s.root,'Работать над этапом').click();assert.equal(s.work(),1);assert.ok(s.pc.state.music.job);assert.equal(s.pc.state.music.job.sliders[0],9);
+ findButton(s.root,'Работать над битом').click();assert.equal(s.work(),1);assert.ok(s.pc.state.music.job);assert.equal(s.pc.state.music.job.sliders[0],9);
  s.pc.syncState(advanceBeatWork(s.pc.state,600).state);
  const workflow=allPc(s.root).find(n=>n.dataset.ftRole==='workflow');
  assert.ok(allPc(workflow).some(n=>n.textContent?.includes('Музыкальная основа')));
@@ -25,7 +25,7 @@ test('beginner decisions stay hidden below 25 and appear at 25',()=>{
  for(const skill of [10,25,26]){
   const s=setup();s.pc.syncHost({skills:{beatmaking:skill}});
   const state=createBeat(s.pc.state,{id:'tier',name:'Порог'},{beatmaking:skill}).state;s.pc.syncState(state);s.pc.openProject(state.projects[0]);s.launch();
-  assert.equal(allPc(s.root).filter(n=>n.type==='range').length,skill<25?0:3);s.pc.dispose();
+  assert.equal(allPc(s.root).filter(n=>n.type==='range').length,skill<25?0:9);s.pc.dispose();
  }
 });
 test('local store buys a sample once and RIPLINE is installable',()=>{
@@ -54,11 +54,11 @@ test('Projects navigation preserves live wallet, infection, recovered needs and 
 });
 test('Explorer opening selects a saved beat even while the new-beat form is open',()=>{
  const s=setup(),state=createBeat(s.pc.state,{id:'existing',name:'Существующий'},{}).state;s.pc.syncState(state);s.pc.open('ft-studio');s.launch();findButton(s.root,'Новый проект').click();assert.ok(field(s.root,'Название бита'));
- s.pc.openProject(state.projects[0]);assert.equal(Boolean(field(s.root,'Название бита')),false);assert.ok(findButton(s.root,'Работать над этапом'));
+ s.pc.openProject(state.projects[0]);assert.equal(Boolean(field(s.root,'Название бита')),false);assert.ok(findButton(s.root,'Работать над битом'));
 });
 test('opening a legacy project replaces the active v2 view without rewriting its data',()=>{
  const s=setup(),legacy=createStudioProject({id:'legacy',name:'Архивный проект',battleId:'concrete-echo'}).project;let state=createBeat(s.pc.state,{id:'new',name:'Новый проект'},{}).state;state.projects.push(legacy);s.pc.syncState(state);s.pc.open('ft-studio');s.launch();s.pc.openProject(legacy);
- assert.equal(s.pc.state.music.activeBeatId,null);assert.equal(Boolean(findButton(s.root,'Работать над этапом')),false);
+ assert.equal(s.pc.state.music.activeBeatId,null);assert.equal(Boolean(findButton(s.root,'Работать над битом')),false);
  assert.ok(allPc(s.root).some(n=>n.textContent==='Архивный проект'));assert.ok(allPc(s.root).some(n=>n.textContent?.includes('Открыт прежний проект: Архивный проект')));
  assert.deepEqual(s.pc.state.projects,state.projects);
 });

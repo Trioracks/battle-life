@@ -75,7 +75,6 @@ test('keyboard Tab reaches and wraps from the scrollable FT playlist',()=>{
  findButton(s.root,'Закрыть окно').focus();fire(s.root,'keydown',{key:'Tab'});
  assert.equal(s.d.activeElement.textContent,'Новый проект');
  fire(s.root,'keydown',{key:'Tab'});assert.equal(s.d.activeElement.textContent,'Открыть проект');
- fire(s.root,'keydown',{key:'Tab'});assert.equal(s.d.activeElement.textContent,'Жанры');
  fire(s.root,'keydown',{key:'Tab'});assert.equal(s.d.activeElement.textContent,'Библиотека');
  fire(s.root,'keydown',{key:'Tab'});assert.equal(s.d.activeElement.textContent,'Ритм-панель');
  fire(s.root,'keydown',{key:'Tab'});

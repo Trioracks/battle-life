@@ -6,7 +6,7 @@ import {resolveBeatPlayback} from './beat-playback.js?rev=34';
 import {describeBeatMix} from './beat-mix.js?rev=34';
 import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=34';
 import {startVocalWork} from './vocal-production.js?rev=34';
-import {startCreativeChain,pauseCreativeChain} from './creative-workflow.js?rev=34';
+import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=34';
 import {appendRecordingControls} from './recording-studio-view.js?rev=34';
 import {normalizeGenreProgression,genreOptions,genreById,genreCap,chooseGenre,chooseSpecialization} from './genre-progression.js?rev=34';
 
@@ -17,7 +17,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
  body.append(panel);body.className+=' ft-producing';
  const actions=find('project-actions'),workflow=find('workflow');
  actions.append(button(d,'Новый проект',{},()=>openDialog('new')),button(d,'Открыть проект',{},()=>openDialog('projects')));
- actions.append(button(d,'Жанры',{},()=>openDialog('genres')));
+ const genreButton=button(d,'Жанры',{},()=>openDialog('genres'));
  const footer=pcFind(workspace,n=>n.className==='ft-bottom');footer.replaceChildren(el(d,'span',{text:'●  FIELD TONE / HOME STUDIO'}),el(d,'span',{text:'Три этапа. Твой первый звук.'}),el(d,'span',{text:'44.1 kHz / 16 bit'}));
  const summary=el(d,'p',{className:'ft-needs'}),session=pcFind(workspace,n=>n.className==='ft-session').children[1],tempo=pcFind(workspace,n=>n.className==='ft-tempo').children[0];
  const readout=pcFind(workspace,n=>n.className==='ft-readout').children[1],transport=find('transport'),playhead=find('playhead'),status=find('transport-status');
@@ -85,7 +85,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
    const projects=getState().projects.filter(p=>p.kind!=='lyrics');
    if(!projects.length)card.append(el(d,'p',{className:'ft-production-note',text:'Пока нет сохранённых проектов.'}));
    const list=el(d,'div',{className:'ft-dialog-projects'});
-   for(const p of projects)list.append(button(d,p.name+' · '+(p.kind==='beat'?(p.status==='ready'?'готов':p.stages.length+'/3'):'архив'),{className:'ft-project-item'},()=>selectProject(p)));
+   for(const p of projects)list.append(button(d,p.name+' · '+(p.recoveryIssue?'ошибка формата':p.kind==='beat'?(p.status==='ready'?'готов':p.stages.length+'/3'):'архив'),{className:'ft-project-item'},()=>selectProject(p)));
    card.append(list,button(d,'Новый проект',{},()=>openDialog('new')));
   }else{
    card.append(el(d,'p',{className:'ft-production-note',text:'Чистый лист или работа, к которой хочется вернуться.'}),button(d,'Новый проект',{className:'ft-menu-choice'},()=>openDialog('new')),button(d,'Открыть проект',{className:'ft-menu-choice'},()=>openDialog('projects')));
@@ -99,6 +99,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
   pcFocusable(dialog)[0]?.focus();
  }
  function selectProject(project){
+  if(project.recoveryIssue){message=project.recoveryIssue;closeDialog();render();return;}
   sessionSelected=true;
   closeDialog({restore:false});legacyName=project.kind==='beat'?undefined:project.name;message='';audio.stop();
   const s=pauseCreativeChain(getState());change({...s,music:{...s.music,activeBeatId:project.kind==='beat'?project.id:null}});
@@ -106,6 +107,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
  }
  function render(){
   if(disposed)return;const s=getState(),beat=currentBeat();signature=stateSignature();panel.replaceChildren();workflow.replaceChildren();
+  if(effectiveBeatSkill(s,getMetadata().skills)>=25){if(!genreButton.parentNode)actions.append(genreButton);}else genreButton.remove();
   panel.append(el(d,'small',{className:'ft-eyebrow',text:'АНАЛИЗ ПРОЕКТА'}),summary);
   const genres=normalizeGenreProgression(s.music.genres),genreId=beat?.genreProfile?.id??'experimental',options=genreOptions(genres,effectiveBeatSkill(s,getMetadata().skills));
   panel.append(el(d,'p',{className:'ft-production-note',dataset:{ftRole:'genre-summary'},text:(beat&&!beat.genreProfile?'Архивная экспериментальная работа · ':genreById(genreId).name+' · ')+genres.xp[genreId].toFixed(2)+' / '+genreCap(genres,genreId)}));
@@ -133,17 +135,20 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
     if(job)panel.append(el(d,'p',{text:'Сохранено '+Math.floor(job.elapsed)+' из '+job.total+' мин. Можно продолжить.'}));
     const blocked=beat.audioIssue?'Не найден аудиобанк проекта. Работа сохранена.':workBlockReason(s);
     if(blocked)panel.append(el(d,'p',{className:'ft-warning',text:blocked}));
-    let decisions;
+    const plans=s.creativeWork?.items.find(i=>i.projectId===beat.id)?.plans,stageSliders=[];
+    const readiness=creativeChainProgress(s,beat.id),progress=el(d,'progress',{attributes:{'aria-label':'Готовность бита'}});progress.max=1;progress.value=readiness.overall;
+    panel.append(el(d,'p',{text:'Общая готовность · '+Math.round(readiness.overall*100)+'%'}),progress);
     if(effectiveBeatSkill(s,getMetadata().skills)>=25){
-     decisions=job?[...job.sliders]:[5,5,5];
-     const fields=el(d,'div',{className:'ft-stage-result ft-beat-decisions'});
-     BEAT_STAGES[stage].sliders.forEach((label,i)=>{
-      const row=el(d,'label'),caption=el(d,'span',{text:label+' · '+decisions[i]}),input=el(d,'input',{type:'range',value:String(decisions[i]),attributes:{type:'range',min:'0',max:'10',step:'1','aria-label':label}});
-      input.disabled=Boolean(job);input.addEventListener('input',()=>{decisions[i]=Number(input.value);caption.textContent=label+' · '+decisions[i];});row.append(caption,input);fields.append(row);
-     });panel.append(fields);
+     for(let next=stage;next<3;next++){
+      const decisions=stageSliders[next]=[...(plans?.[next]?.sliders??(job?.stage===next?job.sliders:[5,5,5]))];
+      const fields=el(d,'div',{className:'ft-stage-result ft-beat-decisions'});fields.append(el(d,'h3',{text:BEAT_STAGES[next].name}));
+      BEAT_STAGES[next].sliders.forEach((label,i)=>{
+       const row=el(d,'label'),caption=el(d,'span',{text:label+' · '+decisions[i]}),input=el(d,'input',{type:'range',value:String(decisions[i]),attributes:{type:'range',min:'0',max:'10',step:'1','aria-label':label}});
+       input.disabled=Boolean(plans||job?.stage===next);input.addEventListener('input',()=>{decisions[i]=Number(input.value);caption.textContent=label+' · '+decisions[i];});row.append(caption,input);fields.append(row);
+      });panel.append(fields);
+     }
     }
-    const work=button(d,job?'Продолжить этап':'Работать над этапом',{className:'ft-primary'},()=>{
-     const stageSliders=[];stageSliders[stage]=decisions;
+    const work=button(d,job||plans||stage?'Продолжить работу':'Работать над битом',{className:'ft-primary'},()=>{
      const r=startCreativeChain(getState(),{kind:'beat',projectId:beat.id,stageSliders,gameDay:getMetadata().gameDay},getMetadata().skills);message=r.reason;
      if(r.ok){
       // Resume AudioContext in the click gesture, before the cinematic transition.

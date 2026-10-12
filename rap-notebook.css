@@ -47,7 +47,12 @@
 #virtual-pc .rap-notebook .rn-dialog p { font-size:12px; line-height:1.6; color:#667483; }
 #virtual-pc .rap-notebook .rn-dialog-hint { margin:4px 0; }
 .rn-message { color:#a43324!important; }
-.rn-dialog button:last-child { margin-top:12px; }
+.rn-dialog button:last-child { margin-top:0; }
+.rn-dialog form>button { min-height:36px; align-self:start; }
+#virtual-pc .rap-notebook .rn-prose { margin:0 12px 18px 44px; font:16px/2 Consolas,'Courier New',monospace; overflow-wrap:anywhere; }
+.rn-create-action { display:flex; align-items:center; flex-direction:column; gap:10px; padding:26px 12px; margin:12px auto; text-align:center; }
+.rn-create-action progress { width:min(280px,100%); height:7px; accent-color:#446e73; }
+.rap-notebook button.rn-primary { padding:12px 30px; background:#365e66; color:#fff; border-color:#294b52; }
 @media(max-width:700px) {
   .rn-work { width:160px; padding:12px; }
   .rn-sheet { padding-right:8px; }

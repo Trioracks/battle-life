@@ -14,9 +14,11 @@ const byLabel=(root,label)=>allPc(root).find(n=>n.getAttribute('aria-label')===l
 test('novice sees fixed experimental and no locked selector; sliders appear at exactly25',()=>{
  for(const skill of [10,24.99,25]){
   const s=setup(skill);findButton(s.root,'Новый проект').click();
+  assert.equal(Boolean(findButton(s.root,'Жанры')),skill>=25);
   assert.ok(allPc(s.root).some(n=>n.textContent==='Жанр: Экспериментальный'));assert.equal(byLabel(s.root,'Жанр проекта'),undefined);
   byLabel(s.root,'Название бита').value='B';findButton(s.root,'Начать проект').click();
-  assert.equal(s.state.projects[0].genre,'experimental');assert.equal(allPc(s.root).filter(n=>n.type==='range').length,skill<25?0:3);
+  assert.equal(s.state.projects[0].genre,'experimental');assert.equal(allPc(s.root).filter(n=>n.type==='range').length,skill<25?0:9);
+  assert.ok(findButton(s.root,'Работать над битом'));
   assert.ok(allPc(s.root).some(n=>n.dataset.ftRole==='genre-summary'&&n.textContent.includes('0.00 / 75')));s.studio.dispose();
  }
 });

@@ -14,8 +14,8 @@ function draft(name='Голос спального района',skill=10,seed=.
  }};
 }
 
-test('first writing pass is scattered unfinished notes rather than a verse at any skill',()=>{
- for(const skill of [10,60,99]){
+test('experienced first writing pass is scattered unfinished notes rather than a verse',()=>{
+ for(const skill of [60,99]){
   const f=draft(undefined,skill),p=f.finish();
   assert.ok(p.sections.every(s=>s.type==='draft'&&s.title===''));
   assert.ok(notes(p)>=4);
@@ -36,7 +36,7 @@ test('symbols spell consonants and vowels with theme marks instead of random orn
 });
 
 test('rhymes and images refine the same lines and keep room for a final revision',()=>{
- const f=draft(),first=f.finish(),rhymes=f.finish(),images=f.finish();
+ const f=draft(undefined,40),first=f.finish(),rhymes=f.finish(),images=f.finish();
  assert.ok(notes(first)>notes(rhymes));assert.ok(notes(rhymes)>notes(images));assert.ok(notes(images)>0);
  assert.ok(rhymes.sections.some(s=>s.type!=='draft'));assert.equal(images.status,'ready');
  const starts=p=>lines(p).slice(0,8).map(l=>l.words[0].text);
@@ -46,6 +46,23 @@ test('rhymes and images refine the same lines and keep room for a final revision
  assert.ok(lines(images).filter(l=>!l.note).length/lines(images).length<=.85);
  const saved=createVirtualPcState(JSON.parse(JSON.stringify(f.state)));
  assert.deepEqual(saved.projects[0],images,'reload must not re-roll unfinished text');
+});
+
+test('novice prose in all three stages has no headings or author notes',()=>{
+ for(const skill of [10,24]){
+  const f=draft(undefined,skill);
+  for(let i=0;i<3;i++){
+   const p=f.finish();assert.ok(p.sections.every(s=>s.presentation==='prose'&&!s.title));assert.equal(notes(p),0);
+   assert.ok(lines(p).filter(l=>l.gapBefore).length<=2);
+  }
+ }
+});
+test('notes unlock at actual skill 25 and advanced notes at 50, not at slider fit',()=>{
+ for(const skill of [24,25,49,50]){
+  const f=draft(undefined,skill),p=f.finish(),all=lines(p).map(l=>l.note).join(' ');
+  if(skill<25)assert.equal(notes(p),0);else assert.ok(notes(p)>0);
+  if(skill<50)assert.doesNotMatch(all,/панч|сравнение|размерность/);else assert.match(all,/панч|сравнение|размерность/);
+ }
 });
 
 test('legacy written sections are kept verbatim on load rather than silently regenerated',()=>{

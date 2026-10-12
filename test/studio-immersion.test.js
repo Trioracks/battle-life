@@ -52,8 +52,8 @@ test('ordinary FT launch is an empty session without deleting the previous proje
  let state=createBeat(createVirtualPcState({power:'on',download:{status:'installed'}}),{id:'saved',name:'Сохранённый'},{}).state;
  state=startBeatStage(state,'saved',undefined,{}).state;const before=structuredClone(state);
  pc.showDesktop(state);pc.open('ft-studio');launch();findButton(allPc(root).find(n=>n.dataset.ftRole==='dialog'),'Закрыть').click();
- assert.equal(Boolean(findButton(root,'Продолжить этап')),false);assert.deepEqual(pc.state.projects,before.projects);assert.deepEqual(pc.state.music.job,before.music.job);
- pc.openProject(state.projects[0]);assert.ok(findButton(root,'Продолжить этап'));pc.dispose();
+ assert.equal(Boolean(findButton(root,'Продолжить работу')),false);assert.deepEqual(pc.state.projects,before.projects);assert.deepEqual(pc.state.music.job,before.music.job);
+ pc.openProject(state.projects[0]);assert.ok(findButton(root,'Продолжить работу'));pc.dispose();
 });
 
 test('work typing moves both forearms rapidly, freezes on pause, and restores seated base without drift',()=>{

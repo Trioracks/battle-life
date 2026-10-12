@@ -67,7 +67,7 @@ test('launch menu, name-only form, cancel and host updates preserve input and fo
  findButton(s.root,'Отмена').click();assert.equal(s.state.projects.length,0);findButton(s.root,'Новый проект').click();
  allPc(s.root).find(n=>n.getAttribute('aria-label')==='Название бита').value='Пыль';findButton(s.root,'Начать проект').click();
  assert.equal(s.state.projects.length,1);assert.equal(role(s.root,'dialog'),undefined);assert.equal(s.state.projects[0].name,'Пыль');
- findButton(s.root,'Работать над этапом').click();assert.equal(s.work(),1);assert.equal(s.unlocks(),1);s.view.dispose();
+ findButton(s.root,'Работать над битом').click();assert.equal(s.work(),1);assert.equal(s.unlocks(),1);s.view.dispose();
 });
 test('completed stages fill three lanes each at bar one, menu does not reappear on updates',()=>{
  const s=setup(createBeat(createVirtualPcState(),{id:'a',name:'Сеанс'},{beatmaking:10},()=>0).state);s.view.openProject(s.state.projects[0]);
@@ -86,7 +86,7 @@ test('project actions stay above lanes and analytics contain only results, not w
  const actions=role(s.root,'project-actions'),workflow=role(s.root,'workflow'),analytics=role(s.root,'analytics');
  assert.ok(actions);assert.ok(workflow);assert.ok(analytics);
  assert.ok(findButton(actions,'Новый проект'));assert.ok(findButton(actions,'Открыть проект'));
- assert.ok(findButton(workflow,'Работать над этапом'));
+ assert.ok(findButton(workflow,'Работать над битом'));
  assert.equal(allPc(analytics).filter(n=>n.tagName==='BUTTON').length,0);
  assert.equal(s.d.activeElement,findButton(actions,'Новый проект'),'project selection restores focus to a live control');
  assert.equal(analytics.contains(workflow),false);s.view.dispose();
@@ -109,6 +109,6 @@ test('Explorer selection survives delayed launch and a later normal launch still
  const d=pcDocument(),root=d.createElement('section');let launch;
  const pc=mountVirtualPc(root,{audio:{stop(){},dispose(){}},beatAudio:{stop(){},dispose(){},getSnapshot:()=>({status:'stopped'})},setTimeoutFn:fn=>(launch=fn,1),clearTimeoutFn(){}});
  const state=createBeat(createVirtualPcState({power:'on',download:{status:'installed'}}),{id:'a',name:'Saved'},{}).state;pc.showDesktop(state);
- pc.openProject(state.projects[0]);launch();assert.equal(role(root,'dialog'),undefined);assert.ok(findButton(root,'Работать над этапом'));
+ pc.openProject(state.projects[0]);launch();assert.equal(role(root,'dialog'),undefined);assert.ok(findButton(root,'Работать над битом'));
  pc.closeWindow('ft-studio');pc.open('ft-studio');launch();assert.ok(role(root,'dialog'));pc.dispose();
 });

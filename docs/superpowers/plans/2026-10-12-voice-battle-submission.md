@@ -25,7 +25,7 @@
 - Repeated Submit/cancel replacement never create two current submissions — B2–B3.
 - Midnight rerender preserves picker selection/focus without submitting — B3.
 
-## Task B1 Performance pose and gain
+## Task 1 B1 Performance pose and gain
 
 **Files:** modify `src/vocal-result.js`, `src/vocal-result-dsp.js`, `src/apartment-v3-animation.js`, `src/apartment-v3-scene.js`, `src/apartment-app.js`, `src/home-creative-work.js`, `src/ft-studio-view.js`, `src/virtual-pc-icons.js`; create `assets/ui/virtual-pc/icons/microphone.svg`; tests `test/vocal-post-balance.test.js`, `test/apartment-v3-animation.test.js`, `test/vocal-ui.test.js`.
 
@@ -37,7 +37,7 @@
 - [ ] Rerun to PASS; hear identical raw/mixed/mastered sources and visually inspect draft/clean/mix/master/interruption. Measure gain before the shared output limiter, listen after it.
 - [ ] Commit `feat: add mic performance and rebalance vocals`.
 
-## Task B2 Immutable submission model
+## Task 2 B2 Immutable submission model
 
 **Files:** create `src/battle-submission.js`, `test/battle-submission.test.js`; modify `src/virtual-pc-state.js`, `src/vocal-result.js`, `src/vocal-production.js`, `src/virtual-pc-catalog.js`.
 
@@ -49,7 +49,7 @@
 - [ ] Rerun to PASS; JSON round-trip, changed/deleted text, stale revision, duplicate submission, corrupt metadata, backup quota failure preserving original raw save. Existing submission must survive without current source project.
 - [ ] Commit `feat: persist battle track submissions`.
 
-## Task B3 Picker and Iskra
+## Task 3 B3 Picker and Iskra
 
 **Files:** create `src/battle-submission-view.js`, `test/battle-submission-view.test.js`; modify `src/underweb-view.js`, `src/virtual-pc-ui.js`, `src/virtual-pc-catalog.js`, `src/virtual-pc-window-state.js`, `underweb-world.css`; tests `test/underweb-news-view.test.js`, `test/virtual-pc-window-state.test.js`.
 

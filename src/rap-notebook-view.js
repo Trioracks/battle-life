@@ -2,7 +2,7 @@
 import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=21';
 import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill} from './lyric-production.js?rev=34';
 import {normalizeBeat} from './beat-production.js?rev=34';
-import {startCreativeChain,pauseCreativeChain} from './creative-workflow.js?rev=34';
+import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=34';
 
 export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,onWork=()=>false}={}){
  const d=root.ownerDocument;let panel=null,modal=null,returnFocusLabel='',message='',signature='',disposed=false,controls=[];
@@ -12,7 +12,7 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
  function choose(id){const s=pauseCreativeChain(getState());onChange({...s,writing:{...s.writing,activeTextId:id}});panel=null;message='';render();}
  function start(kind='stage',extra={}){
   const before=getState(),p=active();if(!p)return;
-  const stageSliders=[];stageSliders[p.stages.length]=controls.length?controls.map(c=>Number(c.value)):undefined;
+  const stageSliders=[];for(const c of controls)stageSliders[c.stage]=c.inputs.map(input=>Number(input.value));
   const r=kind==='stage'?startCreativeChain(before,{kind:'lyrics',projectId:p.id,stageSliders,gameDay:getMetadata().gameDay},getMetadata().skills):startLyricWork(before,{projectId:p.id,kind,gameDay:getMetadata().gameDay,...extra},getMetadata().skills);
   if(!r.ok){message=r.reason;render();return;}
   onChange(r.state);if(!onWork()){onChange(before);message='Сначала сядь за компьютер.';}else message='';panel=null;render();
@@ -47,7 +47,7 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
   if(disposed)return;const p=active(),s=getState(),skill=effectiveWritingSkill(s,getMetadata().skills),job=s.writing.job??s.creativeWork?.items.find(i=>i.projectId===p?.id)?.pausedJob;
   const wrap=el(d,'section',{className:'rap-notebook',attributes:{'aria-label':'Рэпблокнот'}}),toolbar=el(d,'nav',{className:'rn-toolbar'});
   toolbar.append(button(d,'Новый текст',{},()=>openPanel('new')),button(d,'Открыть текст',{},()=>openPanel('open')));
-  const add=button(d,'Добавить',{},()=>openPanel('add')),adapt=button(d,'Адаптировать под бит',{},()=>openPanel('adapt'));add.disabled=adapt.disabled=!p||p.status!=='ready'||Boolean(job);toolbar.append(add,adapt);
+  if(p?.status==='ready'){const add=button(d,'Добавить',{},()=>openPanel('add')),adapt=button(d,'Адаптировать под бит',{},()=>openPanel('adapt'));add.disabled=adapt.disabled=Boolean(job);toolbar.append(add,adapt);}
   const tab=el(d,'div',{className:'rn-tab',text:'▤ '+(p?p.name+'.rap.txt':'Рэпблокнот — начни с чистого листа')}),body=el(d,'div',{className:'rn-body'}),sheet=el(d,'article',{className:'rn-sheet',dataset:{lyricRole:'document'},attributes:{'aria-label':'Документ текста'}}),side=el(d,'aside',{className:'rn-work'});
   controls=[];
   if(p){
@@ -55,6 +55,12 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
    if(p.adaptation)meta.append(el(d,'p',{text:'Бит: '+p.adaptation.beatName+' · '+p.adaptation.bpm+' BPM'}));sheet.append(meta);
    let number=1;
    for(const section of p.sections){const part=el(d,'section',{className:'rn-section'});if(section.title)part.append(el(d,'h2',{text:section.title}));
+    if(section.presentation==='prose'){
+     let paragraph=el(d,'p',{className:'rn-prose'});part.append(paragraph);
+     for(const line of section.lines){if(line.gapBefore){paragraph=el(d,'p',{className:'rn-prose'});part.append(paragraph);}
+      for(const w of line.words)paragraph.append(el(d,'span',{className:'rn-word'+(w.error?' rn-error':''),text:w.text+' ',attributes:w.error?{title:'Неточное слово: персонаж ещё учится писать'}:{}}));
+     }sheet.append(part);continue;
+    }
     for(const line of section.lines){
      const row=el(d,'div',{className:'rn-line'+(line.gapBefore?' rn-line-gap':''),dataset:{unfinished:String(line.unfinished)}}),lineBody=el(d,'div',{className:'rn-line-body',dataset:{indent:String(line.indent)}}),words=el(d,'span',{className:'rn-words'});
      row.append(el(d,'span',{className:'rn-line-number',text:String(number++),attributes:{'aria-hidden':'true'}}));
@@ -65,9 +71,16 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
    if(!p.sections.length)sheet.append(el(d,'p',{className:'rn-empty',text:'|  Здесь появятся первые строки…'}));
    side.append(el(d,'small',{text:'РАБОТА С ТЕКСТОМ'}),el(d,'h2',{text:p.status==='ready'?'Основа текста готова':LYRIC_STAGES[p.stages.length].name}));
    for(let i=0;i<3;i++)side.append(el(d,'p',{className:i<p.stages.length?'rn-done':'',text:(i<p.stages.length?'✓ ':'○ ')+LYRIC_STAGES[i].name}));
-   if(p.status!=='ready'&&!job&&skill>=25)for(const label of LYRIC_STAGES[p.stages.length].sliders){const field=el(d,'label',{text:label}),input=el(d,'input',{type:'range',value:5,attributes:{min:'0',max:'10',step:'1','aria-label':label}});controls.push(input);field.append(input);side.append(field);}
-   if(job?.projectId===p.id)side.append(el(d,'p',{text:'Незавершённая работа сохранена: '+Math.floor(job.elapsed)+' / '+job.total+' мин.'}),button(d,'Продолжить работу',{},()=>start(job.kind,{beatId:job.beatId})));
-   else if(p.status!=='ready')side.append(button(d,'Начать работу',{},()=>start()));
+   const planned=s.creativeWork?.items.some(i=>i.projectId===p.id);
+   if(p.status!=='ready'&&!job&&!planned&&skill>=25)for(let stage=p.stages.length;stage<3;stage++){
+    const inputs=[];side.append(el(d,'h3',{text:LYRIC_STAGES[stage].name}));
+    for(const label of LYRIC_STAGES[stage].sliders){const field=el(d,'label',{text:label}),input=el(d,'input',{type:'range',value:5,attributes:{min:'0',max:'10',step:'1','aria-label':label}});inputs.push(input);field.append(input);side.append(field);}controls.push({stage,inputs});
+   }
+   if(p.status!=='ready'){
+    const call=el(d,'div',{className:'rn-create-action'}),progress=creativeChainProgress(s,p.id),bar=el(d,'progress',{attributes:{'aria-label':'Готовность текста'}});bar.max=1;bar.value=progress.overall;
+    call.append(el(d,'p',{text:'Три этапа · готово '+Math.round(progress.overall*100)+'%'}),bar,button(d,job||planned||p.stages.length?'Продолжить писать':'Начать писать',{className:'rn-primary'},()=>start()));
+    if(job)call.append(el(d,'small',{text:'Этап '+(job.stage+1)+' / 3 · сохранено '+Math.floor(job.elapsed)+' / '+job.total+' мин.'}));meta.append(call);
+   }else if(job?.projectId===p.id)side.append(button(d,'Продолжить работу',{},()=>start(job.kind,{beatId:job.beatId})));
    else side.append(el(d,'p',{text:'Основная структура собрана. Остались шероховатости: добавь часть или адаптируй строки под бит. Запись вокала — следующий этап.'}));
   }else {sheet.append(el(d,'div',{className:'rn-welcome',text:'Рэпблокнот'}),el(d,'p',{className:'rn-empty',text:'Тема. Первая мысль. Первая строка. Создай текст для баттла или сохрани собственную идею.'}));side.append(el(d,'h2',{text:'Твой черновик'}),el(d,'p',{text:'Здесь герой пишет сам. Ты выбираешь направление работы; символы показывают ритм и стройность текста.'}));}
   side.append(el(d,'hr'),el(d,'p',{text:'Письмо '+skill.toFixed(2)+' / 100'}),el(d,'p',{text:'Сытость '+Math.round(s.music.needs.satiety)+' · энергия '+Math.round(s.music.needs.energy)}));
