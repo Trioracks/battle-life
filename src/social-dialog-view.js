@@ -29,6 +29,7 @@ export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commi
  root.append(socialHeading(d,'Сообщения · '+c.name),socialButton(d,'← Сообщество',()=>navigate('underweb://social/community/'+id),{className:'sn-link'}),history,typing,draft,uploadBox,composerBox);actions.append(register,attach,send,read);root.append(actions,notice,pickerHost);
  const message=()=>{const m=getState().outgoingMessage;return m&&(m.issue||m.communityId===id)?m:null;};
  function flushProgress(){
+  if(blocked)return false;
   if(flushing||pendingSeconds<=0)return true;const m=message();if(!m||m.issue){pendingSeconds=0;return true;}
   const delta=pendingSeconds;pendingSeconds=0;flushing=true;const next=advanceSubmissionMessage(getState(),{activeSeconds:delta,visible:true,powered:true,paused:false});const ok=commit({ok:true,state:next.state});flushing=false;
   if(!ok){pendingSeconds=delta;blocked=true;armed=false;composerError='Не удалось сохранить набор. Вложение на месте. Нажми «Повторить отправку».';}return ok;

@@ -4,10 +4,22 @@ import * as composer from '../src/social-composer.js';
 import {submissionFixture,completeSubmissionUpload} from './helpers/submission-fixtures.js';
 import {ensureBattleWindow} from '../src/battle-windows.js';
 import {attachSubmissionTrack,sendSubmission} from '../src/social-submission.js';
-import {createVirtualPcState} from '../src/virtual-pc-state.js';
+import {createVirtualPcState,loadVirtualPcState,saveVirtualPcState,VIRTUAL_PC_STORAGE_KEY} from '../src/virtual-pc-state.js';
 const options={communityId:'makarevich-1',projectId:'beat',nowMinute:601};
 const ready=()=>completeSubmissionUpload(attachSubmissionTrack(ensureBattleWindow(submissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state,options).state);
 const tick=(s,t,extra={})=>composer.advanceSubmissionMessage(s,{activeSeconds:t,visible:true,powered:true,paused:false,...extra});
+
+test('damaged frozen lyric text isolates composer recovery without emptying the PC on load or save',()=>{
+ for(const sections of [[null],[{lines:[null]}],[{lines:[{words:[null]}]}],[{lines:{broken:true}}],[{lines:[{words:{broken:true}}]}]]){
+  const s=composer.startSubmissionMessage(ready(),options).state,raw=structuredClone(s.outgoingMessage);
+  s.trackVersions.byId[raw.versionId].recipe.lyrics.sections=sections;
+  const versions=structuredClone(s.trackVersions),projects=structuredClone(s.projects),items=new Map([[VIRTUAL_PC_STORAGE_KEY,JSON.stringify(s)]]),storage={getItem:k=>items.get(k)??null,setItem:(k,v)=>items.set(k,v)};
+  const loaded=loadVirtualPcState(storage);assert.equal(loaded.ok,true);assert.deepEqual(loaded.state.projects,projects);assert.deepEqual(loaded.state.trackVersions,versions);
+  assert.ok(loaded.state.outgoingMessage.issue);assert.deepEqual(loaded.state.outgoingMessage.recoveryData,raw);assert.equal(saveVirtualPcState(storage,loaded.state),true);
+  const again=loadVirtualPcState(storage).state;assert.deepEqual(again.trackVersions,versions);assert.deepEqual(again.projects,projects);assert.deepEqual(again.outgoingMessage,loaded.state.outgoingMessage);
+  const cancelled=composer.cancelSubmissionMessage(again).state;assert.equal(composer.startSubmissionMessage(cancelled,options).ok,false);assert.equal(cancelled.battleSubmissions.length,0);
+ }
+});
 test('message uses the frozen symbolic words, original prose/verse gaps, headings and notes without regenerating',()=>{
  const s=ready(),version=s.trackVersions.byId[s.social.dialogs['makarevich-1'].draftVersionId];
  version.recipe.lyrics.sections=[{title:'Черновик',presentation:'prose',lines:[{words:[{text:'αβ.'},{text:'██'}]},{words:[{text:'γδ'}]},{gapBefore:true,words:[{text:'абв'}]}]},{title:'Куплет 2',presentation:'lines',lines:[{words:[{text:'▀▀'},{text:'▓▓.'}],note:'Старая заметка'},{gapBefore:true,indent:1,words:[{text:'<script>'}]}]}];

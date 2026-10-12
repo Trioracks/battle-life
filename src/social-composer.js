@@ -5,6 +5,10 @@ const clone=v=>JSON.parse(JSON.stringify(v));
 export const SUBMISSION_MESSAGE_SECONDS=6;
 export function submissionMessageBody(version){
  const sections=version?.recipe?.lyrics?.sections;
+ // Frozen recipes are retained verbatim, including damaged legacy data. A bad
+ // text must block only this composer, never throw through the whole PC loader.
+ const object=v=>v!==null&&typeof v==='object'&&!Array.isArray(v),optionalText=v=>v==null||typeof v==='string';
+ if(!optionalText(version?.name)||sections!=null&&(!Array.isArray(sections)||sections.some(section=>!object(section)||!optionalText(section.title)||section.lines!=null&&(!Array.isArray(section.lines)||section.lines.some(line=>!object(line)||!optionalText(line.note)||line.indent!=null&&!Number.isFinite(line.indent)||line.words!=null&&(!Array.isArray(line.words)||line.words.some(word=>!object(word)||typeof word.text!=='string')))))))return null;
  const text=Array.isArray(sections)?sections.map(section=>{
   let body='';for(const line of section.lines??[]){const words=(line.words??[]).map(w=>w.text).filter(t=>typeof t==='string').join(' ');if(!words)continue;
    if(body)body+=line.gapBefore?'\n\n':section.presentation==='prose'?' ':'\n';
@@ -23,7 +27,7 @@ export function startSubmissionMessage(state,options={}){
  const check=submissionSendContext(state,options);if(!check.ok)return check;
  const existing=normalizeOutgoingMessage(state.outgoingMessage,state.trackVersions),fail=reason=>({ok:false,state,reason});
  if(existing){if(existing.issue)return fail(existing.issue);if(existing.communityId!==options.communityId||existing.windowId!==check.window.id||existing.versionId!==check.version.id)return fail('Сначала заверши или отмени текущее сообщение.');return {ok:true,state,reason:''};}
- const body=submissionMessageBody(check.version);if(body.length>524288)return fail('Текст этой версии слишком большой. Вложение сохранено.');
+ const body=submissionMessageBody(check.version);if(body===null)return fail('Текст этой версии повреждён. Вложение и исходная версия сохранены; выбери другую работу.');if(body.length>524288)return fail('Текст этой версии слишком большой. Вложение сохранено.');
  return {ok:true,state:{...state,outgoingMessage:{version:1,communityId:options.communityId,windowId:check.window.id,versionId:check.version.id,body,elapsedSeconds:0,totalSeconds:SUBMISSION_MESSAGE_SECONDS}},reason:''};
 }
 export function advanceSubmissionMessage(state,{activeSeconds=0,visible=false,powered=false,paused=true}={}){
