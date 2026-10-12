@@ -1,7 +1,7 @@
 import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=36';
 import {beginnerById} from './beat-beginner-bank.js?rev=31';
 import {normalizeBeatMix} from './beat-mix.js?rev=36';
-import {normalizeRecording,vocalPlaybackProfile} from './vocal-result.js?rev=35';
+import {normalizeRecording,vocalPlaybackProfile} from './vocal-result.js?rev=36';
 import {createBeatSongForm,songPartWindows} from './beat-song-form.js?rev=32';
 import {normalizeGenreSnapshot} from './genre-progression.js?rev=36';
 

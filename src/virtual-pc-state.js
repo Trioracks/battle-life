@@ -3,6 +3,7 @@ import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=36';
 import {normalizeCreativeWork} from './creative-workflow.js?rev=36';
 import {normalizeBattleSubmissions} from './battle-submission.js?rev=36';
 import {normalizeRecordingState} from './vocal-production.js?rev=36';
+import {normalizeTrackVersions,captureTrackVersion} from './track-version.js?rev=36';
 import {drumById} from './beat-catalog.js?rev=36';
 import {normalizeCommunity} from './underweb-community.js?rev=34';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=35';
@@ -85,6 +86,13 @@ function normalizeSnapshot(value) {
   // Damaged saves may contain several valid jobs. Recover one owner in stable
   // schema order; completed projects and already credited practice are retained.
   if(music.job){writing.job=null;recording.job=null;}else if(writing.job)recording.job=null;
+  const battleSubmissions=normalizeBattleSubmissions(source.battleSubmissions);
+  let trackVersions=normalizeTrackVersions(source.trackVersions);
+  for(const submission of battleSubmissions){
+    if(submission.issue||submission.trackVersionId)continue;
+    const captured=captureTrackVersion({projects:[submission.track,...(submission.lyrics?[submission.lyrics]:[])],trackVersions},{projectId:submission.projectId,nowMinute:(submission.submittedDay-1)*1440});
+    if(captured.ok){trackVersions=captured.state.trackVersions;submission.trackVersionId=captured.versionId;submission.timePrecision='day-only';}
+  }
   return withSoftware({
     version: 1,
     noviceSchema: 1,
@@ -100,7 +108,7 @@ function normalizeSnapshot(value) {
     community:normalizeCommunity(source.community),
     household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),
-    battleSubmissions:normalizeBattleSubmissions(source.battleSubmissions),
+    battleSubmissions,trackVersions,
     draft: isRecord(source.draft) ? clone(source.draft) : null,
     lastGameMinute: Number.isFinite(source.lastGameMinute) && source.lastGameMinute >= 0 ? source.lastGameMinute : null,
   },normalizeSoftware(source.software,normalizeDownload(source.download)));
@@ -185,6 +193,7 @@ export function saveVirtualPcState(storage, state) {
     if(isRecord(parsed)&&parsed.version===1&&parsed.creativeWork?.version!==1)reserveCreativeBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'battleSubmissions'))reserveSubmissionBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&parsed.software?.transferVersion!==2)reserveTransferBackup(storage,raw);
+    if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'trackVersions'))reserveTrackVersionBackup(storage,raw);
     storage.setItem(VIRTUAL_PC_STORAGE_KEY, JSON.stringify(normalizeSnapshot(state)));
     return true;
   } catch {
@@ -194,6 +203,10 @@ export function saveVirtualPcState(storage, state) {
 
 function reserveHouseholdBackup(storage,raw){
   const key=VIRTUAL_PC_STORAGE_KEY+'-before-household';
+  if(storage.getItem(key)===null)storage.setItem(key,raw);
+}
+function reserveTrackVersionBackup(storage,raw){
+  const key=VIRTUAL_PC_STORAGE_KEY+'-before-track-versions';
   if(storage.getItem(key)===null)storage.setItem(key,raw);
 }
 function reserveGenreBackup(storage,raw){
@@ -239,6 +252,10 @@ export function loadVirtualPcState(storage) {
     }
     if(parsed.software?.transferVersion!==2){
       try{reserveTransferBackup(storage,raw);}catch{return {ok:false,reason:'parallel-transfers-backup-failed',state:restoredSnapshot(parsed)};}
+    }
+    if(!Object.hasOwn(parsed,'trackVersions')){
+      try{reserveTrackVersionBackup(storage,raw);}
+      catch{return {ok:false,reason:'track-versions-backup-failed',state:restoredSnapshot(parsed)};}
     }
     return { ok: true, state: restoredSnapshot(parsed) };
   } catch {

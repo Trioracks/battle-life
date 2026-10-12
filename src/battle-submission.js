@@ -3,6 +3,7 @@ import {normalizeBeat} from './beat-production.js?rev=36';
 import {normalizeLyric} from './lyric-production.js?rev=36';
 import {resolveBeatPlayback} from './beat-playback.js?rev=36';
 import {RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=36';
+import {captureTrackVersion} from './track-version.js?rev=36';
 const clone=value=>JSON.parse(JSON.stringify(value));
 const day=value=>Number.isSafeInteger(value)&&value>0&&value<100000;
 const battle=id=>BATTLE_BRIEFS.some(b=>b.id===id);
@@ -30,7 +31,7 @@ export function normalizeBattleSubmissions(value){
    result.push({battleId:raw?.battleId??null,roundId:'selection',issue:track?.audioIssue==='retired-source'?RETIRED_DRUM_MESSAGE:'Сохранённую сдачу не удалось прочитать. Исходные данные сохранены.',recoveryData:clone(raw??{})});continue;
   }
   const key=raw.battleId+':selection';if(seen.has(key))continue;seen.add(key);
-  result.push({version:1,battleId:raw.battleId,roundId:'selection',revision:raw.revision,submittedDay:raw.submittedDay,projectId:track.id,status:'pending',topicMatch:lyrics?lyrics.battleId===raw.battleId:null,track,lyrics});
+  result.push({version:1,battleId:raw.battleId,roundId:'selection',revision:raw.revision,submittedDay:raw.submittedDay,projectId:track.id,status:'pending',topicMatch:lyrics?lyrics.battleId===raw.battleId:null,track,lyrics,...(typeof raw.trackVersionId==='string'?{trackVersionId:raw.trackVersionId}:{}),...(raw.timePrecision==='day-only'?{timePrecision:'day-only'}:{})});
  }
  return result;
 }
@@ -45,7 +46,8 @@ export function submitBattleTrack(state,{battleId,projectId,gameDay,replace=fals
  const index=submissions.findIndex(s=>s.battleId===battleId&&s.roundId==='selection'),previous=submissions[index];
  if(previous&&!previous.issue&&JSON.stringify([previous.track,previous.lyrics])===JSON.stringify([track,lyrics]))return {state,ok:true,reason:'Эта версия уже отправлена.'};
  if(previous&&!replace)return fail('Работа уже отправлена. Подтверди замену версии.');
- const submitted={version:1,battleId,roundId:'selection',revision:(previous?.revision??0)+1,submittedDay:gameDay,projectId,status:'pending',topicMatch:info.topicMatch,track,lyrics};
+ const captured=captureTrackVersion(state,{projectId,nowMinute:(gameDay-1)*1440});if(!captured.ok)return fail(captured.reason);
+ const submitted={version:1,battleId,roundId:'selection',revision:(previous?.revision??0)+1,submittedDay:gameDay,projectId,status:'pending',topicMatch:info.topicMatch,track,lyrics,trackVersionId:captured.versionId,timePrecision:'day-only'};
  if(index<0)submissions.push(submitted);else submissions[index]=submitted;
- return {state:{...state,battleSubmissions:submissions},ok:true,reason:'Работа отправлена. Ожидает проверки.'};
+ return {state:{...captured.state,battleSubmissions:submissions},ok:true,reason:'Работа отправлена. Ожидает проверки.'};
 }

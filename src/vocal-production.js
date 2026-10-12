@@ -1,8 +1,9 @@
 import {VOCALS} from './vocal-catalog.js?rev=31';
-import {clampV,createVocalTake,normalizeRecording,recordingQuality,VOCAL_EQUIPMENT,effectiveSoundSkill} from './vocal-result.js?rev=35';
+import {clampV,createVocalTake,normalizeRecording,recordingQuality,VOCAL_EQUIPMENT,effectiveSoundSkill} from './vocal-result.js?rev=36';
 import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=36';
 import {normalizeLyric} from './lyric-production.js?rev=36';
 import {BEAT_RULES as R,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=36';
+import {vocalOutcomes} from './production-outcomes.js?rev=36';
 export {recordingQuality};
 export const VOCAL_STAGES=Object.freeze({draft:{name:'Черновая запись',minutes:60,skill:'flow'},clean:{name:'Чистовая запись',minutes:60,skill:'flow'},mix:{name:'Сведение',minutes:45,skill:'sound'},master:{name:'Мастеринг',minutes:30,skill:'sound'}});
 export function canVocalStage(recording,kind){
@@ -41,7 +42,9 @@ export function startVocalWork(input,{beatId,textId,kind='draft',sliders}={},ski
  if(kind==='draft'||kind==='clean'){
   const snapshot={...skills,flow:effectiveVocalSkill(s,skills,'draft'),sound:effectiveVocalSkill(s,skills,'mix')};
   output[kind]=createVocalTake({kind,seed:before?.draft.seed??Math.floor(unit()*4294967294)+1,skills:snapshot,sliders:values});
-  if(!output[kind])return fail('Проверь настройки записи.');output.mix=null;output.master=null;
+  if(!output[kind])return fail('Проверь настройки записи.');
+  if(kind==='clean'){output.clean.quality=Math.max(output.clean.quality,Math.min(output.clean.ceiling,output.draft.quality+3));output.clean.productionOutcome=vocalOutcomes({take:output.clean});}
+  output.mix=null;output.master=null;
  }else output[kind]={skill,gain:2};
  output=normalizeRecording(output);
  s.recording.job={beatId,kind,baseRevision:before?.revision??0,output,total:Math.round(VOCAL_STAGES[kind].minutes*Math.max(.6,1-skill*.003)),elapsed:0,skill,practiceCredit:0};s.music.activeBeatId=beatId;

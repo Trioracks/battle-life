@@ -4,6 +4,8 @@ import {BEAT_RULES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=36';
 import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=36';
 import {softwareDiskBytes} from './pc-software.js?rev=35';
 import {homeDateLabel} from './home-calendar.js?rev=28';
+import {lyricOutcomes,normalizeProductionOutcome} from './production-outcomes.js?rev=36';
+import {chooseTrackReferences,STARTING_REFERENCE_TOPICS,REFERENCE_CATALOG} from './cultural-references.js?rev=36';
 
 export const LYRIC_STAGES=Object.freeze([
  {name:'Общее создание',sliders:['Ясность мысли','Развитие темы','Личное отношение'],target:[8,7,6]},
@@ -26,14 +28,18 @@ function normalizeSections(list){
 export function normalizeLyric(p){
  if(p?.schemaVersion!==1||p.kind!=='lyrics'||!text(p.id)||!text(p.name,64))return null;
  const battle=BATTLE_BRIEFS.find(b=>b.id===p.battleId),stages=[];
- for(const s of (Array.isArray(p.stages)?p.stages:[]).slice(0,3)){const v=values(s?.sliders);if(!v)break;stages.push({sliders:v,skill:clamp(s.skill),quality:clamp(s.quality)});}
- return {schemaVersion:1,kind:'lyrics',id:text(p.id),name:text(p.name,64),seed:Math.floor(clamp(p.seed,0,4294967295)),revision:Math.max(1,Math.floor(clamp(p.revision,1,10000))),createdDay:validDay(p.createdDay),updatedDay:validDay(p.updatedDay??p.createdDay),createdDate:homeDateLabel(validDay(p.createdDay)),updatedDate:homeDateLabel(validDay(p.updatedDay??p.createdDay)),battleId:battle?.id??null,battleName:battle?.title??'Вне баттла',round:'Отбор',opponent:'Не назначен',stages,status:stages.length===3?'ready':'draft',sections:normalizeSections(p.sections),additions:(Array.isArray(p.additions)?p.additions:[]).slice(0,6).filter(a=>['diss','story','chorus'].includes(a?.kind)).map(a=>({kind:a.kind,skill:clamp(a.skill)})),adaptation:p.adaptation&&text(p.adaptation.beatId)?{beatId:text(p.adaptation.beatId),beatName:text(p.adaptation.beatName,64),bpm:90,skill:clamp(p.adaptation.skill)}:null};
+ for(const s of (Array.isArray(p.stages)?p.stages:[]).slice(0,3)){const v=values(s?.sliders);if(!v)break;stages.push({sliders:v,skill:clamp(s.skill),quality:clamp(s.quality),...(s.resultVersion===1?{resultVersion:1}:{})});}
+ const produced=normalizeProductionOutcome(p.productionOutcome);
+ const references=(Array.isArray(p.referenceUses)?p.referenceUses:[]).slice(0,2).filter(use=>REFERENCE_CATALOG.some(r=>r.id===use.referenceId&&r.sourceId===use.sourceId)&&Number.isFinite(use.fit)&&Number.isFinite(use.clarity)).map(use=>({referenceId:use.referenceId,sourceId:use.sourceId,fit:clamp(use.fit,0,1),clarity:clamp(use.clarity,0,1),placement:use.placement==='ending'?'ending':'body',origin:'production-simulation'}));
+ return {schemaVersion:1,kind:'lyrics',id:text(p.id),name:text(p.name,64),seed:Math.floor(clamp(p.seed,0,4294967295)),revision:Math.max(1,Math.floor(clamp(p.revision,1,10000))),createdDay:validDay(p.createdDay),updatedDay:validDay(p.updatedDay??p.createdDay),createdDate:homeDateLabel(validDay(p.createdDay)),updatedDate:homeDateLabel(validDay(p.updatedDay??p.createdDay)),battleId:battle?.id??null,battleName:battle?.title??'Вне баттла',round:'Отбор',opponent:'Не назначен',stages,status:stages.length===3?'ready':'draft',sections:normalizeSections(p.sections),additions:(Array.isArray(p.additions)?p.additions:[]).slice(0,6).filter(a=>['diss','story','chorus'].includes(a?.kind)).map(a=>({kind:a.kind,skill:clamp(a.skill),...(a.resultVersion===1?{resultVersion:1}:{})})),adaptation:p.adaptation&&text(p.adaptation.beatId)?{beatId:text(p.adaptation.beatId),beatName:text(p.adaptation.beatName,64),bpm:90,skill:clamp(p.adaptation.skill)}:null,...(produced?{productionOutcome:produced}:{}),...(references.length?{referenceUses:references}:{})};
 }
 export function normalizeWriting(value,projects=[]){
  const w=value??{},texts=projects.map(normalizeLyric).filter(Boolean),j=w.job,p=texts.find(p=>p.id===j?.projectId),v=values(j?.sliders);
  const valid=p&&kinds.has(j.kind)&&j.baseRevision===p.revision&&j.stage===p.stages.length&&v&&Number.isFinite(j.total)&&j.total>0&&j.total<=600&&Number.isFinite(j.elapsed)&&j.elapsed>=0&&j.elapsed<j.total&&(j.kind==='stage'?p.status==='draft':p.status==='ready');
  const job=valid?{projectId:p.id,kind:j.kind,stage:j.stage,baseRevision:p.revision,sliders:v,total:j.total,elapsed:j.elapsed,skill:clamp(j.skill),practiceCredit:clamp(j.practiceCredit,0,j.elapsed/j.total/3),gameDay:validDay(j.gameDay),beatId:text(j.beatId)||null}:null;
- return {practice:clamp(w.practice),activeTextId:texts.some(p=>p.id===w.activeTextId)?w.activeTextId:null,job};
+ return {practice:clamp(w.practice),activeTextId:texts.some(p=>p.id===w.activeTextId)?w.activeTextId:null,job,
+  ...(Array.isArray(w.referenceHistory)?{referenceHistory:w.referenceHistory.slice(-50).map(work=>({referenceIds:(Array.isArray(work?.referenceIds)?work.referenceIds:[]).filter(id=>REFERENCE_CATALOG.some(r=>r.id===id))}))}:{}),
+  ...(Array.isArray(w.knownReferenceTopics)?{knownReferenceTopics:[...new Set(w.knownReferenceTopics.filter(g=>REFERENCE_CATALOG.some(r=>r.group===g)))]}:{})};
 }
 function normalized(input){const projects=[...(input.projects??[])];return {...input,projects,music:normalizeMusic(input.music,projects),writing:normalizeWriting(input.writing,projects)};}
 export const effectiveWritingSkill=(state,skills={})=>clamp(number(skills.writing,10)+number(state.writing?.practice));
@@ -114,11 +120,20 @@ export function advanceLyricWork(input,requested,clock=null){
  if(finished){
   if(j.kind==='stage'){
    const target=LYRIC_STAGES[j.stage].target,fit=1-j.sliders.reduce((sum,v,i)=>sum+Math.abs(v-target[i]),0)/30;
-   p.stages.push({sliders:j.sliders,skill:j.skill,quality:Math.round(clamp(j.skill*(.55+.45*fit)))});
+   p.stages.push({sliders:j.sliders,skill:j.skill,quality:Math.round(clamp(j.skill*(.55+.45*fit))),resultVersion:1});
   }else {p.revision++;if(j.kind==='adapt'){const b=s.projects.find(p=>p.id===j.beatId);p.adaptation={beatId:b.id,beatName:b.name,bpm:90,skill:j.skill};}else p.additions.push({kind:j.kind,skill:j.skill});}
   // The job may cross midnight or resume several days after it was started.
   p.updatedDay=clock&&Number.isSafeInteger(clock.day)&&clock.day>0&&Number.isFinite(clock.minutes)?validDay(clock.day+Math.floor((clock.minutes+minutes)/1440)):j.gameDay;p.status=p.stages.length===3?'ready':'draft';
   const generated=makeSections(p);p.sections=['diss','story','chorus'].includes(j.kind)?[...p.sections,generated.at(-1)]:generated;
+  if(j.kind==='stage'&&j.stage===2){
+   const topic=p.name+' '+p.battleName,theme=/ден|money|cash/i.test(topic)?'money':/район|двор|спальн/i.test(topic)?'district':/памят|прошл|детств/i.test(topic)?'memory':'rivalry';
+   const gameDate=homeDateLabel(p.updatedDay).split('.').reverse().join('-');
+   const selected=chooseTrackReferences({seed:p.seed,gameDate,knownTopics:s.writing.knownReferenceTopics??STARTING_REFERENCE_TOPICS,theme,history:s.writing.referenceHistory,limit:1});
+   p.referenceUses=selected.uses.map(use=>({...use,fit:use.fit*j.skill/100,clarity:use.clarity*(.4+.6*j.skill/100)}));
+   s.writing.referenceHistory=selected.history;
+  }
+  if(['diss','story','chorus'].includes(j.kind))p.additions.at(-1).resultVersion=1;
+  p.productionOutcome=lyricOutcomes({project:p});
   s.projects[s.projects.findIndex(v=>v.id===p.id)]=normalizeLyric(p);s.writing.job=null;
  }
  return {state:s,minutes,finished,blocked:!finished&&Boolean(workBlockReason(s)),practiceGained:Math.min(credit,100-j.skill)};
