@@ -2,6 +2,7 @@ import {pcElement as el} from './virtual-pc-dom.js?rev=39';
 import {socialButton} from './social-dom.js?rev=39';
 import {playTrackVersion} from './track-version-audio.js?rev=39';
 import {chooseBeginnerParts} from './beat-beginner-bank.js?rev=39';
+import {npcPlaybackDescriptor} from './battle-npc-audio.js?rev=39';
 // These authored background demos use the cleared in-game bank. They are not
 // historical recordings or entries in the current submission window.
 export function backgroundAudioDescriptor(item){
@@ -24,6 +25,15 @@ export function createSocialAudio(audio){
     }catch{if(!disposed&&token===generation)status.textContent='Не удалось воспроизвести запись.';}
    },{dataset:{socialAudio:version?.id??item?.id??'missing'},attributes:{'aria-label':'Слушать: '+title}});
    row.append(play,el(d,'div',{className:'sn-audio-title',text:title}),button(d,'Ⅱ',()=>{generation++;audio?.pause?.();status.textContent='Пауза';},{attributes:{'aria-label':'Пауза: '+title}}),button(d,'■',()=>{stop();status.textContent='Остановлено';},{attributes:{'aria-label':'Остановить: '+title}}),el(d,'span',{className:'sn-audio-duration',text:'0:'+String(Math.round(version?.recipe?.descriptor?.durationSeconds??32/3)).padStart(2,'0')}),status);
+   if(version?.npc){
+    const npc=npcPlaybackDescriptor(version);
+    if(!npc.ok){status.textContent=npc.reason;play.disabled=true;}
+    if(npc.previewDescriptor)row.append(button(d,'Предпросмотр бита — без голоса',async()=>{
+     if(disposed)return;const token=++generation;status.textContent='Загрузка бита…';
+     try{const ok=await audio?.playDescriptor(npc.previewDescriptor);if(!disposed&&token===generation)status.textContent=ok?'Играет бит без голоса':'Не удалось воспроизвести бит.';}
+     catch{if(!disposed&&token===generation)status.textContent='Не удалось воспроизвести бит.';}
+    },{attributes:{'aria-label':'Предпросмотр бита — без голоса'}}));
+   }
    return row;
   },stop,dispose(){disposed=true;generation++;for(const [node,handler]of listeners)node.removeEventListener('click',handler);listeners.length=0;}
  };
