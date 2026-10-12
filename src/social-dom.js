@@ -1,6 +1,13 @@
 import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=38';
 import {socialPhotoSource} from './social-portraits.js?rev=38';
 export const socialButton=(d,text,fn,extra={})=>pcButton(d,text,{className:'sn-button',...extra},fn);
+export function showRegistrationNotice(host,name,onContinue){
+ const d=host.ownerDocument,previous=d.activeElement,overlay=el(d,'div',{className:'sn-registration-overlay'}),box=el(d,'section',{className:'sn-registration-confirm',attributes:{role:'alertdialog','aria-modal':'true','aria-label':'Заявка принята'}});
+ const close=()=>{overlay.remove();if(previous?.isConnected)previous.focus();};
+ const proceed=socialButton(d,'Перейти к сдаче',()=>{close();onContinue();}),dismiss=socialButton(d,'Закрыть',close);
+ box.append(el(d,'h2',{text:'Заявка принята'}),el(d,'p',{text:'Ваша заявка принята, '+name+'. Ожидаем вашего трека'}),proceed,dismiss);overlay.append(box);host.append(overlay);proceed.focus();
+ box.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close();}else if(e.key==='Tab'){e.preventDefault();e.stopPropagation();(d.activeElement===proceed?dismiss:proceed).focus();}});return close;
+}
 export function socialAvatar(d,avatar={},name='',large=false){
  const node=el(d,'div',{className:'sn-avatar'+(large?' sn-avatar-large':''),text:avatar.mark??'Р',attributes:{role:'img','aria-label':'Аватар: '+name}});
  node.style.setProperty('--avatar-color',avatar.color??'#617d94');const src=socialPhotoSource(avatar.src);

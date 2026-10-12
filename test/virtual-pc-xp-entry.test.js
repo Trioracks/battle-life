@@ -9,7 +9,7 @@ function setup(callbacks={}){const d=pcDocument(),root=d.createElement('section'
 test('host metadata updates clock without touching inputs or leave-return forms',()=>{
   const {c,root}=setup();c.showDesktop(createVirtualPcState());c.open('underweb');
   const input=allPc(root).find(n=>n.tagName==='INPUT');input.value='Незавершённый ввод';
-  c.syncHost({playerName:'Саша',clockLabel:'16:00'});assert.equal(findPc(root,'clock').textContent,'16:00');
+  c.syncHost({playerName:'Саша',clockLabel:'16:00'});assert.equal(allPc(findPc(root,'clock')).find(n=>n.tagName==='TIME').textContent,'16:00');
   assert.equal(allPc(root).find(n=>n.tagName==='INPUT')===input,true);
   c.requestLeave();c.showDesktop(c.state);assert.equal(allPc(root).find(n=>n.tagName==='INPUT')===input,true);
   assert.equal(input.value,'Незавершённый ввод');findButton(root,'Слобода').click();assert.ok(allPc(root).some(n=>n.textContent==='Саша'));
@@ -22,9 +22,9 @@ test('new game resets icons and windows alongside PC',()=>{
 test('computer date tracks the shared game day and leaves clock text readable',()=>{
  const {c,root}=setup();c.showDesktop(createVirtualPcState());
  c.syncHost({playerName:'Саша',clockLabel:'23:59',gameDay:30});
- assert.equal(findPc(root,'clock').textContent,'23:59');assert.equal(findPc(root,'clock').getAttribute('title'),'30.09.2012');
+ assert.equal(allPc(findPc(root,'clock')).find(n=>n.tagName==='TIME').textContent,'23:59');assert.match(findPc(root,'clock').getAttribute('title'),/30\.09\.2012/);assert.equal(findPc(root,'clock').tagName,'BUTTON');
  c.syncHost({playerName:'Саша',clockLabel:'00:00',gameDay:31});
- assert.equal(findPc(root,'clock').getAttribute('title'),'01.10.2012');c.dispose();
+ assert.match(findPc(root,'clock').getAttribute('title'),/01\.10\.2012/);c.dispose();
 });
 test('host controller owns the eleven second cold boot with no DOM timer',()=>{
   const timers=[];const {c,root}=setup({setTimeoutFn:(fn,delay)=>{timers.push({fn,delay});return timers.length;},clearTimeoutFn:()=>{}});

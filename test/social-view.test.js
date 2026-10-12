@@ -5,7 +5,7 @@ import {resolveSocialRoute} from '../src/social-routing.js';
 import {createVirtualPcState} from '../src/virtual-pc-state.js';
 import {subscriptionFixture} from './helpers/social-fixtures.js';
 import {ensureBattleWindow} from '../src/battle-windows.js';
-import {gameMinuteLabel} from '../src/game-minute.js';
+import {gameDateTimeLabel as gameMinuteLabel} from '../src/home-calendar.js';
 import {pcDocument,allPc,findButton,fire} from './helpers/virtual-pc-dom.js';
 function setup(path='me',options={}){
  const d=pcDocument(),root=d.createElement('div');let state=options.state??createVirtualPcState(),route=resolveSocialRoute('underweb://social/'+path),navigated='';

@@ -38,6 +38,7 @@ try{
   await go('underweb://battles/makarevich-1');const registration=page.getByRole('button',{name:'Подать заявку',exact:true});await affordance(registration,'registration');await registration.click();
   await page.getByRole('button',{name:'Подтвердить заявку',exact:true}).click();assert.equal(await page.evaluate(()=>qa.pc.state.battleApplications.length),1);
   await page.screenshot({path:out+'/browser-'+width+'-battle.png'});
+  await page.getByRole('alertdialog',{name:'Заявка принята'}).getByRole('button',{name:'Закрыть',exact:true}).click();
   for(const route of ['me','friends','photos','audio','messages','groups']){
    await go('underweb://social/'+route);assert.equal(await page.locator('[data-social-section]').count(),6);
    assert.equal(await page.locator('.uw-page').evaluate(n=>n.scrollWidth>n.clientWidth+1),false,'overflow '+width+' '+route);

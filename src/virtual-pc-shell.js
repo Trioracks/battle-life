@@ -2,10 +2,11 @@ import {PC_IDENTITY} from './pc-identity.js?rev=38';
 import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=38';
 import {createPcIcon} from './virtual-pc-icons.js?rev=38';
 import {homeDateLabel} from './home-calendar.js?rev=38';
+import {mountPcCalendar} from './pc-calendar-view.js?rev=38';
 
 export function mountPcShell(root,{onCommand}) {
   const d=root.ownerDocument,win=d.defaultView??globalThis;
-  let model=null,disposed=false,selected=null,modalNode=null;
+  let model=null,disposed=false,selected=null,modalNode=null,calendar=null;
   const cleanups=new Set(),frames=new Map(),icons=new Map();
   const shell=el(d,'section',{className:'pc-shell pc-desktop'});
   const workspace=el(d,'div',{className:'pc-workspace',attributes:{'aria-label':'Рабочий стол '+PC_IDENTITY.name}});
@@ -15,7 +16,7 @@ export function mountPcShell(root,{onCommand}) {
   const taskbar=el(d,'footer',{className:'pc-taskbar'});
   const start=el(d,'button',{className:'pc-start',text:'',type:'button',attributes:{'aria-label':PC_IDENTITY.menuLabel}});
   start.append(createPcIcon(d,'start',{size:24}),el(d,'span',{text:PC_IDENTITY.menuLabel}));
-  const tasks=el(d,'div',{className:'pc-tasks'}),clock=el(d,'time',{className:'pc-clock',dataset:{pcRole:'clock'}});
+  const tasks=el(d,'div',{className:'pc-tasks'}),clock=el(d,'button',{className:'pc-clock',type:'button',dataset:{pcRole:'clock'},attributes:{'aria-label':'Открыть календарь','aria-expanded':'false'}}),clockTime=el(d,'time');clock.append(clockTime);
   taskbar.append(start,tasks,clock);
   const warning=el(d,'div',{className:'pc-storage-warning',dataset:{pcRole:'persistence-warning'},attributes:{'aria-live':'polite'}});
   const menus=el(d,'div',{className:'pc-menu-layer'}),modal=el(d,'div',{className:'pc-modal-layer'});
@@ -26,6 +27,7 @@ export function mountPcShell(root,{onCommand}) {
     cleanups.add(off);if(group!==cleanups)group.add(off);return off;
   }
   const windowCommand=(type,id,extra={})=>emit({type:'window',action:{type,id,...extra}});
+  listen(clock,'click',()=>{if(modalNode)return;if(calendar){calendar.dispose();calendar=null;clock.setAttribute('aria-expanded','false');return;}calendar=mountPcCalendar({document:d,anchor:clock,getGameDay:()=>model?.metadata.gameDay??1,onClose:()=>{calendar=null;clock.setAttribute('aria-expanded','false');}});shell.append(calendar.root);clock.setAttribute('aria-expanded','true');calendar.root.focus();});
   const bounds=()=>({width:model?.windows.viewport.width??1280,height:(model?.windows.viewport.height??720)-32});
   const current=id=>model?.windows.windows.find(w=>w.id===id);
   function select(id) {selected=id;for(const [key,item]of icons){item.node.dataset.selected=String(key===id);item.node.setAttribute('aria-pressed',String(key===id));}}
@@ -112,7 +114,7 @@ export function mountPcShell(root,{onCommand}) {
     if(disposed)return;model=next;
     iconRoot.inert=Boolean(next.masterWindow);taskbar.inert=Boolean(next.masterWindow);menus.inert=Boolean(next.masterWindow);
     shell.style.setProperty('--pc-wallpaper','url("'+next.wallpaper+'")');
-    clock.textContent=next.metadata.clockLabel;clock.setAttribute('title',homeDateLabel(next.metadata.gameDay));clock.setAttribute('aria-label','Игровое время '+next.metadata.clockLabel+', '+homeDateLabel(next.metadata.gameDay));
+    clockTime.textContent=next.metadata.clockLabel;clock.setAttribute('title','Игровое время '+next.metadata.clockLabel+', '+homeDateLabel(next.metadata.gameDay));calendar?.update();
     warning.textContent=next.warning??'';warning.hidden=!next.warning;
     for(const [id,item]of icons)if(!next.apps.some(a=>a.id===id)){item.group.forEach(off=>off());item.node.remove();icons.delete(id);}
     for(const app of next.apps){
@@ -160,5 +162,5 @@ export function mountPcShell(root,{onCommand}) {
     if(r.width>0&&r.height>0&&(r.width!==model?.windows.viewport.width||r.height!==model?.windows.viewport.height))emit({type:'window',action:{type:'viewport',width:r.width,height:r.height}});
   }):null;observer?.observe(root);
   return {render,getContentRoot:id=>frames.get(id)?.content??null,getMenuRoot:()=>menus,setModal,focusActive,
-    dispose(){disposed=true;observer?.disconnect();for(const off of [...cleanups])off();root.replaceChildren();frames.clear();icons.clear();}};
+    dispose(){disposed=true;calendar?.dispose();observer?.disconnect();for(const off of [...cleanups])off();root.replaceChildren();frames.clear();icons.clear();}};
 }

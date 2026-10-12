@@ -41,7 +41,7 @@ test('registration stays at the application section and focuses its input after 
  findButton(s.root,'Подать заявку').click();
  assert.equal(page.scrollTop,380);assert.equal(s.d.activeElement.getAttribute('aria-label'),'Имя участника');
  findButton(s.root,'Подтвердить заявку').click();assert.equal(page.scrollTop,380);
- assert.equal(s.d.activeElement.textContent,'Заявка подана');
+ assert.equal(s.d.activeElement.textContent,'Перейти к сдаче');
 });
 
 test('opening and closing visual FT never rewrites or discards existing projects and draft',()=>{

@@ -117,26 +117,26 @@ test('a clock-only torent update retains the focused install control', () => {
   assert.equal(document.activeElement, install);
 });
 
-test('a failed durable application write keeps a visible in-memory warning', () => {
+test('a failed durable application write keeps warning and does not claim registration', () => {
   const document = creatorDocument(), root = document.createElement('section');
   const controller = mountVirtualPc(root, { onPersist() { return false; } });
   controller.showDesktop(createVirtualPcState());controller.open('underweb');
   controller.navigateUnderweb('underweb://battles/concrete-echo');
   find(root, n => n.textContent === 'Подать заявку').click();
   find(root, n => n.textContent === 'Подтвердить заявку').click();
-  assert.equal(controller.state.battleApplications.length, 1);
+  assert.equal(controller.state.battleApplications.length, 0);
   assert.equal(hasText(root, 'Сохранение браузера недоступно: изменения останутся только до закрытия страницы.'), true);
-  assert.equal(hasText(root, 'Заявка подана'), true);
+  assert.equal(hasText(root, 'Заявка подана'), false);
+  assert.equal(hasText(root,'Не удалось сохранить заявку. Повтори после освобождения места.'),true);
 });
 
-test('empty application names are rejected without mutating saved data', () => {
+test('registration ignores a tampered read-only field and uses the hero nickname', () => {
   const {controller,root,state,saves}=createController();controller.showDesktop(state);controller.open('underweb');
   controller.navigateUnderweb('underweb://battles/concrete-echo');
   find(root, n => n.textContent === 'Подать заявку').click();
   find(root,n=>n.getAttribute?.('aria-label')==='Имя участника').value='   ';
   find(root,n=>n.textContent==='Подтвердить заявку').click();
-  assert.equal(hasText(root,'Укажи имя участника.'),true);assert.equal(saves.length,0);
-  assert.deepEqual(controller.state.battleApplications,[]);
+  assert.equal(controller.state.battleApplications[0].nickname,controller.metadata.playerName);assert.ok(saves.length>0);
 });
 
 test('host storage warnings remain visible after state synchronization', () => {

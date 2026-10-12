@@ -11,10 +11,14 @@ import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=38';
 import {mountSocial} from './social-view.js?rev=38';
 import {activateSocial} from './social-runtime.js?rev=38';
 import {SOCIAL_IDENTITY} from './social-identity.js?rev=38';
+import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=38';
+import {ensureBattleWindow} from './battle-windows.js?rev=38';
+import {showRegistrationNotice} from './social-dom.js?rev=38';
 const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-control '+(options.className??'')},fn);
 
 export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,onSubmitTrack=()=>{},onResultViewed=()=>{},getSoftwareMessage=()=>'',isVisible=()=>true}){
- let socialView=null;
+ let socialView=null,closeRegistration=null,lastWindows='';
+ const windowSignature=()=>JSON.stringify((getState().battleWindows??[]).map(w=>[w.id,battleDeadlineLabel(w,metadataGameMinute(getMetadata()))]));
  const d=root.ownerDocument,history=['underweb://iskra'];let index=0,route=resolveUnderweb(history[0],getMetadata()),applicationOpen=false,lastApplications='',applicationFocus=null,lastSoftware='',lastDay=0;
  const softwareSignature=()=>{const s=getState().software;return JSON.stringify([s?.client?.installed,s?.client?.receivedBytes===2000000,s?.ft?.installed,s?.ft?.receivedBytes===800000000,s?.notebook?.installed,s?.notebook?.receivedBytes===4000000,s?.metadata,s?.notebookMetadata,s?.transfers,getSoftwareMessage()]);};
  const browser=el(d,'section',{className:'uw-browser',attributes:{'aria-label':'Браузер Underweb'}}),toolbar=el(d,'form',{className:'uw-toolbar',attributes:{'aria-label':'Адрес Underweb'}});
@@ -78,6 +82,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  }
  function detailPage(){
   const b=route.brief,site=el(d,'div',{className:'uw-battle-site uw-standalone '+b.color,attributes:{'aria-label':'Сайт баттла '+b.title}}),masthead=el(d,'header',{className:'uw-battle-masthead'});
+  const window=getState().battleWindows?.find(w=>w.battleId===b.id),deadline=battleDeadlineLabel(window,metadataGameMinute(getMetadata()));
   masthead.append(el(d,'strong',{text:b.title}),el(d,'span',{text:b.season}),el(d,'small',{text:homeDateLabel(communityDay(getMetadata().gameDay))}));site.append(masthead);
   const nav=el(d,'nav',{className:'uw-battle-tabs',attributes:{'aria-label':'Разделы сайта баттла'}});for(const [id,title]of [['home','Главная'],['rules','Правила'],['rounds','Раунды'],['players','Участники']])nav.append(button(d,title,{attributes:route.tab===id?{'aria-current':'page'}:{}},()=>navigate('underweb://battles/'+b.id+'/'+id)));nav.append(button(d,'Обсуждение на форуме',{},()=>navigate('underweb://forum/'+b.id)));site.append(nav);
   const back=button(d,'← Каталог баттлов',{className:'uw-breadcrumb'},()=>navigate('underweb://battles'));site.append(back);
@@ -90,25 +95,26 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   }else if(route.tab==='rules'){
    rules.append(el(d,'h2',{text:'Регламент отбора'}),el(d,'p',{className:'uw-theme',text:b.theme}));const list=el(d,'ul');for(const text of b.rules)list.append(el(d,'li',{text}));rules.append(list,el(d,'p',{text:'Участие бесплатно. Чужие куплеты, публикация личных данных и травля участников запрещены. Заявки и тексты остаются в игровом мире.'}),button(d,'Задать вопрос о правилах →',{},()=>navigate('underweb://forum/topic/'+b.id+'-rules')));
   }else if(route.tab==='rounds'){
-   rules.append(el(d,'h2',{text:'Ход турнира'}));for(const [n,title,text]of [['01','Отбор · «'+b.theme+'»','Регистрация и приём аудиоработ открыты. Достаточно готового бита с черновым вокалом.'],['02','Парные раунды','Пары, темы и сроки пока не объявлены. Оппонент не назначен.'],['03','Итоги','Появятся после проведения турнира.']]){const round=el(d,'article',{className:'uw-round-row'});round.append(el(d,'b',{text:n}),el(d,'h3',{text:title}),el(d,'p',{text}));rules.append(round);}
+   rules.append(el(d,'h2',{text:'Ход турнира'}));for(const [n,title,text]of [['01','Отбор · «'+b.theme+'»',deadline.text],['02','Парные раунды','Пары, темы и сроки пока не объявлены. Оппонент не назначен.'],['03','Итоги','Появятся после проведения турнира.']]){const round=el(d,'article',{className:'uw-round-row'});round.append(el(d,'b',{text:n}),el(d,'h3',{text:title}),el(d,'p',{text}));rules.append(round);}
   }else{
    rules.append(el(d,'h2',{text:'Участники'}));const applications=getState().battleApplications?.filter(a=>a.battleId===b.id)??[];rules.append(el(d,'p',{text:'Подтверждённые заявки в этой игре: '+applications.length}));
    for(const a of applications){const row=el(d,'article',{className:'uw-participant'});row.append(el(d,'strong',{text:a.nickname}),el(d,'span',{text:'Зарегистрирован · отбор · оппонент не назначен'}));rules.append(row);}if(!applications.length)rules.append(el(d,'p',{text:'Твоей заявки ещё нет. Зарегистрируйся ниже, чтобы появиться в списке.'}));
   }
-  const facts=el(d,'aside',{className:'uw-facts'});for(const [label,value]of [['Формат',b.format],['Организатор',b.organizer],['Призовой фонд',b.prize],['Взнос','Бесплатно'],['Статус','Регистрация открыта'],['Сдача трека','Приём работ открыт']]){facts.append(el(d,'small',{text:label}),el(d,'strong',{text:value}));}
+  const facts=el(d,'aside',{className:'uw-facts'});for(const [label,value]of [['Формат',b.format],['Организатор',b.organizer],['Призовой фонд',b.prize],['Взнос','Бесплатно'],['Статус',deadline.open?'Регистрация открыта':'Приём закрыт'],['Сдача трека',deadline.text]]){facts.append(el(d,'small',{text:label}),el(d,'strong',{text:value}));}
   columns.append(rules,facts);site.append(columns);
-  const action=el(d,'section',{className:'uw-application'});
+  const action=el(d,'section',{className:'uw-application'});action.append(el(d,'p',{className:'uw-deadline',text:deadline.text}));
   if(isApplied(b.id)){
    const saved=getState().battleSubmissions?.find(s=>s.battleId===b.id);
    applicationFocus=el(d,'h2',{text:'Заявка подана',attributes:{tabindex:'-1'}});action.append(applicationFocus,el(d,'p',{text:'Ты зарегистрирован на '+b.title+'. Выбери трек из «Моих проектов».'}));
    if(saved){action.append(el(d,'strong',{text:saved.issue??(saved.status==='accepted'?'Работа принята':'Работа отправлена')}));if(!saved.issue)action.append(el(d,'p',{text:getState().trackVersions?.byId?.[saved.trackVersionId]?.name??saved.track?.name??'Сохранённая работа'}),el(d,'p',{text:saved.topicMatch===null?'Связь текста с темой не подтверждена.':saved.topicMatch?'Текст соответствует теме баттла.':'Отправлен трек для другой темы.'}));}
    action.append(button(d,'Открыть сообщения сообщества',{className:'uw-primary',dataset:{pcRole:'submit-track'}},()=>navigate('underweb://social/dialog/'+b.id)));
   }
+  else if(window&&!deadline.open)action.append(el(d,'strong',{text:'Приём заявок и треков закрыт.'}));
   else if(applicationOpen){
-   const form=el(d,'form'),label=el(d,'label',{text:'Имя участника'}),name=el(d,'input',{value:getMetadata().playerName,attributes:{'aria-label':'Имя участника',maxlength:'32',required:'true'}});label.append(name);
+   const form=el(d,'form'),label=el(d,'label',{text:'Имя участника'}),name=el(d,'input',{value:getMetadata().playerName,attributes:{'aria-label':'Имя участника',readonly:'true'}});label.append(name);
    const note=el(d,'p',{text:'Зарегистрируйся, затем отправь готовый трек с вокалом. Всё происходит внутри игры.'}),error=el(d,'p',{className:'uw-form-error',attributes:{'aria-live':'polite'}});
    applicationFocus=name;
-   function submit(){const value=name.value.trim();if(!value){error.textContent='Укажи имя участника.';name.focus();return;}onApply(b.id,value);applicationOpen=false;render({resetScroll:false,focusApplication:true});}
+   function submit(){const result=registerBattle(getState(),{battleId:b.id,playerName:getMetadata().playerName,nowMinute:metadataGameMinute(getMetadata())});if(!result.ok){error.textContent=result.reason;return;}let saved;try{saved=onChange(result.state);}catch{saved=false;}if(saved===false||saved?.ok===false){error.textContent='Не удалось сохранить заявку. Повтори после освобождения места.';return;}applicationOpen=false;render({resetScroll:false,focusApplication:true});closeRegistration=showRegistrationNotice(browser,getState().battleApplications.find(a=>a.battleId===b.id).nickname,()=>navigate('underweb://social/dialog/'+b.id));}
    form.append(el(d,'h2',{text:'Заявка на участие'}),label,note,error,button(d,'Подтвердить заявку',{className:'uw-primary'},submit),button(d,'Отмена',{},()=>{applicationOpen=false;render({resetScroll:false,focusApplication:true});}));form.addEventListener('submit',e=>{e.preventDefault();submit();});action.append(form);
   }else {applicationFocus=button(d,'Подать заявку',{className:'uw-primary'},()=>{applicationOpen=true;render({resetScroll:false,focusApplication:true});});action.append(applicationFocus,el(d,'span',{text:'Бесплатная регистрация · Без отправки аудио'}));}
   site.append(action,el(d,'footer',{className:'uw-site-footer',text:b.organizer+' · Самостоятельный вымышленный сайт в Underweb'}));return site;
@@ -139,22 +145,22 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
    socialView=mountSocial(host,{route,getState,getMetadata,onChange,navigate,audio,onResultViewed,isVisible});
   }else
   page.replaceChildren(route.type.startsWith('news')?createNewsPage(d,{route,navigate}):route.type.startsWith('forum')?createCommunityView(d,{route,getState,getMetadata,onChange,navigate}):['samples','ripline'].includes(route.type)?createBeatMarket(d,{getState,onChange,audio,navigate,ripline:route.type==='ripline'}):route.type==='home'?homePage():route.type==='search'?resultsPage():route.type==='battles'?catalogPage():route.type==='battle'?detailPage():route.type==='dump'?softwareForum(d,{topic:route.topic,state:getState(),navigate,onAction:onSoftware,message:getSoftwareMessage()}):el(d,'p',{className:'uw-error',text:route.message}));
-  lastSoftware=softwareSignature();
+  lastSoftware=softwareSignature();lastWindows=windowSignature();
   restore?.();page.scrollTop=scrollTop;if(focusApplication)applicationFocus?.focus();
   status.textContent='Готово · '+(route.type==='home'||route.type==='search'?'Искра':'Локальная сеть');lastApplications=JSON.stringify([getState().battleApplications,getState().battleSubmissions]);
  }
  function activateRoute(next){
-  if(next.type!=='social')return;
-  const result=activateSocial(getState(),getMetadata().gameMinutes,BATTLE_BRIEFS.some(b=>b.id===next.communityId)?next.communityId:'makarevich-1');
+  if(!['social','battle'].includes(next.type))return;
+  const nowMinute=metadataGameMinute(getMetadata()),result=next.type==='battle'?ensureBattleWindow(getState(),{battleId:next.brief.id,nowMinute}):activateSocial(getState(),nowMinute,BATTLE_BRIEFS.some(b=>b.id===next.communityId)?next.communityId:'makarevich-1');
   if(!result.ok)return;let state=result.state;
   if(state!==getState())onChange(state);
  }
- function navigate(input){const next=resolveUnderweb(input,getMetadata());activateRoute(next);route=next;history.splice(index+1);history.push(route.url);index=history.length-1;applicationOpen=false;render();}
- function travel(delta){const next=index+delta;if(next<0||next>=history.length)return;index=next;const resolved=resolveUnderweb(history[index],getMetadata());activateRoute(resolved);route=resolved;applicationOpen=false;render();}
+ function navigate(input){closeRegistration?.();closeRegistration=null;const next=resolveUnderweb(input,getMetadata());activateRoute(next);route=next;history.splice(index+1);history.push(route.url);index=history.length-1;applicationOpen=false;render();}
+ function travel(delta){const next=index+delta;if(next<0||next>=history.length)return;closeRegistration?.();closeRegistration=null;index=next;const resolved=resolveUnderweb(history[index],getMetadata());activateRoute(resolved);route=resolved;applicationOpen=false;render();}
  render();return {navigate,get snapshot(){return {route,index,history:[...history]};},update(){
   if(route.type==='social'){socialView?.update();return;}
   if(lastDay!==JSON.stringify([getMetadata().gameDay])){route=resolveUnderweb(history[index],getMetadata());render({resetScroll:false,preserveInputs:true});}
-  else if(lastApplications!==JSON.stringify([getState().battleApplications,getState().battleSubmissions])&&['home','battle','battles'].includes(route.type)||route.type==='dump'&&lastSoftware!==softwareSignature())render({resetScroll:false,preserveInputs:true});
+  else if(lastApplications!==JSON.stringify([getState().battleApplications,getState().battleSubmissions])&&['home','battle','battles'].includes(route.type)||route.type==='battle'&&lastWindows!==windowSignature()||route.type==='dump'&&lastSoftware!==softwareSignature())render({resetScroll:false,preserveInputs:true});
   else if(route.type==='dump'){const node=pcFind(page,n=>n.dataset?.pcRole==='forum-transfer');if(node){const p=downloadPresentation(getState(),'client');node.textContent=`Загрузка: ${p.receivedMb.toFixed(2)} / ${p.totalMb} МБ · ${p.speedKbPerSecond} КБ/с${p.error?' · '+softwareMessage(p.error):''}`;}}
- },dispose(){socialView?.dispose();root.replaceChildren();}};
+ },dispose(){closeRegistration?.();socialView?.dispose();root.replaceChildren();}};
 }

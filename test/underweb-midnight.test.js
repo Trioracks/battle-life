@@ -9,9 +9,9 @@ test('midnight preserves forum reply focus and selection while revealing dated p
  const s=setup();s.pc.navigateUnderweb('underweb://forum/topic/concrete-echo-general');const before=field(s,'Ваш ответ');before.value='Pending text';fire(before,'input');before.focus();before.selectionStart=7;before.selectionEnd=11;before.selectionDirection='backward';
  s.day(2);const after=field(s,'Ваш ответ');assert.equal(after.value,'Pending text');assert.ok(s.d.activeElement===after,'Reply keeps focus');assert.equal(after.selectionStart,7);assert.equal(after.selectionEnd,11);assert.equal(after.selectionDirection,'backward');assert.ok(allPc(s.root).some(n=>n.textContent==='Текст есть. Только не надо опять мерить характер количеством хрипов в микрофон.'));s.pc.dispose();
 });
-test('midnight preserves a custom registration name and its selection',()=>{
+test('midnight preserves registration focus and selection but submission always uses hero nickname',()=>{
  const s=setup();s.day(2);s.pc.navigateUnderweb('underweb://battles/concrete-echo');findButton(s.root,'Подать заявку').click();const input=field(s,'Имя участника');input.value='Custom';input.focus();input.selectionStart=1;input.selectionEnd=4;input.selectionDirection='forward';
- s.day(3);const after=field(s,'Имя участника');assert.equal(after.value,'Custom');assert.equal(s.d.activeElement,after);assert.equal(after.selectionStart,1);assert.equal(after.selectionEnd,4);findButton(s.root,'Подтвердить заявку').click();assert.equal(s.pc.state.battleApplications[0].nickname,'Custom');s.pc.dispose();
+ s.day(3);const after=field(s,'Имя участника');assert.equal(after.getAttribute('readonly'),'true');assert.equal(after.value,'Custom');assert.equal(s.d.activeElement,after);assert.equal(after.selectionStart,1);assert.equal(after.selectionEnd,4);findButton(s.root,'Подтвердить заявку').click();assert.equal(s.pc.state.battleApplications[0].nickname,'Original');s.pc.dispose();
 });
 test('midnight keeps unfinished address and search inputs while replacing dated results',()=>{
  const s=setup();s.day(3);s.pc.navigateUnderweb('Dark Souls');const search=field(s,'Поиск Искры');search.value='Ещё не выполненный поиск';const address=field(s,'Адрес или поиск Underweb');address.value='underweb://forum/unfinished';address.focus();address.selectionStart=12;address.selectionEnd=14;
