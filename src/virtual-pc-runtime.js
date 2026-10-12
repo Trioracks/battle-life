@@ -24,20 +24,20 @@ export function createSubmissionTransferClock(){
  }};
 }
 export {gameMinuteStamp};
-export function advanceVirtualPc(input,clock){
+export function advanceVirtualPc(input,clock,options={}){
  let s=createVirtualPcState(input);const stamp=gameMinuteStamp(clock),previous=s.lastGameMinute;
  if(stamp===null)return {state:s,advancedBytes:0};
- const social=advanceSocial(s,stamp);s=social.state;
+ const social=advanceSocial(s,stamp,options);s=social.state;
  s.lastGameMinute=stamp;
- if(previous===null||stamp<previous||s.power!=='on')return {state:s,advancedBytes:0,events:social.events};
- return {...advanceTransfers(s,previous,stamp),events:social.events};
+ if(previous===null||stamp<previous||s.power!=='on')return {state:s,advancedBytes:0,events:social.events,domainChanged:social.domainChanged};
+ return {...advanceTransfers(s,previous,stamp),events:social.events,domainChanged:social.domainChanged};
 }
 // A domain event becomes visible only after its state has been durably saved.
 // Ordinary frame progress retains the host's existing batched-save policy.
-export function advanceVirtualPcDurably(input,clock,persist){
- const next=advanceVirtualPc(input,clock);
+export function advanceVirtualPcDurably(input,clock,persist,options={}){
+ const next=advanceVirtualPc(input,clock,options);
  const migration=JSON.stringify(input.battleSubmissions??[])!==JSON.stringify(next.state.battleSubmissions??[]);
- if(next.events?.length||migration){
+ if(next.events?.length||migration||next.domainChanged){
   let saved;try{saved=persist(next.state);}catch{saved=false;}
   if(saved===false||saved?.ok===false)return {...next,state:input,events:[],advancedBytes:0,saveFailed:true};
  }

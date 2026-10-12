@@ -15,7 +15,7 @@ export function battleDeadlineLabel(window,nowMinute){
 export function registerBattle(state,{battleId,playerName,nowMinute}={}){
  const fail=reason=>({ok:false,state,reason,alreadyRegistered:false});
  if(typeof playerName!=='string'||!playerName.trim())return fail('Не удалось определить ник героя.');
- const ensured=ensureBattleWindow(state,{battleId,nowMinute});if(!ensured.ok)return fail(ensured.reason);
+ const ensured=ensureBattleWindow(state,{battleId,nowMinute,judgingPolicyVersion:2});if(!ensured.ok)return fail(ensured.reason);
  const window=ensured.state.battleWindows.find(w=>w.id===ensured.windowId);if(!battleDeadlineLabel(window,nowMinute).open)return fail('Приём заявок и треков закрыт.');
  const alreadyRegistered=Boolean(ensured.state.battleApplications?.some(a=>a.battleId===battleId));
  return {ok:true,state:alreadyRegistered?ensured.state:applyToBattle(ensured.state,battleId,playerName),alreadyRegistered,reason:''};

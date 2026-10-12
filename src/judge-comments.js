@@ -32,7 +32,7 @@ export function commentSimilarity(a,b){
  return [...x].filter(t=>y.has(t)).length/Math.min(x.size,y.size);
 }
 function choose(pool,rand,weight){let point=rand()*pool.reduce((s,t)=>s+weight(t),0);return pool.find(t=>(point-=weight(t))<0)??pool.at(-1);}
-export function generateJudgeReview(input,{seed=0,history=[]}={}){
+export function generateJudgeReview(input,{seed=0,history=[],copyHistory=true}={}){
  const safeHistory=Array.isArray(history)?history:[],id=[input.format?.battleId??'free',input.format?.roundId??'selection',input.version.id,input.judge.id].join(':');
  const existing=safeHistory.find(r=>r.id===id),diagnostics={unsupportedClaims:[],noveltyShortages:[],limitedFamilies:[],nearRepeats:[]};
  if(existing)return {result:clone(existing),history:clone(safeHistory),diagnostics};
@@ -61,7 +61,7 @@ export function generateJudgeReview(input,{seed=0,history=[]}={}){
  for(const t of selected)for(const c of t.conditions)if(!conditionPasses(c,ctx,t))diagnostics.unsupportedClaims.push(t.id+':'+c.kind);
  if(recent.some(r=>commentSimilarity(comment,r.comment)>.65))diagnostics.nearRepeats.push(id);
  const result={...evaluation,id,comment,templateIds:selected.map(t=>t.id),families:[...new Set(selected.map(t=>t.family))],focus:selected[0].family,length:comment.length>350?'long':comment.length>170?'medium':'short',evidenceIds,knownFacts:clone(ctx.perception.knownFactIds),recognizedReferences:ctx.perception.recognizedReferences.map(r=>r.referenceId),seed,commentPolicyVersion:1};
- return {result,history:[...clone(safeHistory),result],diagnostics};
+ return {result,history:[...(copyHistory?clone(safeHistory):safeHistory),result],diagnostics};
 }
 export function normalizeJudging(raw){
  const results={},recovery=Array.isArray(raw?.recovery)?clone(raw.recovery):[];

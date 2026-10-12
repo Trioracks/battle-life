@@ -44,3 +44,9 @@ test('panel waits for every expected judge and never invents qualification; dupl
  const a=generateJudgeReview(reviewFixture(),{seed:1}).result,b=generateJudgeReview(reviewFixture('work',80,'klim-propavshiy'),{seed:2}).result,options={battleId:'makarevich-1',roundId:'selection',versionIds:['work'],judgeIds:['eparhiya','klim-propavshiy']};
  assert.equal(finalizeJudgePanel({...options,results:[a,a]}).complete,false);const done=finalizeJudgePanel({...options,results:[a,b]});assert.equal(done.complete,true);assert.equal(done.totals.work,a.grade+b.grade);assert.equal(done.events[0].type,'judge-panel-complete');assert.ok(!('qualified' in done));
 });
+test('bulk generation can reuse immutable history entries without cloning the entire tournament per track',()=>{
+ const first=generateJudgeReview(reviewFixture('bulk-first'),{seed:2});Object.freeze(first.history);Object.freeze(first.result);
+ const next=generateJudgeReview(reviewFixture('bulk-next'),{seed:3,history:first.history,copyHistory:false});
+ assert.equal(next.history[0],first.result);assert.equal(first.history.length,1);assert.equal(next.history.length,2);
+ assert.deepEqual(next.result,generateJudgeReview(reviewFixture('bulk-next'),{seed:3,history:first.history}).result);
+});

@@ -17,6 +17,7 @@ import {normalizeResultReactions} from './social-result-reaction.js?rev=39';
 import {normalizeNpcTracks} from './battle-npc.js?rev=39';
 import {normalizeTournaments} from './battle-tournament.js?rev=39';
 import {normalizeBattleHistory} from './battle-history.js?rev=39';
+import {encodePcSave,decodePcSave} from './pc-save-codec.js?rev=39';
 import {drumById} from './beat-catalog.js?rev=39';
 import {normalizeCommunity} from './underweb-community.js?rev=39';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=39';
@@ -213,7 +214,7 @@ export function saveVirtualPcState(storage, state) {
   try {
     if (!storage) return false;
     const raw=storage.getItem?.(VIRTUAL_PC_STORAGE_KEY);
-    let parsed;try{parsed=raw?JSON.parse(raw):null;}catch{/* A fresh game may replace an unreadable save, as before. */}
+    let parsed;try{parsed=raw?decodePcSave(raw):null;}catch{/* A fresh game may replace an unreadable save, as before. */}
     if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'household'))reserveHouseholdBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&parsed.music?.genres?.version!==1)reserveGenreBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&parsed.creativeWork?.version!==1)reserveCreativeBackup(storage,raw);
@@ -222,7 +223,7 @@ export function saveVirtualPcState(storage, state) {
     if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'trackVersions'))reserveTrackVersionBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&parsed.socialRuntime?.version!==1)reserveSocialBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&(parsed.social?.schemaVersion??0)<2)reservePersonalBackup(storage,raw);
-    storage.setItem(VIRTUAL_PC_STORAGE_KEY, JSON.stringify(normalizeSnapshot(state)));
+    storage.setItem(VIRTUAL_PC_STORAGE_KEY, encodePcSave(normalizeSnapshot(state)));
     return true;
   } catch {
     return false;
@@ -272,7 +273,7 @@ export function loadVirtualPcState(storage) {
     if (!storage) return { ok: false, state: createVirtualPcState() };
     const raw = storage.getItem(VIRTUAL_PC_STORAGE_KEY);
     if (raw === null) return { ok: true, state: createVirtualPcState() };
-    const parsed = JSON.parse(raw);
+    const parsed = decodePcSave(raw);
     if (!isRecord(parsed) || parsed.version !== 1) return { ok: false, state: createVirtualPcState() };
     if(!Object.hasOwn(parsed,'household')){
       try{reserveHouseholdBackup(storage,raw);}catch{return {ok:false,reason:'household-backup-failed',state:restoredSnapshot(parsed)};}

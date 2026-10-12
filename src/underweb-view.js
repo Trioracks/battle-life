@@ -151,7 +151,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  }
  function activateRoute(next){
   if(!['social','battle'].includes(next.type))return;
-  const nowMinute=metadataGameMinute(getMetadata()),result=next.type==='battle'?ensureBattleWindow(getState(),{battleId:next.brief.id,nowMinute}):activateSocial(getState(),nowMinute,BATTLE_BRIEFS.some(b=>b.id===next.communityId)?next.communityId:'makarevich-1');
+  const nowMinute=metadataGameMinute(getMetadata()),result=next.type==='battle'?ensureBattleWindow(getState(),{battleId:next.brief.id,nowMinute,judgingPolicyVersion:2}):activateSocial(getState(),nowMinute,BATTLE_BRIEFS.some(b=>b.id===next.communityId)?next.communityId:'makarevich-1');
   if(!result.ok)return;let state=result.state;
   if(state!==getState())onChange(state);
  }

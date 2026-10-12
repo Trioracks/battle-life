@@ -10,11 +10,17 @@ import {effectiveVocalSkill} from './vocal-production.js?rev=39';
 import {validGameMinute} from './game-minute.js?rev=39';
 export const TOURNAMENT_ROUNDS=Object.freeze(['selection','round-2','round-3','round-4','round-5','final']);
 const clone=v=>structuredClone(v),record=v=>v!==null&&typeof v==='object'&&!Array.isArray(v),battleId=DEMO_BATTLE.battleId;
+function validRoundInternals(r){
+ if(!r||!Array.isArray(r.judgeIds)||!record(r.submissions)||!Array.isArray(r.pairs)||!record(r.noShows))return false;
+ if(!Object.values(r.submissions).every(id=>typeof id==='string')||!r.pairs.every(p=>typeof p?.nodeId==='string'&&Array.isArray(p.participantIds)&&p.participantIds.length===2&&p.participantIds.every(id=>id===null||typeof id==='string')))return false;
+ if(r.judgingClock!==undefined&&(!record(r.judgingClock)||r.judgingClock.policyVersion!==2||!Number.isInteger(r.judgingClock.checkedHour)||r.judgingClock.checkedHour<6||r.judgingClock.checkedHour>40||!record(r.judgingClock.completed)||!Object.entries(r.judgingClock.completed).every(([id,at])=>r.judgeIds.includes(id)&&validGameMinute(at))))return false;
+ return r.judgeBatches===undefined||record(r.judgeBatches)&&Object.entries(r.judgeBatches).every(([id,b])=>r.judgeIds.includes(id)&&b?.judgeId===id&&validGameMinute(b.publishedAt)&&Array.isArray(b.resultIds)&&b.resultIds.every(id=>typeof id==='string'));
+}
 export function heroTournamentSkills(state,skills={}){return {writing:effectiveWritingSkill(state,skills),musicality:Math.max(0,Math.min(100,Number.isFinite(skills.musicality)?skills.musicality:10)),flow:effectiveVocalSkill(state,skills),beatmaking:effectiveBeatSkill(state,skills),sound:effectiveVocalSkill(state,skills,'mix')};}
 export function normalizeTournaments(raw){
  const byId={},recovery=Array.isArray(raw?.recovery)?clone(raw.recovery):[];
  for(const [id,t]of Object.entries(record(raw?.byId)?raw.byId:{})){
-  const valid=id===battleId&&t?.policyVersion===2&&t.battleId===id&&Number.isSafeInteger(t.seed)&&TOURNAMENT_ROUNDS.includes(t.currentRoundId)&&record(t.rounds)&&Array.isArray(t.events)&&Array.isArray(t.participantIds)&&['active','complete'].includes(t.status)&&Object.entries(t.rounds).every(([key,r])=>TOURNAMENT_ROUNDS.includes(key)&&r?.roundId===key&&validGameMinute(r.opensAt)&&validGameMinute(r.closesAt)&&r.closesAt>r.opensAt&&Array.isArray(r.judgeIds)&&record(r.submissions)&&Array.isArray(r.pairs)&&record(r.noShows)&&['accepting','awaiting_judges','complete'].includes(r.status));
+  const valid=id===battleId&&t?.policyVersion===2&&t.battleId===id&&Number.isSafeInteger(t.seed)&&TOURNAMENT_ROUNDS.includes(t.currentRoundId)&&record(t.rounds)&&Array.isArray(t.events)&&Array.isArray(t.participantIds)&&['active','complete'].includes(t.status)&&Object.entries(t.rounds).every(([key,r])=>TOURNAMENT_ROUNDS.includes(key)&&validRoundInternals(r)&&r?.roundId===key&&validGameMinute(r.opensAt)&&validGameMinute(r.closesAt)&&r.closesAt>r.opensAt&&Array.isArray(r.judgeIds)&&record(r.submissions)&&Array.isArray(r.pairs)&&record(r.noShows)&&['accepting','awaiting_judges','complete'].includes(r.status));
   if(valid)byId[id]=clone(t);else recovery.push({battleId:id,recoveryData:clone(t),reason:'Турнир повреждён. История сохранена без повторного посева.'});
  }return {version:2,byId,recovery};
 }

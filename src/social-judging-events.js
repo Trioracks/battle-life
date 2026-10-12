@@ -27,20 +27,22 @@ export function scheduleSubmissionJudging(state,submissionId){
 }
 export function publicBattleResults(state,submissionId){
  const s=state.battleSubmissions?.find(s=>s.id===submissionId),schedule=state.judgingSchedule?.[submissionId],events=state.socialRuntime?.events??[];
- const publicIds=new Set(events.filter(e=>e.type==='judge-review'&&e.entityId===submissionId).map(e=>e.resultId)),results=(schedule?.items??[]).filter(i=>publicIds.has(i.resultId)).map(i=>state.judging?.results?.[i.resultId]).filter(Boolean);
+ const publicIds=new Set(events.filter(e=>e.type==='judge-review'&&e.entityId===submissionId).map(e=>e.resultId)),results=[...publicIds].map(id=>state.judging?.results?.[id]).filter(Boolean);
  const panelEvent=events.find(e=>e.type==='judge-panel-complete'&&e.entityId===submissionId),window=state.battleWindows?.find(w=>w.id===s?.windowId);
- return {results,expectedJudgeIds:window?.judgeIds??[],complete:Boolean(panelEvent),panelEvent:panelEvent??null,total:panelEvent?.total??null,qualification:state.battleQualifications?.[s?.windowId]?.[s?.playerId]??null};
+ return {results,expectedJudgeIds:window?.judgeIds??[],complete:Boolean(panelEvent),panelEvent:panelEvent??null,total:panelEvent?.total??null,qualification:panelEvent?.qualification??state.battleQualifications?.[s?.windowId]?.[s?.playerId]??null};
 }
 export function publishJudgeEvents(input,nowMinute){
  if(!Number.isFinite(nowMinute))return {state:input,events:[]};
  let state=input;
  for(const s of state.battleSubmissions??[]){
+  if(state.tournaments?.byId?.[s.battleId]?.rounds?.[s.roundId])continue;
   const w=state.battleWindows?.find(w=>w.id===s.windowId&&!w.issue);
   if(!w||w.closesAt>nowMinute||s.status==='recovery')continue;
   const scheduled=scheduleSubmissionJudging(state,s.id);if(scheduled.ok)state=scheduled.state;
  }
  const previous=state.socialRuntime?.events??[],seen=new Set(previous.map(e=>e.id)),events=[];
  for(const schedule of Object.values(state.judgingSchedule??{})){
+  if(state.tournaments?.byId?.['makarevich-1']&&schedule.windowId?.startsWith('makarevich-1:'))continue;
   const s=state.battleSubmissions?.find(s=>s.id===schedule.submissionId);if(!s)continue;
   const c=communityById(s.communityId),common={source:SOCIAL_IDENTITY.name,sender:c?.name??'Баттл',entityId:s.id,communityId:s.communityId,trackVersionId:s.trackVersionId};
   for(const item of schedule.items){

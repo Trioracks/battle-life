@@ -1,6 +1,7 @@
 import {SAVE_KEY,STAT_KEYS,normalizeAppearance} from './avatar-v3-profile.js?rev=39';
 import {createWardrobe} from './home-wardrobe.js?rev=39';
 import {VIRTUAL_PC_STORAGE_KEY,createVirtualPcState} from './virtual-pc-state.js?rev=39';
+import {decodePcSave,encodePcSave} from './pc-save-codec.js?rev=39';
 
 export const NOVICE_JOURNAL_KEY='battle-life-novice-migration-v1';
 export const PROFILE_BACKUP_KEY=SAVE_KEY+'-before-novice-v1';
@@ -26,7 +27,7 @@ export function migrateNoviceSave(storage){
    // A different confirmed hero always wins over an old recovery journal.
    if(profileRaw!==journal.sourceProfile&&profile?.noviceSchema===1&&profile.noviceMigration!==journal.token){abandonNoviceMigration(storage);return {ok:true};}
   }else{
-   const profile=profileRaw===null?null:JSON.parse(profileRaw),pc=pcRaw===null?null:JSON.parse(pcRaw);
+   const profile=profileRaw===null?null:JSON.parse(profileRaw),pc=pcRaw===null?null:decodePcSave(pcRaw);
    if(profile!==null&&!record(profile)||pc!==null&&!record(pc))throw Error('Неверный формат сохранения');
    if(!profile||profile.noviceSchema===1)return {ok:true};
    if(profile.version!==3||typeof profile.name!=='string'||!profile.name.trim()||!record(profile.skills))throw Error('Неверный формат героя');
@@ -39,7 +40,7 @@ export function migrateNoviceSave(storage){
    journal={status:'prepared',token,sourceProfile:profileRaw,profile:targetProfile,pc:targetPc};storage.setItem(NOVICE_JOURNAL_KEY,JSON.stringify(journal));
   }
   if(journal.status!=='prepared')return {ok:true};
-  storage.setItem(SAVE_KEY,JSON.stringify(journal.profile));storage.setItem(VIRTUAL_PC_STORAGE_KEY,JSON.stringify(journal.pc));
+  storage.setItem(SAVE_KEY,JSON.stringify(journal.profile));storage.setItem(VIRTUAL_PC_STORAGE_KEY,encodePcSave(journal.pc));
   if(journal.kind==='new-game')storage.setItem('battle-life-apartment-v3-time',JSON.stringify(journal.homeTime));
   storage.setItem(NOVICE_JOURNAL_KEY,JSON.stringify({status:'completed',token:journal.token}));return {ok:true};
  }catch(error){return {ok:false,error:'Переход на новые навыки не сохранён. Автосохранение отключено; перезагрузите страницу для восстановления. '+(error?.message??'')};}

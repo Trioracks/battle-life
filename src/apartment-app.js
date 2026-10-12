@@ -292,20 +292,20 @@ try{
         const creative=creativeWorkDescriptor(pcState,profile?.skills);
         if(pcLifecycle.snapshot.phase==='working'&&creative.job){
           lastWorkJob={...creative.job};lastWorkBeat=creative.project;
-          const r=advanceCreativeWork(pcState,dt,homeTime,profile?.skills);pcState=r.state;homeTime.advanceMinutes(r.minutes);pcState=advanceVirtualPcDurably(pcState,homeTime,next=>persistPc(next,{atomic:true})).state;virtualPc.syncState(pcState);
+          const r=advanceCreativeWork(pcState,dt,homeTime,profile?.skills);pcState=r.state;homeTime.advanceMinutes(r.minutes);pcState=advanceVirtualPcDurably(pcState,homeTime,next=>persistPc(next,{atomic:true}),{heroSkills:profile?.skills}).state;virtualPc.syncState(pcState);
           if(creative.chainProgress)workReward+=r.practiceGained??0;
           if(r.finished){if(!creative.chainProgress)workReward=r.practiceGained;workFinished=true;lastWorkJob.elapsed=lastWorkJob.total;}
           if(r.finished||r.blocked){pcLifecycle.finishWork({blocked:r.blocked});syncWorkAudio();if(r.blocked){message=r.reason||workBlockReason(pcState);messageUntil=now+10000;speech.say(workNeedSpeech(pcState),{afterRoom:true});}}
           if(r.finished||r.blocked||now-lastWorkSave>1000){saveHomeTime(storage,homeTime);persistPc(pcState);lastWorkSave=now;}
         }
       }else if(mode==='pc'){
-        const frame=advanceComputerHomeFrame(motion,homeTime,pcState,dt,true,next=>persistPc(next,{atomic:true}));pcState=frame.pcState;virtualPc.syncState(pcState);events=frame.events;
+        const frame=advanceComputerHomeFrame(motion,homeTime,pcState,dt,true,next=>persistPc(next,{atomic:true}),{heroSkills:profile?.skills});pcState=frame.pcState;virtualPc.syncState(pcState);events=frame.events;
       }else{
         const before=homeTime.day*1440+homeTime.minutes,wasSleeping=motion.sleeping;
         events=advanceHomeFrame(motion,homeTime,dt,hold).events;
         if(wasSleeping)pcState=restoreMusicNeeds(pcState,'sleep',homeTime.day*1440+homeTime.minutes-before);
         if(events.some(e=>e.type==='completed'&&e.id==='dining'))pcState=restoreMusicNeeds(pcState,'meal');
-        pcState=advanceVirtualPcDurably(pcState,homeTime,next=>persistPc(next,{atomic:true})).state;virtualPc.syncState(pcState);
+        pcState=advanceVirtualPcDurably(pcState,homeTime,next=>persistPc(next,{atomic:true}),{heroSkills:profile?.skills}).state;virtualPc.syncState(pcState);
       }
     }
     for(const event of events){
