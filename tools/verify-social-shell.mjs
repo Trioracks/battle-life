@@ -7,10 +7,10 @@ await mkdir(output+'/browser-temp',{recursive:true});process.env.TEMP=process.en
 const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,args:['--autoplay-policy=no-user-gesture-required']});
 const page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
 try{
- await page.route('**/__social-shell-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/desktop-apps.css?rev=35"><link rel="stylesheet" href="/social-network.css?rev=36"><style>html,body,#qa{margin:0;width:100%;height:100%;overflow:hidden}</style><div id="qa"></div>'}));
+ await page.route('**/__social-shell-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/desktop-apps.css?rev=37"><link rel="stylesheet" href="/social-network.css?rev=37"><style>html,body,#qa{margin:0;width:100%;height:100%;overflow:hidden}</style><div id="qa"></div>'}));
  await page.goto((process.env.BATTLE_QA_URL||'http://127.0.0.1:4175')+'/__social-shell-qa');
  await page.evaluate(async()=>{
-  const [{mountUnderweb},{createVirtualPcState},{BeatAudio}]=await Promise.all([import('/src/underweb-view.js?rev=36'),import('/src/virtual-pc-state.js?rev=36'),import('/src/beat-audio.js?rev=36')]);
+  const [{mountUnderweb},{createVirtualPcState},{BeatAudio}]=await Promise.all([import('/src/underweb-view.js?rev=37'),import('/src/virtual-pc-state.js?rev=37'),import('/src/beat-audio.js?rev=37')]);
   let state=createVirtualPcState();window.socialQA={audio:new BeatAudio()};
   socialQA.view=mountUnderweb(document.getElementById('qa'),{getState:()=>state,getMetadata:()=>({gameDay:1,gameMinutes:600,playerName:'Новый голос'}),onChange:next=>{state=next;return true;},onApply:()=>{},audio:socialQA.audio});
  });

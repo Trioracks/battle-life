@@ -1,9 +1,11 @@
-import {communityById} from './social-catalog.js?rev=36';
-import {normalizeSocial} from './social-state.js?rev=36';
-import {ensureBattleWindow} from './battle-windows.js?rev=35';
-import {ACK_TEMPLATES,acknowledgementFor} from './social-submission.js?rev=36';
-import {validGameMinute} from './game-minute.js?rev=36';
-import {receivePhoneEvents} from './phone-notifications.js?rev=36';
+import {communityById} from './social-catalog.js?rev=37';
+import {normalizeSocial} from './social-state.js?rev=37';
+import {ensureBattleWindow} from './battle-windows.js?rev=37';
+import {ACK_TEMPLATES,acknowledgementFor} from './social-submission.js?rev=37';
+import {validGameMinute} from './game-minute.js?rev=37';
+import {receivePhoneEvents} from './phone-notifications.js?rev=37';
+import {publishJudgeEvents} from './social-judging-events.js?rev=37';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=37';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export function normalizeSocialRuntime(raw){
  const seen=new Set(),events=(Array.isArray(raw?.events)?raw.events:[]).filter(e=>e&&typeof e.id==='string'&&typeof e.type==='string'&&validGameMinute(e.dueAt)&&!seen.has(e.id)&&seen.add(e.id)).map(clone);
@@ -39,7 +41,7 @@ export function advanceSocial(input,nowMinute){
  for(const s of submissions){
   if(s.version!==2||s.status==='recovery')continue;
   const c=communityById(s.communityId),window=state.battleWindows?.find(w=>w.id===s.windowId&&!w.issue);if(!c||!window)continue;
-  const common={source:'Рифмосеть',sender:c.name,entityId:s.id,trackVersionId:s.trackVersionId,communityId:c.id};
+  const common={source:SOCIAL_IDENTITY.name,sender:c.name,entityId:s.id,trackVersionId:s.trackVersionId,communityId:c.id};
   if(s.status==='pending'&&s.ackAt<=nowMinute)due.push({...common,id:s.id+':ack',type:'submission-ack',dueAt:s.ackAt,text:ACK_TEMPLATES.find(t=>t.id===s.ackTemplateId)?.body??'Работа получена. Подтверждение сохранено.'});
   if(window.closesAt<=nowMinute)due.push({...common,id:s.id+':published',type:'submission-published',dueAt:window.closesAt,text:'Приём закрыт. Работа добавлена в аудиозаписи сообщества.'});
  }
@@ -52,5 +54,6 @@ export function advanceSocial(input,nowMinute){
   }else communityAudio[e.communityId]=[...new Set([...(communityAudio[e.communityId]??[]),e.trackVersionId])];
  }
  state={...state,social,communityAudio,battleSubmissions:submissions,phone:receivePhoneEvents(state.phone,events.filter(e=>e.type==='submission-ack')),socialRuntime:{version:1,lastMinute:nowMinute,events:[...runtime.events,...events]}};
- return {state,events};
+ const judged=publishJudgeEvents(state,nowMinute);
+ return {state:judged.state,events:[...events,...judged.events]};
 }

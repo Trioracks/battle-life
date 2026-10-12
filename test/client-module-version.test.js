@@ -21,38 +21,19 @@ test('home integration invalidates every changed dependency and its importers wi
  await visit('src/apartment-app.js');
  const affected=new Set(changed);let size;
  do{size=affected.size;for(const [file,imports]of graph)if(imports.some(dependency=>affected.has(dependency.file)))affected.add(file);}while(affected.size!==size);
- const vocalDamageAffected=new Set(['src/vocal-result-dsp.js']);
- do{size=vocalDamageAffected.size;for(const [file,imports]of graph)if(imports.some(dependency=>vocalDamageAffected.has(dependency.file)))vocalDamageAffected.add(file);}while(vocalDamageAffected.size!==size);
- const demoAffected=new Set(['apartment-app','beat-beginner-bank','beat-catalog','beat-production','beat-result-dsp','beat-work-view','underweb-view','virtual-pc-ui','vocal-catalog'].map(n=>'src/'+n+'.js'));
- do{size=demoAffected.size;for(const [file,imports]of graph)if(imports.some(dependency=>demoAffected.has(dependency.file)))demoAffected.add(file);}while(demoAffected.size!==size);
- for(const file of demoAffected)affected.add(file);
- const drySongAffected=new Set(['audio-performance','beat-song-form','beat-mix','beat-result-dsp','vocal-result-dsp','beat-audio','beat-playback','ft-studio-view'].map(n=>'src/'+n+'.js'));
- do{size=drySongAffected.size;for(const [file,imports]of graph)if(imports.some(dependency=>drySongAffected.has(dependency.file)))drySongAffected.add(file);}while(drySongAffected.size!==size);
- for(const file of drySongAffected)affected.add(file);
- const comfortAffected=new Set(['apartment-v3-camera','apartment-v3-scene','home-food','home-needs-view','vocal-result','vocal-result-dsp'].map(n=>'src/'+n+'.js'));
- do{size=comfortAffected.size;for(const [file,imports]of graph)if(imports.some(dependency=>comfortAffected.has(dependency.file)))comfortAffected.add(file);}while(comfortAffected.size!==size);
- for(const file of comfortAffected)affected.add(file);
- const genreForumAffected=new Set(['genre-progression','underweb-community-data','underweb-forum-archive','underweb-forum-archive-view','apartment-app','audio-performance','beat-playback','beat-production','beat-result','beat-result-dsp','beat-studio-view','beat-work-view','ft-studio-view','pc-software-catalog','pc-software-view','pc-software','underweb-community-view','underweb-community','underweb-view','virtual-pc-catalog','virtual-pc-explorer','virtual-pc-state','virtual-pc-ui','vocal-result-dsp'].map(n=>'src/'+n+'.js'));
- do{size=genreForumAffected.size;for(const [file,imports]of graph)if(imports.some(dependency=>genreForumAffected.has(dependency.file)))genreForumAffected.add(file);}while(genreForumAffected.size!==size);
- for(const file of genreForumAffected)affected.add(file);
- const patchAffected=new Set('src/apartment-app.js src/apartment-v3-animation.js src/apartment-v3-camera.js src/apartment-v3-computer.js src/apartment-v3-scene.js src/battle-submission-view.js src/battle-submission.js src/beat-production.js src/beat-studio-view.js src/beat-work-view.js src/creative-workflow.js src/footstep-cadence.js src/ft-studio-view.js src/home-creative-work.js src/home-needs-view.js src/indoor-footsteps.js src/lyric-production.js src/pc-identity.js src/pc-software-catalog.js src/pc-software-view.js src/pc-software.js src/pc-transfer-runtime.js src/rap-notebook-view.js src/underweb-view.js src/virtual-pc-catalog.js src/virtual-pc-disk-view.js src/virtual-pc-explorer-view.js src/virtual-pc-explorer.js src/virtual-pc-icons.js src/virtual-pc-menus.js src/virtual-pc-presentation.js src/virtual-pc-runtime.js src/virtual-pc-shell.js src/virtual-pc-state.js src/virtual-pc-system-windows.js src/virtual-pc-ui.js src/virtual-pc-window-state.js src/vocal-production.js src/vocal-result-dsp.js src/vocal-result.js'.split(' '));
- do{size=patchAffected.size;for(const [file,imports]of graph)if(imports.some(dependency=>patchAffected.has(dependency.file)))patchAffected.add(file);}while(patchAffected.size!==size);
- for(const file of patchAffected)affected.add(file);
- const retirementAffected=new Set(['beat-catalog','beat-production','beat-playback','beat-audio','beat-studio-view','beat-market-view'].map(n=>'src/'+n+'.js'));
- do{size=retirementAffected.size;for(const [file,imports]of graph)if(imports.some(dependency=>retirementAffected.has(dependency.file)))retirementAffected.add(file);}while(retirementAffected.size!==size);
- for(const file of retirementAffected)affected.add(file);
  const html=await read('index.html');
- assert.match(html,/apartment-app\.js\?rev=36/);
- for(const style of ['apartment-v3','creator-v12','desktop-apps','rap-notebook'])assert.ok(html.includes(style+'.css?rev='+(style==='creator-v12'?28:35)),style+' must invalidate changed styles');
- assert.ok((await read('desktop-apps.css')).includes('underweb-world.css?rev=35'));
- assert.match(html,/virtual-pc\.css\?rev=35/,'Sloboda shell invalidates base styles');
- for(const [file,imports]of graph)for(const dependency of imports)if(affected.has(dependency.file))assert.equal(dependency.query,retirementAffected.has(dependency.file)?'rev=36':patchAffected.has(dependency.file)?'rev=35':genreForumAffected.has(dependency.file)?'rev=34':comfortAffected.has(dependency.file)?'rev=33':drySongAffected.has(dependency.file)?'rev=32':demoAffected.has(dependency.file)?'rev=31':vocalDamageAffected.has(dependency.file)?'rev=30':'rev=28',file+' must load canonical '+dependency.file);
+ assert.match(html,/apartment-app\.js\?rev=37/);
+ for(const style of ['apartment-v3','creator-v12','desktop-apps','rap-notebook','virtual-pc','social-network','phone-hud'])assert.ok(html.includes(style+'.css?rev=37'),style+' must invalidate changed styles');
+ assert.ok((await read('desktop-apps.css')).includes('underweb-world.css?rev=37'));
+ const canonical=new Map();
+ for(const [file,imports]of graph)for(const dependency of imports){
+  if(!dependency.file.startsWith('src/'))continue;
+  assert.equal(dependency.query,'rev=37',file+' must load canonical '+dependency.file);
+  const previous=canonical.get(dependency.file);if(previous)assert.equal(previous,dependency.query);canonical.set(dependency.file,dependency.query);
+ }
  for(const file of changed)assert.ok(graph.has(file),file+' is covered by the live entry graph');
- // Work audio ownership stays at v28; the expanded sample catalog is invalidated.
- for(const [file,modules]of [
-  ['src/apartment-app.js',['beat-work-audio']],
-  ['src/beat-audio.js',['beat-beginner-bank']],
- ])for(const module of modules)assert.ok((await read(file)).includes(module+'.js?rev='+(retirementAffected.has('src/'+module+'.js')?36:patchAffected.has('src/'+module+'.js')?35:genreForumAffected.has('src/'+module+'.js')?34:demoAffected.has('src/'+module+'.js')?31:28)),file+' must invalidate '+module);
+ for(const name of ['social-view','social-runtime','social-result-view','social-result-reaction','judge-comments','judge-evaluation','battle-knowledge','phone-hud','track-version'])assert.ok(graph.has('src/'+name+'.js'),name+' must be live');
+ assert.ok(canonical.size>=120,'covers full application, not only new files');
 });
 
 test('HTML loads the new versioned apartment entry; legacy campaign remains accessible',async()=>{
@@ -60,7 +41,7 @@ test('HTML loads the new versioned apartment entry; legacy campaign remains acce
   assert.match(html,/src="\.\/src\/apartment-app\.js\?rev=[^"]+"/);
   assert.match(html,/href="\.\/virtual-pc\.css\?rev=[^"]+"/);
   assert.match(html,/<section id="virtual-pc" hidden/);
-  await access(new URL('../src/apartment-app.js?rev=36',import.meta.url));
+  await access(new URL('../src/apartment-app.js?rev=37',import.meta.url));
   const legacy=await readFile(new URL('../legacy.html',import.meta.url),'utf8');
   assert.match(legacy,/id="creator-modal"/);
   assert.match(legacy,/src="\.\/src\/main\.js\?rev=[^"]+"/);

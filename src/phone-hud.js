@@ -1,5 +1,5 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=21';
-import {normalizePhone,hoverPhoneNotice} from './phone-notifications.js?rev=36';
+import {pcElement as el} from './virtual-pc-dom.js?rev=37';
+import {normalizePhone,hoverPhoneNotice} from './phone-notifications.js?rev=37';
 export function mountPhoneHud(root,{getState,onChange,playVibration=()=>{}}){
  const d=root.ownerDocument,device=el(d,'div',{className:'bl-phone-device',attributes:{role:'img','aria-label':'Телефон'}}),screen=el(d,'div',{className:'bl-phone-screen'}),notice=el(d,'div',{className:'bl-phone-notice',dataset:{phoneNotice:'true'},attributes:{tabindex:'0',role:'status','aria-live':'polite','aria-label':'Уведомление телефона. Наведи и отведи указатель, чтобы закрыть.'}}),source=el(d,'small'),sender=el(d,'strong'),body=el(d,'p',{className:'bl-phone-body'}),hint=el(d,'small',{className:'bl-phone-hint',text:'Полностью — в сообщениях на ПК'});
  root.className='bl-phone-hud';screen.append(el(d,'span',{text:'Р'}));device.append(screen,el(d,'i',{className:'bl-phone-key'}));notice.append(source,sender,body,hint);root.replaceChildren(notice,device);

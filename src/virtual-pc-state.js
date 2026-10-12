@@ -1,20 +1,22 @@
-import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=36';
-import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=36';
-import {normalizeCreativeWork} from './creative-workflow.js?rev=36';
-import {normalizeBattleSubmissions} from './battle-submission.js?rev=36';
-import {normalizeRecordingState} from './vocal-production.js?rev=36';
-import {normalizeTrackVersions,captureTrackVersion} from './track-version.js?rev=36';
-import {normalizeSocial} from './social-state.js?rev=36';
-import {normalizeBattleWindows} from './battle-windows.js?rev=35';
-import {normalizeSocialRuntime,normalizeCommunityAudio} from './social-runtime.js?rev=36';
-import {normalizePhone} from './phone-notifications.js?rev=36';
-import {normalizeBattleKnowledge} from './battle-knowledge.js?rev=36';
-import {normalizeJudging} from './judge-comments.js?rev=36';
-import {drumById} from './beat-catalog.js?rev=36';
-import {normalizeCommunity} from './underweb-community.js?rev=34';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=35';
-import {normalizeHousehold} from './home-food.js?rev=33';
-import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=35';
+import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=37';
+import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=37';
+import {normalizeCreativeWork} from './creative-workflow.js?rev=37';
+import {normalizeBattleSubmissions} from './battle-submission.js?rev=37';
+import {normalizeRecordingState} from './vocal-production.js?rev=37';
+import {normalizeTrackVersions,captureTrackVersion} from './track-version.js?rev=37';
+import {normalizeSocial} from './social-state.js?rev=37';
+import {normalizeBattleWindows} from './battle-windows.js?rev=37';
+import {normalizeSocialRuntime,normalizeCommunityAudio} from './social-runtime.js?rev=37';
+import {normalizePhone} from './phone-notifications.js?rev=37';
+import {normalizeBattleKnowledge} from './battle-knowledge.js?rev=37';
+import {normalizeJudging} from './judge-comments.js?rev=37';
+import {normalizeJudgingSchedule} from './social-judging-events.js?rev=37';
+import {normalizeResultReactions} from './social-result-reaction.js?rev=37';
+import {drumById} from './beat-catalog.js?rev=37';
+import {normalizeCommunity} from './underweb-community.js?rev=37';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=37';
+import {normalizeHousehold} from './home-food.js?rev=37';
+import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=37';
 export const VIRTUAL_PC_STORAGE_KEY = 'battle-life-virtual-pc-v1';
 export const VIRTUAL_DISK_MB = 16000;
 export const SYSTEM_RESERVED_MB = 14000;
@@ -119,6 +121,8 @@ function normalizeSnapshot(value) {
     phone:normalizePhone(source.phone),
     battleKnowledge:normalizeBattleKnowledge(source.battleKnowledge),
     judging:normalizeJudging(source.judging),
+    judgingSchedule:normalizeJudgingSchedule(source.judgingSchedule),
+    resultReactions:normalizeResultReactions(source.resultReactions),
     household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),
     battleSubmissions,trackVersions,

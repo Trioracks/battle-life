@@ -1,14 +1,14 @@
-import {pcElement as el,pcButton as button,pcFind,pcFocusable} from './virtual-pc-dom.js?rev=21';
-import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=35';
-import {BEAT_STAGES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=36';
-import {randomBeatName} from './beat-names.js?rev=28';
-import {resolveBeatPlayback} from './beat-playback.js?rev=36';
-import {describeBeatMix} from './beat-mix.js?rev=36';
-import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=36';
-import {startVocalWork} from './vocal-production.js?rev=36';
-import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=36';
-import {appendRecordingControls} from './recording-studio-view.js?rev=36';
-import {normalizeGenreProgression,genreOptions,genreById,genreCap,chooseGenre,chooseSpecialization} from './genre-progression.js?rev=36';
+import {pcElement as el,pcButton as button,pcFind,pcFocusable} from './virtual-pc-dom.js?rev=37';
+import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=37';
+import {BEAT_STAGES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=37';
+import {randomBeatName} from './beat-names.js?rev=37';
+import {resolveBeatPlayback} from './beat-playback.js?rev=37';
+import {describeBeatMix} from './beat-mix.js?rev=37';
+import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=37';
+import {startVocalWork} from './vocal-production.js?rev=37';
+import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=37';
+import {appendRecordingControls} from './recording-studio-view.js?rev=37';
+import {normalizeGenreProgression,genreOptions,genreById,genreCap,chooseGenre,chooseSpecialization} from './genre-progression.js?rev=37';
 
 export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio,legacyName,initialProject}){
  const d=root.ownerDocument,workspace=createStudioWorkspace(d,{projectName:legacyName});root.replaceChildren(workspace);

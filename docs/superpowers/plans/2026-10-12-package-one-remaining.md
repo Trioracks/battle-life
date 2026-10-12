@@ -82,7 +82,7 @@ BL-014+ не включаются автоматически: карьера NPC
 
 ## R0. Входы и baseline
 
-**Files:** создать `docs/qa/2026-10-12-package-one-source-manifest.json`, вести `docs/backlog/implementation-v1-status.md` в worktree.
+**Files:** создать `docs/qa/2026-10-12-package-one-source-manifest.json`, вести `docs/qa/2026-10-12-package-one-status.md` в worktree. Журнал вынесен в QA для сохранения одноимённого незакоммиченного документа соседнего чата в основном checkout.
 
 **Interfaces:** manifest `{baseCommit,requirements:[{path,sha256}],decisions:[{source,value}]}` фиксирует версию параллельно редактируемой постановки.
 

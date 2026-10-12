@@ -1,19 +1,20 @@
-import {pcElement as el,pcFind} from './virtual-pc-dom.js?rev=21';
-import {SOCIAL_SECTIONS,communityById} from './social-catalog.js?rev=36';
-import {normalizeSocial,listCommunities} from './social-state.js?rev=36';
-import {socialAvatar,socialButton,socialHeading} from './social-dom.js?rev=36';
-import {createSocialAudio} from './social-audio-view.js?rev=36';
-import {createSocialProfileView} from './social-profile-view.js?rev=36';
-import {createSocialCommunityView} from './social-community-view.js?rev=36';
-import {mountSocialDialog} from './social-dialog-view.js?rev=36';
+import {pcElement as el,pcFind} from './virtual-pc-dom.js?rev=37';
+import {SOCIAL_SECTIONS,communityById} from './social-catalog.js?rev=37';
+import {normalizeSocial,listCommunities} from './social-state.js?rev=37';
+import {socialAvatar,socialButton,socialHeading} from './social-dom.js?rev=37';
+import {createSocialAudio} from './social-audio-view.js?rev=37';
+import {createSocialProfileView} from './social-profile-view.js?rev=37';
+import {createSocialCommunityView} from './social-community-view.js?rev=37';
+import {mountSocialDialog} from './social-dialog-view.js?rev=37';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=37';
 export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,navigate,audio,onResultViewed=()=>{}}){
- const d=root.ownerDocument,shell=el(d,'section',{className:'sn-network',attributes:{'aria-label':'Рифмосеть'}}),head=el(d,'header',{className:'sn-top'});
- head.append(el(d,'strong',{text:'р / Рифмосеть'}),el(d,'span',{text:'Люди. Музыка. Наши места.'}));
- const grid=el(d,'div',{className:'sn-layout'}),nav=el(d,'nav',{className:'sn-nav',attributes:{'aria-label':'Разделы Рифмосети'}}),content=el(d,'div',{className:'sn-content'}),message=el(d,'p',{className:'sn-message',attributes:{'aria-live':'polite'}});
+ const d=root.ownerDocument,shell=el(d,'section',{className:'sn-network',attributes:{'aria-label':SOCIAL_IDENTITY.name}}),head=el(d,'header',{className:'sn-top'});
+ head.append(el(d,'strong',{text:SOCIAL_IDENTITY.mark+' / '+SOCIAL_IDENTITY.name}),el(d,'span',{text:'Люди. Музыка. Наши места.'}));
+ const grid=el(d,'div',{className:'sn-layout'}),nav=el(d,'nav',{className:'sn-nav',attributes:{'aria-label':'Разделы: '+SOCIAL_IDENTITY.name}}),content=el(d,'div',{className:'sn-content'}),message=el(d,'p',{className:'sn-message',attributes:{'aria-live':'polite'}});
  for(const [id,title]of SOCIAL_SECTIONS)nav.append(socialButton(d,title,()=>navigate('underweb://social/'+id),{className:'sn-nav-link',dataset:{socialSection:id},attributes:route.section===id?{'aria-current':'page'}:{}}));
- grid.append(nav,content);shell.append(head,grid,message,el(d,'footer',{className:'sn-footer',text:'Рифмосеть · 2012 · Вымышленная локальная сеть'}));root.replaceChildren(shell);
- const playback=createSocialAudio(audio);let last='',query='',disposed=false,dialogView=null;
- const signature=()=>JSON.stringify([getState().social,Object.keys(getState().trackVersions?.byId??{}),getState().communityAudio,getState().battleSubmissions,getMetadata().playerName]);
+ grid.append(nav,content);shell.append(head,grid,message,el(d,'footer',{className:'sn-footer',text:SOCIAL_IDENTITY.name+' · '+SOCIAL_IDENTITY.year+' · Вымышленная локальная сеть'}));root.replaceChildren(shell);
+ const playback=createSocialAudio(audio),expandedResults=new Set();let last='',query='',disposed=false,dialogView=null;
+ const signature=()=>JSON.stringify([getState().social,Object.keys(getState().trackVersions?.byId??{}),getState().communityAudio,getState().battleSubmissions,getState().socialRuntime?.events,getState().battleKnowledge,getMetadata().playerName]);
  function commit(result){
   if(!result?.ok){message.textContent=result?.reason??'Не удалось выполнить действие.';return false;}
   let saved;try{saved=onChange(result.state);}catch{saved=false;}
@@ -38,7 +39,7 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
  function render(){
   if(dialogView){dialogView.update();last=signature();return;}
   const focus=content.contains(d.activeElement)?d.activeElement:null,label=focus?.getAttribute?.('aria-label'),start=focus?.selectionStart,end=focus?.selectionEnd;
-  const options={getState,getMetadata,navigate,commit,audio:playback,onResultViewed};
+  const options={getState,getMetadata,navigate,commit,audio:playback,onResultViewed:id=>{pcFind(content,n=>n.dataset?.resultSummary===id)?.focus?.({preventScroll:true});onResultViewed(id);},expandedResults};
   let node;
   if(route.section==='groups')node=groups();
   else if(route.section==='community')node=createSocialCommunityView(d,{...options,id:route.communityId});

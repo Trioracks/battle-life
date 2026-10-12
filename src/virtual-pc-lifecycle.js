@@ -1,4 +1,4 @@
-import {PcTransition} from './virtual-pc-transition.js?rev=21';
+import {PcTransition} from './virtual-pc-transition.js?rev=37';
 export const pcNeedsSceneFrame=(snapshot,mode)=>mode!=='pc'||snapshot.overlay<1;
 export function beginPcCutscene(motion){
  if(motion.busy||!motion.config.actions.computer)return false;
@@ -36,6 +36,8 @@ export class PcLifecycle{
  }
  leave(){const result=this.transition.leave();this.consume();return result;}
  work(){const result=this.transition.work();this.consume();return result;}
+ react(){const result=this.transition.react();if(result)this.reactionLook={mode:this.view.modes.mode,yaw:this.view.modes.yaw,pitch:this.view.modes.pitch};this.consume();return result;}
+ finishReaction(){const result=this.transition.finishReaction();this.consume();return result;}
  finishWork(options){const result=this.transition.finishWork(options);this.consume();return result;}
  shutdown(){const result=this.transition.shutdown();this.consume();return result;}
  tick(dt,{paused=false,hidden=false}={}){if(!paused&&!hidden)this.transition.tick(dt);this.consume();}
@@ -45,8 +47,10 @@ export class PcLifecycle{
   else if(event.type==='desktop-ready')this.onDesktop();
   else if(event.type==='work-scene'){this.view.endComputerView();this.view.modes.mode='2D';this.view.modes.revision++;}
   else if(event.type==='work-camera')this.view.beginComputerView();
+  else if(event.type==='reaction-scene'){this.view.endComputerView();this.view.modes.mode='2D';this.view.modes.revision++;}
+  else if(event.type==='reaction-camera'){if(this.reactionLook)Object.assign(this.view.modes,this.reactionLook);this.view.modes.revision++;this.reactionLook=null;this.view.beginComputerView();}
   else if(event.type==='room-ready'){this.view.endComputerView();this.onRoom();}
  }}
  restore(phase){if(phase!=='return-in'||!this.savedLook)return;Object.assign(this.view.modes,this.savedLook);this.view.modes.revision++;this.savedLook=null;}
- reset(){this.generation++;this.pending=null;this.entering=false;this.savedLook=null;this.transition.cancel();this.view.endComputerView();this.sounds?.stop?.();}
+ reset(){this.generation++;this.pending=null;this.entering=false;this.savedLook=null;this.reactionLook=null;this.transition.cancel();this.view.endComputerView();this.sounds?.stop?.();}
 }

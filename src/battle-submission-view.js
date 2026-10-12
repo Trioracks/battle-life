@@ -1,6 +1,6 @@
-import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=21';
-import {submissionCandidates} from './battle-submission.js?rev=36';
-import {attachSubmissionTrack} from './social-submission.js?rev=36';
+import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=37';
+import {submissionCandidates} from './battle-submission.js?rev=37';
+import {attachSubmissionTrack} from './social-submission.js?rev=37';
 // File picker only attaches a frozen version. Sending is a separate dialog action.
 export function mountBattleSubmissionPicker(root,{getState,battleId,communityId=battleId,getGameMinute=()=>null,onChange,onClose=()=>{}}){
  const d=root.ownerDocument,box=el(d,'section',{className:'battle-submit',attributes:{role:'dialog','aria-modal':'true','aria-label':'Прикрепить трек'}}),list=el(d,'div',{className:'battle-submit-files'}),details=el(d,'p'),status=el(d,'p',{attributes:{role:'status'}});

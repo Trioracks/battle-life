@@ -1,6 +1,6 @@
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=35';
-import {battleRoster} from './battle-roster.js?rev=36';
-import {validGameMinute} from './game-minute.js?rev=36';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=37';
+import {battleRoster} from './battle-roster.js?rev=37';
+import {validGameMinute} from './game-minute.js?rev=37';
 const clone=v=>JSON.parse(JSON.stringify(v)),ids=new Set(BATTLE_BRIEFS.map(b=>b.id));
 export function normalizeBattleWindows(value){
  const seen=new Set();return (Array.isArray(value)?value:[]).filter(v=>v&&ids.has(v.battleId)&&!seen.has(v.battleId+':'+v.roundId)&&seen.add(v.battleId+':'+v.roundId)).map(v=>{

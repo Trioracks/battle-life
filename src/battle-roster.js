@@ -1,4 +1,4 @@
-import { BATTLE_ROSTERS } from './battle-roster-data.js?rev=36';
+import { BATTLE_ROSTERS } from './battle-roster-data.js?rev=37';
 
 export const BATTLE_ROUND_IDS = Object.freeze(['selection','round-2','round-3','round-4','round-5','final']);
 

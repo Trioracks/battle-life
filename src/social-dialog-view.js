@@ -1,10 +1,10 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=21';
-import {communityById} from './social-catalog.js?rev=36';
-import {socialButton,socialAvatar,socialHeading} from './social-dom.js?rev=36';
-import {sendSubmission,dialogIsTyping,markDialogRead} from './social-submission.js?rev=36';
-import {attemptForWindow} from './battle-windows.js?rev=35';
-import {gameMinuteLabel} from './game-minute.js?rev=36';
-import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=36';
+import {pcElement as el} from './virtual-pc-dom.js?rev=37';
+import {communityById} from './social-catalog.js?rev=37';
+import {socialButton,socialAvatar,socialHeading} from './social-dom.js?rev=37';
+import {sendSubmission,dialogIsTyping,markDialogRead} from './social-submission.js?rev=37';
+import {attemptForWindow} from './battle-windows.js?rev=37';
+import {gameMinuteLabel} from './game-minute.js?rev=37';
+import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=37';
 export function mountSocialDialog(d,{id,getState,getMetadata,navigate,commit,audio}){
  const c=communityById(id),root=el(d,'section',{className:'sn-dialog'}),history=el(d,'div',{className:'sn-dialog-history'}),typing=el(d,'p',{className:'sn-typing',attributes:{'aria-live':'polite'}}),draft=el(d,'div',{className:'sn-dialog-draft'}),actions=el(d,'div',{className:'sn-actions'}),notice=el(d,'p',{className:'sn-note'}),pickerHost=el(d,'div',{className:'sn-file-picker'});
  let picker=null,lastMessages='',lastDraft='',disposed=false;

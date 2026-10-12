@@ -1,7 +1,7 @@
-import { STAT_KEYS, validateAllocations } from './creator.js';
-import {createWardrobe,validWardrobe,canWear} from './home-wardrobe.js?rev=28';
+import { STAT_KEYS, validateAllocations } from './creator.js?rev=37';
+import {createWardrobe,validWardrobe,canWear} from './home-wardrobe.js?rev=37';
 
-export { STAT_KEYS, statLabels as STAT_LABELS } from './creator.js';
+export { STAT_KEYS, statLabels as STAT_LABELS } from './creator.js?rev=37';
 
 function category(label, options) {
   return Object.freeze({

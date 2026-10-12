@@ -117,7 +117,7 @@
 
 ## S6. Сквозная проверка и интеграционная готовность
 
-**Files:** Create `tools/verify-package-one-social.mjs`, `tools/verify-package-one-judging.mjs`, `docs/qa/2026-10-12-package-one.md`; Modify `docs/backlog/implementation-v1-status.md`, соответствующие client revision imports/HTML, `test/client-module-version.test.js`, `test/virtual-pc-xp-entry.test.js` при изменении entry revision.
+**Files:** Create `tools/verify-package-one-social.mjs`, `tools/verify-package-one-judging.mjs`, `docs/qa/2026-10-12-package-one.md`; Modify `docs/qa/2026-10-12-package-one-status.md` (отдельно от незакоммиченного журнала соседнего чата), соответствующие client revision imports/HTML, `test/client-module-version.test.js`, `test/virtual-pc-xp-entry.test.js` при изменении entry revision.
 
 **Interfaces:** QA пользуется реальными экспортами/DOM и отдельным origin/save, не изменяет пользовательские сохранения. Артефакты `D:/Project/Battle/artifacts/sloboda-track-qa/package-one`.
 

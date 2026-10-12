@@ -99,7 +99,7 @@
 #virtual-pc .pc-caption-button:hover { filter:brightness(1.14); }
 #virtual-pc .pc-app-root { background:#eee9da; flex:1; min-height:0; overflow:auto; color:#111; }
 #virtual-pc .pc-window-content { padding:12px; background:#eee9da; min-height:100%; }
-#virtual-pc .pc-window button:not(.pc-caption-button):not(.pc-menu-item):not(.pc-file):not(.pc-tree-item):not(.pc-menu-trigger):not(.uw-control),#virtual-pc .pc-dialog button { background:linear-gradient(#fff,#e4e1d3); border:1px solid #6f7d93; border-radius:3px; color:#111; padding:4px 10px; min-height:24px; }
+#virtual-pc .pc-window button:not(.pc-caption-button):not(.pc-menu-item):not(.pc-file):not(.pc-tree-item):not(.pc-menu-trigger):not(.uw-control):not(.sn-network button),#virtual-pc .pc-dialog button { background:linear-gradient(#fff,#e4e1d3); border:1px solid #6f7d93; border-radius:3px; color:#111; padding:4px 10px; min-height:24px; }
 #virtual-pc .pc-window input:not([type=range]),#virtual-pc .pc-window select { background:white; border:1px solid #7f9db9; padding:3px 5px; color:#111; }
 #virtual-pc .pc-window p { font-size:13px; line-height:1.45; margin:6px 0; }
 #virtual-pc .pc-window h3 { font-size:14px; margin:4px 0 10px; }

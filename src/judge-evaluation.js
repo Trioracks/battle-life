@@ -1,4 +1,4 @@
-import {formatMismatch,checkHardRules} from './battle-format.js?rev=36';
+import {formatMismatch,checkHardRules} from './battle-format.js?rev=37';
 const axes=['text','performance','music','sound'],clamp=(v,max=1)=>Math.max(0,Math.min(max,v));
 /** JudgeResult: decision is fixed from raw quality; display rounding and comments never decide a pair. */
 export function evaluateTrack(version,judge,format,{opponent=null}={}){

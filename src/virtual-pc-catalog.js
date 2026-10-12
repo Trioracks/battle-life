@@ -1,8 +1,9 @@
-import {COMMUNITY_BOARDS,COMMUNITY_TOPICS,communityDay} from './underweb-community.js?rev=34';
-import {newsIssue,archiveForDay} from './underweb-news.js?rev=28';
-import {resolveSocialRoute} from './social-routing.js?rev=36';
-import {SOCIAL_COMMUNITIES} from './social-catalog.js?rev=36';
-import {FORUM_ARCHIVE_BOARDS,archiveTopicsForDay,archiveTopicForDay} from './underweb-forum-archive.js?rev=34';
+import {COMMUNITY_BOARDS,COMMUNITY_TOPICS,communityDay} from './underweb-community.js?rev=37';
+import {newsIssue,archiveForDay} from './underweb-news.js?rev=37';
+import {resolveSocialRoute} from './social-routing.js?rev=37';
+import {SOCIAL_COMMUNITIES} from './social-catalog.js?rev=37';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=37';
+import {FORUM_ARCHIVE_BOARDS,archiveTopicsForDay,archiveTopicForDay} from './underweb-forum-archive.js?rev=37';
 const apps = Object.freeze([
   { id: 'computer', label: 'Мой компьютер', iconId: 'computer', description: 'Диск C: и Мои проекты' },
   { id: 'underweb', label: 'Underweb', iconId: 'underweb', description: 'Локальная сеть баттлов' },
@@ -81,7 +82,7 @@ export function resolveUnderweb(address,metadata={}) {
   pages.push({title:'Исторический архив Hip-Hop.ru',url:'underweb://forum/archive',site:'Hip-Hop.ru / Историческая подборка',description:'Реальные даты и авторы, краткие пересказы, короткие цитаты и ссылки на оригинал. Архив только для чтения.',keywords:'хип хоп hip hop ru форум архив 2012'});
   for(const topic of archiveTopicsForDay(null,gameDay))pages.push({title:topic.title,url:'underweb://forum/archive/topic/'+topic.id,site:'Hip-Hop.ru / Архив / '+topic.date,description:topic.posts[0]?.body??'',keywords:'исторический архив 2012 '+topic.posts.map(p=>p.author).join(' ')});
   const results=words.length?pages.map(p=>({...p,score:words.reduce((n,w)=>n+(p.title+' '+p.description+' '+p.keywords).toLowerCase().replaceAll('ё','е').includes(w),0)})).filter(p=>p.score>0).sort((a,b)=>b.score-a.score).map(({keywords,score,...p})=>p):[];
-  const socialPages=[{title:'Рифмосеть — люди и музыка',url:'underweb://social/me',site:'Рифмосеть',description:'Друзья, фотографии, аудио, сообщения и сообщества.',keywords:'рифмосеть соцсеть социальная сеть друзья'},...SOCIAL_COMMUNITIES.map(c=>({title:c.name,url:'underweb://social/community/'+c.id,site:'Рифмосеть / Сообщества',description:c.description,keywords:'рифмосеть сообщество '+c.category}))];
+  const socialPages=[{title:SOCIAL_IDENTITY.name+' — люди и музыка',url:'underweb://social/me',site:SOCIAL_IDENTITY.name,description:'Друзья, фотографии, аудио, сообщения и сообщества.',keywords:SOCIAL_IDENTITY.name+' соцсеть социальная сеть друзья'},...SOCIAL_COMMUNITIES.map(c=>({title:c.name,url:'underweb://social/community/'+c.id,site:SOCIAL_IDENTITY.name+' / Сообщества',description:c.description,keywords:SOCIAL_IDENTITY.name+' сообщество '+c.category}))];
   for(const {keywords,...p} of socialPages)if(words.some(w=>(p.title+' '+p.description+' '+keywords).toLowerCase().replaceAll('ё','е').includes(w)))results.push(p);
   return {type:'search',url:'underweb://iskra/search?q='+encodeURIComponent(query),query,results};
 }

@@ -1,7 +1,7 @@
-import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=21';
-import {COMMUNITY_BOARDS,COMMUNITY_REPLY_LIMIT,normalizeCommunity,communityDay,topicsForDay,topicForDay,replyToTopic} from './underweb-community.js?rev=34';
-import {homeDateLabel} from './home-calendar.js?rev=28';
-import {createForumArchiveView} from './underweb-forum-archive-view.js?rev=34';
+import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=37';
+import {COMMUNITY_BOARDS,COMMUNITY_REPLY_LIMIT,normalizeCommunity,communityDay,topicsForDay,topicForDay,replyToTopic} from './underweb-community.js?rev=37';
+import {homeDateLabel} from './home-calendar.js?rev=37';
+import {createForumArchiveView} from './underweb-forum-archive-view.js?rev=37';
 const button=(d,text,fn,attributes={})=>pcButton(d,text,{className:'uw-control uw-forum-link',attributes},fn);
 export function createCommunityView(d,{route,getState,getMetadata,onChange,navigate}){
  const day=communityDay(getMetadata().gameDay),state=normalizeCommunity(getState().community);

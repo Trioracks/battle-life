@@ -1,7 +1,7 @@
-import {normalizeBeat} from './beat-production.js?rev=36';
-import {normalizeLyric} from './lyric-production.js?rev=36';
-import {resolveBeatPlayback} from './beat-playback.js?rev=36';
-import {lyricOutcomes,beatOutcomes,vocalOutcomes,combineProductionOutcomes} from './production-outcomes.js?rev=36';
+import {normalizeBeat} from './beat-production.js?rev=37';
+import {normalizeLyric} from './lyric-production.js?rev=37';
+import {resolveBeatPlayback} from './beat-playback.js?rev=37';
+import {lyricOutcomes,beatOutcomes,vocalOutcomes,combineProductionOutcomes} from './production-outcomes.js?rev=37';
 export const TRACK_DSP_VERSION=1;
 const clone=value=>JSON.parse(JSON.stringify(value));
 const object=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
@@ -34,11 +34,6 @@ export function captureTrackVersion(state,{projectId,nowMinute}={}){
  const compatible=lyrics?.status==='ready'&&lyrics.id===ref.id&&lyrics.revision===ref.revision;
  const savedLyrics=compatible?lyrics:null,descriptor=clone(play.descriptor);
  const recipe=clone({beat,lyrics:savedLyrics,descriptor,dspVersion:TRACK_DSP_VERSION});
- const signature=canonicalTrackSignature(recipe),trackVersions=normalizeTrackVersions(state.trackVersions);
- const existing=Object.values(trackVersions.byId).find(v=>v.signature===signature&&canonicalTrackSignature(v.recipe)===signature);
- if(existing)return {ok:true,state:{...state,trackVersions},versionId:existing.id,reason:''};
- const stem='track-'+digest(signature);let id=stem,suffix=1;
- while(Object.hasOwn(trackVersions.byId,id))id=stem+'-'+suffix++;
  const take=beat.recording.clean??beat.recording.draft;
  const textOutcome=savedLyrics?.productionOutcome??lyricOutcomes({project:{id:ref.id,stages:[]}});
  const musicOutcome=beatOutcomes({recipe:beat,descriptor});
@@ -51,6 +46,14 @@ export function captureTrackVersion(state,{projectId,nowMinute}={}){
   voiceOutcome.facts.push(...clone(take.productionOutcome.facts.filter(f=>f.key.startsWith('vocal.'))));
  }
  const outcome=combineProductionOutcomes(textOutcome,musicOutcome,voiceOutcome);
+ // Identity includes the realized evidence, not only the audible recipe. A later
+ // outcome adapter may create a new attachment, but cannot rewrite an old one.
+ const content={recipe,qualities:outcome.qualities,facts:outcome.facts,availability:outcome.availability};
+ const signature=canonicalTrackSignature(content),trackVersions=normalizeTrackVersions(state.trackVersions);
+ const existing=Object.values(trackVersions.byId).find(v=>canonicalTrackSignature({recipe:v.recipe,qualities:v.qualities,facts:v.facts,availability:v.availability})===signature);
+ if(existing)return {ok:true,state:{...state,trackVersions},versionId:existing.id,reason:''};
+ const stem='track-'+digest(signature);let id=stem,suffix=1;
+ while(Object.hasOwn(trackVersions.byId,id))id=stem+'-'+suffix++;
  const version={schemaVersion:1,id,trackId:beat.id,name:beat.name,createdAtMinute:nowMinute,
   sourceRevision:{beat:digest(canonicalTrackSignature(beat)),lyrics:savedLyrics?.revision??null,vocal:beat.recording.revision},
   signature,recipe,qualities:outcome.qualities,facts:outcome.facts,availability:outcome.availability,

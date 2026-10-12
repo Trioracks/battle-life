@@ -1,16 +1,17 @@
-import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=21';
-import {resolveUnderweb,BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=35';
-import {createBeatMarket} from './beat-market-view.js?rev=36';
-import {softwareForum,softwareMessage} from './pc-software-view.js?rev=36';
-import {downloadPresentation} from './virtual-pc-runtime.js?rev=36';
-import {createCommunityView} from './underweb-community-view.js?rev=34';
-import {communityDay} from './underweb-community.js?rev=34';
-import {homeDateLabel} from './home-calendar.js?rev=28';
-import {newsForDay} from './underweb-news.js?rev=28';
-import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=28';
-import {mountSocial} from './social-view.js?rev=36';
-import {activateSocial} from './social-runtime.js?rev=36';
-import {markDialogRead} from './social-submission.js?rev=36';
+import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=37';
+import {resolveUnderweb,BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=37';
+import {createBeatMarket} from './beat-market-view.js?rev=37';
+import {softwareForum,softwareMessage} from './pc-software-view.js?rev=37';
+import {downloadPresentation} from './virtual-pc-runtime.js?rev=37';
+import {createCommunityView} from './underweb-community-view.js?rev=37';
+import {communityDay} from './underweb-community.js?rev=37';
+import {homeDateLabel} from './home-calendar.js?rev=37';
+import {newsForDay} from './underweb-news.js?rev=37';
+import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=37';
+import {mountSocial} from './social-view.js?rev=37';
+import {activateSocial} from './social-runtime.js?rev=37';
+import {markDialogRead} from './social-submission.js?rev=37';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=37';
 const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-control '+(options.className??'')},fn);
 
 export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,onSubmitTrack=()=>{},onResultViewed=()=>{},getSoftwareMessage=()=>''}){
@@ -28,7 +29,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  bookmarks.append(button(d,'Базар',{},()=>navigate('underweb://samples')),button(d,'RIPLINE',{},()=>navigate('underweb://ripline')));
  bookmarks.append(button(d,'Файловая помойка',{},()=>navigate('underweb://dump')));
  bookmarks.append(button(d,'Форум',{},()=>navigate('underweb://forum')));
- bookmarks.append(button(d,'Рифмосеть',{},()=>navigate('underweb://social/me')));
+ bookmarks.append(button(d,SOCIAL_IDENTITY.name,{},()=>navigate('underweb://social/me')));
  const page=el(d,'div',{className:'uw-page'}),status=el(d,'footer',{className:'uw-status',text:'Готово · Локальная сеть'});
  browser.append(toolbar,bookmarks,page,status);root.replaceChildren(browser);
  function searchForm(query=''){
@@ -46,7 +47,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
    const card=el(d,'article');card.append(el(d,'small',{text:number}),button(d,title,{},()=>navigate(url)),el(d,'p',{text}));directory.append(card);
   }
   const columns=el(d,'div',{className:'uw-home-columns'}),main=el(d,'div',{className:'uw-home-main'}),side=el(d,'aside',{className:'uw-my-battles',attributes:{'aria-label':'Мои баттлы'}});
-  main.append(createNewsPanel(d,{issue:newsForDay(getMetadata().gameDay),navigate}),directory,button(d,'Рифмосеть — друзья и сообщества',{},()=>navigate('underweb://social/me')));
+  main.append(createNewsPanel(d,{issue:newsForDay(getMetadata().gameDay),navigate}),directory,button(d,SOCIAL_IDENTITY.name+' — друзья и сообщества',{},()=>navigate('underweb://social/me')));
   side.append(el(d,'h2',{text:'Мои баттлы'}));
   const registered=BATTLE_BRIEFS.filter(b=>isApplied(b.id));
   for(const b of registered){const saved=getState().battleSubmissions?.find(s=>s.battleId===b.id);side.append(button(d,b.title,{},()=>navigate('underweb://battles/'+b.id)),el(d,'small',{text:saved?.issue?'Проверь сохранённую работу':saved?'Ожидает проверки':'Зарегистрирован · можно сдать трек'}));}
@@ -84,7 +85,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   const hero=el(d,'div',{className:'uw-detail-hero'}),text=el(d,'div');text.append(el(d,'small',{className:'uw-badge',text:b.season}),el(d,'h1',{text:b.title}),el(d,'p',{text:b.description}));hero.append(poster(b,true),text);site.append(hero);
   const columns=el(d,'div',{className:'uw-detail-columns'}),rules=el(d,'section',{className:'uw-battle-content'});
   if(route.tab==='home'){
-   rules.append(el(d,'small',{text:'ОТБОР'}),el(d,'h2',{text:'Тема: «'+b.theme+'»'}),el(d,'p',{text:b.condition}),el(d,'p',{text:'Подай заявку, напиши текст в Рэпблокноте и запиши вокал в FT Studio. Готовый трек отправляется через сообщения сообщества в Рифмосети.'}),button(d,'Скачать Рэпблокнот →',{className:'uw-text-link'},()=>navigate('underweb://dump/notebook')));
+   rules.append(el(d,'small',{text:'ОТБОР'}),el(d,'h2',{text:'Тема: «'+b.theme+'»'}),el(d,'p',{text:b.condition}),el(d,'p',{text:'Подай заявку, напиши текст в Рэпблокноте и запиши вокал в FT Studio. Готовый трек отправляется через сообщения сообщества в сети «'+SOCIAL_IDENTITY.name+'».'}),button(d,'Скачать Рэпблокнот →',{className:'uw-text-link'},()=>navigate('underweb://dump/notebook')));
    const note=el(d,'div',{className:'uw-battle-bulletin'});note.append(el(d,'strong',{text:'На связи организаторы'}),el(d,'p',{text:'Правила уже опубликованы. Вопросы по формату и первые впечатления собираем в общей теме.'}),button(d,'Читать обсуждение →',{},()=>navigate('underweb://forum/topic/'+b.id+'-general')));rules.append(note);
   }else if(route.tab==='rules'){
    rules.append(el(d,'h2',{text:'Регламент отбора'}),el(d,'p',{className:'uw-theme',text:b.theme}));const list=el(d,'ul');for(const text of b.rules)list.append(el(d,'li',{text}));rules.append(list,el(d,'p',{text:'Участие бесплатно. Чужие куплеты, публикация личных данных и травля участников запрещены. Заявки и тексты остаются в игровом мире.'}),button(d,'Задать вопрос о правилах →',{},()=>navigate('underweb://forum/topic/'+b.id+'-rules')));

@@ -1,5 +1,7 @@
 .bl-phone-hud{position:fixed;left:14px;bottom:126px;width:58px;z-index:145;pointer-events:none;font:12px/1.4 Arial,sans-serif;color:#e6f0e9}
 .bl-phone-hud[hidden]{display:none!important}body[data-mode=pc] .bl-phone-hud{bottom:54px}
+/* System menus must remain clickable. This changes presentation only, not the notice queue. */
+body:has(#virtual-pc .pc-popup) .bl-phone-hud{z-index:39}
 .bl-phone-device{width:48px;height:79px;border-radius:9px 9px 12px 12px;border:2px solid #727e79;background:linear-gradient(110deg,#45524f,#182421);box-shadow:1px 4px 9px #0008;padding:13px 6px 5px;position:relative}
 .bl-phone-device:before{content:"";position:absolute;top:5px;left:17px;width:11px;height:2px;background:#111e1a;border-radius:2px}
 .bl-phone-screen{height:39px;background:#253b32;border:1px solid #0a1510;display:flex;align-items:center;justify-content:center;color:#415e4a;font-weight:bold;font-size:16px}

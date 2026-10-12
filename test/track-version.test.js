@@ -6,6 +6,17 @@ import {legacySubmissionFixture} from './helpers/submission-fixtures.js';
 import {startVocalWork,advanceVocalWork} from '../src/vocal-production.js';
 const api=await import('../src/track-version.js').catch(()=>({}));
 function capture(state){assert.equal(typeof api.captureTrackVersion,'function');return api.captureTrackVersion(state,{projectId:'beat',nowMinute:600});}
+test('equal audio recipes cannot reuse a snapshot with different saved facts or qualities',()=>{
+ for(const field of ['facts','qualities']){
+  const first=capture(submissionFixture()),old=first.state.trackVersions.byId[first.versionId];
+  if(field==='facts')old.facts=[{id:'old',key:'music.groove',value:1,origin:'legacy-observed',evidence:[]}];
+  else old.qualities.music=9.9;
+  const before=JSON.stringify(old),next=capture(first.state);
+  assert.notEqual(next.versionId,first.versionId,field+' is part of version identity');
+  assert.equal(JSON.stringify(next.state.trackVersions.byId[first.versionId]),before,'old published evidence is never rewritten');
+  assert.equal(capture(next.state).versionId,next.versionId,'unchanged complete snapshot still deduplicates');
+ }
+});
 
 test('unchanged attachment reuses complete signature, while frozen recipe owns its copies',()=>{
  const original=submissionFixture(),saved=capture(original);assert.equal(saved.ok,true);

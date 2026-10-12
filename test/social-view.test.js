@@ -4,14 +4,22 @@ import {mountSocial} from '../src/social-view.js';
 import {resolveSocialRoute} from '../src/social-routing.js';
 import {createVirtualPcState} from '../src/virtual-pc-state.js';
 import {subscriptionFixture} from './helpers/social-fixtures.js';
+import {ensureBattleWindow} from '../src/battle-windows.js';
+import {gameMinuteLabel} from '../src/game-minute.js';
 import {pcDocument,allPc,findButton,fire} from './helpers/virtual-pc-dom.js';
 function setup(path='me',options={}){
  const d=pcDocument(),root=d.createElement('div');let state=options.state??createVirtualPcState(),route=resolveSocialRoute('underweb://social/'+path),navigated='';
- const view=mountSocial(root,{route,getState:()=>state,getMetadata:()=>({gameDay:1,playerName:'Герой'}),onChange:next=>{if(options.fail)return false;state=next;return true;},navigate:url=>{navigated=url;},audio:options.audio});
+ const view=mountSocial(root,{route,getState:()=>state,getMetadata:()=>({gameDay:1,playerName:'Герой',...options.metadata}),onChange:next=>{if(options.fail)return false;state=next;return true;},navigate:url=>{navigated=url;},audio:options.audio});
  return {d,root,view,get state(){return state;},get navigated(){return navigated;}};
 }
 test('study button persists qualitative knowledge without leaking hidden coefficients',()=>{
  const s=setup('community/makarevich-1');findButton(s.root,'Изучить площадку').click();assert.equal(s.state.battleKnowledge.byRound['makarevich-1:selection'].evidence.length,1);assert.ok(allPc(s.root).some(n=>n.textContent?.includes('Уверенность: Низкая')));assert.ok(!allPc(s.root).some(n=>/formatAdherence|strictnessOffset|maxPenalty/.test(n.textContent??'')));s.view.dispose();
+});
+test('community shows its saved deadline and prefers explicit analysis over intelligence',()=>{
+ const state=ensureBattleWindow(createVirtualPcState(),{battleId:'makarevich-1',nowMinute:600}).state;
+ const s=setup('community/makarevich-1',{state,metadata:{skills:{analysis:90,intelligence:10}}});
+ assert.ok(allPc(s.root).some(n=>n.textContent?.includes(gameMinuteLabel(state.battleWindows[0].closesAt))));
+ findButton(s.root,'Изучить площадку').click();assert.ok(Math.abs(s.state.battleKnowledge.byRound['makarevich-1:selection'].evidence[0].strength-.78)<1e-10);s.view.dispose();
 });
 test('six sections show personal profile and no free wall or message composers',()=>{
  const s=setup();assert.equal(allPc(s.root).filter(n=>n.dataset?.socialSection).length,6);

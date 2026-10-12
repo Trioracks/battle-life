@@ -1,41 +1,43 @@
-import {ApartmentMotion} from './apartment-v3-motion.js?rev=8';
-import {ApartmentTime,loadHomeTime,saveHomeTime as saveHomeTimeRaw} from './apartment-v3-time.js?rev=28';
-import {districts,getDistrictLocations} from './calikfornia.js';
-import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=36';
-import {playSoundCue} from './sound-cues.js?rev=28';
-import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=35';
-import {DEFAULT_APPEARANCE,loadProfile,saveProfile} from './avatar-v3-profile.js?rev=28';
-import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=28';
-import {createNewGameSession} from './apartment-v3-new-game.js?rev=36';
-import {advanceVirtualPcDurably,gameMinuteStamp} from './virtual-pc-runtime.js?rev=36';
-import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=36';
-import {mountVirtualPc} from './virtual-pc-ui.js?rev=36';
-import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=28';
-import {PcSounds} from './virtual-pc-sounds.js?rev=28';
-import {playIndoorFootstep} from './indoor-footsteps.js?rev=35';
-import {createFootstepCadence} from './footstep-cadence.js?rev=35';
-import {restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=36';
-import {advanceInstallation} from './pc-software.js?rev=35';
-import {createBeatWorkPanel} from './beat-work-view.js?rev=36';
-import {normalizeGenreProgression,genreById,genreCap} from './genre-progression.js?rev=36';
-import {createBeatWorkAudio} from './beat-work-audio.js?rev=28';
-import {createLyricWorkAudio} from './lyric-work-audio.js?rev=28';
-import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.js?rev=36';
-import {pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=36';
-import {effectiveVocalSkill} from './vocal-production.js?rev=36';
-import {effectiveWritingSkill} from './lyric-production.js?rev=36';
-import {consumeFood} from './home-food.js?rev=33';
-import {createCharacterSpeech,workNeedSpeech} from './character-speech.js?rev=36';
-import {mountHomeNeedsView,mountCharacterSpeech} from './home-needs-view.js?rev=35';
-import {migrateNoviceSave} from './home-profile-migration.js?rev=36';
-import {mountHomeWardrobeView} from './home-wardrobe-view.js?rev=28';
-import {mountPhoneHud} from './phone-hud.js?rev=36';
+import {ApartmentMotion} from './apartment-v3-motion.js?rev=37';
+import {ApartmentTime,loadHomeTime,saveHomeTime as saveHomeTimeRaw} from './apartment-v3-time.js?rev=37';
+import {districts,getDistrictLocations} from './calikfornia.js?rev=37';
+import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=37';
+import {playSoundCue} from './sound-cues.js?rev=37';
+import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=37';
+import {DEFAULT_APPEARANCE,loadProfile,saveProfile} from './avatar-v3-profile.js?rev=37';
+import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=37';
+import {createNewGameSession} from './apartment-v3-new-game.js?rev=37';
+import {advanceVirtualPcDurably,gameMinuteStamp} from './virtual-pc-runtime.js?rev=37';
+import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=37';
+import {mountVirtualPc} from './virtual-pc-ui.js?rev=37';
+import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=37';
+import {PcSounds} from './virtual-pc-sounds.js?rev=37';
+import {playIndoorFootstep} from './indoor-footsteps.js?rev=37';
+import {createFootstepCadence} from './footstep-cadence.js?rev=37';
+import {restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=37';
+import {advanceInstallation} from './pc-software.js?rev=37';
+import {createBeatWorkPanel} from './beat-work-view.js?rev=37';
+import {normalizeGenreProgression,genreById,genreCap} from './genre-progression.js?rev=37';
+import {createBeatWorkAudio} from './beat-work-audio.js?rev=37';
+import {createLyricWorkAudio} from './lyric-work-audio.js?rev=37';
+import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.js?rev=37';
+import {pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=37';
+import {effectiveVocalSkill} from './vocal-production.js?rev=37';
+import {effectiveWritingSkill} from './lyric-production.js?rev=37';
+import {consumeFood} from './home-food.js?rev=37';
+import {createCharacterSpeech,workNeedSpeech} from './character-speech.js?rev=37';
+import {mountHomeNeedsView,mountCharacterSpeech} from './home-needs-view.js?rev=37';
+import {migrateNoviceSave} from './home-profile-migration.js?rev=37';
+import {mountHomeWardrobeView} from './home-wardrobe-view.js?rev=37';
+import {mountPhoneHud} from './phone-hud.js?rev=37';
+import {nextSafeResultReaction,completeResultReaction} from './social-result-reaction.js?rev=37';
+import {captureDesktopReturn} from './desktop-return-state.js?rev=37';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false,stepVariation=0;
 const cue=id=>{try{audio??=new AudioContext();if(audio.state==='suspended')audio.resume().catch(()=>{});if(id==='footstep')playIndoorFootstep(audio,stepVariation++);else playSoundCue(id,audio);}catch{/* Sound is optional. */}};
 try{
-  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=35');
+  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=37');
   const response=await fetch('./assets/apartment/v3/scene.json',{cache:'no-cache'});if(!response.ok)throw Error('Scene manifest '+response.status);
   const config=prepareApartmentConfig(await response.json()),view=await createApartmentScene(canvas,config);
   const footsteps=createFootstepCadence(config.stride);
@@ -63,7 +65,7 @@ try{
   let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lastInstallationSave=0,lightPreview='game';
   const pcRoot=$('#virtual-pc'),savedPc=loadVirtualPcState(storage);let pcState=savedPc.state;
   let pcStorageWarning=migration.ok?(savedPc.ok?'':'Сохранение виртуального ПК недоступно.'):migration.error;
-  let virtualPc,workReward=0,workFinished=false,lastWorkJob=null,lastWorkBeat=null;
+  let virtualPc,workReward=0,workFinished=false,lastWorkJob=null,lastWorkBeat=null,resultEpisode=null,failedReactionId=null;
   const fridgeRoot=document.createElement('section'),speechRoot=document.createElement('div');document.body.append(fridgeRoot,speechRoot);canvas.tabIndex=0;
   const speech=createCharacterSpeech({beep:()=>{if(audio?.state==='running'&&!document.hidden)playSoundCue('speech',audio);}}),speechView=mountCharacterSpeech(speechRoot);
   const fridgeView=mountHomeNeedsView(fridgeRoot,{
@@ -103,6 +105,7 @@ try{
     onAppSound:cue=>pcSounds.play(cue),
     onWork:()=>{if(!preparePcWorkPose(motion))return false;const started=pcLifecycle.work();if(started){if(pcState.writing.job)void lyricWorkAudio.unlock();workReward=0;workFinished=false;lastWorkJob=null;lastWorkBeat=null;resumeAnimation();saveHomeTime(storage,homeTime);persistPc(pcState);}return started;},
     onSaveProject:(state,project)=>saveStudioProject(state,project),
+    onResultViewed:()=>{failedReactionId=null;},
   });
   virtualPc.setPersistenceWarning(pcStorageWarning);
   const phoneRoot=document.createElement('aside');phoneRoot.hidden=true;document.body.append(phoneRoot);
@@ -260,9 +263,18 @@ try{
     if(mode==='peephole'){view.renderPeephole($('#peek-stage').getBoundingClientRect());return;}
     if(mode==='menu'||mode==='destinations'||mode==='door'){view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));view.render(motion,0,{paused:true});return;}
     let events=[];
+    if(mode==='pc'&&!paused&&!document.hidden&&!resultEpisode){
+      const pending=nextSafeResultReaction(pcState,{atDesktop:true,creativeJob:creativeWorkDescriptor(pcState,profile?.skills).job,transitionPhase:pcLifecycle.snapshot.phase,modalOpen:Boolean(virtualPc.confirmClose||virtualPc.shutdownModal||virtualPc.submissionModal||virtualPc.uninstallModal)});
+      if(pending&&pending.id!==failedReactionId&&pcLifecycle.react()){
+        resultEpisode={reaction:pending,ui:captureDesktopReturn(pcRoot),speaking:false,elapsed:0,returning:false};
+        virtualPc.beatAudio.stop();resumeAnimation();
+      }
+    }
     syncWorkAudio();
     if((!paused||step)&&!document.hidden&&!homeModalOpen()){
-      if(mode==='pc'&&pcLifecycle.snapshot.phase.startsWith('work')){
+      if(mode==='pc'&&pcLifecycle.snapshot.phase.startsWith('reaction')){
+        // A reaction spends presentation time only: no clock, work progress, needs or XP.
+      }else if(mode==='pc'&&pcLifecycle.snapshot.phase.startsWith('work')){
         const creative=creativeWorkDescriptor(pcState,profile?.skills);
         if(pcLifecycle.snapshot.phase==='working'&&creative.job){
           lastWorkJob={...creative.job};lastWorkBeat=creative.project;
@@ -298,6 +310,11 @@ try{
       if(event.type==='exited'){saveHomeTime(storage,homeTime);setMode('destinations');}
     }
     pcLifecycle.tick(dt,{paused:paused&&!step,hidden:document.hidden});pcLifecycle.restore(motion.phase);
+    if(resultEpisode&&pcLifecycle.snapshot.phase==='reaction-speaking'&&!document.hidden&&!paused){
+      if(!resultEpisode.speaking){speech.say(resultEpisode.reaction.speech);resultEpisode.speaking=true;}
+      resultEpisode.elapsed+=dt;
+      if(resultEpisode.elapsed>=5.2){pcLifecycle.finishReaction();resultEpisode.returning=true;}
+    }
     $('#camera-fade').style.opacity=pcLifecycle.snapshot.blackout??0;
     const workSound=syncWorkAudio(),workPhase=pcLifecycle.snapshot.phase;
     workHud.hidden=workPhase!=='working'&&!(workFinished&&['work-cover','work-in'].includes(workPhase));
@@ -309,6 +326,12 @@ try{
       workPanel.update({beat,job:shownJob,chainProgress,needs:pcState.music.needs,skill:shownJob?.output?.draft?effectiveVocalSkill(pcState,profile?.skills,shownJob.kind):beat?.kind==='lyrics'?effectiveWritingSkill(pcState,profile?.skills):effectiveBeatSkill(pcState,profile?.skills),genreProgress:{name:genreById(genreId).name,xp:genres.xp[genreId],cap:genreCap(genres,genreId)},clockLabel:homeTime.label,reward:workFinished?workReward:0,finished:workFinished,...workSound});
     }
     virtualPc.presentTransition(pcLifecycle.snapshot);
+    if(resultEpisode?.returning&&pcLifecycle.snapshot.phase==='desktop'){
+      const done=completeResultReaction(pcState,resultEpisode.reaction.id);
+      if(done.ok&&persistPc(done.state,{atomic:true}))virtualPc.syncState(pcState);
+      else failedReactionId=resultEpisode.reaction.id;
+      resultEpisode.ui.restore();resultEpisode=null;
+    }
     view.setComputerPresentation(pcLifecycle.snapshot,pcState,profile?.name??'Игрок');
     if(footsteps.update({clip:motion.clip,walkDistance:motion.walkDistance,paused:mode!=='game'||(paused&&!step)||document.hidden||homeModalOpen()}))cue('footstep');
     const door=motion.doorOpen>.3;if(door&&!lastDoor)cue('door');lastDoor=door;
@@ -316,8 +339,9 @@ try{
     motion.workPerformance=creativeWorkDescriptor(pcState,profile?.skills).performance;
     if(pcNeedsSceneFrame(pcLifecycle.snapshot,mode))view.render(motion,(paused&&!step)||homeModalOpen()||document.hidden?0:dt,{skeleton,paused:(paused&&!step)||homeModalOpen()||document.hidden});cameraLabel();$('#fade').style.opacity=motion.fade;
     const headAnchor=view.getHeadScreenPosition(),firstPerson=view.modes.mode==='3D',roomReady=pcLifecycle.snapshot.phase==='room'&&motion.actionId!=='computer'&&motion.fade<.01;
-    speech.tick(paused?0:dt,{hidden:document.hidden,present:mode==='game'&&!cameraFade&&roomReady&&!homeModalOpen()&&(firstPerson||headAnchor.visible),roomReady,audioAllowed:audio?.state==='running'});
-    speechView.update(speech.snapshot,headAnchor,{firstPerson,width:innerWidth,height:innerHeight,bottomLimit:$('#controls').getBoundingClientRect().top-12});
+    const reacting=mode==='pc'&&pcLifecycle.snapshot.phase==='reaction-speaking';
+    speech.tick(paused?0:dt,{hidden:document.hidden,present:reacting||mode==='game'&&!cameraFade&&roomReady&&!homeModalOpen()&&(firstPerson||headAnchor.visible),roomReady:reacting||roomReady,audioAllowed:audio?.state==='running'});
+    speechView.update(speech.snapshot,headAnchor,{firstPerson:reacting?false:firstPerson,width:innerWidth,height:innerHeight,bottomLimit:reacting?innerHeight-40:$('#controls').getBoundingClientRect().top-12});
     virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,gameDay:homeTime.day,gameMinutes:gameMinuteStamp(homeTime),skills:profile?.skills});
     $('#home-time').textContent=`${homeTime.dateLabel} · ${homeTime.label} · ${homeTime.period} · Дом`;
     phoneRoot.hidden=!playing||!['game','pc'].includes(mode);phoneView.update();

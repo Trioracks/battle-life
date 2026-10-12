@@ -1,9 +1,9 @@
-import {communityById} from './social-catalog.js?rev=36';
-import {normalizeSocial} from './social-state.js?rev=36';
-import {attemptForWindow} from './battle-windows.js?rev=35';
-import {validGameMinute} from './game-minute.js?rev=36';
-import {captureTrackVersion,TRACK_DSP_VERSION} from './track-version.js?rev=36';
-import {submissionCandidates} from './battle-submission.js?rev=36';
+import {communityById} from './social-catalog.js?rev=37';
+import {normalizeSocial} from './social-state.js?rev=37';
+import {attemptForWindow} from './battle-windows.js?rev=37';
+import {validGameMinute} from './game-minute.js?rev=37';
+import {captureTrackVersion,TRACK_DSP_VERSION} from './track-version.js?rev=37';
+import {submissionCandidates} from './battle-submission.js?rev=37';
 export const ACK_TEMPLATES=Object.freeze([
  'Привет! Трек принят, спасибо за участие. После дедлайна передадим судьям.',
  'Работа на месте, вложение открылось. Ждём окончания приёма.',
