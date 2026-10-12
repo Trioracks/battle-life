@@ -1,8 +1,8 @@
 import {PC_IDENTITY} from './pc-identity.js?rev=35';
-import {diskUsage} from './virtual-pc-state.js?rev=34';
-import {formatDiskGb,diskAmount} from './virtual-pc-disk-view.js?rev=21';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=34';
-import {SOFTWARE} from './pc-software-catalog.js?rev=34';
+import {diskUsage} from './virtual-pc-state.js?rev=35';
+import {formatDiskGb,diskAmount} from './virtual-pc-disk-view.js?rev=35';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=35';
+import {SOFTWARE} from './pc-software-catalog.js?rev=35';
 export const EXPLORER_PATHS=Object.freeze({
   computer:{label:'Мой компьютер',address:'Мой компьютер',parent:null,iconId:'computer'},
   disk:{label:'Локальный диск (C:)',address:'C:\\',parent:'computer',iconId:'disk'},

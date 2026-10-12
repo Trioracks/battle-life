@@ -1,17 +1,17 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {ApartmentAnimation} from './apartment-v3-animation.js?rev=28';
+import {ApartmentAnimation} from './apartment-v3-animation.js?rev=35';
 import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=28';
 import {homeLight} from './apartment-v3-time.js?rev=28';
 import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=28';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=7';
-import {CameraModes,cameraPose,pickVisible,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=33';
+import {CameraModes,cameraPose,pickVisible,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=35';
 import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=21';
 import {createSmoke} from './apartment-v3-smoke.js?rev=21';
 import {createRetroPass} from './apartment-v3-retro.js?rev=11';
-import {createComputerView} from './apartment-v3-computer.js?rev=28';
+import {createComputerView} from './apartment-v3-computer.js?rev=35';
 import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=28';
-import {pcPresentation} from './virtual-pc-presentation.js?rev=21';
+import {pcPresentation} from './virtual-pc-presentation.js?rev=35';
 import {createWardrobeFurniture} from './home-wardrobe.js?rev=28';
 import {applySwitchStyle} from './apartment-switch-style.js?rev=28';
 

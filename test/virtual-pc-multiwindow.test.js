@@ -43,7 +43,7 @@ test('Explorer title and icon follow the current folder',()=>{
   const {controller:c,root}=setup();c.open('computer');c.openFolder('projects');
   const w=c.windows.windows.find(w=>w.id==='computer');assert.equal(w.title,'Мои проекты');
   const title=allPc(root).find(n=>n.dataset.pcRole==='titlebar'&&n.dataset.windowId==='computer');
-  assert.ok(allPc(title).some(n=>n.tagName==='IMG'&&n.getAttribute('src').endsWith('/folder.svg')));
+  assert.ok(allPc(title).some(n=>n.tagName==='IMG'&&n.getAttribute('src').endsWith('/folder.svg?rev=35')));
 });
 test('delayed Studio launch does not replace unfinished Underweb text',()=>{
   const s=setup(),c=s.controller;c.open('underweb');

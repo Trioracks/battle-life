@@ -8,7 +8,17 @@ import {mountTorrent,mountInstaller} from '../src/pc-software-view.js';
 import {pcDocument,findButton,allPc,fire} from './helpers/virtual-pc-dom.js';
 import {createBeat} from '../src/beat-production.js';
 import {startCreativeChain} from '../src/creative-workflow.js';
+import {startLyricWork} from '../src/lyric-production.js';
+import {submissionFixture} from './helpers/submission-fixtures.js';
 const ready=id=>createVirtualPcState({power:'on',software:{client:{installed:true},[id]:{receivedBytes:SOFTWARE[id].downloadBytes}}});
+test('uninstall explains why a standalone text refinement cannot be paused',()=>{
+ let s=submissionFixture();s.software.notebook.installed=true;s.music.needs={satiety:100,energy:100};
+ s=startLyricWork(s,{projectId:'lyrics',kind:'diss'},{}).state;assert.ok(s.writing.job);
+ const d=pcDocument(),root=d.createElement('div'),pc=mountVirtualPc(root);pc.showDesktop(s);pc.softwareAction('uninstall','notebook');
+ assert.equal(findButton(root,'Удалить программу').disabled,true);
+ assert.ok(allPc(root).some(n=>n.textContent==='Сначала заверши текущую доработку.'));
+ assert.ok(pc.state.writing.job);pc.dispose();
+});
 function finish(id){let s=software.openInstaller(ready(id),id).state;for(let n=0;n<3;n++)s=software.advanceInstaller(s).state;return software.advanceInstallation(s,SOFTWARE[id].installSeconds).state;}
 for(const id of ['client','ft','notebook'])test(id+' opens once on Done, checkbox prevents opening and uninstall retains files',()=>{
  let s=finish(id);assert.equal(s.software.installer.openAfterInstall,true);
@@ -30,7 +40,7 @@ test('selected completed torrent has one top install action and double click ope
 test('wizard shows app artwork and a keyboard reachable open checkbox',()=>{
  const d=pcDocument(),root=d.createElement('div');let s=finish('notebook');const actions=[];
  const view=mountInstaller(root,{getState:()=>s,onAction:(...a)=>actions.push(a)});
- assert.ok(allPc(root).some(n=>n.tagName==='IMG'&&n.getAttribute('src').endsWith('/notebook.svg')));
+ assert.ok(allPc(root).some(n=>n.tagName==='IMG'&&n.getAttribute('src').endsWith('/notebook.svg?rev=35')));
  const checkbox=allPc(root).find(n=>n.getAttribute?.('aria-label')==='Открыть после установки');assert.ok(checkbox);assert.equal(checkbox.checked,true);
  checkbox.checked=false;fire(checkbox,'change');assert.deepEqual(actions,[['open-after-install',false]]);view.dispose();
 });

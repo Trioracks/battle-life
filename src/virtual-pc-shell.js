@@ -1,6 +1,6 @@
 import {PC_IDENTITY} from './pc-identity.js?rev=35';
 import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=21';
-import {createPcIcon} from './virtual-pc-icons.js?rev=28';
+import {createPcIcon} from './virtual-pc-icons.js?rev=35';
 import {homeDateLabel} from './home-calendar.js?rev=28';
 
 export function mountPcShell(root,{onCommand}) {

@@ -41,6 +41,6 @@ test('installed rap notebook uses its own notepad icon instead of a documents fo
  const app=desktopApps(createVirtualPcState({software:{notebook:{installed:true}}})).find(a=>a.id==='rap-notebook');
  assert.equal(app.iconId,'notebook');
  const icon=createPcIcon(pcDocument(),app.iconId);
- assert.equal(icon.getAttribute('src'),'./assets/ui/virtual-pc/icons/notebook.svg');
+ assert.equal(icon.getAttribute('src'),'./assets/ui/virtual-pc/icons/notebook.svg?rev=35');
  await access(new URL('../assets/ui/virtual-pc/icons/notebook.svg',import.meta.url));
 });

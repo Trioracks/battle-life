@@ -1,9 +1,9 @@
 import {BEAT_RULES as R,BEAT_PRACTICE,BEAT_GENRES,DRUMS,drumById} from './beat-catalog.js?rev=31';
 import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=31';
-import {softwareDiskBytes} from './pc-software.js?rev=34';
+import {softwareDiskBytes} from './pc-software.js?rev=35';
 import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=34';
 import {createBeatResult} from './beat-result.js?rev=34';
-import {normalizeRecording,effectiveSoundSkill} from './vocal-result.js?rev=33';
+import {normalizeRecording,effectiveSoundSkill} from './vocal-result.js?rev=35';
 import {genreById,normalizeGenreProgression,genreOptions,genreSnapshot,normalizeGenreSnapshot,addGenrePractice} from './genre-progression.js?rev=34';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
 const clamp=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,finite(v)));

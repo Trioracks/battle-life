@@ -11,7 +11,7 @@ test('studio progressively shows draft then locked muted draft and clean vocal l
  let s=fixture(),root=createStudioWorkspace(pcDocument());renderStudioTracks(root,s.projects[0]);const rows=()=>allPc(root).filter(n=>n.dataset.ftRole==='track-label');assert.equal(rows().length,9);
  s=advanceVocalWork(startVocalWork(s,{beatId:'b',textId:'t',kind:'draft'}).state,1000).state;renderStudioTracks(root,s.projects[0]);assert.equal(rows().length,10);
  s=advanceVocalWork(startVocalWork(s,{beatId:'b',kind:'clean'}).state,1000).state;renderStudioTracks(root,s.projects[0]);assert.equal(rows().length,11);assert.ok(allPc(root).some(n=>n.dataset.muted==='true'));assert.ok(rows().some(n=>n.textContent.includes('Clean Vocal')));
- assert.equal(allPc(root).filter(n=>n.tagName==='IMG'&&n.getAttribute('src')?.endsWith('/microphone.svg')).length,2);
+ assert.equal(allPc(root).filter(n=>n.tagName==='IMG'&&n.getAttribute('src')?.endsWith('/microphone.svg?rev=35')).length,2);
 });
 test('add vocal picks completed text and begins a real saved work job',()=>{
  let state=fixture(),work=0;const d=pcDocument(),root=d.createElement('section');

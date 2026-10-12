@@ -1,13 +1,13 @@
 import {pcElement as el,pcButton as button,pcFind,pcFocusable} from './virtual-pc-dom.js?rev=21';
-import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=34';
+import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=35';
 import {BEAT_STAGES} from './beat-catalog.js?rev=31';
 import {randomBeatName} from './beat-names.js?rev=28';
-import {resolveBeatPlayback} from './beat-playback.js?rev=34';
+import {resolveBeatPlayback} from './beat-playback.js?rev=35';
 import {describeBeatMix} from './beat-mix.js?rev=34';
-import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=34';
-import {startVocalWork} from './vocal-production.js?rev=34';
-import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=34';
-import {appendRecordingControls} from './recording-studio-view.js?rev=34';
+import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=35';
+import {startVocalWork} from './vocal-production.js?rev=35';
+import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=35';
+import {appendRecordingControls} from './recording-studio-view.js?rev=35';
 import {normalizeGenreProgression,genreOptions,genreById,genreCap,chooseGenre,chooseSpecialization} from './genre-progression.js?rev=34';
 
 export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio,legacyName,initialProject}){

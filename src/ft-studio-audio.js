@@ -1,4 +1,4 @@
-import { STUDIO_STEP_COUNT, normalizeStudioProject } from './ft-studio-project.js?rev=34';
+import { STUDIO_STEP_COUNT, normalizeStudioProject } from './ft-studio-project.js?rev=35';
 
 const voices = Object.freeze({ kick: 88, snare: 220, hat: 6800, bass: 55 });
 

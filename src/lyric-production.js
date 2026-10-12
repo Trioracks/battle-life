@@ -1,8 +1,8 @@
 // Persisted, symbolic writing: no copyrighted lyrics or generated prose.
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=34';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=35';
 import {BEAT_RULES} from './beat-catalog.js?rev=31';
-import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=34';
-import {softwareDiskBytes} from './pc-software.js?rev=34';
+import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=35';
+import {softwareDiskBytes} from './pc-software.js?rev=35';
 import {homeDateLabel} from './home-calendar.js?rev=28';
 
 export const LYRIC_STAGES=Object.freeze([

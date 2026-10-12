@@ -1,7 +1,7 @@
-import {createVirtualPcState} from './virtual-pc-state.js?rev=34';
-import {softwareDiskBytes} from './pc-software.js?rev=34';
-import {SOFTWARE} from './pc-software-catalog.js?rev=34';
-import {advanceTransfers,TRANSFER_RATES} from './pc-transfer-runtime.js?rev=34';
+import {createVirtualPcState} from './virtual-pc-state.js?rev=35';
+import {softwareDiskBytes} from './pc-software.js?rev=35';
+import {SOFTWARE} from './pc-software-catalog.js?rev=35';
+import {advanceTransfers,TRANSFER_RATES} from './pc-transfer-runtime.js?rev=35';
 export function gameMinuteStamp(clock){return Number.isSafeInteger(clock?.day)&&clock.day>=1&&Number.isFinite(clock.minutes)&&clock.minutes>=0&&clock.minutes<1440?(clock.day-1)*1440+clock.minutes:null;}
 export function advanceVirtualPc(input,clock){
  const s=createVirtualPcState(input),stamp=gameMinuteStamp(clock),previous=s.lastGameMinute;

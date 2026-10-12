@@ -18,7 +18,7 @@ test('tracker opens available software immediately with categories and three own
  for(const [topic,id]of [['client','client'],['ft-studio','ft'],['notebook','notebook']]){
   const calls=[],page=softwareForum(d,{topic,state,navigate,onAction:(...a)=>calls.push(a)});
   const poster=allPc(page).find(n=>n.className==='dump-release-poster');assert.ok(poster,topic);
-  assert.ok(allPc(poster).some(n=>n.tagName==='IMG'&&n.getAttribute('src').endsWith('/'+SOFTWARE[id].iconId+'.svg')));
+  assert.ok(allPc(poster).some(n=>n.tagName==='IMG'&&n.getAttribute('src').endsWith('/'+SOFTWARE[id].iconId+'.svg?rev=35')));
   assert.ok(allPc(page).some(n=>n.textContent==='Загрузка: '+SOFTWARE[id].downloadBytes/1000000+' МБ'));
   assert.ok(allPc(page).some(n=>n.textContent==='После установки: '+SOFTWARE[id].installedBytes/1000000+' МБ'));
   const label=id==='client'?'Скачать установщик torent':'Скачать '+SOFTWARE[id].torrent;

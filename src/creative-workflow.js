@@ -1,6 +1,6 @@
 import {BEAT_RULES} from './beat-catalog.js?rev=31';
-import {normalizeMusic,startBeatStage,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=34';
-import {normalizeWriting,startLyricWork,effectiveWritingSkill} from './lyric-production.js?rev=34';
+import {normalizeMusic,startBeatStage,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=35';
+import {normalizeWriting,startLyricWork,effectiveWritingSkill} from './lyric-production.js?rev=35';
 const owner=kind=>kind==='beat'?'music':'writing';
 const jobId=j=>j?.beatId??j?.projectId;
 const triple=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite)?v.map(x=>Math.max(0,Math.min(10,Math.round(x)))):null;

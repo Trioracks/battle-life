@@ -1,7 +1,7 @@
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=34';
-import {normalizeBeat} from './beat-production.js?rev=34';
-import {normalizeLyric} from './lyric-production.js?rev=34';
-import {resolveBeatPlayback} from './beat-playback.js?rev=34';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=35';
+import {normalizeBeat} from './beat-production.js?rev=35';
+import {normalizeLyric} from './lyric-production.js?rev=35';
+import {resolveBeatPlayback} from './beat-playback.js?rev=35';
 const clone=value=>JSON.parse(JSON.stringify(value));
 const day=value=>Number.isSafeInteger(value)&&value>0&&value<100000;
 const battle=id=>BATTLE_BRIEFS.some(b=>b.id===id);
