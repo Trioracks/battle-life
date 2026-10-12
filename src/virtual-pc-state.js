@@ -1,6 +1,7 @@
 import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=34';
 import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=34';
 import {normalizeCreativeWork} from './creative-workflow.js?rev=34';
+import {normalizeBattleSubmissions} from './battle-submission.js?rev=34';
 import {normalizeRecordingState} from './vocal-production.js?rev=34';
 import {normalizeCommunity} from './underweb-community.js?rev=34';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=34';
@@ -87,6 +88,7 @@ function normalizeSnapshot(value) {
     community:normalizeCommunity(source.community),
     household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),
+    battleSubmissions:normalizeBattleSubmissions(source.battleSubmissions),
     draft: isRecord(source.draft) ? clone(source.draft) : null,
     lastGameMinute: Number.isFinite(source.lastGameMinute) && source.lastGameMinute >= 0 ? source.lastGameMinute : null,
   },normalizeSoftware(source.software,normalizeDownload(source.download)));
@@ -170,6 +172,7 @@ export function saveVirtualPcState(storage, state) {
     if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'household'))reserveHouseholdBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&parsed.music?.genres?.version!==1)reserveGenreBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&parsed.creativeWork?.version!==1)reserveCreativeBackup(storage,raw);
+    if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'battleSubmissions'))reserveSubmissionBackup(storage,raw);
     storage.setItem(VIRTUAL_PC_STORAGE_KEY, JSON.stringify(normalizeSnapshot(state)));
     return true;
   } catch {
@@ -187,6 +190,10 @@ function reserveGenreBackup(storage,raw){
 }
 function reserveCreativeBackup(storage,raw){
   const key=VIRTUAL_PC_STORAGE_KEY+'-before-creative-work';
+  if(storage.getItem(key)===null)storage.setItem(key,raw);
+}
+function reserveSubmissionBackup(storage,raw){
+  const key=VIRTUAL_PC_STORAGE_KEY+'-before-battle-submissions';
   if(storage.getItem(key)===null)storage.setItem(key,raw);
 }
 function restoredSnapshot(parsed){
@@ -210,6 +217,9 @@ export function loadVirtualPcState(storage) {
     }
     if(parsed.creativeWork?.version!==1){
       try{reserveCreativeBackup(storage,raw);}catch{return {ok:false,reason:'creative-work-backup-failed',state:restoredSnapshot(parsed)};}
+    }
+    if(!Object.hasOwn(parsed,'battleSubmissions')){
+      try{reserveSubmissionBackup(storage,raw);}catch{return {ok:false,reason:'battle-submissions-backup-failed',state:restoredSnapshot(parsed)};}
     }
     return { ok: true, state: restoredSnapshot(parsed) };
   } catch {

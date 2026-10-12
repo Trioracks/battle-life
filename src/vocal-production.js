@@ -23,7 +23,7 @@ export function normalizeRecordingState(value,projects=[]){
  return {equipment:{...VOCAL_EQUIPMENT},practice:{flow:clampV(s.practice?.flow),sound:clampV(s.practice?.sound)},job:valid?{beatId:beat.id,kind:j.kind,baseRevision:j.baseRevision,output,total:j.total,elapsed:j.elapsed,skill:clampV(j.skill),practiceCredit:clampV(j.practiceCredit,0,j.elapsed/j.total/3)}:null};
 }
 export const effectiveVocalSkill=(s,skills={},kind='draft')=>{const k=VOCAL_STAGES[kind]?.skill??'flow';return k==='sound'?effectiveSoundSkill(s,skills):clampV((skills[k]??10)+(s.recording?.practice?.[k]??0));};
-const normalized=input=>{const projects=(input.projects??[]).map(p=>p.kind==='beat'?normalizeBeat(p):p).filter(Boolean);return {...input,projects,music:normalizeMusic(input.music,projects),recording:normalizeRecordingState(input.recording,projects)};};
+const normalized=input=>{const projects=(input.projects??[]).map(p=>p.kind==='beat'&&!p.recoveryIssue?normalizeBeat(p):p).filter(Boolean);return {...input,projects,music:normalizeMusic(input.music,projects),recording:normalizeRecordingState(input.recording,projects)};};
 export function startVocalWork(input,{beatId,textId,kind='draft',sliders}={},skills={},random=Math.random){
  const s=normalized(input),fail=reason=>({ok:false,reason,state:s}),beat=s.projects.find(p=>p.id===beatId&&p.kind==='beat');
  if(input.music?.job||input.writing?.job)return fail('Сначала заверши текущую работу.');
@@ -35,7 +35,7 @@ export function startVocalWork(input,{beatId,textId,kind='draft',sliders}={},ski
  if(kind==='draft'&&text?.status!=='ready')return fail('Для записи нужен готовый текст.');
  const unit=()=>clampV(random(),0,.999999),sourceId=before?.sourceId??VOCALS[Math.floor(unit()*VOCALS.length)].id;
  const values=sliders===undefined||skill<25?Array.from({length:3},()=>Math.floor(unit()*11)):sliders;
- let output=before?structuredClone(before):{version:1,revision:0,text:{id:text.id,name:text.name,revision:text.revision},sourceId,draft:null,clean:null,mix:null,master:null};
+ let output=before?structuredClone(before):{version:1,revision:0,text:{id:text.id,name:text.name,revision:text.revision,snapshot:structuredClone(text)},sourceId,draft:null,clean:null,mix:null,master:null};
  output.revision++;
  if(kind==='draft'||kind==='clean'){
   const snapshot={...skills,flow:effectiveVocalSkill(s,skills,'draft'),sound:effectiveVocalSkill(s,skills,'mix')};
