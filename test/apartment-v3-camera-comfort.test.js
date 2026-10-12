@@ -9,6 +9,19 @@ import {CameraModes,cameraPose} from '../src/apartment-v3-camera.js';
 import {PerspectiveCamera,Vector3} from '../vendor/three/three.module.js';
 
 const config=prepareApartmentConfig(JSON.parse(fs.readFileSync(assetPath('scene.json'),'utf8')));
+test('new game defaults to 3D, temporarily sleeps in 2D and restores after standing',()=>{
+ const camera=new CameraModes();assert.equal(camera.mode,'3D');
+ camera.onMotionEvent({type:'started',id:'bed'});assert.equal(camera.mode,'2D');
+ camera.onMotionState({clip:'idle',phase:'return-in'});assert.equal(camera.mode,'2D');
+ camera.onMotionState({clip:'idle',phase:'idle'});assert.equal(camera.mode,'3D');
+ camera.reset({initialMode:'2D'});assert.equal(camera.mode,'2D');
+ camera.onMotionEvent({type:'started',id:'bed'});camera.onMotionState({clip:'idle',phase:'idle'});assert.equal(camera.mode,'2D');
+});
+test('medium framing uses 75 percent of the previous overview height, not another scene',()=>{
+ const pose=cameraPose('2D',new ApartmentMotion(config),1.63,{aspect:1280/900});
+ const expected=2*Math.atan(5.025/(2*8/Math.cos(8*Math.PI/180)))*180/Math.PI;
+ assert.ok(Math.abs(pose.fov-expected)<1e-10);assert.equal(pose.position[2],8);
+});
 function fixture(mode){
  const motion=new ApartmentMotion(config),clock=new ApartmentTime({day:2,minutes:720}),camera=new CameraModes();camera.mode=mode;
  const step=()=>{const frame=advanceHomeFrame(motion,clock,.05);for(const event of frame.events)camera.onMotionEvent(event);camera.onMotionState(motion);return frame;};
@@ -60,16 +73,16 @@ test('a new character cannot inherit the sleeping character first-person restore
  const newcomer=new ApartmentMotion(config);newcomer.startSleeping();
  for(const event of newcomer.drainEvents())f.camera.onMotionEvent(event);newcomer.wakeUp();
  for(let i=0;i<100&&newcomer.phase!=='idle';i++){newcomer.tick(.05);for(const event of newcomer.drainEvents())f.camera.onMotionEvent(event);f.camera.onMotionState(newcomer);}
- assert.equal(newcomer.phase,'idle');assert.equal(f.camera.mode,'2D');
+ assert.equal(newcomer.phase,'idle');assert.equal(f.camera.mode,'3D');
 });
 
 for(const outcome of ['resolve','reject'])test(`camera reset invalidates a pending load that will ${outcome} without unlocking a competing cycle`,async()=>{
- const camera=new CameraModes();let resolve,reject;
+ const camera=new CameraModes({initialMode:'2D'});let resolve,reject;
  const pending=camera.cycle({clip:'idle'},()=>new Promise((yes,no)=>{resolve=yes;reject=no;}));
  camera.reset();assert.equal(camera.loading,true);
  assert.equal(await camera.cycle({clip:'idle'},async()=>{}),false);
  if(outcome==='resolve')resolve();else reject(Error('old character load failed'));
- assert.equal(await pending,false);assert.equal(camera.mode,'2D');assert.equal(camera.loading,false);assert.equal(camera.error,null);
+ assert.equal(await pending,false);assert.equal(camera.mode,'3D');assert.equal(camera.loading,false);assert.equal(camera.error,null);
 });
 
 test('dining still forces 2D without remembering an unrelated first-person mode',()=>{
@@ -86,10 +99,10 @@ for(const id of ['computer','dining'])test(`${id} supersedes a pending sleep res
  assert.equal(camera.mode,'2D','later forced camera action wins over the skipped sleep restore');
 });
 
-test('the wide overview includes furniture in the adjacent kitchen from the living-room spawn',()=>{
+test('the medium overview retains the doorway and whole actor from the living-room spawn',()=>{
  const state=new ApartmentMotion(config),pose=cameraPose('2D',state,1.63,{aspect:1280/900}),camera=new PerspectiveCamera(pose.fov,1280/900,.03,200);
  camera.position.fromArray(pose.position);camera.lookAt(new Vector3(...pose.target));camera.updateMatrixWorld();
- for(const point of [[-3.32,.8,-1],[6.9,1,-1],[3.4,0,.85],[3.4,1.75,.85]]){
+ for(const point of [[-1,.8,-1],[5,1,-1],[3.4,0,.85],[3.4,1.75,.85]]){
   const p=new Vector3(...point).project(camera);assert.ok(Math.abs(p.x)<1&&Math.abs(p.y)<1,`overview must show ${point}: ${p.toArray()}`);
  }
 });

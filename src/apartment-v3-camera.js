@@ -23,10 +23,9 @@ export function cameraAllowsFirstPerson(state){return !['sleep','seated','eat'].
 export function cameraPose(mode,state,eyeHeight,look={yaw:0,pitch:0}){
  if(mode==='3D')return {position:[state.position[0],state.position[1]+eyeHeight,state.position[2]],yaw:look.yaw,pitch:look.pitch,fov:60,near:.03};
  const yaw=0,pitch=8,distance=8;
- // Back away from the same furnished scene: the standing hero is about half
- // the old size. A modest bias toward the apartment center reveals the next
- // room; the actor remains in a central follow band on narrow viewports.
- const height=6.7,targetY=1.15,fov=2*Math.atan(height/(2*distance/Math.cos(pitch*DEG)))/DEG;
+ // Intermediate framing between the original close view and the wide overview.
+ // Follow and edge limits still operate on the exact same furnished scene.
+ const height=5.025,targetY=1.15,fov=2*Math.atan(height/(2*distance/Math.cos(pitch*DEG)))/DEG;
  const aspect=look.aspect??1280/900,z=state.position?.[2]??.85;
  const depth=distance/Math.cos(pitch*DEG)-z*Math.cos(pitch*DEG)-(1-targetY)*Math.sin(pitch*DEG);
  const halfWidth=depth*Math.tan(fov*DEG/2)*aspect;
@@ -43,8 +42,8 @@ export function pickVisible(targets,blockers,floor){
  if(floor&&floor.distance<=wall+.025)return {x:floor.x};return {};
 }
 export class CameraModes{
- constructor(){this.mode='2D';this.yaw=0;this.pitch=0;this.loading=false;this.error=null;this.loaded=new Set(['2D']);this.revision=0;this.sleepCamera=null;}
- reset(){this.mode='2D';this.sleepCamera=null;this.error=null;this.revision++;}
+ constructor({initialMode='3D'}={}){this.mode=initialMode==='2D'?'2D':'3D';this.yaw=0;this.pitch=0;this.loading=false;this.error=null;this.loaded=new Set(['2D']);this.revision=0;this.sleepCamera=null;}
+ reset({initialMode='3D'}={}){this.mode=initialMode==='2D'?'2D':'3D';this.yaw=0;this.pitch=0;this.sleepCamera=null;this.error=null;this.revision++;}
  look(dx,dy){this.yaw-=dx*.004;this.pitch=Math.max(-70*DEG,Math.min(70*DEG,this.pitch-dy*.004));}
  onMotionEvent(event){
   if(event.id==='bed'&&(event.type==='swap'||event.type==='started')){

@@ -147,7 +147,7 @@ try{
     pcLifecycle.reset();
     speech.clear();
     view.modes.reset();cameraLabel();
-    profile=nextProfile;motion=new ApartmentMotion(config);if(homeTime.initialRest||homeTime.isSleeping)motion.startSleeping();view.setAppearance(profile.appearance);
+    profile=nextProfile;motion=new ApartmentMotion(config);if(homeTime.initialRest||homeTime.isSleeping){motion.startSleeping();view.modes.onMotionEvent({id:'bed',type:'started'});}view.setAppearance(profile.appearance);
     playing=true;lastStep=0;lastDoor=false;hold=false;skeleton=false;$('#hold').checked=false;$('#show-bones').checked=false;
     $('#player-name').textContent=profile.name;resumeAnimation();setMode('game');cue('sleep');
   }

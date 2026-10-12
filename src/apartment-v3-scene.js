@@ -67,6 +67,7 @@ export async function createApartmentScene(canvas,config){
   model.scene.updateMatrixWorld(true);
   const head=model.scene.getObjectByName('head');
   const eyeHeight=head?head.getWorldPosition(new THREE.Vector3()).y+.09:1.61;
+  modes.loaded.add('3D'); // All shared geometry has finished loading before first render.
   // Both cameras are ready with the same scene. Keep the async mode contract for
   // camera transitions and the monitor lifecycle without loading a second room.
   async function loadMode(){if(disposed)throw Error('Scene disposed');}
