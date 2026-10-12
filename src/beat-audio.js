@@ -29,15 +29,17 @@ export function primitiveSamples(kind,rate=44100){
  return data;
 }
 export class BeatAudio{
- constructor({contextFactory=()=>new (globalThis.AudioContext??globalThis.webkitAudioContext)(),fetchFn=(...a)=>fetch(...a)}={}){
-  Object.assign(this,{contextFactory,fetchFn});this.cache=new Map();this.resultCache=new Map();this.sources=[];this.retiring=[];this.generation=0;this.error='';this.disposed=false;this.status='stopped';this.offset=0;this.startedAt=0;this.descriptor=null;this.pending=null;
+ constructor({contextFactory=()=>new (globalThis.AudioContext??globalThis.webkitAudioContext)(),fetchFn=(...a)=>fetch(...a),outputFactory=null}={}){
+  Object.assign(this,{contextFactory,fetchFn,outputFactory});this.output=null;this.roomFrame=null;this.cache=new Map();this.resultCache=new Map();this.sources=[];this.retiring=[];this.generation=0;this.error='';this.disposed=false;this.status='stopped';this.offset=0;this.startedAt=0;this.descriptor=null;this.pending=null;
  }
  async unlock(){
   if(this.disposed)return;
   this.context??=this.contextFactory();
   if(this.context.state==='suspended')await this.context.resume();
   if(this.context.state!=='running')throw Error('audio context unavailable');
+  if(!this.output&&this.outputFactory){this.output=this.outputFactory(this.context);if(this.roomFrame)this.output.update(this.roomFrame);}
  }
+ setRoomFrame(frame){if(this.disposed)return;this.roomFrame=frame;this.output?.update(frame);}
  current(token){return token===this.generation&&!this.disposed;}
  async buffer(id,token=this.generation){
   if(drumById(id)?.retired)throw Error('retired source');
@@ -83,7 +85,8 @@ export class BeatAudio{
    if(!this.current(token))return false;
    this.gain=this.context.createGain();this.gain.gain.value=descriptorOutputGain(descriptor);
    const layerEffects=[];
-   const master=descriptor.mix?.version===2||descriptor.parts.some(p=>p.vocal)?connectBeatResultMaster(this.context,this.context.destination):connectBeatMix(this.context,descriptor.mix,this.context.destination);
+   const destination=this.output?.input??this.context.destination;
+   const master=descriptor.mix?.version===2||descriptor.parts.some(p=>p.vocal)?connectBeatResultMaster(this.context,destination):connectBeatMix(this.context,descriptor.mix,destination);
    this.effects={input:master.input,dispose(){layerEffects.forEach(fx=>fx.dispose());master.dispose();}};this.gain.connect(master.input);
    let beatInput=this.gain;
    if(descriptor.mix?.version===1&&descriptor.parts.some(p=>p.vocal)){
@@ -151,5 +154,5 @@ export class BeatAudio{
   }else this.release(voices,gain,effects);
   this.offset=0;this.status='stopped';this.error='';
  }
- dispose(){this.stop();this.disposed=true;this.cache.clear();this.resultCache.clear();Promise.resolve(this.context?.close()).catch(()=>{});}
+ dispose(){if(this.disposed)return;this.stop();this.disposed=true;this.output?.dispose();this.output=null;this.cache.clear();this.resultCache.clear();Promise.resolve(this.context?.close()).catch(()=>{});}
 }

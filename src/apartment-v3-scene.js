@@ -3,6 +3,7 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {ApartmentAnimation} from './apartment-v3-animation.js?rev=38';
 import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=38';
 import {headCameraPose} from './apartment-head-pose.js?rev=38';
+import {segmentIntersectsBox} from './pc-room-audio.js?rev=38';
 import {homeLight} from './apartment-v3-time.js?rev=38';
 import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=38';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=38';
@@ -82,6 +83,18 @@ export async function createApartmentScene(canvas,config){
   const transitionQuad=new THREE.Mesh(new THREE.PlaneGeometry(2,2),transitionBackdrop);transitionQuad.frustumCulled=false;transitionQuad.renderOrder=1000;transitionQuad.visible=false;scene.add(transitionQuad);
   async function prepareComputerView(){if(!computer)throw Error('Computer surfaces are missing');await loadMode('3D');if(disposed)throw Error('Scene disposed');}
   const headViewCamera=new THREE.PerspectiveCamera(60,rect.width/rect.height,.03,far);
+  // Exported depth proxies are the exact solid sides of the middle partition.
+  const acousticWalls=['depth-middle-wall','depth-middle-front-wall'].map(name=>environment.scene.getObjectByName(name)).filter(Boolean);
+  const speakerAnchor=environment.scene.getObjectByName(config.computer?.screen);
+  function getComputerAudioFrame({desktop=false}={}){
+    const pose=getHeadCameraPose(),source=speakerAnchor?.getWorldPosition(new THREE.Vector3()).toArray()??[...config.actions.computer.hit[0]];
+    const listener=pose.position,right=new THREE.Vector3(1,0,0);
+    if(modes.mode==='3D'&&!computerActive)right.applyEuler(new THREE.Euler(modes.pitch,modes.yaw,0,'YXZ'));
+    else right.applyQuaternion(new THREE.Quaternion().fromArray(pose.quaternion));
+    const walls=[...acousticWalls,environment.scene.getObjectByName('passage-leaf')].filter(Boolean);
+    const occluded=walls.some(node=>{node.updateWorldMatrix(true,false);const box=new THREE.Box3().setFromObject(node);return segmentIntersectsBox(source,listener,{min:box.min.toArray(),max:box.max.toArray()});});
+    return {source,listener,right:right.toArray(),desktop,occluded};
+  }
   function getHeadCameraPose(){
     actor.updateMatrixWorld(true);
     const anchor=head??actor;
@@ -270,5 +283,5 @@ export async function createApartmentScene(canvas,config){
     point.y+=.24;point.project(modes.mode==='3D'?firstCamera:camera);
     return {x:rect.left+(point.x+1)*rect.width/2,y:rect.top+(1-point.y)*rect.height/2,visible:actor.visible&&!computerActive&&modes.mode!=='3D'};
   }
-  return {modes,loadMode,prepareComputerView,beginComputerView,getHeadCameraPose,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,getHeadScreenPosition,clips:[...animation.actions.keys()],dispose(){disposed=true;switchStyle.dispose();computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,staticScene])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
+  return {modes,loadMode,prepareComputerView,beginComputerView,getHeadCameraPose,getComputerAudioFrame,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,getHeadScreenPosition,clips:[...animation.actions.keys()],dispose(){disposed=true;switchStyle.dispose();computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,staticScene])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
 }

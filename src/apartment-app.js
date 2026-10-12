@@ -338,6 +338,7 @@ try{
     view.setRoomLights(homeTime.lights);view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));
     motion.workPerformance=creativeWorkDescriptor(pcState,profile?.skills).performance;
     if(pcNeedsSceneFrame(pcLifecycle.snapshot,mode))view.render(motion,(paused&&!step)||homeModalOpen()||document.hidden?0:dt,{skeleton,paused:(paused&&!step)||homeModalOpen()||document.hidden});cameraLabel();$('#fade').style.opacity=motion.fade;
+    virtualPc.beatAudio.setRoomFrame(view.getComputerAudioFrame({desktop:mode==='pc'&&pcLifecycle.snapshot.phase==='desktop'}));
     const headAnchor=view.getHeadScreenPosition(),firstPerson=view.modes.mode==='3D',roomReady=pcLifecycle.snapshot.phase==='room'&&motion.actionId!=='computer'&&motion.fade<.01;
     const reacting=mode==='pc'&&pcLifecycle.snapshot.phase==='reaction-speaking';
     speech.tick(paused?0:dt,{hidden:document.hidden,present:reacting||mode==='game'&&!cameraFade&&roomReady&&!homeModalOpen()&&(firstPerson||headAnchor.visible),roomReady:reacting||roomReady,audioAllowed:audio?.state==='running'});

@@ -18,6 +18,7 @@ try{
  sleep(mode){motion=new ApartmentMotion(config);view.modes.reset({initialMode:mode});motion.startSleeping();for(const e of motion.drainEvents())view.modes.onMotionEvent(e);view.modes.onMotionEvent({type:'started',id:'bed'});render();return view.modes.mode;},
  wake(){motion.wakeUp();until(()=>motion.phase==='idle');render();return view.modes.mode;},
  async seated(mode){view.endComputerView();motion=new ApartmentMotion(config);view.modes.reset({initialMode:mode});motion.interact('computer');until(()=>motion.phase==='perform');render();const head=view.getHeadCameraPose();await view.prepareComputerView();view.beginComputerView();this.zoom(0);return {head,camera:camera.position.toArray()};},
+ audioFrame(mode='2D',yaw=0,desktop=false){view.endComputerView();view.modes.mode=mode;view.modes.yaw=yaw;render();return view.getComputerAudioFrame({desktop});},
  zoom(t){view.setComputerPresentation({phase:t===1?'desktop':'zoom-in',zoom:t,progress:t,overlay:0},{power:'on'},'Проверка');render();return camera.position.toArray();},dispose(){view.dispose();}};
  </script>`}));
  await page.goto((process.env.BATTLE_QA_URL||'http://127.0.0.1:4175')+'/__v-krugu-camera');await page.waitForFunction(()=>window.qa);
@@ -30,5 +31,8 @@ try{
    for(const t of [0,.25,.5,.75,1,.75,.5,.25,0]){const position=await page.evaluate(t=>qa.zoom(t),t);assert.ok(Math.hypot(...position.map((x,i)=>x-start.head.position[i]))<1.2,'flight stays near computer');await page.screenshot({path:out+'/camera-'+width+'-'+mode+'-flight-'+t+'.png'});}
   }
  }
- assert.deepEqual(errors,[]);await writeFile(out+'/camera-evidence.json',JSON.stringify(evidence,null,2));await page.evaluate(()=>qa.dispose());console.log('PASS close framing, both rooms/edges/sleep restore at three sizes; head-anchored 2D/3D monitor flights');
+ const audioFrames=await page.evaluate(()=>{qa.show(3.4);const near=qa.audioFrame(),right=qa.audioFrame('3D'),left=qa.audioFrame('3D',Math.PI),desktop=qa.audioFrame('2D',0,true);qa.show(-3.8);return {near,right,left,desktop,kitchen:qa.audioFrame()};});
+ assert.equal(audioFrames.near.occluded,false);assert.equal(audioFrames.kitchen.occluded,true);assert.deepEqual(audioFrames.left.listener,audioFrames.right.listener);
+ await writeFile(out+'/camera-audio-frames.json',JSON.stringify(audioFrames,null,2));
+ assert.deepEqual(errors,[]);await writeFile(out+'/camera-evidence.json',JSON.stringify(evidence,null,2));await page.evaluate(()=>qa.dispose());console.log('PASS close framing, both rooms/edges/sleep restore at three sizes; head-anchored 2D/3D monitor flights; real speaker/partition audio frames');
 }finally{await context.close();await browser.close();}

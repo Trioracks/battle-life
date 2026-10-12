@@ -19,6 +19,7 @@ import {applyToBattle} from './virtual-pc-state.js?rev=38';
 import {mountBeatStudio} from './beat-studio-view.js?rev=38';
 import {BeatAudio} from './beat-audio.js?rev=38';
 import {createPcAudioSession} from './pc-audio-session.js?rev=38';
+import {createPcRoomOutput} from './pc-room-audio.js?rev=38';
 import {normalizeBeat} from './beat-production.js?rev=38';
 import {createBeatMarket} from './beat-market-view.js?rev=38';
 import * as software from './pc-software.js?rev=38';
@@ -103,7 +104,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     setTimeoutFn: callbacks.setTimeoutFn ?? ((...args) => globalThis.setTimeout(...args)),
     clearTimeoutFn: callbacks.clearTimeoutFn ?? (timer => globalThis.clearTimeout(timer)),
     audio: callbacks.audio ?? new FtStudioAudio(),
-    beatAudio: callbacks.beatAudio ?? new BeatAudio(),
+    beatAudio: callbacks.beatAudio ?? new BeatAudio({outputFactory:createPcRoomOutput}),
     studioView:null,
     notebookView:null,
     pendingStudioProject:null,

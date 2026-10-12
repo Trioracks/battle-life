@@ -23,6 +23,14 @@ test('unknown/missing files fail safely and disposal is final',async()=>{
  assert.equal(await audio.play({drumId:'../../evil',stage:1}),false);audio.dispose();assert.equal(await audio.play({drumId:'primitive',stage:1}),false);
 });
 
+test('optional post-master output caches room frames without touching descriptor or playback rate',async()=>{
+ const ctx=context(),frames=[],input={},output={input,update:f=>frames.push(f),dispose(){this.disposals=(this.disposals??0)+1;}},audio=new BeatAudio({contextFactory:()=>ctx,outputFactory:()=>output});
+ const descriptor={key:'room',owner:'saved',durationSeconds:32/3,parts:[{id:'primitive',loopSeconds:32/3}]},before=JSON.stringify(descriptor);
+ audio.setRoomFrame({desktop:true});assert.equal(frames.length,0);assert.equal(await audio.playDescriptor(descriptor),true);assert.deepEqual(frames,[{desktop:true}]);
+ const source=audio.sources[0];audio.setRoomFrame({desktop:false,listener:[-3,1,0]});assert.equal(audio.sources[0],source);assert.equal(JSON.stringify(descriptor),before);assert.equal(audio.effects.input,input);
+ audio.stop();assert.equal(output.disposals,undefined);audio.dispose();audio.dispose();assert.equal(output.disposals,1);
+});
+
 test('saved source calibration and output gain are applied without mutating cached legacy PCM',async()=>{
  const ctx=context();
  ctx.createBuffer=(channels,length,rate)=>{const data=Array.from({length:channels},()=>new Float32Array(length));return {numberOfChannels:channels,length,sampleRate:rate,duration:length/rate,getChannelData:ch=>data[ch],copyToChannel:(a,ch)=>data[ch].set(a)};};
