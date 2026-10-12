@@ -11,6 +11,25 @@ import {startCreativeChain} from '../src/creative-workflow.js';
 import {startLyricWork} from '../src/lyric-production.js';
 import {submissionFixture} from './helpers/submission-fixtures.js';
 const ready=id=>createVirtualPcState({power:'on',software:{client:{installed:true},[id]:{receivedBytes:SOFTWARE[id].downloadBytes}}});
+for(const otherApp of [false,true])test('uninstall repairs open executable directory and history, another app: '+otherApp,()=>{
+ const s=ready('notebook');s.software.notebook.installed=true;s.software.client.installed=otherApp;
+ const d=pcDocument(),root=d.createElement('div'),pc=mountVirtualPc(root);pc.showDesktop(s);pc.open('computer');
+ pc.openFolder('disk');pc.openFolder(s.software.notebook.path);findButton(root,'Открыть Рэпблокнот.exe').click();findButton(root,'Удалить').click();findButton(root,'Удалить программу').click();
+ assert.equal(pc.windows.windows.find(w=>w.id==='computer').title,otherApp?'Program Files':'Локальный диск (C:)');
+ for(const label of ['↑ Вверх','← Назад','← Назад','Вперёд →','Вперёд →']){
+  const b=findButton(root,label);if(!b.disabled)assert.doesNotThrow(()=>b.click());
+ }
+ assert.ok(pc.windows.windows.find(w=>w.id==='computer').title);pc.dispose();
+});
+test('uninstall reconciles vanished history when another folder is current',()=>{
+ const s=ready('notebook');s.software.notebook.installed=true;s.software.notebook.path='C:\\Custom\\Only\\Notebook';
+ const d=pcDocument(),root=d.createElement('div'),pc=mountVirtualPc(root);pc.showDesktop(s);pc.open('computer');
+ pc.openFolder(s.software.notebook.path);pc.openFolder('projects');pc.softwareAction('uninstall','notebook');findButton(root,'Удалить программу').click();
+ assert.doesNotThrow(()=>findButton(root,'← Назад').click());
+ assert.equal(pc.windows.windows.find(w=>w.id==='computer').title,'Локальный диск (C:)');
+ assert.doesNotThrow(()=>findButton(root,'Вперёд →').click());
+ assert.equal(pc.windows.windows.find(w=>w.id==='computer').title,'Мои проекты');pc.dispose();
+});
 test('uninstall explains why a standalone text refinement cannot be paused',()=>{
  let s=submissionFixture();s.software.notebook.installed=true;s.music.needs={satiety:100,energy:100};
  s=startLyricWork(s,{projectId:'lyrics',kind:'diss'},{}).state;assert.ok(s.writing.job);

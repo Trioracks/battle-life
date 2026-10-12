@@ -30,7 +30,23 @@ function resolvePath(value,paths=EXPLORER_PATHS) {
 export function createExplorerState(path='computer') {
   path=resolvePath(path)??'computer';return {path,history:[path],index:0,selection:null,view:'icons',treeVisible:true,error:''};
 }
+export function reconcileExplorerState(s,pcState={}) {
+  const paths=explorerPaths(pcState);
+  const existingAncestor=value=>{
+    let candidate=value;
+    while(candidate){
+      const found=resolvePath(candidate,paths);if(found)return found;
+      const end=candidate.lastIndexOf('\\');if(end<0)break;
+      candidate=candidate.slice(0,end);
+    }
+    return 'computer';
+  };
+  const path=existingAncestor(s.path),history=s.history.map(existingAncestor);
+  if(path===s.path&&history.every((entry,i)=>entry===s.history[i]))return s;
+  return {...s,path,history,...(path!==s.path?{selection:null,error:''}:{})};
+}
 export function navigateExplorer(s,a,pcState={}) {
+  s=reconcileExplorerState(s,pcState);
   const paths=explorerPaths(pcState);
   if(a.type==='select')return {...s,selection:a.id??null,error:''};
   if(a.type==='view')return ['icons','details'].includes(a.view)?{...s,view:a.view}:s;

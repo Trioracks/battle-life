@@ -53,7 +53,7 @@ test('invalid audio is rejected and foreign lyric metadata is quarantined',()=>{
  const good=submit(submissionFixture()).state;good.battleSubmissions[0].lyrics.id='unrelated';
  assert.ok(createVirtualPcState(good).battleSubmissions[0].issue);
 });
-test('Makarevich demo rules accept the short four/eight bar format',()=>{
- const rules=BATTLE_BRIEFS.find(b=>b.id==='makarevich-1').rules.join(' ');
+for(const id of ['makarevich-1','concrete-echo'])test(id+' demo rules accept the short four/eight bar format',()=>{
+ const rules=BATTLE_BRIEFS.find(b=>b.id===id).rules.join(' ');
  assert.doesNotMatch(rules,/60 до 120/);assert.match(rules,/4.*8.*такт/);
 });

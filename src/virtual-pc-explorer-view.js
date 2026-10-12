@@ -1,7 +1,7 @@
 import {PC_IDENTITY} from './pc-identity.js?rev=35';
 import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=21';
 import {createPcIcon} from './virtual-pc-icons.js?rev=35';
-import {createExplorerState,navigateExplorer,explorerEntries,explorerProperties,explorerPaths} from './virtual-pc-explorer.js?rev=35';
+import {createExplorerState,reconcileExplorerState,navigateExplorer,explorerEntries,explorerProperties,explorerPaths} from './virtual-pc-explorer.js?rev=35';
 import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=35';
 import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=35';
 import {normalizeStudioProject} from './ft-studio-project.js?rev=35';
@@ -98,8 +98,9 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
   files.addEventListener('contextmenu',backgroundMenu);
   render(true);
   return {navigate,update(next){
-    state=next;const sig=structuralSignature();
-    if(sig!==signature){if(nav.selection&&!entries().some(e=>e.id===nav.selection))nav={...nav,selection:null};render(false);}
+    state=next;const previous=nav;nav=reconcileExplorerState(nav,state);const moved=previous.path!==nav.path,sig=structuralSignature();
+    if(sig!==signature||nav!==previous){if(nav.selection&&!entries().some(e=>e.id===nav.selection))nav={...nav,selection:null};render(moved);}
     else {updateInstall();diskLabel?.update(diskUsage(state));for(const entry of entries()){const label=sizeLabels.get(entry.id);if(label)label.textContent=entry.sizeMb?entry.sizeMb.toFixed(3)+' МБ':'';}}
+    if(moved)onNavigate?.(explorerPaths(state)[nav.path]);
   },dispose(){disposed=true;diskLabel?.dispose();form.removeEventListener('submit',submit);files.removeEventListener('contextmenu',backgroundMenu);root.replaceChildren();}};
 }
