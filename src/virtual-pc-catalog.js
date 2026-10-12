@@ -1,5 +1,7 @@
 import {COMMUNITY_BOARDS,COMMUNITY_TOPICS,communityDay} from './underweb-community.js?rev=34';
 import {newsIssue,archiveForDay} from './underweb-news.js?rev=28';
+import {resolveSocialRoute} from './social-routing.js?rev=36';
+import {SOCIAL_COMMUNITIES} from './social-catalog.js?rev=36';
 import {FORUM_ARCHIVE_BOARDS,archiveTopicsForDay,archiveTopicForDay} from './underweb-forum-archive.js?rev=34';
 const apps = Object.freeze([
   { id: 'computer', label: 'Мой компьютер', iconId: 'computer', description: 'Диск C: и Мои проекты' },
@@ -31,6 +33,7 @@ export function desktopApps(state) {
 export function resolveUnderweb(address,metadata={}) {
   const raw=typeof address==='string'?address.trim():'';
   const normalized = raw.toLowerCase().replaceAll('ё','е');
+  const social=resolveSocialRoute(normalized);if(social)return social;
   if(!normalized||['underweb://iskra','underweb://iskra/','искра'].includes(normalized))return {type:'home',url:'underweb://iskra'};
   if(normalized==='underweb://iskra/archive')return {type:'news-archive',url:normalized,issues:archiveForDay(metadata.gameDay)};
   if(normalized.startsWith('underweb://iskra/news/')){const issue=newsIssue(normalized.slice('underweb://iskra/news/'.length),metadata.gameDay);return issue?{type:'news',url:'underweb://iskra/news/'+issue.id,issue}:{type:'error',url:raw,message:'Этот выпуск ещё не опубликован или не найден в архиве.'};}
@@ -78,5 +81,7 @@ export function resolveUnderweb(address,metadata={}) {
   pages.push({title:'Исторический архив Hip-Hop.ru',url:'underweb://forum/archive',site:'Hip-Hop.ru / Историческая подборка',description:'Реальные даты и авторы, краткие пересказы, короткие цитаты и ссылки на оригинал. Архив только для чтения.',keywords:'хип хоп hip hop ru форум архив 2012'});
   for(const topic of archiveTopicsForDay(null,gameDay))pages.push({title:topic.title,url:'underweb://forum/archive/topic/'+topic.id,site:'Hip-Hop.ru / Архив / '+topic.date,description:topic.posts[0]?.body??'',keywords:'исторический архив 2012 '+topic.posts.map(p=>p.author).join(' ')});
   const results=words.length?pages.map(p=>({...p,score:words.reduce((n,w)=>n+(p.title+' '+p.description+' '+p.keywords).toLowerCase().replaceAll('ё','е').includes(w),0)})).filter(p=>p.score>0).sort((a,b)=>b.score-a.score).map(({keywords,score,...p})=>p):[];
+  const socialPages=[{title:'Рифмосеть — люди и музыка',url:'underweb://social/me',site:'Рифмосеть',description:'Друзья, фотографии, аудио, сообщения и сообщества.',keywords:'рифмосеть соцсеть социальная сеть друзья'},...SOCIAL_COMMUNITIES.map(c=>({title:c.name,url:'underweb://social/community/'+c.id,site:'Рифмосеть / Сообщества',description:c.description,keywords:'рифмосеть сообщество '+c.category}))];
+  for(const {keywords,...p} of socialPages)if(words.some(w=>(p.title+' '+p.description+' '+keywords).toLowerCase().replaceAll('ё','е').includes(w)))results.push(p);
   return {type:'search',url:'underweb://iskra/search?q='+encodeURIComponent(query),query,results};
 }
