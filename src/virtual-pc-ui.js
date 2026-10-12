@@ -352,9 +352,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
   pc.showSubmission=battleId=>{
     if(pc.submissionModal||pc.shutdownModal||pc.confirmClose)return;
-    pc.returnFocus=document.activeElement;
-    const node=el(document,'div'),view=mountBattleSubmissionPicker(node,{getState:()=>pc.state,battleId,getGameDay:()=>pc.metadata.gameDay??1,onChange:next=>pc.persist(next,{atomic:true}),onClose:()=>pc.closeSubmission()});
-    pc.submissionModal={node,view};pc.shell.setModal(node,pc.returnFocus);
+    pc.open('underweb');pc.navigateUnderweb('underweb://social/dialog/'+battleId);
   };
   pc.showShutdown = () => {
     if(pc.confirmClose||pc.shutdownModal)return;pc.cancelStudioLaunch();pc.menu.close();pc.returnFocus=document.activeElement;

@@ -3,7 +3,7 @@ import {normalizeBeat} from './beat-production.js?rev=36';
 import {normalizeLyric} from './lyric-production.js?rev=36';
 import {resolveBeatPlayback} from './beat-playback.js?rev=36';
 import {RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=36';
-import {captureTrackVersion} from './track-version.js?rev=36';
+import {validGameMinute} from './game-minute.js?rev=36';
 const clone=value=>JSON.parse(JSON.stringify(value));
 const day=value=>Number.isSafeInteger(value)&&value>0&&value<100000;
 const battle=id=>BATTLE_BRIEFS.some(b=>b.id===id);
@@ -23,6 +23,11 @@ export function normalizeBattleSubmissions(value){
  const result=[],seen=new Set();
  for(const raw of Array.isArray(value)?value:[]){
   if(raw?.issue&&raw.recoveryData){result.push(clone(raw));continue;}
+  if(raw?.version===2){
+   const valid=typeof raw.id==='string'&&typeof raw.windowId==='string'&&battle(raw.battleId)&&raw.communityId===raw.battleId&&raw.roundId==='selection'&&['pending','accepted','recovery'].includes(raw.status)&&validGameMinute(raw.ackAt)&&typeof raw.ackTemplateId==='string'&&(validGameMinute(raw.sentAt)||raw.sentAt===null&&raw.migration?.timePrecision==='day-only')&&(typeof raw.trackVersionId==='string'||raw.status==='recovery');
+   if(!valid){result.push({battleId:raw.battleId,roundId:'selection',issue:'Сохранённую отправку не удалось прочитать. Повторная попытка не открыта.',recoveryData:clone(raw)});continue;}
+   if(seen.has(raw.windowId))continue;seen.add(raw.windowId);result.push(clone(raw));continue;
+  }
   const track=normalizeBeat(raw?.track),lyrics=normalizeLyric(raw?.lyrics);
   if(lyrics&&(lyrics.id!==track?.recording?.text.id||lyrics.revision!==track?.recording?.text.revision)){
    result.push({battleId:raw.battleId,roundId:'selection',issue:'Версия текста не совпадает с записью. Исходная сдача сохранена.',recoveryData:clone(raw)});continue;
@@ -36,18 +41,8 @@ export function normalizeBattleSubmissions(value){
  return result;
 }
 
-export function submitBattleTrack(state,{battleId,projectId,gameDay,replace=false}={}){
- const fail=reason=>({state,ok:false,reason});
- if(!battle(battleId)||!state.battleApplications?.some(a=>a.battleId===battleId))return fail('Сначала зарегистрируйся на этот баттл.');
- if(!day(gameDay))return fail('Не удалось определить игровую дату.');
- const raw=state.projects?.find(p=>p.id===projectId&&p.kind==='beat');if(!raw)return fail('Выбери трек из папки «Мои проекты».');
- const info=candidate(state,raw,battleId);if(info.issue)return fail(info.issue);
- const track=clone(normalizeBeat(raw)),lyrics=clone(textForTrack(state,track)),submissions=normalizeBattleSubmissions(state.battleSubmissions);
- const index=submissions.findIndex(s=>s.battleId===battleId&&s.roundId==='selection'),previous=submissions[index];
- if(previous&&!previous.issue&&JSON.stringify([previous.track,previous.lyrics])===JSON.stringify([track,lyrics]))return {state,ok:true,reason:'Эта версия уже отправлена.'};
- if(previous&&!replace)return fail('Работа уже отправлена. Подтверди замену версии.');
- const captured=captureTrackVersion(state,{projectId,nowMinute:(gameDay-1)*1440});if(!captured.ok)return fail(captured.reason);
- const submitted={version:1,battleId,roundId:'selection',revision:(previous?.revision??0)+1,submittedDay:gameDay,projectId,status:'pending',topicMatch:info.topicMatch,track,lyrics,trackVersionId:captured.versionId,timePrecision:'day-only'};
- if(index<0)submissions.push(submitted);else submissions[index]=submitted;
- return {state:{...captured.state,battleSubmissions:submissions},ok:true,reason:'Работа отправлена. Ожидает проверки.'};
+export function submitBattleTrack(state){
+ // Legacy entry point is intentionally closed: it must not bypass the draft,
+ // exact deadline, immutable attachment, or single-attempt rule.
+ return {state,ok:false,reason:'Сдача перенесена в сообщения сообщества. Прикрепи трек и нажми «Отправить» там.'};
 }

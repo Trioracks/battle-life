@@ -5,17 +5,19 @@ import {socialAvatar,socialButton,socialHeading} from './social-dom.js?rev=36';
 import {createSocialAudio} from './social-audio-view.js?rev=36';
 import {createSocialProfileView} from './social-profile-view.js?rev=36';
 import {createSocialCommunityView} from './social-community-view.js?rev=36';
+import {mountSocialDialog} from './social-dialog-view.js?rev=36';
 export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,navigate,audio,onResultViewed=()=>{}}){
  const d=root.ownerDocument,shell=el(d,'section',{className:'sn-network',attributes:{'aria-label':'Рифмосеть'}}),head=el(d,'header',{className:'sn-top'});
  head.append(el(d,'strong',{text:'р / Рифмосеть'}),el(d,'span',{text:'Люди. Музыка. Наши места.'}));
  const grid=el(d,'div',{className:'sn-layout'}),nav=el(d,'nav',{className:'sn-nav',attributes:{'aria-label':'Разделы Рифмосети'}}),content=el(d,'div',{className:'sn-content'}),message=el(d,'p',{className:'sn-message',attributes:{'aria-live':'polite'}});
  for(const [id,title]of SOCIAL_SECTIONS)nav.append(socialButton(d,title,()=>navigate('underweb://social/'+id),{className:'sn-nav-link',dataset:{socialSection:id},attributes:route.section===id?{'aria-current':'page'}:{}}));
  grid.append(nav,content);shell.append(head,grid,message,el(d,'footer',{className:'sn-footer',text:'Рифмосеть · 2012 · Вымышленная локальная сеть'}));root.replaceChildren(shell);
- const playback=createSocialAudio(audio);let last='',query='',disposed=false;
+ const playback=createSocialAudio(audio);let last='',query='',disposed=false,dialogView=null;
  const signature=()=>JSON.stringify([getState().social,Object.keys(getState().trackVersions?.byId??{}),getState().communityAudio,getState().battleSubmissions,getMetadata().playerName]);
  function commit(result){
   if(!result?.ok){message.textContent=result?.reason??'Не удалось выполнить действие.';return false;}
-  if(onChange(result.state)===false){message.textContent='Не удалось сохранить изменение. Освободи место для сохранения и повтори.';return false;}
+  let saved;try{saved=onChange(result.state);}catch{saved=false;}
+  if(saved===false||saved?.ok===false){message.textContent='Не удалось сохранить изменение. Освободи место для сохранения и повтори.';return false;}
   message.textContent='';render();return true;
  }
  function groups(){
@@ -34,16 +36,17 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
   return node;
  }
  function render(){
+  if(dialogView){dialogView.update();last=signature();return;}
   const focus=content.contains(d.activeElement)?d.activeElement:null,label=focus?.getAttribute?.('aria-label'),start=focus?.selectionStart,end=focus?.selectionEnd;
   const options={getState,getMetadata,navigate,commit,audio:playback,onResultViewed};
   let node;
   if(route.section==='groups')node=groups();
   else if(route.section==='community')node=createSocialCommunityView(d,{...options,id:route.communityId});
   else if(route.section==='messages')node=messages();
-  else if(route.section==='dialog'){node=el(d,'section');node.append(socialHeading(d,communityById(route.communityId)?.name??'Диалог'),el(d,'p',{className:'sn-note',text:'Диалог сообщества. Здесь будут храниться вложения и ответы организаторов.'}));}
+  else if(route.section==='dialog'){dialogView=mountSocialDialog(d,{...options,id:route.communityId});node=dialogView.root;}
   else node=createSocialProfileView(d,{...options,id:route.profileId??'me',view:route.section==='profile'?route.view:['friends','photos','audio'].includes(route.section)?route.section:'page'});
   content.replaceChildren(node);last=signature();
   if(label){const field=pcFind(content,n=>n.getAttribute?.('aria-label')===label);field?.focus?.({preventScroll:true});if(Number.isInteger(start))field?.setSelectionRange?.(start,end);}
  }
- render();return {update(){if(!disposed&&last!==signature())render();},dispose(){disposed=true;playback.dispose();root.replaceChildren();}};
+ render();return {update(){if(disposed)return;if(last!==signature())render();else dialogView?.update();},dispose(){disposed=true;dialogView?.dispose();playback.dispose();root.replaceChildren();}};
 }

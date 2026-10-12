@@ -9,7 +9,9 @@ import {createBeat} from '../src/beat-production.js';
 import {startCreativeChain,pauseCreativeChain} from '../src/creative-workflow.js';
 import {advanceCreativeWork} from '../src/home-creative-work.js';
 import {startVocalWork,advanceVocalWork} from '../src/vocal-production.js';
-import {submitBattleTrack,submissionCandidates} from '../src/battle-submission.js';
+import {submissionCandidates} from '../src/battle-submission.js';
+import {ensureBattleWindow} from '../src/battle-windows.js';
+import {attachSubmissionTrack,sendSubmission} from '../src/social-submission.js';
 const restore=s=>createVirtualPcState(JSON.parse(JSON.stringify(s)));
 const accepted=r=>{assert.equal(r.ok,true,r.reason);return r.state;};
 function install(s,id){
@@ -53,7 +55,9 @@ for(const polished of [false,true])test('creation to submission '+(polished?'cle
  }
  const seconds=submissionCandidates(s,'makarevich-1')[0].seconds;
  assert.equal(seconds,polished?64/3:32/3);
- s=accepted(submitBattleTrack(s,{battleId:'makarevich-1',projectId:'beat',gameDay:2}));
+ s=accepted(ensureBattleWindow(s,{battleId:'makarevich-1',nowMinute:1440}));
+ s=accepted(attachSubmissionTrack(s,{communityId:'makarevich-1',projectId:'beat',nowMinute:1441}));
+ s=accepted(sendSubmission(s,{communityId:'makarevich-1',nowMinute:1442}));
  const sent=structuredClone(s.battleSubmissions[0]);assert.equal(sent.status,'pending');assert.equal(sent.topicMatch,true);
  s.projects[0].name='Позже изменено';s.projects[1].name='Другая версия';
  assert.deepEqual(restore(s).battleSubmissions[0],sent);

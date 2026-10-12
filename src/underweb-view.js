@@ -9,6 +9,8 @@ import {homeDateLabel} from './home-calendar.js?rev=28';
 import {newsForDay} from './underweb-news.js?rev=28';
 import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=28';
 import {mountSocial} from './social-view.js?rev=36';
+import {activateSocial} from './social-runtime.js?rev=36';
+import {markDialogRead} from './social-submission.js?rev=36';
 const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-control '+(options.className??'')},fn);
 
 export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,onSubmitTrack=()=>{},onResultViewed=()=>{},getSoftwareMessage=()=>''}){
@@ -82,7 +84,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   const hero=el(d,'div',{className:'uw-detail-hero'}),text=el(d,'div');text.append(el(d,'small',{className:'uw-badge',text:b.season}),el(d,'h1',{text:b.title}),el(d,'p',{text:b.description}));hero.append(poster(b,true),text);site.append(hero);
   const columns=el(d,'div',{className:'uw-detail-columns'}),rules=el(d,'section',{className:'uw-battle-content'});
   if(route.tab==='home'){
-   rules.append(el(d,'small',{text:'ОТБОР ОТКРЫТ'}),el(d,'h2',{text:'Тема: «'+b.theme+'»'}),el(d,'p',{text:b.condition}),el(d,'p',{text:'Подай заявку, напиши текст в Рэпблокноте и запиши вокал в FT Studio. Готовый трек можно отправить прямо здесь.'}),button(d,'Скачать Рэпблокнот →',{className:'uw-text-link'},()=>navigate('underweb://dump/notebook')));
+   rules.append(el(d,'small',{text:'ОТБОР'}),el(d,'h2',{text:'Тема: «'+b.theme+'»'}),el(d,'p',{text:b.condition}),el(d,'p',{text:'Подай заявку, напиши текст в Рэпблокноте и запиши вокал в FT Studio. Готовый трек отправляется через сообщения сообщества в Рифмосети.'}),button(d,'Скачать Рэпблокнот →',{className:'uw-text-link'},()=>navigate('underweb://dump/notebook')));
    const note=el(d,'div',{className:'uw-battle-bulletin'});note.append(el(d,'strong',{text:'На связи организаторы'}),el(d,'p',{text:'Правила уже опубликованы. Вопросы по формату и первые впечатления собираем в общей теме.'}),button(d,'Читать обсуждение →',{},()=>navigate('underweb://forum/topic/'+b.id+'-general')));rules.append(note);
   }else if(route.tab==='rules'){
    rules.append(el(d,'h2',{text:'Регламент отбора'}),el(d,'p',{className:'uw-theme',text:b.theme}));const list=el(d,'ul');for(const text of b.rules)list.append(el(d,'li',{text}));rules.append(list,el(d,'p',{text:'Участие бесплатно. Чужие куплеты, публикация личных данных и травля участников запрещены. Заявки и тексты остаются в игровом мире.'}),button(d,'Задать вопрос о правилах →',{},()=>navigate('underweb://forum/topic/'+b.id+'-rules')));
@@ -98,8 +100,8 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   if(isApplied(b.id)){
    const saved=getState().battleSubmissions?.find(s=>s.battleId===b.id);
    applicationFocus=el(d,'h2',{text:'Заявка подана',attributes:{tabindex:'-1'}});action.append(applicationFocus,el(d,'p',{text:'Ты зарегистрирован на '+b.title+'. Выбери трек из «Моих проектов».'}));
-   if(saved){action.append(el(d,'strong',{text:saved.issue??'Ожидает проверки'}));if(!saved.issue)action.append(el(d,'p',{text:saved.track.name+' · версия сдачи '+saved.revision+' · '+homeDateLabel(saved.submittedDay)}),el(d,'p',{text:saved.topicMatch===null?'Связь текста с темой не подтверждена.':saved.topicMatch?'Текст соответствует теме баттла.':'Отправлен трек для другой темы.'}));}
-   action.append(button(d,saved?'Заменить работу':'Добавить свою работу',{className:'uw-primary',dataset:{pcRole:'submit-track'}},()=>onSubmitTrack(b.id)));
+   if(saved){action.append(el(d,'strong',{text:saved.issue??(saved.status==='accepted'?'Работа принята':'Работа отправлена')}));if(!saved.issue)action.append(el(d,'p',{text:getState().trackVersions?.byId?.[saved.trackVersionId]?.name??saved.track?.name??'Сохранённая работа'}),el(d,'p',{text:saved.topicMatch===null?'Связь текста с темой не подтверждена.':saved.topicMatch?'Текст соответствует теме баттла.':'Отправлен трек для другой темы.'}));}
+   action.append(button(d,'Открыть сообщения сообщества',{className:'uw-primary',dataset:{pcRole:'submit-track'}},()=>navigate('underweb://social/dialog/'+b.id)));
   }
   else if(applicationOpen){
    const form=el(d,'form'),label=el(d,'label',{text:'Имя участника'}),name=el(d,'input',{value:getMetadata().playerName,attributes:{'aria-label':'Имя участника',maxlength:'32',required:'true'}});label.append(name);
@@ -140,8 +142,15 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   restore?.();page.scrollTop=scrollTop;if(focusApplication)applicationFocus?.focus();
   status.textContent='Готово · '+(route.type==='home'||route.type==='search'?'Искра':'Локальная сеть');lastApplications=JSON.stringify([getState().battleApplications,getState().battleSubmissions]);
  }
- function navigate(input){route=resolveUnderweb(input,getMetadata());history.splice(index+1);history.push(route.url);index=history.length-1;applicationOpen=false;render();}
- function travel(delta){const next=index+delta;if(next<0||next>=history.length)return;index=next;route=resolveUnderweb(history[index],getMetadata());applicationOpen=false;render();}
+ function activateRoute(next){
+  if(next.type!=='social')return;
+  const result=activateSocial(getState(),getMetadata().gameMinutes,BATTLE_BRIEFS.some(b=>b.id===next.communityId)?next.communityId:'makarevich-1');
+  if(!result.ok)return;let state=result.state;
+  if(next.section==='dialog'&&state.social?.dialogs?.[next.communityId]?.unread)state=markDialogRead(state,next.communityId).state;
+  if(state!==getState())onChange(state);
+ }
+ function navigate(input){const next=resolveUnderweb(input,getMetadata());activateRoute(next);route=next;history.splice(index+1);history.push(route.url);index=history.length-1;applicationOpen=false;render();}
+ function travel(delta){const next=index+delta;if(next<0||next>=history.length)return;index=next;const resolved=resolveUnderweb(history[index],getMetadata());activateRoute(resolved);route=resolved;applicationOpen=false;render();}
  render();return {navigate,get snapshot(){return {route,index,history:[...history]};},update(){
   if(route.type==='social'){socialView?.update();return;}
   if(lastDay!==JSON.stringify([getMetadata().gameDay])){route=resolveUnderweb(history[index],getMetadata());render({resetScroll:false,preserveInputs:true});}

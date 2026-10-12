@@ -7,7 +7,7 @@ import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?re
 import {DEFAULT_APPEARANCE,loadProfile,saveProfile} from './avatar-v3-profile.js?rev=28';
 import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=28';
 import {createNewGameSession} from './apartment-v3-new-game.js?rev=36';
-import {advanceVirtualPc} from './virtual-pc-runtime.js?rev=36';
+import {advanceVirtualPcDurably,gameMinuteStamp} from './virtual-pc-runtime.js?rev=36';
 import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=36';
 import {mountVirtualPc} from './virtual-pc-ui.js?rev=36';
 import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=28';
@@ -119,7 +119,7 @@ try{
   function openComputer(){
     virtualPc.showDesktop(pcState);virtualPc.presentTransition(pcLifecycle.snapshot);
     setMode('pc');pcRoot.hidden=false;
-    virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,gameDay:homeTime.day,skills:profile?.skills});
+    virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,gameDay:homeTime.day,gameMinutes:gameMinuteStamp(homeTime),skills:profile?.skills});
     void pcLifecycle.seated();
   }
   pcRoot.addEventListener('click',event=>{const target=event.target.closest?.('button,[role="menuitem"]');if(target&&!target.disabled&&target.getAttribute('aria-disabled')!=='true'&&!pcLifecycle.snapshot.locked)void pcSounds.play('click');});
@@ -258,20 +258,20 @@ try{
         const creative=creativeWorkDescriptor(pcState,profile?.skills);
         if(pcLifecycle.snapshot.phase==='working'&&creative.job){
           lastWorkJob={...creative.job};lastWorkBeat=creative.project;
-          const r=advanceCreativeWork(pcState,dt,homeTime,profile?.skills);pcState=r.state;homeTime.advanceMinutes(r.minutes);pcState=advanceVirtualPc(pcState,homeTime).state;virtualPc.syncState(pcState);
+          const r=advanceCreativeWork(pcState,dt,homeTime,profile?.skills);pcState=r.state;homeTime.advanceMinutes(r.minutes);pcState=advanceVirtualPcDurably(pcState,homeTime,next=>persistPc(next,{atomic:true})).state;virtualPc.syncState(pcState);
           if(creative.chainProgress)workReward+=r.practiceGained??0;
           if(r.finished){if(!creative.chainProgress)workReward=r.practiceGained;workFinished=true;lastWorkJob.elapsed=lastWorkJob.total;}
           if(r.finished||r.blocked){pcLifecycle.finishWork({blocked:r.blocked});syncWorkAudio();if(r.blocked){message=r.reason||workBlockReason(pcState);messageUntil=now+10000;speech.say(workNeedSpeech(pcState),{afterRoom:true});}}
           if(r.finished||r.blocked||now-lastWorkSave>1000){saveHomeTime(storage,homeTime);persistPc(pcState);lastWorkSave=now;}
         }
       }else if(mode==='pc'){
-        const frame=advanceComputerHomeFrame(motion,homeTime,pcState,dt,true);pcState=frame.pcState;virtualPc.syncState(pcState);events=frame.events;
+        const frame=advanceComputerHomeFrame(motion,homeTime,pcState,dt,true,next=>persistPc(next,{atomic:true}));pcState=frame.pcState;virtualPc.syncState(pcState);events=frame.events;
       }else{
         const before=homeTime.day*1440+homeTime.minutes,wasSleeping=motion.sleeping;
         events=advanceHomeFrame(motion,homeTime,dt,hold).events;
         if(wasSleeping)pcState=restoreMusicNeeds(pcState,'sleep',homeTime.day*1440+homeTime.minutes-before);
         if(events.some(e=>e.type==='completed'&&e.id==='dining'))pcState=restoreMusicNeeds(pcState,'meal');
-        pcState=advanceVirtualPc(pcState,homeTime).state;virtualPc.syncState(pcState);
+        pcState=advanceVirtualPcDurably(pcState,homeTime,next=>persistPc(next,{atomic:true})).state;virtualPc.syncState(pcState);
       }
     }
     for(const event of events){
@@ -310,7 +310,7 @@ try{
     const headAnchor=view.getHeadScreenPosition(),firstPerson=view.modes.mode==='3D',roomReady=pcLifecycle.snapshot.phase==='room'&&motion.actionId!=='computer'&&motion.fade<.01;
     speech.tick(paused?0:dt,{hidden:document.hidden,present:mode==='game'&&!cameraFade&&roomReady&&!homeModalOpen()&&(firstPerson||headAnchor.visible),roomReady,audioAllowed:audio?.state==='running'});
     speechView.update(speech.snapshot,headAnchor,{firstPerson,width:innerWidth,height:innerHeight,bottomLimit:$('#controls').getBoundingClientRect().top-12});
-    virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,gameDay:homeTime.day,skills:profile?.skills});
+    virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,gameDay:homeTime.day,gameMinutes:gameMinuteStamp(homeTime),skills:profile?.skills});
     $('#home-time').textContent=`${homeTime.dateLabel} · ${homeTime.label} · ${homeTime.period} · Дом`;
     if(now-lastTimeSave>(homeTime.isSleeping?500:15000)){saveHomeTime(storage,homeTime);persistPc(pcState);lastTimeSave=now;}
     $('#room').textContent=motion.position[0]<0?'КУХНЯ':'ЖИЛАЯ КОМНАТА';

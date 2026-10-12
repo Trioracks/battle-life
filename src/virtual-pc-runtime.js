@@ -2,13 +2,27 @@ import {createVirtualPcState} from './virtual-pc-state.js?rev=36';
 import {softwareDiskBytes} from './pc-software.js?rev=35';
 import {SOFTWARE} from './pc-software-catalog.js?rev=35';
 import {advanceTransfers,TRANSFER_RATES} from './pc-transfer-runtime.js?rev=35';
-export function gameMinuteStamp(clock){return Number.isSafeInteger(clock?.day)&&clock.day>=1&&Number.isFinite(clock.minutes)&&clock.minutes>=0&&clock.minutes<1440?(clock.day-1)*1440+clock.minutes:null;}
+import {gameMinuteStamp} from './game-minute.js?rev=36';
+import {advanceSocial} from './social-runtime.js?rev=36';
+export {gameMinuteStamp};
 export function advanceVirtualPc(input,clock){
- const s=createVirtualPcState(input),stamp=gameMinuteStamp(clock),previous=s.lastGameMinute;
+ let s=createVirtualPcState(input);const stamp=gameMinuteStamp(clock),previous=s.lastGameMinute;
  if(stamp===null)return {state:s,advancedBytes:0};
+ const social=advanceSocial(s,stamp);s=social.state;
  s.lastGameMinute=stamp;
- if(previous===null||stamp<previous||s.power!=='on')return {state:s,advancedBytes:0};
- return advanceTransfers(s,previous,stamp);
+ if(previous===null||stamp<previous||s.power!=='on')return {state:s,advancedBytes:0,events:social.events};
+ return {...advanceTransfers(s,previous,stamp),events:social.events};
+}
+// A domain event becomes visible only after its state has been durably saved.
+// Ordinary frame progress retains the host's existing batched-save policy.
+export function advanceVirtualPcDurably(input,clock,persist){
+ const next=advanceVirtualPc(input,clock);
+ const migration=JSON.stringify(input.battleSubmissions??[])!==JSON.stringify(next.state.battleSubmissions??[]);
+ if(next.events?.length||migration){
+  let saved;try{saved=persist(next.state);}catch{saved=false;}
+  if(saved===false||saved?.ok===false)return {...next,state:input,events:[],advancedBytes:0,saveFailed:true};
+ }
+ return next;
 }
 export function downloadPresentation(input,appId='ft'){
  const s=createVirtualPcState(input),id=SOFTWARE[appId]?appId:'ft',t=s.software.transfers[id],app=s.software[id],total=SOFTWARE[id].downloadBytes,received=app.receivedBytes;

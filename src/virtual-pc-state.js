@@ -5,6 +5,8 @@ import {normalizeBattleSubmissions} from './battle-submission.js?rev=36';
 import {normalizeRecordingState} from './vocal-production.js?rev=36';
 import {normalizeTrackVersions,captureTrackVersion} from './track-version.js?rev=36';
 import {normalizeSocial} from './social-state.js?rev=36';
+import {normalizeBattleWindows} from './battle-windows.js?rev=35';
+import {normalizeSocialRuntime,normalizeCommunityAudio} from './social-runtime.js?rev=36';
 import {drumById} from './beat-catalog.js?rev=36';
 import {normalizeCommunity} from './underweb-community.js?rev=34';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=35';
@@ -90,7 +92,7 @@ function normalizeSnapshot(value) {
   const battleSubmissions=normalizeBattleSubmissions(source.battleSubmissions);
   let trackVersions=normalizeTrackVersions(source.trackVersions);
   for(const submission of battleSubmissions){
-    if(submission.issue||submission.trackVersionId)continue;
+    if(submission.version!==1||submission.issue||submission.trackVersionId)continue;
     const captured=captureTrackVersion({projects:[submission.track,...(submission.lyrics?[submission.lyrics]:[])],trackVersions},{projectId:submission.projectId,nowMinute:(submission.submittedDay-1)*1440});
     if(captured.ok){trackVersions=captured.state.trackVersions;submission.trackVersionId=captured.versionId;submission.timePrecision='day-only';}
   }
@@ -108,6 +110,9 @@ function normalizeSnapshot(value) {
     creativeWork:normalizeCreativeWork(source.creativeWork,projects),
     community:normalizeCommunity(source.community),
     social:normalizeSocial(source.social),
+    battleWindows:normalizeBattleWindows(source.battleWindows),
+    socialRuntime:normalizeSocialRuntime(source.socialRuntime),
+    communityAudio:normalizeCommunityAudio(source.communityAudio),
     household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),
     battleSubmissions,trackVersions,
@@ -196,6 +201,7 @@ export function saveVirtualPcState(storage, state) {
     if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'battleSubmissions'))reserveSubmissionBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&parsed.software?.transferVersion!==2)reserveTransferBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'trackVersions'))reserveTrackVersionBackup(storage,raw);
+    if(isRecord(parsed)&&parsed.version===1&&parsed.socialRuntime?.version!==1)reserveSocialBackup(storage,raw);
     storage.setItem(VIRTUAL_PC_STORAGE_KEY, JSON.stringify(normalizeSnapshot(state)));
     return true;
   } catch {
@@ -203,6 +209,10 @@ export function saveVirtualPcState(storage, state) {
   }
 }
 
+function reserveSocialBackup(storage,raw){
+  const key=VIRTUAL_PC_STORAGE_KEY+'-before-social-delivery';
+  if(storage.getItem(key)===null)storage.setItem(key,raw);
+}
 function reserveHouseholdBackup(storage,raw){
   const key=VIRTUAL_PC_STORAGE_KEY+'-before-household';
   if(storage.getItem(key)===null)storage.setItem(key,raw);
@@ -258,6 +268,9 @@ export function loadVirtualPcState(storage) {
     if(!Object.hasOwn(parsed,'trackVersions')){
       try{reserveTrackVersionBackup(storage,raw);}
       catch{return {ok:false,reason:'track-versions-backup-failed',state:restoredSnapshot(parsed)};}
+    }
+    if(parsed.socialRuntime?.version!==1){
+      try{reserveSocialBackup(storage,raw);}catch{return {ok:false,reason:'social-delivery-backup-failed',state:restoredSnapshot(parsed)};}
     }
     return { ok: true, state: restoredSnapshot(parsed) };
   } catch {

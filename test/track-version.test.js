@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {submissionFixture} from './helpers/submission-fixtures.js';
 import {createVirtualPcState,loadVirtualPcState,saveVirtualPcState,VIRTUAL_PC_STORAGE_KEY} from '../src/virtual-pc-state.js';
-import {submitBattleTrack} from '../src/battle-submission.js';
+import {legacySubmissionFixture} from './helpers/submission-fixtures.js';
 import {startVocalWork,advanceVocalWork} from '../src/vocal-production.js';
 const api=await import('../src/track-version.js').catch(()=>({}));
 function capture(state){assert.equal(typeof api.captureTrackVersion,'function');return api.captureTrackVersion(state,{projectId:'beat',nowMinute:600});}
@@ -50,8 +50,7 @@ test('package migration reserves original data; quota failure cannot rewrite old
 });
 
 test('valid historical submission gets a frozen version once, not the later edited project',()=>{
- let s=submissionFixture();
- s=submitBattleTrack(s,{battleId:'makarevich-1',projectId:'beat',gameDay:2}).state;
+ let s=legacySubmissionFixture();
  delete s.trackVersions;
  delete s.battleSubmissions[0].trackVersionId;delete s.battleSubmissions[0].timePrecision;
  s.projects.find(p=>p.id==='beat').name='Новая рабочая копия';
