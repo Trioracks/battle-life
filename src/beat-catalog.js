@@ -15,9 +15,13 @@ export const BEAT_GENRES=Object.freeze([
  {id:'chiptune',name:'Чиптюн',targets:[[6,7,4],[10,5,9],[6,8,7]]},
  {id:'gfunk',name:'Джи-фанк',targets:[[8,6,3],[8,7,8],[8,6,5]]},
 ]);
-export const DRUMS=Object.freeze(['free','shop'].flatMap(bank=>Array.from({length:bank==='free'?5:10},(_,i)=>{
+// BL-001: the shop stays empty until an authored, cleared sample library is supplied.
+export const DRUMS=Object.freeze([]);
+export const RETIRED_DRUM_MESSAGE='Источник звука недоступен: старый луп удалён из игры. Проект сохранён без подмены дорожек.';
+// Tombstones preserve saved projects/purchases, but deliberately have no playable path.
+const retiredDrums=Object.freeze(['free','shop'].flatMap(bank=>Array.from({length:bank==='free'?5:10},(_,i)=>{
  const number=String(i+1).padStart(2,'0');
- return Object.freeze({id:`${bank}-${number}`,name:`${bank==='free'?'Практика':'Архив'} / ${number}`,bank,bpm:90,bars:2,kind:'drums',path:`./stems/drums/${bank==='shop'?'shops':'free'}/${number}.mp3`,price:bank==='shop'?BEAT_RULES.price:0});
+ return Object.freeze({id:`${bank}-${number}`,name:`${bank==='free'?'Практика':'Архив'} / ${number}`,bank,bpm:90,bars:2,kind:'drums',retired:true});
 })));
-export const drumById=id=>DRUMS.find(d=>d.id===id);
+export const drumById=id=>DRUMS.find(d=>d.id===id)??retiredDrums.find(d=>d.id===id);
 export const loopSeconds=(bpm=90,bars=2)=>60/bpm*4*bars;

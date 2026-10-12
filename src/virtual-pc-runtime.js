@@ -1,4 +1,4 @@
-import {createVirtualPcState} from './virtual-pc-state.js?rev=35';
+import {createVirtualPcState} from './virtual-pc-state.js?rev=36';
 import {softwareDiskBytes} from './pc-software.js?rev=35';
 import {SOFTWARE} from './pc-software-catalog.js?rev=35';
 import {advanceTransfers,TRANSFER_RATES} from './pc-transfer-runtime.js?rev=35';

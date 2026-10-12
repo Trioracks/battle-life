@@ -9,16 +9,16 @@ test('primitive loops are original deterministic finite PCM on an exact bar boun
 });
 test('drum and musical layers start on one clock and stop together',async()=>{
  const ctx=context(),audio=new BeatAudio({contextFactory:()=>ctx,fetchFn:async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(8)})});
- assert.equal(await audio.play({drumId:'free-01',stage:3}),true);assert.equal(ctx.sources.length,3);
+ assert.equal(await audio.play({drumId:'primitive',stage:3}),true);assert.equal(ctx.sources.length,3);
  assert.ok(ctx.sources.every(s=>s.time===12.04&&s.loopEnd===loopSeconds()));audio.stop();assert.ok(ctx.sources.every(s=>s.stopped));
 });
 test('decode completing after stop cannot start audio',async()=>{
  const ctx=context();let resolve;const audio=new BeatAudio({contextFactory:()=>ctx,fetchFn:()=>new Promise(r=>resolve=r)});
- const pending=audio.play({drumId:'shop-01',stage:1});await Promise.resolve();audio.stop();resolve({ok:true,arrayBuffer:async()=>new ArrayBuffer(8)});
+ const pending=audio.play({drumId:'beginner-drums-01',stage:1});await Promise.resolve();audio.stop();resolve({ok:true,arrayBuffer:async()=>new ArrayBuffer(8)});
  assert.equal(await pending,false);assert.equal(ctx.sources.length,0);
 });
 test('unknown/missing files fail safely and disposal is final',async()=>{
  const ctx=context(),audio=new BeatAudio({contextFactory:()=>ctx,fetchFn:async()=>({ok:false})});
- assert.equal(await audio.play({drumId:'shop-01',stage:1}),false);assert.match(audio.error,/звук/i);
+ assert.equal(await audio.play({drumId:'beginner-drums-01',stage:1}),false);assert.match(audio.error,/звук/i);
  assert.equal(await audio.play({drumId:'../../evil',stage:1}),false);audio.dispose();assert.equal(await audio.play({drumId:'primitive',stage:1}),false);
 });

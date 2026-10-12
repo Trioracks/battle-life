@@ -6,7 +6,7 @@ const beat=(drumId='beginner-drums-01')=>({version:3,id:'one',name:'One',genre:'
 function context(){return {state:'running',currentTime:12,destination:{},sources:[],createGain(){return {gain:{value:0,setValueAtTime(){},linearRampToValueAtTime(){}},connect(){},disconnect(){}};},createBufferSource(){const s={connect(){},disconnect(){this.disconnected=true;},start(time,offset){Object.assign(this,{time,offset});},stop(time){this.stopped=true;this.stopTime=time;}};this.sources.push(s);return s;},decodeAudioData:async()=>({duration:32/3}),close(){}};}
 const make=(ctx,fetchFn=async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(8)}))=>new BeatAudio({contextFactory:()=>ctx,fetchFn});
 test('market preview has a distinct owner and project Play replaces it',async()=>{
- const ctx=context(),audio=make(ctx);await audio.play({drumId:'free-01',stage:1});
+ const ctx=context(),audio=make(ctx);await audio.play({drumId:'beginner-drums-01',stage:1});
  assert.equal(audio.getSnapshot().owner,'preview');const preview=ctx.sources[0];
  await audio.playProject(beat());assert.equal(audio.getSnapshot().owner,'studio');assert.equal(preview.stopped,true);audio.dispose();
 });
@@ -29,10 +29,10 @@ test('pause_resume_keeps_offset, stop_rewinds, repeated_play_is_idempotent and l
  audio.stop();assert.equal(audio.getSnapshot().positionSeconds,0);assert.ok(ctx.sources.every(s=>s.stopped));
  await audio.playProject(beat());assert.equal(ctx.sources.at(-1).offset,0);audio.dispose();
 });
-test('short MP3 drums loop twice inside a four-bar project and positions wrap',async()=>{
- const ctx=context(),audio=make(ctx);assert.equal(typeof audio.playProject,'function');await audio.playProject(beat('free-01'));
- assert.deepEqual(ctx.sources.map(s=>s.loopEnd),[16/3,32/3,32/3]);ctx.currentTime=12.04+32/3+7;audio.pause();await audio.playProject(beat('free-01'));
- assert.ok(Math.abs(ctx.sources[3].offset-(7-16/3))<1e-8);assert.ok(Math.abs(ctx.sources[4].offset-7)<1e-8);audio.dispose();
+test('authored four-bar sources stay aligned and playback positions wrap',async()=>{
+ const ctx=context(),audio=make(ctx);assert.equal(typeof audio.playProject,'function');await audio.playProject(beat('beginner-drums-01'));
+ assert.deepEqual(ctx.sources.map(s=>s.loopEnd),[32/3,32/3,32/3]);ctx.currentTime=12.04+32/3+7;audio.pause();await audio.playProject(beat('beginner-drums-01'));
+ assert.ok(Math.abs(ctx.sources[3].offset-7)<1e-8);assert.ok(Math.abs(ctx.sources[4].offset-7)<1e-8);audio.dispose();
 });
 test('stop or pause cancels late fetch and decode without stale errors',async()=>{
  for(const action of ['stop','pause']){

@@ -1,8 +1,8 @@
 import {VOCALS} from './vocal-catalog.js?rev=31';
 import {clampV,createVocalTake,normalizeRecording,recordingQuality,VOCAL_EQUIPMENT,effectiveSoundSkill} from './vocal-result.js?rev=35';
-import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=35';
-import {normalizeLyric} from './lyric-production.js?rev=35';
-import {BEAT_RULES as R} from './beat-catalog.js?rev=31';
+import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=36';
+import {normalizeLyric} from './lyric-production.js?rev=36';
+import {BEAT_RULES as R,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=36';
 export {recordingQuality};
 export const VOCAL_STAGES=Object.freeze({draft:{name:'Черновая запись',minutes:60,skill:'flow'},clean:{name:'Чистовая запись',minutes:60,skill:'flow'},mix:{name:'Сведение',minutes:45,skill:'sound'},master:{name:'Мастеринг',minutes:30,skill:'sound'}});
 export function canVocalStage(recording,kind){
@@ -27,6 +27,7 @@ const normalized=input=>{const projects=(input.projects??[]).map(p=>p.kind==='be
 export function startVocalWork(input,{beatId,textId,kind='draft',sliders}={},skills={},random=Math.random){
  const s=normalized(input),fail=reason=>({ok:false,reason,state:s}),beat=s.projects.find(p=>p.id===beatId&&p.kind==='beat');
  if(input.music?.job||input.writing?.job)return fail('Сначала заверши текущую работу.');
+ if(beat?.audioIssue==='retired-source')return fail(RETIRED_DRUM_MESSAGE);
  if(!beat||beat.status!=='ready'||beat.audioIssue)return fail('Сначала закончи бит.');
  const blocked=workBlockReason(s);if(blocked)return fail(blocked);
  if(s.recording.job){if(s.recording.job.beatId!==beatId||s.recording.job.kind!==kind)return fail('Сначала заверши текущую запись.');s.music.activeBeatId=beatId;return {ok:true,state:s};}
@@ -49,6 +50,8 @@ export function startVocalWork(input,{beatId,textId,kind='draft',sliders}={},ski
 export function advanceVocalWork(input,requested){
  const s=normalized(input),j=s.recording.job;
  if(!j||input.music?.job||input.writing?.job||!Number.isFinite(requested)||requested<=0)return {state:s,minutes:0,finished:false,blocked:false};
+ const beat=s.projects.find(p=>p.id===j.beatId);
+ if(beat?.audioIssue)return {state:s,minutes:0,finished:false,blocked:true,reason:beat.audioIssue==='retired-source'?RETIRED_DRUM_MESSAGE:'Не найден аудиобанк проекта. Работа сохранена.'};
  const needs=s.music.needs,minutes=Math.max(0,Math.min(requested,j.total-j.elapsed,(needs.satiety-R.minSatiety)/R.satietyPerMinute,(needs.energy-R.minEnergy)/R.energyPerMinute));
  j.elapsed+=minutes;needs.satiety=clampV(needs.satiety-minutes*R.satietyPerMinute);needs.energy=clampV(needs.energy-minutes*R.energyPerMinute);
  const finished=j.total-j.elapsed<1e-7,credit=(finished?1:j.elapsed/j.total)/3,gain=Math.max(0,credit-j.practiceCredit),key=VOCAL_STAGES[j.kind].skill;

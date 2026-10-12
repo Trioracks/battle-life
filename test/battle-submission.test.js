@@ -6,6 +6,14 @@ import {startVocalWork,advanceVocalWork} from '../src/vocal-production.js';
 import {BATTLE_BRIEFS} from '../src/virtual-pc-catalog.js';
 const api=await import('../src/battle-submission.js').catch(e=>{if(e.code==='ERR_MODULE_NOT_FOUND')return {};throw e;});
 const submit=(s,extra={})=>{assert.equal(typeof api.submitBattleTrack,'function');return api.submitBattleTrack(s,{battleId:'makarevich-1',projectId:'beat',gameDay:2,...extra});};
+
+test('a saved submission with a retired source retains its snapshot and explains the unavailable audio',()=>{
+ const s=submit(submissionFixture()).state;s.battleSubmissions[0].track.drumId='shop-01';
+ const original=structuredClone(s.battleSubmissions[0]),loaded=createVirtualPcState(s);
+ assert.match(loaded.battleSubmissions[0].issue,/источник.*недоступен/i);
+ assert.deepEqual(loaded.battleSubmissions[0].recoveryData,original);
+ assert.deepEqual(createVirtualPcState(loaded),loaded);
+});
 test('registered draft accepted while registration vocal and valid date are required',()=>{
  const s=submissionFixture(),r=submit(s);assert.equal(r.ok,true);assert.equal(r.state.battleSubmissions[0].status,'pending');
  assert.equal(r.state.battleSubmissions[0].topicMatch,true);

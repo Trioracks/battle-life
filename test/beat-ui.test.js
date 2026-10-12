@@ -11,7 +11,7 @@ test('FT creates a beat without tempo editing and retains inputs across host tic
  const s=setup();s.pc.open('ft-studio');s.launch();findButton(s.root,'Новый проект').click();
  const name=field(s.root,'Название бита');assert.ok(name);name.value='Город';fire(name,'input');name.focus();
  s.pc.syncHost({playerName:'Игрок',clockLabel:'10:01',skills:{beatmaking:40}});assert.equal(field(s.root,'Название бита'),name);assert.equal(name.value,'Город');
- findButton(s.root,'Начать проект').click();assert.equal(s.pc.state.projects[0].name,'Город');assert.match(s.pc.state.projects[0].drumId,/free/);
+ findButton(s.root,'Начать проект').click();assert.equal(s.pc.state.projects[0].name,'Город');assert.match(s.pc.state.projects[0].drumId,/^beginner-drums-/);
  assert.equal(allPc(s.root).filter(n=>n.type==='range').length,9);assert.equal(field(s.root,'BPM'),undefined);
  const groove=field(s.root,'Ровный грув');groove.value='9';fire(groove,'input');
  findButton(s.root,'Работать над битом').click();assert.equal(s.work(),1);assert.ok(s.pc.state.music.job);assert.equal(s.pc.state.music.job.sliders[0],9);
@@ -28,12 +28,27 @@ test('beginner decisions stay hidden below 25 and appear at 25',()=>{
   assert.equal(allPc(s.root).filter(n=>n.type==='range').length,skill<25?0:9);s.pc.dispose();
  }
 });
-test('local store buys a sample once and RIPLINE is installable',()=>{
+test('local store stays empty, preserves wallet and offers no retired sources in RIPLINE either',()=>{
  const s=setup();s.pc.open('underweb');s.pc.navigateUnderweb('underweb://samples');
- findButton(s.root,'Купить Архив / 01').click();assert.equal(s.pc.state.music.owned.length,1);assert.equal(s.pc.state.music.cash,4750);
+ assert.ok(allPc(s.root).some(n=>n.textContent==='Магазин пока пуст'));
+ assert.equal(allPc(s.root).some(n=>n.className==='beat-cover'),false);
+ assert.equal(allPc(s.root).some(n=>/^Купить ·|Получить через torent|▶ Слушать/.test(n.textContent)),false);
+ assert.equal(s.pc.state.music.owned.length,0);assert.equal(s.pc.state.music.cash,5000);
  s.pc.navigateUnderweb('underweb://ripline');findButton(s.root,'Установить RIPLINE').click();assert.equal(s.pc.state.music.ripline,true);
  s.pc.open('ripline');assert.ok(s.pc.windows.windows.some(w=>w.id==='ripline'));
  assert.ok(allPc(s.root).some(n=>n.textContent?.includes('Только внутриигровая')));
+ assert.ok(allPc(s.root).some(n=>n.textContent==='Нет доступных источников'));
+ assert.equal(allPc(s.root).some(n=>n.textContent==='Вырезать из ролика'),false);s.pc.dispose();
+});
+test('ready and unfinished retired projects display an unavailable source without enabling playback or recording',()=>{
+ for(const complete of [false,true]){
+  const s=setup();let state=createBeat(s.pc.state,{id:'old',name:'Архивный бит'},{beatmaking:40}).state;
+  state.projects[0].drumId='shop-01';state.projects[0].stages=Array.from({length:complete?3:1},()=>({sliders:[5,5,5],fit:50,quality:30}));
+  state=createVirtualPcState(state);s.pc.syncState(state);s.pc.openProject(state.projects[0]);s.launch();
+  assert.ok(allPc(s.root).some(n=>n.textContent?.includes('старый луп удалён из игры')));
+  assert.ok(allPc(s.root).some(n=>n.textContent==='Источник звука недоступен'));
+  assert.equal(allPc(s.root).some(n=>n.textContent==='Добавить вокал'),false);s.pc.dispose();
+ }
 });
 test('finished beat keeps base quality hidden and presents a subjective impression',()=>{
  const s=setup();let state=createBeat(s.pc.state,{id:'done',name:'Готовый'},{}).state;

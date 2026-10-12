@@ -1,10 +1,10 @@
-import {BEAT_RULES as R,BEAT_PRACTICE,BEAT_GENRES,DRUMS,drumById} from './beat-catalog.js?rev=31';
+import {BEAT_RULES as R,BEAT_PRACTICE,BEAT_GENRES,drumById,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=36';
 import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=31';
 import {softwareDiskBytes} from './pc-software.js?rev=35';
-import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=34';
-import {createBeatResult} from './beat-result.js?rev=34';
+import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=36';
+import {createBeatResult} from './beat-result.js?rev=36';
 import {normalizeRecording,effectiveSoundSkill} from './vocal-result.js?rev=35';
-import {genreById,normalizeGenreProgression,genreOptions,genreSnapshot,normalizeGenreSnapshot,addGenrePractice} from './genre-progression.js?rev=34';
+import {genreById,normalizeGenreProgression,genreOptions,genreSnapshot,normalizeGenreSnapshot,addGenrePractice} from './genre-progression.js?rev=36';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
 const clamp=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,finite(v)));
 const text=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';
@@ -25,6 +25,7 @@ export function normalizeBeat(p){
   if(!(drumById(beat.drumId)||beginnerById(beat.drumId)?.kind==='drums')||
    beat.audio.bankVersion!==1||beat.audio.bars!==4||beginnerById(beat.audio.themeId)?.kind!=='theme'||beginnerById(beat.audio.arrangementId)?.kind!=='arrangement')beat.audioIssue='invalid-bank';
  }
+ if(drumById(beat.drumId)?.retired)beat.audioIssue='retired-source';
  return beat;
 }
 export function normalizeMusic(value,projects=[]){
@@ -54,9 +55,10 @@ export function createBeat(input,options={},skills={},random=Math.random){
  if(!id||!name||s.projects.some(p=>p.id===id))return result(s,false,'Укажи название проекта.');
  if(!genreOptions(s.music.genres,effectiveBeatSkill(s,skills)).available.includes(genre))return result(s,false,'Жанровая специализация пока недоступна.');
  if(softwareDiskBytes(s).free<2000000)return result(s,false,'Недостаточно места для нового проекта.');
+ if(options.assetId&&drumById(options.assetId)?.retired)return result(s,false,RETIRED_DRUM_MESSAGE);
  if(options.assetId&&!s.music.owned.some(a=>a.id===options.assetId))return result(s,false,'Этот луп ещё не получен.');
- const skill=effectiveBeatSkill(s,skills),parts=chooseBeginnerParts(random),free=DRUMS.filter(d=>d.bank==='free');
- const drumId=options.assetId||(skill>=R.freeSkill?free[Math.floor(clamp(random(),0,.999999)*free.length)].id:parts.drumsId);
+ const skill=effectiveBeatSkill(s,skills),parts=chooseBeginnerParts(random);
+ const drumId=options.assetId||parts.drumsId;
  const beat=normalizeBeat({version:3,kind:'beat',id,name,genre,genreProfile:genreSnapshot(s.music.genres,genre),drumId,stages:[],mix:createBeatMix(id,{beatmaking:skill,sound:effectiveSoundSkill(s,skills)}),productionMode:skill<25?'beginner':'automatic',
   audio:{bankVersion:1,bars:4,themeId:parts.themeId,arrangementId:parts.arrangementId}});
  s.projects.push(beat);s.music.activeBeatId=id;return result(s);
@@ -67,7 +69,7 @@ export function startBeatStage(input,id,values,skills={},random=Math.random,plan
  if(input.writing?.job)return result(s,false,'Сначала закончи текущий текст.');
  if(blocked)return result(s,false,blocked);
  if(!beat||beat.status==='ready')return result(s,false,'Этот этап недоступен.');
- if(beat.audioIssue)return result(s,false,'Не найден аудиобанк проекта. Работа сохранена.');
+ if(beat.audioIssue)return result(s,false,beat.audioIssue==='retired-source'?RETIRED_DRUM_MESSAGE:'Не найден аудиобанк проекта. Работа сохранена.');
  if(s.music.job&&s.music.job.beatId!==id)return result(s,false,'Сначала закончи текущую работу.');
  if(!s.music.job){
   const v=plan?sliders(plan.sliders):values===undefined?Array.from({length:3},()=>Math.floor(clamp(random(),0,.999999)*11)):sliders(values);
@@ -88,7 +90,7 @@ export function advanceBeatWork(input,requested){
  const s=normalized(input),job=s.music.job;
  if(!job||!Number.isFinite(requested)||requested<=0)return {state:s,minutes:0,finished:false,blocked:false};
  const current=normalizeBeat(s.projects.find(p=>p.id===job.beatId));
- if(!current||current.audioIssue)return {state:s,minutes:0,finished:false,blocked:true,reason:'Не найден аудиобанк проекта. Работа сохранена.'};
+ if(!current||current.audioIssue)return {state:s,minutes:0,finished:false,blocked:true,reason:current?.audioIssue==='retired-source'?RETIRED_DRUM_MESSAGE:'Не найден аудиобанк проекта. Работа сохранена.'};
  const needs=s.music.needs,minutes=Math.max(0,Math.min(requested,job.total-job.elapsed,(needs.satiety-R.minSatiety)/R.satietyPerMinute,(needs.energy-R.minEnergy)/R.energyPerMinute));
  job.elapsed+=minutes;needs.satiety=clamp(needs.satiety-minutes*R.satietyPerMinute);needs.energy=clamp(needs.energy-minutes*R.energyPerMinute);
  const finished=job.total-job.elapsed<1e-7;
@@ -109,7 +111,7 @@ export function advanceBeatWork(input,requested){
 }
 export function acquireDrum(input,id,method,random=Math.random){
  const s=normalized(input),asset=drumById(id);
- if(asset?.bank!=='shop'||!['buy','torrent','rip'].includes(method))return result(s,false,'Источник недоступен.');
+ if(asset?.retired||asset?.bank!=='shop'||!['buy','torrent','rip'].includes(method))return result(s,false,'Источник недоступен.');
  if(s.music.owned.some(a=>a.id===id))return result(s,true,'Уже в библиотеке.');
  if(method==='rip'&&!s.music.ripline)return result(s,false,'Сначала установи RIPLINE.');
  if(method==='buy'&&s.music.cash<asset.price)return result(s,false,'Недостаточно игровых денег.');

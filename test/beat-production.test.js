@@ -33,17 +33,15 @@ test('general beat practice preserves writing, flow and sound progress through c
  assert.equal(s.music.practice,1/3);assert.equal(s.music.genrePractice.boombap,7);
  assert.equal(s.writing.practice,8.5);assert.deepEqual(s.recording.practice,{flow:4.5,sound:6.5});
 });
-test('catalog preserves fifteen original paths and 90 BPM; free unlock is 40',()=>{
- assert.equal(DRUMS.length,15);assert.ok(DRUMS.every(d=>d.bpm===90));
- assert.match(make(seed(),39).projects[0].drumId,/^beginner-drums-/);
- assert.match(make(seed(),40).projects[0].drumId,/^free-/);
+test('empty market never interrupts new authored-bank beats at any skill',()=>{
+ assert.equal(DRUMS.length,0);
+ for(const skill of [0,10,25,39,40,50,75,100])assert.match(make(seed(),skill).projects[0].drumId,/^beginner-drums-/);
  assert.equal(make().projects[0].bpm,90);
 });
-test('selected purchase stays audible at low skill and after bad sliders; duplicates do not charge',()=>{
- let r=acquireDrum(seed(),'shop-01','buy',()=>0);assert.equal(r.ok,true);assert.equal(r.state.music.cash,4750);
- const duplicate=acquireDrum(r.state,'shop-01','buy',()=>{throw Error('must not roll');});assert.equal(duplicate.state.music.cash,4750);
- let s=make(r.state,1,'shop-01');s=startBeatStage(s,'beat-1',[0,10,10],{beatmaking:1}).state;
- s=advanceBeatWork(s,600).state;assert.equal(s.projects[0].drumId,'shop-01');assert.equal(s.projects[0].stages.length,1);
+test('retired purchases do not charge cash or become new project sources',()=>{
+ const s=seed();s.music.owned=[{id:'shop-01',method:'buy'}];s.music.cash=4750;
+ const r=acquireDrum(s,'shop-01','buy',()=>{throw Error('must not roll');});assert.equal(r.ok,false);assert.deepEqual(r.state,s);
+ assert.equal(createBeat(s,{id:'new',name:'Новый',assetId:'shop-01'},{beatmaking:100}).ok,false);
 });
 test('partial job survives normalization, resumes without reset and rewards once',()=>{
  let s=startBeatStage(make(),'beat-1',[9,3,2],{beatmaking:10}).state;
@@ -114,10 +112,10 @@ test('needs stop work at threshold, charge only worked minutes and allow resume 
  assert.equal(startBeatStage(r.state,'beat-1',[5,5,5],{}).reason,'Хочу поесть. Сейчас не могу работать.');
  s=restoreMusicNeeds(r.state,'meal');assert.equal(startBeatStage(s,'beat-1',[5,5,5],{}).ok,true);
 });
-test('unofficial acquisition is local, requires RIPLINE for video and rolls infection once',()=>{
+test('legacy infection can still be cleaned although no unofficial sources remain',()=>{
  assert.equal(acquireDrum(seed(),'shop-01','rip',()=>0).ok,false);
- let s=installRipline(seed());s=acquireDrum(s,'shop-01','rip',()=>0).state;assert.equal(s.music.infected,true);
- s=cleanMusicVirus(s).state;assert.equal(s.music.infected,false);
+ let s=installRipline(seed());s.music.infected=true;
+ s=cleanMusicVirus(s).state;assert.equal(s.music.infected,false);assert.equal(s.music.cash,4900);
  s=acquireDrum(s,'shop-01','torrent',()=>{throw Error('duplicate roll');}).state;assert.equal(s.music.infected,false);
  assert.equal(acquireDrum(s,'https://evil.test/a.mp3','buy').ok,false);
  assert.equal(acquireDrum(s,'shop-02','unknown').ok,false);

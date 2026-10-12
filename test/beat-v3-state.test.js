@@ -5,12 +5,12 @@ import {createBeat,startBeatStage,advanceBeatWork,normalizeBeat} from '../src/be
 const seed=()=>createVirtualPcState({power:'on',download:{status:'installed'}});
 const make=(skill=25,random=()=>0)=>createBeat(seed(),{id:'a',name:'Первый'},{beatmaking:skill},random);
 
-test('v3_only_requires_name and skill_tier_is_pinned through the free-bank boundary',()=>{
- for(const skill of [0,24,25,26,39,40]){
+test('v3_only_requires_name and uses the authored bank at every skill tier',()=>{
+ for(const skill of [0,24,25,26,39,40,75,100]){
   const r=make(skill);assert.equal(r.ok,true);
   const beat=r.state.projects[0];assert.equal(beat.version,3);assert.equal(beat.bpm,90);
   assert.equal(beat.productionMode,skill<25?'beginner':'automatic');
-  assert.equal(beat.drumId,skill>=40?'free-01':'beginner-drums-17');
+  assert.equal(beat.drumId,'beginner-drums-17');
   assert.deepEqual(beat.audio,{bankVersion:1,bars:4,themeId:'beginner-theme-17',arrangementId:'beginner-arrangement-17'});
  }
 });

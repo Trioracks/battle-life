@@ -1,14 +1,14 @@
 import {pcElement as el,pcButton as button,pcFind,pcFocusable} from './virtual-pc-dom.js?rev=21';
 import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=35';
-import {BEAT_STAGES} from './beat-catalog.js?rev=31';
+import {BEAT_STAGES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=36';
 import {randomBeatName} from './beat-names.js?rev=28';
-import {resolveBeatPlayback} from './beat-playback.js?rev=35';
-import {describeBeatMix} from './beat-mix.js?rev=34';
-import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=35';
-import {startVocalWork} from './vocal-production.js?rev=35';
-import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=35';
-import {appendRecordingControls} from './recording-studio-view.js?rev=35';
-import {normalizeGenreProgression,genreOptions,genreById,genreCap,chooseGenre,chooseSpecialization} from './genre-progression.js?rev=34';
+import {resolveBeatPlayback} from './beat-playback.js?rev=36';
+import {describeBeatMix} from './beat-mix.js?rev=36';
+import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=36';
+import {startVocalWork} from './vocal-production.js?rev=36';
+import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=36';
+import {appendRecordingControls} from './recording-studio-view.js?rev=36';
+import {normalizeGenreProgression,genreOptions,genreById,genreCap,chooseGenre,chooseSpecialization} from './genre-progression.js?rev=36';
 
 export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio,legacyName,initialProject}){
  const d=root.ownerDocument,workspace=createStudioWorkspace(d,{projectName:legacyName});root.replaceChildren(workspace);
@@ -119,7 +119,9 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
    const stage=beat.stages.length,job=s.music.job?.beatId===beat.id?s.music.job:s.creativeWork?.items.find(i=>i.projectId===beat.id)?.pausedJob;
    workflow.append(el(d,'span',{className:'ft-workflow-stage',text:stage===3?'Бит готов · 3 / 3':'Этап '+(stage+1)+' / 3 · '+BEAT_STAGES[stage].name}));
    panel.append(el(d,'h2',{text:beat.name}));
-   if(stage===3)appendRecordingControls({document:d,beat,state:s,skills:getMetadata().skills,workflow,panel,onStart:startRecording,onPickText:values=>{vocalDecisions=values;openDialog('vocals');}});
+   if(beat.audioIssue)panel.append(el(d,'p',{className:'ft-warning',attributes:{role:'status'},text:beat.audioIssue==='retired-source'?RETIRED_DRUM_MESSAGE:'Не найден аудиобанк проекта. Работа сохранена.'}));
+   if(s.retiredSourceWork?.some(a=>a.job.beatId===beat.id))panel.append(el(d,'p',{className:'ft-production-note',text:'Незавершённая работа сохранена в архиве. Она не тратит время и не мешает создавать новые проекты.'}));
+   if(stage===3&&!beat.audioIssue)appendRecordingControls({document:d,beat,state:s,skills:getMetadata().skills,workflow,panel,onStart:startRecording,onPickText:values=>{vocalDecisions=values;openDialog('vocals');}});
    const sound=describeBeatMix(beat.mix),mixPanel=el(d,'section',{className:'ft-stage-result',dataset:{ftRole:'mix-character'}});
    mixPanel.append(el(d,'h3',{text:sound.label}),el(d,'p',{text:sound.detail}));
    if(sound.skill!==undefined)mixPanel.append(el(d,'small',{text:'Звук при создании: '+sound.skill+'/100 · сохранён с проектом'}));
@@ -133,7 +135,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
    if(stage<3){
     panel.append(el(d,'p',{className:'ft-production-note',text:['Начнём с пульса. Персонаж подбирает простой ритм и пробует связать ударные.','Теперь мелодия. Несколько нот, немного атмосферы — у бита появляется тема.','Собираем всё вместе: низ, переходы и небольшие детали.'][stage]}));
     if(job)panel.append(el(d,'p',{text:'Сохранено '+Math.floor(job.elapsed)+' из '+job.total+' мин. Можно продолжить.'}));
-    const blocked=beat.audioIssue?'Не найден аудиобанк проекта. Работа сохранена.':workBlockReason(s);
+    const blocked=beat.audioIssue?'':workBlockReason(s);
     if(blocked)panel.append(el(d,'p',{className:'ft-warning',text:blocked}));
     const plans=s.creativeWork?.items.find(i=>i.projectId===beat.id)?.plans,stageSliders=[];
     const readiness=creativeChainProgress(s,beat.id),progress=el(d,'progress',{attributes:{'aria-label':'Готовность бита'}});progress.max=1;progress.value=readiness.overall;
@@ -177,7 +179,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
   const position=snapshot.owner==='work'?0:snapshot.positionSeconds??0,beatPosition=position*90/60;
   readout.textContent=String(Math.floor(beatPosition/4)+1).padStart(2,'0')+' : '+String(Math.floor(beatPosition%4)+1).padStart(2,'0')+' : '+String(Math.floor((beatPosition%1)*1000)).padStart(3,'0');
   playhead.style.left=(position/(60/90*4*16)*100)+'%';
-  status.textContent=snapshot.error||({loading:'Загрузка звука…',playing:'Играет',paused:'Пауза',error:'Звук недоступен',stopped:available?'Готов к прослушиванию':'Нет готового слоя'}[snapshot.status]??'Готов');
+  status.textContent=(beat?.audioIssue?'Источник звука недоступен':snapshot.error)||({loading:'Загрузка звука…',playing:'Играет',paused:'Пауза',error:'Звук недоступен',stopped:available?'Готов к прослушиванию':'Нет готового слоя'}[snapshot.status]??'Готов');
   transport.dataset.status=snapshot.status;
  }
  controls.play.addEventListener('click',()=>{const beat=currentBeat();if(!beat)return;Promise.resolve(audio.playProject(beat)).then(()=>{if(!disposed)updateTransport();});updateTransport();});

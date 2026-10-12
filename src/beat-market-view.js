@@ -1,6 +1,6 @@
 import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=21';
-import {DRUMS,BEAT_RULES} from './beat-catalog.js?rev=31';
-import {acquireDrum,installRipline,cleanMusicVirus} from './beat-production.js?rev=35';
+import {DRUMS,BEAT_RULES} from './beat-catalog.js?rev=36';
+import {acquireDrum,installRipline,cleanMusicVirus} from './beat-production.js?rev=36';
 export function createBeatMarket(d,{getState,onChange,audio,navigate,ripline=false}){
  const root=el(d,'section',{className:'beat-market'+(ripline?' ripline':'')}),status=el(d,'p',{className:'beat-market-status',attributes:{role:'status'}});
  function render(){
@@ -9,6 +9,13 @@ export function createBeatMarket(d,{getState,onChange,audio,navigate,ripline=fal
   else root.append(button(d,'Открыть RIPLINE',{},()=>navigate('underweb://ripline')));
   if(s.music.infected)root.append(el(d,'p',{className:'beat-virus',text:'⚠ Подозрительное ПО. Работа персонажа за ПК замедлена на 35%.'}),button(d,`Очистить ПК · ${BEAT_RULES.cleanup} ₽`,{},()=>{const r=cleanMusicVirus(getState());onChange(r.state);status.textContent=r.reason;render();}));
   const grid=el(d,'div',{className:'beat-market-grid'});
+  if(!DRUMS.length){
+   const empty=el(d,'article',{className:'beat-market-card',dataset:{marketEmpty:'true'}});empty.append(
+    el(d,'h2',{text:ripline?'Нет доступных источников':'Магазин пока пуст'}),
+    el(d,'p',{text:'Новые авторские сэмплы и биты появятся позже. Сейчас здесь нечего покупать или скачивать.'})
+   );grid.append(empty);
+   root.append(grid);return;
+  }
   for(const a of DRUMS.filter(a=>a.bank==='shop')){
    const owned=s.music.owned.find(o=>o.id===a.id),card=el(d,'article',{className:'beat-market-card'});
    card.append(el(d,'div',{className:'beat-cover',text:a.id.slice(-2)}),el(d,'h2',{text:a.name}),el(d,'p',{text:'Барабанный луп · 90 BPM · не готовый бит'}),button(d,'▶ Слушать',{attributes:{'aria-label':'Слушать '+a.name}},async()=>{status.textContent='Загрузка звука…';const ok=await audio.play({drumId:a.id,stage:1});status.textContent=ok?'Играет: '+a.name:audio.error;}));

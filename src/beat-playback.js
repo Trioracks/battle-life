@@ -1,9 +1,9 @@
-import {drumById,loopSeconds} from './beat-catalog.js?rev=31';
+import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=36';
 import {beginnerById} from './beat-beginner-bank.js?rev=31';
-import {normalizeBeatMix} from './beat-mix.js?rev=34';
+import {normalizeBeatMix} from './beat-mix.js?rev=36';
 import {normalizeRecording,vocalPlaybackProfile} from './vocal-result.js?rev=35';
 import {createBeatSongForm,songPartWindows} from './beat-song-form.js?rev=32';
-import {normalizeGenreSnapshot} from './genre-progression.js?rev=34';
+import {normalizeGenreSnapshot} from './genre-progression.js?rev=36';
 
 // A project has one musical clock, even when a legacy drum loop is shorter.
 export function resolveBeatPlayback(beat,{workStage=null,recordingPreview=null}={}){
@@ -13,6 +13,7 @@ export function resolveBeatPlayback(beat,{workStage=null,recordingPreview=null}=
  const modern=beat.version===3;
  const ids=modern?[beat.drumId,beat.audio?.themeId,beat.audio?.arrangementId]:[beat.drumId,'melody','bass'];
  const validDrum=drumById(ids[0])||(!modern&&ids[0]==='primitive')||(modern&&beginnerById(ids[0])?.kind==='drums');
+ if(drumById(beat.drumId)?.retired)return fail(RETIRED_DRUM_MESSAGE);
  if(!validDrum||modern&&(beat.audioIssue||beat.audio?.bankVersion!==1||beat.audio?.bars!==4||beginnerById(ids[1])?.kind!=='theme'||beginnerById(ids[2])?.kind!=='arrangement'))return fail('Не найден аудиобанк проекта. Проект сохранён.');
  const chosen=workStage===null?ids.slice(0,Math.min(3,beat.stages.length)):[ids[workStage]];
  if(!chosen.length)return fail('Сначала завершите ритмическую основу.');

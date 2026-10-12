@@ -1,6 +1,6 @@
-import {BEAT_RULES} from './beat-catalog.js?rev=31';
-import {normalizeMusic,startBeatStage,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=35';
-import {normalizeWriting,startLyricWork,effectiveWritingSkill} from './lyric-production.js?rev=35';
+import {BEAT_RULES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=36';
+import {normalizeMusic,normalizeBeat,startBeatStage,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=36';
+import {normalizeWriting,startLyricWork,effectiveWritingSkill} from './lyric-production.js?rev=36';
 const owner=kind=>kind==='beat'?'music':'writing';
 const jobId=j=>j?.beatId??j?.projectId;
 const triple=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite)?v.map(x=>Math.max(0,Math.min(10,Math.round(x)))):null;
@@ -23,6 +23,7 @@ export function startCreativeChain(input,{kind,projectId,stageSliders,gameDay=1}
  const fail=reason=>({state:input,ok:false,reason});
  const p=input.projects?.find(p=>p.id===projectId&&p.kind===kind);
  if(!p||p.recoveryIssue||!['beat','lyrics'].includes(kind)||p.stages?.length>=3)return fail('Эта работа недоступна.');
+ if(kind==='beat'&&normalizeBeat(p)?.audioIssue==='retired-source')return fail(RETIRED_DRUM_MESSAGE);
  const active=input.music?.job??input.writing?.job;
  if(input.recording?.job||active&&(jobId(active)!==projectId||active.kind&&active.kind!=='stage'))return fail('Сначала приостанови текущую работу.');
  const blocked=workBlockReason(input);if(blocked)return fail(blocked);

@@ -1,7 +1,8 @@
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=35';
-import {normalizeBeat} from './beat-production.js?rev=35';
-import {normalizeLyric} from './lyric-production.js?rev=35';
-import {resolveBeatPlayback} from './beat-playback.js?rev=35';
+import {normalizeBeat} from './beat-production.js?rev=36';
+import {normalizeLyric} from './lyric-production.js?rev=36';
+import {resolveBeatPlayback} from './beat-playback.js?rev=36';
+import {RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=36';
 const clone=value=>JSON.parse(JSON.stringify(value));
 const day=value=>Number.isSafeInteger(value)&&value>0&&value<100000;
 const battle=id=>BATTLE_BRIEFS.some(b=>b.id===id);
@@ -26,7 +27,7 @@ export function normalizeBattleSubmissions(value){
    result.push({battleId:raw.battleId,roundId:'selection',issue:'Версия текста не совпадает с записью. Исходная сдача сохранена.',recoveryData:clone(raw)});continue;
   }
   if(raw?.version!==1||!battle(raw.battleId)||raw.roundId!=='selection'||!Number.isSafeInteger(raw.revision)||raw.revision<1||!day(raw.submittedDay)||raw.status!=='pending'||track?.status!=='ready'||!track.recording?.draft||track.id!==raw.projectId||!resolveBeatPlayback(track).ok||raw.lyrics&&!lyrics){
-   result.push({battleId:raw?.battleId??null,roundId:'selection',issue:'Сохранённую сдачу не удалось прочитать. Исходные данные сохранены.',recoveryData:clone(raw??{})});continue;
+   result.push({battleId:raw?.battleId??null,roundId:'selection',issue:track?.audioIssue==='retired-source'?RETIRED_DRUM_MESSAGE:'Сохранённую сдачу не удалось прочитать. Исходные данные сохранены.',recoveryData:clone(raw??{})});continue;
   }
   const key=raw.battleId+':selection';if(seen.has(key))continue;seen.add(key);
   result.push({version:1,battleId:raw.battleId,roundId:'selection',revision:raw.revision,submittedDay:raw.submittedDay,projectId:track.id,status:'pending',topicMatch:lyrics?lyrics.battleId===raw.battleId:null,track,lyrics});

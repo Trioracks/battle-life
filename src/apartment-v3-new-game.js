@@ -1,7 +1,7 @@
 import { createCreatorSession } from './apartment-v3-creator-session.js?rev=28';
 import { ApartmentTime } from './apartment-v3-time.js?rev=28';
-import { createVirtualPcState } from './virtual-pc-state.js?rev=35';
-import {prepareNoviceNewGame} from './home-profile-migration.js?rev=35';
+import { createVirtualPcState } from './virtual-pc-state.js?rev=36';
+import {prepareNoviceNewGame} from './home-profile-migration.js?rev=36';
 
 // Only the creator's validated submit reaches this boundary; cancel never resets a save.
 export function createNewGameSession(profile, storage, { enter, restore }) {

@@ -1,10 +1,10 @@
-import {drumById,loopSeconds} from './beat-catalog.js?rev=31';
+import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=36';
 import {beginnerById} from './beat-beginner-bank.js?rev=31';
-import {resolveBeatPlayback} from './beat-playback.js?rev=35';
-import {connectBeatMix} from './beat-mix.js?rev=34';
-import {transformBeatBuffer,connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=34';
+import {resolveBeatPlayback} from './beat-playback.js?rev=36';
+import {connectBeatMix} from './beat-mix.js?rev=36';
+import {transformBeatBuffer,connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=36';
 import {vocalById} from './vocal-catalog.js?rev=31';
-import {transformVocalBuffer} from './vocal-result-dsp.js?rev=35';
+import {transformVocalBuffer} from './vocal-result-dsp.js?rev=36';
 import {arrangeSongBuffer} from './beat-song-form.js?rev=32';
 
 // Authored placeholder PCM, not a remix of third-party music. Sliders never enter here.
@@ -39,6 +39,7 @@ export class BeatAudio{
  }
  current(token){return token===this.generation&&!this.disposed;}
  async buffer(id,token=this.generation){
+  if(drumById(id)?.retired)throw Error('retired source');
   if(this.cache.has(id))return this.cache.get(id);
   let buffer;
   if(['primitive','melody','bass'].includes(id)){
@@ -65,6 +66,7 @@ export class BeatAudio{
  }
  playDescriptor(descriptor){
   if(this.disposed)return Promise.resolve(false);
+  if(descriptor.parts.some(part=>drumById(part.id)?.retired)){this.stop();this.status='error';this.error=RETIRED_DRUM_MESSAGE;return Promise.resolve(false);}
   if(this.descriptor?.key===descriptor.key){
    if(this.status==='playing')return Promise.resolve(true);
    if(this.status==='loading')return this.pending;

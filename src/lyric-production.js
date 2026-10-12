@@ -1,7 +1,7 @@
 // Persisted, symbolic writing: no copyrighted lyrics or generated prose.
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=35';
-import {BEAT_RULES} from './beat-catalog.js?rev=31';
-import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=35';
+import {BEAT_RULES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=36';
+import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=36';
 import {softwareDiskBytes} from './pc-software.js?rev=35';
 import {homeDateLabel} from './home-calendar.js?rev=28';
 
@@ -54,6 +54,8 @@ export function startLyricWork(input,{projectId,kind='stage',sliders,beatId,game
  const s=normalized(input),p=normalizeLyric(s.projects.find(p=>p.id===projectId)),blocked=workBlockReason(s);
  if(blocked)return outcome(s,false,blocked);
  if(!p||!kinds.has(kind))return outcome(s,false,'Работа недоступна.');
+ const adaptationBeat=kind==='adapt'?normalizeBeat(s.projects.find(b=>b.id===(s.writing.job?.beatId??beatId))):null;
+ if(adaptationBeat?.audioIssue)return outcome(s,false,adaptationBeat.audioIssue==='retired-source'?RETIRED_DRUM_MESSAGE:'Бит для адаптации больше не доступен.');
  if(s.writing.job){if(s.writing.job.projectId!==projectId||s.writing.job.kind!==kind)return outcome(s,false,'Сначала закончи текущий текст.');s.writing.activeTextId=projectId;return outcome(s);}
  if(kind==='stage'?p.status!=='draft':p.status!=='ready')return outcome(s,false,'Сначала закончи три этапа текста.');
  if(kind!=='stage'&&kind!=='adapt'&&(p.battleId==='yard-cipher'||p.additions.length>=6))return outcome(s,false,'Этот формат не допускает новых частей.');
@@ -102,6 +104,8 @@ export function advanceLyricWork(input,requested,clock=null){
  const s=normalized(input),j=s.writing.job,empty={state:s,minutes:0,finished:false,blocked:false,practiceGained:0};
  if(!j||!Number.isFinite(requested)||requested<=0)return empty;
  const p=normalizeLyric(s.projects.find(p=>p.id===j.projectId)),needs=s.music.needs,R=BEAT_RULES;
+ const adaptationBeat=j.kind==='adapt'?normalizeBeat(s.projects.find(b=>b.id===j.beatId)):null;
+ if(adaptationBeat?.audioIssue)return {...empty,blocked:true,reason:adaptationBeat.audioIssue==='retired-source'?RETIRED_DRUM_MESSAGE:'Бит для адаптации больше не доступен.'};
  if(j.kind==='adapt'&&!s.projects.some(b=>normalizeBeat(b)?.id===j.beatId&&b.status==='ready'))return {...empty,blocked:true,reason:'Бит для адаптации больше не доступен.'};
  const minutes=Math.max(0,Math.min(requested,j.total-j.elapsed,(needs.satiety-R.minSatiety)/R.satietyPerMinute,(needs.energy-R.minEnergy)/R.energyPerMinute));
  j.elapsed+=minutes;needs.satiety=clamp(needs.satiety-minutes*R.satietyPerMinute);needs.energy=clamp(needs.energy-minutes*R.energyPerMinute);

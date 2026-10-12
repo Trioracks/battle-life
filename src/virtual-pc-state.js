@@ -1,8 +1,9 @@
-import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=35';
-import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=35';
-import {normalizeCreativeWork} from './creative-workflow.js?rev=35';
-import {normalizeBattleSubmissions} from './battle-submission.js?rev=35';
-import {normalizeRecordingState} from './vocal-production.js?rev=35';
+import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=36';
+import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=36';
+import {normalizeCreativeWork} from './creative-workflow.js?rev=36';
+import {normalizeBattleSubmissions} from './battle-submission.js?rev=36';
+import {normalizeRecordingState} from './vocal-production.js?rev=36';
+import {drumById} from './beat-catalog.js?rev=36';
 import {normalizeCommunity} from './underweb-community.js?rev=34';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=35';
 import {normalizeHousehold} from './home-food.js?rev=33';
@@ -71,6 +72,16 @@ function normalizeSnapshot(value) {
   const source = isRecord(value) ? value : {};
   const projects = Array.isArray(source.projects) ? source.projects.map(normalizeProject).filter(Boolean) : [];
   const music=normalizeMusic(source.music,projects),writing=normalizeWriting(source.writing,projects),recording=normalizeRecordingState(source.recording,projects);
+  // BL-001 archives are inert history, never candidates for automatic job resumption.
+  // Keep them even if the player later edits the text or deletes its old project.
+  const retiredSourceWork=(Array.isArray(source.retiredSourceWork)?source.retiredSourceWork:[])
+    .filter(a=>['music','writing','recording'].includes(a?.domain)&&drumById(a.sourceId)?.retired&&isRecord(a.job)).map(clone);
+  for(const [domain,state]of Object.entries({music,writing,recording})){
+    const job=state.job,beat=projects.find(p=>p.id===job?.beatId&&p.kind==='beat');
+    if(job&&beat?.audioIssue==='retired-source'&&(domain!=='writing'||job.kind==='adapt')){
+      retiredSourceWork.push({domain,sourceId:beat.drumId,job:clone(job)});state.job=null;
+    }
+  }
   // Damaged saves may contain several valid jobs. Recover one owner in stable
   // schema order; completed projects and already credited practice are retained.
   if(music.job){writing.job=null;recording.job=null;}else if(writing.job)recording.job=null;
@@ -84,6 +95,7 @@ function normalizeSnapshot(value) {
     download: normalizeDownload(source.download),
     projects,
     music,writing,recording,
+    ...(retiredSourceWork.length?{retiredSourceWork}:{}),
     creativeWork:normalizeCreativeWork(source.creativeWork,projects),
     community:normalizeCommunity(source.community),
     household:normalizeHousehold(source.household),

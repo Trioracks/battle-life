@@ -12,6 +12,28 @@ export function fixture(){
  s.music.needs={satiety:100,energy:100};return s;
 }
 const finish=(s,kind,extra={})=>{s.music.needs={satiety:100,energy:100};const r=v.startVocalWork(s,{beatId:'b',textId:'t',kind,...extra},{flow:10,sound:10},()=>.2);assert.equal(r.ok,true,r.reason);return v.advanceVocalWork(r.state,1000).state;};
+
+test('saved recording and post jobs on retired beats remain frozen without needs, minutes or XP costs',()=>{
+ for(const drumId of ['free-01','shop-10']){
+  let ready=fixture();
+  for(const kind of ['draft','clean','mix','master']){
+   const started=v.startVocalWork(ready,{beatId:'b',textId:'t',kind},{},()=>.2);assert.equal(started.ok,true,started.reason);
+   const old=structuredClone(started.state);old.projects[0].drumId=drumId;
+   const advanced=v.advanceVocalWork(old,1000);
+   assert.equal(advanced.minutes,0);assert.equal(advanced.blocked,true);assert.equal(advanced.finished,false);
+   assert.match(advanced.reason,/источник.*недоступен/i);
+   const saved=createVirtualPcState(JSON.parse(JSON.stringify(old)));
+   assert.equal(saved.recording.job,null);assert.equal(saved.retiredSourceWork[0].domain,'recording');
+   assert.deepEqual(saved.retiredSourceWork[0].job,old.recording.job);
+   assert.deepEqual(createVirtualPcState(JSON.parse(JSON.stringify(saved))),saved);
+   assert.equal(createBeat(saved,{id:'fresh',name:'Новый бит'}).ok,true);
+   assert.equal(createLyric(saved,{id:'fresh',name:'Новый текст'}).ok,true);
+   const resumed=v.startVocalWork(saved,{beatId:'b',textId:'t',kind});
+   assert.equal(resumed.ok,false);assert.match(resumed.reason,/источник.*недоступен/i);
+   ready=finish(ready,kind);
+  }
+ }
+});
 test('ready beat and ready text required; recording survives save and fixes one source',()=>{
  assert.equal(typeof v.startVocalWork,'function');let s=fixture();
  assert.equal(v.startVocalWork(s,{beatId:'b',kind:'draft',textId:'missing'}).ok,false);

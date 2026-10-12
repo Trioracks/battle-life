@@ -1,5 +1,5 @@
 import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=21';
-import {submissionCandidates,submitBattleTrack} from './battle-submission.js?rev=35';
+import {submissionCandidates,submitBattleTrack} from './battle-submission.js?rev=36';
 export function mountBattleSubmissionPicker(root,{getState,battleId,getGameDay=()=>1,onChange,onClose=()=>{}}){
  const d=root.ownerDocument,box=el(d,'section',{className:'battle-submit',attributes:{role:'dialog','aria-modal':'true','aria-label':'Отправить трек на баттл'}});
  const list=el(d,'div',{className:'battle-submit-files'}),details=el(d,'p'),status=el(d,'p',{attributes:{role:'status'}}),confirmation=el(d,'div',{className:'battle-submit-confirm'});

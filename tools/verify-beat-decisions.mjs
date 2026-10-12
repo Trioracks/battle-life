@@ -9,7 +9,6 @@ const output=process.env.FT_QA_DIR||'D:/Codex/Builds/Battle/beat-decisions-20261
 await mkdir(output,{recursive:true});await mkdir(scratch,{recursive:true});process.env.TEMP=scratch;process.env.TMP=scratch;
 process.env.PLAYWRIGHT_BROWSERS_PATH??='D:/Codex/Caches/ms-playwright';
 const sourcePaths=['drums','theme','arrangement'].map(kind=>new URL('../assets/audio/ft/beginner-v1/'+kind+'/04.wav',import.meta.url));
-sourcePaths.push(new URL('../stems/drums/shops/01.mp3',import.meta.url));
 const hashes=()=>Promise.all(sourcePaths.map(async path=>createHash('sha256').update(await readFile(path)).digest('hex')));
 const before=await hashes(),browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE||'D:/Codex/Caches/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-win64/chrome-headless-shell.exe',args:['--autoplay-policy=no-user-gesture-required']});
 const page=await browser.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
