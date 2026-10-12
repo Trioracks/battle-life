@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "source": "src/avatar-portrait-renderer.js + assets/apartment/v3/mannequin.glb; original game geometry, no real people",
+  "files": [
+    {
+      "file": "anya-avatar.jpg",
+      "width": 256,
+      "height": 256,
+      "bytes": 5477,
+      "sha256": "8ea93842c1a110251d3631ef8838374db5b3c0db58c3791cb40804e7e62d1673"
+    },
+    {
+      "file": "anya-01.jpg",
+      "width": 256,
+      "height": 256,
+      "bytes": 5064,
+      "sha256": "ff7c4f7609d8f3baa6ed564cd9b8258ded1eab7787155e691cdf1d858d77db6b"
+    },
+    {
+      "file": "anya-02.jpg",
+      "width": 256,
+      "height": 256,
+      "bytes": 5091,
+      "sha256": "535a3d52fbdab797b3762f5fa82840c7cd06de9f3b70c2c823fa56f63f1d8cd0"
+    },
+    {
+      "file": "vitya-avatar.jpg",
+      "width": 256,
+      "height": 256,
+      "bytes": 5521,
+      "sha256": "6df14ce6003978528c92cfa76ca9129a272a833234f455ade3ff02e57c552969"
+    },
+    {
+      "file": "vitya-01.jpg",
+      "width": 256,
+      "height": 256,
+      "bytes": 5280,
+      "sha256": "1d9344dfcfc17964b31013b79808334ddc26c0fac9ba50b2898a320863a2c1ad"
+    },
+    {
+      "file": "vitya-02.jpg",
+      "width": 256,
+      "height": 256,
+      "bytes": 5356,
+      "sha256": "2f969aea0178b443dcb675560204e1dc596046521b64cb3dbfca4f7bb03f7bc4"
+    },
+    {
+      "file": "dasha-avatar.jpg",
+      "width": 256,
+      "height": 256,
+      "bytes": 5805,
+      "sha256": "ef3dbf407b5120a88bf2658a67e0ea65457856bd1cdb6ecdb2af41e8ede54702"
+    },
+    {
+      "file": "dasha-01.jpg",
+      "width": 256,
+      "height": 256,
+      "bytes": 5463,
+      "sha256": "a3bf7109ed2f4cd0fd8b83352d5b201c304038691242dec92c4cee621ca940ee"
+    },
+    {
+      "file": "dasha-02.jpg",
+      "width": 256,
+      "height": 256,
+      "bytes": 5276,
+      "sha256": "6a772bfffc6bca8e9830d49eeb91e4ae53906e47f915454c982396583c5eed7e"
+    }
+  ]
+}

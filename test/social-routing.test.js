@@ -9,12 +9,12 @@ test('six section routes and strict nested routes resolve through the real brows
  for(const section of ['me','friends','photos','audio','messages','groups']){const r=resolveSocialRoute('underweb://social/'+section);assert.equal(r.section,section);assert.equal(resolveUnderweb(r.url).type,'social');}
  for(const path of ['profile/anya','community/makarevich-1','dialog/makarevich-1'])assert.equal(resolveSocialRoute('underweb://social/'+path).type,'social');
  for(const path of ['ads','profile/anya/secret','profile/','community/not-there'])assert.equal(resolveSocialRoute('underweb://social/'+path),null);
- assert.ok(resolveUnderweb('Рифмосеть').results.some(r=>r.url==='underweb://social/me'));
+ assert.ok(resolveUnderweb('В кругу').results.some(r=>r.url==='underweb://social/me'));
 });
 test('browser bookmark, battle community link and back/forward preserve social routes',()=>{
  const d=pcDocument(),root=d.createElement('div'),state=createVirtualPcState();
  const view=mountUnderweb(root,{getState:()=>state,getMetadata:()=>({gameDay:1}),onChange:()=>true,onApply:()=>{}});
- findButton(root,'Рифмосеть').click();assert.equal(view.snapshot.route.section,'me');
+ findButton(root,'В кругу').click();assert.equal(view.snapshot.route.section,'me');
  findButton(root,'Мои сообщества').click();assert.equal(view.snapshot.route.section,'groups');
  findButton(root,'Назад в Underweb').click();assert.equal(view.snapshot.route.section,'me');
  findButton(root,'Вперёд в Underweb').click();assert.equal(view.snapshot.route.section,'groups');

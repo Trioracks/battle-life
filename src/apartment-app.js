@@ -33,6 +33,7 @@ import {mountHomeWardrobeView} from './home-wardrobe-view.js?rev=38';
 import {mountPhoneHud} from './phone-hud.js?rev=38';
 import {nextSafeResultReaction,completeResultReaction} from './social-result-reaction.js?rev=38';
 import {captureDesktopReturn} from './desktop-return-state.js?rev=38';
+import {createPlayerPortraitController,portraitKey} from './social-portraits.js?rev=38';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 let audio=null,paused=false,skeleton=false,hold=false,stepVariation=0;
@@ -76,7 +77,7 @@ try{
   const wardrobeRoot=document.createElement('section');document.body.append(wardrobeRoot);
   const wardrobeView=mountHomeWardrobeView(wardrobeRoot,{
     returnFocus:canvas,onPreview:look=>view.setAppearance(look),
-    onApply:next=>{if(!migrationReady)return {ok:false,error:migration.error||'Автосохранение отключено до восстановления.'};const saved=saveProfile(storage,next);if(saved.ok)profile=saved.profile;return saved;},
+    onApply:next=>{if(!migrationReady)return {ok:false,error:migration.error||'Автосохранение отключено до восстановления.'};const saved=saveProfile(storage,next);if(saved.ok){profile=saved.profile;void requestPlayerPortrait();}return saved;},
     onClose:()=>{if(motion.actionId==='wardrobe'&&motion.phase==='perform')motion.leaveAction();last=performance.now();},
   });
   const homeModalOpen=()=>fridgeView.isOpen||wardrobeView.isOpen;
@@ -109,6 +110,9 @@ try{
     onResultViewed:()=>{failedReactionId=null;},
   });
   virtualPc.setPersistenceWarning(pcStorageWarning);
+  const portraitController=createPlayerPortraitController({getState:()=>pcState,getAppearance:()=>profile?.appearance,render:look=>view.capturePlayerPortrait(look),save:next=>{const saved=persistPc(next,{atomic:true});if(saved)virtualPc.syncState(pcState);return saved;}});
+  const requestPlayerPortrait=()=>portraitController.request();
+  const portraitMetadata=()=>({portraitKey:profile?portraitKey(profile.appearance):null,requestPlayerPortrait});
   const phoneRoot=document.createElement('aside');phoneRoot.hidden=true;document.body.append(phoneRoot);
   const phoneView=mountPhoneHud(phoneRoot,{
     getState:()=>pcState.phone,
@@ -130,7 +134,7 @@ try{
   function openComputer(){
     virtualPc.showDesktop(pcState);virtualPc.presentTransition(pcLifecycle.snapshot);
     setMode('pc');pcRoot.hidden=false;
-    virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,gameDay:homeTime.day,gameMinutes:gameMinuteStamp(homeTime),skills:profile?.skills});
+    virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,gameDay:homeTime.day,gameMinutes:gameMinuteStamp(homeTime),skills:profile?.skills,...portraitMetadata()});
     void pcLifecycle.seated();
   }
   pcRoot.addEventListener('click',event=>{const target=event.target.closest?.('button,[role="menuitem"]');if(target&&!target.disabled&&target.getAttribute('aria-disabled')!=='true'&&!pcLifecycle.snapshot.locked)void pcSounds.play('click');});
@@ -164,6 +168,7 @@ try{
     profile=nextProfile;motion=new ApartmentMotion(config);if(homeTime.initialRest||homeTime.isSleeping){motion.startSleeping();view.modes.onMotionEvent({id:'bed',type:'started'});}view.setAppearance(profile.appearance);
     playing=true;footsteps.reset();lastDoor=false;hold=false;skeleton=false;$('#hold').checked=false;$('#show-bones').checked=false;
     $('#player-name').textContent=profile.name;resumeAnimation();setMode('game');cue('sleep');
+    void requestPlayerPortrait();
   }
   function selectCreatorSection(section){
     creator.selectSection(section);const clothing=section==='clothing';
@@ -347,7 +352,7 @@ try{
     const reacting=mode==='pc'&&pcLifecycle.snapshot.phase==='reaction-speaking';
     speech.tick(paused?0:dt,{hidden:document.hidden,present:reacting||mode==='game'&&!cameraFade&&roomReady&&!homeModalOpen()&&(firstPerson||headAnchor.visible),roomReady:reacting||roomReady,audioAllowed:audio?.state==='running'});
     speechView.update(speech.snapshot,headAnchor,{firstPerson:reacting?false:firstPerson,width:innerWidth,height:innerHeight,bottomLimit:reacting?innerHeight-40:$('#controls').getBoundingClientRect().top-12});
-    virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,gameDay:homeTime.day,gameMinutes:gameMinuteStamp(homeTime),skills:profile?.skills});
+    virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,gameDay:homeTime.day,gameMinutes:gameMinuteStamp(homeTime),skills:profile?.skills,...portraitMetadata()});
     $('#home-time').textContent=`${homeTime.dateLabel} · ${homeTime.label} · ${homeTime.period} · Дом`;
     phoneRoot.hidden=!playing||!['game','pc'].includes(mode);phoneView.update();
     if(now-lastTimeSave>(homeTime.isSleeping?500:15000)){saveHomeTime(storage,homeTime);persistPc(pcState);lastTimeSave=now;}

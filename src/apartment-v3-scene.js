@@ -5,6 +5,7 @@ import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=38'
 import {headCameraPose} from './apartment-head-pose.js?rev=38';
 import {segmentIntersectsBox} from './pc-room-audio.js?rev=38';
 import {workCameraPose} from './work-camera.js?rev=38';
+import {renderAvatarPortrait} from './avatar-portrait-renderer.js?rev=38';
 import {homeLight} from './apartment-v3-time.js?rev=38';
 import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=38';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=38';
@@ -296,5 +297,6 @@ export async function createApartmentScene(canvas,config){
     point.y+=.24;point.project(modes.mode==='3D'?firstCamera:camera);
     return {x:rect.left+(point.x+1)*rect.width/2,y:rect.top+(1-point.y)*rect.height/2,visible:actor.visible&&!computerActive&&modes.mode!=='3D'};
   }
-  return {modes,loadMode,prepareComputerView,beginComputerView,getHeadCameraPose,getComputerAudioFrame,setWorkCamera,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,pick,setTime,setRoomLights,setAppearance,getHeadScreenPosition,clips:[...animation.actions.keys()],dispose(){disposed=true;switchStyle.dispose();computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,staticScene])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
+  const capturePlayerPortrait=appearance=>renderAvatarPortrait({appearance,sceneAssets:{model,environment:environment.scene,staticScene,config}});
+  return {modes,loadMode,prepareComputerView,beginComputerView,getHeadCameraPose,getComputerAudioFrame,setWorkCamera,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,capturePlayerPortrait,pick,setTime,setRoomLights,setAppearance,getHeadScreenPosition,clips:[...animation.actions.keys()],dispose(){disposed=true;switchStyle.dispose();computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,staticScene])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
 }

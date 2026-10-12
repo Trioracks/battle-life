@@ -1,4 +1,5 @@
 import {SOCIAL_COMMUNITIES,SOCIAL_PROFILES,profileById} from './social-catalog.js?rev=38';
+import {normalizePlayerPortrait} from './social-portraits.js?rev=38';
 const copy=value=>JSON.parse(JSON.stringify(value));
 const record=v=>v&&typeof v==='object'&&!Array.isArray(v);
 const ids=(v,allow=()=>true)=>[...new Set((Array.isArray(v)?v:[]).filter(id=>typeof id==='string'&&id.length>0&&id.length<180&&allow(id)))];
@@ -9,7 +10,7 @@ export function normalizeSocial(raw){
  const s=record(raw)?raw:{},accessibleProfiles=ids([...known,...ids(s.accessibleProfiles)],id=>people.has(id));
  return {schemaVersion:1,subscriptions:ids(s.subscriptions,id=>communities.has(id)),friends:ids(s.friends??known,id=>accessibleProfiles.includes(id)),
   accessibleProfiles,personalAudioIds:ids(s.personalAudioIds),dialogs:Object.fromEntries(Object.entries(record(s.dialogs)?s.dialogs:{}).filter(([id,v])=>communities.has(id)&&record(v)).map(([id,v])=>[id,copy(v)])),
-  posts:records(s.posts),reactions:records(s.reactions),audienceCount:Number.isFinite(s.audienceCount)?Math.max(0,Math.min(1e7,Math.floor(s.audienceCount))):12};
+  playerPortrait:normalizePlayerPortrait(s.playerPortrait),posts:records(s.posts),reactions:records(s.reactions),audienceCount:Number.isFinite(s.audienceCount)?Math.max(0,Math.min(1e7,Math.floor(s.audienceCount))):12};
 }
 export function listCommunities(state,{query=''}={}){
  const social=normalizeSocial(state.social),q=String(query).toLocaleLowerCase('ru').replaceAll('ё','е').trim();

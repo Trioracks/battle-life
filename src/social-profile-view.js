@@ -3,8 +3,8 @@ import {profileById} from './social-catalog.js?rev=38';
 import {normalizeSocial,profileAccess,addSocialFriend} from './social-state.js?rev=38';
 import {socialAvatar,socialButton,socialHeading,socialPhoto,socialPost} from './social-dom.js?rev=38';
 export function playerSocialProfile(state,metadata={}){
- const social=normalizeSocial(state.social);
- return {id:'me',name:metadata.playerName??'Игрок',avatar:{mark:'Я',color:'#648577'},description:'Своя комната. Первые записи. Всё ещё впереди.',birthday:null,education:'скрыто',languages:['ru'],friends:social.friends,photos:[{id:'room',title:'Дома',date:'2012-09-01',scene:2}],audio:social.personalAudioIds,wall:social.posts};
+ const social=normalizeSocial(state.social),portrait=social.playerPortrait&&(!metadata.portraitKey||social.playerPortrait.key===metadata.portraitKey)?social.playerPortrait:null;
+ return {id:'me',name:metadata.playerName??'Игрок',avatar:{mark:'Я',color:'#648577',src:portrait?.url},description:'Своя комната. Первые записи. Всё ещё впереди.',birthday:null,education:'скрыто',languages:['ru'],friends:social.friends,photos:portrait?[{id:'room',title:'Дома, за своим столом',date:'2012-09-01',src:portrait.url}]:[],audio:social.personalAudioIds,wall:social.posts};
 }
 const languages={ru:'Русский',en:'Английский',de:'Немецкий'};
 export function createSocialProfileView(d,{id='me',view='page',getState,getMetadata,navigate,commit,audio}){
@@ -17,6 +17,7 @@ export function createSocialProfileView(d,{id='me',view='page',getState,getMetad
  if(view==='friends'){root.append(socialHeading(d,'Друзья · '+p.name,p.friends.length));for(const friend of p.friends){const f=profileById(friend);if(!f)continue;const card=el(d,'article',{className:'sn-person'});card.append(socialAvatar(d,f.avatar,f.name),socialButton(d,f.name,()=>navigate('underweb://social/profile/'+f.id),{className:'sn-link'}));root.append(card);}return root;}
  if(view==='audio'){root.append(socialHeading(d,'Аудиозаписи · '+p.name,p.audio.length));for(const versionId of p.audio)root.append(audio.row(d,{version:state.trackVersions?.byId?.[versionId]}));if(!p.audio.length)root.append(el(d,'p',{className:'sn-empty',text:'Пока нет аудиозаписей. Прикрепи готовый трек в диалоге баттла — он появится здесь.'}));return root;}
  const aside=el(d,'aside',{className:'sn-profile-aside'});aside.append(socialAvatar(d,p.avatar,p.name,true));
+ if(id==='me'&&!p.avatar.src)aside.append(el(d,'p',{className:'sn-note',text:'Фото ещё не готово'}),socialButton(d,'Повторить снимок',()=>getMetadata().requestPlayerPortrait?.()));
  if(id!=='me')aside.append(socialButton(d,social.friends.includes(id)?'У вас в друзьях':'Добавить в друзья',()=>commit(addSocialFriend(getState(),id))));
  aside.append(socialButton(d,'Фотографии ('+p.photos.length+')',()=>navigate(url('photos'))),socialButton(d,'Друзья ('+p.friends.length+')',()=>navigate(url('friends'))));
  const main=el(d,'div',{className:'sn-profile-main'});main.append(socialHeading(d,p.name),el(d,'p',{className:'sn-profile-description',text:p.description}));

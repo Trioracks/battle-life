@@ -1,16 +1,19 @@
 import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=38';
+import {socialPhotoSource} from './social-portraits.js?rev=38';
 export const socialButton=(d,text,fn,extra={})=>pcButton(d,text,{className:'sn-button',...extra},fn);
 export function socialAvatar(d,avatar={},name='',large=false){
  const node=el(d,'div',{className:'sn-avatar'+(large?' sn-avatar-large':''),text:avatar.mark??'Р',attributes:{role:'img','aria-label':'Аватар: '+name}});
- node.style.setProperty('--avatar-color',avatar.color??'#617d94');return node;
+ node.style.setProperty('--avatar-color',avatar.color??'#617d94');const src=socialPhotoSource(avatar.src);
+ if(src){const img=el(d,'img',{attributes:{src,alt:'Аватар: '+name}});node.textContent='';node.append(img);img.addEventListener('error',()=>{node.replaceChildren();node.textContent=avatar.mark??'Фото';});}return node;
 }
 export function socialHeading(d,title,count){
  const h=el(d,'h2',{className:'sn-heading',text:title});if(count!==undefined)h.append(el(d,'span',{text:String(count)}));return h;
 }
 export function socialPhoto(d,photo){
- const fig=el(d,'figure',{className:'sn-photo'}),file=['courtyard','factory','room'][Math.abs(photo.scene??0)%3];
- const img=el(d,'img',{attributes:{src:'./assets/ui/virtual-pc/wallpaper-'+file+'.png',alt:photo.title,loading:'lazy'}});
- fig.append(img,el(d,'figcaption',{text:photo.title}),el(d,'small',{text:photo.date}));return fig;
+ const fig=el(d,'figure',{className:'sn-photo'}),src=socialPhotoSource(photo.src);
+ if(src){const img=el(d,'img',{attributes:{src,alt:photo.title,loading:'lazy'}});img.addEventListener('error',()=>{img.remove();fig.prepend?.(el(d,'span',{text:'Фото недоступно'}));});fig.append(img);}
+ else fig.append(el(d,'span',{className:'sn-photo-pending',text:'Фото ещё не готово'}));
+ fig.append(el(d,'figcaption',{text:photo.title}),el(d,'small',{text:photo.date}));return fig;
 }
 export function socialPost(d,post,{author='',navigate,profileById}={}){
  const article=el(d,'article',{className:'sn-post'});
