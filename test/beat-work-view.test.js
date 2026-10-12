@@ -2,6 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {pcDocument,allPc,findButton} from './helpers/virtual-pc-dom.js';
 const module=await import('../src/beat-work-view.js').catch(e=>{if(e.code==='ERR_MODULE_NOT_FOUND')return {};throw e;});
+
+test('chain panel separates overall progress from current stage',()=>{
+ const panel=module.createBeatWorkPanel(pcDocument());
+ panel.update({beat:{kind:'lyrics'},job:{stage:1,total:60,elapsed:30},chainProgress:{overall:.5,stage:.5,index:1,count:3}});
+ const role=key=>allPc(panel.element).find(n=>n.dataset.workRole===key);
+ assert.ok(role('overall'));assert.equal(role('overall').value,.5);assert.match(role('overall-label').textContent,/50%/);
+ assert.equal(role('progress').value,.5);assert.match(role('stage').textContent,/2 \/ 3/);
+});
 test('panel shows actual progress, needs, skill and reward only after completion',()=>{
  assert.equal(typeof module.createBeatWorkPanel,'function');let cancel=0,enable=0;
  const panel=module.createBeatWorkPanel(pcDocument(),{onCancel:()=>cancel++,onEnableAudio:()=>enable++});

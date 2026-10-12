@@ -2,16 +2,18 @@
 import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=21';
 import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill} from './lyric-production.js?rev=34';
 import {normalizeBeat} from './beat-production.js?rev=34';
+import {startCreativeChain,pauseCreativeChain} from './creative-workflow.js?rev=34';
 
 export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,onWork=()=>false}={}){
  const d=root.ownerDocument;let panel=null,modal=null,returnFocusLabel='',message='',signature='',disposed=false,controls=[];
  function openPanel(mode){returnFocusLabel=d.activeElement?.textContent??'';panel=mode;message='';render();}
  const active=()=>normalizeLyric(getState().projects.find(p=>p.id===getState().writing.activeTextId));
  const fingerprint=()=>JSON.stringify([getState().writing.activeTextId,getState().projects,getState().battleApplications,getState().writing.job?.kind,getState().writing.practice,getState().music.needs]);
- function choose(id){const s=getState();onChange({...s,writing:{...s.writing,activeTextId:id}});panel=null;message='';render();}
+ function choose(id){const s=pauseCreativeChain(getState());onChange({...s,writing:{...s.writing,activeTextId:id}});panel=null;message='';render();}
  function start(kind='stage',extra={}){
   const before=getState(),p=active();if(!p)return;
-  const r=startLyricWork(before,{projectId:p.id,kind,gameDay:getMetadata().gameDay,sliders:controls.length?controls.map(c=>Number(c.value)):undefined,...extra},getMetadata().skills);
+  const stageSliders=[];stageSliders[p.stages.length]=controls.length?controls.map(c=>Number(c.value)):undefined;
+  const r=kind==='stage'?startCreativeChain(before,{kind:'lyrics',projectId:p.id,stageSliders,gameDay:getMetadata().gameDay},getMetadata().skills):startLyricWork(before,{projectId:p.id,kind,gameDay:getMetadata().gameDay,...extra},getMetadata().skills);
   if(!r.ok){message=r.reason;render();return;}
   onChange(r.state);if(!onWork()){onChange(before);message='Сначала сядь за компьютер.';}else message='';panel=null;render();
  }
@@ -42,7 +44,7 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
   box.append(button(d,'Отмена',{},()=>{panel=null;render();}));return cover;
  }
  function render(){
-  if(disposed)return;const p=active(),s=getState(),skill=effectiveWritingSkill(s,getMetadata().skills),job=s.writing.job;
+  if(disposed)return;const p=active(),s=getState(),skill=effectiveWritingSkill(s,getMetadata().skills),job=s.writing.job??s.creativeWork?.items.find(i=>i.projectId===p?.id)?.pausedJob;
   const wrap=el(d,'section',{className:'rap-notebook',attributes:{'aria-label':'Рэпблокнот'}}),toolbar=el(d,'nav',{className:'rn-toolbar'});
   toolbar.append(button(d,'Новый текст',{},()=>openPanel('new')),button(d,'Открыть текст',{},()=>openPanel('open')));
   const add=button(d,'Добавить',{},()=>openPanel('add')),adapt=button(d,'Адаптировать под бит',{},()=>openPanel('adapt'));add.disabled=adapt.disabled=!p||p.status!=='ready'||Boolean(job);toolbar.append(add,adapt);

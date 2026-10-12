@@ -20,6 +20,7 @@ import {normalizeGenreProgression,genreById,genreCap} from './genre-progression.
 import {createBeatWorkAudio} from './beat-work-audio.js?rev=28';
 import {createLyricWorkAudio} from './lyric-work-audio.js?rev=28';
 import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.js?rev=34';
+import {pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=34';
 import {effectiveVocalSkill} from './vocal-production.js?rev=34';
 import {effectiveWritingSkill} from './lyric-production.js?rev=34';
 import {consumeFood} from './home-food.js?rev=33';
@@ -107,7 +108,7 @@ try{
     const textSound=lyricWorkAudio.sync({phase:writing?phase:'idle',hidden,job:writing?job:null});return writing?textSound:beatSound;
   };
   const workPanel=createBeatWorkPanel(document,{
-    onCancel:()=>{if(pcLifecycle.finishWork({blocked:true})){syncWorkAudio();saveHomeTime(storage,homeTime);persistPc(pcState);}},
+    onCancel:()=>{if(pcLifecycle.finishWork({blocked:true})){pcState=pauseCreativeChain(pcState);virtualPc.syncState(pcState);syncWorkAudio();saveHomeTime(storage,homeTime);persistPc(pcState);}},
     onEnableAudio:()=>pcState.writing.job?lyricWorkAudio.enableAudio():workAudio.enableAudio(),
   });
   const workHud=workPanel.element;workHud.hidden=true;document.body.append(workHud);let lastWorkSave=0;
@@ -252,8 +253,9 @@ try{
         const creative=creativeWorkDescriptor(pcState,profile?.skills);
         if(pcLifecycle.snapshot.phase==='working'&&creative.job){
           lastWorkJob={...creative.job};lastWorkBeat=creative.project;
-          const r=advanceCreativeWork(pcState,dt,homeTime);pcState=r.state;homeTime.advanceMinutes(r.minutes);pcState=advanceVirtualPc(pcState,homeTime).state;virtualPc.syncState(pcState);
-          if(r.finished){workReward=r.practiceGained;workFinished=true;lastWorkJob.elapsed=lastWorkJob.total;}
+          const r=advanceCreativeWork(pcState,dt,homeTime,profile?.skills);pcState=r.state;homeTime.advanceMinutes(r.minutes);pcState=advanceVirtualPc(pcState,homeTime).state;virtualPc.syncState(pcState);
+          if(creative.chainProgress)workReward+=r.practiceGained??0;
+          if(r.finished){if(!creative.chainProgress)workReward=r.practiceGained;workFinished=true;lastWorkJob.elapsed=lastWorkJob.total;}
           if(r.finished||r.blocked){pcLifecycle.finishWork({blocked:r.blocked});syncWorkAudio();if(r.blocked){message=r.reason||workBlockReason(pcState);messageUntil=now+10000;speech.say(workNeedSpeech(pcState),{afterRoom:true});}}
           if(r.finished||r.blocked||now-lastWorkSave>1000){saveHomeTime(storage,homeTime);persistPc(pcState);lastWorkSave=now;}
         }
@@ -290,7 +292,8 @@ try{
       const creative=creativeWorkDescriptor(pcState,profile?.skills),beat=lastWorkBeat??creative.project;
       const shownJob=creative.job??lastWorkJob;
       const genres=normalizeGenreProgression(pcState.music.genres),genreId=shownJob?.genreProfile?.id??beat?.genreProfile?.id??'experimental';
-      workPanel.update({beat,job:shownJob,needs:pcState.music.needs,skill:shownJob?.output?.draft?effectiveVocalSkill(pcState,profile?.skills,shownJob.kind):beat?.kind==='lyrics'?effectiveWritingSkill(pcState,profile?.skills):effectiveBeatSkill(pcState,profile?.skills),genreProgress:{name:genreById(genreId).name,xp:genres.xp[genreId],cap:genreCap(genres,genreId)},clockLabel:homeTime.label,reward:workReward,finished:workFinished,...workSound});
+      const chainProgress=pcState.creativeWork?.items.some(i=>i.projectId===beat?.id)&&!shownJob?.output&&!['diss','story','chorus','adapt'].includes(shownJob?.kind)?creativeChainProgress(pcState,beat?.id):null;
+      workPanel.update({beat,job:shownJob,chainProgress,needs:pcState.music.needs,skill:shownJob?.output?.draft?effectiveVocalSkill(pcState,profile?.skills,shownJob.kind):beat?.kind==='lyrics'?effectiveWritingSkill(pcState,profile?.skills):effectiveBeatSkill(pcState,profile?.skills),genreProgress:{name:genreById(genreId).name,xp:genres.xp[genreId],cap:genreCap(genres,genreId)},clockLabel:homeTime.label,reward:workFinished?workReward:0,finished:workFinished,...workSound});
     }
     virtualPc.presentTransition(pcLifecycle.snapshot);
     view.setComputerPresentation(pcLifecycle.snapshot,pcState,profile?.name??'Игрок');

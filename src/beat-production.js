@@ -94,7 +94,7 @@ export function advanceBeatWork(input,requested){
  const finished=job.total-job.elapsed<1e-7;
  if(minutes>0){
   const credit=(finished?1:job.elapsed/job.total)*PRACTICE_PER_STAGE,gain=Math.max(0,credit-job.practiceCredit);
-  s.music.practice=clamp(s.music.practice+gain);job.practiceCredit=credit;
+  s.music.practice=clamp(s.music.practice+gain,0,Math.max(s.music.practice,100-job.skill+s.music.practice-job.practiceCredit));job.practiceCredit=credit;
   s.music.genres=addGenrePractice(s.music.genres,job.genreProfile?.id??'experimental',Math.max(0,credit-job.genreCredit));job.genreCredit=credit;
  }
  const practiceGained=Math.min(job.practiceCredit,100-job.skill);

@@ -24,6 +24,7 @@ import {mountTorrent,mountInstaller,softwareMessage} from './pc-software-view.js
 import {SOFTWARE} from './pc-software-catalog.js?rev=34';
 import {mountRapNotebook} from './rap-notebook-view.js?rev=34';
 import {normalizeLyric} from './lyric-production.js?rev=34';
+import {pauseCreativeChain} from './creative-workflow.js?rev=34';
 
 const NOOP = () => {};
 
@@ -341,6 +342,7 @@ export function mountVirtualPc(root, callbacks = {}) {
 
 
   pc.openProject = project => {
+    if(pc.state.creativeWork?.activeId&&pc.state.creativeWork.activeId!==project.id)pc.persist(pauseCreativeChain(pc.state));
     const lyric=normalizeLyric(project);
     if(lyric){if(!pc.state.software.notebook.installed){pc.open('underweb');pc.navigateUnderweb('underweb://dump/notebook');return;}pc.persist({...pc.state,writing:{...pc.state.writing,activeTextId:lyric.id}});pc.open('rap-notebook');pc.notebookView?.openProject(lyric);return;}
     const beat=normalizeBeat(project),normalized = beat??normalizeStudioProject(project);
@@ -432,6 +434,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
   pc.closeWindow = (id=pc.windows.activeId) => {
     if(pc.locked||pc.confirmClose||!id)return;
+    if((id==='ft-studio'&&pc.state.music.job)||(id==='rap-notebook'&&pc.state.writing.job))pc.persist(pauseCreativeChain(pc.state));
     pc.closeNow(id);
   };
 
@@ -439,12 +442,13 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (pc.locked||pc.confirmClose||pc.shutdownModal) return;
     pc.cancelStudioLaunch();
     pc.menu?.close();
-    pc.persist();
+    pc.persist(pauseCreativeChain(pc.state));
     pc.audio.stop();pc.beatAudio.stop();pc.callbacks.onLeave();
   };
 
   pc.requestShutdown = () => {
     if (pc.locked||pc.confirmClose) return;
+    pc.persist(pauseCreativeChain(pc.state));
     pc.cancelStudioLaunch();
     pc.audio.stop();pc.beatAudio.stop();pc.callbacks.onShutdown();
   };

@@ -10,6 +10,8 @@ export function createBeatWorkPanel(document,{onCancel=()=>{},onEnableAudio=()=>
  const node=(role,tag,className)=>nodes[role]=el(document,tag,{className,dataset:{workRole:role}});
  const head=el(document,'div',{className:'beat-work-head'}),title=node('title','h2'),stage=node('stage','span','beat-work-stage'),time=node('time','span','beat-work-time');
  head.append(stage,time,title);
+ const overall=node('overall','progress');overall.max=1;overall.setAttribute('aria-label','Общая готовность');
+ const overallLabel=node('overall-label','span','beat-work-overall-label');
  const progress=node('progress','progress');progress.max=1;progress.setAttribute('aria-label','Работа над битом');
  const details=el(document,'div',{className:'beat-work-details'}),skill=node('skill','span'),reward=node('reward','strong','beat-work-reward');reward.hidden=true;
  details.append(reward,node('minutes','span'));
@@ -24,8 +26,10 @@ export function createBeatWorkPanel(document,{onCancel=()=>{},onEnableAudio=()=>
   row.append(el(document,'span',{text:label}),bar,node(key+'-value','span'));needs.append(row);
  }
  const foot=el(document,'div',{className:'beat-work-foot'}),audioStatus=node('audio','span','beat-work-audio'),enable=button(document,'Включить звук',{},onEnableAudio),cancel=button(document,'Прервать работу',{},onCancel);
- foot.append(audioStatus,enable,cancel);root.append(head,progress,details,training,needs,foot);
- return {element:root,update({beat,job,needs:values={},skill:level=0,genreProgress,clockLabel='',reward:earned=0,finished=false,audioError='',needsGesture=false}={}){
+ foot.append(audioStatus,enable,cancel);root.append(head,overallLabel,overall,progress,details,training,needs,foot);
+ return {element:root,update({beat,job,chainProgress,needs:values={},skill:level=0,genreProgress,clockLabel='',reward:earned=0,finished=false,audioError='',needsGesture=false}={}){
+  overall.hidden=overallLabel.hidden=!chainProgress;overall.value=chainProgress?.overall??0;
+  overallLabel.textContent='Общая готовность · '+Math.round(overall.value*100)+'% · '+((chainProgress?.index??0)+1)+' / 3';
   const writing=beat?.kind==='lyrics',stages=writing?LYRIC_STAGES:BEAT_STAGES,extra=writing&&job?.kind!=='stage'?({diss:'Диссовая часть',story:'Сюжетный куплет',chorus:'Припев',adapt:'Адаптация под бит'})[job?.kind]:null;
   const vocal=job?.output?.draft?VOCAL_STAGES[job.kind]:null;
   title.textContent=beat?.name??'Работа над битом';stage.textContent=vocal?.name??extra??('ЭТАП '+((job?.stage??0)+1)+' / 3 · '+(stages[job?.stage??0]?.name??'Работа'));

@@ -6,6 +6,7 @@ import {resolveBeatPlayback} from './beat-playback.js?rev=34';
 import {describeBeatMix} from './beat-mix.js?rev=34';
 import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=34';
 import {startVocalWork} from './vocal-production.js?rev=34';
+import {startCreativeChain,pauseCreativeChain} from './creative-workflow.js?rev=34';
 import {appendRecordingControls} from './recording-studio-view.js?rev=34';
 import {normalizeGenreProgression,genreOptions,genreById,genreCap,chooseGenre,chooseSpecialization} from './genre-progression.js?rev=34';
 
@@ -100,7 +101,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
  function selectProject(project){
   sessionSelected=true;
   closeDialog({restore:false});legacyName=project.kind==='beat'?undefined:project.name;message='';audio.stop();
-  const s=getState();change({...s,music:{...s.music,activeBeatId:project.kind==='beat'?project.id:null}});
+  const s=pauseCreativeChain(getState());change({...s,music:{...s.music,activeBeatId:project.kind==='beat'?project.id:null}});
   pcFocusable(actions)[0]?.focus();
  }
  function render(){
@@ -113,7 +114,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
   session.textContent=beat?.name??legacyName??'Сеанс без названия';tempo.textContent=beat?String(beat.bpm):'—';
   renderStudioTracks(workspace,beat);
   if(beat){
-   const stage=beat.stages.length,job=s.music.job?.beatId===beat.id?s.music.job:null;
+   const stage=beat.stages.length,job=s.music.job?.beatId===beat.id?s.music.job:s.creativeWork?.items.find(i=>i.projectId===beat.id)?.pausedJob;
    workflow.append(el(d,'span',{className:'ft-workflow-stage',text:stage===3?'Бит готов · 3 / 3':'Этап '+(stage+1)+' / 3 · '+BEAT_STAGES[stage].name}));
    panel.append(el(d,'h2',{text:beat.name}));
    if(stage===3)appendRecordingControls({document:d,beat,state:s,skills:getMetadata().skills,workflow,panel,onStart:startRecording,onPickText:values=>{vocalDecisions=values;openDialog('vocals');}});
@@ -142,7 +143,8 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
      });panel.append(fields);
     }
     const work=button(d,job?'Продолжить этап':'Работать над этапом',{className:'ft-primary'},()=>{
-     const r=startBeatStage(getState(),beat.id,decisions,getMetadata().skills);message=r.reason;
+     const stageSliders=[];stageSliders[stage]=decisions;
+     const r=startCreativeChain(getState(),{kind:'beat',projectId:beat.id,stageSliders,gameDay:getMetadata().gameDay},getMetadata().skills);message=r.reason;
      if(r.ok){
       // Resume AudioContext in the click gesture, before the cinematic transition.
       Promise.resolve(audio.unlock?.()).catch(()=>{});audio.stop();onChange(r.state);

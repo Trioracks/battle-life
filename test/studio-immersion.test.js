@@ -7,7 +7,18 @@ import {PcSounds} from '../src/virtual-pc-sounds.js';
 import {AudioContext} from './helpers/pc-audio.js';
 import {createBeat,startBeatStage} from '../src/beat-production.js';
 import {ApartmentAnimation} from '../src/apartment-v3-animation.js';
+import {creativeFixture} from './helpers/creative-fixtures.js';
+import {startCreativeChain} from '../src/creative-workflow.js';
+import {advanceCreativeWork} from '../src/home-creative-work.js';
 import {AnimationMixer,AnimationClip,QuaternionKeyframeTrack,Object3D,Bone} from '../vendor/three/three.module.js';
+
+test('leaving the computer transfers a partial chain to its project',()=>{
+ const f=creativeFixture('beat'),d=pcDocument(),root=d.createElement('section');
+ const s=advanceCreativeWork(startCreativeChain(f.state,{kind:'beat',projectId:f.projectId},f.skills).state,2,null,f.skills).state;
+ const job=structuredClone(s.music.job),pc=mountVirtualPc(root);
+ pc.showDesktop(s);pc.requestLeave();assert.equal(pc.state.music.job,null);
+ assert.deepEqual(pc.state.creativeWork.items[0].pausedJob,job);pc.dispose();
+});
 
 test('delayed FT launch fills desktop above taskbar, announces sound once and closes only the welcome card',()=>{
  const d=pcDocument(),root=d.createElement('section'),cues=[];let launch;

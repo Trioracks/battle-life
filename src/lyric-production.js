@@ -105,7 +105,7 @@ export function advanceLyricWork(input,requested,clock=null){
  const minutes=Math.max(0,Math.min(requested,j.total-j.elapsed,(needs.satiety-R.minSatiety)/R.satietyPerMinute,(needs.energy-R.minEnergy)/R.energyPerMinute));
  j.elapsed+=minutes;needs.satiety=clamp(needs.satiety-minutes*R.satietyPerMinute);needs.energy=clamp(needs.energy-minutes*R.energyPerMinute);
  const finished=j.total-j.elapsed<1e-7,credit=(finished?1:j.elapsed/j.total)/3;
- s.writing.practice=clamp(s.writing.practice+Math.max(0,credit-j.practiceCredit),0,Math.max(0,100-(j.skill-s.writing.practice)));j.practiceCredit=credit;
+ s.writing.practice=clamp(s.writing.practice+Math.max(0,credit-j.practiceCredit),0,Math.max(s.writing.practice,100-j.skill+s.writing.practice-j.practiceCredit));j.practiceCredit=credit;
  if(finished){
   if(j.kind==='stage'){
    const target=LYRIC_STAGES[j.stage].target,fit=1-j.sliders.reduce((sum,v,i)=>sum+Math.abs(v-target[i]),0)/30;
