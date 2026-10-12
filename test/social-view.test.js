@@ -10,6 +10,9 @@ function setup(path='me',options={}){
  const view=mountSocial(root,{route,getState:()=>state,getMetadata:()=>({gameDay:1,playerName:'Герой'}),onChange:next=>{if(options.fail)return false;state=next;return true;},navigate:url=>{navigated=url;},audio:options.audio});
  return {d,root,view,get state(){return state;},get navigated(){return navigated;}};
 }
+test('study button persists qualitative knowledge without leaking hidden coefficients',()=>{
+ const s=setup('community/makarevich-1');findButton(s.root,'Изучить площадку').click();assert.equal(s.state.battleKnowledge.byRound['makarevich-1:selection'].evidence.length,1);assert.ok(allPc(s.root).some(n=>n.textContent?.includes('Уверенность: Низкая')));assert.ok(!allPc(s.root).some(n=>/formatAdherence|strictnessOffset|maxPenalty/.test(n.textContent??'')));s.view.dispose();
+});
 test('six sections show personal profile and no free wall or message composers',()=>{
  const s=setup();assert.equal(allPc(s.root).filter(n=>n.dataset?.socialSection).length,6);
  for(const text of ['Герой','День рождения','Образование','Языки','скрыто'])assert.ok(allPc(s.root).some(n=>n.textContent===text),text);
