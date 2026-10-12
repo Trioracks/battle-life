@@ -2,7 +2,7 @@ import {pcElement as el} from './virtual-pc-dom.js?rev=39';
 import {communityById} from './social-catalog.js?rev=39';
 import {socialButton,socialAvatar,socialHeading} from './social-dom.js?rev=39';
 import {sendSubmission,dialogIsTyping,markDialogRead} from './social-submission.js?rev=39';
-import {attemptForWindow} from './battle-windows.js?rev=39';
+import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=39';
 import {gameDateTimeLabel} from './home-calendar.js?rev=39';
 import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=39';
 import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=39';
@@ -50,7 +50,7 @@ export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commi
  }
  const autoRead=visibleDialogReader({id,getState,isVisible,onRead});
  function update(markRead=true){
-  if(disposed)return;if(!isVisible()){flushProgress();keyboard.sync({phase:'idle'});}const state=getState(),dialog=state.social?.dialogs?.[id]??{},window=state.battleWindows?.find(w=>w.battleId===c.battleId&&!w.issue),attempt=window&&attemptForWindow(state,window),now=getMetadata().gameMinutes;
+  if(disposed)return;if(!isVisible()){flushProgress();keyboard.sync({phase:'idle'});}const state=getState(),dialog=state.social?.dialogs?.[id]??{},window=currentBattleWindow(state,c.battleId,getMetadata().gameMinutes),attempt=window&&attemptForWindow(state,window),now=getMetadata().gameMinutes;
   const signature=JSON.stringify(dialog.messages??[]);if(signature!==lastMessages){
    lastMessages=signature;history.replaceChildren();
    for(const msg of dialog.messages??[]){
@@ -66,7 +66,7 @@ export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commi
   const upload=uploadPresentation(state),ownUpload=upload&&(upload.status==='error'||upload.communityId===id),waiting=ownUpload&&upload.status!=='ready';
   uploadBox.hidden=!ownUpload;uploadBar.hidden=upload?.status==='error';uploadCancel.textContent=upload?.status==='ready'?'Сменить вложение':'Отменить загрузку';draft.hidden=Boolean(waiting);
   if(ownUpload){uploadBar.value=upload.percent;uploadLabel.textContent=upload.status==='error'?upload.reason:upload.status==='ready'?'Вложение загружено · '+(upload.totalBytes/1000000).toFixed(2)+' МБ':(upload.uploadedBytes/1000000).toFixed(2)+' / '+(upload.totalBytes/1000000).toFixed(2)+' МБ · '+upload.percent+'% · '+(upload.bytesPerSecond/1000)+' КБ/с · осталось '+upload.remainingSeconds+' сек.';}
-  attach.disabled=!registered||Boolean(attempt)||!deadline.open||Boolean(upload);send.disabled=!registered||Boolean(attempt)||!dialog.draftVersionId||!deadline.open||Boolean(waiting);
+  attach.disabled=!canSubmitToBattleWindow(state,window)||!registered||Boolean(attempt)||!deadline.open||Boolean(upload);send.disabled=!canSubmitToBattleWindow(state,window)||!registered||Boolean(attempt)||!dialog.draftVersionId||!deadline.open||Boolean(waiting);
   const composing=message(),elapsed=composing&&!composing.issue?Math.min(6,composing.elapsedSeconds+pendingSeconds):0;
   composerBox.hidden=!composing;uploadCancel.disabled=Boolean(composing);attach.disabled||=Boolean(composing);
   if(composing){composerText.textContent=composing.issue?'':Array.from(composing.body).slice(0,Math.floor(Array.from(composing.body).length*elapsed/6)).join('');composerStatus.textContent=composing.issue||composerError||(elapsed>=6?'Текст готов. Нажми «Повторить отправку».':'Набираем сообщение · '+Math.floor(elapsed/6*100)+'%');}

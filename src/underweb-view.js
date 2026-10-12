@@ -12,7 +12,7 @@ import {mountSocial} from './social-view.js?rev=39';
 import {activateSocial} from './social-runtime.js?rev=39';
 import {SOCIAL_IDENTITY} from './social-identity.js?rev=39';
 import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=39';
-import {ensureBattleWindow} from './battle-windows.js?rev=39';
+import {ensureBattleWindow,currentBattleWindow,attemptForWindow} from './battle-windows.js?rev=39';
 import {showRegistrationNotice} from './social-dom.js?rev=39';
 const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-control '+(options.className??'')},fn);
 
@@ -54,7 +54,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   main.append(socialEntry,createNewsPanel(d,{issue:newsForDay(getMetadata().gameDay),navigate}),directory);
   side.append(el(d,'h2',{text:'Мои баттлы'}));
   const registered=BATTLE_BRIEFS.filter(b=>isApplied(b.id));
-  for(const b of registered){const saved=getState().battleSubmissions?.find(s=>s.battleId===b.id);side.append(button(d,b.title,{},()=>navigate('underweb://battles/'+b.id)),el(d,'small',{text:saved?.issue?'Проверь сохранённую работу':saved?'Ожидает проверки':'Зарегистрирован · можно сдать трек'}));}
+  for(const b of registered){const saved=attemptForWindow(getState(),currentBattleWindow(getState(),b.id,metadataGameMinute(getMetadata()))??{});side.append(button(d,b.title,{},()=>navigate('underweb://battles/'+b.id)),el(d,'small',{text:saved?.issue?'Проверь сохранённую работу':saved?'Ожидает проверки':'Зарегистрирован · можно сдать трек'}));}
   if(!registered.length)side.append(el(d,'p',{text:'Пока нет заявок.'}),button(d,'Найти баттл',{},()=>navigate('underweb://battles')));
   columns.append(main,side);home.append(columns,el(d,'footer',{className:'uw-site-footer',text:'Искра · Поиск по игровым сайтам'}));return home;
  }
@@ -82,7 +82,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  }
  function detailPage(){
   const b=route.brief,site=el(d,'div',{className:'uw-battle-site uw-standalone '+b.color,attributes:{'aria-label':'Сайт баттла '+b.title}}),masthead=el(d,'header',{className:'uw-battle-masthead'});
-  const window=getState().battleWindows?.find(w=>w.battleId===b.id),deadline=battleDeadlineLabel(window,metadataGameMinute(getMetadata()));
+  const window=currentBattleWindow(getState(),b.id,metadataGameMinute(getMetadata())),deadline=battleDeadlineLabel(window,metadataGameMinute(getMetadata()));
   masthead.append(el(d,'strong',{text:b.title}),el(d,'span',{text:b.season}),el(d,'small',{text:homeDateLabel(communityDay(getMetadata().gameDay))}));site.append(masthead);
   const nav=el(d,'nav',{className:'uw-battle-tabs',attributes:{'aria-label':'Разделы сайта баттла'}});for(const [id,title]of [['home','Главная'],['rules','Правила'],['rounds','Раунды'],['players','Участники']])nav.append(button(d,title,{attributes:route.tab===id?{'aria-current':'page'}:{}},()=>navigate('underweb://battles/'+b.id+'/'+id)));nav.append(button(d,'Обсуждение на форуме',{},()=>navigate('underweb://forum/'+b.id)));site.append(nav);
   const back=button(d,'← Каталог баттлов',{className:'uw-breadcrumb'},()=>navigate('underweb://battles'));site.append(back);
@@ -104,7 +104,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   columns.append(rules,facts);site.append(columns);
   const action=el(d,'section',{className:'uw-application'});action.append(el(d,'p',{className:'uw-deadline',text:deadline.text}));
   if(isApplied(b.id)){
-   const saved=getState().battleSubmissions?.find(s=>s.battleId===b.id);
+   const saved=attemptForWindow(getState(),currentBattleWindow(getState(),b.id,metadataGameMinute(getMetadata()))??{});
    applicationFocus=el(d,'h2',{text:'Заявка подана',attributes:{tabindex:'-1'}});action.append(applicationFocus,el(d,'p',{text:'Ты зарегистрирован на '+b.title+'. Выбери трек из «Моих проектов».'}));
    if(saved){action.append(el(d,'strong',{text:saved.issue??(saved.status==='accepted'?'Работа принята':'Работа отправлена')}));if(!saved.issue)action.append(el(d,'p',{text:getState().trackVersions?.byId?.[saved.trackVersionId]?.name??saved.track?.name??'Сохранённая работа'}),el(d,'p',{text:saved.topicMatch===null?'Связь текста с темой не подтверждена.':saved.topicMatch?'Текст соответствует теме баттла.':'Отправлен трек для другой темы.'}));}
    action.append(button(d,'Открыть сообщения сообщества',{className:'uw-primary',dataset:{pcRole:'submit-track'}},()=>navigate('underweb://social/dialog/'+b.id)));

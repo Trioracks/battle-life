@@ -4,6 +4,7 @@ import {normalizeLyric} from './lyric-production.js?rev=39';
 import {resolveBeatPlayback} from './beat-playback.js?rev=39';
 import {RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=39';
 import {validGameMinute} from './game-minute.js?rev=39';
+import {BATTLE_ROUND_IDS} from './battle-roster.js?rev=39';
 const clone=value=>JSON.parse(JSON.stringify(value));
 const day=value=>Number.isSafeInteger(value)&&value>0&&value<100000;
 const battle=id=>BATTLE_BRIEFS.some(b=>b.id===id);
@@ -24,7 +25,7 @@ export function normalizeBattleSubmissions(value){
  for(const raw of Array.isArray(value)?value:[]){
   if(raw?.issue&&raw.recoveryData){result.push(clone(raw));continue;}
   if(raw?.version===2){
-   const valid=typeof raw.id==='string'&&typeof raw.windowId==='string'&&battle(raw.battleId)&&raw.communityId===raw.battleId&&raw.roundId==='selection'&&['pending','accepted','recovery'].includes(raw.status)&&validGameMinute(raw.ackAt)&&typeof raw.ackTemplateId==='string'&&(validGameMinute(raw.sentAt)||raw.sentAt===null&&raw.migration?.timePrecision==='day-only')&&(typeof raw.trackVersionId==='string'||raw.status==='recovery');
+   const valid=typeof raw.id==='string'&&typeof raw.windowId==='string'&&battle(raw.battleId)&&raw.communityId===raw.battleId&&BATTLE_ROUND_IDS.includes(raw.roundId)&&raw.windowId===raw.battleId+':'+raw.roundId+':1'&&['pending','accepted','recovery'].includes(raw.status)&&validGameMinute(raw.ackAt)&&typeof raw.ackTemplateId==='string'&&(validGameMinute(raw.sentAt)||raw.sentAt===null&&raw.migration?.timePrecision==='day-only')&&(typeof raw.trackVersionId==='string'||raw.status==='recovery');
    if(!valid){result.push({battleId:raw.battleId,roundId:'selection',issue:'Сохранённую отправку не удалось прочитать. Повторная попытка не открыта.',recoveryData:clone(raw)});continue;}
    if(seen.has(raw.windowId))continue;seen.add(raw.windowId);result.push(clone(raw));continue;
   }

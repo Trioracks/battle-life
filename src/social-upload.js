@@ -1,5 +1,5 @@
 import {communityById} from './social-catalog.js?rev=39';
-import {attemptForWindow} from './battle-windows.js?rev=39';
+import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow,isBattleWindowId} from './battle-windows.js?rev=39';
 import {validGameMinute} from './game-minute.js?rev=39';
 import {captureTrackVersion,TRACK_DSP_VERSION} from './track-version.js?rev=39';
 import {submissionCandidates} from './battle-submission.js?rev=39';
@@ -11,12 +11,13 @@ export function normalizeOutgoingUpload(raw,trackVersions){
  if(raw==null)return null;
  if(raw.issue&&Object.hasOwn(raw,'recoveryData'))return clone(raw);
  const version=trackVersions?.byId?.[raw.versionId],c=communityById(raw.communityId),bytes=fileBytes(version);
- const valid=raw.version===1&&c?.battleId&&raw.windowId===c.battleId+':selection:1'&&version?.recipe?.dspVersion===TRACK_DSP_VERSION&&bytes!==null&&raw.totalBytes===bytes&&Number.isSafeInteger(raw.uploadedBytes)&&raw.uploadedBytes>=0&&raw.uploadedBytes<=bytes&&Number.isFinite(raw.fractionalBytes)&&raw.fractionalBytes>=0&&raw.fractionalBytes<1&&((raw.status==='uploading'&&raw.uploadedBytes<bytes)||(raw.status==='ready'&&raw.uploadedBytes===bytes&&raw.fractionalBytes===0));
+ const valid=raw.version===1&&c?.battleId&&isBattleWindowId(raw.windowId,c.battleId)&&version?.recipe?.dspVersion===TRACK_DSP_VERSION&&bytes!==null&&raw.totalBytes===bytes&&Number.isSafeInteger(raw.uploadedBytes)&&raw.uploadedBytes>=0&&raw.uploadedBytes<=bytes&&Number.isFinite(raw.fractionalBytes)&&raw.fractionalBytes>=0&&raw.fractionalBytes<1&&((raw.status==='uploading'&&raw.uploadedBytes<bytes)||(raw.status==='ready'&&raw.uploadedBytes===bytes&&raw.fractionalBytes===0));
  return valid?clone(raw):{issue:'Загрузка повреждена или её сохранённая версия недоступна. Отмени передачу и выбери файл заново.',recoveryData:clone(raw)};
 }
 export function startSubmissionUpload(state,{communityId,projectId,nowMinute}={}){
- const fail=reason=>({ok:false,state,reason}),c=communityById(communityId),window=state.battleWindows?.find(w=>w.battleId===c?.battleId&&w.roundId==='selection'&&!w.issue);
+ const fail=reason=>({ok:false,state,reason}),c=communityById(communityId),window=currentBattleWindow(state,c?.battleId,nowMinute);
  if(state.outgoingUpload)return fail('Сначала заверши или отмени текущую исходящую загрузку.');
+ if(!canSubmitToBattleWindow(state,window))return fail('В этом раунде ты не участвуешь или приём закрыт.');
  if(state.outgoingMessage)return fail('Сначала заверши отправку текущего сообщения.');
  if(!c?.battleId||!window||!validGameMinute(nowMinute))return fail('Открой сообщество баттла и проверь сроки приёма.');
  if(attemptForWindow(state,window))return fail('Работа уже отправлена. Повторная сдача и замена недоступны.');

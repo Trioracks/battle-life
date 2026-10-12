@@ -1,6 +1,7 @@
 import {communityById} from './social-catalog.js?rev=39';
 import {TRACK_DSP_VERSION} from './track-version.js?rev=39';
 import {submissionSendContext} from './social-submission-validation.js?rev=39';
+import {isBattleWindowId} from './battle-windows.js?rev=39';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export const SUBMISSION_MESSAGE_SECONDS=6;
 export function submissionMessageBody(version){
@@ -20,7 +21,7 @@ export function submissionMessageBody(version){
 export function normalizeOutgoingMessage(raw,trackVersions){
  if(raw==null)return null;if(raw.issue&&Object.hasOwn(raw,'recoveryData'))return clone(raw);
  const v=trackVersions?.byId?.[raw.versionId],c=communityById(raw.communityId);
- const valid=raw.version===1&&c?.battleId&&raw.windowId===c.battleId+':selection:1'&&v?.recipe?.dspVersion===TRACK_DSP_VERSION&&raw.totalSeconds===SUBMISSION_MESSAGE_SECONDS&&Number.isFinite(raw.elapsedSeconds)&&raw.elapsedSeconds>=0&&raw.elapsedSeconds<=SUBMISSION_MESSAGE_SECONDS&&typeof raw.body==='string'&&raw.body.length<=524288&&raw.body===submissionMessageBody(v);
+ const valid=raw.version===1&&c?.battleId&&isBattleWindowId(raw.windowId,c.battleId)&&v?.recipe?.dspVersion===TRACK_DSP_VERSION&&raw.totalSeconds===SUBMISSION_MESSAGE_SECONDS&&Number.isFinite(raw.elapsedSeconds)&&raw.elapsedSeconds>=0&&raw.elapsedSeconds<=SUBMISSION_MESSAGE_SECONDS&&typeof raw.body==='string'&&raw.body.length<=524288&&raw.body===submissionMessageBody(v);
  return valid?clone(raw):{issue:'Набор сообщения повреждён. Отмени его и начни заново; вложение сохранено.',recoveryData:clone(raw)};
 }
 export function startSubmissionMessage(state,options={}){

@@ -15,6 +15,8 @@ import {normalizeJudging} from './judge-comments.js?rev=39';
 import {normalizeJudgingSchedule} from './social-judging-events.js?rev=39';
 import {normalizeResultReactions} from './social-result-reaction.js?rev=39';
 import {normalizeNpcTracks} from './battle-npc.js?rev=39';
+import {normalizeTournaments} from './battle-tournament.js?rev=39';
+import {normalizeBattleHistory} from './battle-history.js?rev=39';
 import {drumById} from './beat-catalog.js?rev=39';
 import {normalizeCommunity} from './underweb-community.js?rev=39';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=39';
@@ -128,7 +130,7 @@ function normalizeSnapshot(value) {
     resultReactions:normalizeResultReactions(source.resultReactions),
     household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),
-    battleSubmissions,trackVersions,npcTracks:normalizeNpcTracks(source.npcTracks),
+    battleSubmissions,trackVersions,npcTracks:normalizeNpcTracks(source.npcTracks),tournaments:normalizeTournaments(source.tournaments),battleHistory:normalizeBattleHistory(source.battleHistory),
     outgoingUpload:normalizeOutgoingUpload(source.outgoingUpload,trackVersions),
     outgoingUploadRecovery:Array.isArray(source.outgoingUploadRecovery)?source.outgoingUploadRecovery.map(clone):[],
     outgoingMessage:normalizeOutgoingMessage(source.outgoingMessage,trackVersions),

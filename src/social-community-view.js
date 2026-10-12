@@ -5,15 +5,16 @@ import {socialAvatar,socialButton,socialHeading,socialPost} from './social-dom.j
 import {revealBattleKnowledge,battleKnowledgeHints} from './battle-knowledge.js?rev=39';
 import {createSocialResultView} from './social-result-view.js?rev=39';
 import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=39';
+import {currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=39';
 export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),navigate,commit,audio,expandedResults=new Set(),onResultViewed,onRegistered=()=>{}}){
  const c=communityById(id),root=el(d,'section',{className:'sn-community'});if(!c)return root;
  const state=getState(),subscribed=normalizeSocial(state.social).subscriptions.includes(id),header=el(d,'header',{className:'sn-community-header'});
  const intro=el(d,'div');intro.append(socialHeading(d,c.name),el(d,'p',{text:c.description}));header.append(socialAvatar(d,c.avatar,c.name,true),intro);root.append(header);
  const actions=el(d,'div',{className:'sn-actions'});actions.append(socialButton(d,subscribed?'Вы подписаны':'Подписаться',()=>commit(subscribeCommunity(getState(),id,!subscribed))));
- if(c.battleId){const registered=state.battleApplications?.some(a=>a.battleId===c.battleId),window=state.battleWindows?.find(w=>w.battleId===c.battleId),deadline=battleDeadlineLabel(window,metadataGameMinute(getMetadata()));const register=socialButton(d,registered?'Сдать трек':'Зарегистрироваться',()=>{if(registered){navigate('underweb://social/dialog/'+id);return;}const result=registerBattle(getState(),{battleId:c.battleId,playerName:getMetadata().playerName,nowMinute:metadataGameMinute(getMetadata())});if(commit(result))onRegistered(c.battleId);});register.disabled=Boolean(window)&&!deadline.open;actions.append(register,socialButton(d,'Правила баттла',()=>navigate('underweb://battles/'+c.battleId+'/rules'),{className:'sn-link'}));}root.append(actions);
+ if(c.battleId){const registered=state.battleApplications?.some(a=>a.battleId===c.battleId),window=currentBattleWindow(state,c.battleId,metadataGameMinute(getMetadata())),deadline=battleDeadlineLabel(window,metadataGameMinute(getMetadata()));const register=socialButton(d,registered?'Сдать трек':'Зарегистрироваться',()=>{if(registered){navigate('underweb://social/dialog/'+id);return;}const result=registerBattle(getState(),{battleId:c.battleId,playerName:getMetadata().playerName,nowMinute:metadataGameMinute(getMetadata())});if(commit(result))onRegistered(c.battleId);});register.disabled=Boolean(window)&&(!deadline.open||registered&&!canSubmitToBattleWindow(state,window));actions.append(register,socialButton(d,'Правила баттла',()=>navigate('underweb://battles/'+c.battleId+'/rules'),{className:'sn-link'}));}root.append(actions);
  const columns=el(d,'div',{className:'sn-community-columns'}),wall=el(d,'main'),side=el(d,'aside');
  if(c.battleId){
-  const window=state.battleWindows?.find(w=>w.battleId===c.battleId);
+  const window=currentBattleWindow(state,c.battleId,metadataGameMinute(getMetadata()));
   root.append(el(d,'p',{className:'sn-note',text:battleDeadlineLabel(window,metadataGameMinute(getMetadata())).text}));
   const options={battleId:c.battleId,roundId:'selection'},known=battleKnowledgeHints(state.battleKnowledge,options);
   side.append(socialHeading(d,'О площадке'),el(d,'p',{text:'Уверенность: '+known.confidence}));
