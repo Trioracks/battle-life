@@ -4,6 +4,7 @@ import {normalizeCreativeWork} from './creative-workflow.js?rev=36';
 import {normalizeBattleSubmissions} from './battle-submission.js?rev=36';
 import {normalizeRecordingState} from './vocal-production.js?rev=36';
 import {normalizeTrackVersions,captureTrackVersion} from './track-version.js?rev=36';
+import {normalizeSocial} from './social-state.js?rev=36';
 import {drumById} from './beat-catalog.js?rev=36';
 import {normalizeCommunity} from './underweb-community.js?rev=34';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=35';
@@ -106,6 +107,7 @@ function normalizeSnapshot(value) {
     ...(retiredSourceWork.length?{retiredSourceWork}:{}),
     creativeWork:normalizeCreativeWork(source.creativeWork,projects),
     community:normalizeCommunity(source.community),
+    social:normalizeSocial(source.social),
     household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),
     battleSubmissions,trackVersions,
