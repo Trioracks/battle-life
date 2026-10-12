@@ -196,3 +196,7 @@ for v in obj.data.vertices:
 obj=bpy.data.objects.get('look-footwear-boots')
 for v in obj.data.vertices:
     if v.co.z>.14:v.co.z=.14+(v.co.z-.14)*2.4
+# High canvas shoes keep the characteristic light rubber sole and fabric cuff.
+obj=bpy.data.objects.get('look-footwear-highcanvas')
+for slot in obj.material_slots:
+    if slot.material in [sole,trim]:slot.material=white_trim

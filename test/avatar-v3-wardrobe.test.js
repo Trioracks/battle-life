@@ -4,7 +4,7 @@ import {Group,Mesh,MeshStandardMaterial,Ray,Vector3,Triangle} from '../vendor/th
 import {normalizeAppearance,applyAppearance,createProfile,saveProfile,loadProfile} from '../src/avatar-v3-profile.js?rev=28';
 import {readGlb} from './helpers/glb-pose.js';
 test('new wardrobe choices and independent colors survive normalization; old shaggy retains bowl silhouette',()=>{
-  for(const [key,ids] of Object.entries({hair:['bald','lake','buzz','crop','parted','bowl','messy','longshag'],beard:['none','stubble','short','full','goatee','chinstrap'],mustache:['none','pencil','classic','walrus','handlebar','horseshoe'],top:['tee','shirt','hoodie','sweater','tank','turtleneck'],bottom:['jeans','skinny','breeches','shorts','sports'],footwear:['sneakers','canvas','boots','sandals','flipflops']}))for(const id of ids)assert.equal(normalizeAppearance({[key]:id})[key],id);
+  for(const [key,ids] of Object.entries({hair:['bald','lake','buzz','crop','parted','bowl','messy','longshag'],beard:['none','stubble','short','full','goatee','chinstrap'],mustache:['none','pencil','classic','walrus','handlebar','horseshoe'],top:['tee','shirt','hoodie','sweater','tank','turtleneck'],bottom:['jeans','skinny','breeches','shorts','sports'],footwear:['sneakers','canvas','boots','highcanvas','ankleboots']}))for(const id of ids)assert.equal(normalizeAppearance({[key]:id})[key],id);
   assert.equal(normalizeAppearance({hair:'shaggy'}).hair,'bowl');
   assert.deepEqual(['topColor','bottomColor','footwearColor'].map(k=>normalizeAppearance({[k]:'red'})[k]),['red','red','red']);
 });

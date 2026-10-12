@@ -237,9 +237,9 @@ test('pants rise follows the front and rear hips without a downward crotch wedge
 
 test('shoe outsoles have a broad flat contact patch rather than ellipsoid tips',()=>{
   const {g,values}=model();
-  for(const look of ['sneakers','boots','flipflops','sandals']){
+  for(const look of ['sneakers','boots','ankleboots','highcanvas']){
     const node=g.nodes.find(n=>n.name==='look-footwear-'+look);
-    const sole=g.meshes[node.mesh].primitives.filter(p=>g.materials[p.material].name==='rubber-soles').flatMap(p=>values(p.attributes.POSITION));
+    const sole=g.meshes[node.mesh].primitives.filter(p=>/rubber-soles|fixed-white/.test(g.materials[p.material].name)).flatMap(p=>values(p.attributes.POSITION));
     for(const side of [-1,1]){
       const bottom=sole.filter(v=>v[0]*side>0&&v[1]<.007);
       assert.ok(bottom.length>6,'sole needs an actual polygonal contact surface');
@@ -252,7 +252,7 @@ test('shoe outsoles have a broad flat contact patch rather than ellipsoid tips',
 // Catches a missing export, rigid props, duplicate skeletons, or flat face cards.
 test('every selectable look exports three-dimensional geometry on the shared skeleton',()=>{
   const {g,values}=model();
-  const choices={hair:['crop','parted','bowl','lake','buzz','messy','longshag'],face:['oval','square','long'],beard:['stubble','short','full','goatee','chinstrap'],mustache:['pencil','classic','walrus','handlebar','horseshoe'],top:['tee','shirt','hoodie','sweater','tank','turtleneck'],bottom:['jeans','skinny','breeches','shorts','sports'],footwear:['sneakers','canvas','boots','flipflops','sandals']};
+  const choices={hair:['crop','parted','bowl','lake','buzz','messy','longshag'],face:['oval','square','long'],beard:['stubble','short','full','goatee','chinstrap'],mustache:['pencil','classic','walrus','handlebar','horseshoe'],top:['tee','shirt','hoodie','sweater','tank','turtleneck'],bottom:['jeans','skinny','breeches','shorts','sports'],footwear:['sneakers','canvas','boots','ankleboots','highcanvas']};
   const joints=g.skins[0].joints;
   for(const [category,options] of Object.entries(choices))for(const option of options){
     const prefix=`look-${category}-${option}`;

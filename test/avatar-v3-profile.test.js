@@ -99,7 +99,7 @@ test('every catalog option survives normalization and has a readable Russian UI 
   }), {
     topColor:'blue',bottomColor:'blue',footwearColor:'grey',
     hair: 'parted', face: 'square', beard: 'stubble', mustache: 'classic',
-    top: 'shirt', bottom: 'breeches', footwear: 'flipflops',
+    top: 'shirt', bottom: 'breeches', footwear: 'ankleboots',
   });
   assert.deepEqual(normalizeAppearance({
     hair: 'shaggy', face: 'long', beard: 'full', top: 'hoodie', bottom: 'sports', footwear: 'boots',

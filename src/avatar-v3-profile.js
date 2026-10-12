@@ -1,5 +1,6 @@
 import { STAT_KEYS, validateAllocations } from './creator.js?rev=38';
 import {createWardrobe,validWardrobe,canWear} from './home-wardrobe.js?rev=38';
+import {closedFootwearId,migrateClosedFootwear,reserveFootwearBackup} from './avatar-footwear-migration.js?rev=38';
 
 export { STAT_KEYS, statLabels as STAT_LABELS } from './creator.js?rev=38';
 
@@ -19,7 +20,7 @@ export const APPEARANCE_OPTIONS = Object.freeze({
   mustache: category('Усы', [['none', 'Без усов'],['pencil','Карандаш'], ['classic', 'Шеврон'],['walrus','Морж'],['handlebar','Закрученные'],['horseshoe','Подкова']]),
   top: category('Верх', [['tee', 'Футболка'], ['shirt', 'Рубашка'], ['hoodie', 'Худи'], ['sweater', 'Свитер'],['tank','Майка'],['turtleneck','Водолазка']]),
   bottom: category('Низ', [['jeans', 'Широкие джинсы'],['skinny','Узкие джинсы'], ['breeches', 'Бриджи'], ['shorts', 'Шорты'], ['sports', 'Спортивные штаны']]),
-  footwear: category('Обувь', [['sneakers', 'Кроссовки'],['canvas','Кеды'], ['boots', 'Сапоги'], ['flipflops', 'Шлёпанцы'], ['sandals', 'Сандалии']]),
+  footwear: category('Обувь', [['sneakers', 'Кроссовки'],['canvas','Кеды'], ['boots', 'Сапоги'], ['ankleboots', 'Ботинки'], ['highcanvas', 'Высокие кеды']]),
   topColor:category('Цвет верха',colorOptions),bottomColor:category('Цвет низа',colorOptions),footwearColor:category('Цвет обуви',colorOptions),
 });
 
@@ -37,6 +38,7 @@ function isRecord(value) {
 
 export function normalizeAppearance(input) {
   const appearance = isRecord(input) ? {...input} : {};
+  appearance.footwear=closedFootwearId(appearance.footwear);
   if(appearance.hair==='shaggy')appearance.hair='bowl';
   if(appearance.mustache==='chevron')appearance.mustache='classic';
   if(appearance.beard==='broad')appearance.beard='full';
@@ -117,7 +119,11 @@ export function loadProfile(storage) {
   try {
     if (typeof storage?.getItem !== 'function') throw new Error('Хранилище сохранений недоступно.');
     const saved = storage.getItem(SAVE_KEY);
-    return { ok: true, profile: saved === null ? null : validateProfile(JSON.parse(saved)) };
+    if(saved===null)return {ok:true,profile:null};
+    const migration=migrateClosedFootwear(JSON.parse(saved));
+    const profile=validateProfile(migration.profile);
+    if(migration.changed){reserveFootwearBackup(storage,saved);storage.setItem(SAVE_KEY,JSON.stringify(profile));}
+    return {ok:true,profile};
   } catch (error) {
     return { ok: false, error: error?.message || 'Не удалось загрузить героя.', profile: null };
   }

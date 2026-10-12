@@ -123,7 +123,8 @@ for side,s in [('L',1),('R',-1)]:
     # moving fabric cannot reveal redundant hip triangles through the waist.
     # A 2 cm overlap above the shortest hem keeps the bare lower legs seamless.
     rings('skin-leg-'+side,[((s*.112,0,.66),.062,.061,{thigh:1}),((s*.112,0,.62),.058,.057,{thigh:1}),((s*.112,0,.525),.048,.046,{thigh:.8,shin:.2}),((s*.112,0,.488),.046,.046,{thigh:.2,shin:.8}),((s*.112,.005,.39),.058,.058,{shin:1}),((s*.112,0,.20),.036,.037,{shin:1}),((s*.112,0,.095),.030,.034,{shin:1})],skin)
-    ellipsoid('skin-foot-'+side,(s*.112,-.064,.063),(.050,.128,.042),skin,'foot.'+side)
+    # Every selectable shoe is closed. Do not export a hidden bare foot that
+    # could poke through the upper during skinned ankle poses.
 finish_group('neutral-skinned-body',0)
 
 # A single selectable head includes its features, so face changes never stack.
@@ -432,21 +433,18 @@ def shoe_upper(name,x,foot,material):
     faces.extend([tuple(reversed(range(8))),tuple(40+j for j in range(8))])
     surface(name,vertices,faces,material,[{foot:1}]*len(vertices))
 
-for kind in ['sneakers','boots','flipflops','sandals']:
+for kind in ['sneakers','boots','ankleboots','highcanvas']:
     start=len(meshes);prefix='look-footwear-'+kind
     for side,s in [('L',1),('R',-1)]:
         foot='foot.'+side;shin='shin.'+side;x=s*.112
         shoe_sole(prefix+'-sole-'+side,x,foot)
-        if kind in ['sneakers','boots']:
-            material=shoe if kind=='sneakers' else leather
-            shoe_upper(prefix+'-upper-'+side,x,foot,material)
-            rings(prefix+'-ankle-'+side,[((x,.009,.082),.049,.058,{foot:1}),((x,.006,.137 if kind=='sneakers' else .224),.045,.051,{'shin.'+side:1})],material,cap=False)
-            for y,z in [(-.094,.112),(-.063,.121),(-.032,.126)]:capsule(prefix+'-lace-'+side,(x-.032,y,z),(x+.032,y,z),(.003,.003),trim,foot)
-        elif kind=='flipflops':
-            for sign in [-1,1]:capsule(prefix+'-thong-'+side,(x,-.143,.077),(x+sign*.047,-.051,.080),(.008,.010),leather,foot)
-        else:
-            for y in [-.126,-.042]:capsule(prefix+'-strap-'+side,(x-.05,y,.078),(x+.05,y,.078),(.015,.010),leather,foot)
-            capsule(prefix+'-heel-'+side,(x-.042,.039,.076),(x+.042,.039,.076),(.011,.013),leather,foot)
+        material=shoe if kind in ['sneakers','highcanvas'] else leather
+        shoe_upper(prefix+'-upper-'+side,x,foot,material)
+        height={'sneakers':.137,'boots':.224,'ankleboots':.185,'highcanvas':.245}[kind]
+        rings(prefix+'-ankle-'+side,[((x,.009,.082),.049,.058,{foot:1}),((x,.006,height),.041 if kind=='highcanvas' else .045,.048 if kind=='highcanvas' else .051,{shin:1})],material,cap=False)
+        for y,z in [(-.094,.112),(-.063,.121),(-.032,.126)]:capsule(prefix+'-lace-'+side,(x-.032,y,z),(x+.032,y,z),(.003,.003),trim,foot)
+        if kind=='highcanvas':
+            for z in [.157,.184,.211]:capsule(prefix+'-high-lace-'+side,(x-.026,-.045,z),(x+.026,-.045,z),(.002,.002),trim,shin)
     finish_group(prefix,start)
 
 exec(compile(open(os.path.join(ROOT,'tools','avatar-wardrobe-v3.py'),encoding='utf-8').read(),'avatar-wardrobe-v3.py','exec'))
@@ -620,7 +618,7 @@ bpy.ops.wm.save_as_mainfile(filepath=os.path.join(SOURCE_OUT,'mannequin-v3.blend
 with open(os.path.join(OUT,'rig.json'),'w') as f:json.dump({
  'height':1.85,'forward':'local +Z in glTF',
  'wardrobe':'All look-{category}-{value} meshes bind to the same 19-bone armature. Show exactly one value per category; none hides the category.',
- 'looks':{'hair':['bald','lake','buzz','crop','parted','bowl','messy','longshag'],'face':['oval','square','long'],'beard':['none','stubble','short','full','goatee','chinstrap'],'mustache':['none','pencil','classic','walrus','handlebar','horseshoe'],'top':['tee','shirt','hoodie','sweater','tank','turtleneck'],'bottom':['jeans','skinny','breeches','shorts','sports'],'footwear':['sneakers','canvas','boots','flipflops','sandals']},
+ 'looks':{'hair':['bald','lake','buzz','crop','parted','bowl','messy','longshag'],'face':['oval','square','long'],'beard':['none','stubble','short','full','goatee','chinstrap'],'mustache':['none','pencil','classic','walrus','handlebar','horseshoe'],'top':['tee','shirt','hoodie','sweater','tank','turtleneck'],'bottom':['jeans','skinny','breeches','shorts','sports'],'footwear':['sneakers','canvas','boots','ankleboots','highcanvas']},
  'walk':{'strideDistance':WALK_STRIDE,'duration':1.0,'stanceFraction':.6,'swingClearance':.045,'soleProfile':SOLE_PROFILE,'pelvisHeightRange':[min(s['pelvis']['head'][2] for s in walk_samples),max(s['pelvis']['head'][2] for s in walk_samples)],'heelStrikeDegrees':-12,'toeOffDegrees':24},
  'clips':clips},f,indent=2)
 with open(os.path.join(OUT,'walk-audit.json'),'w') as f:json.dump(walk_samples,f)
