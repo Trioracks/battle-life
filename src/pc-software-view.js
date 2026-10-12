@@ -1,10 +1,11 @@
 import {PC_IDENTITY} from './pc-identity.js?rev=35';
+import {createPcIcon} from './virtual-pc-icons.js?rev=28';
 import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=21';
 const button=pcButton;
 import {SOFTWARE} from './pc-software-catalog.js?rev=34';
 import {softwareDiskBytes} from './pc-software.js?rev=34';
 import {downloadPresentation} from './virtual-pc-runtime.js?rev=34';
-export const softwareMessage=reason=>({'client-required':'Сначала скачай и установи torent из темы клиента.','metadata-required':'Сначала скачай файл .torrent нужной программы.','insufficient-space':'Недостаточно места на C:. Загрузка сохранена; освободи место или отмени задачу.','invalid-path':'Укажи папку на игровом C: без .. и специальных символов.','transfer-active':'Сначала заверши или отмени текущую загрузку.','archive-required':'Сначала дождись полной загрузки установщика.','already-installed':'Программа уже установлена.','installer-active':'Сначала закрой текущий мастер установки.','pc-off':'Включи игровой компьютер.'}[reason]??reason??'');
+export const softwareMessage=reason=>({'select-transfer':'Выбери загрузку.','recording-in-progress':'Сначала заверши текущую запись вокала, сведение или мастеринг.','work-in-progress':'Сначала заверши текущую доработку.','downloads-in-progress':'Сначала заверши или отмени загрузки в torent.','client-required':'Сначала скачай и установи torent из темы клиента.','metadata-required':'Сначала скачай файл .torrent нужной программы.','insufficient-space':'Недостаточно места на C:. Загрузка сохранена; освободи место или отмени задачу.','invalid-path':'Укажи папку на игровом C: без .. и специальных символов.','transfer-active':'Сначала заверши или отмени текущую загрузку.','archive-required':'Сначала дождись полной загрузки установщика.','already-installed':'Программа уже установлена.','installer-active':'Сначала закрой текущий мастер установки.','pc-off':'Включи игровой компьютер.'}[reason]??reason??'');
 export function softwareForum(d,{topic,state,navigate,onAction,message=''}){
  const button=(doc,text,options={},handler)=>pcButton(doc,text,{...options,className:'uw-control '+(options.className??'')},handler);
  const site=el(d,'section',{className:'uw-dump'}),head=el(d,'header',{className:'dump-header'});
@@ -47,7 +48,8 @@ export function mountTorrent(root,{getState,onAction,getMessage=()=>''}){
  const d=root.ownerDocument,wrap=el(d,'section',{className:'pc-torrent-client'}),toolbar=el(d,'div',{className:'torrent-toolbar'}),body=el(d,'div',{className:'torrent-body'}),side=el(d,'aside',{className:'torrent-sidebar'}),main=el(d,'div',{className:'torrent-main'});
  let selected=null;const rows=new Map();
  const pause=button(d,'Ⅱ Пауза',{},()=>onAction('pause',selected)),resume=button(d,'▶ Продолжить',{},()=>onAction('resume',selected)),cancel=button(d,'× Отменить',{},()=>onAction('cancel',selected));
- toolbar.append(button(d,'+ Открыть .torrent',{},()=>onAction('browse-metadata')),pause,resume,cancel);
+ const install=button(d,'Установить',{},()=>onAction(getState().software[selected]?.installed?'uninstall':'installer',selected));
+ toolbar.append(button(d,'+ Открыть .torrent',{},()=>onAction('browse-metadata')),pause,resume,cancel,install);
  side.append(el(d,'strong',{text:'torent'}),el(d,'p',{text:'Все задачи'}),el(d,'p',{text:'Загружаются'}),el(d,'p',{text:'Завершены'}));
  const table=el(d,'div',{className:'torrent-table',attributes:{'aria-label':'Задачи загрузки'}}),head=el(d,'div',{className:'torrent-table-head',text:'Имя                 Размер       Прогресс       Сиды / Пиры'}),row=el(d,'div',{className:'torrent-row'}),details=el(d,'div',{className:'torrent-details'}),progress=el(d,'progress',{attributes:{max:'100','aria-label':'Прогресс загрузки'}}),controls=el(d,'div',{className:'torrent-actions'});
  const message=el(d,'p',{attributes:{role:'status'}});
@@ -58,17 +60,17 @@ export function mountTorrent(root,{getState,onAction,getMessage=()=>''}){
   for(const [id,b]of rows)if(!ids.includes(id)){b.remove();rows.delete(id);}
   if(!ids.length)row.textContent='Нет задач. Открой файл .torrent из Загрузок.';
   for(const id of ids){
-   if(!rows.has(id)){if(!rows.size)row.textContent='';const b=button(d,'',{attributes:{'aria-label':'Выбрать загрузку '+SOFTWARE[id].name}},()=>{selected=id;update();});rows.set(id,b);row.append(b);}
+   if(!rows.has(id)){if(!rows.size)row.textContent='';const b=button(d,'',{attributes:{'aria-label':'Выбрать загрузку '+SOFTWARE[id].name}},()=>{selected=id;update();});b.addEventListener('dblclick',()=>{selected=id;const app=getState().software[id];if(!app.installed&&app.receivedBytes===SOFTWARE[id].downloadBytes)onAction('installer',id);});rows.set(id,b);row.append(b);}
    const b=rows.get(id),p=downloadPresentation(s,id);
    b.textContent=SOFTWARE[id].archive+'     '+p.totalMb+' МБ     '+p.percent+'%     '+p.seeds+' / '+p.peers;
    b.setAttribute('aria-pressed',String(selected===id));
   }
   const t=s.software.transfers[selected],p=downloadPresentation(s,selected??'ft'),app=SOFTWARE[selected];
   message.textContent=getMessage();pause.disabled=!t||t.paused;resume.disabled=!t||(!t.paused&&!t.error);cancel.disabled=!t;
+  install.textContent=s.software[selected]?.installed?'Удалить':'Установить';install.disabled=!selected||(!s.software[selected].installed&&s.software[selected].receivedBytes!==app.downloadBytes);install.hidden=!selected;
   progress.hidden=!selected;progress.value=selected?p.percent:0;progress.setAttribute('aria-label','Прогресс загрузки '+(app?.name??''));
   details.textContent=selected?p.receivedMb.toFixed(1)+' / '+p.totalMb+' МБ · '+p.speedKbPerSecond+' КБ/с · сиды '+p.seeds+' · пиры '+p.peers+' · осталось '+(p.remainingGameMinutes??'—')+' игровых мин.'+(p.paused?' · Пауза':'')+(p.error?' · '+softwareMessage(p.error):''):'Список загрузок пуст.';
-  const key=JSON.stringify(ids.map(id=>[id,s.software[id].receivedBytes===SOFTWARE[id].downloadBytes,s.software[id].installed]));
-  if(key!==signature){signature=key;controls.replaceChildren();for(const id of ids){const item=s.software[id],definition=SOFTWARE[id];if(item.receivedBytes===definition.downloadBytes&&!item.installed)controls.append(button(d,'Открыть установщик '+definition.name,{},()=>onAction('installer',id)));if(item.installed)controls.append(el(d,'p',{text:definition.name+' установлена. Ярлык появился на рабочем столе.'}));}}
+  controls.textContent=selected&&s.software[selected].installed?app.name+' установлена. Проекты и установщик сохранятся при удалении.':'Выбери файл и нажми «Установить» или открой его двойным щелчком.';
  }
  update();return {update,dispose(){root.replaceChildren();}};
 }
@@ -84,7 +86,7 @@ export function mountInstaller(root,{getState,onAction,getMessage=()=>''}){
  function update(){const state=getState(),w=state.software.installer;if(!w)return;const key=JSON.stringify([w.appId,w.step,w.path]);if(key===signature){updateProgress(state,w);return;}signature=key;progress=null;status=null;
   let restoreFocus=root.contains(d.activeElement);for(let node=root;restoreFocus&&node;node=node.parentElement)if(node.inert||node.hidden)restoreFocus=false;
   const app=SOFTWARE[w.appId],wrap=el(d,'section',{className:'pc-installer'}),banner=el(d,'aside',{className:'installer-banner'}),body=el(d,'div',{className:'installer-body'}),content=el(d,'div',{className:'installer-content'}),actions=el(d,'footer',{className:'installer-actions'});
-  banner.append(el(d,'strong',{text:app.name}),el(d,'span',{text:'МАСТЕР\nУСТАНОВКИ'}));body.append(content,actions);wrap.append(banner,body);root.replaceChildren(wrap);
+  banner.append(createPcIcon(d,app.iconId,{size:56}),el(d,'strong',{text:app.name}),el(d,'span',{text:'МАСТЕР\nУСТАНОВКИ'}));body.append(content,actions);wrap.append(banner,body);root.replaceChildren(wrap);
   const titles={welcome:'Добро пожаловать',destination:'Выбор папки установки',summary:'Всё готово к установке',install:'Установка',finish:'Установка завершена'};
   const heading=el(d,'h2',{text:titles[w.step],attributes:{tabindex:'-1'}});content.append(heading,el(d,'p',{text:app.name+' · '+PC_IDENTITY.name}));let input=null;
   if(w.step==='welcome')content.append(el(d,'p',{text:'Мастер поможет установить '+app.name+' на игровой компьютер.'}));
@@ -92,7 +94,12 @@ export function mountInstaller(root,{getState,onAction,getMessage=()=>''}){
   if(['summary','install','finish'].includes(w.step))content.append(el(d,'p',{text:'Папка: '+w.path}));
   if(w.step==='summary')content.append(el(d,'p',{text:`Требуется: ${app.installedBytes/1000000} МБ · Свободно: ${(softwareDiskBytes(state).free/1000000).toFixed(2)} МБ`}),el(d,'p',{text:'Скачанный архив останется в Загрузках.'}));
   if(w.step==='install'){status=el(d,'p');progress=el(d,'progress',{attributes:{max:'100','aria-label':'Прогресс установки '+app.name}});content.append(status,progress);}
-  if(w.step==='finish')content.append(el(d,'p',{text:'Программа установлена. Ярлык появился на рабочем столе.'}));
+  if(w.step==='finish'){
+   content.append(el(d,'p',{text:'Программа установлена. Ярлык появился на рабочем столе.'}));
+   const label=el(d,'label',{className:'installer-open-after'}),check=el(d,'input',{attributes:{type:'checkbox','aria-label':'Открыть после установки'}});
+   check.checked=w.openAfterInstall;check.addEventListener('change',()=>onAction('open-after-install',check.checked));
+   label.append(check,el(d,'span',{text:'Открыть после установки'}));content.append(label);
+  }
   error=el(d,'p',{className:'pc-error',text:getMessage(),attributes:{role:'status'}});content.append(error);
   const back=button(d,'< Назад',{},()=>onAction('back'));back.disabled=!['destination','summary'].includes(w.step);
   const label={summary:'Установить',install:'Установка…',finish:'Готово'}[w.step]??'Далее >';

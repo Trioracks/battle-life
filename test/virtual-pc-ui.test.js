@@ -109,11 +109,11 @@ test('a clock-only torent update retains the focused install control', () => {
 
   controller.showDesktop(ready);
   controller.open('torent');
-  const install = find(root, element => element.tagName === 'BUTTON' && element.textContent === 'Открыть установщик FT Studio');
+  const install = find(root, element => element.tagName === 'BUTTON' && element.textContent === 'Установить');
   install.focus();
   controller.syncState(nextMinute);
 
-  assert.equal(find(root, element => element.tagName === 'BUTTON' && element.textContent === 'Открыть установщик FT Studio'), install);
+  assert.equal(find(root, element => element.tagName === 'BUTTON' && element.textContent === 'Установить'), install);
   assert.equal(document.activeElement, install);
 });
 

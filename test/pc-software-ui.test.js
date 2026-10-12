@@ -8,7 +8,7 @@ import * as software from '../src/pc-software.js?rev=28';
 import {pcDocument,findButton,allPc,fire} from './helpers/virtual-pc-dom.js';
 function setup(){const d=pcDocument(),root=d.createElement('section'),pc=mountVirtualPc(root);pc.showDesktop(createVirtualPcState({power:'on'}));pc.open('underweb');pc.navigateUnderweb('underweb://dump');return {pc,root,d};}
 function click(root,name){const b=findButton(root,name);assert.ok(b,'Missing '+name);b.click();}
-function wizard(root,pc){for(const name of ['Далее >','Далее >','Установить'])click(root,name);pc.syncState(software.advanceInstallation(pc.state,pc.state.software.installer.appId==='client'?10:30).state);click(root,'Готово');}
+function wizard(root,pc){root=pc.shell.getContentRoot('installer');for(const name of ['Далее >','Далее >','Установить'])click(root,name);pc.syncState(software.advanceInstallation(pc.state,pc.state.software.installer.appId==='client'?10:30).state);click(root,'Готово');}
 test('opening the installer cancels a pending FT launch and preserves its keyboard scope',()=>{
  const d=pcDocument(),root=d.createElement('section'),timers=new Map();let timerId=0;
  const pc=mountVirtualPc(root,{setTimeoutFn:fn=>{timers.set(++timerId,fn);return timerId;},clearTimeoutFn:id=>timers.delete(id)});
@@ -48,7 +48,7 @@ test('forum client download leads through wizard into an empty torrent client an
  click(root,'Открыть установщик torent');wizard(root,pc);pc.open('torent');assert.ok(allPc(root).some(n=>n.textContent==='Нет задач. Открой файл .torrent из Загрузок.'));
  pc.open('underweb');pc.navigateUnderweb('underweb://dump/ft-studio');click(root,'Скачать FT-Studio.torrent');
  assert.equal(pc.window,'torent');assert.equal(pc.state.software.transfers.ft.appId,'ft');assert.equal(pc.windows.windows.filter(w=>w.id==='torent').length,1);
- pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:600}).state);click(root,'Открыть установщик FT Studio');wizard(root,pc);assert.equal(pc.state.download.status,'installed');
+ pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:600}).state);click(pc.shell.getContentRoot('torent'),'Установить');wizard(root,pc);assert.equal(pc.state.download.status,'installed');
  assert.ok(findButton(root,'FT Studio'));pc.open('computer');pc.openFolder('C:\\Program Files\\Field Tone\\FT Studio');assert.ok(allPc(root).some(n=>n.textContent==='Plugins'));
 });
 test('wizard typing survives clock sync, back and Escape cancellation retain the downloaded installer',()=>{

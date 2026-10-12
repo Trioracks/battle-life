@@ -51,11 +51,11 @@ export function explorerEntries(pcState,path) {
   const paths=explorerPaths(pcState),entries=Object.entries(paths).filter(([,p])=>p.parent===path).map(([id,p])=>({id,kind:id==='disk'?'disk':'folder',name:p.label,iconId:p.iconId,targetPath:id}));
   const s=pcState.software;
   if(path==='downloads'&&s){
-   for(const [id,definition]of Object.entries(SOFTWARE)){const app=s[id],total=definition.downloadBytes;if(app?.receivedBytes>0)entries.push({id:'archive:'+id,kind:'artifact',name:definition.archive+(app.receivedBytes<total?'.part':''),iconId:'project',sizeMb:app.receivedBytes/1000000,...(app.receivedBytes===total?{action:'installer',appId:id}:{})});}
+   for(const [id,definition]of Object.entries(SOFTWARE)){const app=s[id],total=definition.downloadBytes;if(app?.receivedBytes>0)entries.push({id:'archive:'+id,kind:'artifact',name:definition.archive+(app.receivedBytes<total?'.part':''),iconId:definition.iconId,sizeMb:app.receivedBytes/1000000,...(app.receivedBytes===total?{action:'installer',appId:id}:{})});}
    for(const [id,definition]of Object.entries(SOFTWARE))if(definition.metadataKey&&s[definition.metadataKey])entries.push({id:id+'-metadata',kind:'artifact',name:definition.torrent,iconId:'torent',sizeMb:.012,action:'open-metadata',appId:id});
   }
   for(const [id,app]of Object.entries(s??{}))if(SOFTWARE[id]&&app.installed&&paths[path]?.address.toLowerCase()===app.path.toLowerCase()){
-   entries.push({id:'exe:'+id,kind:'application',name:SOFTWARE[id].name+'.exe',iconId:id==='ft'?'studio':id==='notebook'?'documents':'torent',appId:id==='ft'?'ft-studio':id==='notebook'?'rap-notebook':'torent'});
+   entries.push({id:'exe:'+id,kind:'application',name:SOFTWARE[id].name+'.exe',iconId:SOFTWARE[id].iconId,softwareId:id,sizeMb:SOFTWARE[id].installedBytes/1000000,appId:SOFTWARE[id].desktopAppId});
    if(id==='client')entries.push({id:'config:client',kind:'file',name:'settings.dat',iconId:'project'});
   }
   return entries;

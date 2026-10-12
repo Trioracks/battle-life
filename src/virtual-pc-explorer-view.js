@@ -7,7 +7,7 @@ import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=21';
 import {normalizeStudioProject} from './ft-studio-project.js?rev=34';
 import {normalizeBeat} from './beat-production.js?rev=34';
 
-export function mountExplorer(root,{onOpenArtifact,onOpenApp,onOpenProject,onProperties,onClose,onMenu,onNavigate}) {
+export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenProject,onProperties,onClose,onMenu,onNavigate}) {
   const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',diskLabel=null,disposed=false;
   const wrap=el(d,'div',{className:'pc-explorer'}),menubar=el(d,'div',{className:'pc-menubar'});
   const tools=el(d,'div',{className:'pc-explorer-tools'}),form=el(d,'form',{className:'pc-address'});
@@ -50,11 +50,14 @@ export function mountExplorer(root,{onOpenArtifact,onOpenApp,onOpenProject,onPro
   const back=button(d,'← Назад',{'attributes':{'aria-label':'Назад'}},()=>change({type:'back'}));
   const forward=button(d,'Вперёд →',{'attributes':{'aria-label':'Вперёд'}},()=>change({type:'forward'}));
   const up=button(d,'↑ Вверх',{'attributes':{'aria-label':'Вверх'}},()=>change({type:'up'}));
-  tools.append(back,forward,up,button(d,'Папки',{},()=>change({type:'toggle-tree'})),button(d,'Вид',{},e=>menu(e.currentTarget,viewItems())));
+  const install=button(d,'Установить',{},()=>{const entry=selected(),id=entry?.softwareId??entry?.appId;if(id)onSoftware?.(state.software[id]?.installed?'uninstall':'installer',id);});
+  tools.append(back,forward,up,button(d,'Папки',{},()=>change({type:'toggle-tree'})),button(d,'Вид',{},e=>menu(e.currentTarget,viewItems())),install);
+  function updateInstall(){const entry=selected(),id=entry?.softwareId??(entry?.action==='installer'?entry.appId:null);install.hidden=!id;install.disabled=!id;install.textContent=id&&state.software[id]?.installed?'Удалить':'Установить';}
   function render(updateAddress) {
     if(disposed)return;
     const paths=explorerPaths(state);
     signature=structuralSignature();sizeLabels.clear();
+    updateInstall();
     if(updateAddress)address.value=paths[nav.path]?.address??'Мой компьютер';
     back.disabled=nav.index===0;forward.disabled=nav.index===nav.history.length-1;up.disabled=nav.path==='computer';
     tree.hidden=!nav.treeVisible;tree.replaceChildren();
@@ -72,6 +75,7 @@ export function mountExplorer(root,{onOpenArtifact,onOpenApp,onOpenProject,onPro
         nav={...nav,selection:entry.id,error:''};
         for(const item of files.children)if(item.dataset.entryId)item.setAttribute('aria-pressed',String(item.dataset.entryId===entry.id));
         status.textContent=entry.name;
+        updateInstall();
       });
       b.append(createPcIcon(d,entry.iconId,{size:nav.view==='details'?16:32}),el(d,'span',{className:'pc-file-name',text:entry.name}));
       if(entry.kind==='disk'){const info=el(d,'span');b.append(info);diskLabel=mountDiskUsage(info);diskLabel.update(diskUsage(state));}
@@ -96,6 +100,6 @@ export function mountExplorer(root,{onOpenArtifact,onOpenApp,onOpenProject,onPro
   return {navigate,update(next){
     state=next;const sig=structuralSignature();
     if(sig!==signature){if(nav.selection&&!entries().some(e=>e.id===nav.selection))nav={...nav,selection:null};render(false);}
-    else {diskLabel?.update(diskUsage(state));for(const entry of entries()){const label=sizeLabels.get(entry.id);if(label)label.textContent=entry.sizeMb?entry.sizeMb.toFixed(3)+' МБ':'';}}
+    else {updateInstall();diskLabel?.update(diskUsage(state));for(const entry of entries()){const label=sizeLabels.get(entry.id);if(label)label.textContent=entry.sizeMb?entry.sizeMb.toFixed(3)+' МБ':'';}}
   },dispose(){disposed=true;diskLabel?.dispose();form.removeEventListener('submit',submit);files.removeEventListener('contextmenu',backgroundMenu);root.replaceChildren();}};
 }

@@ -121,6 +121,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     properties: null,
     shutdownModal: null,
     submissionModal: null,
+    uninstallModal: null,
     metadata: {playerName:'Игрок',clockLabel:'12:00'},
     returnFocus: null,
     folder: 'computer',
@@ -167,7 +168,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.windows=reduceWindows(pc.windows,{type:'open',id:appId,appId,title:app?.label??appId});
   };
   pc.windowAction = action => {
-    if((pc.confirmClose||pc.shutdownModal||pc.submissionModal)&&action.type!=='viewport')return;
+    if((pc.confirmClose||pc.shutdownModal||pc.submissionModal||pc.uninstallModal)&&action.type!=='viewport')return;
     if(action.type==='close'){pc.closeWindow(action.id);return;}
     pc.windows=reduceWindows(pc.windows,action);
     pc.renderDesktop(false);
@@ -178,14 +179,33 @@ export function mountVirtualPc(root, callbacks = {}) {
     if(pc.phase==='desktop')pc.renderDesktop(false);
   };
 
+  pc.closeUninstall=()=>{pc.uninstallModal=null;pc.shell.setModal(null,pc.returnFocus);pc.renderDesktop(false);};
+  pc.showUninstall=id=>{
+    if(!SOFTWARE[id]||pc.uninstallModal||pc.submissionModal||pc.shutdownModal||pc.confirmClose)return;
+    pc.returnFocus=document.activeElement;
+    const node=el(document,'section',{className:'pc-system-content pc-uninstall-confirm',attributes:{role:'dialog','aria-modal':'true','aria-label':'Удаление '+SOFTWARE[id].name}});
+    const check=software.uninstallSoftware(pc.state,id),blocked=['recording-in-progress','downloads-in-progress','installer-active'].includes(check.reason);
+    node.append(createPcIcon(document,SOFTWARE[id].iconId,{size:40}),el(document,'h3',{text:'Удалить '+SOFTWARE[id].name+'?'}),el(document,'p',{text:blocked?softwareMessage(check.reason):'Проекты, тексты и скачанный установщик останутся. Работу над битом или текстом можно будет продолжить после повторной установки.'}));
+    const remove=button(document,'Удалить программу',{},()=>pc.softwareAction('confirm-uninstall',id));remove.disabled=blocked;
+    node.append(remove,button(document,'Отмена',{},pc.closeUninstall));pc.uninstallModal={node,id};pc.shell.setModal(node);pc.shell.focusActive();
+  };
   pc.refreshTorent = () => pc.torrentView?.update();
   pc.softwareAction = (action,id) => {
     let result;
+    if(action==='uninstall'){pc.showUninstall(id);return;}
+    if(action==='confirm-uninstall'){
+      const target=SOFTWARE[id]?.desktopAppId;
+      const working=(id==='ft'&&pc.state.music.job)||(id==='notebook'&&pc.state.writing.job);
+      result=software.uninstallSoftware(working?pauseCreativeChain(pc.state):pc.state,id);
+      pc.message=softwareMessage(result.reason);pc.persist(result.state);pc.closeUninstall();
+      if(result.ok&&target)pc.closeNow(target);pc.renderDesktop(false);return;
+    }
     if(action==='browse-metadata'){pc.open('computer');pc.openFolder('downloads');return;}
     if(action==='next'){
       if(id!==undefined){result=software.setInstallerPath(pc.state,id);if(result.ok)result=software.advanceInstaller(result.state);}
       else result=software.advanceInstaller(pc.state);
     }else if(action==='back')result=software.advanceInstaller(pc.state,{back:true});
+    else if(action==='open-after-install')result=software.setInstallerOpenAfter(pc.state,id);
     else {const actions={'download-notebook':software.downloadNotebook,'download-client':software.downloadClient,'download-metadata':software.downloadMetadata,'open-metadata':software.openMetadata,installer:software.openInstaller,pause:software.pauseTransfer,resume:software.resumeTransfer,cancel:software.cancelTransfer,'cancel-installer':software.cancelInstaller};result=actions[action]?.(pc.state,id);}
     if(!result)return;
     const metadataAction=['download-notebook','download-metadata','open-metadata'].includes(action),metadataId=action==='download-notebook'?'notebook':id??'ft';
@@ -194,6 +214,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     if(action==='installer'&&result.ok){pc.cancelStudioLaunch();pc.windows=reduceWindows(pc.windows,{type:'open',id:'installer',appId:'installer',title:'Мастер установки — '+SOFTWARE[id].name});pc.renderDesktop(false);pc.shell.focusActive();return;}
     if(!pc.state.software.installer&&pc.windows.windows.some(w=>w.id==='installer'))pc.closeNow('installer');
     pc.renderDesktop(false);
+    if(result.openAppId){pc.cancelStudioLaunch();pc.openNow(result.openAppId);}
     if(metadataAction&&pc.state.power==='on'&&pc.state.software.client.installed&&pc.state.software[SOFTWARE[metadataId]?.metadataKey]){pc.cancelStudioLaunch();pc.open('torent');}
   };
 
@@ -254,7 +275,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.notebookView?.update();pc.submissionModal?.view.update();
     for(const view of pc.systemViews.values())view.update();
     const guard=pc.confirmClose?findByDataset(root,'pcRole','close-guard'):null;
-    pc.shell.setModal(pc.submissionModal?.node??pc.shutdownModal?.node??guard,pc.returnFocus);
+    pc.shell.setModal(pc.uninstallModal?.node??pc.submissionModal?.node??pc.shutdownModal?.node??guard,pc.returnFocus);
     if(!pc.confirmClose&&replaceActive){
       const scope=pc.focusScope(),restored=focusId&&findFocusControl(scope,focusId);
       (restored&&!restored.disabled?restored:focusableControls(scope)[0])?.focus?.();
@@ -275,7 +296,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.studioView.update();return;
     }
     if(appId==='computer'){
-      if(!pc.explorer)pc.explorer=mountExplorer(target,{onOpenArtifact:entry=>{pc.softwareAction(entry.action,entry.appId);return pc.message;},onOpenApp:id=>pc.open(id),onOpenProject:p=>pc.openProject(p),onProperties:p=>pc.showProperties(p),onClose:()=>pc.closeWindow('computer'),onMenu:p=>pc.menu?.open(p),onNavigate:location=>{
+      if(!pc.explorer)pc.explorer=mountExplorer(target,{onSoftware:pc.softwareAction,onOpenArtifact:entry=>{pc.softwareAction(entry.action,entry.appId);return pc.message;},onOpenApp:id=>pc.open(id),onOpenProject:p=>pc.openProject(p),onProperties:p=>pc.showProperties(p),onClose:()=>pc.closeWindow('computer'),onMenu:p=>pc.menu?.open(p),onNavigate:location=>{
         pc.windows={...pc.windows,windows:pc.windows.windows.map(w=>w.id==='computer'?{...w,title:location.label,iconId:location.iconId}:w)};pc.renderDesktop(false);
       }});
       pc.explorer.update(pc.state);return;
@@ -346,7 +367,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.studioView?.dispose();pc.studioView=null;
     pc.underwebView?.dispose();pc.underwebView=null;
     pc.explorer?.dispose();pc.explorer=null;for(const view of pc.systemViews.values())view.dispose();pc.systemViews.clear();
-    pc.shutdownModal?.view.dispose();pc.shutdownModal=null;pc.menu?.close();
+    pc.shutdownModal?.view.dispose();pc.shutdownModal=null;pc.uninstallModal=null;pc.menu?.close();
   };
 
   pc.windowFrame = (title, content) => content;
@@ -473,6 +494,7 @@ export function mountVirtualPc(root, callbacks = {}) {
 
 
   pc.focusScope = () => {
+    if(pc.uninstallModal)return pc.uninstallModal.node;
     if(pc.submissionModal)return pc.submissionModal.node;
     if (pc.confirmClose) return findByDataset(root, 'pcRole', 'close-guard');
     if (pc.startOpen) return findByDataset(root, 'pcRole', 'start-menu');
@@ -481,6 +503,7 @@ export function mountVirtualPc(root, callbacks = {}) {
 
   root.addEventListener('keydown', event => {
     if (pc.locked || pc.phase !== 'desktop' || event.defaultPrevented) return;
+    if(event.key==='Escape'&&pc.uninstallModal){event.preventDefault();event.stopPropagation();pc.closeUninstall();return;}
     const scope = pc.focusScope();
     const controls = focusableControls(scope);
     if(event.key==='Escape'&&pc.shutdownModal){event.preventDefault();event.stopPropagation();pc.cancelShutdown();return;}

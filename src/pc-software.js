@@ -6,7 +6,7 @@ export function normalizeInstallPath(value){
  if(!/^C:\\[^<>:"|?*\x00-\x1f]+$/i.test(path))return null;
  const parts=path.slice(3).split('\\');
  if(path.length>180||parts.some(p=>!p.trim()||p==='.'||p==='..'||/[. ]$/.test(p)||/^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(p)))return null;
- if(parts[0].toLowerCase()==='windows'||parts[0].toLowerCase()==='мои документы')return null;
+ if(['windows','system'].includes(parts[0].toLowerCase())||parts[0].toLowerCase()==='мои документы')return null;
  return 'C:\\'+parts.join('\\');
 }
 export function normalizeSoftware(value,legacy={}){
@@ -17,7 +17,7 @@ export function normalizeSoftware(value,legacy={}){
  const candidates=source?.transferVersion===2?source.transfers:legacyTask?{[legacyTask.appId]:legacyTask}:!source&&old==='downloading'?{ft:{appId:'ft'}}:{};
  for(const id of Object.keys(SOFTWARE)){const t=candidates?.[id];if(t&&app(id).receivedBytes<SOFTWARE[id].downloadBytes)transfers[id]={appId:id,paused:t.paused===true,error:t.error==='insufficient-space'?t.error:''};}
  const wizard=source?.installer,id=wizard?.appId,step=wizard?.step;
- const installer=SOFTWARE[id]&&['welcome','destination','summary','install','finish'].includes(step)&&app(id).receivedBytes===SOFTWARE[id].downloadBytes&&(!app(id).installed||step==='finish')?{appId:id,step:step==='finish'&&!app(id).installed?'welcome':step,path:normalizeInstallPath(wizard.path)??SOFTWARE[id].path,elapsedSeconds:step==='install'?bytes(wizard.elapsedSeconds,SOFTWARE[id].installSeconds):step==='finish'&&app(id).installed?SOFTWARE[id].installSeconds:0,error:step==='install'&&wizard.error==='insufficient-space'?'insufficient-space':''}:null;
+ const installer=SOFTWARE[id]&&['welcome','destination','summary','install','finish'].includes(step)&&app(id).receivedBytes===SOFTWARE[id].downloadBytes&&(!app(id).installed||step==='finish')?{appId:id,openAfterInstall:wizard.openAfterInstall!==false,step:step==='finish'&&!app(id).installed?'welcome':step,path:normalizeInstallPath(wizard.path)??SOFTWARE[id].path,elapsedSeconds:step==='install'?bytes(wizard.elapsedSeconds,SOFTWARE[id].installSeconds):step==='finish'&&app(id).installed?SOFTWARE[id].installSeconds:0,error:step==='install'&&wizard.error==='insufficient-space'?'insufficient-space':''}:null;
  return {client,ft,notebook:app('notebook'),metadata:source?source.metadata===true:['downloading','ready-to-install'].includes(old),notebookMetadata:source?.notebookMetadata===true,transferVersion:2,transfers,installer};
 }
 export function withSoftware(state,software){
@@ -30,7 +30,7 @@ export function softwareDiskBytes(state){
  const downloaded=Object.keys(SOFTWARE).reduce((n,id)=>n+s[id].receivedBytes+(SOFTWARE[id].metadataKey&&s[SOFTWARE[id].metadataKey]?METADATA_BYTES:0),0),installed=Object.keys(SOFTWARE).reduce((n,id)=>n+(s[id].installed?SOFTWARE[id].installedBytes:0),0),projects=(state.projects?.length??0)*2000000;
  return {downloaded,installed,projects,used:SYSTEM_BYTES+downloaded+installed+projects,free:Math.max(0,DISK_BYTES-SYSTEM_BYTES-downloaded-installed-projects)};
 }
-const result=(state,ok=true,reason='')=>({ok,reason,state});
+const result=(state,ok=true,reason='')=>({ok,reason,state,openAppId:null});
 const copy=input=>withSoftware(input,normalizeSoftware(input.software,input.download));
 export function downloadClient(input){
  const s=copy(input),soft=s.software;
@@ -62,10 +62,19 @@ export function openInstaller(input,appId){
  const s=copy(input),app=SOFTWARE[appId];if(!app)return result(s,false,'unknown-app');
  if(s.software[appId].installed)return result(s,false,'already-installed');if(s.software[appId].receivedBytes!==app.downloadBytes)return result(s,false,'archive-required');
  if(s.software.installer&&s.software.installer.appId!==appId)return result(s,false,'installer-active');
- s.software.installer??={appId,step:'welcome',path:app.path,elapsedSeconds:0,error:''};return result(s);
+ s.software.installer??={appId,openAfterInstall:true,step:'welcome',path:app.path,elapsedSeconds:0,error:''};return result(s);
 }
 export function setInstallerPath(input,path){const s=copy(input),valid=normalizeInstallPath(path);if(!s.software.installer)return result(s,false,'installer-required');if(!valid)return result(s,false,'invalid-path');s.software.installer.path=valid;return result(s);}
 export function cancelInstaller(input){const s=copy(input);s.software.installer=null;return result(s);}
+export function setInstallerOpenAfter(input,value){const s=copy(input);if(!s.software.installer)return result(s,false,'installer-required');s.software.installer.openAfterInstall=value===true;return result(s);}
+export function uninstallSoftware(input,id){
+ const s=copy(input);if(!SOFTWARE[id])return result(s,false,'unknown-app');
+ if(id==='ft'&&s.recording?.job)return result(s,false,'recording-in-progress');
+ if((id==='ft'&&s.music?.job)||(id==='notebook'&&s.writing?.job))return result(s,false,'work-in-progress');
+ if(id==='client'&&Object.keys(s.software.transfers).some(id=>id!=='client'))return result(s,false,'downloads-in-progress');
+ if(s.software.installer?.appId===id)return result(s,false,'installer-active');
+ s.software[id].installed=false;return result(withSoftware(s,s.software));
+}
 export function advanceInstaller(input,{back=false}={}){
  const s=copy(input),w=s.software.installer;if(!w)return result(s,false,'installer-required');
  const steps=['welcome','destination','summary','install','finish'],index=steps.indexOf(w.step);
@@ -73,7 +82,7 @@ export function advanceInstaller(input,{back=false}={}){
  if(w.step==='summary'&&softwareDiskBytes(s).free<SOFTWARE[w.appId].installedBytes)return result(s,false,'insufficient-space');
  if(w.step==='install')return result(s,false,'installation-running');
  if(w.step==='summary'){w.elapsedSeconds=0;w.error='';}
- if(w.step==='finish')s.software.installer=null;else w.step=steps[index+1];return result(withSoftware(s,s.software));
+ if(w.step==='finish'){s.software.installer=null;return {...result(withSoftware(s,s.software)),openAppId:w.openAfterInstall?SOFTWARE[w.appId].desktopAppId:null};}w.step=steps[index+1];return result(withSoftware(s,s.software));
 }
 // Installation uses only active real-time deltas supplied by the host, never a saved clock.
 export function advanceInstallation(input,seconds){

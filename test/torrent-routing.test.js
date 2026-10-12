@@ -35,13 +35,13 @@ test('notebook download API retrieves metadata before allowing client-owned tran
 test('second torrent preserves the running transfer and minimized installer',()=>{
  const {pc,root}=desktop({lastGameMinute:10,software:{client:{installed:true},ft:{receivedBytes:1234},metadata:true,task:{appId:'ft',baseMinute:10,baseBytes:1234},notebook:{receivedBytes:4000000},installer:{appId:'notebook',step:'install',elapsedSeconds:4}}});
  pc.windowAction({type:'minimize',id:'installer'});pc.open('underweb');pc.navigateUnderweb('underweb://dump/notebook');const task=structuredClone(pc.state.software.transfers);click(root,'Скачать Rap-Notebook.torrent');
- assert.equal(pc.window,'torent');assert.deepEqual(pc.state.software.transfers,task);assert.equal(pc.state.software.installer.elapsedSeconds,4);assert.equal(pc.windows.windows.find(w=>w.id==='installer').mode,'minimized');assert.ok(findButton(pc.shell.getContentRoot('torent'),'Открыть установщик Рэпблокнот'));
+ assert.equal(pc.window,'torent');assert.deepEqual(pc.state.software.transfers,task);assert.equal(pc.state.software.installer.elapsedSeconds,4);assert.equal(pc.windows.windows.find(w=>w.id==='installer').mode,'minimized');assert.ok(findButton(pc.shell.getContentRoot('torent'),'Установить'));
  pc.syncState(software.advanceInstallation(pc.state,6).state);assert.equal(pc.state.software.notebook.installed,true);assert.equal(pc.window,'torent');assert.equal(pc.windows.windows.find(w=>w.id==='installer').mode,'minimized');pc.dispose();
 });
 test('notebook cancellation retains metadata and reload reanchors partial transfer',()=>{
  let s=createVirtualPcState({power:'on',lastGameMinute:0,software:{client:{installed:true}}});s=software.openMetadata(software.downloadMetadata(s,'notebook').state,'notebook').state;s=advanceVirtualPc(s,{day:1,minutes:1}).state;assert.ok(s.software.notebook.receivedBytes>0);
  const restored=loadVirtualPcState({getItem:()=>JSON.stringify(s)}).state;assert.equal(advanceVirtualPc(restored,{day:99,minutes:0}).advancedBytes,0);s=software.cancelTransfer(restored).state;assert.equal(s.software.notebook.receivedBytes,0);assert.equal(s.software.notebookMetadata,true);
- s=software.openMetadata(s,'notebook').state;s=advanceVirtualPc(s,{day:1,minutes:1}).state;s=advanceVirtualPc(s,{day:1,minutes:10}).state;const {pc}=desktop(s);pc.open('torent');assert.ok(findButton(pc.shell.getContentRoot('torent'),'Открыть установщик Рэпблокнот'));pc.dispose();
+ s=software.openMetadata(s,'notebook').state;s=advanceVirtualPc(s,{day:1,minutes:1}).state;s=advanceVirtualPc(s,{day:1,minutes:10}).state;const {pc}=desktop(s);pc.open('torent');assert.ok(findButton(pc.shell.getContentRoot('torent'),'Установить'));pc.dispose();
 });
 test('busy client adds a second torrent while preserving the first transfer',()=>{
  const {pc,root}=desktop({software:{client:{installed:true},metadata:true,task:{appId:'ft',baseMinute:0,baseBytes:0}}});pc.open('underweb');pc.navigateUnderweb('underweb://dump/notebook');click(root,'Скачать Rap-Notebook.torrent');
