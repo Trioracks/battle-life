@@ -377,6 +377,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.openFolder = folder => pc.explorer?.navigate(folder);
 
   pc.navigateUnderweb = address => pc.underwebView?.navigate(address);
+  pc.tickOutgoingMessage = (dt,options) => pc.underwebView?.tickOutgoingMessage(dt,options);
 
 
 

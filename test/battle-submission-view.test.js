@@ -30,7 +30,7 @@ function pcFixture(fail=false){
 }
 test('actual browser goes from battle to dialog, attaches, sends once and receives persisted ack',()=>{
  const {root,pc}=pcFixture();findButton(root,'Открыть сообщения сообщества').click();findButton(root,'Прикрепить').click();findButton(root,'Выбрать: Работа').click();findButton(root,'Прикрепить выбранный трек').click();
- assert.equal(pc.state.battleSubmissions.length,0);assert.equal(pc.state.social.personalAudioIds.length,0);assert.equal(findButton(root,'Отправить').disabled,true);pc.syncState(completeSubmissionUpload(pc.state));assert.equal(pc.state.social.personalAudioIds.length,1);findButton(root,'Отправить').click();findButton(root,'Отправить').click();assert.equal(pc.state.battleSubmissions.length,1);
+ assert.equal(pc.state.battleSubmissions.length,0);assert.equal(pc.state.social.personalAudioIds.length,0);assert.equal(findButton(root,'Отправить').disabled,true);pc.syncState(completeSubmissionUpload(pc.state));assert.equal(pc.state.social.personalAudioIds.length,1);findButton(root,'Отправить').click();assert.equal(pc.state.battleSubmissions.length,0);pc.tickOutgoingMessage(6,{paused:false});findButton(root,'Отправить').click();assert.equal(pc.state.battleSubmissions.length,1);
  const row=pc.state.battleSubmissions[0];pc.state=advanceSocial(pc.state,row.ackAt).state;pc.syncHost({gameDay:1,gameMinutes:row.ackAt,playerName:'Игрок'});
  assert.ok(allPc(root).some(n=>n.textContent?.includes('Работа принята.')));assert.equal(findButton(root,'Отправить').disabled,true);assert.equal(findButton(root,'Заменить работу'),undefined);pc.dispose();
 });

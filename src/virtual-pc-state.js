@@ -6,6 +6,7 @@ import {normalizeRecordingState} from './vocal-production.js?rev=38';
 import {normalizeTrackVersions,captureTrackVersion} from './track-version.js?rev=38';
 import {normalizeSocial} from './social-state.js?rev=38';
 import {normalizeOutgoingUpload} from './social-upload.js?rev=38';
+import {normalizeOutgoingMessage} from './social-composer.js?rev=38';
 import {normalizeBattleWindows} from './battle-windows.js?rev=38';
 import {normalizeSocialRuntime,normalizeCommunityAudio} from './social-runtime.js?rev=38';
 import {normalizePhone} from './phone-notifications.js?rev=38';
@@ -129,6 +130,8 @@ function normalizeSnapshot(value) {
     battleSubmissions,trackVersions,
     outgoingUpload:normalizeOutgoingUpload(source.outgoingUpload,trackVersions),
     outgoingUploadRecovery:Array.isArray(source.outgoingUploadRecovery)?source.outgoingUploadRecovery.map(clone):[],
+    outgoingMessage:normalizeOutgoingMessage(source.outgoingMessage,trackVersions),
+    outgoingMessageRecovery:Array.isArray(source.outgoingMessageRecovery)?source.outgoingMessageRecovery.map(clone):[],
     draft: isRecord(source.draft) ? clone(source.draft) : null,
     lastGameMinute: Number.isFinite(source.lastGameMinute) && source.lastGameMinute >= 0 ? source.lastGameMinute : null,
   },normalizeSoftware(source.software,normalizeDownload(source.download)));

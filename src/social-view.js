@@ -51,5 +51,5 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
   content.replaceChildren(node);last=signature();
   if(label){const field=pcFind(content,n=>n.getAttribute?.('aria-label')===label);field?.focus?.({preventScroll:true});if(Number.isInteger(start))field?.setSelectionRange?.(start,end);}
  }
- render();if(route.section==='me'||route.profileId==='me')void getMetadata().requestPlayerPortrait?.();return {update(){if(disposed)return;if(last!==signature())render();else dialogView?.update();updateBadge();},dispose(){disposed=true;closeRegistration?.();dialogView?.dispose();messagesView?.dispose();playback.dispose();root.replaceChildren();}};
+ render();if(route.section==='me'||route.profileId==='me')void getMetadata().requestPlayerPortrait?.();return {tickOutgoingMessage:(dt,options)=>dialogView?.tickOutgoingMessage?.(dt,options),update(){if(disposed)return;if(last!==signature())render();else dialogView?.update();updateBadge();},dispose(){disposed=true;closeRegistration?.();dialogView?.dispose();messagesView?.dispose();playback.dispose();root.replaceChildren();}};
 }

@@ -157,7 +157,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  }
  function navigate(input){closeRegistration?.();closeRegistration=null;const next=resolveUnderweb(input,getMetadata());activateRoute(next);route=next;history.splice(index+1);history.push(route.url);index=history.length-1;applicationOpen=false;render();}
  function travel(delta){const next=index+delta;if(next<0||next>=history.length)return;closeRegistration?.();closeRegistration=null;index=next;const resolved=resolveUnderweb(history[index],getMetadata());activateRoute(resolved);route=resolved;applicationOpen=false;render();}
- render();return {navigate,get snapshot(){return {route,index,history:[...history]};},update(){
+ render();return {navigate,tickOutgoingMessage:(dt,options)=>socialView?.tickOutgoingMessage(dt,options),get snapshot(){return {route,index,history:[...history]};},update(){
   if(route.type==='social'){socialView?.update();return;}
   if(lastDay!==JSON.stringify([getMetadata().gameDay])){route=resolveUnderweb(history[index],getMetadata());render({resetScroll:false,preserveInputs:true});}
   else if(lastApplications!==JSON.stringify([getState().battleApplications,getState().battleSubmissions])&&['home','battle','battles'].includes(route.type)||route.type==='battle'&&lastWindows!==windowSignature()||route.type==='dump'&&lastSoftware!==softwareSignature())render({resetScroll:false,preserveInputs:true});

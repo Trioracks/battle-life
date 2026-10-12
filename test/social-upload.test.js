@@ -48,7 +48,7 @@ test('durable real-time clock checkpoints once a second and flushes partial phas
 });
 test('completed upload cannot send a different legacy draft; expiry consumes no attempt and recovery cancellation keeps raw data',()=>{
  let s=tick(start().state,30).state;const oldId=s.outgoingUpload.versionId,old=structuredClone(s.trackVersions.byId[oldId]),other='track-other';s.trackVersions.byId[other]={...old,id:other};s.social.dialogs['makarevich-1'].draftVersionId=other;
- assert.equal(sendSubmission(s,options).ok,false);
+ assert.match(sendSubmission(s,options).reason,/Загруженная версия не совпадает/);
  s.social.dialogs['makarevich-1'].draftVersionId=oldId;const late=sendSubmission(s,{...options,nowMinute:s.battleWindows[0].closesAt});assert.equal(late.ok,false);assert.equal(late.state.battleSubmissions.length,0);assert.equal(late.state.social.dialogs['makarevich-1'].draftVersionId,oldId);
  const raw={...s.outgoingUpload,uploadedBytes:-2},bad=createVirtualPcState({...s,outgoingUpload:raw}),cancelled=upload.cancelSubmissionUpload(bad);assert.deepEqual(cancelled.state.outgoingUploadRecovery[0].recoveryData,raw);assert.ok(cancelled.state.trackVersions.byId[oldId]);
 });

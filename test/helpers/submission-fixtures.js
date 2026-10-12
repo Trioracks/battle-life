@@ -5,7 +5,9 @@ import {startCreativeChain} from '../../src/creative-workflow.js';
 import {advanceCreativeWork} from '../../src/home-creative-work.js';
 import {startVocalWork,advanceVocalWork} from '../../src/vocal-production.js';
 import {advanceSubmissionUpload} from '../../src/social-upload.js';
+import {startSubmissionMessage,advanceSubmissionMessage} from '../../src/social-composer.js';
 export const completeSubmissionUpload=state=>advanceSubmissionUpload(state,{activeSeconds:3600,powered:true,paused:false}).state;
+export const completeSubmissionMessage=(state,{communityId='makarevich-1',nowMinute=601}={})=>advanceSubmissionMessage(startSubmissionMessage(state,{communityId,nowMinute}).state,{activeSeconds:6,visible:true,powered:true,paused:false}).state;
 export function submissionFixture({battleId='makarevich-1',registered=true,vocal=true,mixed=false}={}){
  let s=createVirtualPcState({power:'on',music:{needs:{satiety:100,energy:100}}});
  if(registered)s=applyToBattle(s,'makarevich-1','Игрок');

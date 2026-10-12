@@ -19,13 +19,14 @@ try{
   const names=['virtual-pc-ui','virtual-pc-state','home-creative-work','vocal-production','virtual-pc-runtime','avatar-v3-profile','phone-hud','social-result-reaction'];
   const [ui,state,work,vocal,runtime,profile,phone,reaction]=await Promise.all(names.map(n=>import('/src/'+n+'.js?rev=37')));
   const q=window.qa={work,vocal,runtime,state,profile,reaction,minute:2160,fail:false};
-  q.persist=next=>!q.fail&&state.saveVirtualPcState(localStorage,next);
+  q.persist=next=>!q.fail&&!(q.failSend&&next.battleSubmissions.length>(q.pc?.state.battleSubmissions.length??0))&&state.saveVirtualPcState(localStorage,next);
   q.pc=ui.mountVirtualPc(document.querySelector('#virtual-pc'),{onWork:()=>true,onPersist:q.persist});
   q.pc.showDesktop(state.createVirtualPcState({power:'on',software:{client:{installed:true},ft:{installed:true},notebook:{installed:true}}}));
   q.pc.syncState(state.applyToBattle(q.pc.state,'makarevich-1','Новый голос'));q.pc.syncHost({gameDay:2,gameMinutes:q.minute,playerName:'Новый голос',skills:{writing:10,beatmaking:10,flow:10,sound:10}});
   q.refill=()=>q.pc.syncState({...q.pc.state,music:{...q.pc.state.music,needs:{satiety:100,energy:100}}});
   q.advance=minute=>{q.minute=minute;q.pc.syncState(runtime.advanceVirtualPcDurably(q.pc.state,{day:Math.floor(minute/1440)+1,minutes:minute%1440},q.persist).state);q.pc.syncHost({gameDay:Math.floor(minute/1440)+1,gameMinutes:minute});q.phone.update();};
   q.phone=phone.mountPhoneHud(document.querySelector('#phone'),{getState:()=>q.pc.state.phone,onChange:phone=>{const next={...q.pc.state,phone};if(!q.persist(next))return false;q.pc.syncState(next);return true;}});
+  const transfer=runtime.createSubmissionTransferClock();let last=performance.now();q.running=true;const frame=now=>{if(!q.running)return;const dt=Math.min(.25,(now-last)/1000);last=now;const r=transfer.tick(q.pc.state,{activeSeconds:dt,powered:q.pc.state.power==='on',paused:document.hidden,phase:String(document.hidden)},q.persist);if(r.changed)q.pc.syncState(r.state);q.pc.tickOutgoingMessage(dt,{paused:document.hidden});requestAnimationFrame(frame);};requestAnimationFrame(frame);
  });
  await start('Рэпблокнот');await win('rap-notebook').getByRole('button',{name:'Новый текст',exact:true}).click();
  await win('rap-notebook').getByRole('combobox',{name:'Для чего пишем текст'}).selectOption('makarevich-1');await win('rap-notebook').getByRole('button',{name:'Создать текст',exact:true}).click();
@@ -44,8 +45,9 @@ try{
  const picker=page.getByRole('dialog',{name:'Прикрепить трек'});await page.getByRole('button',{name:'Выбрать: Пакет один — новая работа',exact:true}).click();
  await page.getByRole('button',{name:'Прикрепить выбранный трек',exact:true}).click();
  assert.equal(await page.evaluate(()=>qa.pc.state.battleSubmissions.length),0);
- await page.evaluate(()=>qa.fail=true);await win('underweb').getByRole('button',{name:'Отправить',exact:true}).click();assert.equal(await page.evaluate(()=>qa.pc.state.battleSubmissions.length),0);
- await page.evaluate(()=>qa.fail=false);await win('underweb').getByRole('button',{name:'Отправить',exact:true}).click();assert.equal(await page.evaluate(()=>qa.pc.state.battleSubmissions.length),1);assert.equal(await win('underweb').getByRole('button',{name:'Отправить',exact:true}).isDisabled(),true);
+ await page.waitForFunction(()=>qa.pc.state.outgoingUpload?.status==='ready',null,{timeout:60000});await page.evaluate(()=>qa.failSend=true);const typingStart=performance.now();await win('underweb').getByRole('button',{name:'Отправить',exact:true}).click();assert.equal(await page.evaluate(()=>qa.pc.state.battleSubmissions.length),0);
+ await page.waitForFunction(()=>qa.pc.state.outgoingMessage?.elapsedSeconds>=2);await shot('package-typing');await page.waitForFunction(()=>qa.pc.state.outgoingMessage?.elapsedSeconds===6);const typingSeconds=(performance.now()-typingStart)/1000;assert.ok(typingSeconds>=5&&typingSeconds<=7.5,'typing seconds '+typingSeconds);assert.equal(await page.evaluate(()=>qa.pc.state.battleSubmissions.length),0);
+ await page.evaluate(()=>qa.failSend=false);await win('underweb').getByRole('button',{name:'Повторить отправку',exact:true}).click();assert.equal(await page.evaluate(()=>qa.pc.state.battleSubmissions.length),1);assert.equal(await win('underweb').getByRole('button',{name:'Отправить',exact:true}).isDisabled(),true);
  await page.evaluate(()=>{qa.pc.syncState({...qa.pc.state,power:'off'});qa.advance(qa.pc.state.battleSubmissions[0].ackAt);});await shot('package-dialog');
  await page.evaluate(()=>qa.advance(qa.pc.state.battleWindows[0].closesAt+qa.pc.state.battleWindows[0].judgingOffsets[0]));await go('community/makarevich-1');
  assert.equal(await page.locator('[data-judge-review]').count(),1);assert.equal(await page.getByRole('button',{name:'Открыть общий итог'}).count(),0);
