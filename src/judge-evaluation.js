@@ -19,7 +19,8 @@ export function perceiveTrack(version,judge,history=[],catalog=[]){
   if(fact.value===null||fact.value===undefined)continue;
   knownFactIds.push(fact.id);
   if(Number.isFinite(fact.value)&&/^(text|vocal|music|sound)\./.test(fact.key)){
-   observations.push({family:fact.key,value:fact.value,polarity:fact.value>=65?'good':fact.value<=35?'bad':'mixed',evidenceIds:[fact.id],attention:attention[fact.key]??attention[fact.key.replace('vocal.','performance.')]??1});
+   const interested=Array.isArray(attention)&&attention.some(k=>k.replace('performance.','vocal.').replace('text.imagery','text.images')===fact.key);
+   observations.push({family:fact.key,value:fact.value,polarity:fact.value>=65?'good':fact.value<=35?'bad':'mixed',evidenceIds:[fact.id],attention:interested?2:1});
   }
   if(fact.key!=='text.reference'||!Array.isArray(fact.value))continue;
   for(const use of fact.value){

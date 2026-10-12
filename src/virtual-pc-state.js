@@ -9,6 +9,7 @@ import {normalizeBattleWindows} from './battle-windows.js?rev=35';
 import {normalizeSocialRuntime,normalizeCommunityAudio} from './social-runtime.js?rev=36';
 import {normalizePhone} from './phone-notifications.js?rev=36';
 import {normalizeBattleKnowledge} from './battle-knowledge.js?rev=36';
+import {normalizeJudging} from './judge-comments.js?rev=36';
 import {drumById} from './beat-catalog.js?rev=36';
 import {normalizeCommunity} from './underweb-community.js?rev=34';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=35';
@@ -117,6 +118,7 @@ function normalizeSnapshot(value) {
     communityAudio:normalizeCommunityAudio(source.communityAudio),
     phone:normalizePhone(source.phone),
     battleKnowledge:normalizeBattleKnowledge(source.battleKnowledge),
+    judging:normalizeJudging(source.judging),
     household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),
     battleSubmissions,trackVersions,
