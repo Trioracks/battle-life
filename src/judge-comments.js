@@ -10,7 +10,7 @@ const legacyOnly=bank=>data.common.filter(t=>t.family==='reaction.overall'&&!ban
 export const JUDGE_COMMENTS=Object.freeze([...data.sourceRows,...individual,...data.banks.flatMap(bank=>[...bank.personal,...legacyOnly(bank),...bank.templateIds.map(id=>({...commonById.get(id),id:bank.judgeId+':'+id,judgeId:bank.judgeId})),...expansion.common.map(t=>({...t,id:bank.judgeId+':'+t.id,judgeId:bank.judgeId}))])]);
 const byJudge=new Map(data.banks.map(b=>[b.judgeId,JUDGE_COMMENTS.filter(t=>t.judgeId===b.judgeId)]));
 function context(input,history=[]){
- const evaluation=evaluateTrack(input.version,input.judge,input.format,{opponent:input.opponent??null});
+ const evaluation=evaluateTrack(input.version,input.judge,input.format,{opponent:input.opponent??null,tieSeed:input.pairTieSeed});
  const perception=perceiveTrack(input.version,input.judge,history.filter(h=>h.judgeId===input.judge.id),REFERENCE_CATALOG);
  return {...input,evaluation,perception};
 }

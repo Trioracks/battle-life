@@ -25,7 +25,7 @@ test('whole32work batches publish atomically; every judge is public by40h, next 
  assert.equal(advanceBattleLifecycle(closed,11040).events.some(e=>e.type==='battle-judge-complete'),false);
  const done=advanceBattleLifecycle(closed,13080),round=done.state.tournaments.byId[battleId].rounds.selection;
  assert.equal(round.status,'complete');assert.equal(Object.keys(round.judgeBatches).length,5);
- for(const batch of Object.values(round.judgeBatches)){assert.equal(batch.resultIds.length,32);assert.ok(batch.publishedAt<=13080);}
+ for(const batch of Object.values(round.judgeBatches)){assert.equal(batch.resultIds.length,32);assert.ok(batch.publishedAt<=13080);assert.ok(batch.ltr?.trackVersionId);assert.equal(batch.ltr.judgeId,batch.judgeId);const e=done.events.find(e=>e.type==='battle-judge-complete'&&e.judgeId===batch.judgeId);assert.deepEqual(e.ltr,batch.ltr);}
  assert.equal(done.events.filter(e=>e.type==='round-result').length,1);assert.equal(done.state.tournaments.byId[battleId].nextRoundAt,round.completedAt+1440);
  const next=advanceBattleLifecycle(done.state,14520);assert.equal(next.state.tournaments.byId[battleId].currentRoundId,'round-2');
  assert.equal(advanceBattleLifecycle(createVirtualPcState(next.state),14520).events.length,0);

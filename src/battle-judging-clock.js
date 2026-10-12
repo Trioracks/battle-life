@@ -6,6 +6,7 @@ import {judgeProfile} from './judge-profiles.js?rev=39';
 import {battleFormat} from './battle-format.js?rev=39';
 import {generateJudgeReview} from './judge-comments.js?rev=39';
 import {SOCIAL_IDENTITY} from './social-identity.js?rev=39';
+import {selectRoundLtr} from './battle-round-awards.js?rev=39';
 const clone=v=>structuredClone(v),battleId='makarevich-1',order=(a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id);
 export function advanceJudgeClock(raw,{deadline,judgeIds,seed,nowMinute,roll,publishedAtByJudge={},notBefore=0}={}){
  const clock=raw?clone(raw):{policyVersion:2,checkedHour:6,completed:{}},ready=[];
@@ -27,11 +28,12 @@ function judgeBatch(input,round,judgeId,at){
  for(const [participantId,versionId]of Object.entries(round.submissions).sort(([a],[b])=>a.localeCompare(b))){
   const version=input.trackVersions.byId[versionId],pair=round.pairs.find(p=>p.participantIds.includes(participantId)),opponentId=pair?.technical?.kind==='judged'?pair.participantIds.find(id=>id!==participantId):null,opponent=input.trackVersions.byId[round.submissions[opponentId]]??null;
   const prior=Object.values(judging.results).find(r=>r.battleId===battleId&&r.roundId===round.roundId&&r.trackVersionId===versionId&&r.judgeId===judgeId);
-  const generated=prior?{result:prior,history:judging.history}:generateJudgeReview({version,judge,format,opponent},{seed:[round.id,judgeId,participantId].join(':'),history:judging.history,copyHistory:false});
+  const generated=prior?{result:prior,history:judging.history}:generateJudgeReview({version,judge,format,opponent,pairTieSeed:round.id},{seed:[round.id,judgeId,participantId].join(':'),history:judging.history,copyHistory:false});
   if(!generated.result||generated.diagnostics?.unsupportedClaims.length)throw Error('Не удалось сформировать подтверждённый отзыв: '+judgeId);
   const result=generated.result;judging.results[result.id]=result;judging.history=generated.history;resultIds.push(result.id);
  }
- return {state:{...input,judging},batch:{judgeId,publishedAt:at,resultIds,policyVersion:2}};
+ const ltr=selectRoundLtr({versions:Object.entries(round.submissions).map(([participantId,id])=>({participantId,id})),judgeResults:resultIds.map(id=>judging.results[id]),judgeId,seed:round.id});
+ return {state:{...input,judging},batch:{judgeId,publishedAt:at,resultIds,policyVersion:2,ltr}};
 }
 export function advanceRoundJudging(input,{battleId:id=battleId,roundId,nowMinute,roll}={}){
  const original=input.tournaments?.byId?.[id],source=original?.rounds?.[roundId],unchanged={state:input,events:[],changed:false};
@@ -42,7 +44,7 @@ export function advanceRoundJudging(input,{battleId:id=battleId,roundId,nowMinut
  try{
   for(const {judgeId,completedAt}of advanced.ready){
    const made=judgeBatch(state,round,judgeId,completedAt);state=made.state;round.judgeBatches[judgeId]=made.batch;
-   events.push(event(round,'battle-judge-complete',completedAt,judgeId,{judgeId,resultIds:made.batch.resultIds,text:judgeProfile(judgeId).name+' закончил судейство раунда.'}));
+   events.push(event(round,'battle-judge-complete',completedAt,judgeId,{judgeId,resultIds:made.batch.resultIds,ltr:made.batch.ltr,text:judgeProfile(judgeId).name+' закончил судейство раунда.'}));
    const hero=made.batch.resultIds.map(id=>state.judging.results[id]).find(r=>r.trackVersionId===round.submissions.player),submission=state.battleSubmissions?.find(s=>s.windowId===round.id);
    if(hero&&submission&&!(input.socialRuntime?.events??[]).some(e=>e.type==='judge-review'&&e.resultId===hero.id))events.push(event(round,'judge-review',completedAt,judgeId,{entityId:submission.id,trackVersionId:hero.trackVersionId,resultId:hero.id,judgeId,text:judgeProfile(judgeId).name+' оставил отзыв о твоей работе.'}));
   }

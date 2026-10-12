@@ -1,8 +1,9 @@
 import {formatMismatch,checkHardRules} from './battle-format.js?rev=39';
 import {normalizeContentMix,textMixRetention} from './text-content-mix.js?rev=39';
+import {seededLottery} from './battle-seeding.js?rev=39';
 const axes=['text','performance','music','sound'],clamp=(v,max=1)=>Math.max(0,Math.min(max,v));
 /** JudgeResult: decision is fixed from raw quality; display rounding and comments never decide a pair. */
-export function evaluateTrack(version,judge,format,{opponent=null}={}){
+export function evaluateTrack(version,judge,format,{opponent=null,tieSeed}={}){
  const weights=judge?.weights??{},known=axes.filter(k=>Number.isFinite(version?.qualities?.[k])&&Number.isFinite(weights[k])&&weights[k]>0);
  if(!known.length)return {ok:false,reason:'Недостаточно сохранённых данных для оценки.',trackVersionId:version?.id,judgeId:judge?.id};
  const contentMix=normalizeContentMix(version.facts?.find(f=>f.key==='text.contentMix')?.value),retention=textMixRetention(contentMix,judge.preferredContentMix,judge.contentMixSensitivity);
@@ -12,6 +13,11 @@ export function evaluateTrack(version,judge,format,{opponent=null}={}){
  if(opponent){
   const other=evaluateTrack(opponent,judge,format);if(!other.ok)return {...result,ok:false,reason:'У соперника недостаточно сохранённых данных.'};
   const difference=raw-other.raw;result.margin=Math.abs(difference);result.decision=difference===0?{kind:'tie',winnerId:null}:{kind:'pair_vote',winnerId:difference>0?version.id:opponent.id};result.opponentRaw=other.raw;
+  if(difference===0&&tieSeed!==undefined&&version.id!==opponent.id){
+   const adjusted=(v,k)=>clamp(v.qualities[k],10)*(k==='text'?textMixRetention(normalizeContentMix(v.facts?.find(f=>f.key==='text.contentMix')?.value),judge.preferredContentMix,judge.contentMixSensitivity):1);
+   for(const key of [...known].sort((a,b)=>weights[b]-weights[a]||axes.indexOf(a)-axes.indexOf(b))){if(!Number.isFinite(opponent.qualities[key]))continue;const delta=adjusted(version,key)-adjusted(opponent,key);if(delta!==0){result.decision={kind:'pair_vote',winnerId:delta>0?version.id:opponent.id,resolvedBy:'preferred-aspect',axis:key};break;}}
+   if(result.decision.kind==='tie')result.decision={kind:'pair_vote',winnerId:seededLottery([version.id,opponent.id],[tieSeed,judge.id,...[version.id,opponent.id].sort()].join(':'))[0],resolvedBy:'seeded-lottery'};
+  }
  }
  return result;
 }
