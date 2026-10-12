@@ -1,19 +1,19 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {ApartmentAnimation} from './apartment-v3-animation.js?rev=37';
-import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=37';
-import {homeLight} from './apartment-v3-time.js?rev=37';
-import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=37';
-import {createLandingReveal} from './apartment-v3-landing.js?rev=37';
-import {CameraModes,cameraPose,pickVisible,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=37';
-import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=37';
-import {createSmoke} from './apartment-v3-smoke.js?rev=37';
-import {createRetroPass} from './apartment-v3-retro.js?rev=37';
-import {createComputerView} from './apartment-v3-computer.js?rev=37';
-import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=37';
-import {pcPresentation} from './virtual-pc-presentation.js?rev=37';
-import {createWardrobeFurniture} from './home-wardrobe.js?rev=37';
-import {applySwitchStyle} from './apartment-switch-style.js?rev=37';
+import {ApartmentAnimation} from './apartment-v3-animation.js?rev=38';
+import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=38';
+import {homeLight} from './apartment-v3-time.js?rev=38';
+import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=38';
+import {createLandingReveal} from './apartment-v3-landing.js?rev=38';
+import {CameraModes,cameraPose,pickVisible,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=38';
+import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=38';
+import {createSmoke} from './apartment-v3-smoke.js?rev=38';
+import {createRetroPass} from './apartment-v3-retro.js?rev=38';
+import {createComputerView} from './apartment-v3-computer.js?rev=38';
+import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=38';
+import {pcPresentation} from './virtual-pc-presentation.js?rev=38';
+import {createWardrobeFurniture} from './home-wardrobe.js?rev=38';
+import {applySwitchStyle} from './apartment-switch-style.js?rev=38';
 
 export async function createApartmentScene(canvas,config){
   const BASE=config.assetBase??'./assets/apartment/v3/';

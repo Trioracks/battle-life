@@ -1,4 +1,4 @@
-@import url('./underweb-world.css?rev=37');
+@import url('./underweb-world.css?rev=38');
 /* Original in-game applications: visual FT workspace and Underweb pages. */
 .installer-content progress{display:block;appearance:none;width:100%;height:19px;margin:20px 0;border:1px solid #7f9db9;border-radius:2px;background:#fff;box-shadow:inset 1px 1px 2px #7774;accent-color:#41b531}
 .installer-content progress::-webkit-progress-bar{background:#fff;box-shadow:inset 1px 1px 2px #7774}

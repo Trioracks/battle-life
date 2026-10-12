@@ -30,10 +30,15 @@ export const BEGINNER_RECIPES=Object.freeze(BEGINNER_FAMILIES.flatMap((name,fami
     arrangementId:partId('arrangement',family*2+(variant%3===0?0:1)),
   }))
 ));
-const catalogue=new Map(BEGINNER_BANK.map(part=>[part.id,part]));
+export const USER_DRUM_BANK=Object.freeze(Array.from({length:10},(_,index)=>{
+ const number=String(index+1).padStart(2,'0');
+ return Object.freeze({id:'user-drums-20261012-'+number,kind:'drums',bpm:90,bars:4,key:null,authorship:'user',name:'Авторский ритм / '+number,path:'./assets/audio/ft/user-drums-v1/'+number+'.wav'});
+}));
+const catalogue=new Map([...BEGINNER_BANK,...USER_DRUM_BANK].map(part=>[part.id,part]));
 export const beginnerById=id=>catalogue.get(id);
-export function chooseBeginnerParts(random=Math.random){
+export function chooseBeginnerParts(random=Math.random,{skill}={}){
   const value=random(),unit=Number.isFinite(value)?Math.max(0,Math.min(.999999,value)):0;
-  const {drumsId,themeId,arrangementId}=BEGINNER_RECIPES[Math.floor(unit*BEGINNER_RECIPES.length)];
-  return {drumsId,themeId,arrangementId};
+  const index=Math.floor(unit*BEGINNER_RECIPES.length),{drumsId,themeId,arrangementId}=BEGINNER_RECIPES[index];
+  const author=Number.isFinite(skill)&&skill<50&&index%3===0;
+  return {drumsId:author?USER_DRUM_BANK[Math.floor(index/3)%10].id:drumsId,themeId,arrangementId};
 }

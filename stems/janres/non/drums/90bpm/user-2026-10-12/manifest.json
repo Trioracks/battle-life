@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "batch": "user-drums-2026-10-12",
+  "role": "drums-only",
+  "authorship": "User supplied original drum parts for Battle Life",
+  "bpm": 90,
+  "bpmSource": "user-declared",
+  "key": null,
+  "keyCompatibility": "Any musical key, as specified by the author",
+  "sourcePolicy": "Original MP3 bytes preserved; filenames organized only. Do not overwrite these sources with derived loops.",
+  "playbackStatus": "integrated-user-drums-v1",
+  "derivedManifest": "assets/audio/ft/user-drums-v1/manifest.json",
+  "preparationRule": "One-bar patterns at 90 BPM; encoder delay removed by decoding, decay tails folded into the cycle, repeated to four bars. Source PCM is calibrated by saved runtime gains, never overwritten.",
+  "parts": [
+    {
+      "id": "user-drums-20261012-01",
+      "file": "drums-90-01.mp3",
+      "originalFile": "1.mp3",
+      "originalPath": "Новая папка/beats 90 bpm/1.mp3",
+      "bytes": 65157,
+      "sha256": "da398e8d6c91dbb6305c69f5b9d7d738de08b63fca8d8e33277c3fa27f55de0b",
+      "encodedDurationSeconds": 2.712,
+      "sampleRate": 48000,
+      "channels": 2
+    },
+    {
+      "id": "user-drums-20261012-02",
+      "file": "drums-90-02.mp3",
+      "originalFile": "2.mp3",
+      "originalPath": "Новая папка/beats 90 bpm/2.mp3",
+      "bytes": 69765,
+      "sha256": "2c4b5d8073d90a413c68c1118b3f56dd3f9abe336596b35e9a6d4aa755ab2f02",
+      "encodedDurationSeconds": 2.904,
+      "sampleRate": 48000,
+      "channels": 2
+    },
+    {
+      "id": "user-drums-20261012-03",
+      "file": "drums-90-03.mp3",
+      "originalFile": "3.mp3",
+      "originalPath": "Новая папка/beats 90 bpm/3.mp3",
+      "bytes": 149829,
+      "sha256": "9678d961c0a3a8f78e21158b6a583d4b2ab6928ef4c15dacf248a2c885393795",
+      "encodedDurationSeconds": 6.24,
+      "sampleRate": 48000,
+      "channels": 2
+    },
+    {
+      "id": "user-drums-20261012-04",
+      "file": "drums-90-04.mp3",
+      "originalFile": "4.mp3",
+      "originalPath": "Новая папка/beats 90 bpm/4.mp3",
+      "bytes": 152133,
+      "sha256": "fecd71659bc1a55df350139ec397d09efc22505828dfddd58503183f5ef1c007",
+      "encodedDurationSeconds": 6.336,
+      "sampleRate": 48000,
+      "channels": 2
+    },
+    {
+      "id": "user-drums-20261012-05",
+      "file": "drums-90-05.mp3",
+      "originalFile": "5.mp3",
+      "originalPath": "Новая папка/beats 90 bpm/5.mp3",
+      "bytes": 84165,
+      "sha256": "ba3204f3ca2cb964ee20e627e67da15c118af1aa69ad9509aca968a76785cab1",
+      "encodedDurationSeconds": 3.504,
+      "sampleRate": 48000,
+      "channels": 2
+    },
+    {
+      "id": "user-drums-20261012-06",
+      "file": "drums-90-06.mp3",
+      "originalFile": "6.mp3",
+      "originalPath": "Новая папка/beats 90 bpm/6.mp3",
+      "bytes": 148101,
+      "sha256": "d41389b8f66170871d4f731d6c109f3c816ff429d4e50db0117af8e6949794d4",
+      "encodedDurationSeconds": 6.168,
+      "sampleRate": 48000,
+      "channels": 2
+    },
+    {
+      "id": "user-drums-20261012-07",
+      "file": "drums-90-07.mp3",
+      "originalFile": "7.mp3",
+      "originalPath": "Новая папка/beats 90 bpm/7.mp3",
+      "bytes": 148101,
+      "sha256": "9d08031ac386ea24dab3c927842ca5cc0184d895f391f56b987d7315b1e2988a",
+      "encodedDurationSeconds": 6.168,
+      "sampleRate": 48000,
+      "channels": 2
+    },
+    {
+      "id": "user-drums-20261012-08",
+      "file": "drums-90-08.mp3",
+      "originalFile": "8.mp3",
+      "originalPath": "Новая папка/beats 90 bpm/8.mp3",
+      "bytes": 99141,
+      "sha256": "d68694f279c34b15401bd7bd16d2816ae2501d38bcd7f53760660db5c835bf8a",
+      "encodedDurationSeconds": 4.128,
+      "sampleRate": 48000,
+      "channels": 2
+    },
+    {
+      "id": "user-drums-20261012-09",
+      "file": "drums-90-09.mp3",
+      "originalFile": "9.mp3",
+      "originalPath": "Новая папка/beats 90 bpm/9.mp3",
+      "bytes": 65157,
+      "sha256": "bd612be6a1e0fd6b734c448421d79a79b4dcc17a5e4a60c1f8d24c56824809fc",
+      "encodedDurationSeconds": 2.712,
+      "sampleRate": 48000,
+      "channels": 2
+    },
+    {
+      "id": "user-drums-20261012-10",
+      "file": "drums-90-10.mp3",
+      "originalFile": "10.mp3",
+      "originalPath": "Новая папка/beats 90 bpm/10.mp3",
+      "bytes": 65733,
+      "sha256": "6e765c37206f3536c5463ce76a2360af4c91ef24f0d04c74b0c301792c4a2628",
+      "encodedDurationSeconds": 2.736,
+      "sampleRate": 48000,
+      "channels": 2
+    }
+  ]
+}

@@ -1,9 +1,9 @@
-import {createVirtualPcState} from './virtual-pc-state.js?rev=37';
-import {softwareDiskBytes} from './pc-software.js?rev=37';
-import {SOFTWARE} from './pc-software-catalog.js?rev=37';
-import {advanceTransfers,TRANSFER_RATES} from './pc-transfer-runtime.js?rev=37';
-import {gameMinuteStamp} from './game-minute.js?rev=37';
-import {advanceSocial} from './social-runtime.js?rev=37';
+import {createVirtualPcState} from './virtual-pc-state.js?rev=38';
+import {softwareDiskBytes} from './pc-software.js?rev=38';
+import {SOFTWARE} from './pc-software-catalog.js?rev=38';
+import {advanceTransfers,TRANSFER_RATES} from './pc-transfer-runtime.js?rev=38';
+import {gameMinuteStamp} from './game-minute.js?rev=38';
+import {advanceSocial} from './social-runtime.js?rev=38';
 export {gameMinuteStamp};
 export function advanceVirtualPc(input,clock){
  let s=createVirtualPcState(input);const stamp=gameMinuteStamp(clock),previous=s.lastGameMinute;

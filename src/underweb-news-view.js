@@ -1,4 +1,4 @@
-import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=37';
+import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=38';
 const date=value=>typeof value==='string'?value.split('-').reverse().join('.'):'';
 const link=(d,text,fn,className='')=>pcButton(d,text,{className:'uw-control uw-news-link '+className},fn);
 const articleUrl=issue=>'underweb://iskra/news/'+issue.id;

@@ -1,4 +1,4 @@
-import {SOCIAL_COMMUNITIES,SOCIAL_PROFILES,profileById} from './social-catalog.js?rev=37';
+import {SOCIAL_COMMUNITIES,SOCIAL_PROFILES,profileById} from './social-catalog.js?rev=38';
 const copy=value=>JSON.parse(JSON.stringify(value));
 const record=v=>v&&typeof v==='object'&&!Array.isArray(v);
 const ids=(v,allow=()=>true)=>[...new Set((Array.isArray(v)?v:[]).filter(id=>typeof id==='string'&&id.length>0&&id.length<180&&allow(id)))];

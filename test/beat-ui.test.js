@@ -11,7 +11,7 @@ test('FT creates a beat without tempo editing and retains inputs across host tic
  const s=setup();s.pc.open('ft-studio');s.launch();findButton(s.root,'Новый проект').click();
  const name=field(s.root,'Название бита');assert.ok(name);name.value='Город';fire(name,'input');name.focus();
  s.pc.syncHost({playerName:'Игрок',clockLabel:'10:01',skills:{beatmaking:40}});assert.equal(field(s.root,'Название бита'),name);assert.equal(name.value,'Город');
- findButton(s.root,'Начать проект').click();assert.equal(s.pc.state.projects[0].name,'Город');assert.match(s.pc.state.projects[0].drumId,/^beginner-drums-/);
+ findButton(s.root,'Начать проект').click();assert.equal(s.pc.state.projects[0].name,'Город');assert.match(s.pc.state.projects[0].drumId,/^(beginner-drums-|user-drums-20261012-)/);
  assert.equal(allPc(s.root).filter(n=>n.type==='range').length,9);assert.equal(field(s.root,'BPM'),undefined);
  const groove=field(s.root,'Ровный грув');groove.value='9';fire(groove,'input');
  findButton(s.root,'Работать над битом').click();assert.equal(s.work(),1);assert.ok(s.pc.state.music.job);assert.equal(s.pc.state.music.job.sliders[0],9);

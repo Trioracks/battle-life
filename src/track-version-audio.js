@@ -1,7 +1,7 @@
-import {TRACK_DSP_VERSION} from './track-version.js?rev=37';
-import {beginnerById} from './beat-beginner-bank.js?rev=37';
-import {drumById,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=37';
-import {vocalById} from './vocal-catalog.js?rev=37';
+import {TRACK_DSP_VERSION} from './track-version.js?rev=38';
+import {beginnerById} from './beat-beginner-bank.js?rev=38';
+import {drumById,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=38';
+import {vocalById} from './vocal-catalog.js?rev=38';
 export async function playTrackVersion(audio,version){
  const fail=reason=>{audio?.stop?.();return {ok:false,reason};};
  if(version?.schemaVersion!==1||version.recipe?.dspVersion!==TRACK_DSP_VERSION)return fail('Эта версия обработки пока не поддерживается. Работа сохранена без изменений.');

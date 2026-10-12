@@ -1,5 +1,5 @@
-import {normalizeBeatResult} from './beat-result.js?rev=37';
-import {creativeProfileAmount} from './audio-performance.js?rev=37';
+import {normalizeBeatResult} from './beat-result.js?rev=38';
+import {creativeProfileAmount} from './audio-performance.js?rev=38';
 const clamp=(v,lo=0,hi=1)=>Math.max(lo,Math.min(hi,v));
 const mod=(x,n)=>((x%n)+n)%n;
 const sample=(a,t)=>{const i=Math.floor(t),f=t-i;return a[mod(i,a.length)]*(1-f)+a[mod(i+1,a.length)]*f;};

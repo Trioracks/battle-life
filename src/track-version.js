@@ -1,7 +1,7 @@
-import {normalizeBeat} from './beat-production.js?rev=37';
-import {normalizeLyric} from './lyric-production.js?rev=37';
-import {resolveBeatPlayback} from './beat-playback.js?rev=37';
-import {lyricOutcomes,beatOutcomes,vocalOutcomes,combineProductionOutcomes} from './production-outcomes.js?rev=37';
+import {normalizeBeat} from './beat-production.js?rev=38';
+import {normalizeLyric} from './lyric-production.js?rev=38';
+import {resolveBeatPlayback} from './beat-playback.js?rev=38';
+import {lyricOutcomes,beatOutcomes,vocalOutcomes,combineProductionOutcomes} from './production-outcomes.js?rev=38';
 export const TRACK_DSP_VERSION=1;
 const clone=value=>JSON.parse(JSON.stringify(value));
 const object=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);

@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-12",
+  "scope": "Approved source loudness and ten user drum patterns; not the V krugu/browser/camera package.",
+  "clientRevision": 38,
+  "policy": {
+    "newProjectsOnly": true,
+    "legacyProjectsAndFrozenVersionsUnchanged": true,
+    "sourceCount": 152,
+    "targetsLufs": {"drums": -30, "theme": -27, "arrangement": -28.5},
+    "sourcePeakCeilingDbTP": -10,
+    "peakRule": "Static gain ceiling only, not dynamic compression. Sparse sources may remain below loudness target.",
+    "baseOutputGain": 0.55,
+    "mixedDb": 3,
+    "masteredTotalDb": 4,
+    "existingSongFormRetained": "2 bars intro + 4 verse + 2 outro after mixing",
+    "newDrums": {"count": 10, "bpm": 90, "key": null, "sourceBars": 1, "outputBars": 4, "belowBeatSkill": 50, "selection": "30 out of 90 equal-probability recipe picks; three picks per new drum"},
+    "sourceLocation": "stems/janres/non/drums/90bpm/user-2026-10-12",
+    "playbackLocation": "assets/audio/ft/user-drums-v1"
+  },
+  "verification": {
+    "baseline": {"command": "npm test", "passed": 915, "failed": 0},
+    "final": {"command": "npm test", "passed": 922, "failed": 0, "log": "artifacts/audio-levels/final-test.log"},
+    "sourceIntegrity": "All ten original MP3 SHA-256 checks pass; old bank WAV assets unmodified",
+    "webAudio": {"command": "node tools/verify-audio-levels.mjs", "passed": true, "skills": [10,49,75,100], "newDrumMasteredCombinations": 40, "largestPeak": 0.7549564242362976, "safetyShaperKnee": 0.85, "gainOnlyMaximumSampleResidual": 0.0000001977296141819629, "evidence": "artifacts/audio-levels/web-audio-verification.json"},
+    "demoExport": {"command": "node tools/render-skill-demos.mjs", "passed": true, "directory": "artifacts/audio-levels/skill-demos", "mixedSkills": [10,30,75,100], "extra": ["before-mix-10", "skill-100-mastered"]},
+    "review": "Independent read-only reviewer: no critical, important or actionable minor findings in scoped audio implementation",
+    "notClaimed": ["Human listening approval", "Perceptual equality of every possible full mix", "Completion of the separate 14-task V krugu package"]
+  },
+  "pendingSeparateWork": {
+    "plan": "docs/superpowers/plans/2026-10-12-v-krugu-browser-camera.md",
+    "status": "Written specification approved; implementation-plan confirmation requested asynchronously, not yet received during this audio change."
+  }
+}

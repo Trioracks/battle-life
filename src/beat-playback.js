@@ -1,9 +1,10 @@
-import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=37';
-import {beginnerById} from './beat-beginner-bank.js?rev=37';
-import {normalizeBeatMix} from './beat-mix.js?rev=37';
-import {normalizeRecording,vocalPlaybackProfile} from './vocal-result.js?rev=37';
-import {createBeatSongForm,songPartWindows} from './beat-song-form.js?rev=37';
-import {normalizeGenreSnapshot} from './genre-progression.js?rev=37';
+import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=38';
+import {beginnerById} from './beat-beginner-bank.js?rev=38';
+import {normalizeBeatMix} from './beat-mix.js?rev=38';
+import {normalizeRecording,vocalPlaybackProfile} from './vocal-result.js?rev=38';
+import {createBeatSongForm,songPartWindows} from './beat-song-form.js?rev=38';
+import {normalizeGenreSnapshot} from './genre-progression.js?rev=38';
+import {SOURCE_GAINS_DB} from './source-levels-v1.js?rev=38';
 
 // A project has one musical clock, even when a legacy drum loop is shorter.
 export function resolveBeatPlayback(beat,{workStage=null,recordingPreview=null}={}){
@@ -20,15 +21,19 @@ export function resolveBeatPlayback(beat,{workStage=null,recordingPreview=null}=
  const mix=normalizeBeatMix(beat.mix);
  const recording=normalizeRecording(recordingPreview??beat.recording);
  if((recordingPreview||beat.recording)&&!recording)return fail('Не найдена запись вокала. Проект сохранён.');
- const post=(recording?.mix?2:0)+(recording?.master?2:0);
+ const leveled=beat.audio?.levelVersion===1;
+ const post=leveled?0:(recording?.mix?2:0)+(recording?.master?2:0);
  const form=workStage===null&&!recordingPreview?createBeatSongForm({...beat,recording}):null;
  const durationSeconds=form?.durationSeconds??(modern||recordingPreview||beat.recording?32/3:loopSeconds());
  const owner=workStage===null&&!recordingPreview?'studio':'work',parts=chosen.map((id,index)=>{
   const part={id,loopSeconds:beginnerById(id)?32/3:loopSeconds()},layer=mix?.version===2?mix.layers[workStage??index]:null;
+  if(leveled)part.sourceGainDb=SOURCE_GAINS_DB[id]??0;
   if(layer)part.result=post&&workStage===null?{...layer,quality:Math.min(110,layer.quality+post),postGain:post}:layer;
   if(form)part.windows=songPartWindows(form,index);return part;
  });
  const genreProfile=normalizeGenreSnapshot(beat.genreProfile);
- if(recording&&workStage===null&&beat.stages.length===3){const vocal={id:recording.sourceId,loopSeconds:32/3,vocal:{...vocalPlaybackProfile(recording),...(genreProfile?{genreProfile}:{})}};if(form)vocal.windows=songPartWindows(form,3);parts.push(vocal);}
- return {ok:true,reason:'',descriptor:{key:JSON.stringify([beat.id,owner,workStage,chosen,mix,recording,...(genreProfile?[genreProfile]:[])]),owner,durationSeconds,parts,mix}};
+ if(recording&&workStage===null&&beat.stages.length===3){const performance=leveled?{...recording,mix:null,master:null}:recording;const vocal={id:recording.sourceId,loopSeconds:32/3,vocal:{...vocalPlaybackProfile(performance),...(genreProfile?{genreProfile}:{})}};if(form)vocal.windows=songPartWindows(form,3);parts.push(vocal);}
+ const gainDb=workStage===null&&!recordingPreview?(recording?.mix?3:0)+(recording?.master?1:0):0;
+ const levels=leveled?{levelVersion:1,outputGain:.55*10**(gainDb/20)}:{};
+ return {ok:true,reason:'',descriptor:{key:JSON.stringify([beat.id,owner,workStage,chosen,mix,recording,...(genreProfile?[genreProfile]:[]),...(leveled?[levels]:[])]),owner,durationSeconds,parts,mix,...levels}};
 }

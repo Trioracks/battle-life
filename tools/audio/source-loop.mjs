@@ -25,6 +25,19 @@ export function encodePcm16({sampleRate,channels}){
   for(let i=0;i<frames;i++)for(let ch=0;ch<count;ch++)wav.writeInt16LE(Math.round(Math.max(-1,Math.min(1,channels[ch][i]))*32767),44+(i*count+ch)*2);
   return wav;
 }
+// The supplied MP3s contain one musical bar followed by decay, not two-bar songs.
+// Fold that decay into a steady-state cycle before repeating: no padded silent bars.
+export function repeatDrumCycle({sampleRate,channels,cycleBars=1}){
+  if(!Number.isInteger(sampleRate)||sampleRate<8000||sampleRate>192000||![1,2,4].includes(cycleBars)||!Array.isArray(channels)||![1,2].includes(channels.length))throw Error('Invalid drum cycle');
+  const frames=Math.round(sampleRate*32/3),cycleFrames=Math.round(sampleRate*8/3*cycleBars);
+  if(channels.some(c=>c.length<cycleFrames||c.length>frames*2))throw Error('Source too short or too long for drum cycle');
+  if(pcmStatistics(channels).rms<.0001)throw Error('Source is silent');
+  return {sampleRate,channels:channels.map(input=>{
+    const cycle=new Float32Array(cycleFrames);
+    for(let i=0;i<input.length;i++)cycle[i%cycleFrames]+=input[i];
+    return Float32Array.from({length:frames},(_,i)=>cycle[i%cycleFrames]*Math.min(1,i/(sampleRate*.001),(frames-1-i)/(sampleRate*.001)));
+  })};
+}
 export function deriveSourceLoop({sampleRate,channels}){
   if(!Number.isFinite(sampleRate)||sampleRate<8000||sampleRate>192000||!Array.isArray(channels)||![1,2].includes(channels.length))throw new Error('Invalid PCM source');
   const sourceFrames=Math.round(sampleRate*32/3);

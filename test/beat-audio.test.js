@@ -22,3 +22,20 @@ test('unknown/missing files fail safely and disposal is final',async()=>{
  assert.equal(await audio.play({drumId:'beginner-drums-01',stage:1}),false);assert.match(audio.error,/звук/i);
  assert.equal(await audio.play({drumId:'../../evil',stage:1}),false);audio.dispose();assert.equal(await audio.play({drumId:'primitive',stage:1}),false);
 });
+
+test('saved source calibration and output gain are applied without mutating cached legacy PCM',async()=>{
+ const ctx=context();
+ ctx.createBuffer=(channels,length,rate)=>{const data=Array.from({length:channels},()=>new Float32Array(length));return {numberOfChannels:channels,length,sampleRate:rate,duration:length/rate,getChannelData:ch=>data[ch],copyToChannel:(a,ch)=>data[ch].set(a)};};
+ const input=ctx.createBuffer(2,470400,44100);input.getChannelData(0).fill(.1);input.getChannelData(1).fill(-.2);
+ ctx.decodeAudioData=async()=>input;
+ const audio=new BeatAudio({contextFactory:()=>ctx,fetchFn:async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(8)})});
+ const descriptor={key:'leveled',owner:'studio',durationSeconds:32/3,levelVersion:1,outputGain:.4,parts:[{id:'beginner-theme-16',loopSeconds:32/3,sourceGainDb:-6}]};
+ assert.equal(await audio.playDescriptor(descriptor),true);
+ assert.equal(audio.gain.gain.value,.4);
+ assert.ok(Math.abs(ctx.sources[0].buffer.getChannelData(0)[100]-.050118723)<1e-8);
+ assert.ok(Math.abs(ctx.sources[0].buffer.getChannelData(1)[100]+.100237446)<1e-8);
+ assert.equal(input.getChannelData(0)[100],Math.fround(.1));
+ await audio.playDescriptor({key:'legacy',owner:'studio',durationSeconds:32/3,parts:[{id:'beginner-theme-16',loopSeconds:32/3}]});
+ assert.equal(audio.gain.gain.value,.7);assert.equal(ctx.sources.at(-1).buffer,input);
+ audio.dispose();
+});

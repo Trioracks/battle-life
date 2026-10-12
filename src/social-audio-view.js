@@ -1,7 +1,7 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=37';
-import {socialButton} from './social-dom.js?rev=37';
-import {playTrackVersion} from './track-version-audio.js?rev=37';
-import {chooseBeginnerParts} from './beat-beginner-bank.js?rev=37';
+import {pcElement as el} from './virtual-pc-dom.js?rev=38';
+import {socialButton} from './social-dom.js?rev=38';
+import {playTrackVersion} from './track-version-audio.js?rev=38';
+import {chooseBeginnerParts} from './beat-beginner-bank.js?rev=38';
 // These authored background demos use the cleared in-game bank. They are not
 // historical recordings or entries in the current submission window.
 export function backgroundAudioDescriptor(item){

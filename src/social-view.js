@@ -1,12 +1,12 @@
-import {pcElement as el,pcFind} from './virtual-pc-dom.js?rev=37';
-import {SOCIAL_SECTIONS,communityById} from './social-catalog.js?rev=37';
-import {normalizeSocial,listCommunities} from './social-state.js?rev=37';
-import {socialAvatar,socialButton,socialHeading} from './social-dom.js?rev=37';
-import {createSocialAudio} from './social-audio-view.js?rev=37';
-import {createSocialProfileView} from './social-profile-view.js?rev=37';
-import {createSocialCommunityView} from './social-community-view.js?rev=37';
-import {mountSocialDialog} from './social-dialog-view.js?rev=37';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=37';
+import {pcElement as el,pcFind} from './virtual-pc-dom.js?rev=38';
+import {SOCIAL_SECTIONS,communityById} from './social-catalog.js?rev=38';
+import {normalizeSocial,listCommunities} from './social-state.js?rev=38';
+import {socialAvatar,socialButton,socialHeading} from './social-dom.js?rev=38';
+import {createSocialAudio} from './social-audio-view.js?rev=38';
+import {createSocialProfileView} from './social-profile-view.js?rev=38';
+import {createSocialCommunityView} from './social-community-view.js?rev=38';
+import {mountSocialDialog} from './social-dialog-view.js?rev=38';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=38';
 export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,navigate,audio,onResultViewed=()=>{}}){
  const d=root.ownerDocument,shell=el(d,'section',{className:'sn-network',attributes:{'aria-label':SOCIAL_IDENTITY.name}}),head=el(d,'header',{className:'sn-top'});
  head.append(el(d,'strong',{text:SOCIAL_IDENTITY.mark+' / '+SOCIAL_IDENTITY.name}),el(d,'span',{text:'Люди. Музыка. Наши места.'}));

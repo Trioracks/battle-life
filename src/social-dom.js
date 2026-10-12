@@ -1,4 +1,4 @@
-import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=37';
+import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=38';
 export const socialButton=(d,text,fn,extra={})=>pcButton(d,text,{className:'sn-button',...extra},fn);
 export function socialAvatar(d,avatar={},name='',large=false){
  const node=el(d,'div',{className:'sn-avatar'+(large?' sn-avatar-large':''),text:avatar.mark??'Р',attributes:{role:'img','aria-label':'Аватар: '+name}});

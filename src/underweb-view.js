@@ -1,17 +1,17 @@
-import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=37';
-import {resolveUnderweb,BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=37';
-import {createBeatMarket} from './beat-market-view.js?rev=37';
-import {softwareForum,softwareMessage} from './pc-software-view.js?rev=37';
-import {downloadPresentation} from './virtual-pc-runtime.js?rev=37';
-import {createCommunityView} from './underweb-community-view.js?rev=37';
-import {communityDay} from './underweb-community.js?rev=37';
-import {homeDateLabel} from './home-calendar.js?rev=37';
-import {newsForDay} from './underweb-news.js?rev=37';
-import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=37';
-import {mountSocial} from './social-view.js?rev=37';
-import {activateSocial} from './social-runtime.js?rev=37';
-import {markDialogRead} from './social-submission.js?rev=37';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=37';
+import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=38';
+import {resolveUnderweb,BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=38';
+import {createBeatMarket} from './beat-market-view.js?rev=38';
+import {softwareForum,softwareMessage} from './pc-software-view.js?rev=38';
+import {downloadPresentation} from './virtual-pc-runtime.js?rev=38';
+import {createCommunityView} from './underweb-community-view.js?rev=38';
+import {communityDay} from './underweb-community.js?rev=38';
+import {homeDateLabel} from './home-calendar.js?rev=38';
+import {newsForDay} from './underweb-news.js?rev=38';
+import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=38';
+import {mountSocial} from './social-view.js?rev=38';
+import {activateSocial} from './social-runtime.js?rev=38';
+import {markDialogRead} from './social-submission.js?rev=38';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=38';
 const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-control '+(options.className??'')},fn);
 
 export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,onSubmitTrack=()=>{},onResultViewed=()=>{},getSoftwareMessage=()=>''}){

@@ -35,7 +35,7 @@ test('general beat practice preserves writing, flow and sound progress through c
 });
 test('empty market never interrupts new authored-bank beats at any skill',()=>{
  assert.equal(DRUMS.length,0);
- for(const skill of [0,10,25,39,40,50,75,100])assert.match(make(seed(),skill).projects[0].drumId,/^beginner-drums-/);
+ for(const skill of [0,10,25,39,40,50,75,100])assert.match(make(seed(),skill).projects[0].drumId,skill<50?/^(beginner-drums-|user-drums-20261012-)/:/^beginner-drums-/);
  assert.equal(make().projects[0].bpm,90);
 });
 test('retired purchases do not charge cash or become new project sources',()=>{

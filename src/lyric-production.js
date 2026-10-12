@@ -1,11 +1,11 @@
 // Persisted, symbolic writing: no copyrighted lyrics or generated prose.
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=37';
-import {BEAT_RULES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=37';
-import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=37';
-import {softwareDiskBytes} from './pc-software.js?rev=37';
-import {homeDateLabel} from './home-calendar.js?rev=37';
-import {lyricOutcomes,normalizeProductionOutcome} from './production-outcomes.js?rev=37';
-import {chooseTrackReferences,STARTING_REFERENCE_TOPICS,REFERENCE_CATALOG} from './cultural-references.js?rev=37';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=38';
+import {BEAT_RULES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=38';
+import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=38';
+import {softwareDiskBytes} from './pc-software.js?rev=38';
+import {homeDateLabel} from './home-calendar.js?rev=38';
+import {lyricOutcomes,normalizeProductionOutcome} from './production-outcomes.js?rev=38';
+import {chooseTrackReferences,STARTING_REFERENCE_TOPICS,REFERENCE_CATALOG} from './cultural-references.js?rev=38';
 
 export const LYRIC_STAGES=Object.freeze([
  {name:'Общее создание',sliders:['Ясность мысли','Развитие темы','Личное отношение'],target:[8,7,6]},

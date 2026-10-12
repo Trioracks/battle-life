@@ -1,11 +1,12 @@
-import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=37';
-import {beginnerById} from './beat-beginner-bank.js?rev=37';
-import {resolveBeatPlayback} from './beat-playback.js?rev=37';
-import {connectBeatMix} from './beat-mix.js?rev=37';
-import {transformBeatBuffer,connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=37';
-import {vocalById} from './vocal-catalog.js?rev=37';
-import {transformVocalBuffer} from './vocal-result-dsp.js?rev=37';
-import {arrangeSongBuffer} from './beat-song-form.js?rev=37';
+import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=38';
+import {beginnerById} from './beat-beginner-bank.js?rev=38';
+import {resolveBeatPlayback} from './beat-playback.js?rev=38';
+import {connectBeatMix} from './beat-mix.js?rev=38';
+import {transformBeatBuffer,connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=38';
+import {vocalById} from './vocal-catalog.js?rev=38';
+import {transformVocalBuffer} from './vocal-result-dsp.js?rev=38';
+import {arrangeSongBuffer} from './beat-song-form.js?rev=38';
+import {calibratedSourceBuffer,descriptorOutputGain} from './audio-levels.js?rev=38';
 
 // Authored placeholder PCM, not a remix of third-party music. Sliders never enter here.
 export function primitiveSamples(kind,rate=44100){
@@ -80,7 +81,7 @@ export class BeatAudio{
    await this.unlock();if(!this.current(token))return false;
    const buffers=await Promise.all(descriptor.parts.map(part=>this.buffer(part.id,token)));
    if(!this.current(token))return false;
-   this.gain=this.context.createGain();this.gain.gain.value=.7;
+   this.gain=this.context.createGain();this.gain.gain.value=descriptorOutputGain(descriptor);
    const layerEffects=[];
    const master=descriptor.mix?.version===2||descriptor.parts.some(p=>p.vocal)?connectBeatResultMaster(this.context,this.context.destination):connectBeatMix(this.context,descriptor.mix,this.context.destination);
    this.effects={input:master.input,dispose(){layerEffects.forEach(fx=>fx.dispose());master.dispose();}};this.gain.connect(master.input);
@@ -91,20 +92,21 @@ export class BeatAudio{
    // Prepare all PCM before reading the shared scheduling clock.
    const prepared=buffers.map((buffer,index)=>{
     const part=descriptor.parts[index];
+    buffer=calibratedSourceBuffer(this.context,buffer,part.sourceGainDb);
     if(part.vocal){
      const key=JSON.stringify([part.id,part.loopSeconds,part.vocal]);let processed=this.resultCache.get(key);
      if(!processed){processed=transformVocalBuffer(this.context,buffer,part.vocal,part.loopSeconds);if(this.resultCache.size>=8)this.resultCache.delete(this.resultCache.keys().next().value);this.resultCache.set(key,processed);}
      return {buffer:processed,input:this.gain};
     }
     if(!part.result)return {buffer,input:beatInput};
-    const key=JSON.stringify([part.id,part.loopSeconds,part.result]);
+    const key=JSON.stringify([part.id,part.loopSeconds,part.result,part.sourceGainDb]);
     let transformed=this.resultCache.get(key);
     if(!transformed){transformed=transformBeatBuffer(this.context,buffer,part.result,part.loopSeconds);if(this.resultCache.size>=8)this.resultCache.delete(this.resultCache.keys().next().value);this.resultCache.set(key,transformed);}
     const fx=connectBeatResult(this.context,part.result,beatInput);layerEffects.push(fx);return {buffer:transformed,input:fx.input};
    });
    const arranged=prepared.map(({buffer,input},index)=>{
     const part=descriptor.parts[index];if(!part.windows)return {buffer,input};
-    const key=JSON.stringify(['song',part.id,part.loopSeconds,part.result,part.vocal,part.windows,descriptor.durationSeconds]);let complete=this.resultCache.get(key);
+    const key=JSON.stringify(['song',part.id,part.loopSeconds,part.result,part.vocal,part.windows,descriptor.durationSeconds,part.sourceGainDb]);let complete=this.resultCache.get(key);
     if(!complete){complete=arrangeSongBuffer(this.context,buffer,part.windows,descriptor.durationSeconds,part.loopSeconds);if(this.resultCache.size>=8)this.resultCache.delete(this.resultCache.keys().next().value);this.resultCache.set(key,complete);}
     return {buffer:complete,input};
    });

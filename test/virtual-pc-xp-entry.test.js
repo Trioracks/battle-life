@@ -33,7 +33,7 @@ test('host controller owns the eleven second cold boot with no DOM timer',()=>{
 });
 test('entry loads versioned Sloboda stylesheet and module, and host feeds game metadata',async()=>{
   const html=await readFile(new URL('../index.html',import.meta.url),'utf8'),app=await readFile(new URL('../src/apartment-app.js?rev=32',import.meta.url),'utf8');
-  assert.match(html,/apartment-app\.js\?rev=37/);assert.match(html,/virtual-pc\.css\?rev=37/);
-  assert.match(html,/desktop-apps\.css\?rev=37/);
-  assert.match(app,/virtual-pc-ui\.js\?rev=37/);assert.match(app,/syncHost\(\{playerName:profile\?\.name/);
+  assert.match(html,/apartment-app\.js\?rev=38/);assert.match(html,/virtual-pc\.css\?rev=38/);
+  assert.match(html,/desktop-apps\.css\?rev=38/);
+  assert.match(app,/virtual-pc-ui\.js\?rev=38/);assert.match(app,/syncHost\(\{playerName:profile\?\.name/);
 });
