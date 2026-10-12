@@ -25,6 +25,7 @@ import {SOFTWARE} from './pc-software-catalog.js?rev=34';
 import {mountRapNotebook} from './rap-notebook-view.js?rev=34';
 import {normalizeLyric} from './lyric-production.js?rev=34';
 import {pauseCreativeChain} from './creative-workflow.js?rev=34';
+import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=34';
 
 const NOOP = () => {};
 
@@ -118,6 +119,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     launchGeneration:0,
     properties: null,
     shutdownModal: null,
+    submissionModal: null,
     metadata: {playerName:'Игрок',clockLabel:'12:00'},
     returnFocus: null,
     folder: 'computer',
@@ -136,10 +138,11 @@ export function mountVirtualPc(root, callbacks = {}) {
     bootStep: 0,
   };
 
-  pc.persist = (state = pc.state) => {
-    pc.state = createVirtualPcState(state);
-    const result = pc.callbacks.onPersist(pc.state);
+  pc.persist = (state = pc.state,options={}) => {
+    const next=createVirtualPcState(state);
+    const result = pc.callbacks.onPersist(next,options);
     const durable = result?.ok ?? result !== false;
+    if(durable||!options.atomic)pc.state=next;
     pc.persistenceWarning = durable ? '' : 'Сохранение браузера недоступно: изменения останутся только до закрытия страницы.';
     pc.refreshPersistenceWarning();
     return durable;
@@ -163,7 +166,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.windows=reduceWindows(pc.windows,{type:'open',id:appId,appId,title:app?.label??appId});
   };
   pc.windowAction = action => {
-    if((pc.confirmClose||pc.shutdownModal)&&action.type!=='viewport')return;
+    if((pc.confirmClose||pc.shutdownModal||pc.submissionModal)&&action.type!=='viewport')return;
     if(action.type==='close'){pc.closeWindow(action.id);return;}
     pc.windows=reduceWindows(pc.windows,action);
     pc.renderDesktop(false);
@@ -247,10 +250,10 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.explorer?.update(pc.state);
     pc.underwebView?.update();pc.torrentView?.update();pc.installerView?.update();
     pc.studioView?.update();
-    pc.notebookView?.update();
+    pc.notebookView?.update();pc.submissionModal?.view.update();
     for(const view of pc.systemViews.values())view.update();
     const guard=pc.confirmClose?findByDataset(root,'pcRole','close-guard'):null;
-    pc.shell.setModal(pc.shutdownModal?.node??guard,pc.returnFocus);
+    pc.shell.setModal(pc.submissionModal?.node??pc.shutdownModal?.node??guard,pc.returnFocus);
     if(!pc.confirmClose&&replaceActive){
       const scope=pc.focusScope(),restored=focusId&&findFocusControl(scope,focusId);
       (restored&&!restored.disabled?restored:focusableControls(scope)[0])?.focus?.();
@@ -263,7 +266,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.notebookView.update();return;
     }
     if(appId==='underweb'){
-      if(!pc.underwebView)pc.underwebView=mountUnderweb(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onApply:(id,name)=>pc.persist(applyToBattle(pc.state,id,name)),onSoftware:pc.softwareAction,getSoftwareMessage:()=>pc.message,onChange:next=>{pc.persist(next);pc.renderDesktop(false);},audio:pc.beatAudio});
+      if(!pc.underwebView)pc.underwebView=mountUnderweb(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onApply:(id,name)=>pc.persist(applyToBattle(pc.state,id,name)),onSubmitTrack:id=>pc.showSubmission(id),onSoftware:pc.softwareAction,getSoftwareMessage:()=>pc.message,onChange:next=>{const saved=pc.persist(next);pc.renderDesktop(false);return saved;},audio:pc.beatAudio});
       pc.underwebView.update();return;
     }
     if(appId==='ft-studio'){
@@ -319,12 +322,24 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.cancelShutdown = () => {
     pc.shutdownModal?.view.dispose();pc.shutdownModal=null;pc.shell.setModal(null,pc.returnFocus);pc.renderDesktop(false);
   };
+  pc.closeSubmission=()=>{
+    pc.submissionModal?.view.dispose();pc.submissionModal=null;pc.underwebView?.update();
+    const target=findByDataset(root,'pcRole','submit-track')??pc.returnFocus;
+    pc.shell.setModal(null,target);pc.renderDesktop(false);
+  };
+  pc.showSubmission=battleId=>{
+    if(pc.submissionModal||pc.shutdownModal||pc.confirmClose)return;
+    pc.returnFocus=document.activeElement;
+    const node=el(document,'div'),view=mountBattleSubmissionPicker(node,{getState:()=>pc.state,battleId,getGameDay:()=>pc.metadata.gameDay??1,onChange:next=>pc.persist(next,{atomic:true}),onClose:()=>pc.closeSubmission()});
+    pc.submissionModal={node,view};pc.shell.setModal(node,pc.returnFocus);
+  };
   pc.showShutdown = () => {
     if(pc.confirmClose||pc.shutdownModal)return;pc.cancelStudioLaunch();pc.menu.close();pc.returnFocus=document.activeElement;
     const node=el(document,'div');const view=mountSystemWindow(node,{kind:'shutdown',getState:()=>pc.state,onClose:()=>pc.cancelShutdown(),onConfirmShutdown:()=>{pc.cancelShutdown();pc.requestShutdown();}});
     pc.shutdownModal={node,view};pc.shell.setModal(node,pc.returnFocus);
   };
   pc.clearViews = () => {
+    pc.submissionModal?.view.dispose();pc.submissionModal=null;
     pc.notebookView?.dispose();pc.notebookView=null;
     pc.torrentView?.dispose();pc.torrentView=null;pc.installerView?.dispose();pc.installerView=null;
     pc.studioView?.dispose();pc.studioView=null;
@@ -457,6 +472,7 @@ export function mountVirtualPc(root, callbacks = {}) {
 
 
   pc.focusScope = () => {
+    if(pc.submissionModal)return pc.submissionModal.node;
     if (pc.confirmClose) return findByDataset(root, 'pcRole', 'close-guard');
     if (pc.startOpen) return findByDataset(root, 'pcRole', 'start-menu');
     return findByDataset(root, 'windowId', pc.windows.activeId) ?? root;

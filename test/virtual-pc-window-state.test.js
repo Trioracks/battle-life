@@ -2,6 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createWindowState, reduceWindows } from '../src/virtual-pc-window-state.js';
 const open=(s,id='computer')=>reduceWindows(s,{type:'open',id,appId:id,title:id});
+
+test('browser first maximized, then user geometry and minimized state restore',()=>{
+ let s=open(createWindowState({width:1280,height:900}),'underweb');assert.equal(s.windows[0].mode,'maximized');assert.equal(s.windows[0].rect.height,868);
+ s=reduceWindows(s,{type:'toggle-maximize',id:'underweb'});s=reduceWindows(s,{type:'geometry',id:'underweb',rect:{x:10,y:20,width:800,height:600}});
+ s=reduceWindows(s,{type:'minimize',id:'underweb'});s=open(s,'underweb');assert.equal(s.windows[0].mode,'normal');assert.deepEqual(s.windows[0].rect,{x:10,y:20,width:800,height:600});
+});
 test('maximize restores geometry without mutating its input',()=>{
   const a=createWindowState({width:1280,height:720}), b=open(a);
   const c=reduceWindows(b,{type:'toggle-maximize',id:'computer'});

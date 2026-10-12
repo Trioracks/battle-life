@@ -19,7 +19,7 @@ export function reduceWindows(state,action) {
     const big=['ft-studio','underweb','rap-notebook'].includes(action.appId),offset=windows.length*24;
     const normal=fit({x:120+offset,y:48+offset,width:big?940:560,height:big?620:420},state.viewport);
     const rect=action.rect&&Object.values(action.rect).length===4&&Object.values(action.rect).every(Number.isFinite)?fit(action.rect,state.viewport):normal;
-    const mode=['ft-studio','rap-notebook'].includes(action.appId)||state.viewport.width<=640?'maximized':'normal';
+    const mode=['ft-studio','rap-notebook','underweb'].includes(action.appId)||state.viewport.width<=640?'maximized':'normal';
     w={id:action.id,appId:action.appId,title:action.title,rect:mode==='maximized'?area(state.viewport):rect,restoreRect:rect,mode,restoreMode:mode,z};
     return {...state,windows:[...windows,w],activeId:w.id};
   }

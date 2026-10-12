@@ -2,6 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {pcDocument,allPc,findButton} from './helpers/virtual-pc-dom.js';
 import * as view from '../src/underweb-news-view.js?rev=28';
+import {mountUnderweb} from '../src/underweb-view.js';
+import {submissionFixture} from './helpers/submission-fixtures.js';
+
+test('Iskra places news before directory and only registered battles in sidebar',()=>{
+ const d=pcDocument(),root=d.createElement('section'),state=submissionFixture();
+ const browser=mountUnderweb(root,{getState:()=>state,getMetadata:()=>({gameDay:1}),onChange(){}});
+ const nodes=allPc(root),side=nodes.find(n=>n.getAttribute('aria-label')==='Мои баттлы');assert.ok(side);
+ assert.ok(findButton(side,'Макаревич Батл №1'));assert.equal(findButton(side,'Бетонное эхо'),undefined);
+ assert.ok(nodes.findIndex(n=>n.className==='uw-news-panel')<nodes.findIndex(n=>n.className==='uw-home-directory'));
+ assert.ok(!nodes.some(n=>n.textContent?.includes('Без ИИ')));findButton(side,'Макаревич Батл №1').click();assert.equal(browser.snapshot.route.brief.id,'makarevich-1');
+});
 const issue={id:'fixture-only',publishDate:'2012-09-04',eventDate:'2012-09-02',title:'Проверочная новость',body:['Текст для проверки отображения.','<script>not executable</script>'],category:'Техника',sourceTitle:'Источник',sourceUrl:'https://example.com/source'};
 test('Iskra news panel shows distinct issue and event dates and navigates to a local article',()=>{
  assert.equal(typeof view.createNewsPanel,'function');const d=pcDocument();let address='';const panel=view.createNewsPanel(d,{issue,navigate:value=>address=value});

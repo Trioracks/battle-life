@@ -74,9 +74,11 @@ try{
     onClose:()=>{if(motion.actionId==='wardrobe'&&motion.phase==='perform')motion.leaveAction();last=performance.now();},
   });
   const homeModalOpen=()=>fridgeView.isOpen||wardrobeView.isOpen;
-  function persistPc(next){
+  function persistPc(next,{atomic=false}={}){
+    const previous=pcState;
     pcState=createVirtualPcState(next);
     const saved=migrationReady&&saveVirtualPcState(storage,pcState);
+    if(atomic&&!saved)pcState=previous;
     pcStorageWarning=saved?'':migrationReady?'Сохранение виртуального ПК недоступно.':migration.error||'Автосохранение отключено до восстановления.';
     virtualPc?.setPersistenceWarning(pcStorageWarning);
     if(fridgeView.isOpen)fridgeView.update(pcState,pcStorageWarning);
@@ -92,7 +94,7 @@ try{
   }
   const pcLifecycle=new PcLifecycle({view,getState:()=>pcState,setPower:power=>persistPc(setPcPower(pcState,power)),sounds:pcSounds,onRoom:returnFromComputer,onError:()=>{pcPrepareError=true;message='Не удалось подготовить экран. Попробуйте сесть за ПК ещё раз.';messageUntil=performance.now()+6000;}});
   virtualPc=mountVirtualPc(pcRoot,{
-    onPersist:next=>persistPc(next),
+    onPersist:(next,options)=>persistPc(next,options),
     onLeave:()=>pcLifecycle.leave(),
     onShutdown:()=>pcLifecycle.shutdown(),
     onAppSound:cue=>pcSounds.play(cue),

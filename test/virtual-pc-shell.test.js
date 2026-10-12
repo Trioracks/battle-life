@@ -47,7 +47,8 @@ test('desktop icons resolve real local SVG artwork',async()=>{
 });
 test('closing or disposing a dragging frame releases pointer capture',()=>{
   for(const action of ['close','dispose']){
-    const {root,shell,model}=setup(),title=findPc(root,'titlebar','underweb');let captured=null;
+    const {root,shell,model}=setup();model.windows=reduceWindows(model.windows,{type:'toggle-maximize',id:'underweb'});shell.render(model);
+    const title=findPc(root,'titlebar','underweb');let captured=null;
     title.setPointerCapture=id=>{captured=id;};title.hasPointerCapture=id=>captured===id;title.releasePointerCapture=()=>{captured=null;};
     fire(title,'pointerdown',{button:0,pointerId:7,clientX:10,clientY:10});
     assert.equal(captured,7);
