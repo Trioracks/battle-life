@@ -10,11 +10,10 @@ import {newsForDay} from './underweb-news.js?rev=38';
 import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=38';
 import {mountSocial} from './social-view.js?rev=38';
 import {activateSocial} from './social-runtime.js?rev=38';
-import {markDialogRead} from './social-submission.js?rev=38';
 import {SOCIAL_IDENTITY} from './social-identity.js?rev=38';
 const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-control '+(options.className??'')},fn);
 
-export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,onSubmitTrack=()=>{},onResultViewed=()=>{},getSoftwareMessage=()=>''}){
+export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,onSubmitTrack=()=>{},onResultViewed=()=>{},getSoftwareMessage=()=>'',isVisible=()=>true}){
  let socialView=null;
  const d=root.ownerDocument,history=['underweb://iskra'];let index=0,route=resolveUnderweb(history[0],getMetadata()),applicationOpen=false,lastApplications='',applicationFocus=null,lastSoftware='',lastDay=0;
  const softwareSignature=()=>{const s=getState().software;return JSON.stringify([s?.client?.installed,s?.client?.receivedBytes===2000000,s?.ft?.installed,s?.ft?.receivedBytes===800000000,s?.notebook?.installed,s?.notebook?.receivedBytes===4000000,s?.metadata,s?.notebookMetadata,s?.transfers,getSoftwareMessage()]);};
@@ -137,7 +136,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   socialView?.dispose();socialView=null;
   if(route.type==='social'){
    const host=el(d,'div');page.replaceChildren(host);
-   socialView=mountSocial(host,{route,getState,getMetadata,onChange,navigate,audio,onResultViewed});
+   socialView=mountSocial(host,{route,getState,getMetadata,onChange,navigate,audio,onResultViewed,isVisible});
   }else
   page.replaceChildren(route.type.startsWith('news')?createNewsPage(d,{route,navigate}):route.type.startsWith('forum')?createCommunityView(d,{route,getState,getMetadata,onChange,navigate}):['samples','ripline'].includes(route.type)?createBeatMarket(d,{getState,onChange,audio,navigate,ripline:route.type==='ripline'}):route.type==='home'?homePage():route.type==='search'?resultsPage():route.type==='battles'?catalogPage():route.type==='battle'?detailPage():route.type==='dump'?softwareForum(d,{topic:route.topic,state:getState(),navigate,onAction:onSoftware,message:getSoftwareMessage()}):el(d,'p',{className:'uw-error',text:route.message}));
   lastSoftware=softwareSignature();
@@ -148,7 +147,6 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   if(next.type!=='social')return;
   const result=activateSocial(getState(),getMetadata().gameMinutes,BATTLE_BRIEFS.some(b=>b.id===next.communityId)?next.communityId:'makarevich-1');
   if(!result.ok)return;let state=result.state;
-  if(next.section==='dialog'&&state.social?.dialogs?.[next.communityId]?.unread)state=markDialogRead(state,next.communityId).state;
   if(state!==getState())onChange(state);
  }
  function navigate(input){const next=resolveUnderweb(input,getMetadata());activateRoute(next);route=next;history.splice(index+1);history.push(route.url);index=history.length-1;applicationOpen=false;render();}

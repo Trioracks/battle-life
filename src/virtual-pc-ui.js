@@ -292,7 +292,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.notebookView.update();return;
     }
     if(appId==='underweb'){
-      if(!pc.underwebView)pc.underwebView=mountUnderweb(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onApply:(id,name)=>pc.persist(applyToBattle(pc.state,id,name)),onSubmitTrack:id=>pc.showSubmission(id),onResultViewed:callbacks.onResultViewed,onSoftware:pc.softwareAction,getSoftwareMessage:()=>pc.message,onChange:next=>{const saved=pc.persist(next,{atomic:true});pc.renderDesktop(false);return saved;},audio:pc.audioSession.forOwner('underweb')});
+      if(!pc.underwebView)pc.underwebView=mountUnderweb(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,isVisible:()=>pc.phase==='desktop'&&!pc.locked&&!root.hidden&&!document.hidden&&(!root.dataset.pcTransition||root.dataset.pcTransition==='desktop')&&pc.windows.activeId==='underweb'&&pc.windows.windows.some(w=>w.id==='underweb'&&w.mode!=='minimized'),onApply:(id,name)=>pc.persist(applyToBattle(pc.state,id,name)),onSubmitTrack:id=>pc.showSubmission(id),onResultViewed:callbacks.onResultViewed,onSoftware:pc.softwareAction,getSoftwareMessage:()=>pc.message,onChange:next=>{const saved=pc.persist(next,{atomic:true});pc.renderDesktop(false);return saved;},audio:pc.audioSession.forOwner('underweb')});
       pc.underwebView.update();return;
     }
     if(appId==='ft-studio'){

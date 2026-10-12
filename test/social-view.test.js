@@ -24,7 +24,7 @@ test('community shows its saved deadline and prefers explicit analysis over inte
 test('six sections show personal profile and no free wall or message composers',()=>{
  const s=setup();assert.equal(allPc(s.root).filter(n=>n.dataset?.socialSection).length,6);
  for(const text of ['Герой','День рождения','Образование','Языки','скрыто'])assert.ok(allPc(s.root).some(n=>n.textContent===text),text);
- for(const path of ['me','friends','photos','audio','messages','groups']){const x=setup(path);assert.equal(allPc(x.root).filter(n=>n.tagName==='TEXTAREA'||n.getAttribute?.('contenteditable')==='true').length,0);assert.equal(allPc(x.root).filter(n=>n.tagName==='INPUT'&&n.getAttribute('aria-label')!=='Поиск сообществ').length,0);x.view.dispose();}
+ for(const path of ['me','friends','photos','audio','messages','groups']){const x=setup(path);assert.equal(allPc(x.root).filter(n=>n.tagName==='TEXTAREA'||n.getAttribute?.('contenteditable')==='true').length,0);assert.equal(allPc(x.root).filter(n=>n.tagName==='INPUT'&&!['Поиск сообществ','Поиск по сообщениям'].includes(n.getAttribute('aria-label'))).length,0);x.view.dispose();}
  findButton(s.root,'Мои фотографии').click();assert.equal(s.navigated,'underweb://social/photos');s.view.dispose();
 });
 test('private profile route exposes neither wall nor photos and cannot add a friend',()=>{

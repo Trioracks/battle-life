@@ -5,7 +5,9 @@ import {sendSubmission,dialogIsTyping,markDialogRead} from './social-submission.
 import {attemptForWindow} from './battle-windows.js?rev=38';
 import {gameMinuteLabel} from './game-minute.js?rev=38';
 import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=38';
-export function mountSocialDialog(d,{id,getState,getMetadata,navigate,commit,audio}){
+import {mountPersonalDialog,visibleDialogReader} from './social-messages-view.js?rev=38';
+export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commit,audio,isVisible=()=>true,onRead=id=>commit(markDialogRead(getState(),id))}){
+ if(peer?.kind==='person')return mountPersonalDialog(d,{id,getState,getMetadata,navigate,commit,isVisible,onRead});
  const c=communityById(id),root=el(d,'section',{className:'sn-dialog'}),history=el(d,'div',{className:'sn-dialog-history'}),typing=el(d,'p',{className:'sn-typing',attributes:{'aria-live':'polite'}}),draft=el(d,'div',{className:'sn-dialog-draft'}),actions=el(d,'div',{className:'sn-actions'}),notice=el(d,'p',{className:'sn-note'}),pickerHost=el(d,'div',{className:'sn-file-picker'});
  let picker=null,lastMessages='',lastDraft='',disposed=false;
  const closePicker=()=>{picker?.dispose();picker=null;attach.focus();};
@@ -16,7 +18,8 @@ export function mountSocialDialog(d,{id,getState,getMetadata,navigate,commit,aud
  const send=socialButton(d,'Отправить',()=>{if(!send.disabled)commit(sendSubmission(getState(),{communityId:id,nowMinute:getMetadata().gameMinutes}));});
  const read=socialButton(d,'Отметить прочитанным',()=>commit(markDialogRead(getState(),id)),{className:'sn-link'});
  root.append(socialHeading(d,'Сообщения · '+c.name),socialButton(d,'← Сообщество',()=>navigate('underweb://social/community/'+id),{className:'sn-link'}),history,typing,draft);actions.append(attach,send,read);root.append(actions,notice,pickerHost);
- function update(){
+ const autoRead=visibleDialogReader({id,getState,isVisible,onRead});
+ function update(markRead=true){
   if(disposed)return;const state=getState(),dialog=state.social?.dialogs?.[id]??{},window=state.battleWindows?.find(w=>w.battleId===c.battleId&&!w.issue),attempt=window&&attemptForWindow(state,window),now=getMetadata().gameMinutes;
   const signature=JSON.stringify(dialog.messages??[]);if(signature!==lastMessages){
    lastMessages=signature;history.replaceChildren();
@@ -33,6 +36,7 @@ export function mountSocialDialog(d,{id,getState,getMetadata,navigate,commit,aud
   read.hidden=!dialog.unread;
   notice.textContent=attempt?(attempt.status==='recovery'?'Старая работа сохранена с ошибкой источника. Замена закрыта.':attempt.status==='accepted'?'Работа принята. Ответ администратора не является оценкой судей.':'Работа отправлена. Администратор ответит через 1–30 игровых минут.'):(window?'Приём до '+gameMinuteLabel(window.closesAt)+' · одна отправка без замены.':'Срок приёма ещё не активирован.');
   picker?.update();
+  if(markRead)autoRead();
  }
- update();return {root,update,dispose(){disposed=true;picker?.dispose();root.replaceChildren();}};
+ update(false);return {root,update,dispose(){disposed=true;picker?.dispose();root.replaceChildren();}};
 }

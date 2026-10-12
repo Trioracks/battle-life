@@ -47,6 +47,19 @@ try{
   assert.ok((await page.locator('.sn-community').innerText()).includes('Игровые фоновые записи · прошлый сезон'));
   await page.screenshot({path:out+'/browser-'+width+'-archive.png'});
   await go('underweb://social/community/concrete-echo');assert.equal(await page.locator('.sn-audio').count(),0);
+  await go('underweb://social/messages');
+  await page.evaluate(async()=>{const {advancePersonalDialogs}=await import('/src/social-personal.js?rev=38');qa.pc.syncState(advancePersonalDialogs(qa.pc.state,600).state);});
+  assert.equal(await page.locator('.sn-unread-badge').innerText(),'+1');
+  await page.evaluate(async()=>{const {hoverPhoneNotice}=await import('/src/phone-notifications.js?rev=38'),s=qa.pc.state,id=s.phone.activeId;qa.pc.syncState({...s,phone:hoverPhoneNotice(hoverPhoneNotice(s.phone,id,true),id,false)});});
+  assert.equal(await page.locator('.sn-unread-badge').innerText(),'+1');
+  const search=page.getByRole('textbox',{name:'Поиск по сообщениям'});await search.fill('тРИСТА');assert.equal(await page.locator('.sn-message-row').count(),1);await page.evaluate(()=>qa.pc.underwebView.update());assert.equal(await search.evaluate(n=>document.activeElement===n),true);
+  for(const id of ['anya','dasha','vitya']){await go('underweb://social/dialog/'+id);await page.evaluate(()=>qa.pc.underwebView.update());assert.equal(await page.locator('.sn-dialog').getByRole('button',{name:'Прикрепить',exact:true}).count(),0);assert.ok(await page.locator('.sn-dialog-message').count()>=4);await page.screenshot({path:out+'/browser-'+width+'-dialog-'+id+'.png'});}
+  assert.equal(await page.evaluate(()=>qa.pc.state.social.dialogs.vitya.unread),false);
+  await windowView().getByRole('button',{name:'Свернуть окно',exact:true}).click();
+  await page.evaluate(async()=>{const {advancePersonalDialogs}=await import('/src/social-personal.js?rev=38');qa.pc.syncState(advancePersonalDialogs(qa.pc.state,3480).state);});assert.equal(await page.evaluate(()=>qa.pc.state.social.dialogs.vitya.unread),true);
+  await page.getByRole('button',{name:'Переключить Underweb',exact:true}).click();assert.equal(await page.evaluate(()=>qa.pc.state.social.dialogs.vitya.unread),false);
+  await page.getByRole('button',{name:'Заблокировать и удалить из друзей',exact:true}).click();assert.equal(await page.evaluate(()=>qa.pc.state.social.friends.includes('vitya')),false);
+  await page.evaluate(()=>{const s=qa.createVirtualPcState(JSON.parse(JSON.stringify(qa.pc.state)));qa.pc.showDesktop(s);qa.pc.openNow('underweb');});await go('underweb://social/dialog/vitya');assert.ok((await page.locator('.sn-dialog').innerText()).includes('Пользователь заблокирован'));
   await go('underweb://iskra');const entry=page.getByRole('button',{name:'В кругу — найди друзей и одноклассников',exact:true});
   assert.ok((await entry.boundingBox()).y<(await page.locator('.uw-news-panel').boundingBox()).y);
   assert.equal(await entry.evaluate(n=>getComputedStyle(n).fontSize),'19px');
