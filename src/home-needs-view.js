@@ -9,16 +9,18 @@ export function mountHomeNeedsView(root,{onConsume=()=>{},onClose=()=>{},returnF
   const slot=make('div',text);slot.className='home-food-slot home-food-empty';slot.dataset.slot=String(index+1);parent.append(slot);
  }
  const freezer=make('section'),freezerTitle=make('h3','Морозилка'),freezerNote=make('p','Место для замороженных ингредиентов');freezer.className='home-fridge-freezer';freezer.dataset.fridgeCompartment='freezer';freezer.setAttribute('aria-label','Морозилка');freezer.append(freezerTitle,freezerNote);
- for(let index=0;index<3;index++)emptySlot(freezer,index);
+ const freezerSlots=make('div');freezerSlots.className='home-fridge-slots';freezer.append(freezerSlots);
+ for(let index=0;index<3;index++)emptySlot(freezerSlots,index);
  interior.append(freezer);
  const icons={apple:'🍎',pear:'🍐',banana:'🍌',sausage:'🌭',bread:'🍞',cheese:'🧀'};
  for(const [index,ids]of [['apple','pear','banana'],[null,null,null],['sausage','bread','cheese']].entries()){
   const shelf=make('section');shelf.className='home-fridge-shelf';shelf.dataset.fridgeShelf=String(index+1);shelf.setAttribute('aria-label','Полка '+(index+1));
+  const slots=make('div');slots.className='home-fridge-slots';shelf.append(make('h3','Полка '+(index+1)),slots);
   for(const [slotIndex,id]of ids.entries()){
-   if(!id){emptySlot(shelf,slotIndex);continue;}
+   if(!id){emptySlot(slots,slotIndex);continue;}
    const item=FOOD_CATALOG[id],row=make('div'),icon=make('span',icons[id]),name=make('strong',item.name),count=make('span'),purpose=make('small','Сразу +30 сытости · Ингредиент'),eat=make('button','Съесть');
    row.className='home-food-slot';row.dataset.slot=String(slotIndex+1);icon.className='home-food-icon';icon.setAttribute('aria-hidden','true');count.className='home-food-stock';eat.type='button';eat.dataset.foodId=item.id;eat.setAttribute('aria-label','Съесть: '+item.name);eat.addEventListener('click',()=>{if(!eat.disabled)onConsume(item.id);});
-   row.append(icon,name,count,purpose,eat);shelf.append(row);rows.push({item,count,eat});
+   row.append(icon,name,count,purpose,eat);slots.append(row);rows.push({item,count,eat});
   }
   interior.append(shelf);
  }

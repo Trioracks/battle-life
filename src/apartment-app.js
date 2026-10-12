@@ -13,6 +13,7 @@ import {mountVirtualPc} from './virtual-pc-ui.js?rev=34';
 import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=28';
 import {PcSounds} from './virtual-pc-sounds.js?rev=28';
 import {playIndoorFootstep} from './indoor-footsteps.js?rev=21';
+import {createFootstepCadence} from './footstep-cadence.js?rev=34';
 import {restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=34';
 import {advanceInstallation} from './pc-software.js?rev=34';
 import {createBeatWorkPanel} from './beat-work-view.js?rev=34';
@@ -36,6 +37,7 @@ try{
   const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=33');
   const response=await fetch('./assets/apartment/v3/scene.json',{cache:'no-cache'});if(!response.ok)throw Error('Scene manifest '+response.status);
   const config=prepareApartmentConfig(await response.json()),view=await createApartmentScene(canvas,config);
+  const footsteps=createFootstepCadence(config.stride);
   let motion=new ApartmentMotion(config),mode='menu',playing=false,previewYaw=0,previewTarget=0;
   let cameraFade=false;const lookInput=new CameraPointer();
   const cameraButton=$('#camera-mode');
@@ -126,7 +128,7 @@ try{
   const names={wardrobe:'Выбирает одежду',dining:'Ест за столом',computer:'За компьютером',bed:'Сон',sink:'Моет посуду',stove:'Готовит еду',fridge:'Берёт еду',entry:'Открывает дверь','light-living':'Нажимает выключатель в комнате','light-kitchen':'Нажимает выключатель на кухне'};
   const sounds={dining:'dishes',computer:'chair-scrape',bed:'sleep',sink:'dishes',stove:'cook',fridge:'fridge',entry:'door'};
   const completed={dining:'Поел.',computer:'Работа за компьютером закончена.',bed:'Отдохнул. Можно идти дальше.',sink:'Посуда вымыта.',stove:'Еда приготовлена.',fridge:'Взял еду из холодильника.'};
-  let message='',messageUntil=0,last=performance.now(),lastStep=0,lastDoor=false,frameRate=60;
+  let message='',messageUntil=0,last=performance.now(),lastDoor=false,frameRate=60;
   function setMode(next){
     lookInput.stop();
     if(next!=='game'){fridgeView.close();wardrobeView.close();}
@@ -148,7 +150,7 @@ try{
     speech.clear();
     view.modes.reset();cameraLabel();
     profile=nextProfile;motion=new ApartmentMotion(config);if(homeTime.initialRest||homeTime.isSleeping){motion.startSleeping();view.modes.onMotionEvent({id:'bed',type:'started'});}view.setAppearance(profile.appearance);
-    playing=true;lastStep=0;lastDoor=false;hold=false;skeleton=false;$('#hold').checked=false;$('#show-bones').checked=false;
+    playing=true;footsteps.reset();lastDoor=false;hold=false;skeleton=false;$('#hold').checked=false;$('#show-bones').checked=false;
     $('#player-name').textContent=profile.name;resumeAnimation();setMode('game');cue('sleep');
   }
   function selectCreatorSection(section){
@@ -208,7 +210,7 @@ try{
   for(const district of districts){const b=document.createElement('button');b.textContent=district.name;b.dataset.district=district.id;b.addEventListener('click',()=>showDistrict(district.id));$('#districts').append(b);}
   showDistrict('north-sloboda');
   $('#return-home').addEventListener('click',()=>{if(motion.returnHome()){setMode('game');resumeAnimation();cue('door');}});
-  function act(id){if(homeModalOpen()||pcLifecycle.pending||pcLifecycle.snapshot.phase!=='room')return;resumeAnimation();if(id==='computer'&&workBlockReason(pcState)){message=workBlockReason(pcState);messageUntil=performance.now()+6000;speech.say(workNeedSpeech(pcState));return;}if(id==='entry'){if(!motion.busy)setMode('door');return;}const result=id==='computer'?{allowed:beginPcCutscene(motion)}:startHomeAction(motion,homeTime,id);if(result.allowed){if(id==='computer'){pcPrepareError=false;virtualPc.prepareAudio();pcSounds.unlock().catch(()=>{});pcLifecycle.prepare();}else cue('footstep');}else if(result.reason){message=result.reason;messageUntil=performance.now()+5000;}}
+  function act(id){if(homeModalOpen()||pcLifecycle.pending||pcLifecycle.snapshot.phase!=='room')return;resumeAnimation();if(id==='computer'&&workBlockReason(pcState)){message=workBlockReason(pcState);messageUntil=performance.now()+6000;speech.say(workNeedSpeech(pcState));return;}if(id==='entry'){if(!motion.busy)setMode('door');return;}const result=id==='computer'?{allowed:beginPcCutscene(motion)}:startHomeAction(motion,homeTime,id);if(result.allowed){if(id==='computer'){pcPrepareError=false;virtualPc.prepareAudio();pcSounds.unlock().catch(()=>{});pcLifecycle.prepare();}}else if(result.reason){message=result.reason;messageUntil=performance.now()+5000;}}
   $('#door-peek').addEventListener('click',()=>{setMode('game');act('peephole');});
   $('#door-exit').addEventListener('click',()=>{setMode('game');resumeAnimation();motion.interact('entry');});
   $('#door-cancel').addEventListener('click',()=>setMode('game'));
@@ -220,7 +222,7 @@ try{
     if(config.actions[id]?.lightRoom)b.setAttribute('aria-label',label);
     $('#actions').append(b);
   }
-  canvas.addEventListener('pointerdown',e=>{if(homeModalOpen()||!lookInput.canPick(e)||cameraFade||mode!=='game')return;const hit=view.pick(e);resumeAnimation();if(hit.id)act(hit.id);else if(hit.hero)motion.faceCamera();else if(Number.isFinite(hit.x)&&moveInRoom(motion,pcLifecycle,hit.x))cue('footstep');});
+  canvas.addEventListener('pointerdown',e=>{if(homeModalOpen()||!lookInput.canPick(e)||cameraFade||mode!=='game')return;const hit=view.pick(e);resumeAnimation();if(hit.id)act(hit.id);else if(hit.hero)motion.faceCamera();else if(Number.isFinite(hit.x))moveInRoom(motion,pcLifecycle,hit.x);});
   canvas.addEventListener('pointermove',e=>{if(mode!=='game'){canvas.style.cursor='default';return;}const delta=lookInput.move(e);if(delta){view.modes.look(...delta);canvas.style.cursor='grabbing';$('#hover-label').textContent='';return;}const hit=view.pick(e);canvas.style.cursor=hit.id||hit.hero?'pointer':'crosshair';
     const action=config.actions[hit.id];$('#hover-label').textContent=action?.lightRoom?(homeTime.lights[action.lightRoom]?'Выключить':'Включить')+' свет '+(action.lightRoom==='living'?'в комнате':'на кухне'):action?.label??(hit.hero?'Повернуться к камере':'');});
   canvas.addEventListener('pointerleave',()=>$('#hover-label').textContent='');
@@ -230,6 +232,7 @@ try{
   $('#step').addEventListener('click',()=>{paused=true;$('#pause').textContent='Продолжить';update(1/30,performance.now(),true);});$('#face').addEventListener('click',()=>motion.faceCamera());
   document.addEventListener('keydown',e=>{if(e.defaultPrevented||e.key!=='Escape')return;if(mode==='peephole')stopPeeking();else if(mode==='door')setMode('game');else if(mode==='pc')virtualPc.closeWindow();else if(mode==='game')setMode('menu');});
   function update(dt,now,step=false){
+    if(mode!=='game'||cameraFade||document.hidden||(paused&&!step)||homeModalOpen())footsteps.reset();
     if(mode!=='game'||cameraFade||document.hidden){speech.tick(0,{present:false});speechView.update(speech.snapshot);}
     cameraLabel();
     view.setComputerPresentation(pcLifecycle.snapshot,pcState,profile?.name??'Игрок');
@@ -299,7 +302,7 @@ try{
     }
     virtualPc.presentTransition(pcLifecycle.snapshot);
     view.setComputerPresentation(pcLifecycle.snapshot,pcState,profile?.name??'Игрок');
-    if(motion.clip==='walk'&&motion.walkDistance-lastStep>config.stride/2){cue('footstep');lastStep=motion.walkDistance;}
+    if(footsteps.update({clip:motion.clip,walkDistance:motion.walkDistance,paused:mode!=='game'||(paused&&!step)||document.hidden||homeModalOpen()}))cue('footstep');
     const door=motion.doorOpen>.3;if(door&&!lastDoor)cue('door');lastDoor=door;
     view.setRoomLights(homeTime.lights);view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));
     motion.workPerformance=creativeWorkDescriptor(pcState,profile?.skills).performance;

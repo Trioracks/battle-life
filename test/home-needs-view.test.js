@@ -40,10 +40,12 @@ test('fridge exposes empty freezer and three shelves with six usable infinite fo
  const view=mountHomeNeedsView(root,{onConsume:id=>chosen.push(id)});
  view.open(createVirtualPcState({music:{needs:{satiety:50}},household:{fridge:{}}}));
  const nodes=allPc(root),freezer=nodes.find(n=>n.dataset.fridgeCompartment==='freezer'),shelves=nodes.filter(n=>n.dataset.fridgeShelf);
- assert.ok(freezer);assert.equal(freezer.children.filter(n=>n.dataset.slot).length,3);assert.equal(allPc(freezer).some(n=>n.tagName==='BUTTON'),false);
+ assert.ok(freezer);assert.equal(allPc(freezer).filter(n=>n.dataset.slot).length,3);assert.equal(allPc(freezer).some(n=>n.tagName==='BUTTON'),false);
  assert.equal(shelves.length,3);
  assert.deepEqual(shelves.map(s=>allPc(s).filter(n=>n.tagName==='BUTTON').map(n=>n.dataset.foodId)),[['apple','pear','banana'],[],['sausage','bread','cheese']]);
- assert.deepEqual(shelves.map(s=>s.children.filter(n=>n.dataset.slot).length),[3,3,3]);
+ assert.deepEqual(shelves.map(s=>allPc(s).filter(n=>n.dataset.slot).length),[3,3,3]);
+ assert.deepEqual(nodes.filter(n=>n.tagName==='H3').map(n=>n.textContent),['Морозилка','Полка 1','Полка 2','Полка 3']);
+ for(const shelf of shelves){const grid=shelf.children.find(n=>n.className==='home-fridge-slots');assert.ok(grid);assert.equal(grid.children.length,3);assert.ok(grid.children.every(n=>n.dataset.slot));}
  const buttons=nodes.filter(n=>n.dataset.foodId);
  for(const button of buttons){assert.equal(button.disabled,false);button.click();}
  assert.deepEqual(chosen,['apple','pear','banana','sausage','bread','cheese']);
