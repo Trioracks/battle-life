@@ -231,9 +231,9 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.syncState = state => {
-    const next = createVirtualPcState(state);
-    if (JSON.stringify(next) === JSON.stringify(pc.state)) return;
-    pc.state = next;
+    // Runtime snapshots already crossed the load/command validation boundary.
+    if (state === pc.state) return;
+    pc.state = state;
     if (pc.phase === 'desktop') pc.refreshDynamicState();
   };
 

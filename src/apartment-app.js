@@ -8,7 +8,7 @@ import {DEFAULT_APPEARANCE,loadProfile,saveProfile} from './avatar-v3-profile.js
 import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=40';
 import {createNewGameSession} from './apartment-v3-new-game.js?rev=40';
 import {advanceVirtualPcDurably,gameMinuteStamp,createSubmissionTransferClock} from './virtual-pc-runtime.js?rev=40';
-import {createVirtualPcState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=40';
+import {createVirtualPcState,preparePcRuntimeState,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=40';
 import {mountVirtualPc} from './virtual-pc-ui.js?rev=40';
 import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=40';
 import {PcSounds} from './virtual-pc-sounds.js?rev=40';
@@ -66,7 +66,7 @@ try{
   function saveHomeTime(_storage,clock){return migrationReady&&saveHomeTimeRaw(storage,clock);}
   const saved=loadProfile(storage);let profile=saved.profile;
   let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lastInstallationSave=0,lightPreview='game';
-  const pcRoot=$('#virtual-pc'),savedPc=loadVirtualPcState(storage);let pcState=savedPc.state;
+  const pcRoot=$('#virtual-pc'),savedPc=loadVirtualPcState(storage);let pcState=preparePcRuntimeState(savedPc.state);
   let pcStorageWarning=migration.ok?(savedPc.ok?'':'Сохранение виртуального ПК недоступно.'):migration.error;
   let virtualPc,workReward=0,workFinished=false,lastWorkJob=null,lastWorkBeat=null,lastWorkCamera=null,resultEpisode=null,failedReactionId=null;
   const submissionTransferClock=createSubmissionTransferClock();
@@ -90,7 +90,7 @@ try{
   const homeModalOpen=()=>fridgeView.isOpen||wardrobeView.isOpen;
   function persistPc(next,{atomic=false}={}){
     const previous=pcState;
-    pcState=createVirtualPcState(next);
+    pcState=preparePcRuntimeState(next);
     const saved=migrationReady&&saveVirtualPcState(storage,pcState);
     if(atomic&&!saved)pcState=previous;
     pcStorageWarning=saved?'':migrationReady?'Сохранение виртуального ПК недоступно.':migration.error||'Автосохранение отключено до восстановления.';
@@ -342,7 +342,7 @@ try{
     }
     virtualPc.presentTransition(pcLifecycle.snapshot);
     if(resultEpisode?.returning&&pcLifecycle.snapshot.phase==='desktop'){
-      const done=completeResultReaction(pcState,resultEpisode.reaction.id,{nowMinute:homeTime.day*1440+homeTime.minutes});
+      const done=completeResultReaction(pcState,resultEpisode.reaction.id,{nowMinute:gameMinuteStamp(homeTime)});
       if(done.ok&&persistPc(done.state,{atomic:true}))virtualPc.syncState(pcState);
       else failedReactionId=resultEpisode.reaction.id;
       resultEpisode.ui.restore();resultEpisode=null;

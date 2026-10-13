@@ -1,10 +1,24 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {encodePcSave,decodePcSave} from '../src/pc-save-codec.js';
+import {readFileSync} from 'node:fs';
+import {encodePcSave,decodePcSave,createPcSnapshotEncoder} from '../src/pc-save-codec.js';
 import {createVirtualPcState,saveVirtualPcState,loadVirtualPcState,VIRTUAL_PC_STORAGE_KEY} from '../src/virtual-pc-state.js';
 import {migrateNoviceSave} from '../src/home-profile-migration.js';
 import {SAVE_KEY} from '../src/avatar-v3-profile.js';
 import {ensureBattleWindow} from '../src/battle-windows.js';
+test('partition encoder rejects combined sections above the decoder limit before writing',()=>{
+ const raw='a'.repeat(32*1024*1024),encode=createPcSnapshotEncoder();
+ assert.throws(()=>encode({version:1,trackVersions:{raw},judging:{raw}}),/размер/);
+});
+test('optimized codec reads the pre-optimization Unicode archive byte-for-byte',()=>{const old=readFileSync(new URL('./fixtures/pc-save-legacy.txt',import.meta.url),'utf8').trimEnd(),value={text:'я'.repeat(200001)};assert.deepEqual(decodePcSave(old),value);assert.equal(encodePcSave(value),old);});
+test('partitioned persistence remains atomic and notices nested changes without stale cached archives',()=>{
+ const state=createVirtualPcState({projects:[{id:'keep'}]}),map=new Map(),storage={getItem:k=>map.get(k)??null,setItem:(k,v)=>map.set(k,v)};
+ state.judging.recovery=[{raw:'Неприкосновенный архив '.repeat(15000)}];assert.equal(saveVirtualPcState(storage,state),true);
+ assert.ok(map.get(VIRTUAL_PC_STORAGE_KEY).startsWith('BLPC-PARTS1:'));
+ state.judging.recovery[0].raw+=' Изменён';assert.equal(saveVirtualPcState(storage,state),true);assert.deepEqual(loadVirtualPcState(storage).state.judging,state.judging);
+ const saved=map.get(VIRTUAL_PC_STORAGE_KEY);state.projects.push({id:'new'});assert.equal(saveVirtualPcState({...storage,setItem(){throw Error('quota');}},state),false);assert.equal(map.get(VIRTUAL_PC_STORAGE_KEY),saved);
+ map.set(VIRTUAL_PC_STORAGE_KEY,JSON.stringify(createVirtualPcState({projects:[{id:'external'}]})));assert.equal(loadVirtualPcState(storage).state.projects[0].id,'external');
+});
 test('large Unicode save is lossless and compact; small and legacy JSON remain readable',()=>{
  const small={version:1,text:'Привет 🙂'};assert.equal(encodePcSave(small),JSON.stringify(small));assert.deepEqual(decodePcSave(JSON.stringify(small)),small);
  const big={rows:Array.from({length:12000},(_,i)=>({id:'result:'+i,text:'Старый неизменяемый отзыв, вокал и барабаны 🎙',facts:['text.contentMix','audio.rhythm'],value:i/19}))};

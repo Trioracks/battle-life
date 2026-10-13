@@ -17,7 +17,7 @@ import {normalizeResultReactions} from './social-result-reaction.js?rev=40';
 import {normalizeNpcTracks} from './battle-npc.js?rev=40';
 import {normalizeTournaments} from './battle-tournament.js?rev=40';
 import {normalizeBattleHistory} from './battle-history.js?rev=40';
-import {encodePcSave,decodePcSave} from './pc-save-codec.js?rev=40';
+import {createPcSnapshotEncoder,decodePcSave} from './pc-save-codec.js?rev=40';
 import {normalizeNpcSocialProfiles} from './npc-social-profiles.js?rev=40';
 import {normalizeRapAnalysis} from './rap-analysis.js?rev=40';
 import {normalizeDossier} from './rap-dossier.js?rev=40';
@@ -87,8 +87,18 @@ function normalizeDownload(value) {
   return { status: 'idle', receivedBytes: 0 };
 }
 
-function normalizeSnapshot(value) {
+const immutableArchives=new WeakSet();
+function freezeArchive(value){if(!value||typeof value!=='object'||immutableArchives.has(value))return value;for(const child of Object.values(value))freezeArchive(child);Object.freeze(value);immutableArchives.add(value);return value;}
+export function preparePcRuntimeState(state){freezeArchive(state.trackVersions);freezeArchive(state.judging);return state;}
+function normalizeSnapshot(value,archiveCache=null) {
   const source = isRecord(value) ? value : {};
+  const archive=(key,normalize)=>{
+    if(!archiveCache)return normalize(source[key]);
+    const old=archiveCache.get(key);if(old?.input===source[key]&&immutableArchives.has(source[key]))return old.value;
+    const inputJson=JSON.stringify(source[key]);
+    if(old?.inputJson===inputJson){old.input=source[key];return old.value;}
+    const value=normalize(source[key]);archiveCache.set(key,{input:source[key],inputJson,value,json:JSON.stringify(value)});return value;
+  };
   const projects = Array.isArray(source.projects) ? source.projects.map(normalizeProject).filter(Boolean) : [];
   const music=normalizeMusic(source.music,projects),writing=normalizeWriting(source.writing,projects),recording=normalizeRecordingState(source.recording,projects);
   // BL-001 archives are inert history, never candidates for automatic job resumption.
@@ -105,7 +115,7 @@ function normalizeSnapshot(value) {
   // schema order; completed projects and already credited practice are retained.
   if(music.job){writing.job=null;recording.job=null;}else if(writing.job)recording.job=null;
   const battleSubmissions=normalizeBattleSubmissions(source.battleSubmissions);
-  let trackVersions=normalizeTrackVersions(source.trackVersions);
+  let trackVersions=archive('trackVersions',normalizeTrackVersions);
   for(const submission of battleSubmissions){
     if(submission.version!==1||submission.issue||submission.trackVersionId)continue;
     const captured=captureTrackVersion({projects:[submission.track,...(submission.lyrics?[submission.lyrics]:[])],trackVersions},{projectId:submission.projectId,nowMinute:(submission.submittedDay-1)*1440});
@@ -134,7 +144,7 @@ function normalizeSnapshot(value) {
     communityAudio:normalizeCommunityAudio(source.communityAudio),
     phone:normalizePhone(source.phone),
     battleKnowledge:normalizeBattleKnowledge(source.battleKnowledge),
-    judging:normalizeJudging(source.judging),
+    judging:archive('judging',normalizeJudging),
     judgingSchedule:normalizeJudgingSchedule(source.judgingSchedule),
     resultReactions:normalizeResultReactions(source.resultReactions),
     household:normalizeHousehold(source.household),
@@ -218,11 +228,13 @@ export function saveStudioProject(state, project) {
   return { ok: true, reason: '', state: { ...normalized, projects } };
 }
 
+const saveCaches=new WeakMap();
 export function saveVirtualPcState(storage, state) {
   try {
     if (!storage) return false;
+    let cache=saveCaches.get(storage);if(!cache){cache={encode:createPcSnapshotEncoder(),archives:new Map()};saveCaches.set(storage,cache);}
     const raw=storage.getItem?.(VIRTUAL_PC_STORAGE_KEY);
-    let parsed;try{parsed=raw?decodePcSave(raw):null;}catch{/* A fresh game may replace an unreadable save, as before. */}
+    let parsed;try{parsed=raw===cache.raw?cache.previous:raw?decodePcSave(raw):null;}catch{/* A fresh game may replace an unreadable save, as before. */}
     if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'household'))reserveHouseholdBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&parsed.music?.genres?.version!==1)reserveGenreBackup(storage,raw);
     if(isRecord(parsed)&&parsed.version===1&&parsed.creativeWork?.version!==1)reserveCreativeBackup(storage,raw);
@@ -234,7 +246,9 @@ export function saveVirtualPcState(storage, state) {
     if(isRecord(parsed)&&Array.isArray(parsed.battleWindows)&&parsed.battleWindows.some(w=>w?.battleId==='makarevich-1'&&w.judgingPolicyVersion!==2)&&state.battleWindows?.some(w=>w.battleId==='makarevich-1'&&w.judgingPolicyVersion===2)){
       const key=VIRTUAL_PC_STORAGE_KEY+'-before-tournament-v2';if(storage.getItem(key)===null)storage.setItem(key,raw);
     }
-    storage.setItem(VIRTUAL_PC_STORAGE_KEY, encodePcSave(normalizeSnapshot(state)));
+    const normalized=normalizeSnapshot(state,cache.archives),encoded=cache.encode(normalized,cache.archives);
+    storage.setItem(VIRTUAL_PC_STORAGE_KEY,encoded);
+    cache.raw=encoded;cache.previous={version:1,household:true,music:{genres:{version:normalized.music.genres.version}},creativeWork:{version:normalized.creativeWork.version},battleSubmissions:[],software:{transferVersion:normalized.software.transferVersion},trackVersions:{},socialRuntime:{version:normalized.socialRuntime.version},social:{schemaVersion:normalized.social.schemaVersion},battleWindows:normalized.battleWindows};
     return true;
   } catch {
     return false;

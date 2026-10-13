@@ -25,10 +25,12 @@ export function createSubmissionTransferClock(){
 }
 export {gameMinuteStamp};
 export function advanceVirtualPc(input,clock,options={}){
- let s=createVirtualPcState(input);const stamp=gameMinuteStamp(clock),previous=s.lastGameMinute;
+ // The host supplies a snapshot normalized at load. Published archives are
+ // immutable domain data, not per-frame input to the save migration pipeline.
+ let s=input??createVirtualPcState();const stamp=gameMinuteStamp(clock),previous=s.lastGameMinute;
  if(stamp===null)return {state:s,advancedBytes:0};
  const social=advanceSocial(s,stamp,options);s=social.state;
- s.lastGameMinute=stamp;
+ s={...s,lastGameMinute:stamp};
  if(previous===null||stamp<previous||s.power!=='on')return {state:s,advancedBytes:0,events:social.events,domainChanged:social.domainChanged};
  return {...advanceTransfers(s,previous,stamp),events:social.events,domainChanged:social.domainChanged};
 }

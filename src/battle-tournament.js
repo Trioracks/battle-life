@@ -23,7 +23,8 @@ export function normalizeTournaments(raw){
  const byId={},recovery=Array.isArray(raw?.recovery)?clone(raw.recovery):[];
  for(const [id,t]of Object.entries(record(raw?.byId)?raw.byId:{})){
   const valid=id===battleId&&t?.policyVersion===2&&t.battleId===id&&Number.isSafeInteger(t.seed)&&TOURNAMENT_ROUNDS.includes(t.currentRoundId)&&record(t.rounds)&&Array.isArray(t.events)&&Array.isArray(t.participantIds)&&['active','complete'].includes(t.status)&&Object.entries(t.rounds).every(([key,r])=>TOURNAMENT_ROUNDS.includes(key)&&validRoundInternals(r)&&r?.roundId===key&&validGameMinute(r.opensAt)&&validGameMinute(r.closesAt)&&r.closesAt>r.opensAt&&Array.isArray(r.judgeIds)&&record(r.submissions)&&Array.isArray(r.pairs)&&record(r.noShows)&&['accepting','awaiting_judges','complete'].includes(r.status));
-  if(valid)byId[id]=clone(t);else recovery.push({battleId:id,recoveryData:clone(t),reason:'Турнир повреждён. История сохранена без повторного посева.'});
+  const linksValid=valid&&record(t.rounds[t.currentRoundId])&&t.events.every(e=>record(e)&&typeof e.id==='string'&&typeof e.type==='string'&&e.battleId===id&&Object.hasOwn(t.rounds,e.roundId)&&validGameMinute(e.dueAt));
+  if(linksValid)byId[id]=clone(t);else recovery.push({battleId:id,recoveryData:clone(t),reason:'Турнир повреждён. История сохранена без повторного посева.'});
  }return {version:2,byId,recovery};
 }
 function newRound(window){return {...clone(window),status:'accepting',submissions:{},pairs:[],noShows:{}};}
