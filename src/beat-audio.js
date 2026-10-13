@@ -2,11 +2,10 @@ import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=4
 import {beginnerById} from './beat-beginner-bank.js?rev=41';
 import {resolveBeatPlayback} from './beat-playback.js?rev=41';
 import {connectBeatMix} from './beat-mix.js?rev=41';
-import {transformBeatBuffer,connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=41';
+import {connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=41';
 import {vocalById} from './vocal-catalog.js?rev=41';
-import {transformVocalBuffer} from './vocal-result-dsp.js?rev=41';
-import {arrangeSongBuffer} from './beat-song-form.js?rev=41';
-import {calibratedSourceBuffer,descriptorOutputGain} from './audio-levels.js?rev=41';
+import {descriptorOutputGain} from './audio-levels.js?rev=41';
+import {createBeatPcmProcessor} from './beat-pcm-background.js?rev=41';
 
 // Authored placeholder PCM, not a remix of third-party music. Sliders never enter here.
 export function primitiveSamples(kind,rate=44100){
@@ -29,7 +28,8 @@ export function primitiveSamples(kind,rate=44100){
  return data;
 }
 export class BeatAudio{
- constructor({contextFactory=()=>new (globalThis.AudioContext??globalThis.webkitAudioContext)(),fetchFn=(...a)=>fetch(...a),outputFactory=null}={}){
+ constructor({contextFactory=()=>new (globalThis.AudioContext??globalThis.webkitAudioContext)(),fetchFn=(...a)=>fetch(...a),outputFactory=null,pcmFactory=createBeatPcmProcessor}={}){
+  this.pcm=pcmFactory();
   Object.assign(this,{contextFactory,fetchFn,outputFactory});this.output=null;this.roomFrame=null;this.cache=new Map();this.resultCache=new Map();this.sources=[];this.retiring=[];this.generation=0;this.error='';this.disposed=false;this.status='stopped';this.offset=0;this.startedAt=0;this.descriptor=null;this.pending=null;
  }
  async unlock(){
@@ -83,6 +83,14 @@ export class BeatAudio{
    await this.unlock();if(!this.current(token))return false;
    const buffers=await Promise.all(descriptor.parts.map(part=>this.buffer(part.id,token)));
    if(!this.current(token))return false;
+   const prepared=await Promise.all(buffers.map(async(buffer,index)=>{
+    const part=descriptor.parts[index],key=JSON.stringify([part,descriptor.durationSeconds]);
+    if(this.resultCache.has(key))return this.resultCache.get(key);
+    const processed=await this.pcm.prepare(this.context,buffer,part,descriptor.durationSeconds);
+    if(this.current(token)){if(this.resultCache.size>=8)this.resultCache.delete(this.resultCache.keys().next().value);this.resultCache.set(key,processed);}
+    return processed;
+   }));
+   if(!this.current(token))return false;
    this.gain=this.context.createGain();this.gain.gain.value=descriptorOutputGain(descriptor);
    const layerEffects=[];
    const destination=this.output?.input??this.context.destination;
@@ -92,26 +100,12 @@ export class BeatAudio{
    if(descriptor.mix?.version===1&&descriptor.parts.some(p=>p.vocal)){
     const legacy=connectBeatMix(this.context,descriptor.mix,this.gain);layerEffects.push(legacy);beatInput=legacy.input;
    }
-   // Prepare all PCM before reading the shared scheduling clock.
-   const prepared=buffers.map((buffer,index)=>{
+   // Heavy PCM is complete before graphs are allocated or the shared clock is read.
+   const arranged=prepared.map((buffer,index)=>{
     const part=descriptor.parts[index];
-    buffer=calibratedSourceBuffer(this.context,buffer,part.sourceGainDb);
-    if(part.vocal){
-     const key=JSON.stringify([part.id,part.loopSeconds,part.vocal]);let processed=this.resultCache.get(key);
-     if(!processed){processed=transformVocalBuffer(this.context,buffer,part.vocal,part.loopSeconds);if(this.resultCache.size>=8)this.resultCache.delete(this.resultCache.keys().next().value);this.resultCache.set(key,processed);}
-     return {buffer:processed,input:this.gain};
-    }
+    if(part.vocal)return {buffer,input:this.gain};
     if(!part.result)return {buffer,input:beatInput};
-    const key=JSON.stringify([part.id,part.loopSeconds,part.result,part.sourceGainDb]);
-    let transformed=this.resultCache.get(key);
-    if(!transformed){transformed=transformBeatBuffer(this.context,buffer,part.result,part.loopSeconds);if(this.resultCache.size>=8)this.resultCache.delete(this.resultCache.keys().next().value);this.resultCache.set(key,transformed);}
-    const fx=connectBeatResult(this.context,part.result,beatInput);layerEffects.push(fx);return {buffer:transformed,input:fx.input};
-   });
-   const arranged=prepared.map(({buffer,input},index)=>{
-    const part=descriptor.parts[index];if(!part.windows)return {buffer,input};
-    const key=JSON.stringify(['song',part.id,part.loopSeconds,part.result,part.vocal,part.windows,descriptor.durationSeconds,part.sourceGainDb]);let complete=this.resultCache.get(key);
-    if(!complete){complete=arrangeSongBuffer(this.context,buffer,part.windows,descriptor.durationSeconds,part.loopSeconds);if(this.resultCache.size>=8)this.resultCache.delete(this.resultCache.keys().next().value);this.resultCache.set(key,complete);}
-    return {buffer:complete,input};
+    const fx=connectBeatResult(this.context,part.result,beatInput);layerEffects.push(fx);return {buffer,input:fx.input};
    });
    const when=this.context.currentTime+.04;this.startedAt=when;
    arranged.forEach(({buffer,input},index)=>{
@@ -144,6 +138,7 @@ export class BeatAudio{
   this.retiring=[];
  }
  stop({fadeSeconds=0}={}){
+  this.pcm.cancel();
   this.generation++;this.pending=null;this.clearRetiring();
   const voices=this.sources,gain=this.gain,effects=this.effects;this.sources=[];this.gain=null;this.effects=null;
   const fade=Math.min(.08,Math.max(0,Number(fadeSeconds)||0));
@@ -154,5 +149,5 @@ export class BeatAudio{
   }else this.release(voices,gain,effects);
   this.offset=0;this.status='stopped';this.error='';
  }
- dispose(){if(this.disposed)return;this.stop();this.disposed=true;this.output?.dispose();this.output=null;this.cache.clear();this.resultCache.clear();Promise.resolve(this.context?.close()).catch(()=>{});}
+ dispose(){if(this.disposed)return;this.stop();this.disposed=true;this.pcm.dispose();this.output?.dispose();this.output=null;this.cache.clear();this.resultCache.clear();Promise.resolve(this.context?.close()).catch(()=>{});}
 }

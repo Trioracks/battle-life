@@ -6,6 +6,15 @@ import {createVirtualPcState,saveVirtualPcState,loadVirtualPcState,VIRTUAL_PC_ST
 import {migrateNoviceSave} from '../src/home-profile-migration.js';
 import {SAVE_KEY} from '../src/avatar-v3-profile.js';
 import {ensureBattleWindow} from '../src/battle-windows.js';
+test('changing a small live field reuses independently encoded history chunks in the legacy stream',()=>{
+ const encode=createPcSnapshotEncoder(),state={version:1,trackVersions:{archive:'track '.repeat(40000)},judging:{},tournaments:{history:'История раунда '.repeat(20000)},socialReactions:{history:'Реакция зрителя '.repeat(20000)},clock:600};
+ const first=encode(state),next=encode({...state,clock:601}),parts=text=>JSON.parse(text.slice('BLPC-PARTS1:'.length));
+ assert.deepEqual(decodePcSave(first),state);assert.deepEqual(decodePcSave(next),{...state,clock:601});
+ const chunks=parts(first).base.replace(/^BLPC-LZW1:\d+:[0-9a-f]+:/,'').split(String.fromCharCode(32767+32)),updated=parts(next).base.replace(/^BLPC-LZW1:\d+:[0-9a-f]+:/,'').split(String.fromCharCode(32767+32));
+ assert.ok(chunks.length>=5,'independent property chunks separated by existing LZW RESET code');
+ assert.equal(chunks[2],updated[2],'unchanged tournament block remains byte-identical');assert.equal(chunks[3],updated[3],'unchanged reaction block remains byte-identical');
+ assert.throws(()=>decodePcSave(next.slice(0,-1)));
+});
 test('partition encoder rejects combined sections above the decoder limit before writing',()=>{
  const raw='a'.repeat(32*1024*1024),encode=createPcSnapshotEncoder();
  assert.throws(()=>encode({version:1,trackVersions:{raw},judging:{raw}}),/размер/);

@@ -370,10 +370,11 @@ try{
     motion.workPerformance=creativeWorkDescriptor(pcState,profile?.skills).performance;
     if(pcNeedsSceneFrame(pcLifecycle.snapshot,mode))view.render(motion,(paused&&!step)||homeModalOpen()||document.hidden?0:dt,{skeleton,paused:(paused&&!step)||homeModalOpen()||document.hidden});cameraLabel();$('#fade').style.opacity=motion.fade;
     virtualPc.beatAudio.setRoomFrame(view.getComputerAudioFrame({desktop:mode==='pc'&&pcLifecycle.snapshot.phase==='desktop'}));
-    const headAnchor=view.getHeadScreenPosition(),firstPerson=view.modes.mode==='3D',roomReady=pcLifecycle.snapshot.phase==='room'&&motion.actionId!=='computer'&&motion.fade<.01;
+    const firstPerson=view.modes.mode==='3D',roomReady=pcLifecycle.snapshot.phase==='room'&&motion.actionId!=='computer'&&motion.fade<.01;
     const reacting=mode==='pc'&&pcLifecycle.snapshot.phase==='reaction-speaking';
+    const headAnchor=speech.snapshot.fullText&&(!firstPerson||reacting)?view.getHeadScreenPosition():{visible:true};
     speech.tick(paused?0:dt,{hidden:document.hidden,present:reacting||mode==='game'&&!cameraFade&&roomReady&&!homeModalOpen()&&(firstPerson||headAnchor.visible),roomReady:reacting||roomReady,audioAllowed:audio?.state==='running'});
-    speechView.update(speech.snapshot,headAnchor,{firstPerson:reacting?false:firstPerson,width:innerWidth,height:innerHeight,bottomLimit:reacting?innerHeight-40:$('#controls').getBoundingClientRect().top-12});
+    speechView.update(speech.snapshot,headAnchor,{firstPerson:reacting?false:firstPerson,width:innerWidth,height:innerHeight,bottomLimit:reacting?innerHeight-40:speech.snapshot.visible?$('#controls').getBoundingClientRect().top-12:innerHeight-100});
     virtualPc.syncHost({playerName:profile?.name??'Игрок',clockLabel:homeTime.label,gameDay:homeTime.day,gameMinutes:gameMinuteStamp(homeTime),skills:profile?.skills,...portraitMetadata()});
     virtualPc.tickOutgoingMessage(dt,{paused:paused||document.hidden||mode!=='pc'});
     $('#home-time').textContent=`${homeTime.dateLabel} · ${homeTime.label} · ${homeTime.period} · Дом`;

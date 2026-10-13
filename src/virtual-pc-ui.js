@@ -225,6 +225,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.refreshDynamicState = () => {
+    if(pc.desktopVisible===false){pc.desktopDirty=true;return;}
     pc.refreshPersistenceWarning();
     if(pc.windows.windows.some(w=>w.id==='torent'))pc.refreshTorent();
     pc.renderDesktop(false);
@@ -239,6 +240,8 @@ export function mountVirtualPc(root, callbacks = {}) {
 
   let transitionLayer=null,transitionTitle=null,transitionSubtitle=null,transitionProgress=null;
   pc.presentTransition = snapshot => {
+    pc.desktopVisible=(snapshot.overlay??0)>0;
+    if(pc.desktopVisible&&pc.desktopDirty){pc.desktopDirty=false;pc.refreshDynamicState();}
     const p=pcPresentation(snapshot,pc.state.power,pc.metadata.playerName);
     const wasLocked=pc.locked;
     pc.locked=snapshot.locked;root.dataset.pcTransition=snapshot.phase;
@@ -258,6 +261,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.renderDesktop = (replaceActive=true) => {
+    if(pc.desktopVisible===false&&pc.shell){pc.desktopDirty=true;return;}
     const focused=document.activeElement,focusId=focused?.dataset?.focusId;
     root.dataset.pcStage='desktop';
     if(!pc.shell)pc.shell=mountPcShell(root,{onCommand:command=>{
@@ -423,6 +427,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
 
   pc.showDesktop = state => {
+    pc.desktopVisible=true;pc.desktopDirty=false;
     if (pc.bootTimer !== null) pc.clearTimeoutFn(pc.bootTimer);
     pc.bootTimer = null;
     pc.state = createVirtualPcState(state);

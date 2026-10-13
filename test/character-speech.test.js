@@ -1,6 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createCharacterSpeech,workNeedSpeech} from '../src/character-speech.js?rev=28';
+import {mountCharacterSpeech} from '../src/home-needs-view.js';
+import {pcDocument} from './helpers/virtual-pc-dom.js';
+
+test('hidden speech never forces a layout measurement',()=>{
+ const doc=pcDocument(),root=doc.createElement('div');let reads=0;root.getBoundingClientRect=()=>{reads++;return {width:100,height:50};};const view=mountCharacterSpeech(root);
+ view.update({visible:false,text:''});assert.equal(reads,0);view.update({visible:true,text:'Привет',serial:1,fullText:'Привет'},{x:200,y:200});assert.equal(reads,1);
+});
 test('work refusal chooses food first and uses the current work thresholds',()=>{
  assert.equal(workNeedSpeech({music:{needs:{satiety:20,energy:72}}}),'Не могу работать, хочу поесть.');
  assert.equal(workNeedSpeech({music:{needs:{satiety:68,energy:15}}}),'Не могу работать, хочу поспать.');

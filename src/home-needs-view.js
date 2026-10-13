@@ -49,6 +49,7 @@ export function mountCharacterSpeech(root) {
  root.className='character-speech';root.hidden=true;bubble.setAttribute('aria-hidden','true');live.className='home-visually-hidden';live.setAttribute('aria-live','polite');live.setAttribute('aria-atomic','true');root.append(bubble,live);
  return {update(snapshot,anchor,{firstPerson=false,width=1280,height=720,bottomLimit=height-100}={}){
   root.hidden=!snapshot.visible;root.dataset.firstPerson=String(firstPerson);bubble.textContent=snapshot.text;
+  if(!snapshot.visible)return;
   if(snapshot.visible&&snapshot.serial!==announced){announced=snapshot.serial;live.textContent=snapshot.fullText;}
   const rect=root.getBoundingClientRect(),half=Math.min(rect.width||320,width-24)/2;
   root.style.left=Math.max(half+12,Math.min(width-half-12,firstPerson?width/2:anchor?.x??width/2))+'px';

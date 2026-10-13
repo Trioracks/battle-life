@@ -29,6 +29,15 @@ function createController(state = createVirtualPcState()) {
   };
 }
 
+test('invisible desktop keeps latest data without rendering and refreshes once before its reveal',()=>{
+ const {controller:pc,state}=createController();pc.showDesktop(state);let renders=0;const render=pc.shell.render;pc.shell.render=(...args)=>{renders++;return render(...args);};
+ pc.presentTransition({phase:'working',overlay:0,locked:true});
+ for(let i=1;i<=5;i++){pc.syncState({...state,lastGameMinute:i});pc.syncHost({...pc.metadata,gameMinutes:i,clockLabel:'12:0'+i});}
+ assert.equal(renders,0);assert.equal(pc.state.lastGameMinute,5);assert.equal(pc.metadata.clockLabel,'12:05');
+ pc.presentTransition({phase:'work-in',overlay:.25,locked:true});assert.equal(renders,1);
+ pc.presentTransition({phase:'desktop',overlay:1,locked:false});assert.equal(renders,1);pc.dispose();
+});
+
 test('boot state leads to a desktop whose ft studio icon appears only after installation', () => {
   const { controller, root, state } = createController();
 

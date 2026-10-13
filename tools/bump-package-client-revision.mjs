@@ -11,6 +11,7 @@ async function visit(file){
 }
 await visit('src/apartment-app.js');
 await visit('src/social-worker.js');
+await visit('src/beat-pcm-worker.js');
 for(const file of ['index.html','desktop-apps.css']){
  const original=await readFile(file,'utf8'),content=original.replace(/((?:apartment-app\.js|[\w-]+\.css)\?rev=)\d+/g,'$1'+revision);
  if(content!==original){updates.push(file);if(process.argv.includes('--write'))await writeFile(file,content);}

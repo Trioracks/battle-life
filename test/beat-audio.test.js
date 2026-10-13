@@ -3,6 +3,15 @@ import assert from 'node:assert/strict';
 import {BeatAudio,primitiveSamples} from '../src/beat-audio.js';
 import {loopSeconds} from '../src/beat-catalog.js';
 function context(){return {state:'running',currentTime:12,destination:{},sources:[],createBuffer(channels,length,rate){return {duration:length/rate,copyToChannel(){}};},createGain(){return {gain:{value:0},connect(){},disconnect(){}};},createBufferSource(){const s={connect(){},disconnect(){},start(t){this.time=t;},stop(){this.stopped=true;}};this.sources.push(s);return s;},decodeAudioData:async()=>({duration:5.376}),close(){this.closed=true;}};}
+test('asynchronous PCM is prepared before scheduling; stop rejects stale playback and disposal closes processor',async()=>{
+ const ctx=context(),jobs=[],processor={prepare(_ctx,buffer){return new Promise(resolve=>jobs.push(()=>resolve(buffer)));},cancel(){this.cancellations=(this.cancellations??0)+1;},dispose(){this.disposed=true;}};
+ const audio=new BeatAudio({contextFactory:()=>ctx,pcmFactory:()=>processor});
+ const first=audio.play({stage:1});for(let i=0;i<8;i++)await Promise.resolve();assert.equal(jobs.length,1);assert.equal(ctx.sources.length,0);
+ audio.stop();jobs.shift()();assert.equal(await first,false);assert.equal(ctx.sources.length,0);
+ const next=audio.play({stage:3});for(let i=0;i<8;i++)await Promise.resolve();assert.equal(jobs.length,3);assert.equal(ctx.sources.length,0);ctx.currentTime=20;jobs.splice(0).forEach(f=>f());assert.equal(await next,true);assert.ok(ctx.sources.every(s=>s.time===20.04));
+ audio.dispose();assert.equal(processor.disposed,true);assert.ok(processor.cancellations>=2);
+});
+
 test('primitive loops are original deterministic finite PCM on an exact bar boundary',()=>{
  const a=primitiveSamples('drums',8000),b=primitiveSamples('drums',8000);assert.deepEqual(a,b);assert.equal(a.length,Math.round(loopSeconds()*8000));
  assert.ok(a.some(x=>x!==0));assert.ok(a.every(x=>Number.isFinite(x)&&Math.abs(x)<=.8));

@@ -10,6 +10,9 @@ export function encodePcSave(value){
 function encodeJson(json){
  if(json.length<200000)return json;
  const bytes=new TextEncoder().encode(json);if(bytes.length>LIMIT)throw Error('Сохранение превышает поддерживаемый размер.');
+ const encoded=PREFIX+bytes.length+':'+checksum(bytes)+':'+encodeByteStream(bytes);return encoded.length<json.length?encoded:json;
+}
+function encodeByteStream(bytes){
  // Same LZW stream, but dictionary keys are (prefix code, byte), not growing
  // binary strings. Bounded typed tables avoid millions of string allocations.
  const keys=new Int32Array(65536),codes=new Uint16Array(65536),output=[],chunk=[];
@@ -22,12 +25,37 @@ function encodeJson(json){
   emit(word);if(next<RESET){keys[slot]=key;codes[slot]=next++;}else{emit(RESET);keys.fill(0);next=256;}word=byte;
  }
  emit(word);if(chunk.length)output.push(String.fromCharCode(...chunk));
- const encoded=PREFIX+bytes.length+':'+checksum(bytes)+':'+output.join('');return encoded.length<json.length?encoded:json;
+ return output.join('');
+}
+// The existing decoder already understands dictionary RESET. Encode top-level
+// properties as independent streams so changing a work clock does not recompress
+// tournament tables and audience history. Format/checksum stay fully compatible.
+function createCachedObjectEncoder(){
+ const cache=new Map(),reset=String.fromCharCode(RESET+32);
+ return value=>{
+  const parts=[],keys=new Set();let characters=2;
+  for(const [key,item]of Object.entries(value)){
+   const jsonValue=JSON.stringify(item);if(jsonValue===undefined)continue;
+   const json=(parts.length?',':'')+JSON.stringify(key)+':'+jsonValue;characters+=json.length;keys.add(key);
+   const old=cache.get(key),part=old?.json===json?old:{json};cache.set(key,part);parts.push(part);
+  }
+  for(const key of cache.keys())if(!keys.has(key))cache.delete(key);
+  if(characters<200000)return '{'+parts.map(p=>p.json).join('')+'}';
+  let size=2,hash=Math.imul(2166136261^123,16777619);const streams=[String.fromCharCode(123+32)];
+  for(const part of parts){
+   part.bytes??=new TextEncoder().encode(part.json);size+=part.bytes.length;if(size>LIMIT)throw Error('Сохранение превышает поддерживаемый размер.');
+   part.stream??=encodeByteStream(part.bytes);streams.push(part.stream);
+   for(const byte of part.bytes)hash=Math.imul(hash^byte,16777619);
+  }
+  hash=Math.imul(hash^125,16777619);streams.push(String.fromCharCode(125+32));
+  const encoded=PREFIX+size+':'+(hash>>>0).toString(16)+':'+streams.join(reset);
+  return encoded.length<characters?encoded:'{'+parts.map(p=>p.json).join('')+'}';
+ };
 }
 // One localStorage write still commits the entire snapshot. Only the two large
 // historical sections reuse compression, keyed by content (not mutable identity).
 export function createPcSnapshotEncoder(){
- const cache=new Map();
+ const cache=new Map(),encodeBase=createCachedObjectEncoder();
  return (value,prepared)=>{
   const parts={},base={...value};let size=0;
   for(const key of ['trackVersions','judging']){
@@ -35,7 +63,7 @@ export function createPcSnapshotEncoder(){
    const encoded=known?.value===value[key]&&typeof known.encoded==='string'?known.encoded:old?.json===json?old.encoded:encodeJson(json);cache.set(key,{json,encoded});parts[key]=encoded;delete base[key];
   }
   if(size<200000)return encodePcSave(value);
-  parts.base=encodePcSave(base);
+  parts.base=encodeBase(base);
   if(Object.values(parts).reduce((total,text)=>total+encodedBytes(text),0)>LIMIT)throw Error('Сохранение превышает поддерживаемый размер.');
   return PARTS+JSON.stringify(parts);
  };
