@@ -1,15 +1,15 @@
-import {DEMO_BATTLE,DEMO_PARTICIPANTS} from './battle-demo-config.js?rev=39';
-import {ensureNpcRoundTrack,npcMeanSkill} from './battle-npc.js?rev=39';
-import {rankTournamentSelection,seedBracket} from './battle-seeding.js?rev=39';
-import {decideNoShow,resolveTechnicalPair} from './battle-no-show.js?rev=39';
-import {recordBattleHistory} from './battle-history.js?rev=39';
-import {beatResultSeed} from './beat-result.js?rev=39';
-import {effectiveWritingSkill} from './lyric-production.js?rev=39';
-import {effectiveBeatSkill} from './beat-production.js?rev=39';
-import {effectiveVocalSkill} from './vocal-production.js?rev=39';
-import {validGameMinute} from './game-minute.js?rev=39';
-import {ensureRoundTheme} from './round-topics.js?rev=39';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=39';
+import {DEMO_BATTLE,DEMO_PARTICIPANTS} from './battle-demo-config.js?rev=40';
+import {ensureNpcRoundTrack,npcMeanSkill} from './battle-npc.js?rev=40';
+import {rankTournamentSelection,seedBracket} from './battle-seeding.js?rev=40';
+import {decideNoShow,resolveTechnicalPair} from './battle-no-show.js?rev=40';
+import {recordBattleHistory} from './battle-history.js?rev=40';
+import {beatResultSeed} from './beat-result.js?rev=40';
+import {effectiveWritingSkill} from './lyric-production.js?rev=40';
+import {effectiveBeatSkill} from './beat-production.js?rev=40';
+import {effectiveVocalSkill} from './vocal-production.js?rev=40';
+import {validGameMinute} from './game-minute.js?rev=40';
+import {ensureRoundTheme} from './round-topics.js?rev=40';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=40';
 export const TOURNAMENT_ROUNDS=Object.freeze(['selection','round-2','round-3','round-4','round-5','final']);
 const clone=v=>structuredClone(v),record=v=>v!==null&&typeof v==='object'&&!Array.isArray(v),battleId=DEMO_BATTLE.battleId;
 function validRoundInternals(r){

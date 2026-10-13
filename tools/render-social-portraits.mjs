@@ -9,7 +9,7 @@ try{
  await page.route('**/__portrait-render',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><script type="importmap">{"imports":{"three":"/vendor/three/three.module.js","three/addons/":"/vendor/three/addons/"}}</script>'}));
  await page.goto((process.env.BATTLE_QA_URL||'http://127.0.0.1:4175')+'/__portrait-render');
  await page.evaluate(async()=>{
-  const [{GLTFLoader},{renderAvatarPortrait,NPC_PORTRAITS},{normalizePlayerPortrait}]=await Promise.all([import('three/addons/loaders/GLTFLoader.js'),import('/src/avatar-portrait-renderer.js?rev=39'),import('/src/social-portraits.js?rev=39')]);
+  const [{GLTFLoader},{renderAvatarPortrait,NPC_PORTRAITS},{normalizePlayerPortrait}]=await Promise.all([import('three/addons/loaders/GLTFLoader.js'),import('/src/avatar-portrait-renderer.js?rev=40'),import('/src/social-portraits.js?rev=40')]);
   const model=await new GLTFLoader().loadAsync('/assets/apartment/v3/mannequin.glb?portrait=1');window.qa={model,NPC_PORTRAITS,render:variant=>renderAvatarPortrait({variant,sceneAssets:{model}}),normalizePlayerPortrait};
  });
  const manifest={version:1,source:'src/avatar-portrait-renderer.js + assets/apartment/v3/mannequin.glb; original game geometry, no real people',files:[]};

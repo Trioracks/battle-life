@@ -1,5 +1,5 @@
-import {createResultPost,resultReactionContent} from './social-wall.js?rev=39';
-import {resolveResultOutcome} from './result-outcome.js?rev=39';
+import {createResultPost,resultReactionContent} from './social-wall.js?rev=40';
+import {resolveResultOutcome} from './result-outcome.js?rev=40';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export function normalizeResultReactions(raw){
  const seen=new Set();return {schemaVersion:1,items:(Array.isArray(raw?.items)?raw.items:[]).filter(r=>r&&typeof r.id==='string'&&typeof r.panelEventId==='string'&&typeof r.speech==='string'&&['pending','complete'].includes(r.status)&&!seen.has(r.id)&&seen.add(r.id)).map(clone)};

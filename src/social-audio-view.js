@@ -1,11 +1,11 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=39';
-import {socialButton} from './social-dom.js?rev=39';
-import {playTrackVersion} from './track-version-audio.js?rev=39';
-import {chooseBeginnerParts} from './beat-beginner-bank.js?rev=39';
-import {npcPlaybackDescriptor} from './battle-npc-audio.js?rev=39';
-import {profileAccess} from './social-profile-policy.js?rev=39';
-import {battleCharacter} from './battle-demo-config.js?rev=39';
-import {metadataGameMinute} from './social-registration.js?rev=39';
+import {pcElement as el} from './virtual-pc-dom.js?rev=40';
+import {socialButton} from './social-dom.js?rev=40';
+import {playTrackVersion} from './track-version-audio.js?rev=40';
+import {chooseBeginnerParts} from './beat-beginner-bank.js?rev=40';
+import {npcPlaybackDescriptor} from './battle-npc-audio.js?rev=40';
+import {profileAccess} from './social-profile-policy.js?rev=40';
+import {battleCharacter} from './battle-demo-config.js?rev=40';
+import {metadataGameMinute} from './social-registration.js?rev=40';
 // These authored background demos use the cleared in-game bank. They are not
 // historical recordings or entries in the current submission window.
 export function backgroundAudioDescriptor(item){

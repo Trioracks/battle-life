@@ -1,7 +1,7 @@
-import {battleCharacter} from './battle-demo-config.js?rev=39';
-import {judgeProfile} from './judge-profiles.js?rev=39';
-import {validGameMinute} from './game-minute.js?rev=39';
-import {profileAccess} from './social-profile-policy.js?rev=39';
+import {battleCharacter} from './battle-demo-config.js?rev=40';
+import {judgeProfile} from './judge-profiles.js?rev=40';
+import {validGameMinute} from './game-minute.js?rev=40';
+import {profileAccess} from './social-profile-policy.js?rev=40';
 export const ROUND_LABELS=Object.freeze({selection:'Отбор','round-2':'1/16 финала','round-3':'1/8 финала','round-4':'Четвертьфинал','round-5':'Полуфинал',final:'Финал'});
 export function publicTournamentTrackIds(state,{battleId='makarevich-1',nowMinute}={}){return new Set(Object.keys(state.tournaments?.byId?.[battleId]?.rounds??{}).flatMap(roundId=>publicRoundTable(state,{battleId,roundId,nowMinute}).rows.map(r=>r.trackVersionId).filter(Boolean)));}
 export function publicRoundTable(state,{battleId='makarevich-1',roundId='selection',nowMinute,viewerId='player'}={}){

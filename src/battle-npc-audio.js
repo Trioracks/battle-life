@@ -1,4 +1,4 @@
-import {NPC_VOCAL_CATALOG} from './npc-vocal-catalog.js?rev=39';
+import {NPC_VOCAL_CATALOG} from './npc-vocal-catalog.js?rev=40';
 export function npcPlaybackDescriptor(version,vocalCatalog=NPC_VOCAL_CATALOG){
  if(!version?.npc||!Array.isArray(version.npc.requiredAssets)||version.npc.requiredAssets.some(a=>!a||typeof a.id!=='string')||!Array.isArray(version.recipe?.descriptor?.parts)||version.recipe.descriptor.parts.some(p=>!p||typeof p.id!=='string'))return {ok:false,reason:'Версия NPC недоступна.',missingAssets:[]};
  const requirements=version.npc.requiredAssets.filter(a=>a.kind==='vocal'),descriptor=structuredClone(version.recipe.descriptor);

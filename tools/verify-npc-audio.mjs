@@ -7,7 +7,7 @@ const browser=await chromium.launch({headless:true,executablePath:process.env.PL
 try{
  const page=await browser.newPage();await page.route('**/__npc-audio-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8"><title>NPC audio QA</title>'}));await page.goto((process.env.BATTLE_QA_URL||'http://127.0.0.1:4175')+'/__npc-audio-qa');
  const result=await page.evaluate(async()=>{
-  const [{ensureNpcRoundTrack},{DEMO_PARTICIPANTS},{createVirtualPcState},{npcPlaybackDescriptor},{BeatAudio}]=await Promise.all([import('/src/battle-npc.js?rev=39'),import('/src/battle-demo-config.js?rev=39'),import('/src/virtual-pc-state.js?rev=39'),import('/src/battle-npc-audio.js?rev=39'),import('/src/beat-audio.js?rev=39')]);
+  const [{ensureNpcRoundTrack},{DEMO_PARTICIPANTS},{createVirtualPcState},{npcPlaybackDescriptor},{BeatAudio}]=await Promise.all([import('/src/battle-npc.js?rev=40'),import('/src/battle-demo-config.js?rev=40'),import('/src/virtual-pc-state.js?rev=40'),import('/src/battle-npc-audio.js?rev=40'),import('/src/beat-audio.js?rev=40')]);
   const r=ensureNpcRoundTrack(createVirtualPcState(),{characterId:DEMO_PARTICIPANTS[0].characterId,battleId:'makarevich-1',roundId:'selection',nowMinute:600});if(!r.ok)throw Error(r.reason);
   const saved=JSON.stringify(r.state),v=r.state.trackVersions.byId[r.trackVersionId],before=JSON.stringify(v),checks=[];
   for(const version of [v,createVirtualPcState(JSON.parse(saved)).trackVersions.byId[v.id]]){

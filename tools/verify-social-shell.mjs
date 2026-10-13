@@ -7,10 +7,10 @@ await mkdir(output+'/browser-temp',{recursive:true});process.env.TEMP=process.en
 const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,args:['--autoplay-policy=no-user-gesture-required']});
 const page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
 try{
- await page.route('**/__social-shell-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/virtual-pc.css?rev=39"><link rel="stylesheet" href="/desktop-apps.css?rev=39"><link rel="stylesheet" href="/social-network.css?rev=39"><style>body{margin:0}</style><section id="virtual-pc"></section>'}));
+ await page.route('**/__social-shell-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/virtual-pc.css?rev=40"><link rel="stylesheet" href="/desktop-apps.css?rev=40"><link rel="stylesheet" href="/social-network.css?rev=40"><style>body{margin:0}</style><section id="virtual-pc"></section>'}));
  await page.goto((process.env.BATTLE_QA_URL||'http://127.0.0.1:4175')+'/__social-shell-qa');
  await page.evaluate(async()=>{
-  const [{mountVirtualPc},{createVirtualPcState}]=await Promise.all([import('/src/virtual-pc-ui.js?rev=39'),import('/src/virtual-pc-state.js?rev=39')]);
+  const [{mountVirtualPc},{createVirtualPcState}]=await Promise.all([import('/src/virtual-pc-ui.js?rev=40'),import('/src/virtual-pc-state.js?rev=40')]);
   document.body.dataset.mode='pc';const pc=mountVirtualPc(document.getElementById('virtual-pc'),{onPersist:()=>true});
   pc.showDesktop(createVirtualPcState({power:'on'}));pc.syncHost({gameDay:1,gameMinutes:600,playerName:'Новый голос'});pc.openNow('underweb');
   window.socialQA={pc,audio:pc.beatAudio,view:pc.underwebView};

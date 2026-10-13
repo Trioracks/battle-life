@@ -12,7 +12,7 @@ const browser=await chromium.launch({headless:true,executablePath:process.env.PL
 try{
  const page=await browser.newPage();await page.route('**/__tournament-storage-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><title>Isolated tournament storage QA</title>'}));await page.goto((process.env.BATTLE_QA_URL||'http://127.0.0.1:4175')+'/__tournament-storage-qa');
  const evidence=await page.evaluate(async state=>{
-  const {saveVirtualPcState,loadVirtualPcState,VIRTUAL_PC_STORAGE_KEY}=await import('/src/virtual-pc-state.js?rev=39'),before=JSON.stringify(state),start=performance.now(),saved=saveVirtualPcState(localStorage,state),saveMs=performance.now()-start;
+  const {saveVirtualPcState,loadVirtualPcState,VIRTUAL_PC_STORAGE_KEY}=await import('/src/virtual-pc-state.js?rev=40'),before=JSON.stringify(state),start=performance.now(),saved=saveVirtualPcState(localStorage,state),saveMs=performance.now()-start;
   if(!saved)throw Error('Native browser quota rejected final tournament');const raw=localStorage.getItem(VIRTUAL_PC_STORAGE_KEY),restored=loadVirtualPcState(localStorage).state;
   return {saved,saveMs,rawCharacters:before.length,storedCharacters:raw.length,compressed:raw.startsWith('BLPC-LZW1:'),same:JSON.stringify(restored.trackVersions)===JSON.stringify(state.trackVersions)&&JSON.stringify(restored.judging)===JSON.stringify(state.judging),status:restored.tournaments.byId['makarevich-1'].status,versions:Object.keys(restored.trackVersions.byId).length,results:Object.keys(restored.judging.results).length};
  },done.state);

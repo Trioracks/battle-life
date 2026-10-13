@@ -17,9 +17,9 @@ async function affordance(locator,label){
  await locator.focus();assert.equal(await locator.evaluate(n=>document.activeElement===n),true,label+' keyboard focus');
 }
 try{
- await page.route('**/__v-krugu-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8">'+styles.map(n=>'<link rel="stylesheet" href="/'+n+'.css?rev=39">').join('')+'<style>body{margin:0}</style><section id="virtual-pc"></section>'}));
+ await page.route('**/__v-krugu-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8">'+styles.map(n=>'<link rel="stylesheet" href="/'+n+'.css?rev=40">').join('')+'<style>body{margin:0}</style><section id="virtual-pc"></section>'}));
  await page.goto(base+'/__v-krugu-qa');
- await page.evaluate(async()=>{document.body.dataset.mode='pc';const [{mountVirtualPc},{createVirtualPcState}]=await Promise.all([import('/src/virtual-pc-ui.js?rev=39'),import('/src/virtual-pc-state.js?rev=39')]);window.qa={createVirtualPcState};qa.pc=mountVirtualPc(document.querySelector('#virtual-pc'),{onPersist:()=>true});qa.reset=()=>{qa.pc.showDesktop(createVirtualPcState({power:'on'}));qa.pc.syncHost({playerName:'Проверка',gameDay:1,gameMinutes:600});qa.pc.openNow('underweb');};qa.reset();});
+ await page.evaluate(async()=>{document.body.dataset.mode='pc';const [{mountVirtualPc},{createVirtualPcState}]=await Promise.all([import('/src/virtual-pc-ui.js?rev=40'),import('/src/virtual-pc-state.js?rev=40')]);window.qa={createVirtualPcState};qa.pc=mountVirtualPc(document.querySelector('#virtual-pc'),{onPersist:()=>true});qa.reset=()=>{qa.pc.showDesktop(createVirtualPcState({power:'on'}));qa.pc.syncHost({playerName:'Проверка',gameDay:1,gameMinutes:600});qa.pc.openNow('underweb');};qa.reset();});
  for(const [width,height]of [[800,600],[1280,900],[1920,1080]]){
   await page.setViewportSize({width,height});await page.evaluate(()=>qa.reset());
   await go('underweb://iskra');await affordance(page.getByRole('button',{name:'Найти',exact:true}),'search');
@@ -29,7 +29,7 @@ try{
    await page.screenshot({path:out+'/browser-'+width+'-'+app+'.png'});
    if(app==='client'){
     await dl.click();assert.equal(await dl.isDisabled(),true);
-    await page.evaluate(async()=>{const {advanceTransfers}=await import('/src/pc-transfer-runtime.js?rev=39');qa.pc.syncState(advanceTransfers(qa.pc.state,0,600).state);});
+    await page.evaluate(async()=>{const {advanceTransfers}=await import('/src/pc-transfer-runtime.js?rev=40');qa.pc.syncState(advanceTransfers(qa.pc.state,0,600).state);});
     const open=page.getByRole('button',{name:'Открыть установщик torent',exact:true});await open.click();
     const installer=page.locator('.pc-installer');await installer.waitFor();await page.screenshot({path:out+'/browser-'+width+'-installer.png'});
     await installer.getByRole('button',{name:'Отмена',exact:true}).click();
@@ -49,15 +49,15 @@ try{
   await page.screenshot({path:out+'/browser-'+width+'-archive.png'});
   await go('underweb://social/community/concrete-echo');assert.equal(await page.locator('.sn-audio').count(),0);
   await go('underweb://social/messages');
-  await page.evaluate(async()=>{const {advancePersonalDialogs}=await import('/src/social-personal.js?rev=39');qa.pc.syncState(advancePersonalDialogs(qa.pc.state,600).state);});
+  await page.evaluate(async()=>{const {advancePersonalDialogs}=await import('/src/social-personal.js?rev=40');qa.pc.syncState(advancePersonalDialogs(qa.pc.state,600).state);});
   assert.equal(await page.locator('.sn-unread-badge').innerText(),'+1');
-  await page.evaluate(async()=>{const {hoverPhoneNotice}=await import('/src/phone-notifications.js?rev=39'),s=qa.pc.state,id=s.phone.activeId;qa.pc.syncState({...s,phone:hoverPhoneNotice(hoverPhoneNotice(s.phone,id,true),id,false)});});
+  await page.evaluate(async()=>{const {hoverPhoneNotice}=await import('/src/phone-notifications.js?rev=40'),s=qa.pc.state,id=s.phone.activeId;qa.pc.syncState({...s,phone:hoverPhoneNotice(hoverPhoneNotice(s.phone,id,true),id,false)});});
   assert.equal(await page.locator('.sn-unread-badge').innerText(),'+1');
   const search=page.getByRole('textbox',{name:'Поиск по сообщениям'});await search.fill('тРИСТА');assert.equal(await page.locator('.sn-message-row').count(),1);await page.evaluate(()=>qa.pc.underwebView.update());assert.equal(await search.evaluate(n=>document.activeElement===n),true);
   for(const id of ['anya','dasha','vitya']){await go('underweb://social/dialog/'+id);await page.evaluate(()=>qa.pc.underwebView.update());assert.equal(await page.locator('.sn-dialog').getByRole('button',{name:'Прикрепить',exact:true}).count(),0);assert.ok(await page.locator('.sn-dialog-message').count()>=4);await page.screenshot({path:out+'/browser-'+width+'-dialog-'+id+'.png'});}
   assert.equal(await page.evaluate(()=>qa.pc.state.social.dialogs.vitya.unread),false);
   await windowView().getByRole('button',{name:'Свернуть окно',exact:true}).click();
-  await page.evaluate(async()=>{const {advancePersonalDialogs}=await import('/src/social-personal.js?rev=39');qa.pc.syncState(advancePersonalDialogs(qa.pc.state,3480).state);});assert.equal(await page.evaluate(()=>qa.pc.state.social.dialogs.vitya.unread),true);
+  await page.evaluate(async()=>{const {advancePersonalDialogs}=await import('/src/social-personal.js?rev=40');qa.pc.syncState(advancePersonalDialogs(qa.pc.state,3480).state);});assert.equal(await page.evaluate(()=>qa.pc.state.social.dialogs.vitya.unread),true);
   await page.getByRole('button',{name:'Переключить Underweb',exact:true}).click();assert.equal(await page.evaluate(()=>qa.pc.state.social.dialogs.vitya.unread),false);
   await page.getByRole('button',{name:'Заблокировать и удалить из друзей',exact:true}).click();assert.equal(await page.evaluate(()=>qa.pc.state.social.friends.includes('vitya')),false);
   await page.evaluate(()=>{const s=qa.createVirtualPcState(JSON.parse(JSON.stringify(qa.pc.state)));qa.pc.showDesktop(s);qa.pc.openNow('underweb');});await go('underweb://social/dialog/vitya');assert.ok((await page.locator('.sn-dialog').innerText()).includes('Пользователь заблокирован'));

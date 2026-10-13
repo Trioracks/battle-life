@@ -1,11 +1,11 @@
-import {PC_IDENTITY} from './pc-identity.js?rev=39';
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=39';
-import {createPcIcon} from './virtual-pc-icons.js?rev=39';
-import {createExplorerState,reconcileExplorerState,navigateExplorer,explorerEntries,explorerProperties,explorerPaths} from './virtual-pc-explorer.js?rev=39';
-import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=39';
-import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=39';
-import {normalizeStudioProject} from './ft-studio-project.js?rev=39';
-import {normalizeBeat} from './beat-production.js?rev=39';
+import {PC_IDENTITY} from './pc-identity.js?rev=40';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=40';
+import {createPcIcon} from './virtual-pc-icons.js?rev=40';
+import {createExplorerState,reconcileExplorerState,navigateExplorer,explorerEntries,explorerProperties,explorerPaths} from './virtual-pc-explorer.js?rev=40';
+import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=40';
+import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=40';
+import {normalizeStudioProject} from './ft-studio-project.js?rev=40';
+import {normalizeBeat} from './beat-production.js?rev=40';
 
 export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenProject,onProperties,onClose,onMenu,onNavigate}) {
   const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',diskLabel=null,disposed=false;

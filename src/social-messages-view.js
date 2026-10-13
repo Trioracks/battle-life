@@ -1,8 +1,8 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=39';
-import {socialAvatar,socialButton,socialHeading} from './social-dom.js?rev=39';
-import {searchDialogs,blockAndRemoveFriend} from './social-personal.js?rev=39';
-import {profileById} from './social-catalog.js?rev=39';
-import {gameDateTimeLabel as gameMinuteLabel} from './home-calendar.js?rev=39';
+import {pcElement as el} from './virtual-pc-dom.js?rev=40';
+import {socialAvatar,socialButton,socialHeading} from './social-dom.js?rev=40';
+import {searchDialogs,blockAndRemoveFriend} from './social-personal.js?rev=40';
+import {profileById} from './social-catalog.js?rev=40';
+import {gameDateTimeLabel as gameMinuteLabel} from './home-calendar.js?rev=40';
 export function mountSocialMessages(d,{getState,navigate}){
  const root=el(d,'section',{className:'sn-messages'}),input=el(d,'input',{className:'sn-search',attributes:{'aria-label':'Поиск по сообщениям',placeholder:'Имя или фраза из переписки…'}}),list=el(d,'div');let last='',disposed=false;
  root.append(socialHeading(d,'Мои сообщения'),input,list);

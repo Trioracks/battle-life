@@ -1,7 +1,7 @@
 // Deterministic recording damage, followed by the non-bypassable budget hardware.
 // Grain boundaries follow the 90 BPM clock; the source duration never changes.
-import {clampV,VOCAL_CEILING} from './vocal-result.js?rev=39';
-import {creativeProfileAmount} from './audio-performance.js?rev=39';
+import {clampV,VOCAL_CEILING} from './vocal-result.js?rev=40';
+import {creativeProfileAmount} from './audio-performance.js?rev=40';
 // Global balance: 30% less damage than rev29; saved take quality is unchanged.
 const DAMAGE_AMOUNT=.7;
 const mod=(x,n)=>((x%n)+n)%n;

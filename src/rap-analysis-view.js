@@ -1,8 +1,8 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=39';
-import {socialButton,socialHeading} from './social-dom.js?rev=39';
-import {publicAnalysisReport,pauseStudy} from './rap-analysis.js?rev=39';
-import {gameDateTimeLabel} from './home-calendar.js?rev=39';
-import {saveAnalysisToDossier} from './rap-dossier.js?rev=39';
+import {pcElement as el} from './virtual-pc-dom.js?rev=40';
+import {socialButton,socialHeading} from './social-dom.js?rev=40';
+import {publicAnalysisReport,pauseStudy} from './rap-analysis.js?rev=40';
+import {gameDateTimeLabel} from './home-calendar.js?rev=40';
+import {saveAnalysisToDossier} from './rap-dossier.js?rev=40';
 const names={text:'Текст',performance:'Исполнение',music:'Музыка',sound:'Звук'};
 export function createAnalysisReportView(d,report){
  return createPublicAnalysisReportView(d,publicAnalysisReport(report));

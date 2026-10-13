@@ -5,10 +5,10 @@ const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAY
 await mkdir(out+'/browser-temp',{recursive:true});process.env.TEMP=process.env.TMP=out+'/browser-temp';
 const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE}),page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
 try{
- await page.route('**/__text-mix-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/rap-notebook.css?rev=39"><style>body{margin:0;height:100vh}main{height:100vh}</style><main></main>'}));
+ await page.route('**/__text-mix-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/rap-notebook.css?rev=40"><style>body{margin:0;height:100vh}main{height:100vh}</style><main></main>'}));
  await page.goto((process.env.BATTLE_QA_URL||'http://127.0.0.1:4175')+'/__text-mix-qa');
  await page.evaluate(async()=>{
-  const [lyrics,{createVirtualPcState},{mountRapNotebook},{submissionFixture},{captureTrackVersion}]=await Promise.all([import('/src/lyric-production.js?rev=39'),import('/src/virtual-pc-state.js?rev=39'),import('/src/rap-notebook-view.js?rev=39'),import('/test/helpers/submission-fixtures.js'),import('/src/track-version.js?rev=39')]);
+  const [lyrics,{createVirtualPcState},{mountRapNotebook},{submissionFixture},{captureTrackVersion}]=await Promise.all([import('/src/lyric-production.js?rev=40'),import('/src/virtual-pc-state.js?rev=40'),import('/src/rap-notebook-view.js?rev=40'),import('/test/helpers/submission-fixtures.js'),import('/src/track-version.js?rev=40')]);
   window.qa={lyrics,createVirtualPcState,mountRapNotebook};qa.frozen=captureTrackVersion(submissionFixture(),{projectId:'beat',nowMinute:600});qa.old=JSON.stringify(qa.frozen.state.trackVersions);
   qa.setup=practice=>{qa.view?.dispose();qa.state=lyrics.createLyric(createVirtualPcState(),{id:'text',name:'Проверка содержания'},{writing:24},()=>.3).state;qa.state.writing.practice=practice;qa.mount();};
   qa.mount=()=>{qa.view=mountRapNotebook(document.querySelector('main'),{getState:()=>qa.state,getMetadata:()=>({skills:{writing:24},gameDay:1}),onChange:s=>{qa.state=createVirtualPcState(s);localStorage.setItem('mix-fixture',JSON.stringify(qa.state));},onWork:()=>true});};

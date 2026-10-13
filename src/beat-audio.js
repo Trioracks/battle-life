@@ -1,12 +1,12 @@
-import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=39';
-import {beginnerById} from './beat-beginner-bank.js?rev=39';
-import {resolveBeatPlayback} from './beat-playback.js?rev=39';
-import {connectBeatMix} from './beat-mix.js?rev=39';
-import {transformBeatBuffer,connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=39';
-import {vocalById} from './vocal-catalog.js?rev=39';
-import {transformVocalBuffer} from './vocal-result-dsp.js?rev=39';
-import {arrangeSongBuffer} from './beat-song-form.js?rev=39';
-import {calibratedSourceBuffer,descriptorOutputGain} from './audio-levels.js?rev=39';
+import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=40';
+import {beginnerById} from './beat-beginner-bank.js?rev=40';
+import {resolveBeatPlayback} from './beat-playback.js?rev=40';
+import {connectBeatMix} from './beat-mix.js?rev=40';
+import {transformBeatBuffer,connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=40';
+import {vocalById} from './vocal-catalog.js?rev=40';
+import {transformVocalBuffer} from './vocal-result-dsp.js?rev=40';
+import {arrangeSongBuffer} from './beat-song-form.js?rev=40';
+import {calibratedSourceBuffer,descriptorOutputGain} from './audio-levels.js?rev=40';
 
 // Authored placeholder PCM, not a remix of third-party music. Sliders never enter here.
 export function primitiveSamples(kind,rate=44100){
