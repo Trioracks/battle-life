@@ -33,6 +33,11 @@ Ordinary selection close and judging keep rendering while their Worker is busy. 
 - Failed storage leaves previous saved bytes unchanged; no repeated worker jobs while failed; retry generates the expected 32 selection versions.
 - PCM tests compare calibrated stereo drums, pitched music, vocal and intro/outro samples exactly against the existing DSP. Cancelled, disposed and failed workers cannot start stale playback.
 - `npm test`: **1137/1137 passed**, 102682 ms (`fps-full-tests-3.log`).
+- Task-completion repeat: **1137/1137 passed**, 99254 ms. Independent read-only review: no findings; **37/37** additional targeted checks passed.
+
+An additional native run sampling the visible desktop measured 144 FPS there, but failed the unchanged 250 ms max-frame gate on one 250.1 ms work frame (126.1 FPS average, 13.9 ms frame p95). Functional checks still passed. This outlier is retained in `fps-native-final.log`; concurrent review checks were running, so an exclusive repeat is recorded separately below rather than relaxing the limit.
+
+Exclusive repeat: **PASS**, unchanged thresholds, `fps-native-final-isolated.log`. Walking and visible desktop ~144 FPS; work 131.1 FPS, sleep 131.6 FPS. Work maximum frame 201.5 ms, 70-day catch-up maximum 187.6 ms; both remain explicit one-off limitations. Every measured scenario's frame p95 was at most 7.1 ms. No production changes were made between these two repeats.
 
 Artifacts (ignored local QA output): `artifacts/v-krugu-qa/battle-fps-regression.json`, `fps-native-5.log`, `fps-work.cpuprofile`, `fps-full-tests-3.log`, `battle-fps-recovered.png`. Original walking baseline values were recorded during diagnosis; the reusable diagnostic JSON was subsequently overwritten by an after-run and is not a baseline artifact.
 
