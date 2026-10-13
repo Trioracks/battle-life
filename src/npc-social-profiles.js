@@ -6,6 +6,7 @@ import {beatResultSeed} from './beat-result.js?rev=39';
 import {publicBattleHistory} from './battle-history.js?rev=39';
 import {profileAccess} from './social-profile-policy.js?rev=39';
 import {publicRoundAnnouncements} from './round-topics.js?rev=39';
+import {npcPhoto} from './battle-content-assets.js?rev=39';
 const clone=v=>structuredClone(v),record=v=>v&&typeof v==='object'&&!Array.isArray(v);
 const personalIds=new Set(seededLottery(DEMO_PARTICIPANTS.map(p=>p.characterId),'social-personal-v2').slice(0,6)),judgeIds=new Set(JUDGE_PROFILES.map(j=>j.id)),participantIds=new Set(DEMO_PARTICIPANTS.map(p=>p.characterId));
 function createTemplate(characterId){
@@ -26,6 +27,6 @@ export function npcSocialProfile(state,id){const registry=state.npcSocialProfile
 export function publicCharacterProfile(state,{characterId,nowMinute,viewerId='player'}={}){
  const access=profileAccess(state,{characterId,nowMinute,viewerId});if(!access.canView)return {characterId,...access};
  const p=npcSocialProfile(state,characterId);if(!p)return {characterId,canView:false,canAddFriend:false,reason:'Профиль не найден.'};
- const history=publicBattleHistory(state,{participantId:characterId,nowMinute}),photos=p.photoIds.map(id=>({id,title:{desk:'За своим столом',courtyard:'Во дворе',street:'На прогулке',room:'Дома'}[id.split(':').at(-1)]??'Фотография',date:'август 2012',src:null}));
- return {characterId,...access,name:p.name,profileType:p.profileType,roles:[...p.roles],description:'Вымышленная игровая страница. Не биография и не фотографии реального участника.',avatar:{mark:p.name.slice(0,2).toUpperCase(),color:p.profileType==='personal'?'#718879':'#656981'},photos,posts:[...p.datedPosts.filter(p=>p.at<=nowMinute).map(clone),...publicRoundAnnouncements(state,{nowMinute}).filter(p=>p.authorJudgeId===characterId).map(p=>p.judgePost)],publicTrackVersionIds:[...new Set(history.filter(e=>e.status==='submitted'&&state.trackVersions?.byId?.[e.trackVersionId]).map(e=>e.trackVersionId))],history};
+ const history=publicBattleHistory(state,{participantId:characterId,nowMinute}),photos=p.photoIds.map(id=>({id,title:{desk:'За своим столом',courtyard:'Во дворе',street:'На прогулке',room:'Дома'}[id.split(':').at(-1)]??'Фотография',date:'август 2012',src:npcPhoto(id,p).src}));
+ return {characterId,...access,name:p.name,profileType:p.profileType,roles:[...p.roles],description:'Вымышленная игровая страница. Не биография и не фотографии реального участника.',avatar:{mark:p.name.slice(0,2).toUpperCase(),src:photos[0]?.src??null,color:p.profileType==='personal'?'#718879':['#656981','#6c8178','#876f65','#73658a','#526e86'][p.seed%5]},photos,posts:[...p.datedPosts.filter(p=>p.at<=nowMinute).map(clone),...publicRoundAnnouncements(state,{nowMinute}).filter(p=>p.authorJudgeId===characterId).map(p=>p.judgePost)],publicTrackVersionIds:[...new Set(history.filter(e=>e.status==='submitted'&&state.trackVersions?.byId?.[e.trackVersionId]).map(e=>e.trackVersionId))],history};
 }

@@ -18,6 +18,7 @@ export function normalizePlayerPortrait(raw){
 export function socialPhotoSource(src){
  if(typeof src!=='string')return null;
  if(/^\.\/assets\/social\/photos\/[a-z0-9-]+\.jpg$/.test(src))return src;
+ if(/^\.\/assets\/npc-photos\/mak-npc-\d\d-(desk|courtyard|street|room)\.jpg$/.test(src))return src;
  return normalizePlayerPortrait({key:'portrait-v1:validated',url:src})?.url??null;
 }
 export function createPlayerPortraitController({getState,getAppearance,render,save}){
