@@ -32,7 +32,7 @@ export function createPcSnapshotEncoder(){
   const parts={},base={...value};let size=0;
   for(const key of ['trackVersions','judging']){
    const known=prepared?.get(key),json=known?.value===value[key]?known.json:JSON.stringify(value[key]??{}),old=cache.get(key);size+=json.length;
-   const encoded=old?.json===json?old.encoded:encodeJson(json);cache.set(key,{json,encoded});parts[key]=encoded;delete base[key];
+   const encoded=known?.value===value[key]&&typeof known.encoded==='string'?known.encoded:old?.json===json?old.encoded:encodeJson(json);cache.set(key,{json,encoded});parts[key]=encoded;delete base[key];
   }
   if(size<200000)return encodePcSave(value);
   parts.base=encodePcSave(base);

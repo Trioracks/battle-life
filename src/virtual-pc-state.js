@@ -17,7 +17,7 @@ import {normalizeResultReactions} from './social-result-reaction.js?rev=40';
 import {normalizeNpcTracks} from './battle-npc.js?rev=40';
 import {normalizeTournaments} from './battle-tournament.js?rev=40';
 import {normalizeBattleHistory} from './battle-history.js?rev=40';
-import {createPcSnapshotEncoder,decodePcSave} from './pc-save-codec.js?rev=40';
+import {createPcSnapshotEncoder,decodePcSave,encodePcSave} from './pc-save-codec.js?rev=40';
 import {normalizeNpcSocialProfiles} from './npc-social-profiles.js?rev=40';
 import {normalizeRapAnalysis} from './rap-analysis.js?rev=40';
 import {normalizeDossier} from './rap-dossier.js?rev=40';
@@ -229,10 +229,21 @@ export function saveStudioProject(state, project) {
 }
 
 const saveCaches=new WeakMap();
+function saveCache(storage){let cache=saveCaches.get(storage);if(!cache){cache={encode:createPcSnapshotEncoder(),archives:new Map()};saveCaches.set(storage,cache);}return cache;}
+// Prepared only by our own worker, never by imported or loaded save data.
+// Load still goes through the full validation/migration path below.
+export function preparePcSaveArchives(state,keys=['trackVersions','judging']){
+ return keys.map(key=>{const normalize={trackVersions:normalizeTrackVersions,judging:normalizeJudging}[key];if(!normalize)throw Error('Неизвестная секция архива.');const value=normalize(state[key]),json=JSON.stringify(value);return {key,value,json,encoded:encodePcSave(value)};});
+}
+export function primePcSaveArchives(storage,entries){
+ if(!storage)return;
+ const cache=saveCache(storage);
+ for(const entry of entries){if(!['trackVersions','judging'].includes(entry.key))throw Error('Неизвестная секция архива.');freezeArchive(entry.value);cache.archives.set(entry.key,{input:entry.value,value:entry.value,json:entry.json,encoded:entry.encoded});}
+}
 export function saveVirtualPcState(storage, state) {
   try {
     if (!storage) return false;
-    let cache=saveCaches.get(storage);if(!cache){cache={encode:createPcSnapshotEncoder(),archives:new Map()};saveCaches.set(storage,cache);}
+    const cache=saveCache(storage);
     const raw=storage.getItem?.(VIRTUAL_PC_STORAGE_KEY);
     let parsed;try{parsed=raw===cache.raw?cache.previous:raw?decodePcSave(raw):null;}catch{/* A fresh game may replace an unreadable save, as before. */}
     if(isRecord(parsed)&&parsed.version===1&&!Object.hasOwn(parsed,'household'))reserveHouseholdBackup(storage,raw);

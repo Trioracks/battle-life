@@ -57,7 +57,7 @@ export function advanceSocial(input,nowMinute,options={}){
   }else communityAudio[e.communityId]=[...new Set([...(communityAudio[e.communityId]??[]),e.trackVersionId])];
  }
  state={...state,social,communityAudio,battleSubmissions:submissions,phone:receivePhoneEvents(state.phone,events.filter(e=>e.type==='submission-ack')),socialRuntime:{version:1,lastMinute:nowMinute,events:[...runtime.events,...personal.events,...events]}};
- const lifecycle=advanceBattleLifecycle(state,nowMinute,options);state=lifecycle.state;
+ const lifecycle=advanceBattleLifecycle(state,nowMinute,options);if(lifecycle.reason)return {state:input,events:[],domainChanged:false,reason:lifecycle.reason};state=lifecycle.state;
  const battleEvents=lifecycle.events.map(e=>({source:SOCIAL_IDENTITY.name,sender:'Макаревич Баттл',...e})),notices=[];
  for(const roundId of new Set(battleEvents.filter(e=>e.type==='judge-review').map(e=>e.roundId))){const batch=battleEvents.filter(e=>e.type==='judge-review'&&e.roundId===roundId),last=batch.at(-1);notices.push({...last,id:'reviews:'+batch.map(e=>e.id).join('|'),type:'judge-review-batch',resultIds:batch.map(e=>e.resultId),text:'Новых отзывов о твоей работе: '+batch.length+'. Прочитай их в сообществе.'});}
  notices.push(...battleEvents.filter(e=>['judge-panel-complete','round-announced','round-result'].includes(e.type)));
