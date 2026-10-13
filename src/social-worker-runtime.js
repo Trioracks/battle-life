@@ -1,6 +1,6 @@
-import {advanceSocial} from './social-runtime.js?rev=40';
-import {preparePcSaveArchives} from './virtual-pc-state.js?rev=40';
-import {SOCIAL_DOMAIN_KEYS} from './social-background.js';
+import {advanceSocial} from './social-runtime.js?rev=41';
+import {preparePcSaveArchives} from './virtual-pc-state.js?rev=41';
+import {SOCIAL_DOMAIN_KEYS} from './social-background.js?rev=41';
 
 // Lives in a Worker. All history traversal, validation and large compression
 // stays here; the main thread receives only changed sections and prepared saves.
@@ -19,10 +19,18 @@ export function createSocialWorkerRuntime(){
     const value=result.state[key];if(prepared.get(key)===value)continue;
     // Archive refs can change through normalized UI actions. Preparing them here
     // also primes the first autosave after loading an existing large campaign.
-    const [entry]=preparePcSaveArchives(result.state,[key]);archives.push(entry);changed[key]=entry.value;prepared.set(key,entry.value);
+    const [entry]=preparePcSaveArchives(result.state,[key]),field=key==='trackVersions'?'byId':'results';
+    if(JSON.stringify(input[key])===entry.json)archives.push({...entry,value:undefined,same:true});
+    else{
+     const rows={...entry.value[field]},reused=[];
+     for(const [id,row]of Object.entries(rows))if(input[key]?.[field]?.[id]&&JSON.stringify(row)===JSON.stringify(input[key][field][id])){reused.push(id);delete rows[id];}
+     archives.push({...entry,value:{...entry.value,[field]:rows},reused});
+    }
+    changed[key]=entry.value;prepared.set(key,entry.value);
    }
    mirror={...result.state,...changed};
-   return {id,patch:changed,archives,durable:Boolean(result.events?.length||result.domainChanged||Object.hasOwn(changed,'battleSubmissions'))};
+   const outputPatch={...changed};for(const {key}of archives)delete outputPatch[key];
+   return {id,patch:outputPatch,archives,durable:Boolean(result.events?.length||result.domainChanged||Object.hasOwn(changed,'battleSubmissions'))};
   }catch(error){return {id,error:error.message||String(error)};}
  };
 }

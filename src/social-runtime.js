@@ -1,14 +1,14 @@
-import {communityById} from './social-catalog.js?rev=40';
-import {normalizeSocial} from './social-state.js?rev=40';
-import {ensureBattleWindow} from './battle-windows.js?rev=40';
-import {ACK_TEMPLATES,acknowledgementFor} from './social-submission.js?rev=40';
-import {validGameMinute} from './game-minute.js?rev=40';
-import {receivePhoneEvents} from './phone-notifications.js?rev=40';
-import {publishJudgeEvents} from './social-judging-events.js?rev=40';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=40';
-import {advancePersonalDialogs} from './social-personal.js?rev=40';
-import {advanceBattleLifecycle} from './battle-judging-clock.js?rev=40';
-import {ensureSocialReactionPlans} from './social-reactions.js?rev=40';
+import {communityById} from './social-catalog.js?rev=41';
+import {normalizeSocial} from './social-state.js?rev=41';
+import {ensureBattleWindow} from './battle-windows.js?rev=41';
+import {ACK_TEMPLATES,acknowledgementFor} from './social-submission.js?rev=41';
+import {validGameMinute} from './game-minute.js?rev=41';
+import {receivePhoneEvents} from './phone-notifications.js?rev=41';
+import {publishJudgeEvents} from './social-judging-events.js?rev=41';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=41';
+import {advancePersonalDialogs} from './social-personal.js?rev=41';
+import {advanceBattleLifecycle} from './battle-judging-clock.js?rev=41';
+import {ensureSocialReactionPlans} from './social-reactions.js?rev=41';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export function normalizeSocialRuntime(raw){
  const seen=new Set(),events=(Array.isArray(raw?.events)?raw.events:[]).filter(e=>e&&typeof e.id==='string'&&typeof e.type==='string'&&validGameMinute(e.dueAt)&&!seen.has(e.id)&&seen.add(e.id)).map(clone);

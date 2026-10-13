@@ -1,6 +1,6 @@
-import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=40';
-import {FORUM_ARCHIVE_BOARDS,archiveBoardsForDay,archiveTopicsForDay,archiveTopicForDay} from './underweb-forum-archive.js?rev=40';
-import {homeDateLabel} from './home-calendar.js?rev=40';
+import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=41';
+import {FORUM_ARCHIVE_BOARDS,archiveBoardsForDay,archiveTopicsForDay,archiveTopicForDay} from './underweb-forum-archive.js?rev=41';
+import {homeDateLabel} from './home-calendar.js?rev=41';
 const button=(d,text,fn,attributes={})=>pcButton(d,text,{className:'uw-control uw-forum-link',attributes},fn);
 const dateLabel=date=>date.split('-').reverse().join('.');
 function sourceLink(d,post){return el(d,'a',{text:'Открыть источник ↗',attributes:{href:post.sourceUrl,target:'_blank',rel:'noopener noreferrer','aria-label':'Источник: '+post.sourceTitle}});}

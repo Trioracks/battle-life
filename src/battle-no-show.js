@@ -1,5 +1,5 @@
-import {beatResultSeed} from './beat-result.js?rev=40';
-import {battleRandom} from './battle-seeding.js?rev=40';
+import {beatResultSeed} from './beat-result.js?rev=41';
+import {battleRandom} from './battle-seeding.js?rev=41';
 export function noShowProbability({ownMean,opponentMean,roundId,basePercent=5}={}){
  if(![ownMean,opponentMean,basePercent].every(v=>Number.isFinite(v)&&v>=0&&v<=100))throw new RangeError('No-show skills and probability use0…100');
  return ['round-5','final'].includes(roundId)?0:Math.min(100,basePercent+Math.max(0,opponentMean-ownMean)/2);

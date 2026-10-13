@@ -6,10 +6,10 @@ const out=process.env.FT_QA_DIR||'D:/Codex/Builds/Battle/package-one';await mkdi
 const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,args:['--autoplay-policy=no-user-gesture-required']});
 try{
  const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.route('**/__social-send-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/desktop-apps.css?rev=37"><link rel="stylesheet" href="/social-network.css?rev=37"><style>body{margin:0}#qa{height:100vh}</style><div id="qa"></div>'}));
+ await page.route('**/__social-send-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/desktop-apps.css?rev=41"><link rel="stylesheet" href="/social-network.css?rev=41"><style>body{margin:0}#qa{height:100vh}</style><div id="qa"></div>'}));
  await page.goto((process.env.BATTLE_QA_URL||'http://127.0.0.1:4175')+'/__social-send-qa');
  await page.evaluate(async()=>{
-  const [{submissionFixture},{mountUnderweb},{advanceVirtualPcDurably,createSubmissionTransferClock},{BeatAudio},{saveVirtualPcState,loadVirtualPcState}]=await Promise.all([import('/test/helpers/submission-fixtures.js'),import('/src/underweb-view.js?rev=40'),import('/src/virtual-pc-runtime.js?rev=40'),import('/src/beat-audio.js?rev=40'),import('/src/virtual-pc-state.js?rev=40')]);
+  const [{submissionFixture},{mountUnderweb},{advanceVirtualPcDurably,createSubmissionTransferClock},{BeatAudio},{saveVirtualPcState,loadVirtualPcState}]=await Promise.all([import('/test/helpers/submission-fixtures.js'),import('/src/underweb-view.js?rev=41'),import('/src/virtual-pc-runtime.js?rev=41'),import('/src/beat-audio.js?rev=41'),import('/src/virtual-pc-state.js?rev=41')]);
   const q=window.sendQA={state:submissionFixture(),minute:600,fail:false,audio:new BeatAudio()};
   q.persist=next=>{if(q.fail||q.failSend&&next.battleSubmissions.length>q.state.battleSubmissions.length)return false;const saved=saveVirtualPcState(localStorage,next);if(saved)q.state=next;return saved;};
   q.reload=()=>{q.state=loadVirtualPcState(localStorage).state;};

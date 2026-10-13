@@ -1,4 +1,4 @@
-import {beatResultSeed} from './beat-result.js?rev=40';
+import {beatResultSeed} from './beat-result.js?rev=41';
 export function battleRandom(seed){let x=seed>>>0;return()=>{x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296;};}
 export function seededLottery(ids,seed){
  const list=[...ids].sort(),random=battleRandom(beatResultSeed(String(seed)));

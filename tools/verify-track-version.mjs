@@ -12,7 +12,7 @@ try{
  await page.goto((process.env.BATTLE_QA_URL||'http://127.0.0.1:4175')+'/__track-version-qa');
  const result=await page.evaluate(async()=>{
   const [{submissionFixture},{captureTrackVersion},{playTrackVersion},{BeatAudio},{startVocalWork,advanceVocalWork}]=await Promise.all([
-   import('/test/helpers/submission-fixtures.js'),import('/src/track-version.js?rev=37'),import('/src/track-version-audio.js?rev=37'),import('/src/beat-audio.js?rev=37'),import('/src/vocal-production.js?rev=37')]);
+   import('/test/helpers/submission-fixtures.js'),import('/src/track-version.js?rev=41'),import('/src/track-version-audio.js?rev=41'),import('/src/beat-audio.js?rev=41'),import('/src/vocal-production.js?rev=41')]);
   let state=submissionFixture();
   for(const kind of ['mix','master']){
    state.music.needs={satiety:100,energy:100};

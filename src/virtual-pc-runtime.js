@@ -1,10 +1,10 @@
-import {createVirtualPcState} from './virtual-pc-state.js?rev=40';
-import {softwareDiskBytes} from './pc-software.js?rev=40';
-import {SOFTWARE} from './pc-software-catalog.js?rev=40';
-import {advanceTransfers,TRANSFER_RATES} from './pc-transfer-runtime.js?rev=40';
-import {gameMinuteStamp} from './game-minute.js?rev=40';
-import {advanceSocial} from './social-runtime.js?rev=40';
-import {advanceSubmissionUpload,UPLOAD_BYTES_PER_SECOND} from './social-upload.js?rev=40';
+import {createVirtualPcState} from './virtual-pc-state.js?rev=41';
+import {softwareDiskBytes} from './pc-software.js?rev=41';
+import {SOFTWARE} from './pc-software-catalog.js?rev=41';
+import {advanceTransfers,TRANSFER_RATES} from './pc-transfer-runtime.js?rev=41';
+import {gameMinuteStamp} from './game-minute.js?rev=41';
+import {advanceSocial} from './social-runtime.js?rev=41';
+import {advanceSubmissionUpload,UPLOAD_BYTES_PER_SECOND} from './social-upload.js?rev=41';
 // Only the buffered fraction of active time is ephemeral. State exposed to the
 // UI is always the last durable checkpoint, never an optimistic ready draft.
 export function createSubmissionTransferClock(){
@@ -29,7 +29,7 @@ export function advanceVirtualPc(input,clock,options={}){
  // immutable domain data, not per-frame input to the save migration pipeline.
  let s=input??createVirtualPcState();const stamp=gameMinuteStamp(clock),previous=s.lastGameMinute;
  if(stamp===null)return {state:s,advancedBytes:0};
- const social=advanceSocial(s,stamp,options);s=social.state;
+ const social=options.deferSocial?{state:s,events:[],domainChanged:false}:advanceSocial(s,stamp,options);s=social.state;
  s={...s,lastGameMinute:stamp};
  if(previous===null||stamp<previous||s.power!=='on')return {state:s,advancedBytes:0,events:social.events,domainChanged:social.domainChanged};
  return {...advanceTransfers(s,previous,stamp),events:social.events,domainChanged:social.domainChanged};
@@ -38,7 +38,7 @@ export function advanceVirtualPc(input,clock,options={}){
 // Ordinary frame progress retains the host's existing batched-save policy.
 export function advanceVirtualPcDurably(input,clock,persist,options={}){
  const next=advanceVirtualPc(input,clock,options);
- const migration=JSON.stringify(input.battleSubmissions??[])!==JSON.stringify(next.state.battleSubmissions??[]);
+ const migration=input.battleSubmissions!==next.state.battleSubmissions&&JSON.stringify(input.battleSubmissions??[])!==JSON.stringify(next.state.battleSubmissions??[]);
  if(next.events?.length||migration||next.domainChanged){
   let saved;try{saved=persist(next.state);}catch{saved=false;}
   if(saved===false||saved?.ok===false)return {...next,state:input,events:[],advancedBytes:0,saveFailed:true};

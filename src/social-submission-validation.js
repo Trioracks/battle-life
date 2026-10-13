@@ -1,10 +1,10 @@
-import {communityById} from './social-catalog.js?rev=40';
-import {normalizeSocial} from './social-state.js?rev=40';
-import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=40';
-import {validGameMinute} from './game-minute.js?rev=40';
-import {TRACK_DSP_VERSION} from './track-version.js?rev=40';
-import {submissionCandidates} from './battle-submission.js?rev=40';
-import {normalizeOutgoingUpload} from './social-upload.js?rev=40';
+import {communityById} from './social-catalog.js?rev=41';
+import {normalizeSocial} from './social-state.js?rev=41';
+import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=41';
+import {validGameMinute} from './game-minute.js?rev=41';
+import {TRACK_DSP_VERSION} from './track-version.js?rev=41';
+import {submissionCandidates} from './battle-submission.js?rev=41';
+import {normalizeOutgoingUpload} from './social-upload.js?rev=41';
 export function submissionSendContext(state,{communityId,nowMinute}={}){
  const fail=reason=>({ok:false,state,reason}),c=communityById(communityId),window=currentBattleWindow(state,c?.battleId,nowMinute),upload=normalizeOutgoingUpload(state.outgoingUpload,state.trackVersions);
  if(upload?.issue)return fail(upload.issue);

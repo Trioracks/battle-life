@@ -2,6 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { FT_STUDIO_BYTES, createVirtualPcState, setPcPower, startFtDownload } from '../src/virtual-pc-state.js?rev=28';
 import { advanceVirtualPc, downloadPresentation, gameMinuteStamp } from '../src/virtual-pc-runtime.js?rev=28';
+import {advanceVirtualPcDurably} from '../src/virtual-pc-runtime.js?rev=28';
+import {activateSocial} from '../src/social-runtime.js';
+
+test('room frames defer social calculations across a deadline without stopping downloads',()=>{
+ const initial=activateSocial(downloadingState(),600).state,at=initial.battleWindows[0].closesAt;
+ const state={...initial,lastGameMinute:at-1};let saves=0;
+ const next=advanceVirtualPcDurably(state,{day:Math.floor(at/1440)+1,minutes:at%1440},()=>{saves++;return true;},{deferSocial:true});
+ assert.equal(next.state.social,state.social);assert.equal(next.state.socialRuntime,state.socialRuntime);
+ assert.equal(next.state.tournaments,state.tournaments);assert.equal(next.state.trackVersions,state.trackVersions);
+ assert.equal(next.events.length,0);assert.equal(saves,0);assert.ok(next.advancedBytes>0);assert.equal(next.state.lastGameMinute,at);
+});
 
 function downloadingState(seed = {}) {
   return createVirtualPcState({...seed,power:'on',download:{status:'downloading',receivedBytes:0}});

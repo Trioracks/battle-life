@@ -5,7 +5,7 @@ const READ_KEYS=[...SOCIAL_DOMAIN_KEYS,'battleApplications'];
 const captured=state=>Object.fromEntries(READ_KEYS.map(key=>[key,state[key]]));
 const unchanged=(state,base)=>READ_KEYS.every(key=>state[key]===base[key]);
 
-export function createSocialBackground({createWorker=()=>new Worker(new URL('./social-worker.js',import.meta.url),{type:'module'}),getState,persist,onState,onError=()=>{}}){
+export function createSocialBackground({createWorker=()=>new Worker(new URL('./social-worker.js?rev=41',import.meta.url),{type:'module'}),getState,persist,onState,onError=()=>{}}){
  let worker=null,pending=null,mirror={},lastInput=null,lastMinute=null,lastDispatch=-Infinity,sequence=0,epoch=0,failed='',disposed=false,jobsStarted=0,commits=0;
  function stop(){if(worker)worker.terminate();worker=null;pending=null;mirror={};epoch++;}
  function fail(reason){stop();failed=reason||'Не удалось обработать события баттла.';onError(failed);}
@@ -17,12 +17,17 @@ export function createSocialBackground({createWorker=()=>new Worker(new URL('./s
   // Never merge a whole old snapshot: needs, project work and transfers continue
   // independently while the worker calculates. No optimistic events before save.
   const patch=Object.fromEntries(SOCIAL_DOMAIN_KEYS.filter(key=>Object.hasOwn(data.patch??{},key)).map(key=>[key,data.patch[key]]));
+  const archives=(data.archives??[]).map(entry=>{
+   const field=entry.key==='trackVersions'?'byId':'results',previous=job.input[entry.key];
+   const value=entry.same?previous:{...entry.value,[field]:{...Object.fromEntries((entry.reused??[]).map(id=>[id,previous[field][id]])),...entry.value[field]}};
+   patch[entry.key]=value;return {...entry,value};
+  });
   const next={...getState(),...patch};
   if(data.durable){
-   let saved;try{saved=persist(next,data.archives??[]);}catch{saved=false;}
+   let saved;try{saved=persist(next,archives);}catch{saved=false;}
    if(saved===false||saved?.ok===false){fail('События баттла не сохранены. Проверь свободное место и повтори попытку.');return;}
   }
-  onState(next,data.archives??[]);commits++;lastMinute=job.minute;lastInput=captured(getState());mirror={...job.input,...patch};
+  onState(next,archives);commits++;lastMinute=job.minute;lastInput=captured(getState());mirror={...job.input,...patch};
  }
  return {
   tick(nowMinute,options={},realMs=performance.now()){

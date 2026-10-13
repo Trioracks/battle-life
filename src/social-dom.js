@@ -1,5 +1,5 @@
-import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=40';
-import {socialPhotoSource} from './social-portraits.js?rev=40';
+import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=41';
+import {socialPhotoSource} from './social-portraits.js?rev=41';
 export const socialButton=(d,text,fn,extra={})=>pcButton(d,text,{className:'sn-button',...extra},fn);
 export function showRegistrationNotice(host,name,onContinue){
  const d=host.ownerDocument,previous=d.activeElement,overlay=el(d,'div',{className:'sn-registration-overlay'}),box=el(d,'section',{className:'sn-registration-confirm',attributes:{role:'alertdialog','aria-modal':'true','aria-label':'Заявка принята'}});

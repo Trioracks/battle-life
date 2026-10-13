@@ -1,10 +1,10 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=40';
-import {socialButton,socialAvatar} from './social-dom.js?rev=40';
-import {dossierCharacterIds,publicDossierCard,saveAnalysisToDossier} from './rap-dossier.js?rev=40';
-import {metadataGameMinute} from './social-registration.js?rev=40';
-import {gameDateTimeLabel} from './home-calendar.js?rev=40';
-import {createPublicAnalysisReportView} from './rap-analysis-view.js?rev=40';
-import {ROUND_LABELS} from './battle-results-table.js?rev=40';
+import {pcElement as el} from './virtual-pc-dom.js?rev=41';
+import {socialButton,socialAvatar} from './social-dom.js?rev=41';
+import {dossierCharacterIds,publicDossierCard,saveAnalysisToDossier} from './rap-dossier.js?rev=41';
+import {metadataGameMinute} from './social-registration.js?rev=41';
+import {gameDateTimeLabel} from './home-calendar.js?rev=41';
+import {createPublicAnalysisReportView} from './rap-analysis-view.js?rev=41';
+import {ROUND_LABELS} from './battle-results-table.js?rev=41';
 const statuses={submitted:'Работа сдана',no_show:'Не сдал',won:'Победа',lost:'Поражение',technical_win:'Технический проход',bye:'Проход пустой ветки',eliminated:'Выбыл'};
 export function mountRapDossier(root,{getState,getMetadata=()=>({}),navigate=()=>{},commit=()=>false}){
  const d=root.ownerDocument;let selected=null,selectedReport=null,last='',disposed=false,error='';

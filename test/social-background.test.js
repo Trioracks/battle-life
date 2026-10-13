@@ -54,11 +54,16 @@ test('worker failure latches and retry creates a fresh worker',()=>{
  h.runtime.retry();h.tick(800,100000);assert.equal(h.workers.length,2);h.deliver();assert.equal(h.saves,1);
 });
 
+test('preparing an unchanged archive reuses frozen records instead of cloning them back to the room',()=>{
+ const h=harness();const archive=h.state.trackVersions;h.tick();h.deliver();assert.equal(h.state.trackVersions,archive);
+});
+
 test('real worker calculation equals synchronous close and prepared archives round-trip',()=>{
  const initial=activateSocial(createVirtualPcState(),600).state,at=initial.battleWindows[0].closesAt;
  const expected=advanceSocial(initial,at).state,h=harness(initial);h.tick(at);const result=h.deliver();assert.equal(result.error,undefined);
  for(const key of ['trackVersions','tournaments','npcTracks','battleHistory','socialRuntime','socialReactions'])assert.deepEqual(h.state[key],expected[key],key);
  const loaded=loadVirtualPcState(h.storage);assert.equal(loaded.ok,true);assert.equal(Object.keys(loaded.state.trackVersions.byId).length,32);assert.deepEqual(loaded.state.tournaments,h.state.tournaments);
+ const resumed=harness(h.state),oldArchive=resumed.state.trackVersions;resumed.tick(at+1);resumed.deliver();assert.equal(resumed.state.trackVersions,oldArchive,'reloading a populated archive does not clone its frozen records back');
  const archives=preparePcSaveArchives(h.state,['trackVersions','judging']);primePcSaveArchives(h.storage,archives);assert.equal(saveVirtualPcState(h.storage,{...h.state,lastGameMinute:at+1}),true);
  const raw=h.storage.getItem(VIRTUAL_PC_STORAGE_KEY);h.storage.setItem=()=>{throw Error('quota');};assert.equal(saveVirtualPcState(h.storage,{...h.state,lastGameMinute:at+2}),false);assert.equal(h.storage.getItem(VIRTUAL_PC_STORAGE_KEY),raw);
 });

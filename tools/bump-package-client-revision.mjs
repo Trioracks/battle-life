@@ -1,7 +1,7 @@
 // Mechanical cache-key update; vendor/import-map URLs deliberately remain untouched.
 import {readFile,writeFile} from 'node:fs/promises';
 import path from 'node:path';
-const revision='37',visited=new Set(),updates=[];
+const revision='41',visited=new Set(),updates=[];
 async function visit(file){
  if(visited.has(file)||!file.startsWith('src/'))return;visited.add(file);
  const original=await readFile(file,'utf8'),imports=[...original.matchAll(/(?:from\s*|import\s*\(\s*)['"](\.\.?\/[^'"]+\.js(?:\?[^'"]*)?)['"]/g)];
@@ -10,6 +10,7 @@ async function visit(file){
  if(content!==original){updates.push(file);if(process.argv.includes('--write'))await writeFile(file,content);}
 }
 await visit('src/apartment-app.js');
+await visit('src/social-worker.js');
 for(const file of ['index.html','desktop-apps.css']){
  const original=await readFile(file,'utf8'),content=original.replace(/((?:apartment-app\.js|[\w-]+\.css)\?rev=)\d+/g,'$1'+revision);
  if(content!==original){updates.push(file);if(process.argv.includes('--write'))await writeFile(file,content);}

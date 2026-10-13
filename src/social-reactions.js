@@ -1,10 +1,10 @@
 import bank from '../data/social/reactions-v1.json' with {type:'json'};
-import {publicRoundAnnouncements} from './round-topics.js?rev=40';
-import {beatResultSeed} from './beat-result.js?rev=40';
-import {validGameMinute} from './game-minute.js?rev=40';
-import {judgeProfile} from './judge-profiles.js?rev=40';
-import {profileById} from './social-catalog.js?rev=40';
-import {resolveResultOutcome} from './result-outcome.js?rev=40';
+import {publicRoundAnnouncements} from './round-topics.js?rev=41';
+import {beatResultSeed} from './beat-result.js?rev=41';
+import {validGameMinute} from './game-minute.js?rev=41';
+import {judgeProfile} from './judge-profiles.js?rev=41';
+import {profileById} from './social-catalog.js?rev=41';
+import {resolveResultOutcome} from './result-outcome.js?rev=41';
 export const REACTION_BANK=Object.freeze(bank);
 const clone=v=>structuredClone(v),record=v=>v&&typeof v==='object'&&!Array.isArray(v),clamp=(v,a,b)=>Math.max(a,Math.min(b,Number.isFinite(v)?v:0)),round=Math.round;
 const readerNames=['Радио_Чердак','Пульт_Без_Mute','Тихий_Припев','Ручной_Режим','Антенна_Внутри','Пыль_На_Кнопках','Лента_Оборвалась','Полоса_Приёма','Вечерний_Двор','Сосед_Сверху'];

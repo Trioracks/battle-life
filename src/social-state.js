@@ -1,5 +1,5 @@
-import {SOCIAL_COMMUNITIES,SOCIAL_PROFILES,profileById} from './social-catalog.js?rev=40';
-import {normalizePlayerPortrait} from './social-portraits.js?rev=40';
+import {SOCIAL_COMMUNITIES,SOCIAL_PROFILES,profileById} from './social-catalog.js?rev=41';
+import {normalizePlayerPortrait} from './social-portraits.js?rev=41';
 import conversations from '../data/social/conversations.json' with {type:'json'};
 const copy=value=>JSON.parse(JSON.stringify(value));
 const record=v=>v&&typeof v==='object'&&!Array.isArray(v);

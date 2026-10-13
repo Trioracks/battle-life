@@ -1,9 +1,9 @@
-import {VOCALS} from './vocal-catalog.js?rev=40';
-import {clampV,createVocalTake,normalizeRecording,recordingQuality,VOCAL_EQUIPMENT,effectiveSoundSkill} from './vocal-result.js?rev=40';
-import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=40';
-import {normalizeLyric} from './lyric-production.js?rev=40';
-import {BEAT_RULES as R,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=40';
-import {vocalOutcomes} from './production-outcomes.js?rev=40';
+import {VOCALS} from './vocal-catalog.js?rev=41';
+import {clampV,createVocalTake,normalizeRecording,recordingQuality,VOCAL_EQUIPMENT,effectiveSoundSkill} from './vocal-result.js?rev=41';
+import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=41';
+import {normalizeLyric} from './lyric-production.js?rev=41';
+import {BEAT_RULES as R,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=41';
+import {vocalOutcomes} from './production-outcomes.js?rev=41';
 export {recordingQuality};
 export const VOCAL_STAGES=Object.freeze({draft:{name:'Черновая запись',minutes:60,skill:'flow'},clean:{name:'Чистовая запись',minutes:60,skill:'flow'},mix:{name:'Сведение',minutes:45,skill:'sound'},master:{name:'Мастеринг',minutes:30,skill:'sound'}});
 export function canVocalStage(recording,kind){

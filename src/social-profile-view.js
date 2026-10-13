@@ -1,11 +1,11 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=40';
-import {profileById} from './social-catalog.js?rev=40';
-import {normalizeSocial,profileAccess,addSocialFriend} from './social-state.js?rev=40';
-import {socialAvatar,socialButton,socialHeading,socialPhoto,socialPost} from './social-dom.js?rev=40';
-import {battleCharacter} from './battle-demo-config.js?rev=40';
-import {createNpcSocialProfileView} from './npc-social-profile-view.js?rev=40';
-import {createPostReactionsView} from './social-reactions-view.js?rev=40';
-import {metadataGameMinute} from './social-registration.js?rev=40';
+import {pcElement as el} from './virtual-pc-dom.js?rev=41';
+import {profileById} from './social-catalog.js?rev=41';
+import {normalizeSocial,profileAccess,addSocialFriend} from './social-state.js?rev=41';
+import {socialAvatar,socialButton,socialHeading,socialPhoto,socialPost} from './social-dom.js?rev=41';
+import {battleCharacter} from './battle-demo-config.js?rev=41';
+import {createNpcSocialProfileView} from './npc-social-profile-view.js?rev=41';
+import {createPostReactionsView} from './social-reactions-view.js?rev=41';
+import {metadataGameMinute} from './social-registration.js?rev=41';
 export function playerSocialProfile(state,metadata={}){
  const social=normalizeSocial(state.social),portrait=social.playerPortrait&&(!metadata.portraitKey||social.playerPortrait.key===metadata.portraitKey)?social.playerPortrait:null;
  return {id:'me',name:metadata.playerName??'Игрок',avatar:{mark:'Я',color:'#648577',src:portrait?.url},description:'Своя комната. Первые записи. Всё ещё впереди.',birthday:null,education:'скрыто',languages:['ru'],friends:social.friends,photos:portrait?[{id:'room',title:'Дома, за своим столом',date:'2012-09-01',src:portrait.url}]:[],audio:social.personalAudioIds,wall:social.posts};

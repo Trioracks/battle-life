@@ -1,7 +1,7 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=40';
-import {socialButton,socialHeading} from './social-dom.js?rev=40';
-import {gameDateTimeLabel} from './home-calendar.js?rev=40';
-import {requestResultReaction} from './social-result-reaction.js?rev=40';
+import {pcElement as el} from './virtual-pc-dom.js?rev=41';
+import {socialButton,socialHeading} from './social-dom.js?rev=41';
+import {gameDateTimeLabel} from './home-calendar.js?rev=41';
+import {requestResultReaction} from './social-result-reaction.js?rev=41';
 const statuses={accepting:'Приём работ',judging:'Ожидает итога',no_show:'Не сдал',bye:'Проход пустой ветки',empty:'Пустое место',hidden:'░░░░',qualified:'Прошёл',eliminated:'Выбыл',won:'Победа',technical_win:'Технический проход'};
 export function createBattleResultsTableView(d,{table,navigate,onAnalyze,audio,getState,commit,onResultViewed=()=>{}}={}){
  const root=el(d,'section',{className:'bt-results'});root.append(socialButton(d,'← Сообщество',()=>navigate('underweb://social/community/'+table.battleId),{className:'sn-link'}),socialHeading(d,'Таблица судейства · '+table.title),el(d,'p',{className:'sn-note',text:table.message}));
