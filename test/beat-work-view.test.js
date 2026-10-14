@@ -2,6 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {pcDocument,allPc,findButton} from './helpers/virtual-pc-dom.js';
 const module=await import('../src/beat-work-view.js').catch(e=>{if(e.code==='ERR_MODULE_NOT_FOUND')return {};throw e;});
+test('lyric refinement work is labelled as refinement rather than a fourth creation stage',()=>{
+ const panel=module.createBeatWorkPanel(pcDocument());panel.update({beat:{kind:'lyrics',name:'Мысль'},job:{kind:'refine',stage:3,total:60,elapsed:30},skill:20});
+ assert.equal(allPc(panel.element).find(n=>n.dataset.workRole==='stage').textContent,'Доработка текста');panel.dispose();
+});
 
 test('chain panel separates overall progress from current stage',()=>{
  const panel=module.createBeatWorkPanel(pcDocument());

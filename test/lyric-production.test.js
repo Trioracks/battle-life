@@ -4,13 +4,18 @@ import {createVirtualPcState} from '../src/virtual-pc-state.js';
 import * as lyrics from '../src/lyric-production.js';
 import {createBeat,startBeatStage,advanceBeatWork} from '../src/beat-production.js';
 const fresh=()=>createVirtualPcState({power:'on',music:{needs:{satiety:100,energy:100}}});
-const create=(opts={},skills={writing:10})=>lyrics.createLyric(fresh(),{id:'words-1',name:'Тест',gameDay:1,...opts},skills,()=>.37).state;
+const create=(opts={},skills={writing:10})=>lyrics.createLyric(fresh(),{id:'words-1',...(!opts.battleId?{name:'Тест'}:{}),gameDay:1,...opts},skills,()=>.37).state;
 function finish(s,skills={writing:10},kind='stage',extra={}){const r=lyrics.startLyricWork(s,{projectId:s.projects[0].id,kind,...extra},skills,()=>.5);assert.equal(r.ok,true,r.reason);return lyrics.advanceLyricWork(r.state,1000).state;}
 
 test('battle text takes theme and metadata without registering the hero',()=>{
  const s=create({battleId:'concrete-echo'}),p=s.projects[0];
  assert.equal(p.name,'Голос спального района');assert.equal(p.createdDate,'01.09.2012');assert.equal(p.round,'Отбор');assert.equal(p.opponent,'Не назначен');assert.equal(s.battleApplications.length,0);assert.deepEqual(p.sections,[]);
  assert.equal(lyrics.createLyric(s,{id:'bad',battleId:'nonexistent'},{writing:10}).ok,false);
+});
+test('custom names are honored for battle texts and duplicate lyric names offer a distinct suggestion',()=>{
+ const s=create({battleId:'concrete-echo',name:'Мой район'});assert.equal(s.projects[0].name,'Мой район');
+ const duplicate=lyrics.createLyric(s,{id:'other',name:'Мой район'});assert.equal(duplicate.ok,false);assert.match(duplicate.reason,/Мой район \(2\)/);
+ const paired=createBeat(s,{id:'pair',name:'Мой район'});assert.equal(paired.ok,true,'one track may share its beat and lyric name');
 });
 test('three lyric stages persist stable glyphs and award only a third of a writing level each',()=>{
  let s=create();for(let i=0;i<3;i++)s=finish(s);

@@ -72,3 +72,11 @@
 .rn-content-budget h3 {margin:0 0 8px}
 .rn-content-budget label {display:block;margin:8px 0}
 .rn-content-budget input {display:block;width:100%}
+.project-picker {display:flex;flex-direction:column;gap:8px;min-height:0;width:100%}
+.project-picker>input,.project-picker select {box-sizing:border-box;min-width:0;padding:7px;font:inherit;color:#263345;background:#fff;border:1px solid #aabaca}
+.project-picker-filters {display:flex;gap:6px}
+.project-picker-filters select {flex:1;width:50%}
+.project-picker-list {max-height:300px;overflow:auto;display:flex;flex-direction:column;gap:3px}
+.project-picker-group {margin:9px 0 3px;font:600 11px Tahoma,Arial,sans-serif;color:#667483}
+.ft-dialog-card .project-picker-group {color:#c2c8b5}
+#virtual-pc .project-picker button.project-picker-row {display:block;width:100%;margin:0;padding:7px 9px;text-align:left;line-height:1.35;white-space:normal;overflow-wrap:anywhere}

@@ -1,7 +1,7 @@
 import {VOCALS} from './vocal-catalog.js?rev=41';
 import {clampV,createVocalTake,normalizeRecording,recordingQuality,VOCAL_EQUIPMENT,effectiveSoundSkill} from './vocal-result.js?rev=41';
 import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=41';
-import {normalizeLyric} from './lyric-production.js?rev=41';
+import {latestReadyLyric} from './lyric-production.js?rev=41';
 import {BEAT_RULES as R,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=41';
 import {vocalOutcomes} from './production-outcomes.js?rev=41';
 export {recordingQuality};
@@ -34,7 +34,7 @@ export function startVocalWork(input,{beatId,textId,kind='draft',sliders}={},ski
  const blocked=workBlockReason(s);if(blocked)return fail(blocked);
  if(s.recording.job){if(s.recording.job.beatId!==beatId||s.recording.job.kind!==kind)return fail('Сначала заверши текущую запись.');s.music.activeBeatId=beatId;return {ok:true,state:s};}
  if(!canVocalStage(beat.recording,kind))return fail('Этот этап записи уже выполнен или пока недоступен.');
- const skill=effectiveVocalSkill(s,skills,kind),before=normalizeRecording(beat.recording),text=normalizeLyric(s.projects.find(p=>p.id===textId));
+ const skill=effectiveVocalSkill(s,skills,kind),before=normalizeRecording(beat.recording),text=kind==='draft'?latestReadyLyric(s.projects,textId):null;
  if(kind==='draft'&&text?.status!=='ready')return fail('Для записи нужен готовый текст.');
  const unit=()=>clampV(random(),0,.999999),sourceId=before?.sourceId??VOCALS[Math.floor(unit()*VOCALS.length)].id;
  const values=sliders===undefined||skill<25?Array.from({length:3},()=>Math.floor(unit()*11)):sliders;

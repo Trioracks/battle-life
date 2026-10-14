@@ -13,11 +13,12 @@ test('studio progressively shows draft then locked muted draft and clean vocal l
  s=advanceVocalWork(startVocalWork(s,{beatId:'b',kind:'clean'}).state,1000).state;renderStudioTracks(root,s.projects[0]);assert.equal(rows().length,11);assert.ok(allPc(root).some(n=>n.dataset.muted==='true'));assert.ok(rows().some(n=>n.textContent.includes('Clean Vocal')));
  assert.equal(allPc(root).filter(n=>n.tagName==='IMG'&&n.getAttribute('src')?.endsWith('/microphone.svg?rev=35')).length,2);
 });
-test('add vocal picks completed text and begins a real saved work job',()=>{
+test('add vocal lists only the latest completed lyric revision and begins its real saved work job',()=>{
  let state=fixture(),work=0;const d=pcDocument(),root=d.createElement('section');
+ state.projects.push({...structuredClone(state.projects.find(p=>p.id==='t')),id:'new-text',revision:3,contentSource:{id:'t',revision:1}});
  const view=mountBeatStudio(root,{getState:()=>state,getMetadata:()=>({skills:{flow:10}}),onChange:s=>state=s,onWork:()=>{work++;return true;},audio:{unlock:async()=>{},stop(){},getSnapshot:()=>({status:'stopped'})},initialProject:state.projects[0]});
- const add=findButton(root,'Добавить вокал');assert.ok(add);add.click();assert.ok(findButton(root,'Текст'));
- findButton(root,'Текст').click();assert.equal(state.recording.job.kind,'draft');assert.equal(work,1);view.dispose();
+ const add=findButton(root,'Добавить вокал');assert.ok(add);add.click();const rows=allPc(root).filter(n=>n.dataset.projectId);assert.equal(rows.length,1);assert.equal(rows[0].dataset.projectId,'new-text');assert.match(rows[0].textContent,/Текст.*v3/);
+ rows[0].click();assert.equal(state.recording.job.kind,'draft');assert.equal(state.recording.job.output.text.revision,3);assert.equal(state.recording.job.output.text.id,'new-text');assert.equal(work,1);view.dispose();
 });
 test('work routing advances recording, displays flow meter and no genre practice',()=>{
  let s=startVocalWork(fixture(),{beatId:'b',textId:'t',kind:'draft'}).state;

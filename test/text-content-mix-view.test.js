@@ -12,8 +12,9 @@ test('24 hides manual composition;25 through practice shows conserved linked con
  assert.equal(high.state.projects[0].contentMix.topic,80);assert.equal(inputs(high).reduce((sum,n)=>sum+Number(n.value),0),100);
  fire(findButton(high.root,'Начать писать'),'click');assert.equal(inputs(high).length,0);
 });
-test('started composition offers explicit rework rather than modifying its saved mix',()=>{
+test('started composition keeps its budget and ready work offers bounded refinement',()=>{
  const f=fixture(1),old=structuredClone(f.state.projects[0]);f.state.projects[0].stages=[{skill:25,quality:25,sliders:[5,5,5]}];f.view.update();
- assert.equal(inputs(f).length,0);fire(findButton(f.root,'Новая содержательная версия'),'click');
- assert.equal(f.state.projects.length,2);assert.equal(f.state.projects[1].stages.length,0);assert.deepEqual(f.state.projects[0].contentMix,old.contentMix);assert.equal(inputs(f).length,3);
+ assert.equal(inputs(f).length,0);assert.ok(!findButton(f.root,'Новая содержательная версия'));
+ f.state.projects[0].stages=Array.from({length:3},()=>({skill:25,quality:20,sliders:[5,5,5]}));f.view.update();fire(findButton(f.root,'Доработать'),'click');
+ assert.equal(f.state.projects.length,1);assert.equal(f.state.writing.job.kind,'refine');assert.deepEqual(f.state.projects[0].contentMix,old.contentMix);
 });

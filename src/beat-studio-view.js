@@ -1,7 +1,9 @@
 import {pcElement as el,pcButton as button,pcFind,pcFocusable} from './virtual-pc-dom.js?rev=41';
 import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=41';
 import {BEAT_STAGES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=41';
-import {randomBeatName} from './beat-names.js?rev=41';
+import {randomBeatName,distinctProjectName} from './beat-names.js?rev=41';
+import {mountProjectPicker} from './project-picker-view.js?rev=41';
+import {latestReadyLyrics} from './lyric-production.js?rev=41';
 import {resolveBeatPlayback} from './beat-playback.js?rev=41';
 import {describeBeatMix} from './beat-mix.js?rev=41';
 import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=41';
@@ -65,8 +67,8 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
    }));
   }else if(mode==='vocals'){
    card.children[1].textContent='Текст для записи';dialog.setAttribute('aria-label','Выбрать готовый текст');
-   const texts=getState().projects.filter(p=>p.kind==='lyrics'&&p.status==='ready');
-   for(const p of texts)card.append(button(d,p.name,{className:'ft-project-item'},()=>startRecording('draft',p.id,vocalDecisions)));
+   const texts=latestReadyLyrics(getState().projects);
+   mountProjectPicker(card,{items:texts,onSelect:p=>startRecording('draft',p.id,vocalDecisions),onCancel:()=>closeDialog()});
    if(!texts.length)card.append(el(d,'p',{text:'Сначала закончи текст в Рэпблокноте.'}));
   }else if(mode==='new'){
    const form=el(d,'form'),name=el(d,'input',{attributes:{'aria-label':'Название бита',maxlength:'64',placeholder:'Например, «Первый двор»',required:'true'}}),notice=el(d,'p',{className:'ft-warning',attributes:{role:'status'}});
@@ -77,24 +79,26 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
     select.value=genre;select.addEventListener('change',()=>{genre=select.value;});form.append(el(d,'label',{text:'Жанр проекта'}),select);
    }else form.append(el(d,'p',{text:'Жанр: Экспериментальный'}));
    const create=()=>{
-    const r=createBeat(getState(),{id:globalThis.crypto?.randomUUID?.()??'beat-'+Date.now(),name:name.value,genre},getMetadata().skills);
+    const distinct=distinctProjectName(name.value,getState().projects.filter(p=>p.kind!=='lyrics').map(p=>p.name));
+    if(distinct!==name.value.trim()){notice.textContent='Такой бит уже есть. Попробуй «'+distinct+'».';return;}
+    const r=createBeat(getState(),{id:globalThis.crypto?.randomUUID?.()??'beat-'+Date.now(),name:name.value,genre,gameDay:getMetadata().gameDay},getMetadata().skills);
     if(!r.ok){notice.textContent=r.reason;return;}
     sessionSelected=true;legacyName=undefined;message='';audio.stop();closeDialog({restore:false});change(r.state);pcFocusable(actions)[0]?.focus();
    };
    const naming=el(d,'div',{className:'ft-project-name'});
-   naming.append(name,button(d,'⚄ Случайное название',{attributes:{'aria-label':'Случайное название'}},()=>{name.value=randomBeatName(getMetadata().gameDay,name.value);name.focus();}));
+   naming.append(name,button(d,'⚄ Случайное название',{attributes:{'aria-label':'Случайное название'}},()=>{name.value=randomBeatName(getMetadata().gameDay,name.value,Math.random,getState().projects.map(p=>p.name));name.focus();}));
    form.append(el(d,'label',{text:'Название проекта'}),naming,el(d,'p',{className:'ft-production-note',text:'Начни с простого. Персонаж сам попробует собрать ритм, тему и аранжировку.'}),button(d,'Начать проект',{className:'ft-primary'},create),notice);
    form.addEventListener('submit',e=>{e.preventDefault();create();});card.append(form);
   }else if(mode==='projects'){
    const projects=getState().projects.filter(p=>p.kind!=='lyrics');
    if(!projects.length)card.append(el(d,'p',{className:'ft-production-note',text:'Пока нет сохранённых проектов.'}));
    const list=el(d,'div',{className:'ft-dialog-projects'});
-   for(const p of projects)list.append(button(d,p.name+' · '+(p.recoveryIssue?'ошибка формата':p.kind==='beat'?(p.status==='ready'?'готов':p.stages.length+'/3'):'архив'),{className:'ft-project-item'},()=>selectProject(p)));
+   mountProjectPicker(list,{items:projects,onSelect:selectProject,onCancel:()=>closeDialog()});
    card.append(list,button(d,'Новый проект',{},()=>openDialog('new')));
   }else{
    card.append(el(d,'p',{className:'ft-production-note',text:'Чистый лист или работа, к которой хочется вернуться.'}),button(d,'Новый проект',{className:'ft-menu-choice'},()=>openDialog('new')),button(d,'Открыть проект',{className:'ft-menu-choice'},()=>openDialog('projects')));
   }
-  card.append(button(d,mode==='home'?'Закрыть':'Отмена',{},()=>closeDialog()));
+  if(!['projects','vocals'].includes(mode))card.append(button(d,mode==='home'?'Закрыть':'Отмена',{},()=>closeDialog()));
   dialog.append(card);workspace.append(dialog);
   dialog.addEventListener('keydown',event=>{
    if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closeDialog();return;}

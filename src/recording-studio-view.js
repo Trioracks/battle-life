@@ -1,8 +1,9 @@
 import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=41';
 import {canVocalStage,effectiveVocalSkill,VOCAL_STAGES,recordingQuality} from './vocal-production.js?rev=41';
+import {latestReadyLyrics} from './lyric-production.js?rev=41';
 export function appendRecordingControls({document:d,beat,state,skills={},workflow,panel,onPickText,onStart}){
  const recording=beat.recording,job=state.recording?.job,current=job?.beatId===beat.id?job:null;
- const busy=Boolean(state.music.job||state.writing?.job||job&&!current),texts=state.projects.filter(p=>p.kind==='lyrics'&&p.status==='ready');
+ const busy=Boolean(state.music.job||state.writing?.job||job&&!current),texts=latestReadyLyrics(state.projects);
  const section=el(d,'section',{className:'ft-vocal-analysis',dataset:{ftRole:'vocal-analysis'}});
  section.append(el(d,'h3',{text:'ЗАПИСЬ ВОКАЛА'}));
  let decisions;

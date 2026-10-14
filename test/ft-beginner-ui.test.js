@@ -18,8 +18,14 @@ function setup(state=createVirtualPcState(),metadata={skills:{beatmaking:10},gam
 test('FT project picker excludes notebook documents while keeping legacy music projects',()=>{
  let state=createLyric(createVirtualPcState({projects:[{id:'legacy',name:'Старый бит'}]}),{id:'text',name:'Не музыка'}).state;
  const s=setup(state);findButton(s.root,'Открыть проект').click();
- const labels=allPc(role(s.root,'dialog')).filter(n=>n.className==='ft-project-item').map(n=>n.textContent);
- assert.ok(labels.some(x=>x.includes('Старый бит')));assert.ok(labels.every(x=>!x.includes('Не музыка')));s.view.dispose();
+ const rows=allPc(role(s.root,'dialog')).filter(n=>n.dataset.projectId),labels=rows.map(n=>n.textContent);
+ assert.equal(rows.length,1);assert.match(labels[0],/Старый бит.*архив/);assert.ok(labels.every(x=>!x.includes('Не музыка')));rows[0].click();assert.ok(allPc(s.root).some(n=>n.textContent==='Старый бит'));s.view.dispose();
+});
+test('manual duplicate beat names offer a new variant and the searchable picker keeps input across state updates',()=>{
+ const seed=createBeat(createVirtualPcState(),{id:'b',name:'01.09.2012 — Ночной двор'},{}).state,s=setup(seed);
+ findButton(s.root,'Новый проект').click();const title=allPc(s.root).find(n=>n.getAttribute('aria-label')==='Название бита');title.value='02.09.2012 — Ночной двор';findButton(s.root,'Начать проект').click();
+ assert.equal(s.state.projects.length,1);assert.ok(allPc(s.root).some(n=>n.textContent?.includes('Ночной двор (2)')));findButton(s.root,'Отмена').click();findButton(s.root,'Открыть проект').click();
+ const search=allPc(s.root).find(n=>n.getAttribute('aria-label')==='Поиск проектов');search.value='двор';search.focus();fire(search,'input');s.state={...s.state,projects:[...s.state.projects]};assert.equal(s.d.activeElement,search);assert.equal(search.value,'двор');s.view.dispose();
 });
 test('analytics show the saved layer result and sound skill after the character trains',()=>{
  let state=createBeat(createVirtualPcState(),{id:'audio',name:'Sound'},{sound:12}).state;

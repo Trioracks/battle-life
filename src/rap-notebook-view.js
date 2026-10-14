@@ -1,6 +1,8 @@
 // Notepad-style view of the persisted symbolic lyric projects.
 import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=41';
-import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill,canEditLyricContentMix,setLyricContentMix,createLyricContentRevision} from './lyric-production.js?rev=41';
+import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill,canEditLyricContentMix,setLyricContentMix,lyricRefinementReason} from './lyric-production.js?rev=41';
+import {randomBeatName} from './beat-names.js?rev=41';
+import {mountProjectPicker} from './project-picker-view.js?rev=41';
 import {normalizeBeat} from './beat-production.js?rev=41';
 import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=41';
 
@@ -22,16 +24,16 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
  function dialog(title){const cover=el(d,'div',{className:'rn-cover'}),box=el(d,'section',{className:'rn-dialog',attributes:{role:'dialog','aria-modal':'true','aria-label':title}});box.append(el(d,'h2',{text:title}));cover.append(box);return {cover,box};}
  function newDialog(){
   const {cover,box}=dialog('Новый текст'),form=el(d,'form'),select=el(d,'select',{value:'free',attributes:{'aria-label':'Для чего пишем текст'}}),options=lyricBattleOptions(getState());
-  const free=el(d,'option',{text:'Текст вне баттла',value:'free'});select.append(free);
+  const free=el(d,'option',{text:'Вне баттла',value:'free'});select.append(free);select.value='free';
   for(const [group,label]of [['registered','Баттлы, где ты зарегистрирован'],['other','Для другого баттла']])if(options[group].length){
    const opt=el(d,'optgroup',{attributes:{label}});box.append(el(d,'p',{className:'rn-dialog-hint',text:label}));
    for(const b of options[group])opt.append(el(d,'option',{text:b.title+' — '+b.theme,value:b.id}));select.append(opt);
   }
   const name=el(d,'input',{attributes:{'aria-label':'Название текста',placeholder:'Название трека',maxlength:'64'}});
-  select.addEventListener('change',()=>{const b=[...options.registered,...options.other].find(b=>b.id===select.value);name.disabled=Boolean(b);name.value=b?.theme??'';});
+  select.addEventListener('change',()=>{const b=[...options.registered,...options.other].find(b=>b.id===select.value);if(!name.value)name.value=b?.theme??'';});
   function submit(){const r=createLyric(getState(),{id:'text-'+(globalThis.crypto?.randomUUID?.()??Date.now().toString(36)),name:name.value,battleId:select.value==='free'||!select.value?null:select.value,gameDay:getMetadata().gameDay},getMetadata().skills);if(!r.ok){error.textContent=r.reason;return;}onChange(r.state);panel=null;message='';render();}
   const error=el(d,'p',{className:'rn-message',attributes:{role:'status'}});
-  form.append(select,name,el(d,'p',{text:'Выбор темы не подаёт заявку на баттл. Сначала набросок, затем рифмы и образы.'}),error,button(d,'Создать текст',{},submit),button(d,'Отмена',{},()=>{panel=null;render();}));form.addEventListener('submit',e=>{e.preventDefault();submit();});box.append(form);return cover;
+  form.append(select,name,button(d,'Случайное название',{},()=>{name.value=randomBeatName(getMetadata().gameDay,name.value,Math.random,getState().projects.map(p=>p.name));name.focus();}),el(d,'p',{text:'Выбор темы не подаёт заявку на баттл. Сначала набросок, затем рифмы и образы.'}),error,button(d,'Создать текст',{},submit),button(d,'Отмена',{},()=>{panel=null;render();}));form.addEventListener('submit',e=>{e.preventDefault();submit();});box.append(form);return cover;
  }
  function listDialog(mode){
   const {cover,box}=dialog(mode==='open'?'Открыть текст':mode==='adapt'?'Адаптировать под бит':'Добавить в текст');
@@ -40,16 +42,16 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
    box.append(el(d,'p',{text:'Доработка требует времени. Правила баттла остаются в силе.'}));
   }else {
    const items=getState().projects.map(mode==='open'?normalizeLyric:normalizeBeat).filter(p=>p&&(mode==='open'||p.status==='ready'));
-   for(const p of items)box.append(button(d,p.name+(mode==='open'?' · v'+p.revision+' · '+p.updatedDate:' · '+p.bpm+' BPM'),{},()=>mode==='open'?choose(p.id):start('adapt',{beatId:p.id})));
+   const current=active();mountProjectPicker(box,{items:items.map(p=>({...p,currentAdaptation:mode==='adapt'&&p.id===current?.adaptation?.beatId})),onSelect:p=>mode==='open'?choose(p.id):start('adapt',{beatId:p.id}),onCancel:()=>{panel=null;render();}});
    if(!items.length)box.append(el(d,'p',{text:mode==='open'?'Текстов пока нет.':'Сначала заверши бит в FT Studio.'}));
   }
-  box.append(button(d,'Отмена',{},()=>{panel=null;render();}));return cover;
+  if(mode==='add')box.append(button(d,'Отмена',{},()=>{panel=null;render();}));return cover;
  }
  function render(){
   if(disposed)return;const p=active(),s=getState(),skill=effectiveWritingSkill(s,getMetadata().skills),job=s.writing.job??s.creativeWork?.items.find(i=>i.projectId===p?.id)?.pausedJob;
   const wrap=el(d,'section',{className:'rap-notebook',attributes:{'aria-label':'Рэпблокнот'}}),toolbar=el(d,'nav',{className:'rn-toolbar'});
   toolbar.append(button(d,'Новый текст',{},()=>openPanel('new')),button(d,'Открыть текст',{},()=>openPanel('open')));
-  if(p?.status==='ready'){const add=button(d,'Добавить',{},()=>openPanel('add')),adapt=button(d,'Адаптировать под бит',{},()=>openPanel('adapt'));add.disabled=adapt.disabled=Boolean(job);toolbar.append(add,adapt);}
+  if(p?.status==='ready'){const add=button(d,'Добавить',{},()=>openPanel('add')),adapt=button(d,'Адаптировать под бит',{},()=>openPanel('adapt'));add.disabled=Boolean(job);adapt.disabled=Boolean(job)||p.adaptationCount>=3;toolbar.append(add,adapt);}
   const tab=el(d,'div',{className:'rn-tab',text:'▤ '+(p?p.name+'.rap.txt':'Рэпблокнот — начни с чистого листа')}),body=el(d,'div',{className:'rn-body'}),sheet=el(d,'article',{className:'rn-sheet',dataset:{lyricRole:'document'},attributes:{'aria-label':'Документ текста'}}),side=el(d,'aside',{className:'rn-work'});
   controls=[];
   if(p){
@@ -82,10 +84,11 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
      input.addEventListener('change',()=>{const r=setLyricContentMix(getState(),{projectId:p.id,key,value:Number(input.value)},getMetadata().skills);if(r.ok)onChange(r.state);else message=r.reason;render();});field.append(input);budget.append(field);
     }
    }else budget.append(el(d,'p',{text:p.contentMix?(skill<25?'Пока содержание складывается само. Доли сохраняются вместе с текстом.':`Тема ${p.contentMix.topic}% · Дисс ${p.contentMix.diss}% · Лирика ${p.contentMix.lyric}%`):'Старый текст: доли содержания неизвестны. Он не переоценивается.'}));
-   if((!canEditLyricContentMix(s,p)||!p.contentMix)&&!s.writing.job&&!s.music.job&&!s.recording?.job){
-    budget.append(el(d,'p',{text:'Новая содержательная версия потребует заново пройти три этапа. Старая работа сохранится.'}),button(d,'Новая содержательная версия',{},()=>{
-     const id='text-'+(globalThis.crypto?.randomUUID?.()??Date.now().toString(36)),r=createLyricContentRevision(getState(),{projectId:p.id,id,gameDay:getMetadata().gameDay},getMetadata().skills);if(r.ok)onChange(r.state);else message=r.reason;render();
-    }));
+   if(p.status==='ready'){
+    const reason=lyricRefinementReason(s,p,getMetadata().skills),refine=button(d,'Доработать',{},()=>start('refine'));
+    refine.disabled=Boolean(reason||job||s.music.job||s.recording?.job);
+    budget.append(el(d,'p',{text:'Доработки '+p.refinementCount+'/3 · адаптации '+p.adaptationCount+'/3. Доработка: 60 мин., до +2 качества, до 1/9 опыта создания.'}),refine);
+    if(reason)budget.append(el(d,'p',{text:reason}));
    }
    side.append(budget);
    if(p.status!=='ready'&&!job&&!planned&&skill>=25)for(let stage=p.stages.length;stage<3;stage++){
@@ -97,7 +100,7 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
     call.append(el(d,'p',{text:'Три этапа · готово '+Math.round(progress.overall*100)+'%'}),bar,button(d,job||planned||p.stages.length?'Продолжить писать':'Начать писать',{className:'rn-primary'},()=>start()));
     if(job)call.append(el(d,'small',{text:'Этап '+(job.stage+1)+' / 3 · сохранено '+Math.floor(job.elapsed)+' / '+job.total+' мин.'}));meta.append(call);
    }else if(job?.projectId===p.id)side.append(button(d,'Продолжить работу',{},()=>start(job.kind,{beatId:job.beatId})));
-   else side.append(el(d,'p',{text:'Основная структура собрана. Остались шероховатости: добавь часть или адаптируй строки под бит. Запись вокала — следующий этап.'}));
+   else side.append(el(d,'p',{text:'Основная структура собрана. Доработай текст или адаптируй строки под готовый бит. Запись вокала — следующий этап.'}));
   }else {sheet.append(el(d,'div',{className:'rn-welcome',text:'Рэпблокнот'}),el(d,'p',{className:'rn-empty',text:'Тема. Первая мысль. Первая строка. Создай текст для баттла или сохрани собственную идею.'}));side.append(el(d,'h2',{text:'Твой черновик'}),el(d,'p',{text:'Здесь герой пишет сам. Ты выбираешь направление работы; символы показывают ритм и стройность текста.'}));}
   needsLabel=el(d,'p');updateNeeds();side.append(el(d,'hr'),el(d,'p',{text:'Письмо '+skill.toFixed(2)+' / 100'}),needsLabel);
   body.append(sheet,side);wrap.append(toolbar,tab,body,el(d,'footer',{className:'rn-status',text:message||'UTF-8 · Символический текст · Сохраняется автоматически',attributes:{role:'status'}}));

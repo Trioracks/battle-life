@@ -30,7 +30,7 @@ export function createBeatWorkPanel(document,{onCancel=()=>{},onEnableAudio=()=>
  return {element:root,update({beat,job,chainProgress,needs:values={},skill:level=0,genreProgress,clockLabel='',reward:earned=0,finished=false,audioError='',needsGesture=false}={}){
   overall.hidden=overallLabel.hidden=!chainProgress;overall.value=chainProgress?.overall??0;
   overallLabel.textContent='Общая готовность · '+Math.round(overall.value*100)+'% · '+((chainProgress?.index??0)+1)+' / 3';
-  const writing=beat?.kind==='lyrics',stages=writing?LYRIC_STAGES:BEAT_STAGES,extra=writing&&job?.kind!=='stage'?({diss:'Диссовая часть',story:'Сюжетный куплет',chorus:'Припев',adapt:'Адаптация под бит'})[job?.kind]:null;
+  const writing=beat?.kind==='lyrics',stages=writing?LYRIC_STAGES:BEAT_STAGES,extra=writing&&job?.kind!=='stage'?({diss:'Диссовая часть',story:'Сюжетный куплет',chorus:'Припев',adapt:'Адаптация под бит',refine:'Доработка текста'})[job?.kind]:null;
   const vocal=job?.output?.draft?VOCAL_STAGES[job.kind]:null;
   title.textContent=beat?.name??'Работа над битом';stage.textContent=vocal?.name??extra??('ЭТАП '+((job?.stage??0)+1)+' / 3 · '+(stages[job?.stage??0]?.name??'Работа'));
   root.setAttribute('aria-label',writing?'Работа над текстом':'Работа над битом');progress.setAttribute('aria-label',writing?'Работа над текстом':'Работа над битом');

@@ -40,12 +40,12 @@ test('automatic mix persists, manual threshold includes practice and started ver
  assert.equal(lyric.setLyricContentMix(s,{projectId:'text',key:'topic',value:20},{writing:99}).ok,false);
  const before=structuredClone(s.projects[0]),practice=s.writing.practice;
  assert.equal(lyric.createLyricContentRevision(s,{projectId:'text',id:'next'},{writing:99}).ok,false,'must pause active work first');
- s.writing.job=null;s.projects[0].stages=[{skill:24,quality:24,sliders:[5,5,5]}];
+ s.writing.job=null;s.projects[0].stages=Array.from({length:3},()=>({skill:24,quality:24,sliders:[5,5,5]}));
  const r=lyric.createLyricContentRevision(s,{projectId:'text',id:'next',gameDay:2},{writing:99});assert.equal(r.ok,true,r.reason);
- const next=r.state.projects.find(p=>p.id==='next');assert.equal(next.stages.length,0);assert.equal(next.status,'draft');assert.equal(next.revision,2);assert.equal(next.contentSource.id,'text');assert.equal(r.state.writing.practice,practice);assert.deepEqual(r.state.projects[0].contentMix,before.contentMix);
+ assert.equal(r.state.projects.length,1);assert.equal(r.state.writing.job.kind,'refine');assert.equal(r.state.writing.job.projectId,'text');assert.equal(r.state.projects[0].revision,1);assert.equal(r.state.writing.practice,practice);assert.deepEqual(r.state.projects[0].contentMix,before.contentMix);
 });
-test('legacy normalization never invents proportions; explicit new version upgrades without changing source',()=>{
+test('legacy normalization never invents proportions and legacy revision cannot restart unfinished work',()=>{
  const s=fresh();delete s.projects[0].contentMix;delete s.projects[0].contentPolicyVersion;
  const old=lyric.normalizeLyric(s.projects[0]);assert.equal(old.contentMix,undefined);assert.equal(old.contentEvidence,'legacy');
- const r=lyric.createLyricContentRevision(s,{projectId:'text',id:'new'},{writing:25});assert.equal(r.ok,true,r.reason);assert.equal(r.state.projects[0].contentMix,undefined);assert.ok(mix.normalizeContentMix(r.state.projects[1].contentMix));
+ const r=lyric.createLyricContentRevision(s,{projectId:'text',id:'new'},{writing:25});assert.equal(r.ok,false);assert.equal(r.state.projects.length,1);assert.equal(r.state.projects[0].contentMix,undefined);
 });

@@ -13,6 +13,24 @@ export function fixture(){
 }
 const finish=(s,kind,extra={})=>{s.music.needs={satiety:100,energy:100};const r=v.startVocalWork(s,{beatId:'b',textId:'t',kind,...extra},{flow:10,sound:10},()=>.2);assert.equal(r.ok,true,r.reason);return v.advanceVocalWork(r.state,1000).state;};
 
+test('new recordings resolve the latest ready contentSource revision and old recordings keep frozen lyrics',()=>{
+ let s=finish(fixture(),'draft');const frozen=structuredClone(s.projects[0].recording),original=s.projects.find(p=>p.id==='t');
+ s.projects.push({...structuredClone(original),id:'middle-text',name:'Промежуточный текст',revision:2,contentSource:{id:'t',revision:1}});
+ s.projects.push({...structuredClone(original),id:'new-text',name:'Свежий текст',revision:4,contentSource:{id:'middle-text',revision:2}});
+ s.projects.push({...structuredClone(s.projects[0]),id:'new-beat',name:'Новый бит'});delete s.projects.at(-1).recording;s.music.needs={satiety:100,energy:100};
+ const r=v.startVocalWork(s,{beatId:'new-beat',textId:'t',kind:'draft'},{},()=>.2);assert.equal(r.ok,true,r.reason);
+ assert.equal(r.state.recording.job.output.text.id,'new-text');assert.equal(r.state.recording.job.output.text.revision,4);
+ const saved=createVirtualPcState(JSON.parse(JSON.stringify(r.state)));assert.deepEqual(saved.projects[0].recording,frozen);
+ assert.equal(saved.recording.job.output.text.snapshot.name,'Свежий текст');
+});
+test('refining the same lyric leaves a recorded take unchanged while a new beat records its current revision',()=>{
+ let s=finish(fixture(),'draft');const old=structuredClone(s.projects[0].recording);s.music.needs={satiety:100,energy:100};
+ const r=startLyricWork(s,{projectId:'t',kind:'refine'},{writing:60});assert.equal(r.ok,true,r.reason);s=advanceLyricWork(r.state,60).state;
+ s=createVirtualPcState(JSON.parse(JSON.stringify(s)));assert.deepEqual(s.projects[0].recording,old);
+ s.projects.push({...structuredClone(s.projects[0]),id:'another',name:'Ещё бит'});delete s.projects.at(-1).recording;s.music.needs={satiety:100,energy:100};
+ const take=v.startVocalWork(s,{beatId:'another',textId:'t',kind:'draft'},{},()=>.2);assert.equal(take.ok,true,take.reason);assert.equal(take.state.recording.job.output.text.revision,2);assert.deepEqual(take.state.projects[0].recording,old);
+});
+
 test('saved recording and post jobs on retired beats remain frozen without needs, minutes or XP costs',()=>{
  for(const drumId of ['free-01','shop-10']){
   let ready=fixture();
