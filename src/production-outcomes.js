@@ -55,7 +55,10 @@ export function beatOutcomes({result,recipe,descriptor}={}){
  out.qualities.music=mean(qualities);
  if(recipe){
   add(out,'music.genre',recipe.genre??null,'audio-recipe',[{path:'recipe.genre'}],'beat:genre');
-  add(out,'music.form',descriptor?.durationSeconds>11?'intro-verse-outro':'working-loop','audio-recipe',[{path:'descriptor.parts.windows',windows:descriptor?.parts.map(p=>p.windows??null)}],'beat:form');
+  const formEvidence=descriptor?.parts.some(p=>p.songSection==='intro'||p.songSection==='outro')
+   ?{path:'descriptor.parts',parts:descriptor.parts.map(p=>({id:p.id,songSection:p.songSection??null,windows:clone(p.windows??null)}))}
+   :{path:'descriptor.parts.windows',windows:descriptor?.parts.map(p=>p.windows??null)};
+  add(out,'music.form',descriptor?.durationSeconds>11?'intro-verse-outro':'working-loop','audio-recipe',[formEvidence],'beat:form');
  }
  const rhythm=layers.find(r=>r.stage===0);
  if(rhythm&&Number.isFinite(rhythm.skills?.beatmaking)){

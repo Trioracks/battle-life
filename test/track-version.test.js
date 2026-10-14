@@ -38,6 +38,31 @@ test('alternate sections cannot double-weight music quality or duplicate stage f
  assert.deepEqual(after.facts.filter(f=>f.key!=='music.form'),before.facts.filter(f=>f.key!=='music.form'));
 });
 
+test('alternate form evidence distinguishes source identity and preserves every section window',()=>{
+ const recipe={genre:'experimental'},body={id:'beginner-drums-01',windows:[{startBar:2,bars:4,sourceBar:0}]};
+ const intro={id:'beginner-drums-02',songSection:'intro',windows:[{startBar:0,bars:2,sourceBar:1}]};
+ const outro={id:'beginner-drums-03',songSection:'outro',windows:[{startBar:6,bars:2,sourceBar:2}]};
+ const form=parts=>beatOutcomes({recipe,descriptor:{durationSeconds:64/3,parts}}).facts.find(f=>f.key==='music.form');
+ const first=form([body,intro,outro]),differentSource=form([body,{...intro,id:'beginner-drums-04'},outro]);
+ assert.notDeepEqual(first.evidence,differentSource.evidence,'same windows with different sources must remain distinguishable');
+ assert.deepEqual(first.evidence,[{path:'descriptor.parts',parts:[
+  {id:'beginner-drums-01',songSection:null,windows:[{startBar:2,bars:4,sourceBar:0}]},
+  {id:'beginner-drums-02',songSection:'intro',windows:[{startBar:0,bars:2,sourceBar:1}]},
+  {id:'beginner-drums-03',songSection:'outro',windows:[{startBar:6,bars:2,sourceBar:2}]}
+ ]}]);
+ intro.windows[0].sourceBar=0;assert.equal(first.evidence[0].parts[1].windows[0].sourceBar,1,'fact owns its saved windows');
+});
+
+test('legacy form evidence retains its exact shape and archived old facts never migrate',()=>{
+ const recipe={genre:'experimental'},descriptor={durationSeconds:64/3,parts:[{id:'beginner-drums-01',windows:[{startBar:0,bars:2,sourceBar:0}]},{id:'vocal-01'}]};
+ const oldFact={id:'beat:form',key:'music.form',value:'intro-verse-outro',origin:'audio-recipe',evidence:[{path:'descriptor.parts.windows',windows:[[{startBar:0,bars:2,sourceBar:0}],null]}]};
+ assert.deepEqual(beatOutcomes({recipe,descriptor}).facts.find(f=>f.key==='music.form'),oldFact);
+ const captured=capture(submissionFixture()),version=captured.state.trackVersions.byId[captured.versionId];version.facts=version.facts.map(f=>f.key==='music.form'?oldFact:f);
+ const before=structuredClone(version);const restored=createVirtualPcState(JSON.parse(JSON.stringify(captured.state)));
+ assert.deepEqual(restored.trackVersions.byId[captured.versionId],before);
+ assert.deepEqual(capture(restored).state.trackVersions.byId[captured.versionId],before);
+});
+
 test('legacy beats never acquire eligibility or alternate form on mix, clean or remix',()=>{
  let s=submissionFixture();delete s.projects.find(p=>p.id==='beat').songFormVersion;
  for(const kind of ['mix','clean','mix','master']){
