@@ -21,7 +21,7 @@ export function advanceCreativeWork(state,seconds,clock=null,skills={}){
  let remaining=seconds,minutes=0,stageFinished=false,practiceGained=0,finished=false,blocked=false,reason='';
  // Three base stages at most. Vocal/addition jobs intentionally stay single-stage.
  for(let pass=0;pass<3&&remaining>1e-9;pass++){
-  descriptor=creativeWorkDescriptor(state,skills);const {writing,recording,job}=descriptor;if(!job)break;
+  if(pass>0)descriptor=creativeWorkDescriptor(state,skills);const {writing,recording,job}=descriptor;if(!job)break;
   const localClock=clock?{day:clock.day+Math.floor((clock.minutes+minutes)/1440),minutes:(clock.minutes+minutes)%1440}:null;
   const request=Math.min(remaining*job.total/BEAT_RULES.workSeconds,job.total-job.elapsed);
   const r=writing?advanceLyricWork(state,request,localClock):recording?advanceVocalWork(state,request):advanceBeatWork(state,request);

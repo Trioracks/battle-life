@@ -5,7 +5,10 @@ const owner=kind=>kind==='beat'?'music':'writing';
 const jobId=j=>j?.beatId??j?.projectId;
 const triple=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite)?v.map(x=>Math.max(0,Math.min(10,Math.round(x)))):null;
 const duration=n=>Number.isFinite(n)&&n>0&&n<=600;
-function validJob(kind,job,projects){return (kind==='beat'?normalizeMusic:normalizeWriting)({job},projects).job;}
+function validJob(kind,job,projects){
+ if(!job)return null;
+ return (kind==='beat'?normalizeMusic:normalizeWriting)({job},projects).job;
+}
 
 export function normalizeCreativeWork(value,projects=[]){
  const items=[],seen=new Set();
@@ -62,8 +65,10 @@ export function pauseCreativeChain(input){
 }
 
 export function creativeChainProgress(state,projectId){
- const item=normalizeCreativeWork(state.creativeWork,state.projects).items.find(i=>i.projectId===projectId);
  const p=state.projects?.find(p=>p.id===projectId),completed=p?.stages?.length??0;
+ // Load and commands validate the full archive. A frame needs only this plan.
+ const raw=Array.isArray(state.creativeWork?.items)?state.creativeWork.items.find(i=>i?.projectId===projectId):null;
+ const item=raw&&p?normalizeCreativeWork({items:[raw]},[p]).items[0]:null;
  const j=item&&(jobId(state[owner(item.kind)]?.job)===projectId?state[owner(item.kind)].job:item.pausedJob);
  const total=item?.plans.reduce((sum,p)=>sum+p.total,0)??3;
  const elapsed=item?item.plans.slice(0,completed).reduce((sum,p)=>sum+p.total,0)+(j?.elapsed??0):completed;

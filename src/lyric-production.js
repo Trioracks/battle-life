@@ -36,11 +36,20 @@ export function normalizeLyric(p){
  const references=(Array.isArray(p.referenceUses)?p.referenceUses:[]).slice(0,2).filter(use=>REFERENCE_CATALOG.some(r=>r.id===use.referenceId&&r.sourceId===use.sourceId)&&Number.isFinite(use.fit)&&Number.isFinite(use.clarity)).map(use=>({referenceId:use.referenceId,sourceId:use.sourceId,fit:clamp(use.fit,0,1),clarity:clamp(use.clarity,0,1),placement:use.placement==='ending'?'ending':'body',origin:'production-simulation'}));
  return {...(contentMix?{contentMix,contentPolicyVersion:CONTENT_POLICY_VERSION,contentEvidence:'known'}:{contentEvidence:'legacy'}),...(text(p.contentSource?.id)?{contentSource:{id:text(p.contentSource.id),revision:Math.max(1,Math.floor(number(p.contentSource.revision,1)))}}:{}),schemaVersion:1,kind:'lyrics',id:text(p.id),name:text(p.name,64),seed:Math.floor(clamp(p.seed,0,4294967295)),revision:Math.max(1,Math.floor(clamp(p.revision,1,10000))),createdDay:validDay(p.createdDay),updatedDay:validDay(p.updatedDay??p.createdDay),createdDate:homeDateLabel(validDay(p.createdDay)),updatedDate:homeDateLabel(validDay(p.updatedDay??p.createdDay)),battleId:battle?.id??null,battleName:battle?.title??'Вне баттла',round:text(p.round,64)||'Отбор',roundId:text(p.roundId,64)||'selection',themeId:text(p.themeId,120)||null,opponent:text(p.opponent,64)||'Не назначен',stages,status:stages.length===3?'ready':'draft',sections:normalizeSections(p.sections),additions:(Array.isArray(p.additions)?p.additions:[]).slice(0,6).filter(a=>['diss','story','chorus'].includes(a?.kind)).map(a=>({kind:a.kind,skill:clamp(a.skill),...(a.resultVersion===1?{resultVersion:1}:{})})),adaptation:p.adaptation&&text(p.adaptation.beatId)?{beatId:text(p.adaptation.beatId),beatName:text(p.adaptation.beatName,64),bpm:90,skill:clamp(p.adaptation.skill)}:null,...(produced?{productionOutcome:produced}:{}),...(references.length?{referenceUses:references}:{})};
 }
+function selectedLyric(projects,id){
+ if(typeof id!=='string')return null;
+ for(const raw of projects){
+  if(text(raw?.id)!==id)continue;
+  const lyric=normalizeLyric(raw);if(lyric)return lyric;
+ }
+ return null;
+}
 export function normalizeWriting(value,projects=[]){
- const w=value??{},texts=projects.map(normalizeLyric).filter(Boolean),j=w.job,p=texts.find(p=>p.id===j?.projectId),v=values(j?.sliders);
+ const w=value??{},j=w.job,p=selectedLyric(projects,j?.projectId),v=values(j?.sliders);
  const valid=p&&kinds.has(j.kind)&&j.baseRevision===p.revision&&j.stage===p.stages.length&&v&&Number.isFinite(j.total)&&j.total>0&&j.total<=600&&Number.isFinite(j.elapsed)&&j.elapsed>=0&&j.elapsed<j.total&&(j.kind==='stage'?p.status==='draft':p.status==='ready');
  const job=valid?{projectId:p.id,kind:j.kind,stage:j.stage,baseRevision:p.revision,sliders:v,total:j.total,elapsed:j.elapsed,skill:clamp(j.skill),practiceCredit:clamp(j.practiceCredit,0,j.elapsed/j.total/3),gameDay:validDay(j.gameDay),beatId:text(j.beatId)||null}:null;
- return {practice:clamp(w.practice),activeTextId:texts.some(p=>p.id===w.activeTextId)?w.activeTextId:null,job,
+ const active=p?.id===w.activeTextId?p:selectedLyric(projects,w.activeTextId);
+ return {practice:clamp(w.practice),activeTextId:active?active.id:null,job,
   ...(Array.isArray(w.referenceHistory)?{referenceHistory:w.referenceHistory.slice(-50).map(work=>({referenceIds:(Array.isArray(work?.referenceIds)?work.referenceIds:[]).filter(id=>REFERENCE_CATALOG.some(r=>r.id===id))}))}:{}),
   ...(Array.isArray(w.knownReferenceTopics)?{knownReferenceTopics:[...new Set(w.knownReferenceTopics.filter(g=>REFERENCE_CATALOG.some(r=>r.group===g)))]}:{})};
 }

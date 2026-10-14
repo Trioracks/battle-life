@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {creativeFixture} from './helpers/creative-fixtures.js';
-import {createBeat,startBeatStage,advanceBeatWork} from '../src/beat-production.js';
-import {advanceLyricWork} from '../src/lyric-production.js';
+import {createBeat,startBeatStage,advanceBeatWork,normalizeMusic} from '../src/beat-production.js';
+import {advanceLyricWork,normalizeWriting} from '../src/lyric-production.js';
 import {createVirtualPcState,saveVirtualPcState,loadVirtualPcState,VIRTUAL_PC_STORAGE_KEY as KEY} from '../src/virtual-pc-state.js';
 const api=await import('../src/creative-workflow.js').catch(e=>{if(e.code==='ERR_MODULE_NOT_FOUND')return {};throw e;});
 function start(f){assert.equal(typeof api.startCreativeChain,'function');return api.startCreativeChain(f.state,{kind:f.state.projects[0].kind,projectId:f.projectId},f.skills,()=>.4);}
@@ -50,4 +50,28 @@ test('malformed projects are retained for explanation',()=>{
  const s=createVirtualPcState({projects:[raw]});assert.equal(s.projects.length,1);assert.ok(s.projects[0].recoveryIssue);
  assert.deepEqual(s.projects[0].recoveryData,raw);
  assert.deepEqual(createVirtualPcState(s),s);
+});
+
+test('malformed archived project stays recoverable',()=>{
+ const f=creativeFixture('lyrics'),broken={id:'archived',kind:'lyrics',name:'Архив',schemaVersion:888,sections:[{original:'keep'}]};
+ const s=createVirtualPcState({...f.state,projects:[broken,...f.state.projects],creativeWork:{items:[{projectId:'archived',kind:'lyrics',plans:[{total:60,sliders:[4,4,4]}]}]}});
+ assert.deepEqual(s.projects[0].recoveryData,broken);
+ const started=api.startCreativeChain(s,{kind:'lyrics',projectId:f.projectId},f.skills,()=>.4);
+ assert.equal(started.ok,true);
+ assert.deepEqual(started.state.projects[0],s.projects[0]);
+ assert.deepEqual(api.creativeChainProgress(started.state,f.projectId),{overall:0,stage:0,index:0,count:3});
+ const restored=createVirtualPcState(JSON.parse(JSON.stringify(started.state)));
+ assert.deepEqual(restored.projects[0].recoveryData,broken);
+ assert.equal(restored.creativeWork.items.some(i=>i.projectId==='archived'),false);
+});
+
+test('job validation retains matching-project normalization around corrupt entries',()=>{
+ for(const kind of ['beat','lyrics']){
+  const f=creativeFixture(kind),s=start(f).state,owner=kind==='beat'?'music':'writing',normalize=kind==='beat'?normalizeMusic:normalizeWriting;
+  const p=s.projects[0],broken={...p,...(kind==='beat'?{version:999}:{schemaVersion:999})},padded={...p,id:`  ${p.id}  `};
+  const validated=normalize(s[owner],[broken,padded]);
+  assert.deepEqual(validated.job,s[owner].job);
+  assert.equal(validated[kind==='beat'?'activeBeatId':'activeTextId'],p.id);
+  assert.equal(normalize(s[owner],[broken]).job,null);
+ }
 });

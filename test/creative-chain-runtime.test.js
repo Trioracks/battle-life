@@ -42,3 +42,21 @@ test('invalid deltas are inert and capped practice never invents gains',()=>{
  const r=advanceCreativeWork(s,24,null,expert.skills);assert.equal(r.practiceGained,0);assert.equal(r.state.music.practice,0);
  assert.equal(creativeWorkDescriptor(f.state).chainProgress.count,3);
 });
+
+test('resume retains previously earned practice',()=>{
+ for(const kind of ['beat','lyrics']){
+  const f=begin(kind),owner=kind==='beat'?'music':'writing';
+  const partial=advanceCreativeWork(f.state,2,null,f.skills).state;
+  assert.ok(Math.abs(partial[owner].practice-1/12)<1e-12);
+  const paused=pauseCreativeChain(partial),credit=paused.creativeWork.items[0].pausedJob.practiceCredit;
+  assert.ok(Math.abs(credit-1/12)<1e-12);
+  const loaded=createVirtualPcState(JSON.parse(JSON.stringify(paused)));
+  const resumed=startCreativeChain(loaded,{kind,projectId:f.projectId},f.skills,()=>.9);
+  assert.equal(resumed.ok,true);assert.equal(resumed.state[owner].practice,partial[owner].practice);
+  assert.equal(resumed.state[owner].job.practiceCredit,credit);
+  const completed=advanceCreativeWork(resumed.state,22,null,f.skills);
+  assert.equal(completed.finished,true);
+  assert.ok(Math.abs(completed.state[owner].practice-1)<1e-12);
+  assert.ok(Math.abs(completed.practiceGained-11/12)<1e-12);
+ }
+});

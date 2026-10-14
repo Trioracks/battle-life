@@ -29,9 +29,17 @@ export function normalizeBeat(p){
  if(drumById(beat.drumId)?.retired)beat.audioIssue='retired-source';
  return beat;
 }
+function selectedBeat(projects,id){
+ if(typeof id!=='string')return null;
+ for(const raw of projects){
+  if(text(raw?.id,100)!==id)continue;
+  const beat=normalizeBeat(raw);if(beat)return beat;
+ }
+ return null;
+}
 export function normalizeMusic(value,projects=[]){
  const m=value??{},seen=new Set(),owned=(Array.isArray(m.owned)?m.owned:[]).filter(a=>drumById(a?.id)?.bank==='shop'&&['buy','torrent','rip'].includes(a.method)&&!seen.has(a.id)&&seen.add(a.id)).map(a=>({id:a.id,method:a.method}));
- const job=m.job,beat=projects.map(normalizeBeat).find(p=>p?.id===job?.beatId),values=sliders(job?.sliders);
+ const job=m.job,beat=selectedBeat(projects,job?.beatId),values=sliders(job?.sliders);
  const validJob=beat&&beat.stages.length<3&&job.stage===beat.stages.length&&values&&Number.isFinite(job.total)&&job.total>0&&job.total<=600&&Number.isFinite(job.elapsed)&&job.elapsed>=0&&job.elapsed<job.total;
  // Old partial jobs earned nothing until completion, so a missing credit ledger starts at zero.
  const savedJob=validJob?{beatId:beat.id,stage:job.stage,sliders:values,total:job.total,elapsed:job.elapsed,skill:clamp(job.skill),genreSkill:clamp(finite(job.genreSkill,m.genrePractice?.[beat.genre])),practiceCredit:clamp(job.practiceCredit,0,job.elapsed/job.total*PRACTICE_PER_STAGE)}:null;
@@ -40,7 +48,7 @@ export function normalizeMusic(value,projects=[]){
   savedJob.genreCredit=clamp(finite(job.genreCredit,job.elapsed/job.total*PRACTICE_PER_STAGE),0,job.elapsed/job.total*PRACTICE_PER_STAGE);
   const profile=normalizeGenreSnapshot(job.genreProfile);if(profile)savedJob.genreProfile=profile;
  }
- return {cash:clamp(finite(m.cash,R.startingCash),0,1e9),needs:{satiety:clamp(finite(m.needs?.satiety,68)),energy:clamp(finite(m.needs?.energy,72))},practice:clamp(m.practice),genres:normalizeGenreProgression(m.genres),genrePractice:Object.fromEntries(BEAT_GENRES.map(g=>[g.id,clamp(m.genrePractice?.[g.id])])),owned,ripline:m.ripline===true,infected:m.infected===true,activeBeatId:typeof m.activeBeatId==='string'&&projects.some(p=>normalizeBeat(p)?.id===m.activeBeatId)?m.activeBeatId:null,job:savedJob};
+ return {cash:clamp(finite(m.cash,R.startingCash),0,1e9),needs:{satiety:clamp(finite(m.needs?.satiety,68)),energy:clamp(finite(m.needs?.energy,72))},practice:clamp(m.practice),genres:normalizeGenreProgression(m.genres),genrePractice:Object.fromEntries(BEAT_GENRES.map(g=>[g.id,clamp(m.genrePractice?.[g.id])])),owned,ripline:m.ripline===true,infected:m.infected===true,activeBeatId:selectedBeat(projects,m.activeBeatId)?m.activeBeatId:null,job:savedJob};
 }
 const normalized=s=>({...s,projects:[...(s.projects??[])],music:normalizeMusic(s.music,s.projects)});
 const result=(state,ok=true,reason='')=>({state,ok,reason});
