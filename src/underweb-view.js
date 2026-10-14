@@ -43,16 +43,12 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  function logo(compact=false){const n=el(d,'div',{className:compact?'uw-iskra compact':'uw-iskra'});n.append(el(d,'i',{text:'✳',attributes:{'aria-hidden':'true'}}),el(d,'strong',{text:'Искра'}));return n;}
  function homePage(){
   const home=el(d,'div',{className:'uw-home'});home.append(el(d,'div',{className:'uw-site-top',text:'Твоя точка входа в Underweb'}),logo(),el(d,'p',{className:'uw-tagline',text:'Найди своё в сети.'}),searchForm());
-  const frequent=el(d,'section',{className:'uw-frequent'});frequent.append(el(d,'h2',{text:'Часто ищут'}));
-  for(const text of ['рэп баттлы','Бетонное эхо','Купить сэмплы','FT Studio'])frequent.append(button(d,text,{},()=>navigate(text)));home.append(frequent);
-  const directory=el(d,'div',{className:'uw-home-directory'});
-  for(const [number,title,text,url]of [['01','Баттлы рядом','Новые имена. Первые раунды. Твой голос.','underweb://battles'],['02','Файловая помойка','Программы для твоего рабочего стола.','underweb://dump'],['03','Форум «Подземка»','Споры, черновики и разговоры после раунда.','underweb://forum']]){
-   const card=el(d,'article');card.append(el(d,'small',{text:number}),button(d,title,{},()=>navigate(url)),el(d,'p',{text}));directory.append(card);
+  const directory=el(d,'nav',{className:'uw-home-directory',attributes:{'aria-label':'Ярлыки сайтов'}});
+  for(const [mark,title,text,url,label]of [['в',SOCIAL_IDENTITY.name,'Друзья и сообщения','underweb://social/me',SOCIAL_IDENTITY.name+' — найди друзей и одноклассников'],['◈','Баттлы рядом','Раунды и новые имена','underweb://battles'],['↓','Файловая помойка','Программы для компьютера','underweb://dump'],['♬','Базар','Биты и сэмплы','underweb://samples'],['≡','Подземка','Форум после раунда','underweb://forum'],['♫','FT Studio','Музыкальная мастерская','underweb://software/ft-studio']]){
+   const card=button(d,'',{className:'uw-site-tile',attributes:{'aria-label':label??title}},()=>navigate(url));card.append(el(d,'span',{className:'uw-tile-mark',text:mark,attributes:{'aria-hidden':'true'}}),el(d,'strong',{text:title}),el(d,'small',{text}));directory.append(card);
   }
   const columns=el(d,'div',{className:'uw-home-columns'}),main=el(d,'div',{className:'uw-home-main'}),side=el(d,'aside',{className:'uw-my-battles',attributes:{'aria-label':'Мои баттлы'}});
-  const socialEntry=el(d,'section',{className:'uw-social-entry'});
-  socialEntry.append(button(d,SOCIAL_IDENTITY.name+' — найди друзей и одноклассников',{},()=>navigate('underweb://social/me')),el(d,'p',{text:'Знакомые лица, личные фотографии и разговоры обо всём. Твой круг общения — рядом.'}));
-  main.append(socialEntry,createNewsPanel(d,{issue:newsForDay(getMetadata().gameDay),navigate}),directory);
+  main.append(createNewsPanel(d,{issue:newsForDay(getMetadata().gameDay),navigate}),directory);
   side.append(el(d,'h2',{text:'Мои баттлы'}));
   const registered=BATTLE_BRIEFS.filter(b=>isApplied(b.id));
   for(const b of registered){const saved=attemptForWindow(getState(),currentBattleWindow(getState(),b.id,metadataGameMinute(getMetadata()))??{});side.append(button(d,b.title,{},()=>navigate('underweb://battles/'+b.id)),el(d,'small',{text:saved?.issue?'Проверь сохранённую работу':saved?'Ожидает проверки':'Зарегистрирован · можно сдать трек'}));}

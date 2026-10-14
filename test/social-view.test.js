@@ -12,19 +12,19 @@ function setup(path='me',options={}){
  const view=mountSocial(root,{route,getState:()=>state,getMetadata:()=>({gameDay:1,playerName:'Герой',...options.metadata}),onChange:next=>{if(options.fail)return false;state=next;return true;},navigate:url=>{navigated=url;},audio:options.audio});
  return {d,root,view,get state(){return state;},get navigated(){return navigated;}};
 }
-test('study button persists qualitative knowledge without leaking hidden coefficients',()=>{
- const s=setup('community/makarevich-1');findButton(s.root,'Изучить площадку').click();assert.equal(s.state.battleKnowledge.byRound['makarevich-1:selection'].evidence.length,1);assert.ok(allPc(s.root).some(n=>n.textContent?.includes('Уверенность: Низкая')));assert.ok(!allPc(s.root).some(n=>/formatAdherence|strictnessOffset|maxPenalty/.test(n.textContent??'')));s.view.dispose();
+test('group navigation offers registration without changing saved battle knowledge',()=>{
+ const s=setup('community/makarevich-1'),before=structuredClone(s.state.battleKnowledge);assert.equal(findButton(s.root,'Изучить площадку'),undefined);assert.ok(findButton(s.root,'Зарегистрироваться'));assert.deepEqual(s.state.battleKnowledge,before);assert.ok(!allPc(s.root).some(n=>/formatAdherence|strictnessOffset|maxPenalty/.test(n.textContent??'')));s.view.dispose();
 });
-test('community shows its saved deadline and prefers explicit analysis over intelligence',()=>{
+test('group shows its saved deadline without a study action',()=>{
  const state=ensureBattleWindow(createVirtualPcState(),{battleId:'makarevich-1',nowMinute:600}).state;
  const s=setup('community/makarevich-1',{state,metadata:{skills:{analysis:90,intelligence:10}}});
  assert.ok(allPc(s.root).some(n=>n.textContent?.includes(gameMinuteLabel(state.battleWindows[0].closesAt))));
- findButton(s.root,'Изучить площадку').click();assert.ok(Math.abs(s.state.battleKnowledge.byRound['makarevich-1:selection'].evidence[0].strength-.78)<1e-10);s.view.dispose();
+ assert.equal(findButton(s.root,'Изучить площадку'),undefined);s.view.dispose();
 });
 test('six sections show personal profile and no free wall or message composers',()=>{
  const s=setup();assert.equal(allPc(s.root).filter(n=>n.dataset?.socialSection).length,6);
  for(const text of ['Герой','День рождения','Образование','Языки','скрыто'])assert.ok(allPc(s.root).some(n=>n.textContent===text),text);
- for(const path of ['me','friends','photos','audio','messages','groups']){const x=setup(path);assert.equal(allPc(x.root).filter(n=>n.tagName==='TEXTAREA'||n.getAttribute?.('contenteditable')==='true').length,0);assert.equal(allPc(x.root).filter(n=>n.tagName==='INPUT'&&!['Поиск сообществ','Поиск по сообщениям'].includes(n.getAttribute('aria-label'))).length,0);x.view.dispose();}
+ for(const path of ['me','friends','photos','audio','messages','groups']){const x=setup(path);assert.equal(allPc(x.root).filter(n=>n.tagName==='TEXTAREA'||n.getAttribute?.('contenteditable')==='true').length,0);assert.equal(allPc(x.root).filter(n=>n.tagName==='INPUT'&&!['Поиск групп','Поиск по сообщениям'].includes(n.getAttribute('aria-label'))).length,0);x.view.dispose();}
  findButton(s.root,'Мои фотографии').click();assert.equal(s.navigated,'underweb://social/photos');s.view.dispose();
 });
 test('private profile route exposes neither wall nor photos and cannot add a friend',()=>{

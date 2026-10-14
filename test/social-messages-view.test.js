@@ -20,6 +20,9 @@ test('messages search names and history, folds case/yo, keeps input focus on tim
 test('personal histories have dates and no track submission or reply composer',()=>{
  for(const id of ['anya','dasha','vitya']){const s=setup('dialog/'+id);assert.ok(allPc(s.root).some(n=>n.textContent?.includes(id==='anya'?'2011':'2012')));assert.equal(findButton(s.root,'Прикрепить'),undefined);assert.equal(findButton(s.root,'Отправить'),undefined);assert.equal(allPc(s.root).some(n=>n.tagName==='TEXTAREA'),false);if(id==='vitya')assert.ok(findButton(s.root,'Заблокировать и удалить из друзей'));s.view.dispose();}
 });
+test('the whole dialog row is a native keyboard button including avatar and preview',()=>{
+ const s=setup(),row=allPc(s.root).find(n=>n.className?.split(' ').includes('sn-message-row')&&n.getAttribute('aria-label')==='Анна Лесная');assert.ok(row);assert.equal(row.tagName,'BUTTON');assert.ok(allPc(row).some(n=>n.className==='sn-avatar'));assert.ok(allPc(row).some(n=>n.tagName==='P'));assert.equal(allPc(row).filter(n=>n.tagName==='BUTTON').length,1);row.click();assert.equal(s.address,'underweb://social/dialog/anya');s.view.dispose();
+});
 test('badge counts dialogs, visible reads only after save, hidden and phone-dismiss do not read',()=>{
  let state=advancePersonalDialogs(createVirtualPcState(),3480).state;const list=setup('messages',state);assert.ok(allPc(list.root).some(n=>n.className==='sn-unread-badge'&&n.textContent==='+1'));
  const id=state.phone.activeId;state.phone=hoverPhoneNotice(hoverPhoneNotice(state.phone,id,true),id,false);assert.equal(unreadDialogCount(state),1);

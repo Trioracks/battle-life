@@ -21,9 +21,9 @@ test('V krugu identity is shared by header, search and new notifications',()=>{
  state=sendSubmission(completeSubmissionMessage(completeSubmissionUpload(state)),{communityId:'makarevich-1',nowMinute:601}).state;
  const next=advanceSocial(state,state.battleSubmissions[0].ackAt);assert.equal(next.events[0].source,'В кругу');
 });
-test('general social network is above news and second in browser bookmarks',()=>{
+test('general social shortcut follows news and stays second in browser bookmarks',()=>{
  const d=pcDocument(),root=d.createElement('main');mountUnderweb(root,{getState:()=>submissionFixture(),getMetadata:()=>({gameDay:1}),onChange(){}});
  const nodes=allPc(root),entry=findButton(root,'В кругу — найди друзей и одноклассников');assert.ok(entry);
- assert.ok(nodes.indexOf(entry)<nodes.findIndex(n=>n.className==='uw-news-panel'));
+ assert.ok(nodes.indexOf(entry)>nodes.findIndex(n=>n.className==='uw-news-panel'));
  const nav=nodes.find(n=>n.getAttribute('aria-label')==='Избранное Underweb');assert.deepEqual(nav.children.filter(n=>n.tagName==='BUTTON').slice(0,2).map(n=>n.textContent),['Искра','В кругу']);
 });

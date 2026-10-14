@@ -31,3 +31,12 @@ test('community hero panel uses binary votes rather than out-of-ten grades in a 
  s.socialRuntime.events=[{id:'r',type:'judge-review',entityId:submission.id,resultId:review.id,dueAt:1},{id:'p',type:'judge-panel-complete',entityId:submission.id,total:1,qualification:'qualified',dueAt:2}];
  const d=pcDocument(),view=createSocialResultView(d,{submission,getState:()=>s,commit:()=>true,expandedResults:new Set(['p'])}),text=allPc(view).map(n=>n.textContent).join(' ');assert.ok(text.includes('1 голос'));assert.ok(!text.includes('/ 10'));assert.ok(text.includes('Голоса: 1 / 1'));
 });
+test('table pages preserve every score and local player position across remounts',()=>{
+ const d=pcDocument(),table=publicRoundTable(tableFixture(),options),uiState={page:0,rowsPerPage:2};table.rows=[...table.rows.slice(1),table.rows[0]];const original=structuredClone(table);
+ let root=createBattleResultsTableView(d,{table,navigate(){},uiState});const rows=()=>allPc(root).filter(n=>n.className?.startsWith('bt-row '));assert.equal(rows().length,2);assert.equal(allPc(rows()[0]).filter(n=>n.tagName==='TD').length,table.judges.length+3);
+ findButton(root,'К моему месту').click();assert.equal(uiState.page,1);assert.ok(allPc(rows()[0]).some(n=>n.textContent==='Герой'));assert.deepEqual(allPc(rows()[0]).filter(n=>n.dataset?.judgeScore).map(n=>n.textContent),['8','8','8']);
+ root.dispose?.();root=createBattleResultsTableView(d,{table,navigate(){},uiState});assert.equal(uiState.page,1);assert.equal(rows().length,1);findButton(root,'Предыдущая страница').click();assert.equal(uiState.page,0);assert.equal(rows().length,2);assert.deepEqual(table,original);root.dispose?.();
+});
+test('background social changes preserve focus on the player-place control',()=>{
+ const d=pcDocument(),root=d.createElement('main');let state=tableFixture();const browser=mountUnderweb(root,{getState:()=>state,getMetadata:()=>({gameMinutes:12000,gameDay:9}),onChange:s=>{state=s;return true;}});browser.navigate('underweb://social/results/makarevich-1/selection');findButton(root,'К моему месту').focus();state={...state,social:{...state.social,audienceCount:state.social.audienceCount+1}};browser.update();assert.equal(d.activeElement?.textContent,'К моему месту');browser.dispose();
+});

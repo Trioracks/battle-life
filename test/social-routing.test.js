@@ -15,7 +15,7 @@ test('browser bookmark, battle community link and back/forward preserve social r
  const d=pcDocument(),root=d.createElement('div'),state=createVirtualPcState();
  const view=mountUnderweb(root,{getState:()=>state,getMetadata:()=>({gameDay:1}),onChange:()=>true,onApply:()=>{}});
  findButton(root,'В кругу').click();assert.equal(view.snapshot.route.section,'me');
- findButton(root,'Мои сообщества').click();assert.equal(view.snapshot.route.section,'groups');
+ findButton(root,'Мои группы').click();assert.equal(view.snapshot.route.section,'groups');
  findButton(root,'Назад в Underweb').click();assert.equal(view.snapshot.route.section,'me');
  findButton(root,'Вперёд в Underweb').click();assert.equal(view.snapshot.route.section,'groups');
  view.navigate('underweb://battles/makarevich-1');findButton(root,'Сообщество баттла →').click();assert.equal(view.snapshot.route.communityId,'makarevich-1');view.dispose();

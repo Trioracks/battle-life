@@ -8,8 +8,8 @@ export function mountSocialMessages(d,{getState,navigate}){
  root.append(socialHeading(d,'Мои сообщения'),input,list);
  function update(){
   if(disposed)return;const rows=searchDialogs(getState(),input.value??''),signature=JSON.stringify(rows);if(signature===last)return;last=signature;list.replaceChildren();
-  for(const row of rows){const card=el(d,'article',{className:'sn-message-row'+(row.unread?' is-unread':'')}),info=el(d,'div'),msg=row.lastMessage;
-   info.append(socialButton(d,row.name,()=>navigate('underweb://social/dialog/'+row.id),{className:'sn-link'}),el(d,'p',{text:msg?.body??'Переписка ещё не началась.'}),el(d,'small',{text:msg?.archived?msg.dateLabel:gameMinuteLabel(msg?.at)}));
+  for(const row of rows){const card=socialButton(d,'',()=>navigate('underweb://social/dialog/'+row.id),{className:'sn-message-row'+(row.unread?' is-unread':''),attributes:{'aria-label':row.name}}),info=el(d,'div'),msg=row.lastMessage;
+   info.append(el(d,'strong',{text:row.name}),el(d,'p',{text:msg?.body??'Переписка ещё не началась.'}),el(d,'small',{text:msg?.archived?msg.dateLabel:gameMinuteLabel(msg?.at)}));
    card.append(socialAvatar(d,row.avatar,row.name),info);if(row.unread)card.append(el(d,'span',{className:'sn-message-dot',text:'Новое'}));list.append(card);
   }
   if(!rows.length)list.append(el(d,'p',{className:'sn-empty',text:'Сообщений по этому запросу нет.'}));
