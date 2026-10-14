@@ -60,6 +60,20 @@ test('unsafe names, destinations, time and ids fail without changing the input',
  assert.deepEqual(state,before);
 });
 
+test('completed WAV filenames enforce the same length boundary before save and after reload',()=>{
+ const state=submissionFixture({vocal:false});
+ for(const [filename,ok]of [
+  ['а'.repeat(116),true],['а'.repeat(117),false],['а'.repeat(118),false],['а'.repeat(119),false],['а'.repeat(120),false],
+  ['а'.repeat(116)+'.wav',true],['а'.repeat(117)+'.wav',false],
+ ]){
+  const result=exportFile(state,{kind:'beat',filename});assert.equal(result.ok,ok,'input length '+filename.length);
+  if(!ok){assert.equal(result.state,state);continue;}
+  assert.equal(result.state.audioExports.files[0].filename.length,120);
+  const storage=memory();assert.equal(saveVirtualPcState(storage,result.state),true);const loaded=loadVirtualPcState(storage);assert.equal(loaded.ok,true);
+  assert.deepEqual(loaded.state.audioExports,result.state.audioExports);assert.equal(loaded.state.audioExports.files.length,1);assert.deepEqual(loaded.state.audioExports.recovery,[]);
+ }
+});
+
 test('case-insensitive filename and id collisions never overwrite previous files',()=>{
  const first=exportFile(submissionFixture()).state,before=structuredClone(first);
  for(const change of [{id:'second',filename:'работа.WAV'},{filename:'other.wav'}]){const r=exportFile(first,change);assert.equal(r.ok,false);assert.match(r.reason,/существ|занят/);assert.equal(r.state,first);}
@@ -83,6 +97,24 @@ test('normalization quarantines damaged descriptors, bytes, missing versions and
  assert.deepEqual(normalized.recovery[1].recoveryData,bad);assert.deepEqual(api.normalizeAudioExports(normalized,r.state.trackVersions),normalized);
  const clone=api.normalizeAudioExports({version:1,files:[valid]},r.state.trackVersions);clone.files[0].descriptor.parts[0].windows[0].sourceBar=99;
  assert.notEqual(valid.descriptor.parts[0].windows[0].sourceBar,99);
+});
+
+test('stem normalization quarantines unknown or retired sources and preserves supported legacy recipes',()=>{
+ const state=submissionFixture();
+ for(const [kind,sourceId]of [['beat','does-not-exist'],['beat','free-01'],['vocal','vocal-999']]){
+  const file=structuredClone(exportFile(state,{kind}).state.audioExports.files[0]);file.descriptor.parts[0].id=sourceId;
+  const result=api.normalizeAudioExports({version:1,files:[file],recovery:[]},state.trackVersions);
+  assert.equal(result.files.length,0,kind+' source '+sourceId);assert.equal(result.recovery.length,1);assert.deepEqual(result.recovery[0].recoveryData,file);
+ }
+ for(const sourceId of ['primitive','melody','bass','beginner-drums-01','beginner-theme-01','beginner-arrangement-01','user-drums-20261012-01']){
+  const file=structuredClone(exportFile(state,{kind:'beat'}).state.audioExports.files[0]);file.descriptor.parts=[{id:sourceId,loopSeconds:16/3}];
+  const result=api.normalizeAudioExports({version:1,files:[file],recovery:[]},state.trackVersions);
+  assert.deepEqual(result.files,[file],sourceId);assert.deepEqual(result.recovery,[]);
+ }
+ for(const sourceId of ['vocal-01','vocal-54']){
+  const file=structuredClone(exportFile(state,{kind:'vocal'}).state.audioExports.files[0]);file.descriptor.parts[0].id=sourceId;
+  assert.deepEqual(api.normalizeAudioExports({version:1,files:[file]},state.trackVersions).files,[file],sourceId);
+ }
 });
 
 test('failed export persistence leaves saved bytes, files and versions unchanged and permits retry',()=>{

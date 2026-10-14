@@ -2,6 +2,9 @@ import {normalizeBeat} from './beat-production.js?rev=41';
 import {resolveBeatPlayback} from './beat-playback.js?rev=41';
 import {captureTrackVersion,canonicalTrackSignature} from './track-version.js?rev=41';
 import {softwareDiskBytes} from './pc-software.js?rev=41';
+import {drumById} from './beat-catalog.js?rev=41';
+import {beginnerById} from './beat-beginner-bank.js?rev=41';
+import {vocalById} from './vocal-catalog.js?rev=41';
 
 export const AUDIO_EXPORT_FOLDERS=Object.freeze(['documents','music','exports','downloads','projects']);
 export const AUDIO_EXPORT_KINDS=Object.freeze({beat:'Бит',vocal:'Вокал',track:'Полный трек'});
@@ -13,13 +16,14 @@ export function audioExportFilename(value){
  if(typeof value!=='string'||!value.trim()||value.length>120||/[<>:"/\\|?*\x00-\x1f]/.test(value)||/[. ]$/.test(value))return null;
  const name=value.trim();
  if(name==='.'||name==='..'||/^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(name))return null;
- if(/\.wav$/i.test(name))return name;
- return name.includes('.')?null:name+'.wav';
+ const filename=/\.wav$/i.test(name)?name:name.includes('.')?null:name+'.wav';
+ return filename&&filename.length<=120?filename:null;
 }
 export function audioExportBytes(durationSeconds){return 44+Math.ceil(durationSeconds*44100)*4;}
+const supportedSource=value=>!drumById(value)?.retired&&(['primitive','melody','bass'].includes(value)||Boolean(beginnerById(value)||drumById(value)||vocalById(value)));
 function validDescriptor(d){
  return object(d)&&finiteJson(d)&&typeof d.key==='string'&&typeof d.owner==='string'&&Number.isFinite(d.durationSeconds)&&d.durationSeconds>0&&Number.isSafeInteger(audioExportBytes(d.durationSeconds))&&Array.isArray(d.parts)&&d.parts.length>0&&d.parts.every(p=>
-  object(p)&&id(p.id)&&Number.isFinite(p.loopSeconds)&&p.loopSeconds>0&&(p.vocal===undefined||object(p.vocal))&&
+  object(p)&&id(p.id)&&supportedSource(p.id)&&Number.isFinite(p.loopSeconds)&&p.loopSeconds>0&&(p.vocal===undefined||object(p.vocal))&&
   (p.windows===undefined||Array.isArray(p.windows)&&p.windows.length>0&&p.windows.every(w=>object(w)&&Number.isFinite(w.startBar)&&w.startBar>=0&&Number.isFinite(w.bars)&&w.bars>0&&Number.isFinite(w.sourceBar)&&w.sourceBar>=0)));
 }
 const nameKey=v=>v.normalize('NFC').toLowerCase();

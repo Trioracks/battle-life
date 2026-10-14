@@ -17,6 +17,16 @@ test('a damaged audio file survives recovery and a failed save leaves every stor
  const previousSavedBytes=structuredClone([...data]);storage.setItem=()=>{throw Error('quota');};assert.equal(saveVirtualPcState(storage,loaded.state),false);assert.deepEqual([...data],previousSavedBytes);
 });
 
+test('loading corrupted stem source IDs quarantines only damaged files and retains their raw recipes across saves',()=>{
+ let state=submissionFixture();for(const kind of ['track','beat','vocal']){const result=exportsApi.createAudioExport(state,{id:kind,projectId:'beat',kind,folderId:'exports',filename:kind,nowMinute:600});assert.equal(result.ok,true);state=result.state;}
+ const valid=structuredClone(state.audioExports.files[0]),broken=state.audioExports.files.slice(1).map(file=>{const copy=structuredClone(file);copy.descriptor.parts[0].id='does-not-exist';return copy;});
+ state={...state,audioExports:{version:1,files:[valid,...broken],recovery:[]}};
+ const data=new Map([[VIRTUAL_PC_STORAGE_KEY,JSON.stringify(state)]]),storage={getItem:k=>data.get(k)??null,setItem(k,v){data.set(k,v);}};
+ const loaded=loadVirtualPcState(storage);assert.equal(loaded.ok,true);assert.deepEqual(loaded.state.audioExports.files.map(f=>f.id),['track']);assert.deepEqual(loaded.state.audioExports.files,[valid]);assert.deepEqual(loaded.state.audioExports.recovery.map(r=>r.recoveryData),broken);
+ assert.deepEqual(loaded.state.projects,state.projects);assert.deepEqual(loaded.state.trackVersions,state.trackVersions);assert.deepEqual(loaded.state.phonePresentation,state.phonePresentation);
+ assert.equal(saveVirtualPcState(storage,loaded.state),true);const reloaded=loadVirtualPcState(storage);assert.equal(reloaded.ok,true);assert.deepEqual(reloaded.state.audioExports,loaded.state.audioExports);
+});
+
 const nodes = root => root.children.flatMap(child => [child, ...nodes(child)]);
 const find = (root, label) => nodes(root).find(node => node.getAttribute?.('aria-label') === label || node.textContent === label);
 const project = (id, name = id) => createStudioProject({ id, name, battleId: BATTLE_BRIEFS[0].id }).project;
