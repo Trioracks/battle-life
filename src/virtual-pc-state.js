@@ -4,6 +4,7 @@ import {normalizeCreativeWork} from './creative-workflow.js?rev=41';
 import {normalizeBattleSubmissions} from './battle-submission.js?rev=41';
 import {normalizeRecordingState} from './vocal-production.js?rev=41';
 import {normalizeTrackVersions,captureTrackVersion} from './track-version.js?rev=41';
+import {normalizeAudioExports} from './pc-audio-exports.js?rev=41';
 import {normalizeSocial} from './social-state.js?rev=41';
 import {normalizeOutgoingUpload} from './social-upload.js?rev=41';
 import {normalizeOutgoingMessage} from './social-composer.js?rev=41';
@@ -90,7 +91,7 @@ function normalizeDownload(value) {
 
 const immutableArchives=new WeakSet();
 function freezeArchive(value){if(!value||typeof value!=='object'||immutableArchives.has(value))return value;for(const child of Object.values(value))freezeArchive(child);Object.freeze(value);immutableArchives.add(value);return value;}
-export function preparePcRuntimeState(state){freezeArchive(state.trackVersions);freezeArchive(state.judging);return state;}
+export function preparePcRuntimeState(state){freezeArchive(state.trackVersions);freezeArchive(state.judging);freezeArchive(state.audioExports);return state;}
 function normalizeSnapshot(value,archiveCache=null) {
   const source = isRecord(value) ? value : {};
   const archive=(key,normalize)=>{
@@ -151,7 +152,7 @@ function normalizeSnapshot(value,archiveCache=null) {
     resultReactions:normalizeResultReactions(source.resultReactions),
     household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),
-    battleSubmissions,trackVersions,npcTracks:normalizeNpcTracks(source.npcTracks),tournaments:normalizeTournaments(source.tournaments),battleHistory:normalizeBattleHistory(source.battleHistory),
+    battleSubmissions,trackVersions,audioExports:archive('audioExports',raw=>normalizeAudioExports(raw,trackVersions)),npcTracks:normalizeNpcTracks(source.npcTracks),tournaments:normalizeTournaments(source.tournaments),battleHistory:normalizeBattleHistory(source.battleHistory),
     outgoingUpload:normalizeOutgoingUpload(source.outgoingUpload,trackVersions),
     outgoingUploadRecovery:Array.isArray(source.outgoingUploadRecovery)?source.outgoingUploadRecovery.map(clone):[],
     outgoingMessage:normalizeOutgoingMessage(source.outgoingMessage,trackVersions),

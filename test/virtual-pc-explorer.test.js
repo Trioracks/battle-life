@@ -5,6 +5,20 @@ import {mountExplorer} from '../src/virtual-pc-explorer-view.js?rev=28';
 import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=28';
 import {createStudioProject} from '../src/ft-studio-project.js?rev=28';
 import {pcDocument,findButton,allPc,fire} from './helpers/virtual-pc-dom.js';
+import {submissionFixture} from './helpers/submission-fixtures.js';
+const exportsApi=await import('../src/pc-audio-exports.js').catch(()=>({}));
+
+test('exports folders and independent audio entries expose exact size, date and immutable version',async()=>{
+ assert.equal(typeof exportsApi.createAudioExport,'function');
+ const r=exportsApi.createAudioExport(submissionFixture(),{id:'file',projectId:'beat',kind:'track',folderId:'exports',filename:'Готово',nowMinute:1500});assert.equal(r.ok,true);
+ const s=r.state,entry=explorerEntries(s,'exports')[0];assert.equal(entry.kind,'audio');assert.equal(entry.name,'Готово.wav');assert.equal(entry.fileId,'file');assert.equal(entry.sizeMb,1.881644);
+ assert.equal(explorerEntries(s,'documents').find(e=>e.id==='music').targetPath,'music');assert.equal(explorerEntries(s,'music').find(e=>e.id==='exports').targetPath,'exports');
+ const rows=explorerProperties(s,entry).rows;assert.equal(rows.find(r=>r.label==='Тип').value,'Аудиофайл WAV · полный трек');assert.ok(rows.find(r=>r.label==='Создан'));assert.ok(rows.find(r=>r.label==='Версия').value.includes(s.audioExports.files[0].trackVersionId));
+ const document=pcDocument(),root=document.createElement('div'),opened=[],played=[],audio={getSnapshot:()=>({status:'stopped'}),playDescriptor:async descriptor=>{played.push(structuredClone(descriptor));return true;},stop(){},pause(){}};
+ const view=mountExplorer(root,{audio,onOpenProject:p=>opened.push(p),onProperties(){},onClose(){}});view.update(s);view.navigate('exports');
+ fire(findButton(root,'Открыть Готово.wav'),'dblclick');await Promise.resolve();assert.equal(opened.length,0);assert.deepEqual(played,[s.audioExports.files[0].descriptor]);assert.equal(s.projects.length,2);
+ const name=allPc(root).find(n=>n.getAttribute('aria-label')==='Адрес папки');name.value='unfinished';view.update({...s,lastGameMinute:1600});assert.equal(name.value,'unfinished');view.dispose();
+});
 test('history discards forward branch after new navigation and root disables up',()=>{
   let e=createExplorerState();assert.strictEqual(navigateExplorer(e,{type:'up'}),e);
   for(const path of ['disk','documents'])e=navigateExplorer(e,{type:'navigate',path});

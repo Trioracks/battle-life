@@ -11,20 +11,22 @@ import {startVocalWork} from './vocal-production.js?rev=41';
 import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=41';
 import {appendRecordingControls} from './recording-studio-view.js?rev=41';
 import {normalizeGenreProgression,genreOptions,genreById,genreCap,chooseGenre,chooseSpecialization} from './genre-progression.js?rev=41';
+import {mountAudioExport} from './pc-audio-export-view.js?rev=41';
 
-export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio,legacyName,initialProject}){
+export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onChange,onWork,audio,legacyName,initialProject}){
  const d=root.ownerDocument,workspace=createStudioWorkspace(d,{projectName:legacyName});root.replaceChildren(workspace);
  const find=role=>pcFind(workspace,n=>n.dataset?.ftRole===role);
  const body=pcFind(workspace,n=>n.className==='ft-body'),panel=el(d,'aside',{className:'ft-production',dataset:{ftRole:'analytics'},attributes:{'aria-label':'Анализ проекта'}});
  body.append(panel);body.className+=' ft-producing';
  const actions=find('project-actions'),workflow=find('workflow');
- actions.append(button(d,'Новый проект',{},()=>openDialog('new')),button(d,'Открыть проект',{},()=>openDialog('projects')));
+ const exportButton=button(d,'Экспорт',{},()=>openDialog('export'));
+ actions.append(button(d,'Новый проект',{},()=>openDialog('new')),button(d,'Открыть проект',{},()=>openDialog('projects')),exportButton);
  const genreButton=button(d,'Жанры',{},()=>openDialog('genres'));
  const footer=pcFind(workspace,n=>n.className==='ft-bottom');footer.replaceChildren(el(d,'span',{text:'●  FIELD TONE / HOME STUDIO'}),el(d,'span',{text:'Три этапа. Твой первый звук.'}),el(d,'span',{text:'44.1 kHz / 16 bit'}));
  const summary=el(d,'p',{className:'ft-needs'}),session=pcFind(workspace,n=>n.className==='ft-session').children[1],tempo=pcFind(workspace,n=>n.className==='ft-tempo').children[0];
  const readout=pcFind(workspace,n=>n.className==='ft-readout').children[1],transport=find('transport'),playhead=find('playhead'),status=find('transport-status');
  const controls=Object.fromEntries(['play','pause','stop'].map(key=>[key,pcFind(transport,n=>n.dataset?.ftAction===key)]));
- let signature=[],message='',disposed=false,dialog=null,returnFocus=null,frame=null,sessionSelected=false,visible=true;
+ let signature=[],message='',disposed=false,dialog=null,exportView=null,returnFocus=null,frame=null,sessionSelected=false,visible=true;
  const win=d.defaultView??globalThis,requestFrame=win.requestAnimationFrame?.bind(win),cancelFrame=win.cancelAnimationFrame?.bind(win);
  let beatSource,beatCache;
  const currentBeat=()=>{const s=getState(),source=sessionSelected?s.projects.find(p=>p.id===s.music.activeBeatId):null;if(source!==beatSource){beatSource=source;beatCache=normalizeBeat(source);}return beatCache;};
@@ -40,6 +42,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
  }
  function change(next){onChange(next);render();}
  function closeDialog({restore=true}={}){
+  exportView?.dispose();exportView=null;
   dialog?.remove();dialog=null;
   for(const child of workspace.children)child.inert=false;
   if(restore){(returnFocus?.isConnected?returnFocus:pcFocusable(actions)[0])?.focus();returnFocus=null;}
@@ -50,7 +53,10 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
   dialog=el(d,'div',{className:'ft-dialog-backdrop',dataset:{ftRole:'dialog'},attributes:{role:'dialog','aria-modal':'true','aria-label':mode==='new'?'Новый проект':mode==='projects'?'Открыть проект':'FT Studio — начало работы'}});
   const card=el(d,'section',{className:'ft-dialog-card'});
   card.append(el(d,'span',{className:'ft-eyebrow',text:'FIELD TONE / STUDIO'}),el(d,'h2',{text:mode==='new'?'Как назовём бит?':mode==='projects'?'Твои проекты':'С чего начнём?'}));
-  if(mode==='genres'){
+  if(mode==='export'){
+   card.children[1].textContent='Экспорт аудиофайла';dialog.setAttribute('aria-label','Экспорт аудиофайла');
+   exportView=mountAudioExport(card,{getState,getMetadata,projectId:currentBeat()?.id,onCommit,onClose:fileId=>{closeDialog();if(fileId){message='Аудиофайл сохранён. Открой его в «Моём компьютере».';render();}}});
+  }else if(mode==='genres'){
    card.children[1].textContent='Жанры и специализация';dialog.setAttribute('aria-label','Жанры и специализация');
    const g=normalizeGenreProgression(getState().music.genres),skill=effectiveBeatSkill(getState(),getMetadata().skills),options=genreOptions(g,skill);
    card.append(el(d,'p',{text:'Битмейкинг '+skill.toFixed(2)+' · свободных слотов '+options.remaining+'. Новые слоты: 25, 50, 75.'}));
@@ -98,7 +104,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
   }else{
    card.append(el(d,'p',{className:'ft-production-note',text:'Чистый лист или работа, к которой хочется вернуться.'}),button(d,'Новый проект',{className:'ft-menu-choice'},()=>openDialog('new')),button(d,'Открыть проект',{className:'ft-menu-choice'},()=>openDialog('projects')));
   }
-  if(!['projects','vocals'].includes(mode))card.append(button(d,mode==='home'?'Закрыть':'Отмена',{},()=>closeDialog()));
+  if(!['projects','vocals','export'].includes(mode))card.append(button(d,mode==='home'?'Закрыть':'Отмена',{},()=>closeDialog()));
   dialog.append(card);workspace.append(dialog);
   dialog.addEventListener('keydown',event=>{
    if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closeDialog();return;}
@@ -115,6 +121,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
  }
  function render(){
   if(disposed)return;const s=getState(),beat=currentBeat();signature=stateSignature();panel.replaceChildren();workflow.replaceChildren();
+  exportButton.disabled=!beat||beat.status!=='ready'||Boolean(beat.audioIssue);exportView?.update();
   if(effectiveBeatSkill(s,getMetadata().skills)>=25){if(!genreButton.parentNode)actions.append(genreButton);}else genreButton.remove();
   panel.append(el(d,'small',{className:'ft-eyebrow',text:'АНАЛИЗ ПРОЕКТА'}),summary);
   const genres=normalizeGenreProgression(s.music.genres),genreId=beat?.genreProfile?.id??'experimental',options=genreOptions(genres,effectiveBeatSkill(s,getMetadata().skills));

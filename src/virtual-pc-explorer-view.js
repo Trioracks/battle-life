@@ -6,8 +6,9 @@ import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=41';
 import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=41';
 import {normalizeStudioProject} from './ft-studio-project.js?rev=41';
 import {normalizeBeat} from './beat-production.js?rev=41';
+import {mountAudioFilePlayer} from './pc-audio-export-view.js?rev=41';
 
-export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenProject,onProperties,onClose,onMenu,onNavigate}) {
+export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenProject,onProperties,onClose,onMenu,onNavigate,audio}) {
   const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',diskLabel=null,disposed=false;
   const wrap=el(d,'div',{className:'pc-explorer'}),menubar=el(d,'div',{className:'pc-menubar'});
   const tools=el(d,'div',{className:'pc-explorer-tools'}),form=el(d,'form',{className:'pc-address'});
@@ -16,6 +17,7 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
   const main=el(d,'div',{className:'pc-explorer-main'}),tree=el(d,'nav',{className:'pc-folder-tree',attributes:{'aria-label':'Дерево папок'}});
   const files=el(d,'div',{className:'pc-file-area',attributes:{'aria-label':'Содержимое папки'}}),status=el(d,'div',{className:'pc-explorer-status',attributes:{'aria-live':'polite'}});
   main.append(tree,files);wrap.append(menubar,tools,form,main,status);root.replaceChildren(wrap);
+  const player=mountAudioFilePlayer(wrap,{audio});
   const change=a=>{nav=navigateExplorer(nav,a,state);render(true);onNavigate?.(explorerPaths(state)[nav.path]);};
   const navigate=path=>change({type:'navigate',path});
   const entries=()=>explorerEntries(state,nav.path);
@@ -25,6 +27,7 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
   function openEntry(entry) {
     if(!entry)return;
     if(entry.targetPath){navigate(entry.targetPath);return;}
+    if(entry.kind==='audio'){const file=state.audioExports?.files.find(f=>f.id===entry.fileId);if(file)player.open(file);return;}
     if(entry.kind==='artifact'){
       if(entry.action){const message=onOpenArtifact?.(entry);nav={...nav,error:typeof message==='string'?message:''};status.textContent=nav.error||'Объектов: '+entries().length;status.dataset.error=String(!!nav.error);}
       return;
@@ -79,7 +82,7 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
       });
       b.append(createPcIcon(d,entry.iconId,{size:nav.view==='details'?16:32}),el(d,'span',{className:'pc-file-name',text:entry.name}));
       if(entry.kind==='disk'){const info=el(d,'span');b.append(info);diskLabel=mountDiskUsage(info);diskLabel.update(diskUsage(state));}
-      if(nav.view==='details'){const size=el(d,'span',{text:entry.sizeMb?entry.sizeMb.toFixed(3)+' МБ':''});sizeLabels.set(entry.id,size);b.append(el(d,'span',{className:'pc-file-type',text:entry.kind==='project'?'Проект FT Studio':entry.kind==='disk'?'Локальный диск':entry.kind==='folder'?'Папка':'Файл'}),size);}
+      if(nav.view==='details'){const size=el(d,'span',{text:entry.sizeMb?entry.sizeMb.toFixed(3)+' МБ':''});sizeLabels.set(entry.id,size);b.append(el(d,'span',{className:'pc-file-type',text:entry.kind==='project'?'Проект FT Studio':entry.kind==='audio'?'Аудиофайл WAV':entry.kind==='disk'?'Локальный диск':entry.kind==='folder'?'Папка':'Файл'}),size);}
       b.addEventListener('dblclick',()=>openEntry(entry));
       const context=e=>{e.preventDefault();e.stopPropagation();nav={...nav,selection:entry.id};b.setAttribute('aria-pressed','true');menu(b,[{id:'open',label:'Открыть',onSelect:()=>openEntry(entry)},{id:'properties',label:'Свойства',onSelect:()=>properties(entry)}],e.type==='contextmenu'?e:undefined);};
       b.addEventListener('contextmenu',context);
@@ -98,9 +101,10 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
   files.addEventListener('contextmenu',backgroundMenu);
   render(true);
   return {navigate,update(next){
+    player.update();
     state=next;const previous=nav;nav=reconcileExplorerState(nav,state);const moved=previous.path!==nav.path,sig=structuralSignature();
     if(sig!==signature||nav!==previous){if(nav.selection&&!entries().some(e=>e.id===nav.selection))nav={...nav,selection:null};render(moved);}
     else {updateInstall();diskLabel?.update(diskUsage(state));for(const entry of entries()){const label=sizeLabels.get(entry.id);if(label)label.textContent=entry.sizeMb?entry.sizeMb.toFixed(3)+' МБ':'';}}
     if(moved)onNavigate?.(explorerPaths(state)[nav.path]);
-  },dispose(){disposed=true;diskLabel?.dispose();form.removeEventListener('submit',submit);files.removeEventListener('contextmenu',backgroundMenu);root.replaceChildren();}};
+  },dispose(){disposed=true;player.dispose();diskLabel?.dispose();form.removeEventListener('submit',submit);files.removeEventListener('contextmenu',backgroundMenu);root.replaceChildren();}};
 }

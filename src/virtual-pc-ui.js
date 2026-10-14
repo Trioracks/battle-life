@@ -339,11 +339,11 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.underwebView.update();return;
     }
     if(appId==='ft-studio'){
-      if(!pc.studioView){const initialProject=pc.pendingStudioProject;pc.pendingStudioProject=null;pc.studioView=mountBeatStudio(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onChange:next=>pc.persist(next),onWork:()=>callbacks.onWork?.()??false,audio:pc.audioSession.forOwner('ft-studio'),initialProject});}
+      if(!pc.studioView){const initialProject=pc.pendingStudioProject;pc.pendingStudioProject=null;pc.studioView=mountBeatStudio(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onChange:next=>pc.persist(next),onCommit:next=>pc.persist(next,{atomic:true}),onWork:()=>callbacks.onWork?.()??false,audio:pc.audioSession.forOwner('ft-studio'),initialProject});}
       pc.studioView.update();return;
     }
     if(appId==='computer'){
-      if(!pc.explorer)pc.explorer=mountExplorer(target,{onSoftware:pc.softwareAction,onOpenArtifact:entry=>{pc.softwareAction(entry.action,entry.appId);return pc.message;},onOpenApp:id=>pc.open(id),onOpenProject:p=>pc.openProject(p),onProperties:p=>pc.showProperties(p),onClose:()=>pc.closeWindow('computer'),onMenu:p=>pc.menu?.open(p),onNavigate:location=>{
+      if(!pc.explorer)pc.explorer=mountExplorer(target,{audio:pc.audioSession.forOwner('computer'),onSoftware:pc.softwareAction,onOpenArtifact:entry=>{pc.softwareAction(entry.action,entry.appId);return pc.message;},onOpenApp:id=>pc.open(id),onOpenProject:p=>pc.openProject(p),onProperties:p=>pc.showProperties(p),onClose:()=>pc.closeWindow('computer'),onMenu:p=>pc.menu?.open(p),onNavigate:location=>{
         pc.windows={...pc.windows,windows:pc.windows.windows.map(w=>w.id==='computer'?{...w,title:location.label,iconId:location.iconId}:w)};pc.renderDesktop(false);
       }});
       pc.explorer.update(pc.state);return;

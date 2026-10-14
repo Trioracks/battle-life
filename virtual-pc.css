@@ -175,6 +175,10 @@
 #virtual-pc .pc-details-head { white-space:pre; background:#eee9da; border-bottom:1px solid #999; padding:4px 8px; font-size:12px; }
 #virtual-pc .pc-explorer-status { flex:none; border-top:1px solid #b3b0a3; padding:4px 8px; font-size:12px; min-height:23px; }
 #virtual-pc .pc-explorer-status[data-error=true] { color:#a11; background:#fff8dd; }
+#virtual-pc .pc-audio-player { flex:none; display:grid; gap:5px; padding:8px; border-top:1px solid #b3b0a3; font-size:12px; }
+#virtual-pc .pc-audio-player[hidden] { display:none; }
+#virtual-pc .pc-audio-player strong,#virtual-pc .pc-audio-player small { overflow-wrap:anywhere; }
+#virtual-pc .pc-audio-player>div { display:flex; flex-wrap:wrap; gap:4px; }
 #virtual-pc .pc-system-note { max-width:420px; padding:12px; color:#345681; }
 @media(max-width:640px) { #virtual-pc .pc-folder-tree { flex-basis:150px; } }
 #virtual-pc .pc-popup { position:absolute; min-width:185px; padding:3px; background:#fff; border:1px solid #7f9db9; box-shadow:2px 3px 4px #0006; overflow:auto; color:#111; }

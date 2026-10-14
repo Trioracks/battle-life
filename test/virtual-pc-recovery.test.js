@@ -5,6 +5,17 @@ import { mountVirtualPc } from '../src/virtual-pc-ui.js?rev=28';
 import { createVirtualPcState } from '../src/virtual-pc-state.js?rev=28';
 import { createStudioProject } from '../src/ft-studio-project.js?rev=28';
 import { BATTLE_BRIEFS } from '../src/virtual-pc-catalog.js?rev=28';
+import {loadVirtualPcState,saveVirtualPcState,VIRTUAL_PC_STORAGE_KEY} from '../src/virtual-pc-state.js';
+import {submissionFixture} from './helpers/submission-fixtures.js';
+const exportsApi=await import('../src/pc-audio-exports.js').catch(()=>({}));
+
+test('a damaged audio file survives recovery and a failed save leaves every stored byte unchanged',()=>{
+ assert.equal(typeof exportsApi.createAudioExport,'function');const created=exportsApi.createAudioExport(submissionFixture(),{id:'file',projectId:'beat',kind:'track',folderId:'exports',filename:'Не потерять',nowMinute:600});
+ const broken=structuredClone(created.state.audioExports.files[0]);broken.descriptor.parts[0].loopSeconds=-1;
+ const state={...created.state,audioExports:{version:1,files:[broken],recovery:[]}},data=new Map([[VIRTUAL_PC_STORAGE_KEY,JSON.stringify(state)]]),storage={getItem:k=>data.get(k)??null,setItem(k,v){data.set(k,v);}};
+ const loaded=loadVirtualPcState(storage);assert.equal(loaded.ok,true);assert.equal(loaded.state.audioExports.files.length,0);assert.deepEqual(loaded.state.audioExports.recovery[0].recoveryData,broken);assert.equal(loaded.state.projects.length,2);
+ const previousSavedBytes=structuredClone([...data]);storage.setItem=()=>{throw Error('quota');};assert.equal(saveVirtualPcState(storage,loaded.state),false);assert.deepEqual([...data],previousSavedBytes);
+});
 
 const nodes = root => root.children.flatMap(child => [child, ...nodes(child)]);
 const find = (root, label) => nodes(root).find(node => node.getAttribute?.('aria-label') === label || node.textContent === label);
