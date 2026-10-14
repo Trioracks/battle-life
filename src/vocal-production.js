@@ -4,6 +4,7 @@ import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js
 import {latestReadyLyric} from './lyric-production.js?rev=41';
 import {BEAT_RULES as R,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=41';
 import {vocalOutcomes} from './production-outcomes.js?rev=41';
+import {chooseSongForm} from './beat-song-form.js?rev=41';
 export {recordingQuality};
 export const VOCAL_STAGES=Object.freeze({draft:{name:'Черновая запись',minutes:60,skill:'flow'},clean:{name:'Чистовая запись',minutes:60,skill:'flow'},mix:{name:'Сведение',minutes:45,skill:'sound'},master:{name:'Мастеринг',minutes:30,skill:'sound'}});
 export function canVocalStage(recording,kind){
@@ -60,6 +61,10 @@ export function advanceVocalWork(input,requested){
  j.elapsed+=minutes;needs.satiety=clampV(needs.satiety-minutes*R.satietyPerMinute);needs.energy=clampV(needs.energy-minutes*R.energyPerMinute);
  const finished=j.total-j.elapsed<1e-7,credit=(finished?1:j.elapsed/j.total)/3,gain=Math.max(0,credit-j.practiceCredit),key=VOCAL_STAGES[j.kind].skill;
  s.recording.practice[key]=clampV(s.recording.practice[key]+gain);j.practiceCredit=credit;
- if(finished){const i=s.projects.findIndex(p=>p.id===j.beatId);s.projects[i]={...s.projects[i],recording:j.output};s.recording.job=null;}
+ if(finished){
+  const i=s.projects.findIndex(p=>p.id===j.beatId),completed={...s.projects[i],recording:j.output};
+  if(j.kind==='mix'&&completed.songFormVersion===1&&completed.songForm===undefined)completed.songForm=chooseSongForm(completed);
+  s.projects[i]=completed;s.recording.job=null;
+ }
  return {state:s,minutes,finished,practiceGained:credit,blocked:!finished&&Boolean(workBlockReason(s))};
 }

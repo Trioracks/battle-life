@@ -5,8 +5,51 @@ import {createVocalTake} from '../src/vocal-result.js';
 import {createStudioWorkspace,renderStudioTracks} from '../src/ft-studio-view.js';
 import {pcDocument,allPc} from './helpers/virtual-pc-dom.js';
 import {BeatAudio} from '../src/beat-audio.js';
+import {beginnerById} from '../src/beat-beginner-bank.js';
+import {normalizeBeat} from '../src/beat-production.js';
+import {SOURCE_GAINS_DB} from '../src/source-levels-v1.js';
 const song=await import('../src/beat-song-form.js').catch(error=>{if(error.code==='ERR_MODULE_NOT_FOUND')return {};throw error;});
 const beat=(id='song',seed=15)=>({version:3,id,bpm:90,stages:[{},{},{}],drumId:'beginner-drums-01',audio:{bankVersion:1,bars:4,themeId:'beginner-theme-01',arrangementId:'beginner-arrangement-01'},recording:{version:1,revision:1,text:{id:'t',name:'Text',revision:1},sourceId:'vocal-01',draft:createVocalTake({seed}),clean:null,mix:{skill:10},master:null}});
+
+test('saved alternate drums use a compatible source, its calibrated gain and its own window',()=>{
+ assert.equal(typeof song.chooseSongForm,'function');
+ const b=beat();b.audio.levelVersion=1;
+ const pool=[beginnerById('beginner-drums-02')];
+ const forms=Array.from({length:100},(_,seed)=>song.chooseSongForm(b,{pool,seed}));
+ const form=forms.find(f=>f.introSourceId==='beginner-drums-02');assert.ok(form,'some intros choose another drum');b.songForm=form;
+ const descriptor=resolveBeatPlayback(b).descriptor,part=descriptor.parts.find(p=>p.songSection==='intro');
+ assert.equal(part.id,'beginner-drums-02');assert.equal(part.sourceGainDb,SOURCE_GAINS_DB[part.id]);
+ assert.deepEqual(part.windows,[form.introWindow]);assert.equal(part.windows[0].startBar,0);assert.equal(part.windows[0].bars,2);
+ assert.ok(descriptor.parts.slice(0,3).every(p=>p.windows.every(w=>w.startBar!==0)));
+ assert.ok(forms.some(f=>f.introSourceId===b.drumId||f.introSourceId===b.audio.themeId||f.introSourceId===b.audio.arrangementId),'alternates are occasional');
+ const root=createStudioWorkspace(pcDocument());renderStudioTracks(root,b);
+ const clips=allPc(root).filter(n=>n.dataset.ftRole==='clip'&&n.dataset.sourceId===part.id);
+ assert.ok(clips.length);assert.ok(clips.every(c=>c.dataset.sourceBar===String(form.introWindow.sourceBar+1)));
+});
+
+test('song selection rejects missing, unavailable, wrong-tempo and incompatible tonal alternatives',()=>{
+ assert.equal(typeof song.chooseSongForm,'function');
+ const b=beat(),pool=[{...beginnerById('beginner-theme-02'),key:'F# major'},{...beginnerById('beginner-drums-02'),bpm:120},{...beginnerById('beginner-arrangement-02'),available:false},{id:'missing',kind:'drums',bpm:90,bars:4}];
+ for(let seed=0;seed<100;seed++){
+  const form=song.chooseSongForm(b,{pool,seed}),ids=[b.drumId,b.audio.themeId,b.audio.arrangementId];
+  assert.equal(form.introSourceId,ids[form.introStage]);assert.equal(form.outroSourceId,ids[form.outroStage]);
+  assert.deepEqual(song.chooseSongForm(b,{pool:[],seed}),form);
+ }
+});
+
+test('saved form is normalized without reselection and legacy descriptors stay byte-identical',()=>{
+ assert.equal(typeof song.chooseSongForm,'function');
+ const b={...beat(),kind:'beat',name:'Song',genre:'experimental',stages:Array.from({length:3},()=>({sliders:[5,5,5],fit:50,quality:10}))};
+ const legacy=resolveBeatPlayback(b).descriptor;
+ assert.deepEqual(resolveBeatPlayback(normalizeBeat(JSON.parse(JSON.stringify(b)))).descriptor,legacy);
+ b.songForm=song.chooseSongForm(b,{seed:5});const before=structuredClone(b.songForm),descriptor=resolveBeatPlayback(b).descriptor;
+ const restored=normalizeBeat(JSON.parse(JSON.stringify(b)));assert.deepEqual(restored.songForm,before);
+ assert.deepEqual(resolveBeatPlayback(restored).descriptor,descriptor);
+ restored.recording.clean=createVocalTake({kind:'clean',seed:999});restored.recording.master={skill:10};
+ assert.deepEqual(song.createBeatSongForm(restored),before);
+ assert.deepEqual(resolveBeatPlayback(restored).descriptor.parts.map(p=>[p.id,p.windows]),descriptor.parts.map(p=>[p.id,p.windows]));
+ assert.notEqual(descriptor.key,legacy.key,'cache identity includes saved form');
+});
 
 test('completed recording mix creates eight bars while work and premix keep four',()=>{
  const b=beat(),final=resolveBeatPlayback(b).descriptor;

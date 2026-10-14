@@ -50,7 +50,7 @@ export function lyricOutcomes({project,stage=null,referenceUses=project?.referen
  return out;
 }
 export function beatOutcomes({result,recipe,descriptor}={}){
- const out=empty(),layers=descriptor?.parts.filter(p=>p.result).map(p=>p.result)??recipe?.mix?.layers?.filter(Boolean)??(result?[result]:[]);
+ const out=empty(),layers=descriptor?.parts.filter(p=>p.result&&!p.songSection).map(p=>p.result)??recipe?.mix?.layers?.filter(Boolean)??(result?[result]:[]);
  const qualities=layers.filter(r=>Number.isFinite(r.quality)).map(r=>clamp(r.quality,100)/10);
  out.qualities.music=mean(qualities);
  if(recipe){

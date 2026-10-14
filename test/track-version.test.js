@@ -5,7 +5,48 @@ import {createVirtualPcState,loadVirtualPcState,saveVirtualPcState,VIRTUAL_PC_ST
 import {legacySubmissionFixture} from './helpers/submission-fixtures.js';
 import {startVocalWork,advanceVocalWork} from '../src/vocal-production.js';
 const api=await import('../src/track-version.js').catch(()=>({}));
+import {resolveBeatPlayback} from '../src/beat-playback.js';
+import {beatOutcomes} from '../src/production-outcomes.js';
 function capture(state){assert.equal(typeof api.captureTrackVersion,'function');return api.captureTrackVersion(state,{projectId:'beat',nowMinute:600});}
+
+test('first completed mix saves form once; clean, remix and master retain windows and archived recipes',()=>{
+ let s=submissionFixture(),beat=s.projects.find(p=>p.id==='beat');beat.recording.draft.seed=15;s.music.needs={satiety:100,energy:100};
+ s=startVocalWork(s,{beatId:'beat',kind:'mix'},{},()=>.4).state;s=advanceVocalWork(s,1).state;
+ assert.equal(s.projects.find(p=>p.id==='beat').songForm,undefined,'incomplete mixing cannot choose a form');
+ s=advanceVocalWork(createVirtualPcState(JSON.parse(JSON.stringify(s))),1000).state;beat=s.projects.find(p=>p.id==='beat');
+ assert.equal(beat.songForm?.version,1);
+ assert.ok(resolveBeatPlayback(beat).descriptor.parts.some(p=>p.songSection),'lifecycle fixture contains a real alternative');
+ const form=structuredClone(beat.songForm),initial=capture(s);s=initial.state;
+ const exportedRecipeBefore=structuredClone(s.trackVersions.byId[initial.versionId].recipe);
+ for(const kind of ['clean','mix','master']){
+  s=createVirtualPcState(JSON.parse(JSON.stringify(s)));s.music.needs={satiety:100,energy:100};
+  const started=startVocalWork(s,{beatId:'beat',kind},{flow:75,sound:75},()=>.8);assert.equal(started.ok,true);
+  s=advanceVocalWork(started.state,1000).state;beat=s.projects.find(p=>p.id==='beat');
+  assert.deepEqual(beat.songForm,form);
+  assert.deepEqual(resolveBeatPlayback(beat).descriptor.parts.map(p=>[p.id,p.windows]),exportedRecipeBefore.descriptor.parts.map(p=>[p.id,p.windows]),kind+' keeps the audible form even before remix');
+  const exportedRecipeAfter=s.trackVersions.byId[initial.versionId].recipe;assert.deepEqual(exportedRecipeAfter,exportedRecipeBefore);
+ }
+ const current=resolveBeatPlayback(beat).descriptor;
+ assert.deepEqual(current.parts.map(p=>[p.id,p.windows]),exportedRecipeBefore.descriptor.parts.map(p=>[p.id,p.windows]));
+});
+
+test('alternate sections cannot double-weight music quality or duplicate stage facts',()=>{
+ const recipe={genre:'experimental'},parts=[0,1,2].map(stage=>({id:'layer-'+stage,result:{stage,quality:10+stage*20,skills:{beatmaking:10}}}));
+ const before=beatOutcomes({recipe,descriptor:{durationSeconds:64/3,parts}});
+ const after=beatOutcomes({recipe,descriptor:{durationSeconds:64/3,parts:[...parts,{...parts[1],songSection:'intro'},{...parts[0],songSection:'outro'}]}});
+ assert.equal(after.qualities.music,before.qualities.music);
+ assert.deepEqual(after.facts.filter(f=>f.key!=='music.form'),before.facts.filter(f=>f.key!=='music.form'));
+});
+
+test('legacy beats never acquire eligibility or alternate form on mix, clean or remix',()=>{
+ let s=submissionFixture();delete s.projects.find(p=>p.id==='beat').songFormVersion;
+ for(const kind of ['mix','clean','mix','master']){
+  s=createVirtualPcState(JSON.parse(JSON.stringify(s)));s.music.needs={satiety:100,energy:100};
+  s=advanceVocalWork(startVocalWork(s,{beatId:'beat',kind},{flow:75,sound:75},()=>.8).state,1000).state;
+  const beat=s.projects.find(p=>p.id==='beat');assert.equal(beat.songFormVersion,undefined);assert.equal(beat.songForm,undefined);
+  assert.equal(resolveBeatPlayback(beat).descriptor.parts.length,4);
+ }
+});
 
 test('content mix belongs to the recorded snapshot, not a later editable text or skill',()=>{
  const first=capture(submissionFixture()),old=first.state.trackVersions.byId[first.versionId],before=JSON.stringify(old);

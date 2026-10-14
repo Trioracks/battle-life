@@ -1,6 +1,7 @@
 import {pcElement as el,pcButton as button,pcFind} from './virtual-pc-dom.js?rev=41';
 import {createBeatSongForm,songPartWindows} from './beat-song-form.js?rev=41';
 import {createPcIcon} from './virtual-pc-icons.js?rev=41';
+import {beginnerById} from './beat-beginner-bank.js?rev=41';
 
 export const FT_TRACKS=Object.freeze([
  ...['Drum Kit','Bass','Percussion'].map(name=>({name,stage:0,color:'rhythm'})),
@@ -34,7 +35,8 @@ export function renderStudioTracks(root,beat){
    const windows=form?songPartWindows(form,Math.min(3,track.stage)):[{startBar:0,bars:beat.version===3?4:2}];
    if(form)lane.style.position='relative';
    for(const window of windows){
-    const clip=el(d,'span',{className:'ft-audio-clip',text:track.name,dataset:{ftRole:'clip',color:track.color,startBar:String(window.startBar+1),bars:String(window.bars)}});
+    const sourceId=form?.version&&track.stage<3?(window.startBar===0?form.introSourceId:window.startBar===6?form.outroSourceId:[beat.drumId,beat.audio?.themeId,beat.audio?.arrangementId][track.stage]):null;
+    const clip=el(d,'span',{className:'ft-audio-clip',text:sourceId?beginnerById(sourceId)?.name??track.name:track.name,dataset:{ftRole:'clip',color:track.color,startBar:String(window.startBar+1),bars:String(window.bars),...(sourceId?{sourceId,sourceBar:String((window.sourceBar??0)+1)}:{})}});
     clip.style.marginLeft=(window.startBar*6.25)+'%';clip.style.width=(window.bars*6.25)+'%';
     if(form){clip.style.position='absolute';clip.style.top='2px';}lane.append(clip);
    }

@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createBeatPcmProcessor} from '../src/beat-pcm-background.js';
-import {processBeatPcmMessage} from '../src/beat-pcm-runtime.js';
+import {processBeatPcmMessage,prepareBeatPcm} from '../src/beat-pcm-runtime.js';
+import {resolveBeatPlayback} from '../src/beat-playback.js';
+import {chooseSongForm} from '../src/beat-song-form.js';
+import {beginnerById} from '../src/beat-beginner-bank.js';
 import {calibratedSourceBuffer} from '../src/audio-levels.js';
 import {transformBeatBuffer} from '../src/beat-result-dsp.js';
 import {transformVocalBuffer} from '../src/vocal-result-dsp.js';
@@ -26,6 +29,23 @@ test('cancellation settles pending PCM, ignores stale replies and creates a fres
  const first=processor.prepare(context,source,part,8/3),cancelled=assert.rejects(first,/cancel/i),old=workers[0];processor.cancel();await cancelled;assert.equal(old.terminated,true);
  const second=processor.prepare(context,source,part,8/3);old.finish();workers[1].finish();assert.ok(await second);
  const last=processor.prepare(context,source,part,8/3),disposed=assert.rejects(last,/cancel/i);processor.dispose();await disposed;await assert.rejects(processor.prepare(context,source,part,8/3),/disposed/i);
+});
+
+test('saved alternate source windows are sample-exact in worker and synchronous PCM with silent body',async()=>{
+ const beat={version:3,id:'song',bpm:90,stages:[{},{},{}],drumId:'beginner-drums-01',audio:{bankVersion:1,bars:4,levelVersion:1,themeId:'beginner-theme-01',arrangementId:'beginner-arrangement-01'},recording:{version:1,revision:1,text:{id:'t',name:'T',revision:1},sourceId:'vocal-01',draft:createVocalTake({seed:15}),mix:{skill:10}}};
+ beat.songForm=Array.from({length:100},(_,seed)=>chooseSongForm(beat,{pool:[beginnerById('beginner-drums-02')],seed})).find(f=>f.introSourceId==='beginner-drums-02');
+ const descriptor=resolveBeatPlayback(beat).descriptor,part=descriptor.parts.find(p=>p.songSection==='intro');
+ assert.ok(part);const rate=1200,source=context.createBuffer(2,12800,rate);
+ for(let c=0;c<2;c++)source.copyToChannel(Float32Array.from({length:12800},(_,i)=>(Math.floor(i/3200)+1)*.05*(c+1)),c);
+ const {processor,workers}=harness(),job=processor.prepare(context,source,part,descriptor.durationSeconds);workers[0].finish();
+ const actual=await job,expected=prepareBeatPcm(context,source,part,descriptor.durationSeconds);
+ for(let c=0;c<2;c++){
+  assert.deepEqual(actual.getChannelData(c),expected.getChannelData(c));
+  const want=(part.windows[0].sourceBar+1)*.05*(c+1)*10**(part.sourceGainDb/20);
+  assert.ok(Math.abs(actual.getChannelData(c)[100]-want)<1e-7);
+  assert.ok(actual.getChannelData(c).subarray(6400).every(v=>v===0));
+ }
+ processor.dispose();
 });
 test('worker failure rejects all jobs without a synchronous expensive fallback and allows explicit replay',async()=>{
  const {processor,workers}=harness(),source=input(),part={sourceGainDb:-6};
