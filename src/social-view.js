@@ -48,7 +48,7 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
   analysisRoot.replaceChildren(createRapAnalysisView(d,{getState,onStart:startAnalysis,commit,selectedReportId,navigate}));
   if(dialogView){dialogView.update();last=signature();return;}
   if(messagesView){messagesView.update();last=signature();return;}
-  const identity=n=>n?.getAttribute?.('aria-label')||n?.dataset?.focusId,focus=content.contains(d.activeElement)?d.activeElement:null,label=identity(focus),start=focus?.selectionStart,end=focus?.selectionEnd;
+  const identity=n=>n?.dataset?.focusId||n?.getAttribute?.('aria-label'),focus=content.contains(d.activeElement)?d.activeElement:null,label=identity(focus),start=focus?.selectionStart,end=focus?.selectionEnd;
   const options={onAnalyze:startAnalysis,getState,getMetadata,navigate,commit,audio:playback,isVisible,onRegistered:id=>{closeRegistration?.();closeRegistration=showRegistrationNotice(shell,getState().battleApplications.find(a=>a.battleId===id).nickname,()=>navigate('underweb://social/dialog/'+id));},onRead:id=>commit(markDialogRead(getState(),id)),onResultViewed:id=>{pcFind(content,n=>n.dataset?.resultSummary===id)?.focus?.({preventScroll:true});onResultViewed(id);},expandedResults};
   let node;
   if(route.section==='groups')node=groups();

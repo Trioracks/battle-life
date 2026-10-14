@@ -5,6 +5,8 @@ import {resolveSocialRoute} from '../src/social-routing.js';
 import {createVirtualPcState} from '../src/virtual-pc-state.js';
 import {subscriptionFixture} from './helpers/social-fixtures.js';
 import {ensureBattleWindow} from '../src/battle-windows.js';
+import {ensureSocialReactionPlans} from '../src/social-reactions.js';
+import {topicFixture} from './helpers/round-topic-fixture.js';
 import {gameDateTimeLabel as gameMinuteLabel} from '../src/home-calendar.js';
 import {pcDocument,allPc,findButton,fire} from './helpers/virtual-pc-dom.js';
 function setup(path='me',options={}){
@@ -41,4 +43,15 @@ test('saved audio catches errors without stopping the app session on page dispos
  let stopped=0,played=[];const audio={stop(){stopped++;},playDescriptor:async d=>{played.push(d);throw Error('network');}};
  const s=setup('audio',{state:subscriptionFixture(),audio});const b=allPc(s.root).find(n=>n.dataset?.socialAudio);b.click();await new Promise(r=>setImmediate(r));
  assert.equal(played.length,1);assert.equal(played[0].owner,'social');assert.ok(allPc(s.root).some(n=>n.textContent?.includes('Не удалось')));const before=stopped;s.view.dispose();assert.equal(stopped,before);
+});
+
+for(const label of ['Нравится','Не нравится'])test('voting keeps focus on the same post after its '+label+' count changes',()=>{
+ const s=setup('community/makarevich-1',{state:ensureSocialReactionPlans(topicFixture(),13440).state,metadata:{gameMinutes:13440}}),reaction=()=>allPc(s.root).find(n=>n.dataset?.reactionPost==='announce');
+ const control=findButton(reaction(),label+': 0');control.focus();control.click();const voted=findButton(reaction(),label+': 1');assert.ok(voted);assert.equal(s.d.activeElement===voted,true,'focus follows the same post and vote, not another zero-count control');assert.equal(voted.getAttribute('aria-pressed'),'true');
+ voted.click();const undone=findButton(reaction(),label+': 0');assert.equal(s.d.activeElement===undone,true);assert.equal(undone.getAttribute('aria-pressed'),'false');s.view.dispose();
+});
+
+test('a scheduled background reaction count keeps focus on its original post',()=>{
+ const metadata={gameMinutes:13440},s=setup('community/makarevich-1',{state:ensureSocialReactionPlans(topicFixture(),13440).state,metadata}),reaction=()=>allPc(s.root).find(n=>n.dataset?.reactionPost==='announce');
+ findButton(reaction(),'Нравится: 0').focus();metadata.gameMinutes=15456;s.view.update();const updated=findButton(reaction(),'Нравится: 1');assert.ok(updated);assert.equal(s.d.activeElement===updated,true,'published ratings change the accessible count without changing focus identity');s.view.dispose();
 });
