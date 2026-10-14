@@ -10,6 +10,7 @@ import {normalizeOutgoingMessage} from './social-composer.js?rev=41';
 import {normalizeBattleWindows} from './battle-windows.js?rev=41';
 import {normalizeSocialRuntime,normalizeCommunityAudio} from './social-runtime.js?rev=41';
 import {normalizePhone} from './phone-notifications.js?rev=41';
+import {normalizePhonePresentation} from './phone-presentation.js?rev=41';
 import {normalizeBattleKnowledge} from './battle-knowledge.js?rev=41';
 import {normalizeJudging} from './judge-comments.js?rev=41';
 import {normalizeJudgingSchedule} from './social-judging-events.js?rev=41';
@@ -143,6 +144,7 @@ function normalizeSnapshot(value,archiveCache=null) {
     socialRuntime:normalizeSocialRuntime(source.socialRuntime),
     communityAudio:normalizeCommunityAudio(source.communityAudio),
     phone:normalizePhone(source.phone),
+    phonePresentation:normalizePhonePresentation(source.phonePresentation),
     battleKnowledge:normalizeBattleKnowledge(source.battleKnowledge),
     judging:archive('judging',normalizeJudging),
     judgingSchedule:normalizeJudgingSchedule(source.judgingSchedule),

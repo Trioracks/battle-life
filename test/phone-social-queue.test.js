@@ -5,6 +5,8 @@ import {createVirtualPcState} from '../src/virtual-pc-state.js';
 import {advancePersonalDialogs} from '../src/social-personal.js';
 import {mountPhoneHud} from '../src/phone-hud.js';
 import {pcDocument} from './helpers/virtual-pc-dom.js';
+import {createSocialBackground} from '../src/social-background.js';
+import {createSocialWorkerRuntime} from '../src/social-worker-runtime.js';
 const event=(id,time)=>({id,type:'submission-ack',source:'Рифмосеть',sender:'Макаревич Battle',text:'Работа получена.',dueAt:time,entityId:'entry'});
 test('notice remains indefinitely until enter then leave; outside alone never dismisses',()=>{
  const p=receivePhoneEvents(null,[event('a',1)]);assert.equal(p.activeId,'a');assert.equal(hoverPhoneNotice(p,'a',false).activeId,'a');
@@ -23,5 +25,14 @@ test('save/reload keeps phone independent of dialog unread and rejects malformed
 });
 test('catch-up of two personal messages queues both but does not multiply sound on repeated frames',()=>{
  const state=advancePersonalDialogs(createVirtualPcState(),4000).state,d=pcDocument(),root=d.createElement('aside');let sounds=0;
- const hud=mountPhoneHud(root,{getState:()=>state.phone,onChange:phone=>state.phone=phone,playVibration:()=>sounds++});hud.update();hud.update();assert.equal(state.phone.queue.length,2);assert.equal(sounds,1);assert.equal(state.social.dialogs.vitya.unread,true);hud.dispose();
+ state.phonePresentation={firstWakeAtMinute:0,announcedIds:[]};
+ const hud=mountPhoneHud(root,{getState:()=>state.phone,getPresentation:()=>state.phonePresentation,getContext:()=>({nowMinute:4000,sleeping:false,mode:'game',pcPhase:'room'}),onPresentationChange:next=>{state.phonePresentation=next;return true;},onChange:phone=>state.phone=phone,playVibration:()=>sounds++});hud.update();hud.update();assert.equal(state.phone.queue.length,2);assert.equal(sounds,1);assert.equal(state.social.dialogs.vitya.unread,true);hud.dispose();
+});
+
+test('a durable phone delivery neither invalidates an in-flight social job nor gets overwritten by it',()=>{
+ let state=createVirtualPcState(),request,saves=0;const calculate=createSocialWorkerRuntime(),worker={postMessage:m=>request=structuredClone(m),terminate(){}};
+ const background=createSocialBackground({createWorker:()=>worker,getState:()=>state,persist:()=>{saves++;return true;},onState:next=>state=next});
+ background.tick(600,{},0);const phone=state.phone,presentation={firstWakeAtMinute:599,announcedIds:['already-shown']};state={...state,phonePresentation:presentation};
+ assert.equal(state.phone,phone);worker.onmessage({data:structuredClone(calculate(request))});assert.equal(saves,1);assert.equal(state.phonePresentation,presentation);
+ assert.ok(state.phone.queue.some(e=>e.id==='personal:vitya:day1'));assert.equal(createVirtualPcState(state).phonePresentation.firstWakeAtMinute,599);background.dispose();
 });

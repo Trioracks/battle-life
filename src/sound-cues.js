@@ -10,7 +10,7 @@ const cues = Object.freeze({
   mic: { id: 'mic', type: 'tick', frequency: 260, duration: .06 },
   door: { id: 'door', type: 'tick', frequency: 90, duration: .15 },
   notification: { id: 'notification', type: 'rise', frequency: 660, duration: .11 },
-  'phone-vibrate': {id:'phone-vibrate',type:'vibration',frequency:88,duration:.28,volume:.012},
+  'phone-vibrate': {id:'phone-vibrate',type:'vibration',frequency:88,duration:.4,volume:.012},
   install: { id: 'install', type: 'tick', frequency: 310, duration: .1 },
 });
 
@@ -28,8 +28,11 @@ export function playSoundCue(id, context = null) {
   if (cue.type === 'rise') oscillator.frequency.exponentialRampToValueAtTime(cue.frequency * 1.35, context.currentTime + cue.duration);
   gain.gain.setValueAtTime(cue.volume??.035, context.currentTime);
   if(cue.type==='vibration'){
-    gain.gain.setValueAtTime(.002,context.currentTime+.07);
-    gain.gain.setValueAtTime(cue.volume,context.currentTime+.12);
+    gain.gain.setValueAtTime(.001,context.currentTime+.06);
+    gain.gain.setValueAtTime(cue.volume,context.currentTime+.13);
+    gain.gain.setValueAtTime(.001,context.currentTime+.19);
+    gain.gain.setValueAtTime(cue.volume,context.currentTime+.26);
+    gain.gain.setValueAtTime(.001,context.currentTime+.32);
   }
   gain.gain.exponentialRampToValueAtTime(.001, context.currentTime + cue.duration);
   oscillator.connect(gain).connect(context.destination);

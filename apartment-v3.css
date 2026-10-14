@@ -39,3 +39,18 @@
 #battle-runtime-warning{position:fixed;z-index:300;right:16px;top:150px;max-width:min(420px,calc(100vw - 32px));padding:16px;background:#18282c;border:2px solid #d0aa60;color:#fff1cc;box-shadow:0 4px 18px #0009;font:14px/1.5 system-ui,sans-serif}
 #battle-runtime-warning[hidden]{display:none}
 #battle-runtime-warning button{display:block;margin-top:12px;padding:8px 12px}
+
+/* Apartment controls appear at the action, leaving the room unobstructed. */
+#game-header{left:auto;right:18px;top:14px;z-index:5}
+#game-header .top-right{display:flex;max-width:none;gap:8px;background:none;border:0;box-shadow:none;padding:0}
+#game-header .top-right button{position:relative;width:44px;height:42px;padding:8px;display:grid;place-items:center}
+#game-header .top-right svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round}
+#game-header #rig-toggle{width:auto;font-size:8px}
+.camera-mode-label{position:absolute;right:2px;bottom:0;font:8px/1.4 Arial,sans-serif;background:#172429}
+#controls{left:50%;right:auto;bottom:18px;transform:translateX(-50%);width:max-content;max-width:calc(100vw - 170px);padding:10px 14px;font-size:9px}
+#controls .activity-row{margin:0}#controls #activity{font-size:9px}#controls #wake{display:block;margin:9px auto 0;font-size:9px;padding:8px 10px}#controls #sleep-progress{margin:9px 0 0}
+#hover-label{bottom:24px;max-width:calc(100vw - 180px)}
+#home-input-hint{display:none;position:fixed;bottom:12px;left:50%;transform:translateX(-50%);padding:8px 12px;background:#142024ed;color:var(--muted);font-size:8px;pointer-events:none;z-index:5}
+body[data-mode=game]:has(#apartment:focus-visible) #home-input-hint{display:block}
+#apartment-actions{position:fixed;z-index:85;left:50%;bottom:22px;transform:translateX(-50%);width:460px;max-width:calc(100vw - 32px);max-height:calc(100dvh - 100px);overflow:auto;padding:14px;background:#142024f5;border:2px solid var(--line);box-shadow:4px 4px #080e12}
+#apartment-actions #actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}#apartment-actions button{font-size:9px;padding:9px}#close-apartment-actions{margin-top:12px}
