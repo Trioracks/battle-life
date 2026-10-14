@@ -164,11 +164,12 @@ export function createVirtualPcState(seed) {
 }
 
 export function diskUsage(state) {
-  const normalized = normalizeSnapshot(state);
-  const accounting=softwareDiskBytes(normalized);
+  // Read-only accounting needs software bytes and the number of projects,
+  // never migration/validation of every project and historical submission.
+  const accounting=softwareDiskBytes(state??{});
   const downloadMb = accounting.downloaded/1000000;
   const installedMb = accounting.installed/1000000;
-  const projectsMb = normalized.projects.length * PROJECT_MB;
+  const projectsMb = accounting.projects/1000000;
   const usedMb = accounting.used/1000000;
   return {
     capacityMb: VIRTUAL_DISK_MB,

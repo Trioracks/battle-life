@@ -32,6 +32,23 @@ import {pauseCreativeChain} from './creative-workflow.js?rev=41';
 import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=41';
 
 const NOOP = () => {};
+const sameInputs=(a,b)=>a?.length===b.length&&b.every((value,i)=>value===a[i]);
+
+// A partially exposed window still needs updates. Subtract higher windows so
+// several overlapping windows can also fully occlude a lower one.
+function exposedWindow(window,windows){
+  if(window.mode==='minimized')return false;
+  let parts=[window.rect];
+  for(const cover of windows.filter(w=>w.mode!=='minimized'&&w.z>window.z)){
+    const c=cover.rect;parts=parts.flatMap(r=>{
+      const x=Math.max(r.x,c.x),y=Math.max(r.y,c.y),right=Math.min(r.x+r.width,c.x+c.width),bottom=Math.min(r.y+r.height,c.y+c.height);
+      if(right<=x||bottom<=y)return [r];
+      return [{x:r.x,y:r.y,width:r.width,height:y-r.y},{x:r.x,y:bottom,width:r.width,height:r.y+r.height-bottom},{x:r.x,y,width:x-r.x,height:bottom-y},{x:right,y,width:r.x+r.width-right,height:bottom-y}].filter(p=>p.width>0&&p.height>0);
+    });
+    if(!parts.length)return false;
+  }
+  return true;
+}
 
 function add(parent, child) { parent.append(child); return child; }
 
@@ -178,10 +195,12 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.windows=reduceWindows(pc.windows,action);
     pc.renderDesktop(false);
   };
+  let hostInputs=null;
   pc.syncHost = metadata => {
-    if(JSON.stringify(pc.metadata)===JSON.stringify(metadata))return;
+    const inputs=m=>[m.playerName,m.clockLabel,m.gameDay,Math.floor(m.gameMinutes??0),m.portraitKey,m.requestPlayerPortrait,JSON.stringify(m.skills)];
+    const nextInputs=inputs(metadata),changed=!sameInputs(hostInputs,nextInputs);hostInputs=nextInputs;
     pc.metadata={...metadata};
-    if(pc.phase==='desktop')pc.renderDesktop(false);
+    if(changed&&pc.phase==='desktop')pc.renderDesktop(false);
   };
 
   pc.closeUninstall=()=>{pc.uninstallModal=null;pc.shell.setModal(null,pc.returnFocus);pc.renderDesktop(false);};
@@ -227,7 +246,6 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.refreshDynamicState = () => {
     if(pc.desktopVisible===false){pc.desktopDirty=true;return;}
     pc.refreshPersistenceWarning();
-    if(pc.windows.windows.some(w=>w.id==='torent'))pc.refreshTorent();
     pc.renderDesktop(false);
   };
 
@@ -241,6 +259,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   let transitionLayer=null,transitionTitle=null,transitionSubtitle=null,transitionProgress=null;
   pc.presentTransition = snapshot => {
     pc.desktopVisible=(snapshot.overlay??0)>0;
+    if(!pc.desktopVisible)pc.studioView?.setVisible(false);
     if(pc.desktopVisible&&pc.desktopDirty){pc.desktopDirty=false;pc.refreshDynamicState();}
     const p=pcPresentation(snapshot,pc.state.power,pc.metadata.playerName);
     const wasLocked=pc.locked;
@@ -258,8 +277,21 @@ export function mountVirtualPc(root, callbacks = {}) {
     transitionLayer.style.opacity='1';transitionLayer.style.filter=`brightness(${p.brightness})`;transitionTitle.textContent=p.title;transitionSubtitle.textContent=p.subtitle;
     transitionProgress.hidden=p.screen!=='loading';transitionProgress.value=p.progress;
     if(wasLocked&&!pc.locked&&snapshot.phase==='desktop')pc.shell?.focusActive();
+    if(pc.desktopVisible)pc.studioView?.setVisible(pc.viewVisible('ft-studio')&&!pc.shutdownModal&&!pc.submissionModal&&!pc.uninstallModal);
   };
 
+  let shellInputs=null;const appInputs=new Map();
+  pc.viewVisible=id=>pc.phase==='desktop'&&pc.desktopVisible!==false&&!root.hidden&&!document.hidden&&pc.windows.windows.some(w=>w.id===id&&exposedWindow(w,pc.windows.windows));
+  function updateView(id,view){
+    if(!view||!pc.viewVisible(id))return;
+    // Underweb owns several routes. References cover all domain snapshots;
+    // high-frequency clocks/needs are represented only at displayed cadence.
+    if(id==='underweb'){
+      const s=pc.state,inputs=[...Object.entries(s).filter(([key])=>!['lastGameMinute','music','writing','recording','download','software'].includes(key)).flat(),JSON.stringify(s.software),pc.metadata.gameDay,Math.floor(pc.metadata.gameMinutes??0),pc.metadata.playerName,pc.metadata.portraitKey,pc.metadata.requestPlayerPortrait,JSON.stringify(pc.metadata.skills),pc.message];
+      if(sameInputs(appInputs.get(id),inputs))return;appInputs.set(id,inputs);
+    }
+    if(id==='computer')view.update(pc.state);else view.update();
+  }
   pc.renderDesktop = (replaceActive=true) => {
     if(pc.desktopVisible===false&&pc.shell){pc.desktopDirty=true;return;}
     const focused=document.activeElement,focusId=focused?.dataset?.focusId;
@@ -273,18 +305,18 @@ export function mountVirtualPc(root, callbacks = {}) {
     }});
     if(!pc.menu)pc.menu=mountPcMenu(pc.shell.getMenuRoot(),{onDismiss:()=>{pc.startOpen=false;}});
     const apps=desktopApps(pc.state),v=pc.windows.viewport;
-    pc.shell.render({windows:pc.windows,apps,wallpaper:(WALLPAPERS.find(w=>w.id===pc.state.wallpaper)??WALLPAPERS[0]).path,
-      iconPositions:layoutDesktopIcons(apps.map(a=>a.id),pc.state.desktopIcons,{width:v.width,height:v.height-32}),metadata:pc.metadata,warning:pc.persistenceWarning});
+    const nextShell=[pc.windows,pc.state.wallpaper,pc.state.desktopIcons,apps.map(a=>a.id).join(','),pc.metadata.clockLabel,pc.metadata.gameDay,pc.persistenceWarning];
+    if(!sameInputs(shellInputs,nextShell)){
+      shellInputs=nextShell;pc.shell.render({windows:pc.windows,apps,wallpaper:(WALLPAPERS.find(w=>w.id===pc.state.wallpaper)??WALLPAPERS[0]).path,
+        iconPositions:layoutDesktopIcons(apps.map(a=>a.id),pc.state.desktopIcons,{width:v.width,height:v.height-32}),metadata:pc.metadata,warning:pc.persistenceWarning});
+    }
     for(const w of pc.windows.windows){
       const target=pc.shell.getContentRoot(w.id);
-      if(!target.children.length||(replaceActive&&w.id===pc.windows.activeId))pc.refreshApp(w.id,{replaceContent:true});
+      if(pc.viewVisible(w.id)&&(!target.children.length||(replaceActive&&w.id===pc.windows.activeId)))pc.refreshApp(w.id,{replaceContent:true});
     }
-    pc.explorer?.update(pc.state);
-    pc.underwebView?.update();pc.torrentView?.update();pc.installerView?.update();
-    pc.studioView?.update();
-    pc.notebookView?.update();pc.submissionModal?.view.update();
-    pc.dossierView?.update();
-    for(const view of pc.systemViews.values())view.update();
+    pc.studioView?.setVisible(pc.viewVisible('ft-studio')&&!pc.shutdownModal&&!pc.submissionModal&&!pc.uninstallModal);
+    for(const [id,view]of [['computer',pc.explorer],['underweb',pc.underwebView],['torent',pc.torrentView],['installer',pc.installerView],['ft-studio',pc.studioView],['rap-notebook',pc.notebookView],['rap-dossier',pc.dossierView],...pc.systemViews])updateView(id,view);
+    pc.submissionModal?.view.update();
     const guard=pc.confirmClose?findByDataset(root,'pcRole','close-guard'):null;
     pc.shell.setModal(pc.uninstallModal?.node??pc.submissionModal?.node??pc.shutdownModal?.node??guard,pc.returnFocus);
     if(!pc.confirmClose&&replaceActive){
@@ -374,6 +406,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.shutdownModal={node,view};pc.shell.setModal(node,pc.returnFocus);
   };
   pc.clearViews = () => {
+    appInputs.clear();
     pc.dossierView?.dispose();pc.dossierView=null;
     pc.submissionModal?.view.dispose();pc.submissionModal=null;
     pc.notebookView?.dispose();pc.notebookView=null;
@@ -473,6 +506,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
   pc.cancelStudioLaunch=()=>{pc.launchGeneration++;if(pc.studioLaunch!==null)pc.clearTimeoutFn(pc.studioLaunch);pc.studioLaunch=null;pc.pendingStudioProject=null;pc.setStudioBusy(false);};
   pc.closeNow = id => {
+    appInputs.delete(id);
     if(id==='rap-dossier'){pc.dossierView?.dispose();pc.dossierView=null;}
     if(id==='rap-notebook'){pc.notebookView?.dispose();pc.notebookView=null;}
     if(id==='installer'){if(pc.state.software.installer)pc.persist(software.cancelInstaller(pc.state).state);pc.installerView?.dispose();pc.installerView=null;}
@@ -533,6 +567,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   });
 
   pc.reset = state => {
+    shellInputs=null;
     pc.cancelStudioLaunch();
     pc.audioSession.stopAll();
     if (pc.bootTimer !== null) pc.clearTimeoutFn(pc.bootTimer);
@@ -569,6 +604,10 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.phase = 'off';
     pc.render();
   };
+
+  const visibilityChanged=()=>{if(pc.phase==='desktop')pc.renderDesktop(false);};
+  document.addEventListener?.('visibilitychange',visibilityChanged);
+  const dispose=pc.dispose;pc.dispose=()=>{document.removeEventListener?.('visibilitychange',visibilityChanged);dispose();};
 
   return pc;
 }

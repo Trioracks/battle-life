@@ -158,3 +158,10 @@ test('host storage warnings remain visible after state synchronization', () => {
 
   assert.equal(hasText(root, 'Сохранение виртуального ПК недоступно.'), true);
 });
+
+test('background clock and data updates retain shutdown modal focus',()=>{
+ const {controller:pc,state,root,document}=createController();pc.showDesktop(state);pc.open('underweb');pc.showShutdown();
+ const cancel=find(root,n=>n.tagName==='BUTTON'&&n.textContent==='Отмена');cancel.focus();
+ for(let i=0;i<120;i++){pc.syncHost({...pc.metadata,gameMinutes:720+i/120,clockLabel:i<60?'12:00':'12:01'});pc.syncState({...pc.state,lastGameMinute:720+i/120});}
+ assert.equal(document.activeElement,cancel);assert.equal(pc.shutdownModal.node.contains(cancel),true);pc.dispose();
+});

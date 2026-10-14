@@ -25,8 +25,9 @@ const summarize=rows=>{
  return {frames:rows.length,updateP50:q(update,.5),updateP95:q(update,.95),updateMax:update.at(-1)??0,frameP95:q(frames,.95),frameMax:frames.at(-1)??0,walking:rows.filter(r=>r.walking).length,targetsMet:q(update,.95)<=20&&q(frames,.95)<=25};
 };
 const original=await readFile('src/apartment-app.js','utf8');
-const hook=`window.campaignQA={samples:[],walking:false,get state(){return pcState},get pc(){return virtualPc},get phase(){return pcLifecycle.snapshot.phase},get motion(){return motion},reset(){this.samples=[];this.lastNow=null;}};
+const hook=`window.campaignQA={samples:[],walking:false,freezeUpdates:false,get state(){return pcState},get pc(){return virtualPc},get soundNodes(){return pcSounds.nodes.size},get phase(){return pcLifecycle.snapshot.phase},get motion(){return motion},reset(){this.samples=[];this.lastNow=null;}};
  function update(dt,now,step=false){
+  if(campaignQA.freezeUpdates)return;
   if(campaignQA.walking&&mode==='game'&&motion.phase==='idle')motion.move(motion.position[0]>0?-4.5:4.5);
   const start=performance.now();updateOriginal(dt,now,step);
   campaignQA.samples.push({ms:performance.now()-start,dt:campaignQA.lastNow?now-campaignQA.lastNow:0,phase:pcLifecycle.snapshot.phase,walking:motion.phase==='walk'});campaignQA.lastNow=now;
@@ -35,19 +36,29 @@ const hook=`window.campaignQA={samples:[],walking:false,get state(){return pcSta
 assert.ok(original.includes('function update(dt,now,step=false){'));
 assert.ok(original.includes("loading.hidden=true;setMode('menu');"));
 const source=original.replace('function update(dt,now,step=false){','function updateOriginal(dt,now,step=false){').replace("loading.hidden=true;setMode('menu');",hook+"loading.hidden=true;setMode('menu');");
-const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE||'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',args:['--autoplay-policy=no-user-gesture-required']});
-const report={label,performanceOnly:process.argv.includes('--performance-only'),base,createdAt:new Date().toISOString(),results:[],errors:[]};
+let browser;
+const desktopResources=process.argv.includes('--desktop-resources');
+const report={label,performanceOnly:process.argv.includes('--performance-only'),desktopResources,base,createdAt:new Date().toISOString(),results:[],errors:[]};
 try{
- for(const [tracks,width,height]of [[1,1280,720],[5,1280,720],[10,1280,720],[20,1280,720],[20,1366,768],[20,1920,1080]]){
+ browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE||'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',args:['--autoplay-policy=no-user-gesture-required']});
+ const scenarios=desktopResources?[[20,1280,720],[20,1366,768],[20,1920,1080]]:[[1,1280,720],[5,1280,720],[10,1280,720],[20,1280,720],[20,1366,768],[20,1920,1080]];
+ for(const [tracks,width,height]of process.argv.includes('--first-scenario')?scenarios.slice(0,1):scenarios){
   const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage();page.setDefaultTimeout(90000);
+  if(desktopResources)await page.addInitScript(()=>{
+   const request=window.requestAnimationFrame.bind(window),cancel=window.cancelAnimationFrame.bind(window),pending=new Map(),executed={studio:0,other:0};
+   window.requestAnimationFrame=callback=>{const owner=new Error().stack.includes('beat-studio-view.js')?'studio':'other';const id=request(time=>{pending.delete(id);executed[owner]++;callback(time);});pending.set(id,owner);return id;};
+   window.cancelAnimationFrame=id=>{pending.delete(id);cancel(id);};
+   window.desktopRAF=()=>({pending:[...pending.values()].reduce((n,owner)=>(n[owner]++,n),{studio:0,other:0}),executed:{...executed}});
+  });
   page.on('pageerror',e=>report.errors.push(e.message));
   await page.route('**/__campaign-seed',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><title>Isolated long campaign</title>'}));
   await page.goto(base+'/__campaign-seed');
-  const seed=await page.evaluate(async tracks=>{
+  const seed=await page.evaluate(async ({tracks,desktopResources})=>{
    const [fixtures,profiles,saves,beats,workflow,home]=await Promise.all([import('/test/helpers/long-campaign-fixture.js'),import('/src/avatar-v3-profile.js'),import('/src/virtual-pc-state.js'),import('/src/beat-production.js'),import('/src/creative-workflow.js'),import('/src/home-creative-work.js')]);
    const f=fixtures.longCampaignFixture({tracks,day:8});
    let state=beats.createBeat(f.state,{id:'current',name:'После архива'},f.skills,()=>.4).state;
    const started=workflow.startCreativeChain(state,{kind:'beat',projectId:'current',gameDay:8},f.skills,()=>.4);if(!started.ok)throw Error(started.reason);state=started.state;
+   if(desktopResources)state={...state,software:{...state.software,dossierMetadata:true,transfers:{...state.software.transfers,dossier:{appId:'dossier',paused:false,error:''}}}};
    const history=JSON.stringify({projects:state.projects.filter(p=>p.id!=='current'),plans:state.creativeWork.items.filter(i=>i.projectId!=='current')});
    const costs={progress:[],descriptor:[],advance:[]};
    for(let i=0;i<60;i++)for(const [key,run]of [['progress',()=>workflow.creativeChainProgress(state,'current')],['descriptor',()=>home.creativeWorkDescriptor(state,f.skills)],['advance',()=>home.advanceCreativeWork(state,.001,{day:8,minutes:720},f.skills)]]){const start=performance.now();run();costs[key].push(performance.now()-start);}
@@ -55,21 +66,63 @@ try{
    if(!saves.saveVirtualPcState(localStorage,state))throw Error('Fixture save failed');
    localStorage.setItem('battle-life-apartment-v3-time',JSON.stringify({day:8,minutes:720,initialRest:false}));
    return {history,costs,projects:state.projects.length,plans:state.creativeWork.items.length,progress:workflow.creativeChainProgress(state,'current')};
-  },tracks);
+  },{tracks,desktopResources});
   await page.route('**/src/apartment-app.js*',r=>r.fulfill({contentType:'text/javascript',body:source}));
   await page.route('**/src/virtual-pc-ui.js*',async r=>{const response=await r.fetch(),body=await response.text();assert.ok(body.includes('  return pc;'));await r.fulfill({response,body:body.replace('  return pc;','  window.campaignHost={run:callbacks.onWork};return pc;')});});
   await page.goto(base);await page.waitForFunction(()=>window.campaignQA);await page.locator('#continue-game').click();
   await page.waitForFunction(()=>campaignQA.motion.phase==='idle'&&campaignQA.phase==='room');
   const row={tracks,width,height,seed:{projects:seed.projects,plans:seed.plans,progress:seed.progress},micro:{}};
   for(const [key,times]of Object.entries(seed.costs))row.micro[key]=summarize(times.map(ms=>({ms,dt:0})));
-  await page.evaluate(()=>{campaignQA.walking=true;campaignQA.reset();});
+  if(!desktopResources){await page.evaluate(()=>{campaignQA.walking=true;campaignQA.reset();});
   await page.waitForFunction(()=>campaignQA.samples.length>=180);
   row.walking=summarize(await page.evaluate(()=>campaignQA.samples));assert.ok(row.walking.walking>0);
-  await page.evaluate(()=>campaignQA.walking=false);await page.waitForFunction(()=>campaignQA.motion.phase==='idle');
+  await page.evaluate(()=>campaignQA.walking=false);await page.waitForFunction(()=>campaignQA.motion.phase==='idle');}
   await page.locator('#actions [data-action="computer"]').click();await page.waitForFunction(()=>campaignQA.phase==='desktop');
   await page.evaluate(()=>campaignQA.pc.openNow('ft-studio'));await page.locator('.pc-window[data-window-id="ft-studio"]').waitFor();
   await page.evaluate(()=>campaignQA.reset());await page.waitForFunction(()=>campaignQA.samples.length>=180);
   row.ft=summarize(await page.evaluate(()=>campaignQA.samples));
+  if(desktopResources){
+   await page.evaluate(()=>campaignQA.pc.studioView.openProject(campaignQA.pc.state.projects.find(p=>p.id==='campaign-beat-20')));
+   row.transferBefore=await page.evaluate(()=>campaignQA.pc.state.software.dossier.receivedBytes);
+   const profiler=await context.newCDPSession(page);await profiler.send('Profiler.enable');
+   row.desktop={};
+   for(const app of ['ft-studio','rap-notebook','underweb','torent']){
+    await page.evaluate(app=>{campaignQA.pc.openNow(app);campaignQA.reset();},app);
+    await profiler.send('Profiler.start');await page.waitForFunction(()=>campaignQA.samples.length>=180);
+    const data=await page.evaluate(()=>({samples:campaignQA.samples,raf:desktopRAF(),audio:campaignQA.pc.beatAudio.sources.length}));
+    const {profile}=await profiler.send('Profiler.stop');await writeFile(`${out}/${label}-${width}x${height}-${app}.cpuprofile`,JSON.stringify(profile));
+    row.desktop[app]={...summarize(data.samples),raf:data.raf,audio:data.audio};
+    assert.equal(data.raf.pending.studio,app==='ft-studio'?1:0);
+   }
+   await page.evaluate(()=>{for(const app of ['ft-studio','rap-notebook','underweb','torent'])campaignQA.pc.closeNow(app);});
+   async function cycle(){
+    return page.evaluate(async()=>{
+     const pc=campaignQA.pc;pc.openNow('ft-studio');
+     if(!await pc.audioSession.forOwner('ft-studio').play({stage:1}))throw Error('Native audio failed');
+     const source=pc.beatAudio.sources[0];
+     for(const app of ['rap-notebook','underweb','torent'])pc.openNow(app);
+     if(pc.beatAudio.status!=='playing'||pc.beatAudio.sources[0]!==source||desktopRAF().pending.studio!==0)throw Error('Occlusion changed background audio or kept RAF');
+     pc.closeNow('underweb');if(pc.beatAudio.sources[0]!==source)throw Error('Unrelated close stopped audio');
+     for(const app of ['torent','rap-notebook','ft-studio'])pc.closeNow(app);
+     return {raf:desktopRAF().pending,audio:pc.beatAudio.sources.length,retiring:pc.beatAudio.retiring.length};
+    });
+   }
+   async function settledCounters(){
+    await page.waitForFunction(()=>campaignQA.soundNodes===0);await page.evaluate(()=>campaignQA.freezeUpdates=true);
+    try{await profiler.send('HeapProfiler.collectGarbage');return {...await profiler.send('Memory.getDOMCounters'),...await page.evaluate(()=>({connectedElements:document.querySelectorAll('*').length,cueNodes:campaignQA.soundNodes}))};}
+    finally{await page.evaluate(()=>campaignQA.freezeUpdates=false);}
+   }
+   await cycle();row.resourceBaseline=await settledCounters();row.cycles=[];
+   for(let cycleIndex=1;cycleIndex<=30;cycleIndex++){
+    const resources=await cycle();assert.equal(resources.raf.studio,0);assert.equal(resources.audio,0);assert.equal(resources.retiring,0);
+    if(cycleIndex%10===0)row.cycles.push({cycle:cycleIndex,...resources,transientCueNodes:await page.evaluate(()=>campaignQA.soundNodes),...await settledCounters()});
+   }
+   report.results.push(row);await writeFile(`${out}/${label}.json`,JSON.stringify(report,null,2));console.log(JSON.stringify({resourceBaseline:row.resourceBaseline,cycles:row.cycles}));
+   const last=row.cycles.at(-1);assert.ok(last.jsEventListeners<=row.resourceBaseline.jsEventListeners,'live event handlers grew');
+   row.transferAfter=await page.evaluate(()=>campaignQA.pc.state.software.dossier.receivedBytes);assert.ok(row.transferAfter>row.transferBefore,'background transfer stopped while torent was covered or closed');
+   const history=await page.evaluate(()=>JSON.stringify({projects:campaignQA.state.projects.filter(p=>p.id!=='current'),plans:campaignQA.state.creativeWork.items.filter(i=>i.projectId!=='current')}));assert.equal(history,seed.history);row.historyPreserved=true;
+   await page.screenshot({path:`${out}/${label}-${width}x${height}.png`});await writeFile(`${out}/${label}.json`,JSON.stringify(report,null,2));console.log(JSON.stringify(row));await context.close();continue;
+  }
   const profiler=await context.newCDPSession(page);await profiler.send('Profiler.enable');await profiler.send('Profiler.start');
   await page.evaluate(()=>{if(!campaignHost.run())throw Error('Cannot start work');});await page.waitForFunction(()=>campaignQA.phase==='working');
   await page.evaluate(()=>campaignQA.reset());
@@ -83,4 +136,5 @@ try{
   report.results.push(row);await writeFile(`${out}/${label}.json`,JSON.stringify(report,null,2));console.log(JSON.stringify(row));await context.close();
  }
  assert.deepEqual(report.errors,[]);console.log(`PASS isolated campaign history and native samples: ${out}/${label}.json`);
-}finally{await writeFile(`${out}/${label}.json`,JSON.stringify(report,null,2));await browser.close();await new Promise(r=>server.close(r));}
+}catch(error){report.errors.push(error.message);throw error;}
+finally{try{await browser?.close();}finally{await new Promise(r=>server.close(r));report.cleanup={browserClosed:Boolean(browser),serverClosed:true};await writeFile(`${out}/${label}.json`,JSON.stringify(report,null,2));}}

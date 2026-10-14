@@ -61,13 +61,14 @@ export function mountTorrent(root,{getState,onAction,getMessage=()=>''}){
   if(!ids.includes(selected))selected=ids[0]??null;
   for(const [id,b]of rows)if(!ids.includes(id)){b.remove();rows.delete(id);}
   if(!ids.length)row.textContent='Нет задач. Открой файл .torrent из Загрузок.';
+  const presentations=new Map();
   for(const id of ids){
    if(!rows.has(id)){if(!rows.size)row.textContent='';const b=button(d,'',{attributes:{'aria-label':'Выбрать загрузку '+SOFTWARE[id].name}},()=>{selected=id;update();});b.addEventListener('dblclick',()=>{selected=id;const app=getState().software[id];if(!app.installed&&app.receivedBytes===SOFTWARE[id].downloadBytes)onAction('installer',id);});rows.set(id,b);row.append(b);}
-   const b=rows.get(id),p=downloadPresentation(s,id);
+   const b=rows.get(id),p=downloadPresentation(s,id);presentations.set(id,p);
    b.textContent=SOFTWARE[id].archive+'     '+p.totalMb+' МБ     '+p.percent+'%     '+p.seeds+' / '+p.peers;
    b.setAttribute('aria-pressed',String(selected===id));
   }
-  const t=s.software.transfers[selected],p=downloadPresentation(s,selected??'ft'),app=SOFTWARE[selected];
+  const t=s.software.transfers[selected],p=presentations.get(selected),app=SOFTWARE[selected];
   message.textContent=getMessage();pause.disabled=!t||t.paused;resume.disabled=!t||(!t.paused&&!t.error);cancel.disabled=!t;
   install.textContent=s.software[selected]?.installed?'Удалить':'Установить';install.disabled=!selected||(!s.software[selected].installed&&s.software[selected].receivedBytes!==app.downloadBytes);install.hidden=!selected;
   progress.hidden=!selected;progress.value=selected?p.percent:0;progress.setAttribute('aria-label','Прогресс загрузки '+(app?.name??''));

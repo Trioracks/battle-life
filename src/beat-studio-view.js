@@ -22,10 +22,14 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
  const summary=el(d,'p',{className:'ft-needs'}),session=pcFind(workspace,n=>n.className==='ft-session').children[1],tempo=pcFind(workspace,n=>n.className==='ft-tempo').children[0];
  const readout=pcFind(workspace,n=>n.className==='ft-readout').children[1],transport=find('transport'),playhead=find('playhead'),status=find('transport-status');
  const controls=Object.fromEntries(['play','pause','stop'].map(key=>[key,pcFind(transport,n=>n.dataset?.ftAction===key)]));
- let signature='',message='',disposed=false,dialog=null,returnFocus=null,frame=null,sessionSelected=false;
+ let signature=[],message='',disposed=false,dialog=null,returnFocus=null,frame=null,sessionSelected=false,visible=true;
  const win=d.defaultView??globalThis,requestFrame=win.requestAnimationFrame?.bind(win),cancelFrame=win.cancelAnimationFrame?.bind(win);
- const currentBeat=()=>sessionSelected?normalizeBeat(getState().projects.find(p=>p.id===getState().music.activeBeatId)):null;
- const stateSignature=()=>{const s=getState();return JSON.stringify([s.projects,s.music.activeBeatId,s.music.job?.beatId,s.music.job?.stage,s.recording?.job?.beatId,s.recording?.job?.kind,s.music.genres,effectiveBeatSkill(s,getMetadata().skills)]);};
+ let beatSource,beatCache;
+ const currentBeat=()=>{const s=getState(),source=sessionSelected?s.projects.find(p=>p.id===s.music.activeBeatId):null;if(source!==beatSource){beatSource=source;beatCache=normalizeBeat(source);}return beatCache;};
+ // State has crossed load/command validation. Published project/plan references
+ // change on commands; clock and needs updates retain those references.
+ const stateSignature=()=>{const s=getState();return [s.projects,s.music.activeBeatId,s.music.job?.beatId,s.music.job?.stage,Math.floor(s.music.job?.elapsed??0),s.recording?.job?.beatId,s.recording?.job?.kind,s.creativeWork?.items,s.retiredSourceWork,s.music.genres,effectiveBeatSkill(s,getMetadata().skills),getMetadata().skills?.sound];};
+ const sameInputs=(a,b)=>a.length===b.length&&a.every((value,i)=>value===b[i]);
  let vocalDecisions;
  function startRecording(kind,textId,sliders){
   const beat=currentBeat();if(!beat)return;
@@ -185,13 +189,14 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onWork,audio
  controls.play.addEventListener('click',()=>{const beat=currentBeat();if(!beat)return;Promise.resolve(audio.playProject(beat)).then(()=>{if(!disposed)updateTransport();});updateTransport();});
  controls.pause.addEventListener('click',()=>{audio.pause();updateTransport();});
  controls.stop.addEventListener('click',()=>{audio.stop();updateTransport();});
- const tick=()=>{if(disposed)return;updateTransport();frame=requestFrame?.(tick);};
+ const tick=()=>{frame=null;if(disposed||!visible)return;updateTransport();frame=requestFrame?.(tick)??null;};
  render();if(initialProject)selectProject(initialProject);else openDialog();
- frame=requestFrame?.(tick);
+ frame=requestFrame?.(tick)??null;
  return {
   openProject:selectProject,
   focus(){if(dialog)pcFocusable(dialog)[0]?.focus();},
-  update(){if(stateSignature()!==signature)render();else{updateSummary();updateTransport();}},
+  setVisible(next){visible=next;if(!visible&&frame!==null){cancelFrame?.(frame);frame=null;}else if(visible&&!disposed&&frame===null){updateTransport();frame=requestFrame?.(tick)??null;}},
+  update(){if(disposed||!visible)return;if(!sameInputs(stateSignature(),signature))render();else updateSummary();},
   dispose(){disposed=true;if(frame!==null)cancelFrame?.(frame);closeDialog({restore:false});audio.stop();root.replaceChildren();}
  };
 }

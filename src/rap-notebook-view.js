@@ -5,10 +5,12 @@ import {normalizeBeat} from './beat-production.js?rev=41';
 import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=41';
 
 export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,onWork=()=>false}={}){
- const d=root.ownerDocument;let panel=null,modal=null,returnFocusLabel='',message='',signature='',disposed=false,controls=[];
+ const d=root.ownerDocument;let panel=null,modal=null,returnFocusLabel='',message='',signature=[],disposed=false,controls=[],needsLabel=null;
  function openPanel(mode){returnFocusLabel=d.activeElement?.textContent??'';panel=mode;message='';render();}
  const active=()=>normalizeLyric(getState().projects.find(p=>p.id===getState().writing.activeTextId));
- const fingerprint=()=>JSON.stringify([getState().writing.activeTextId,getState().projects,getState().battleApplications,getState().writing.job?.kind,getState().writing.practice,getState().music.needs]);
+ const fingerprint=()=>{const s=getState(),selected=s.projects.find(p=>p.id===s.writing.activeTextId);return [s.writing.activeTextId,s.projects,selected?.stages,selected?.stages?.length,s.battleApplications,s.writing.job?.kind,s.writing.job?.stage,Math.floor(s.writing.job?.elapsed??0),s.writing.practice,s.creativeWork?.items,effectiveWritingSkill(s,getMetadata().skills)];};
+ const sameInputs=(a,b)=>a.length===b.length&&a.every((value,i)=>value===b[i]);
+ function updateNeeds(){const needs=getState().music.needs;if(needsLabel)needsLabel.textContent='Сытость '+Math.round(needs.satiety)+' · энергия '+Math.round(needs.energy);}
  function choose(id){const s=pauseCreativeChain(getState());onChange({...s,writing:{...s.writing,activeTextId:id}});panel=null;message='';render();}
  function start(kind='stage',extra={}){
   const before=getState(),p=active();if(!p)return;
@@ -97,7 +99,7 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
    }else if(job?.projectId===p.id)side.append(button(d,'Продолжить работу',{},()=>start(job.kind,{beatId:job.beatId})));
    else side.append(el(d,'p',{text:'Основная структура собрана. Остались шероховатости: добавь часть или адаптируй строки под бит. Запись вокала — следующий этап.'}));
   }else {sheet.append(el(d,'div',{className:'rn-welcome',text:'Рэпблокнот'}),el(d,'p',{className:'rn-empty',text:'Тема. Первая мысль. Первая строка. Создай текст для баттла или сохрани собственную идею.'}));side.append(el(d,'h2',{text:'Твой черновик'}),el(d,'p',{text:'Здесь герой пишет сам. Ты выбираешь направление работы; символы показывают ритм и стройность текста.'}));}
-  side.append(el(d,'hr'),el(d,'p',{text:'Письмо '+skill.toFixed(2)+' / 100'}),el(d,'p',{text:'Сытость '+Math.round(s.music.needs.satiety)+' · энергия '+Math.round(s.music.needs.energy)}));
+  needsLabel=el(d,'p');updateNeeds();side.append(el(d,'hr'),el(d,'p',{text:'Письмо '+skill.toFixed(2)+' / 100'}),needsLabel);
   body.append(sheet,side);wrap.append(toolbar,tab,body,el(d,'footer',{className:'rn-status',text:message||'UTF-8 · Символический текст · Сохраняется автоматически',attributes:{role:'status'}}));
   const hadModal=Boolean(modal);modal=null;
   if(panel){
@@ -112,5 +114,5 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
   if(modal)pcFocusable(modal)[0]?.focus();
   else if(hadModal){const items=pcFocusable(toolbar);(items.find(n=>n.textContent===returnFocusLabel)??items[0])?.focus();}
  }
- render();return {update(){if(signature!==fingerprint()&&!panel)render();},openProject(p){if(normalizeLyric(p))choose(p.id);},focus(){if(modal)pcFocusable(modal)[0]?.focus();},dispose(){disposed=true;modal=null;root.replaceChildren();}};
+ render();return {update(){if(disposed)return;if(!panel&&!sameInputs(signature,fingerprint()))render();else updateNeeds();},openProject(p){if(normalizeLyric(p))choose(p.id);},focus(){if(modal)pcFocusable(modal)[0]?.focus();},dispose(){disposed=true;modal=null;root.replaceChildren();}};
 }

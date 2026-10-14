@@ -1,5 +1,6 @@
 import {createVirtualPcState} from './virtual-pc-state.js?rev=41';
 import {softwareDiskBytes} from './pc-software.js?rev=41';
+import {normalizeSoftware} from './pc-software.js?rev=41';
 import {SOFTWARE} from './pc-software-catalog.js?rev=41';
 import {advanceTransfers,TRANSFER_RATES} from './pc-transfer-runtime.js?rev=41';
 import {gameMinuteStamp} from './game-minute.js?rev=41';
@@ -46,7 +47,7 @@ export function advanceVirtualPcDurably(input,clock,persist,options={}){
  return next;
 }
 export function downloadPresentation(input,appId='ft'){
- const s=createVirtualPcState(input),id=SOFTWARE[appId]?appId:'ft',t=s.software.transfers[id],app=s.software[id],total=SOFTWARE[id].downloadBytes,received=app.receivedBytes;
+ const s={...input,software:normalizeSoftware(input?.software,input?.download)},id=SOFTWARE[appId]?appId:'ft',t=s.software.transfers[id],app=s.software[id],total=SOFTWARE[id].downloadBytes,received=app.receivedBytes;
  const running=Boolean(t&&!t.paused&&!t.error&&s.power==='on'),minute=s.lastGameMinute??0;
  const count=Object.values(s.software.transfers).filter(t=>!t.paused&&!t.error).length;
  const speed=running?TRANSFER_RATES[Math.floor(minute)%6]/count:0;
