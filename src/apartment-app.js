@@ -17,6 +17,7 @@ import {playIndoorFootstep} from './indoor-footsteps.js?rev=41';
 import {createFootstepCadence} from './footstep-cadence.js?rev=41';
 import {restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=41';
 import {advanceInstallation} from './pc-software.js?rev=41';
+import {advanceBrowserDownloads} from './pc-browser-downloads.js?rev=41';
 import {createBeatWorkPanel} from './beat-work-view.js?rev=41';
 import {normalizeGenreProgression,genreById,genreCap} from './genre-progression.js?rev=41';
 import {createBeatWorkAudio} from './beat-work-audio.js?rev=41';
@@ -66,7 +67,7 @@ try{
   const migration=migrateNoviceSave(storage);let migrationReady=migration.ok;
   function saveHomeTime(_storage,clock){return migrationReady&&saveHomeTimeRaw(storage,clock);}
   const saved=loadProfile(storage);let profile=saved.profile;
-  let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lastInstallationSave=0,lightPreview='game';
+  let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lastInstallationSave=0,lastBrowserDownloadSave=0,lightPreview='game';
   const pcRoot=$('#virtual-pc'),savedPc=loadVirtualPcState(storage);let pcState=preparePcRuntimeState(savedPc.state);
   let pcStorageWarning=migration.ok?(savedPc.ok?'':'Сохранение виртуального ПК недоступно.'):migration.error;
   let virtualPc,workReward=0,workFinished=false,lastWorkJob=null,lastWorkBeat=null,lastWorkCamera=null,resultEpisode=null,failedReactionId=null;
@@ -273,6 +274,14 @@ try{
   $('#step').addEventListener('click',()=>{paused=true;$('#pause').textContent='Продолжить';update(1/30,performance.now(),true);});$('#face').addEventListener('click',()=>motion.faceCamera());
   document.addEventListener('keydown',e=>{if(e.defaultPrevented||e.key!=='Escape')return;if(!$('#apartment-actions').hidden){$('#apartment-actions').hidden=true;canvas.focus();e.preventDefault();}else if(mode==='peephole')stopPeeking();else if(mode==='door')setMode('game');else if(mode==='pc')virtualPc.closeWindow();else if(mode==='game')setMode('menu');});
   function update(dt,now,step=false){
+    const browserPaused=!['game','pc'].includes(mode)||(paused&&!step)||document.hidden;
+    const browserDownload=advanceBrowserDownloads(pcState,{activeSeconds:dt,powered:pcState.power==='on',paused:browserPaused});
+    if(browserDownload.changed){
+      if(browserDownload.completed.length||now-lastBrowserDownloadSave>=500){persistPc(browserDownload.state,{atomic:true});lastBrowserDownloadSave=now;}
+      else pcState=browserDownload.state;
+      virtualPc.syncState(pcState);
+    }
+    virtualPc.tickBrowserDownloads(dt,{paused:browserPaused||mode!=='pc',advance:false});
     advanceOutgoingTransfer(dt);
     virtualPc.tickOutgoingMessage(0,{paused:paused||document.hidden||mode!=='pc'});
     if(mode!=='game'||cameraFade||document.hidden||(paused&&!step)||homeModalOpen())footsteps.reset();

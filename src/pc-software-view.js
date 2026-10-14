@@ -32,10 +32,8 @@ export function softwareForum(d,{topic,state,navigate,onAction,message=''}){
   for(const text of ['Система: '+PC_IDENTITY.name,'Загрузка: '+app.downloadBytes/1000000+' МБ','После установки: '+app.installedBytes/1000000+' МБ','Установка: '+app.installSeconds+' секунд','Язык: русский','Проверено: sysop / сентябрь 2012'])facts.append(el(d,'span',{text}));
   info.append(facts,el(d,'p',{text:id==='client'?'Скачай установщик, выбери папку на C: и заверши мастер.':'Скачай метаданные: файл .torrent откроет клиент. Там можно поставить загрузку на паузу и выбрать готовый установщик.'}));
   const download=button(d,id==='client'?'Скачать установщик torent':'Скачать '+app.torrent,{},()=>onAction(id==='client'?'download-client':'download-metadata',id));
-  download.disabled=id==='client'?item.installed||item.receivedBytes===app.downloadBytes||Boolean(state.software.transfers.client):state.software[app.metadataKey];
+  download.disabled=(state.browserDownloads?.items??[]).some(entry=>entry.appId===id&&entry.kind===(id==='client'?'installer':'metadata'))||(id==='client'?item.installed||item.receivedBytes===app.downloadBytes:state.software[app.metadataKey]);
   actions.append(download);
-  if(app.metadataKey&&state.software[app.metadataKey])actions.append(button(d,'Открыть '+app.torrent,{},()=>onAction('open-metadata',id)));
-  if(item.receivedBytes===app.downloadBytes&&!item.installed)actions.append(button(d,'Открыть установщик '+app.name,{},()=>onAction('installer',id)));
   if(item.installed)actions.append(el(d,'strong',{text:app.name+' установлена · '+item.path}));
   if(state.software.transfers[id]){
    if(id==='client'){const p=downloadPresentation(state,id);actions.append(el(d,'p',{dataset:{pcRole:'forum-transfer'},text:'Загрузка: '+p.receivedMb.toFixed(2)+' / '+p.totalMb+' МБ · '+p.speedKbPerSecond+' КБ/с'+(p.error?' · '+softwareMessage(p.error):'')}),button(d,'Отменить загрузку',{},()=>onAction('cancel',id)));}

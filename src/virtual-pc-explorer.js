@@ -72,6 +72,7 @@ export function explorerEntries(pcState,path) {
   for(const file of pcState.audioExports?.files??[])if(file.folderId===path)entries.push({id:'audio:'+file.id,kind:'audio',name:file.filename,iconId:'microphone',fileId:file.id,sizeMb:file.bytes/1000000,createdAtMinute:file.createdAtMinute,trackVersionId:file.trackVersionId});
   const s=pcState.software;
   if(path==='downloads'&&s){
+   for(const item of pcState.browserDownloads?.items??[])if(item.kind==='metadata'&&!s[SOFTWARE[item.appId].metadataKey])entries.push({id:item.appId+'-metadata',kind:'artifact',name:SOFTWARE[item.appId].torrent+'.part',iconId:'torent',sizeMb:Math.floor(12000*item.elapsedSeconds)/1000000});
    for(const [id,definition]of Object.entries(SOFTWARE)){const app=s[id],total=definition.downloadBytes;if(app?.receivedBytes>0)entries.push({id:'archive:'+id,kind:'artifact',name:definition.archive+(app.receivedBytes<total?'.part':''),iconId:definition.iconId,sizeMb:app.receivedBytes/1000000,...(app.receivedBytes===total?{action:'installer',appId:id}:{})});}
    for(const [id,definition]of Object.entries(SOFTWARE))if(definition.metadataKey&&s[definition.metadataKey])entries.push({id:id+'-metadata',kind:'artifact',name:definition.torrent,iconId:'torent',sizeMb:.012,action:'open-metadata',appId:id});
   }

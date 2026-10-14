@@ -137,6 +137,10 @@
 #virtual-pc .uw-browser .uw-bookmarks strong{color:#c7b4ec;font-size:10px}
 #virtual-pc .uw-browser .uw-bookmarks button{color:#c9c8d6!important;font-size:11px!important}
 #virtual-pc .uw-browser .uw-status{background:#191923;color:#9e9cae;border-color:#383744;font-size:10px;padding:3px 10px}
+#virtual-pc .uw-browser .uw-downloads{flex:none;max-height:150px;overflow:auto;background:#242331;border-bottom:1px solid #494359;padding:8px 12px;color:#e4deed;font:11px Tahoma,sans-serif}
+#virtual-pc .uw-browser .uw-downloads[hidden]{display:none}
+.uw-download-row{display:flex;align-items:center;gap:10px;margin-top:6px;min-height:25px}.uw-download-row>span{flex:1;overflow-wrap:anywhere}.uw-download-row progress{width:90px;height:9px;accent-color:#ad92d4}.uw-download-row small{max-width:35%;color:#bdb1c9}
+#virtual-pc .uw-browser .uw-download-row button{flex:none;border:1px solid #665674;border-radius:4px;padding:4px 8px;background:#3d344b;color:#f1e9f9;font-size:11px}
 .uw-page{color:#2e3435}.uw-page:has(.uw-home){background:radial-gradient(ellipse at 20% 0,#35304b,transparent 65%),#171722}
 #virtual-pc .uw-home{max-width:1160px;padding:14px 26px 0;color:#e7e5f2;text-align:left}
 #virtual-pc .uw-home .uw-site-top{color:#aaa6ba;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;text-align:center}

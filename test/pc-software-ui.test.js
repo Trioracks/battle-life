@@ -26,13 +26,44 @@ test('tracker opens available software immediately with categories and three own
  }
 });
 function click(root,name){const b=findButton(root,name);assert.ok(b,'Missing '+name);b.click();}
+test('browser Download keeps focus in Underweb until a file is manually opened',()=>{
+ const {pc,root}=setup();pc.navigateUnderweb('underweb://dump/ft-studio');click(root,'Скачать FT-Studio.torrent');
+ assert.equal(pc.window,'underweb');assert.equal(pc.state.software.metadata,false);assert.deepEqual(pc.state.software.transfers,{});
+ assert.ok(allPc(root).some(n=>n.getAttribute?.('aria-label')==='Загрузки Underweb'));pc.dispose();
+});
+
+test('installer launch waits one active second and closing the source cancels stale launch',()=>{
+ const d=pcDocument(),root=d.createElement('section'),pc=mountVirtualPc(root);
+ pc.showDesktop(createVirtualPcState({power:'on',software:{client:{receivedBytes:2000000}}}));pc.open('computer');pc.openFolder('downloads');
+ pc.softwareAction('installer','client');assert.equal(pc.state.software.installer,null);assert.equal(pc.window,'computer');
+ pc.tickBrowserDownloads(.5);assert.equal(pc.state.software.installer,null);pc.tickBrowserDownloads(1,{paused:true});assert.equal(pc.state.software.installer,null);
+ pc.closeWindow('computer');pc.tickBrowserDownloads(.5);assert.equal(pc.state.software.installer,null);
+ pc.open('computer');pc.softwareAction('installer','client');pc.tickBrowserDownloads(1);assert.equal(pc.window,'installer');assert.equal(pc.state.software.installer.step,'welcome');pc.dispose();
+});
+
+test('quota failure rolls back browser start and delayed wizard publication',()=>{
+ const d=pcDocument(),root=d.createElement('section'),pc=mountVirtualPc(root,{onPersist:()=>false});
+ pc.showDesktop(createVirtualPcState({power:'on'}));pc.open('underweb');pc.navigateUnderweb('underweb://dump/client');click(root,'Скачать установщик torent');
+ assert.equal(pc.state.browserDownloads.items.length,0);
+ pc.syncState(createVirtualPcState({power:'on',software:{client:{receivedBytes:2000000}}}));pc.softwareAction('installer','client');pc.tickBrowserDownloads(1);
+ assert.equal(pc.state.software.installer,null);assert.equal(pc.windows.windows.some(w=>w.id==='installer'),false);pc.dispose();
+});
+
+test('shutdown dialog and power changes invalidate a pending installer launch',()=>{
+ for(const action of ['dialog','power']){
+  const d=pcDocument(),root=d.createElement('section'),pc=mountVirtualPc(root);pc.showDesktop(createVirtualPcState({power:'on',software:{client:{receivedBytes:2000000}}}));pc.open('computer');pc.softwareAction('installer','client');pc.tickBrowserDownloads(.5);
+  if(action==='dialog'){pc.showShutdown();pc.tickBrowserDownloads(1);pc.cancelShutdown();}
+  else {pc.syncState({...pc.state,power:'off'});pc.syncState({...pc.state,power:'on'});pc.tickBrowserDownloads(1);}
+  assert.equal(pc.state.software.installer,null,action);assert.equal(pc.windows.windows.some(w=>w.id==='installer'),false);pc.dispose();
+ }
+});
 function wizard(root,pc){root=pc.shell.getContentRoot('installer');for(const name of ['Далее >','Далее >','Установить'])click(root,name);pc.syncState(software.advanceInstallation(pc.state,pc.state.software.installer.appId==='client'?10:30).state);click(root,'Готово');}
 test('opening the installer cancels a pending FT launch and preserves its keyboard scope',()=>{
  const d=pcDocument(),root=d.createElement('section'),timers=new Map();let timerId=0;
  const pc=mountVirtualPc(root,{setTimeoutFn:fn=>{timers.set(++timerId,fn);return timerId;},clearTimeoutFn:id=>timers.delete(id)});
  pc.showDesktop(createVirtualPcState({power:'on',download:{status:'installed'},software:{client:{receivedBytes:2000000},ft:{installed:true}}}));
  pc.open('ft-studio');const pending=timers.get(timerId);assert.equal(root.getAttribute('aria-busy'),'true');
- pc.softwareAction('installer','client');pending();
+ pc.softwareAction('installer','client');pc.tickBrowserDownloads(1);pending();
  assert.equal(pc.window,'installer');assert.equal(root.getAttribute('aria-busy'),'false');
  assert.equal(pc.windows.windows.some(w=>w.id==='ft-studio'),false);
  assert.equal(pc.focusScope().dataset.windowId,'installer');assert.ok(pc.focusScope().contains(d.activeElement));
@@ -40,7 +71,7 @@ test('opening the installer cancels a pending FT launch and preserves its keyboa
  pc.open('ft-studio');timers.get(timerId)();assert.equal(pc.window,'ft-studio');pc.dispose();
 });
 test('wizard step changes move focus into the next step and clock updates preserve its controls',()=>{
- const {pc,root,d}=setup();pc.syncState(createVirtualPcState({power:'on',software:{client:{receivedBytes:2000000}}}));pc.softwareAction('installer','client');
+ const {pc,root,d}=setup();pc.syncState(createVirtualPcState({power:'on',software:{client:{receivedBytes:2000000}}}));pc.softwareAction('installer','client');pc.tickBrowserDownloads(1);
  const next=findButton(root,'Далее >');next.focus();next.click();
  const input=allPc(root).find(n=>n.getAttribute?.('aria-label')==='Папка установки');assert.ok(d.activeElement===input,'Next focuses the destination input');
  input.value='C:\\Keyboard\\torent';input.selectionStart=3;input.selectionEnd=11;
@@ -62,23 +93,32 @@ test('an inactive installer rebuild does not move focus into its inert window',(
 });
 test('forum client download leads through wizard into an empty torrent client and FT metadata adds one task',()=>{
  const {pc,root}=setup();click(root,'torent — торрент-клиент');click(root,'Скачать установщик torent');
- pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:0}).state);pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:2}).state);
- click(root,'Открыть установщик torent');wizard(root,pc);pc.open('torent');assert.ok(allPc(root).some(n=>n.textContent==='Нет задач. Открой файл .torrent из Загрузок.'));
+ pc.tickBrowserDownloads(1);
+ click(root,'Открыть файл torent-setup.exe');pc.tickBrowserDownloads(1);wizard(root,pc);pc.open('torent');assert.ok(allPc(root).some(n=>n.textContent==='Нет задач. Открой файл .torrent из Загрузок.'));
  pc.open('underweb');pc.navigateUnderweb('underweb://dump/ft-studio');click(root,'Скачать FT-Studio.torrent');
+ pc.tickBrowserDownloads(1);click(root,'Открыть файл FT-Studio.torrent');
  assert.equal(pc.window,'torent');assert.equal(pc.state.software.transfers.ft.appId,'ft');assert.equal(pc.windows.windows.filter(w=>w.id==='torent').length,1);
- pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:600}).state);click(pc.shell.getContentRoot('torent'),'Установить');wizard(root,pc);assert.equal(pc.state.download.status,'installed');
+ pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:0}).state);pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:600}).state);click(pc.shell.getContentRoot('torent'),'Установить');pc.tickBrowserDownloads(1);wizard(root,pc);assert.equal(pc.state.download.status,'installed');
  assert.ok(findButton(root,'FT Studio'));pc.open('computer');pc.openFolder('C:\\Program Files\\Field Tone\\FT Studio');assert.ok(allPc(root).some(n=>n.textContent==='Plugins'));
 });
 test('wizard typing survives clock sync, back and Escape cancellation retain the downloaded installer',()=>{
- const {pc,root,d}=setup();pc.syncState(createVirtualPcState({power:'on',software:{client:{receivedBytes:2000000}}}));pc.navigateUnderweb('underweb://dump/client');click(root,'Открыть установщик torent');click(root,'Далее >');
+ const {pc,root,d}=setup();pc.syncState(createVirtualPcState({power:'on',software:{client:{receivedBytes:2000000}}}));pc.open('computer');pc.openFolder('downloads');fire(findButton(pc.shell.getContentRoot('computer'),'Открыть torent-setup.exe'),'keydown',{key:'Enter'});pc.tickBrowserDownloads(1);click(root,'Далее >');
  const input=allPc(root).find(n=>n.getAttribute?.('aria-label')==='Папка установки');input.value='C:\\My Tools\\torent';input.focus();pc.syncState({...pc.state,lastGameMinute:5});assert.equal(d.activeElement,input);assert.equal(input.value,'C:\\My Tools\\torent');
  click(root,'Далее >');click(root,'< Назад');assert.equal(allPc(root).find(n=>n.getAttribute?.('aria-label')==='Папка установки').value,'C:\\My Tools\\torent');
  fire(root,'keydown',{key:'Escape'});assert.equal(pc.state.software.installer,null);assert.equal(pc.state.software.client.receivedBytes,2000000);
 });
-test('live forum transfer keeps its cancel control and keyboard focus across byte updates',()=>{
+test('browser progress keeps its file control and address input across byte updates',()=>{
  const {pc,root,d}=setup();pc.navigateUnderweb('underweb://dump/client');click(root,'Скачать установщик torent');
- const cancel=findButton(root,'Отменить загрузку');cancel.focus();pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:0}).state);pc.syncState(advanceVirtualPc(pc.state,{day:1,minutes:.25}).state);
- assert.equal(findButton(root,'Отменить загрузку'),cancel);assert.equal(d.activeElement,cancel);assert.ok(allPc(root).some(n=>n.textContent?.startsWith('Загрузка: 0.36')));
+ const open=findButton(root,'Открыть файл torent-setup.exe'),address=allPc(root).find(n=>n.getAttribute?.('aria-label')==='Адрес или поиск Underweb');address.value='Незавершённый адрес';address.focus();address.selectionStart=3;address.selectionEnd=8;pc.tickBrowserDownloads(.5);
+ assert.equal(findButton(root,'Открыть файл torent-setup.exe'),open);assert.equal(d.activeElement,address);assert.equal(address.value,'Незавершённый адрес');assert.equal(address.selectionStart,3);assert.equal(address.selectionEnd,8);assert.ok(allPc(root).some(n=>n.textContent==='50%'));pc.dispose();
+});
+
+test('Explorer keeps a selected partial browser file and typed address during progress',()=>{
+ const {pc,root,d}=setup();pc.navigateUnderweb('underweb://dump/client');click(root,'Скачать установщик torent');pc.tickBrowserDownloads(.25);
+ pc.open('computer');pc.openFolder('downloads');const explorer=pc.shell.getContentRoot('computer'),file=findButton(explorer,'Открыть torent-setup.exe.part');file.click();file.focus();pc.tickBrowserDownloads(.25);
+ assert.equal(findButton(explorer,'Открыть torent-setup.exe.part'),file);assert.equal(file.getAttribute('aria-pressed'),'true');assert.equal(d.activeElement,file);
+ const address=allPc(explorer).find(n=>n.getAttribute?.('aria-label')==='Адрес папки');address.value='C:\\Незавершённый';address.focus();pc.tickBrowserDownloads(.5);
+ assert.equal(address.value,'C:\\Незавершённый');assert.equal(d.activeElement,address);assert.equal(findButton(explorer,'Открыть torent-setup.exe').getAttribute('aria-pressed'),'true');pc.dispose();
 });
 test('restored unfinished wizard keeps its path while other apps remain available',()=>{
  const {pc,root}=setup();pc.syncState(createVirtualPcState({power:'on',software:{client:{receivedBytes:2000000},installer:{appId:'client',step:'destination',path:'C:\\Custom\\torent'}}}));
@@ -87,7 +127,7 @@ test('restored unfinished wizard keeps its path while other apps remain availabl
 });
 
 for(const [id,duration,archive,installedMb]of [['client',10,2000000,8],['notebook',10,4000000,12],['ft',30,800000000,800]])test(`${id} installs while minimized without interrupting the browser`,()=>{
- const {pc,root,d}=setup();pc.syncState(createVirtualPcState({power:'on',software:{[id]:{receivedBytes:archive}}}));pc.softwareAction('installer',id);
+ const {pc,root,d}=setup();pc.syncState(createVirtualPcState({power:'on',software:{[id]:{receivedBytes:archive}}}));pc.softwareAction('installer',id);pc.tickBrowserDownloads(1);
  for(const name of ['Далее >','Далее >','Установить'])click(root,name);
  const installer=pc.shell.getContentRoot('installer'),used=diskUsage(pc.state).usedMb;
  assert.equal(findButton(installer.parentElement,'Свернуть окно').disabled,false);
@@ -138,12 +178,13 @@ test('forum has muted graphics, games and system categories without download con
  const {root}=setup();for(const category of ['Графика','Игры','Системы']){assert.ok(allPc(root).some(n=>n.textContent===category));assert.equal(findButton(root,category),undefined);}
 });
 test('opening FT metadata without the client explains the prerequisite in the forum',()=>{
- const {pc,root}=setup();pc.navigateUnderweb('underweb://dump/ft-studio');click(root,'Скачать FT-Studio.torrent');click(root,'Открыть FT-Studio.torrent');
+ const {pc,root}=setup();pc.navigateUnderweb('underweb://dump/ft-studio');click(root,'Скачать FT-Studio.torrent');pc.tickBrowserDownloads(1);click(root,'Открыть файл FT-Studio.torrent');
  assert.ok(allPc(root).some(n=>n.textContent==='Сначала скачай и установи torent из темы клиента.'));assert.equal(pc.window,'underweb');assert.deepEqual(pc.state.software.transfers,{});
 });
 
 test('opening Downloads metadata without the client announces the prerequisite inside Explorer',()=>{
  const {pc,root}=setup();pc.navigateUnderweb('underweb://dump/ft-studio');click(root,'Скачать FT-Studio.torrent');
+ pc.tickBrowserDownloads(1);
  pc.open('computer');pc.openFolder('downloads');const explorer=pc.shell.getContentRoot('computer');
  fire(findButton(explorer,'Открыть FT-Studio.torrent'),'keydown',{key:'Enter'});
  assert.equal(pc.window,'computer');assert.deepEqual(pc.state.software.transfers,{});

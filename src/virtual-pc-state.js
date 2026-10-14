@@ -29,6 +29,7 @@ import {normalizeCommunity} from './underweb-community.js?rev=41';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=41';
 import {normalizeHousehold} from './home-food.js?rev=41';
 import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=41';
+import {normalizeBrowserDownloads} from './pc-browser-downloads.js?rev=41';
 export const VIRTUAL_PC_STORAGE_KEY = 'battle-life-virtual-pc-v1';
 export const VIRTUAL_DISK_MB = 16000;
 export const SYSTEM_RESERVED_MB = 14000;
@@ -146,6 +147,7 @@ function normalizeSnapshot(value,archiveCache=null) {
     communityAudio:normalizeCommunityAudio(source.communityAudio),
     phone:normalizePhone(source.phone),
     phonePresentation:normalizePhonePresentation(source.phonePresentation),
+    browserDownloads:normalizeBrowserDownloads(source.browserDownloads),
     battleKnowledge:normalizeBattleKnowledge(source.battleKnowledge),
     judging:archive('judging',normalizeJudging),
     judgingSchedule:normalizeJudgingSchedule(source.judgingSchedule),

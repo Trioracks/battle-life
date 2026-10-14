@@ -24,6 +24,7 @@ import {normalizeBeat} from './beat-production.js?rev=41';
 import {createBeatMarket} from './beat-market-view.js?rev=41';
 import * as software from './pc-software.js?rev=41';
 import {mountTorrent,mountInstaller,softwareMessage} from './pc-software-view.js?rev=41';
+import {startBrowserDownload,advanceBrowserDownloads} from './pc-browser-downloads.js?rev=41';
 import {SOFTWARE} from './pc-software-catalog.js?rev=41';
 import {mountRapNotebook} from './rap-notebook-view.js?rev=41';
 import {mountRapDossier} from './rap-dossier-view.js?rev=41';
@@ -215,8 +216,36 @@ export function mountVirtualPc(root, callbacks = {}) {
     node.append(remove,button(document,'Отмена',{},pc.closeUninstall));pc.uninstallModal={node,id};pc.shell.setModal(node);pc.shell.focusActive();
   };
   pc.refreshTorent = () => pc.torrentView?.update();
+  let installerLaunch=null,installerFeedback=null;
+  pc.cancelInstallerLaunch=()=>{installerLaunch=null;installerFeedback?.remove();installerFeedback=null;root.setAttribute('data-installer-launching','false');};
+  pc.tickBrowserDownloads=(dt,{paused=false,powered=pc.state.power==='on',advance=true}={})=>{
+    if(paused||!powered||pc.state.power!=='on'||!Number.isFinite(dt)||dt<=0)return;
+    if(advance){const download=advanceBrowserDownloads(pc.state,{activeSeconds:dt,powered,paused});if(download.changed){pc.persist(download.state,{atomic:true});pc.renderDesktop(false);}}
+    if(!installerLaunch)return;
+    installerLaunch.elapsedSeconds+=dt;if(installerLaunch.elapsedSeconds<1)return;
+    const {appId}=installerLaunch;pc.cancelInstallerLaunch();
+    if(pc.phase!=='desktop'||pc.locked)return;
+    const result=software.openInstaller(pc.state,appId);pc.message=softwareMessage(result.reason);
+    if(result.ok&&pc.persist(result.state,{atomic:true})){
+      pc.windows=reduceWindows(pc.windows,{type:'open',id:'installer',appId:'installer',title:'Мастер установки — '+SOFTWARE[appId].name});pc.renderDesktop(false);pc.shell.focusActive();
+    }else pc.renderDesktop(false);
+  };
   pc.softwareAction = (action,id) => {
     let result;
+    if(['download-client','download-metadata','download-notebook'].includes(action)){
+      const appId=action==='download-client'?'client':action==='download-notebook'?'notebook':id??'ft';
+      result=startBrowserDownload(pc.state,{appId,kind:action==='download-client'?'installer':'metadata'});
+      pc.message=softwareMessage(result.reason);if(result.ok)pc.persist(result.state,{atomic:true});pc.renderDesktop(false);return;
+    }
+    if(action==='installer'){
+      result=software.openInstaller(pc.state,id);pc.message=softwareMessage(result.reason);
+      if(result.ok){
+        pc.cancelStudioLaunch();pc.cancelInstallerLaunch();
+        installerLaunch={appId:id,sourceId:pc.window,elapsedSeconds:0};root.setAttribute('data-installer-launching','true');
+        installerFeedback=el(document,'div',{className:'pc-launch-feedback',text:'Запуск установщика '+SOFTWARE[id].name+'…',attributes:{role:'status'}});root.append(installerFeedback);
+      }
+      pc.renderDesktop(false);return;
+    }
     if(action==='uninstall'){pc.showUninstall(id);return;}
     if(action==='confirm-uninstall'){
       const target=SOFTWARE[id]?.desktopAppId;
@@ -231,12 +260,10 @@ export function mountVirtualPc(root, callbacks = {}) {
       else result=software.advanceInstaller(pc.state);
     }else if(action==='back')result=software.advanceInstaller(pc.state,{back:true});
     else if(action==='open-after-install')result=software.setInstallerOpenAfter(pc.state,id);
-    else {const actions={'download-notebook':software.downloadNotebook,'download-client':software.downloadClient,'download-metadata':software.downloadMetadata,'open-metadata':software.openMetadata,installer:software.openInstaller,pause:software.pauseTransfer,resume:software.resumeTransfer,cancel:software.cancelTransfer,'cancel-installer':software.cancelInstaller};result=actions[action]?.(pc.state,id);}
+    else {const actions={'open-metadata':software.openMetadata,pause:software.pauseTransfer,resume:software.resumeTransfer,cancel:software.cancelTransfer,'cancel-installer':software.cancelInstaller};result=actions[action]?.(pc.state,id);}
     if(!result)return;
-    const metadataAction=['download-notebook','download-metadata','open-metadata'].includes(action),metadataId=action==='download-notebook'?'notebook':id??'ft';
-    if(metadataAction&&action!=='open-metadata'&&result.ok)result=software.openMetadata(result.state,metadataId);
-    pc.message=softwareMessage(result.reason);pc.persist(result.state);
-    if(action==='installer'&&result.ok){pc.cancelStudioLaunch();pc.windows=reduceWindows(pc.windows,{type:'open',id:'installer',appId:'installer',title:'Мастер установки — '+SOFTWARE[id].name});pc.renderDesktop(false);pc.shell.focusActive();return;}
+    const metadataAction=action==='open-metadata',metadataId=id??'ft';
+    pc.message=softwareMessage(result.reason);if(!pc.persist(result.state,{atomic:true})){pc.renderDesktop(false);return;}
     if(!pc.state.software.installer&&pc.windows.windows.some(w=>w.id==='installer'))pc.closeNow('installer');
     pc.renderDesktop(false);
     if(result.openAppId){pc.cancelStudioLaunch();pc.openNow(result.openAppId);}
@@ -252,6 +279,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.syncState = state => {
     // Runtime snapshots already crossed the load/command validation boundary.
     if (state === pc.state) return;
+    if(state.power!=='on')pc.cancelInstallerLaunch();
     pc.state = state;
     if (pc.phase === 'desktop') pc.refreshDynamicState();
   };
@@ -401,11 +429,12 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.open('underweb');pc.navigateUnderweb('underweb://social/dialog/'+battleId);
   };
   pc.showShutdown = () => {
-    if(pc.confirmClose||pc.shutdownModal)return;pc.cancelStudioLaunch();pc.menu.close();pc.returnFocus=document.activeElement;
+    if(pc.confirmClose||pc.shutdownModal)return;pc.cancelStudioLaunch();pc.cancelInstallerLaunch();pc.menu.close();pc.returnFocus=document.activeElement;
     const node=el(document,'div');const view=mountSystemWindow(node,{kind:'shutdown',getState:()=>pc.state,onClose:()=>pc.cancelShutdown(),onConfirmShutdown:()=>{pc.cancelShutdown();pc.requestShutdown();}});
     pc.shutdownModal={node,view};pc.shell.setModal(node,pc.returnFocus);
   };
   pc.clearViews = () => {
+    pc.cancelInstallerLaunch();
     appInputs.clear();
     pc.dossierView?.dispose();pc.dossierView=null;
     pc.submissionModal?.view.dispose();pc.submissionModal=null;
@@ -506,6 +535,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
   pc.cancelStudioLaunch=()=>{pc.launchGeneration++;if(pc.studioLaunch!==null)pc.clearTimeoutFn(pc.studioLaunch);pc.studioLaunch=null;pc.pendingStudioProject=null;pc.setStudioBusy(false);};
   pc.closeNow = id => {
+    if(installerLaunch?.sourceId===id||id==='installer')pc.cancelInstallerLaunch();
     appInputs.delete(id);
     if(id==='rap-dossier'){pc.dossierView?.dispose();pc.dossierView=null;}
     if(id==='rap-notebook'){pc.notebookView?.dispose();pc.notebookView=null;}
@@ -529,6 +559,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.requestLeave = () => {
     if (pc.locked||pc.confirmClose||pc.shutdownModal) return;
     pc.cancelStudioLaunch();
+    pc.cancelInstallerLaunch();
     pc.menu?.close();
     pc.persist(pauseCreativeChain(pc.state));
     pc.audio.stop();pc.audioSession.stopOwner('creative-work');pc.callbacks.onLeave();
@@ -538,6 +569,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (pc.locked||pc.confirmClose) return;
     pc.persist(pauseCreativeChain(pc.state));
     pc.cancelStudioLaunch();
+    pc.cancelInstallerLaunch();
     pc.audio.stop();pc.audioSession.stopAll();pc.callbacks.onShutdown();
   };
 

@@ -65,7 +65,7 @@ test('wizard shows app artwork and a keyboard reachable open checkbox',()=>{
 });
 test('explorer selection installs, deletion confirms and closes only chosen app',()=>{
  const d=pcDocument(),root=d.createElement('div'),pc=mountVirtualPc(root);pc.showDesktop(ready('notebook'));pc.open('computer');pc.openFolder('downloads');
- findButton(root,'Открыть Rap-Notebook-setup.exe').click();findButton(root,'Установить').click();assert.equal(pc.window,'installer');
+ findButton(root,'Открыть Rap-Notebook-setup.exe').click();findButton(root,'Установить').click();assert.equal(pc.window,'computer');pc.tickBrowserDownloads(1);assert.equal(pc.window,'installer');
  for(let i=0;i<3;i++)pc.softwareAction('next');pc.syncState(software.advanceInstallation(pc.state,10).state);pc.softwareAction('next');
  assert.equal(pc.window,'rap-notebook');pc.open('underweb');pc.softwareAction('uninstall','notebook');
  assert.equal(pc.state.software.notebook.installed,true);findButton(root,'Удалить программу').click();

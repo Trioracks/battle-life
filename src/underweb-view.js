@@ -3,6 +3,7 @@ import {resolveUnderweb,BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=41';
 import {createBeatMarket} from './beat-market-view.js?rev=41';
 import {softwareForum,softwareMessage} from './pc-software-view.js?rev=41';
 import {downloadPresentation} from './virtual-pc-runtime.js?rev=41';
+import {mountBrowserDownloads} from './pc-browser-downloads-view.js?rev=41';
 import {createCommunityView} from './underweb-community-view.js?rev=41';
 import {communityDay} from './underweb-community.js?rev=41';
 import {homeDateLabel} from './home-calendar.js?rev=41';
@@ -21,12 +22,13 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  let socialView=null,closeRegistration=null,lastWindows='';
  const windowSignature=()=>JSON.stringify((getState().battleWindows??[]).map(w=>[w.id,battleDeadlineLabel(w,metadataGameMinute(getMetadata()))]));
  const d=root.ownerDocument,history=['underweb://iskra'];let index=0,route=resolveUnderweb(history[0],getMetadata()),applicationOpen=false,lastApplications='',applicationFocus=null,lastSoftware='',lastDay=0,lastReactions='';
- const softwareSignature=()=>{const s=getState().software;return JSON.stringify([s?.client?.installed,s?.client?.receivedBytes===2000000,s?.ft?.installed,s?.ft?.receivedBytes===800000000,s?.notebook?.installed,s?.notebook?.receivedBytes===4000000,s?.metadata,s?.notebookMetadata,s?.transfers,getSoftwareMessage()]);};
+ const softwareSignature=()=>{const s=getState().software;return JSON.stringify([s?.client?.installed,s?.client?.receivedBytes===2000000,s?.ft?.installed,s?.ft?.receivedBytes===800000000,s?.notebook?.installed,s?.notebook?.receivedBytes===4000000,s?.dossier?.installed,s?.dossierMetadata,s?.metadata,s?.notebookMetadata,s?.transfers,(getState().browserDownloads?.items??[]).map(item=>item.id),getSoftwareMessage()]);};
  const browser=el(d,'section',{className:'uw-browser',attributes:{'aria-label':'Браузер Underweb'}}),toolbar=el(d,'form',{className:'uw-toolbar',attributes:{'aria-label':'Адрес Underweb'}});
  const back=button(d,'←',{attributes:{'aria-label':'Назад в Underweb'}},()=>travel(-1)),forward=button(d,'→',{attributes:{'aria-label':'Вперёд в Underweb'}},()=>travel(1));
  const home=button(d,'⌂',{attributes:{'aria-label':'Главная Underweb'}},()=>navigate('underweb://iskra'));
  const address=el(d,'input',{value:history[0],attributes:{'aria-label':'Адрес или поиск Underweb',autocomplete:'off',spellcheck:'false'}});
- toolbar.append(back,forward,home,el(d,'span',{className:'uw-address-label',text:'Адрес'}),address,button(d,'Перейти',{},()=>navigate(address.value)));
+ const downloadsRoot=el(d,'section'),downloadsView=mountBrowserDownloads(downloadsRoot,{getState,onAction:onSoftware,getMessage:getSoftwareMessage});
+ toolbar.append(back,forward,home,el(d,'span',{className:'uw-address-label',text:'Адрес'}),address,button(d,'Перейти',{},()=>navigate(address.value)),button(d,'Загрузки',{},()=>downloadsView.toggle()));
  toolbar.addEventListener('submit',e=>{e.preventDefault();navigate(address.value);});
  const bookmarks=el(d,'nav',{className:'uw-bookmarks',attributes:{'aria-label':'Избранное Underweb'}});
  bookmarks.append(el(d,'strong',{text:'UNDERWEB'}),button(d,'Искра',{},()=>navigate('underweb://iskra')),button(d,SOCIAL_IDENTITY.name,{},()=>navigate('underweb://social/me')),button(d,'Баттлы',{},()=>navigate('underweb://battles')),button(d,'FT Studio',{},()=>navigate('underweb://software/ft-studio')));
@@ -34,7 +36,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  bookmarks.append(button(d,'Файловая помойка',{},()=>navigate('underweb://dump')));
  bookmarks.append(button(d,'Форум',{},()=>navigate('underweb://forum')));
  const page=el(d,'div',{className:'uw-page'}),status=el(d,'footer',{className:'uw-status',text:'Готово · Локальная сеть'});
- browser.append(toolbar,bookmarks,page,status);root.replaceChildren(browser);
+ browser.append(toolbar,bookmarks,downloadsRoot,page,status);root.replaceChildren(browser);
  function searchForm(query=''){
   const form=el(d,'form',{className:'uw-search-form'}),input=el(d,'input',{value:query,attributes:{'aria-label':'Поиск Искры',placeholder:'Баттлы, музыка, программы…',maxlength:'160',autocomplete:'off'}});
   form.append(input,button(d,'Найти',{},()=>navigate(input.value)));
@@ -156,12 +158,13 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  function navigate(input){closeRegistration?.();closeRegistration=null;const next=resolveUnderweb(input,getMetadata());activateRoute(next);route=next;history.splice(index+1);history.push(route.url);index=history.length-1;applicationOpen=false;render();}
  function travel(delta){const next=index+delta;if(next<0||next>=history.length)return;closeRegistration?.();closeRegistration=null;index=next;const resolved=resolveUnderweb(history[index],getMetadata());activateRoute(resolved);route=resolved;applicationOpen=false;render();}
  render();return {navigate,tickOutgoingMessage:(dt,options)=>socialView?.tickOutgoingMessage(dt,options),get snapshot(){return {route,index,history:[...history]};},update(){
+  downloadsView.update();
   if(route.type==='social'){socialView?.update();return;}
   if(lastDay!==JSON.stringify([getMetadata().gameDay])){route=resolveUnderweb(history[index],getMetadata());render({resetScroll:false,preserveInputs:true});}
   else if(route.type==='forum'&&lastReactions!==reactionVisibilitySignature(getState(),metadataGameMinute(getMetadata())))render({resetScroll:false,preserveInputs:true});
   else if(lastApplications!==JSON.stringify([getState().battleApplications,getState().battleSubmissions])&&['home','battle','battles'].includes(route.type)||route.type==='battle'&&lastWindows!==windowSignature()||route.type==='dump'&&lastSoftware!==softwareSignature())render({resetScroll:false,preserveInputs:true});
   else if(route.type==='dump'){const node=pcFind(page,n=>n.dataset?.pcRole==='forum-transfer');if(node){const p=downloadPresentation(getState(),'client');node.textContent=`Загрузка: ${p.receivedMb.toFixed(2)} / ${p.totalMb} МБ · ${p.speedKbPerSecond} КБ/с${p.error?' · '+softwareMessage(p.error):''}`;}}
- },dispose(){closeRegistration?.();socialView?.dispose();root.replaceChildren();}};
+ },dispose(){closeRegistration?.();socialView?.dispose();downloadsView.dispose();root.replaceChildren();}};
 }
 import {currentRoundTopic} from './round-topics.js?rev=41';
 import {reactionVisibilitySignature} from './social-reactions-view.js?rev=41';
