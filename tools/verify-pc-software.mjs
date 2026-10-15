@@ -21,7 +21,7 @@ async function fixture(seed){
  await page.route('**/src/apartment-app.js*',r=>r.fulfill({contentType:'text/javascript',body:source}));
  await page.route('**/__software-fixture',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><body>Isolated software fixture</body>'}));
  if(seed){await page.goto(base+'/__software-fixture');await page.evaluate(async seed=>{
-  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=42'),import('/src/virtual-pc-state.js?rev=42')]);
+  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=43'),import('/src/virtual-pc-state.js?rev=43')]);
   localStorage.setItem('battle-life-apartment-v3',JSON.stringify(createProfile({name:'Software QA'})));
   const pc=createVirtualPcState(seed);if(seed.legacy)delete pc.software;
   localStorage.setItem('battle-life-virtual-pc-v1',JSON.stringify(pc));localStorage.setItem('battle-life-apartment-v3-time',JSON.stringify({day:1,minutes:720,initialRest:false}));

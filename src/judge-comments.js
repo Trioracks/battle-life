@@ -1,9 +1,9 @@
 import data from '../data/judges/comments.json' with {type:'json'};
 import expansion from '../data/judges/comment-expansion.json' with {type:'json'};
 import individual from '../data/judges/individual-comments.json' with {type:'json'};
-import {REFERENCE_CATALOG} from './cultural-references.js?rev=42';
-import {evaluateTrack,perceiveTrack} from './judge-evaluation.js?rev=42';
-import {conditionPasses,commentEvidence,selectedReference} from './judge-comment-conditions.js?rev=42';
+import {REFERENCE_CATALOG} from './cultural-references.js?rev=43';
+import {evaluateTrack,perceiveTrack} from './judge-evaluation.js?rev=43';
+import {conditionPasses,commentEvidence,selectedReference} from './judge-comment-conditions.js?rev=43';
 const clone=v=>JSON.parse(JSON.stringify(v));
 const commonById=new Map(data.common.map(t=>[t.id,t]));
 const legacyOnly=bank=>data.common.filter(t=>t.family==='reaction.overall'&&!bank.templateIds.includes(t.id)).map(t=>({...t,id:bank.judgeId+':'+t.id,judgeId:bank.judgeId,conditions:[...t.conditions,{kind:'limitedFacts'}]}));

@@ -8,7 +8,7 @@ export async function verifyFinalWorkflows({browser,base,out,label,source,errors
  try{
   await page.route('**/__final-workflows',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><title>Isolated final campaign acceptance</title>'}));await page.goto(base+'/__final-workflows');
   const result=await page.evaluate(async({workerTimeoutMs})=>{
-   const mod=async name=>import('/src/'+name+'.js?rev=42');
+   const mod=async name=>import('/src/'+name+'.js?rev=43');
    const [fixture,saves,vocal,exports,upload,composer,submission,social,bg,downloads,profiles]=await Promise.all([import('/test/helpers/long-campaign-fixture.js'),mod('virtual-pc-state'),mod('vocal-production'),mod('pc-audio-exports'),mod('social-upload'),mod('social-composer'),mod('social-submission'),mod('social-runtime'),mod('social-background'),mod('pc-browser-downloads'),mod('avatar-v3-profile')]);
    const {canonicalTrackSignature}=await mod('track-version');
    const check=(ok,why)=>{if(!ok)throw Error(why);},same=(a,b,why)=>{if(canonicalTrackSignature(a)!==canonicalTrackSignature(b)){window.finalMismatch={why,actual:a,expected:b};throw Error(why);}},take=r=>{check(r.ok,r.reason);return r.state;};
@@ -25,7 +25,7 @@ export async function verifyFinalWorkflows({browser,base,out,label,source,errors
    for(const kind of ['track','beat','vocal'])state=take(exports.createAudioExport(state,{id:'campaign-'+kind,projectId:'campaign-beat-20',kind,folderId:'exports',filename:'campaign-'+kind,nowMinute}));
    state=take(upload.startSubmissionUpload(state,{communityId:'makarevich-1',fileId:'campaign-track',nowMinute}));
    const {createHeldWorkerReply}=await import('/tools/qa/held-worker-reply.js');
-   const reply=createHeldWorkerReply(()=>new Worker('/src/social-worker.js?rev=42',{type:'module'}),{timeoutMs:workerTimeoutMs});let background,concurrent,version;
+   const reply=createHeldWorkerReply(()=>new Worker('/src/social-worker.js?rev=43',{type:'module'}),{timeoutMs:workerTimeoutMs});let background,concurrent,version;
    try{
     background=bg.createSocialBackground({getState:()=>state,createWorker:()=>reply.worker,persist:next=>saves.saveVirtualPcState(localStorage,next),onState:next=>state=next});
     background.tick(nowMinute,{},0);
@@ -68,7 +68,7 @@ export async function verifyFinalWorkflows({browser,base,out,label,source,errors
   await page.evaluate(()=>{campaignQA.pc.openNow('underweb');campaignQA.pc.navigateUnderweb('underweb://social/results/makarevich-1/selection');});
   await page.getByRole('button',{name:'← Группа',exact:true}).waitFor();await page.screenshot({path:`${out}/${label}-campaign-results.png`});
   await page.reload();await page.waitForFunction(()=>window.campaignQA);await page.locator('#continue-game').click();await page.waitForFunction(()=>campaignQA.phase==='room');
-  await page.evaluate(async()=>{const {canonicalTrackSignature}=await import('/src/track-version.js?rev=42'),expected=JSON.parse(sessionStorage.getItem('__final-campaign-expected'));for(const [key,value]of Object.entries(expected)){const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(canonicalTrackSignature(campaignQA.state[key])))),n=>n.toString(16).padStart(2,'0')).join('');if(hash!==value)throw Error('Actual browser reload changed '+key);}});
+  await page.evaluate(async()=>{const {canonicalTrackSignature}=await import('/src/track-version.js?rev=43'),expected=JSON.parse(sessionStorage.getItem('__final-campaign-expected'));for(const [key,value]of Object.entries(expected)){const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(canonicalTrackSignature(campaignQA.state[key])))),n=>n.toString(16).padStart(2,'0')).join('');if(hash!==value)throw Error('Actual browser reload changed '+key);}});
   const restored=await page.evaluate(()=>({files:campaignQA.state.audioExports.files.length,submissionId:campaignQA.state.battleSubmissions[0].id,status:campaignQA.state.tournaments.byId['makarevich-1'].status}));assert.equal(restored.files,result.exports);assert.equal(restored.submissionId,result.submissionId);assert.equal(restored.status,'complete');
   result.actualPageReload=true;await writeFile(`${out}/${label}-integration.json`,JSON.stringify(result,null,2));console.log(JSON.stringify({integration:result}));return result;
  }catch(error){await page.screenshot({path:`${out}/${label}-integration-failure.png`}).catch(()=>{});await writeFile(`${out}/${label}-integration-failure.json`,JSON.stringify({error:error.stack,body:await page.locator('body').innerText(),mismatch:await page.evaluate(()=>window.finalMismatch??null)},null,2));throw error;}finally{await context.close();}

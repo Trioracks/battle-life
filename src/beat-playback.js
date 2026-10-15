@@ -1,10 +1,10 @@
-import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=42';
-import {beginnerById} from './beat-beginner-bank.js?rev=42';
-import {normalizeBeatMix} from './beat-mix.js?rev=42';
-import {normalizeRecording,vocalPlaybackProfile} from './vocal-result.js?rev=42';
-import {createBeatSongForm,songPartWindows,normalizeSongForm} from './beat-song-form.js?rev=42';
-import {normalizeGenreSnapshot} from './genre-progression.js?rev=42';
-import {SOURCE_GAINS_DB} from './source-levels.js?rev=42';
+import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=43';
+import {beginnerById} from './beat-beginner-bank.js?rev=43';
+import {normalizeBeatMix} from './beat-mix.js?rev=43';
+import {normalizeRecording,vocalPlaybackProfile} from './vocal-result.js?rev=43';
+import {createBeatSongForm,songPartWindows,normalizeSongForm} from './beat-song-form.js?rev=43';
+import {normalizeGenreSnapshot} from './genre-progression.js?rev=43';
+import {SOURCE_GAINS_DB} from './source-levels.js?rev=43';
 
 // A project has one musical clock, even when a legacy drum loop is shorter.
 export function resolveBeatPlayback(beat,{workStage=null,recordingPreview=null}={}){

@@ -1,7 +1,7 @@
 // Mechanical cache-key update; vendor/import-map URLs deliberately remain untouched.
 import {readFile,writeFile} from 'node:fs/promises';
 import path from 'node:path';
-const revision='42',visited=new Set(),updates=[];
+const revision='43',visited=new Set(),updates=[];
 async function visit(file){
  if(visited.has(file)||!file.startsWith('src/'))return;visited.add(file);
  const original=await readFile(file,'utf8'),imports=[...original.matchAll(/(?:from\s*|import\s*\(\s*|new URL\(\s*)['"](\.\.?\/[^'"]+\.js(?:\?[^'"]*)?)['"]/g)];

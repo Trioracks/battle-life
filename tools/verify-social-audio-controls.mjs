@@ -27,7 +27,7 @@ try{
  page.setDefaultTimeout(45000);page.on('pageerror',error=>errors.push(error.message));page.on('response',response=>{if(response.status()>=400)errors.push(response.status()+' '+response.url());});
  await page.goto(base+'/__social-controls');
  const setup=await page.evaluate(async()=>{
-  const [{BeatAudio},{createPcAudioSession},{mountSocial},{createSocialAudio},{exportedSubmissionFixture}]=await Promise.all([import('/src/beat-audio.js?rev=42'),import('/src/pc-audio-session.js?rev=42'),import('/src/social-view.js?rev=42'),import('/src/social-audio-view.js?rev=42'),import('/test/helpers/submission-fixtures.js')]);
+  const [{BeatAudio},{createPcAudioSession},{mountSocial},{createSocialAudio},{exportedSubmissionFixture}]=await Promise.all([import('/src/beat-audio.js?rev=43'),import('/src/pc-audio-session.js?rev=43'),import('/src/social-view.js?rev=43'),import('/src/social-audio-view.js?rev=43'),import('/test/helpers/submission-fixtures.js')]);
   const state=exportedSubmissionFixture({mixed:true}),file=state.audioExports.files[0],version=state.trackVersions.byId[file.trackVersionId];
   const before=JSON.stringify([state.trackVersions,state.audioExports,state.battleSubmissions]);state.social.dialogs['makarevich-1']={messages:[],draftVersionId:version.id};
   const audio=new BeatAudio(),session=createPcAudioSession(audio),adapter=session.forOwner('underweb');

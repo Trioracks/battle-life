@@ -5,9 +5,9 @@ import {receivePhoneEvents} from '../src/phone-notifications.js';
 import {pcDocument,allPc,fire} from './helpers/virtual-pc-dom.js';
 import {getSoundCue,playSoundCue} from '../src/sound-cues.js';
 const event={id:'a',dueAt:1,source:'Рифмосеть',sender:'Макаревич Battle',text:'Длинный ответ '.repeat(30)};
-function setup({fail=false,hidden=false,soundFail=false,presentation={firstWakeAtMinute:0,announcedIds:[]},ackFail=false,reduced=false}={}){
+function setup({fail=false,hidden=false,soundFail=false,presentation={firstWakeAtMinute:0,announcedIds:[]},ackFail=false,reduced=false,noticeEvent=event}={}){
  const d=pcDocument(),events=new EventTarget(),root=d.createElement('div');d.addEventListener=events.addEventListener.bind(events);d.removeEventListener=events.removeEventListener.bind(events);d.dispatchEvent=events.dispatchEvent.bind(events);d.defaultView={matchMedia:()=>({matches:reduced})};
- let phone=receivePhoneEvents(null,[event]),vibrations=0,acknowledgments=0,durableAtCue=false;
+ let phone=receivePhoneEvents(null,[noticeEvent]),vibrations=0,acknowledgments=0,durableAtCue=false;
  const context={nowMinute:1,sleeping:false,mode:hidden?'pc':'game',pcPhase:hidden?'desktop':'room',needs:{satiety:54,energy:69}};
  const view=mountPhoneHud(root,{getState:()=>phone,getPresentation:()=>presentation,getContext:()=>context,onPresentationChange:next=>{acknowledgments++;if(ackFail)return false;presentation=next;return true;},onChange:next=>{if(fail)return false;phone=next;return true;},playVibration:()=>{durableAtCue=presentation.announcedIds.includes('a');vibrations++;if(soundFail)throw Error('autoplay');}});
  return {root,view,d,context,get presentation(){return presentation;},get acknowledgments(){return acknowledgments;},get phone(){return phone;},get vibrations(){return vibrations;},get durableAtCue(){return durableAtCue;},notice:allPc(root).find(n=>n.dataset?.phoneNotice),device:allPc(root).find(n=>n.dataset?.phoneToggle),panel:allPc(root).find(n=>n.dataset?.phonePanel)};
@@ -64,6 +64,13 @@ test('legacy social app labels display canonically without changing the queue',(
  const s=setup(),before=JSON.stringify(s.phone);
  assert.ok(allPc(s.root).some(n=>n.textContent==='В кругу'));
  assert.equal(JSON.stringify(s.phone),before);assert.equal(s.phone.queue[0].source,'Рифмосеть');s.view.dispose();
+});
+
+test('notice footer directs group publications to the wall and personal notices to messages',()=>{
+ for(const [type,want] of [['community-post','Полностью — на стене группы на ПК'],['message','Полностью — в сообщениях на ПК']]){
+  const s=setup({noticeEvent:{...event,type,communityId:'makarevich-1',postId:'welcome'}});
+  assert.equal(allPc(s.notice).find(n=>n.className==='bl-phone-hint').textContent,want);s.view.dispose();
+ }
 });
 
 test('phone LCD shows the live game clock while the needs panel is closed',()=>{

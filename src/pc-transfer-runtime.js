@@ -1,5 +1,5 @@
-import {SOFTWARE} from './pc-software-catalog.js?rev=42';
-import {normalizeSoftware,softwareDiskBytes,withSoftware} from './pc-software.js?rev=42';
+import {SOFTWARE} from './pc-software-catalog.js?rev=43';
+import {normalizeSoftware,softwareDiskBytes,withSoftware} from './pc-software.js?rev=43';
 export const TRANSFER_RATES=Object.freeze([24,31,37,28,35,26]);
 const periodBytes=TRANSFER_RATES.reduce((n,r)=>n+r*60000,0);
 function integral(minute){const periods=Math.floor(minute/6),rest=minute-periods*6,whole=Math.floor(rest);return periods*periodBytes+TRANSFER_RATES.slice(0,whole).reduce((n,r)=>n+r*60000,0)+(rest-whole)*TRANSFER_RATES[whole]*60000;}

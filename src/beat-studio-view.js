@@ -1,17 +1,17 @@
-import {pcElement as el,pcButton as button,pcFind,pcFocusable} from './virtual-pc-dom.js?rev=42';
-import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=42';
-import {BEAT_STAGES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=42';
-import {randomBeatName,distinctProjectName} from './beat-names.js?rev=42';
-import {mountProjectPicker} from './project-picker-view.js?rev=42';
-import {latestReadyLyrics} from './lyric-production.js?rev=42';
-import {resolveBeatPlayback} from './beat-playback.js?rev=42';
-import {describeBeatMix} from './beat-mix.js?rev=42';
-import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=42';
-import {startVocalWork} from './vocal-production.js?rev=42';
-import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=42';
-import {appendRecordingControls} from './recording-studio-view.js?rev=42';
-import {normalizeGenreProgression,genreOptions,genreById,genreCap,chooseGenre,chooseSpecialization} from './genre-progression.js?rev=42';
-import {mountAudioExport} from './pc-audio-export-view.js?rev=42';
+import {pcElement as el,pcButton as button,pcFind,pcFocusable} from './virtual-pc-dom.js?rev=43';
+import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=43';
+import {BEAT_STAGES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=43';
+import {randomBeatName,distinctProjectName} from './beat-names.js?rev=43';
+import {mountProjectPicker} from './project-picker-view.js?rev=43';
+import {latestReadyLyrics} from './lyric-production.js?rev=43';
+import {resolveBeatPlayback} from './beat-playback.js?rev=43';
+import {describeBeatMix} from './beat-mix.js?rev=43';
+import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=43';
+import {startVocalWork} from './vocal-production.js?rev=43';
+import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=43';
+import {appendRecordingControls} from './recording-studio-view.js?rev=43';
+import {normalizeGenreProgression,genreOptions,genreById,genreCap,chooseGenre,chooseSpecialization} from './genre-progression.js?rev=43';
+import {mountAudioExport} from './pc-audio-export-view.js?rev=43';
 
 export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onChange,onWork,audio,legacyName,initialProject}){
  const d=root.ownerDocument,workspace=createStudioWorkspace(d,{projectName:legacyName});root.replaceChildren(workspace);

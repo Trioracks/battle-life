@@ -10,10 +10,10 @@ const errors=[],results=[];
 const summarize=rows=>{const sorted=rows.slice().sort((a,b)=>a-b);return {samples:sorted.length,p95:sorted[Math.floor(sorted.length*.95)],max:sorted.at(-1)};};
 try{
  const page=await browser.newPage({viewport:{width:1280,height:720}});page.on('pageerror',e=>errors.push(e.message));
- await page.route('**/__phone-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/phone-hud.css?rev=42"><style>body{margin:0;background:#41504a}</style><aside id="phone"></aside>'}));
+ await page.route('**/__phone-qa',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/phone-hud.css?rev=43"><style>body{margin:0;background:#41504a}</style><aside id="phone"></aside>'}));
  await page.goto(base+'/__phone-qa');
  await page.evaluate(async()=>{
-  const [{mountPhoneHud},{receivePhoneEvents}]=await Promise.all([import('/src/phone-hud.js?rev=42'),import('/src/phone-notifications.js?rev=42')]);
+  const [{mountPhoneHud},{receivePhoneEvents}]=await Promise.all([import('/src/phone-hud.js?rev=43'),import('/src/phone-notifications.js?rev=43')]);
   const q=window.phoneQA={count:0,saves:0,fail:false,context:{nowMinute:600,sleeping:true,mode:'game',pcPhase:'room',needs:{satiety:71,energy:85}},presentation:{firstWakeAtMinute:null,announcedIds:[]}};
   q.phone=receivePhoneEvents(null,[{id:'ack',dueAt:25,source:'Рифмосеть — сообщение',sender:'Макаревич Battle',text:'Привет! Работа принята. Спасибо, что успел отправить запись. После окончания приёма судьи начнут слушать работы, а эту версию можно будет найти в аудиозаписях сообщества. Оценки придут отдельно.'}]);
   q.options={getState:()=>q.phone,getPresentation:()=>q.presentation,getContext:()=>q.context,onPresentationChange:next=>{q.saves++;if(q.fail)return false;localStorage.setItem('phone-qa-presentation',JSON.stringify(next));q.presentation=next;return true;},onChange:phone=>{q.phone=phone;return true;},playVibration:()=>{q.count++;return Promise.reject(Error('autoplay denied'));}};
@@ -46,7 +46,7 @@ try{
   try{
    await host.route('**/__phone-host-seed',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><title>Isolated phone save</title>'}));await host.goto(base+'/__phone-host-seed');
    await host.evaluate(async()=>{
-    const [{createProfile,saveProfile},{submissionFixture},{saveVirtualPcState},{receivePhoneEvents}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=42'),import('/test/helpers/submission-fixtures.js'),import('/src/virtual-pc-state.js?rev=42'),import('/src/phone-notifications.js?rev=42')]);
+    const [{createProfile,saveProfile},{submissionFixture},{saveVirtualPcState},{receivePhoneEvents}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=43'),import('/test/helpers/submission-fixtures.js'),import('/src/virtual-pc-state.js?rev=43'),import('/src/phone-notifications.js?rev=43')]);
     const state=submissionFixture({vocal:false});state.software.ft.installed=true;state.software.client.installed=true;state.music.needs={satiety:100,energy:100};state.phone=receivePhoneEvents(null,[{id:'qa-first',dueAt:25,source:'Рифмосеть',sender:'Макаревич Battle',text:'Твоя работа принята. Полный ответ можно прочитать в сообщениях на компьютере.'}]);
     assertSave(saveProfile(localStorage,createProfile({name:'Проверка телефона'})).ok);assertSave(saveVirtualPcState(localStorage,state));
     localStorage.setItem('battle-life-apartment-v3-time',JSON.stringify({day:1,minutes:1410,initialRest:true}));

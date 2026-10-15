@@ -1,9 +1,9 @@
-import {communityById} from './social-catalog.js?rev=42';
-import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow,isBattleWindowId} from './battle-windows.js?rev=42';
-import {validGameMinute} from './game-minute.js?rev=42';
-import {TRACK_DSP_VERSION} from './track-version.js?rev=42';
-import {normalizeAudioExports} from './pc-audio-exports.js?rev=42';
-import {normalizeSocial} from './social-state.js?rev=42';
+import {communityById} from './social-catalog.js?rev=43';
+import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow,isBattleWindowId} from './battle-windows.js?rev=43';
+import {validGameMinute} from './game-minute.js?rev=43';
+import {TRACK_DSP_VERSION} from './track-version.js?rev=43';
+import {normalizeAudioExports} from './pc-audio-exports.js?rev=43';
+import {normalizeSocial} from './social-state.js?rev=43';
 export const UPLOAD_TOTAL_SECONDS=2;
 const clone=v=>JSON.parse(JSON.stringify(v));
 const fileBytes=version=>{const seconds=version?.recipe?.descriptor?.durationSeconds;return Number.isFinite(seconds)&&seconds>0&&seconds<=3600?Math.ceil(seconds*192000/8):null;};

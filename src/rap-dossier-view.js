@@ -1,11 +1,11 @@
-import {pcElement as el,pcFind} from './virtual-pc-dom.js?rev=42';
-import {socialButton} from './social-dom.js?rev=42';
-import {dossierCases,publicDossierCase,publicDossierTarget} from './rap-dossier-cases.js?rev=42';
-import {metadataGameMinute} from './social-registration.js?rev=42';
-import {createPublicAnalysisReportView} from './rap-analysis-view.js?rev=42';
-import {startTrackStudy,pauseStudy,effectiveStudySkills} from './rap-analysis.js?rev=42';
-import {startCaseStudy,pauseCaseStudy} from './rap-research.js?rev=42';
-import {mountDossierBoard,forecastText} from './rap-dossier-board-view.js?rev=42';
+import {pcElement as el,pcFind} from './virtual-pc-dom.js?rev=43';
+import {socialButton} from './social-dom.js?rev=43';
+import {dossierCases,publicDossierCase,publicDossierTarget} from './rap-dossier-cases.js?rev=43';
+import {metadataGameMinute} from './social-registration.js?rev=43';
+import {createPublicAnalysisReportView} from './rap-analysis-view.js?rev=43';
+import {startTrackStudy,pauseStudy,effectiveStudySkills} from './rap-analysis.js?rev=43';
+import {startCaseStudy,pauseCaseStudy} from './rap-research.js?rev=43';
+import {mountDossierBoard,forecastText} from './rap-dossier-board-view.js?rev=43';
 const studyLabel=n=>n.kind==='track'?'Изучить трек · 45 мин':['battle','round'].includes(n.kind)?'Изучить '+(n.kind==='battle'?'баттл':'раунд')+' · 6 ч':'Изучить · 45 мин';
 const currentStudy=state=>{const jobs=[state.rapResearch?.job,state.rapAnalysis?.job];return jobs.find(job=>job?.status==='active')??jobs.find(Boolean);};
 export function mountRapDossier(root,{getState,getMetadata=()=>({}),navigate=()=>{},commit=()=>false,onWork=()=>false,isVisible=()=>true}){

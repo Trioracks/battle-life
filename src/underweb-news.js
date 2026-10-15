@@ -1,4 +1,4 @@
-import { UNDERWEB_NEWS } from './underweb-news-data.js?rev=42';
+import { UNDERWEB_NEWS } from './underweb-news-data.js?rev=43';
 
 // Game day one is 2012-09-01. Invalid host metadata must never unlock the future.
 const validDay = value => typeof value === 'number' && Number.isFinite(value) && value >= 1 ? Math.floor(value) : 1;

@@ -4,9 +4,10 @@ import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {createServer} from 'node:http';
 import {resolve,extname,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {withBrowserWatchdog} from './qa/browser-watchdog.mjs';
 
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'C:/Users/zubko/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
-const root=fileURLToPath(new URL('..',import.meta.url)),output=resolve(root,'artifacts/dossier-weekplay/task-3');
+const root=fileURLToPath(new URL('..',import.meta.url)),output=resolve(root,process.env.SOCIAL_BACKGROUND_QA_DIR||'artifacts/dossier-weekplay/task-3');
 const port=Number(process.env.SOCIAL_BACKGROUND_QA_PORT||4196);assert.ok(Number.isInteger(port)&&port>=4193&&port<=65535);
 const base='http://127.0.0.1:'+port,mime={'.js':'text/javascript','.json':'application/json','.svg':'image/svg+xml','.wav':'audio/wav'};
 await mkdir(output+'/browser-temp',{recursive:true});process.env.TEMP=process.env.TMP=output+'/browser-temp';
@@ -27,9 +28,9 @@ try{
  page.setDefaultTimeout(60000);page.on('pageerror',error=>errors.push(error.message));
  page.on('response',response=>{if(response.status()>=400)errors.push(response.status()+' '+response.url());});
  await page.goto(base+'/__archive-audio');
- const evidence=await page.evaluate(async()=>{
+ const evidence=await withBrowserWatchdog(()=>page.evaluate(async()=>{
   const [{SOCIAL_COMMUNITIES},{backgroundAudioDescriptor},{BeatAudio},{exportedSubmissionFixture}]=await Promise.all([
-   import('/src/social-catalog.js?rev=42'),import('/src/social-background-audio.js?rev=42'),import('/src/beat-audio.js?rev=42'),import('/test/helpers/submission-fixtures.js'),
+   import('/src/social-catalog.js?rev=43'),import('/src/social-background-audio.js?rev=43'),import('/src/beat-audio.js?rev=43'),import('/test/helpers/submission-fixtures.js'),
   ]);
   const svgPath='/assets/ui/virtual-pc/icons/dossier.svg',svgResponse=await fetch(svgPath),image=new Image();image.src=svgPath;await image.decode();
   const svg={mime:svgResponse.headers.get('content-type'),width:image.naturalWidth,height:image.naturalHeight};
@@ -54,7 +55,7 @@ try{
    }finally{audio.stop();audio.pcm.dispose();}
   }
   return {origin:location.origin,svg,rows,savedDescriptorsUnchanged:JSON.stringify(saved)===before,subjectiveListening:false};
- });
+ }),browser);
  assert.equal(evidence.svg.mime,'image/svg+xml');assert.ok(evidence.svg.width>0&&evidence.svg.height>0);assert.equal(evidence.savedDescriptorsUnchanged,true);
  assert.equal(evidence.rows.length,6);assert.equal(new Set(evidence.rows.map(row=>row.hash)).size,6);
  for(const row of evidence.rows){

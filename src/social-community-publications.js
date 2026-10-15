@@ -1,9 +1,9 @@
-import {SOCIAL_COMMUNITIES,communityById} from './social-catalog.js?rev=42';
-import {publicRoundAnnouncements} from './round-topics.js?rev=42';
-import {judgeProfile} from './judge-profiles.js?rev=42';
-import {validGameMinute} from './game-minute.js?rev=42';
-import {receivePhoneEvents,retirePhoneNotices} from './phone-notifications.js?rev=42';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=42';
+import {SOCIAL_COMMUNITIES,communityById} from './social-catalog.js?rev=43';
+import {publicRoundAnnouncements} from './round-topics.js?rev=43';
+import {judgeProfile} from './judge-profiles.js?rev=43';
+import {validGameMinute} from './game-minute.js?rev=43';
+import {receivePhoneEvents,retirePhoneNotices} from './phone-notifications.js?rev=43';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=43';
 
 const record=v=>v&&typeof v==='object'&&!Array.isArray(v);
 const ordered=(a,b)=>a.at-b.at||a.id.localeCompare(b.id);
@@ -58,7 +58,9 @@ export function publicCommunityPosts(state,{communityId,nowMinute}={}){
    const at=saved?saved.startAt:old?p.at:judgePublicationMinute(p.at,round.closesAt,index,judges.length);
    if(at===null||at>nowMinute)continue;
    const name=judgeProfile(judgeId)?.name??'Судья';
-   const body=old?'В составе панели этого раунда — '+name+'. Страница открыта, отзывы появятся после окончания приёма.':[
+   // Legacy introductions were published at the round announcement itself.
+   // A saved reaction plan retains that evidence even if cadence is quarantined.
+   const body=old||saved?.startAt===p.at?'В составе панели этого раунда — '+name+'. Страница открыта, отзывы появятся после окончания приёма.':[
     'Знакомим с судьёй раунда: '+name+'. Публичная страница доступна; отзывы будут опубликованы после приёма работ.',
     'Ещё один судья этого раунда — '+name+'. Ему предстоит оценить работы участников. Результаты ещё не опубликованы.',
     'К судьям этого раунда присоединяется '+name+'. Профиль открыт для знакомства; оценки появятся по расписанию после приёма.'

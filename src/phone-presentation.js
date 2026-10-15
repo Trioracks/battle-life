@@ -1,4 +1,4 @@
-import {gameDateTimeLabel} from './home-calendar.js?rev=42';
+import {gameDateTimeLabel} from './home-calendar.js?rev=43';
 
 export function normalizePhonePresentation(raw){
  return {

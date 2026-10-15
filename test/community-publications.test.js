@@ -82,6 +82,20 @@ test('quarantined cadence preserves validated saved publication evidence and vot
  assert.deepEqual(posts.map(p=>[p.id,p.at]),[[postId,13800]]);assert.equal(s.socialReactions.votes[postId],'like');
  assert.equal(api.publicCommunityPosts(s,options(13799)).some(p=>p.id===postId),false);
 });
+
+test('quarantined cadence preserves genuinely published legacy introduction bodies on repeated reload',()=>{
+ let s=topicFixture();s.socialRuntime.lastMinute=13440;
+ s=ensureSocialReactionPlans(s,13440).state;
+ const before=api.publicCommunityPosts(s,options(13440)).filter(p=>p.kind==='judge-announcement');
+ assert.equal(before.length,3);assert.ok(before.every(p=>p.body.startsWith('В составе панели этого раунда')));
+ s=setPostVote(s,{postId:before[0].id,vote:'like',nowMinute:13440}).state;
+ s.social.communityPublications={version:99,legacyCutoff:'bad'};
+ for(let reload=0;reload<2;reload++){
+  s=createVirtualPcState(s);s.socialRuntime.lastMinute=30000;
+  assert.deepEqual(api.publicCommunityPosts(s,options(30000)).filter(p=>p.kind==='judge-announcement'),before);
+  assert.equal(s.socialReactions.votes[before[0].id],'like');
+ }
+});
 test('legacy deduped rounds do not gain fabricated past returning-judge posts',()=>{
  let s=topicFixture(),t=s.tournaments.byId['makarevich-1'];t.rounds.final={...t.rounds['round-2'],roundId:'final',opensAt:30000,closesAt:40080};s.roundThemes['makarevich-1:final']={...s.roundThemes['makarevich-1:round-2'],id:'makarevich-1:final',roundId:'final',opensAt:30000,closesAt:40080};t.events.push({id:'final',type:'round-announced',battleId:t.battleId,roundId:'final',dueAt:30000,themeId:'makarevich-1:final'});s.socialRuntime.lastMinute=31000;
  s=api.ensureCommunityPublications(s,31000).state;

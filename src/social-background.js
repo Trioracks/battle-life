@@ -5,7 +5,7 @@ const READ_KEYS=[...SOCIAL_DOMAIN_KEYS,'battleApplications'];
 const captured=state=>Object.fromEntries(READ_KEYS.map(key=>[key,state[key]]));
 const unchanged=(state,base)=>READ_KEYS.every(key=>state[key]===base[key]);
 
-export function createSocialBackground({createWorker=()=>new Worker(new URL('./social-worker.js?rev=42',import.meta.url),{type:'module'}),getState,persist,onState,onError=()=>{}}){
+export function createSocialBackground({createWorker=()=>new Worker(new URL('./social-worker.js?rev=43',import.meta.url),{type:'module'}),getState,persist,onState,onError=()=>{}}){
  let worker=null,pending=null,mirror={},lastInput=null,lastMinute=null,lastDispatch=-Infinity,sequence=0,epoch=0,failed='',disposed=false,jobsStarted=0,commits=0;
  function stop(){if(worker)worker.terminate();worker=null;pending=null;mirror={};epoch++;}
  function fail(reason){stop();failed=reason||'Не удалось обработать события баттла.';onError(failed);}

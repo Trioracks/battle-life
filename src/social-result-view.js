@@ -1,9 +1,9 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=42';
-import {socialButton,socialHeading} from './social-dom.js?rev=42';
-import {publicBattleResults} from './social-judging-events.js?rev=42';
-import {requestResultReaction} from './social-result-reaction.js?rev=42';
-import {judgeProfile} from './judge-profiles.js?rev=42';
-import {resolveResultOutcome} from './result-outcome.js?rev=42';
+import {pcElement as el} from './virtual-pc-dom.js?rev=43';
+import {socialButton,socialHeading} from './social-dom.js?rev=43';
+import {publicBattleResults} from './social-judging-events.js?rev=43';
+import {requestResultReaction} from './social-result-reaction.js?rev=43';
+import {judgeProfile} from './judge-profiles.js?rev=43';
+import {resolveResultOutcome} from './result-outcome.js?rev=43';
 export function createSocialResultView(d,{submission,getState,commit,expandedResults,onResultViewed=()=>{}}){
  const state=getState(),result=publicBattleResults(state,submission.id),pair=submission.roundId!=='selection',root=el(d,'section',{className:'sn-results',dataset:{submissionResults:submission.id}});
  root.append(socialHeading(d,'Судейство',result.results.length+' / '+result.expectedJudgeIds.length));

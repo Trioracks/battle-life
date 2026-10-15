@@ -1,15 +1,15 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=42';
-import {communityById} from './social-catalog.js?rev=42';
-import {socialButton,socialPeerLink,socialHeading} from './social-dom.js?rev=42';
-import {sendSubmission,dialogIsTyping,markDialogRead} from './social-submission.js?rev=42';
-import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=42';
-import {gameDateTimeLabel} from './home-calendar.js?rev=42';
-import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=42';
-import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=42';
-import {mountPersonalDialog,visibleDialogReader} from './social-messages-view.js?rev=42';
-import {uploadPresentation,cancelSubmissionUpload} from './social-upload.js?rev=42';
-import {startSubmissionMessage,advanceSubmissionMessage,cancelSubmissionMessage} from './social-composer.js?rev=42';
-import {createLyricWorkAudio} from './lyric-work-audio.js?rev=42';
+import {pcElement as el} from './virtual-pc-dom.js?rev=43';
+import {communityById} from './social-catalog.js?rev=43';
+import {socialButton,socialPeerLink,socialHeading} from './social-dom.js?rev=43';
+import {sendSubmission,dialogIsTyping,markDialogRead} from './social-submission.js?rev=43';
+import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=43';
+import {gameDateTimeLabel} from './home-calendar.js?rev=43';
+import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=43';
+import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=43';
+import {mountPersonalDialog,visibleDialogReader} from './social-messages-view.js?rev=43';
+import {uploadPresentation,cancelSubmissionUpload} from './social-upload.js?rev=43';
+import {startSubmissionMessage,advanceSubmissionMessage,cancelSubmissionMessage} from './social-composer.js?rev=43';
+import {createLyricWorkAudio} from './lyric-work-audio.js?rev=43';
 export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commit,audio,isVisible=()=>true,onRegistered=()=>{},onRead=id=>commit(markDialogRead(getState(),id))}){
  if(peer?.kind==='person')return mountPersonalDialog(d,{id,getState,getMetadata,navigate,commit,isVisible,onRead});
  const c=communityById(id),root=el(d,'section',{className:'sn-dialog'}),history=el(d,'div',{className:'sn-dialog-history'}),typing=el(d,'p',{className:'sn-typing',attributes:{'aria-live':'polite'}}),draft=el(d,'div',{className:'sn-dialog-draft'}),actions=el(d,'div',{className:'sn-actions'}),notice=el(d,'p',{className:'sn-note'}),pickerHost=el(d,'div',{className:'sn-file-picker'});

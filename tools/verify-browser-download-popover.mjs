@@ -15,7 +15,7 @@ const button=name=>frame('underweb').getByRole('button',{name,exact:true});
 async function boot(){
  await page.goto(base+'/__download-popover');
  await page.evaluate(async()=>{
-  const [{mountVirtualPc},{createVirtualPcState,loadVirtualPcState,saveVirtualPcState,diskUsage},{explorerEntries}]=await Promise.all([import('/src/virtual-pc-ui.js?rev=42'),import('/src/virtual-pc-state.js?rev=42'),import('/src/virtual-pc-explorer.js?rev=42')]);
+  const [{mountVirtualPc},{createVirtualPcState,loadVirtualPcState,saveVirtualPcState,diskUsage},{explorerEntries}]=await Promise.all([import('/src/virtual-pc-ui.js?rev=43'),import('/src/virtual-pc-state.js?rev=43'),import('/src/virtual-pc-explorer.js?rev=43')]);
   const listeners=new Set(),add=document.addEventListener.bind(document),remove=document.removeEventListener.bind(document);
   document.addEventListener=(type,fn,options)=>{if(options===true&&['keydown','pointerdown'].includes(type))listeners.add(fn);add(type,fn,options);};
   document.removeEventListener=(type,fn,options)=>{listeners.delete(fn);remove(type,fn,options);};
@@ -64,7 +64,7 @@ try{
  evidence.reducedMotion=await button('Загрузки').locator('.uw-download-arrival').evaluate(n=>({display:getComputedStyle(n).display,animation:getComputedStyle(n).animationName}));assert.deepEqual(evidence.reducedMotion,{display:'none',animation:'none'});
  await page.setViewportSize({width:390,height:844});await page.evaluate(()=>new Promise(requestAnimationFrame));const narrow=await downloads().boundingBox();assert.ok(narrow.x>=0&&narrow.x+narrow.width<=391);await snapshot('popover-narrow-reduced-motion');evidence.narrow=narrow;
  await page.setViewportSize({width:1280,height:800});await page.evaluate(async()=>{
-  const [{mountVirtualPc},{createVirtualPcState}]=await Promise.all([import('/src/virtual-pc-ui.js?rev=42'),import('/src/virtual-pc-state.js?rev=42')]);
+  const [{mountVirtualPc},{createVirtualPcState}]=await Promise.all([import('/src/virtual-pc-ui.js?rev=43'),import('/src/virtual-pc-state.js?rev=43')]);
   qa.pc.dispose();qa.pc=mountVirtualPc(document.querySelector('main'),{onPersist:()=>true});qa.pc.showDesktop(createVirtualPcState({power:'on',projects:Array.from({length:1000},(_,i)=>({id:String(i)}))}));qa.pc.open('underweb');qa.pc.softwareAction('download-metadata','notebook');
  });
  assert.match(await downloads().innerText(),/Недостаточно места/);await snapshot('popover-no-room');evidence.noRoom=true;

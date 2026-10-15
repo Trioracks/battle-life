@@ -23,13 +23,13 @@ try{
  page.setDefaultTimeout(15000);page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)errors.push(r.status()+' '+r.url());});
  await page.goto(base+'/__community-qa');
  const setup=await page.evaluate(async()=>{
-  const [{topicFixture},{mountSocial},{resolveSocialRoute},{subscribeCommunity},{ensureSocialReactionPlans},api,{createVirtualPcState}]=await Promise.all([import('/test/helpers/round-topic-fixture.js'),import('/src/social-view.js?rev=42'),import('/src/social-routing.js?rev=42'),import('/src/social-state.js?rev=42'),import('/src/social-reactions.js?rev=42'),import('/src/social-community-publications.js?rev=42'),import('/src/virtual-pc-state.js?rev=42')]);
+  const [{topicFixture},{mountSocial},{resolveSocialRoute},{subscribeCommunity},{ensureSocialReactionPlans},api,{createVirtualPcState}]=await Promise.all([import('/test/helpers/round-topic-fixture.js'),import('/src/social-view.js?rev=43'),import('/src/social-routing.js?rev=43'),import('/src/social-state.js?rev=43'),import('/src/social-reactions.js?rev=43'),import('/src/social-community-publications.js?rev=43'),import('/src/virtual-pc-state.js?rev=43')]);
   const state=subscribeCommunity(topicFixture(),'makarevich-1',true,{nowMinute:13440}).state;
   window.qa={state,now:19920,visible:true,api,createVirtualPcState,topicFixture,subscribeCommunity,ensureSocialReactionPlans,address:'',view:null};
   qa.state=ensureSocialReactionPlans(qa.state,qa.now).state;qa.state=api.publishCommunityNotices(qa.state,qa.now).state;
   qa.mount=url=>{qa.view?.dispose();qa.address=url;qa.view=mountSocial(document.querySelector('main'),{route:resolveSocialRoute(url),getState:()=>qa.state,getMetadata:()=>({gameMinutes:qa.now,playerName:'Макаревич Battle'}),onChange:s=>{qa.state=s;return true;},navigate:qa.mount,isVisible:()=>qa.visible});};
   qa.mount('underweb://social/groups');
-  const {mountPhoneHud}=await import('/src/phone-hud.js?rev=42'),phoneRoot=document.createElement('aside'),styles=document.createElement('link');phoneRoot.id='qa-phone';document.body.append(phoneRoot);styles.rel='stylesheet';styles.href='/phone-hud.css';document.head.append(styles);
+  const {mountPhoneHud}=await import('/src/phone-hud.js?rev=43'),phoneRoot=document.createElement('aside'),styles=document.createElement('link');phoneRoot.id='qa-phone';document.body.append(phoneRoot);styles.rel='stylesheet';styles.href='/phone-hud.css';document.head.append(styles);
   qa.phoneContext={nowMinute:qa.now,sleeping:false,mode:'game',pcPhase:'desktop',needs:{energy:80,satiety:70}};qa.presentation={firstWakeAtMinute:0,announcedIds:[]};
   qa.phone=mountPhoneHud(phoneRoot,{getState:()=>qa.state.phone,getContext:()=>qa.phoneContext,getPresentation:()=>qa.presentation,onPresentationChange:p=>{qa.presentation=p;return true;},onChange:p=>{qa.state={...qa.state,phone:p};return true;}});
   const path='/assets/ui/virtual-pc/icons/dossier.svg',response=await fetch(path),image=new Image();image.src=path;await image.decode();

@@ -1,6 +1,6 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=42';
-import {socialButton,socialLink} from './social-dom.js?rev=42';
-import {battleCover} from './battle-content-assets.js?rev=42';
+import {pcElement as el} from './virtual-pc-dom.js?rev=43';
+import {socialButton,socialLink} from './social-dom.js?rev=43';
+import {battleCover} from './battle-content-assets.js?rev=43';
 export function createRoundAnnouncementView(d,post,{navigate,onWrite}={}){
  const root=el(d,'article',{className:'sn-post sn-round-announcement',dataset:{themeId:post.theme.id}});
  const asset=battleCover(post.theme.coverId);

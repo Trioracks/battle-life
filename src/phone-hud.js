@@ -1,7 +1,7 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=42';
-import {normalizePhone,hoverPhoneNotice} from './phone-notifications.js?rev=42';
-import {normalizePhonePresentation,phonePresentation} from './phone-presentation.js?rev=42';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=42';
+import {pcElement as el} from './virtual-pc-dom.js?rev=43';
+import {normalizePhone,hoverPhoneNotice} from './phone-notifications.js?rev=43';
+import {normalizePhonePresentation,phonePresentation} from './phone-presentation.js?rev=43';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=43';
 
 export function mountPhoneHud(root,{getState,getContext,getPresentation,onPresentationChange,onChange,playVibration=()=>{}}){
  const d=root.ownerDocument;
@@ -46,7 +46,7 @@ export function mountPhoneHud(root,{getState,getContext,getPresentation,onPresen
   root.dataset.open=String(open);device.setAttribute('aria-expanded',String(open));device.className='bl-phone-device'+(event?' has-message':'');
   write(clock,/\d\d:\d\d$/.test(shown.time)?shown.time.slice(-5):'--:--');
   if(open){write(time,shown.time);write(satiety,'Сытость · '+Math.round(shown.needs.satiety)+' / 100');write(energy,'Энергия · '+Math.round(shown.needs.energy)+' / 100');}
-  if(signature!==lastContent){lastContent=signature;write(source,event?.source.replace(/^Рифмосеть(?=\s|$)/u,SOCIAL_IDENTITY.name)??'');write(sender,event?.sender??'');write(body,event?.text??'');}
+  if(signature!==lastContent){lastContent=signature;write(source,event?.source.replace(/^Рифмосеть(?=\s|$)/u,SOCIAL_IDENTITY.name)??'');write(sender,event?.sender??'');write(body,event?.text??'');write(hint,event?.type==='community-post'?'Полностью — на стене группы на ПК':'Полностью — в сообщениях на ПК');}
   if(!event||presentation.announcedIds.includes(event.id))return;
   if(!persistPresentation({...presentation,announcedIds:[...presentation.announcedIds,event.id]},'notice:'+event.id))return;
   if(!d.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches)device.animate?.([{rotate:'0deg'},{rotate:'-5deg'},{rotate:'5deg'},{rotate:'-3deg'},{rotate:'0deg'}],{duration:380,iterations:1});
