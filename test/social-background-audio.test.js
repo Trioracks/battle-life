@@ -58,7 +58,7 @@ test('unknown IDs cannot fabricate audio and returned recipes cannot mutate late
 
 test('archive row receives arranged descriptor and displays its duration',async()=>{
  const played=[],view=createSocialAudio({playDescriptor:async d=>{played.push(d);return true;}}),d=pcDocument(),row=view.row(d,{item:demos[0]});
- assert.equal(allPc(row).find(n=>n.className==='sn-audio-duration').textContent,'0:21');
+ assert.equal(allPc(row).find(n=>n.className==='sn-audio-time').textContent,'0:00 / 0:21');
  findButton(row,'Слушать: '+demos[0].author+' — '+demos[0].title).click();await new Promise(resolve=>setImmediate(resolve));
  assert.equal(played.length,1);assert.deepEqual(played[0],descriptor(demos[0].id));view.dispose();
 });

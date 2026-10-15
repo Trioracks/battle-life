@@ -67,15 +67,15 @@ export class BeatAudio{
   if(!result.ok){this.stop();this.status='error';this.error=result.reason;return Promise.resolve(false);}
   return this.playDescriptor(result.descriptor);
  }
- playDescriptor(descriptor){
+ playDescriptor(descriptor,{loop=true}={}){
   if(this.disposed)return Promise.resolve(false);
   if(descriptor.parts.some(part=>drumById(part.id)?.retired)){this.stop();this.status='error';this.error=RETIRED_DRUM_MESSAGE;return Promise.resolve(false);}
-  if(this.descriptor?.key===descriptor.key){
+  if(this.descriptor?.key===descriptor.key&&this.loop===loop){
    if(this.status==='playing')return Promise.resolve(true);
    if(this.status==='loading')return this.pending;
   }
   const offset=this.descriptor?.key===descriptor.key&&this.status==='paused'?this.offset:0;
-  this.stop();this.descriptor=descriptor;this.offset=offset;this.status='loading';this.error='';
+  this.stop();this.descriptor=descriptor;this.loop=loop;this.offset=offset;this.status='loading';this.error='';
   const token=this.generation;this.pending=this.startDescriptor(descriptor,token,offset);return this.pending;
  }
  async startDescriptor(descriptor,token,offset){
@@ -110,6 +110,8 @@ export class BeatAudio{
    const when=this.context.currentTime+.04;this.startedAt=when;
    arranged.forEach(({buffer,input},index)=>{
     const part=descriptor.parts[index],loop=part.windows?descriptor.durationSeconds:part.loopSeconds,source=this.context.createBufferSource();source.buffer=buffer;source.loop=true;source.loopStart=0;source.loopEnd=loop;source.connect(input);this.sources.push(source);source.start(when,offset%loop);
+    // Source layers may repeat inside the song; the transport policy is ephemeral.
+    if(!this.loop){source.onended=()=>{if(this.current(token)&&this.status==='playing')this.stop();};source.stop(when+Math.max(0,descriptor.durationSeconds-offset));}
    });
    this.status='playing';this.pending=null;
    return true;
@@ -121,7 +123,8 @@ export class BeatAudio{
  getSnapshot(){
   const durationSeconds=this.descriptor?.durationSeconds??0;
   const elapsed=this.status==='playing'?Math.max(0,(this.context?.currentTime??0)-this.startedAt):0;
-  return {status:this.status,key:this.descriptor?.key??'',owner:this.descriptor?.owner??null,positionSeconds:durationSeconds?(this.offset+elapsed)%durationSeconds:0,durationSeconds,error:this.error};
+  const positionSeconds=durationSeconds?(this.loop?(this.offset+elapsed)%durationSeconds:Math.min(durationSeconds,this.offset+elapsed)):0;
+  return {status:this.status,key:this.descriptor?.key??'',owner:this.descriptor?.owner??null,positionSeconds,durationSeconds,error:this.error};
  }
  pause(){
   if(!['playing','loading'].includes(this.status))return;
@@ -129,7 +132,7 @@ export class BeatAudio{
   this.stop();this.offset=offset;this.status='paused';
  }
  release(voices,gain,effects){
-  for(const source of voices){try{source.stop();}catch{/* Already ended. */}try{source.disconnect();}catch{/* Already disconnected. */}}
+  for(const source of voices){source.onended=null;try{source.stop();}catch{/* Already ended. */}try{source.disconnect();}catch{/* Already disconnected. */}}
   try{gain?.disconnect();}catch{/* Already disconnected. */}
   effects?.dispose();
  }

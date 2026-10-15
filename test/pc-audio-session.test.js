@@ -8,7 +8,7 @@ import {pcDocument,allPc} from './helpers/virtual-pc-dom.js';
 
 const descriptor=(key='demo',id='primitive')=>({key,owner:'saved-owner',durationSeconds:32/3,parts:[{id,loopSeconds:32/3}]});
 function fixture(fetchFn=async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(8)})){
- const ctx={state:'running',currentTime:10,destination:{},sources:[],createBuffer(channels,length,rate){return {duration:length/rate,copyToChannel(){}};},createGain(){return {gain:{value:0},connect(){},disconnect(){}};},createBufferSource(){const s={connect(){},disconnect(){},start(){this.started=true;},stop(){this.stopped=true;}};this.sources.push(s);return s;},decodeAudioData:async()=>({duration:32/3}),close(){}};
+ const ctx={state:'running',currentTime:10,destination:{},sources:[],createBuffer(channels,length,rate){return {duration:length/rate,copyToChannel(){}};},createGain(){return {gain:{value:0},connect(){},disconnect(){}};},createBufferSource(){const s={connect(){},disconnect(){},start(){this.started=true;},stop(when){this.stopped=true;this.stopTime=when;}};this.sources.push(s);return s;},decodeAudioData:async()=>({duration:32/3}),close(){}};
  const audio=new BeatAudio({contextFactory:()=>ctx,fetchFn});return {ctx,audio,session:createPcAudioSession(audio)};
 }
 test('owners isolate transport while descriptors and pause position stay intact',async()=>{
@@ -35,6 +35,20 @@ test('failed autoplay remains an explicit error and has no delayed restart',asyn
 test('fade is forwarded only by the owning adapter',async()=>{
  const calls=[],audio={play:()=>true,stop:options=>calls.push(options),dispose(){},getSnapshot:()=>({status:'playing'})},session=createPcAudioSession(audio),work=session.forOwner('creative-work');
  await work.play();calls.length=0;session.forOwner('ft-studio').stop({fadeSeconds:.02});assert.equal(calls.length,0);work.stop({fadeSeconds:.08});assert.deepEqual(calls,[{fadeSeconds:.08}]);session.dispose();
+});
+test('social one-shot playback ends at its remaining duration; FT defaults continue looping',async()=>{
+ const {ctx,audio,session}=fixture(),web=session.forOwner('underweb'),d=descriptor(),before=JSON.stringify(d);
+ await web.playDescriptor(d,{loop:false});const first=ctx.sources[0];assert.ok(Math.abs(first.stopTime-(10.04+32/3))<1e-8);
+ ctx.currentTime=12.04;web.pause();await web.playDescriptor(d,{loop:false});const resumed=ctx.sources[1];assert.ok(Math.abs(resumed.stopTime-(12.08+32/3-2))<1e-8);
+ const ended=resumed.onended;ended();assert.equal(web.getSnapshot().status,'stopped');assert.equal(web.getSnapshot().positionSeconds,0);assert.equal(audio.sources.length,0);
+ await session.forOwner('ft-studio').playDescriptor(descriptor('ft'));const ft=ctx.sources.at(-1);assert.equal(ft.loop,true);assert.equal(ft.stopTime,undefined);ended();assert.equal(audio.status,'playing');assert.equal(JSON.stringify(d),before);session.dispose();
+});
+test('owner subscriptions emit transport and clock snapshots and release the shared timer',async t=>{
+ t.mock.timers.enable({apis:['setInterval']});const {ctx,session}=fixture(),web=session.forOwner('underweb'),ft=session.forOwner('ft-studio'),seen=[],other=[];
+ assert.equal(typeof web.subscribe,'function');const unsubscribe=web.subscribe(snapshot=>seen.push(snapshot)),unsubOther=ft.subscribe(snapshot=>other.push(snapshot));
+ await web.playDescriptor(descriptor('social'),{loop:false});assert.equal(seen.at(-1).key,'social');assert.equal(seen.at(-1).status,'playing');ctx.currentTime+=2;t.mock.timers.tick(100);assert.ok(seen.at(-1).positionSeconds>1);
+ assert.equal(other.at(-1).status,'stopped');web.pause();assert.equal(seen.at(-1).status,'paused');web.stop();assert.equal(seen.at(-1).positionSeconds,0);
+ unsubscribe();unsubOther();const count=seen.length;t.mock.timers.tick(1000);assert.equal(seen.length,count);session.dispose();
 });
 test('real desktop navigation and leaving retain music; close owner, shutdown and reset stop it',async()=>{
  const {audio,ctx}=fixture(),d=pcDocument(),root=d.createElement('div'),pc=mountVirtualPc(root,{beatAudio:audio});

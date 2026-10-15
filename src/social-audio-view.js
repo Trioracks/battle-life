@@ -8,35 +8,63 @@ import {battleCharacter} from './battle-demo-config.js?rev=42';
 import {metadataGameMinute} from './social-registration.js?rev=42';
 // Retain the catalog-item entry point for existing callers; recipes use IDs.
 export const backgroundAudioDescriptor=item=>archiveDescriptor(typeof item==='string'?item:item?.id);
+const clock=seconds=>{const n=Math.max(0,Math.floor(seconds+1e-6));return Math.floor(n/60)+':'+String(n%60).padStart(2,'0');};
+const idle=()=>({status:'stopped',key:'',owner:null,positionSeconds:0});
 export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze}={}){
- let disposed=false,generation=0;const listeners=[];
+ let disposed=false,generation=0,snapshot=audio?.getSnapshot?.()??idle();const listeners=[],rows=new Set();
  const button=(d,text,handler,options)=>{const node=socialButton(d,text,handler,options);listeners.push([node,handler]);return node;};
- const stop=()=>{generation++;audio?.stop?.();};
+ const update=next=>{if(disposed)return;snapshot=next;for(const render of rows)render();};
+ const refresh=()=>update(audio?.getSnapshot?.()??snapshot);
+ const unsubscribe=audio?.subscribe?.(update);
+ const stop=()=>{generation++;audio?.stop?.();if(!audio?.getSnapshot)snapshot=idle();refresh();};
+ // Saved-version validation/cloning stays in its existing adapter. The one-shot
+ // option belongs to this playback request, never to a saved recipe or export.
+ const player={playDescriptor:descriptor=>audio?.playDescriptor?.(descriptor,{loop:false}),stop:()=>audio?.stop?.(),get error(){return audio?.error??'';}};
  return {
   row(d,{version,item}){
-   const row=el(d,'div',{className:'sn-audio'}),descriptor=item?backgroundAudioDescriptor(item):null,title=version?.name??(item?[(item.archive?item.author:null),item.title].filter(Boolean).join(' — '):'Сохранённая работа недоступна');
-   const status=el(d,'small',{attributes:{'aria-live':'polite'}}),play=button(d,'▶',async()=>{
-    if(disposed)return;const token=++generation;status.textContent='Загрузка…';
+   const descriptor=version?null:item?backgroundAudioDescriptor(item):null,key=version?'version:'+version.id:descriptor?.key;
+   const title=version?.name??(item?[(item.archive?item.author:null),item.title].filter(Boolean).join(' — '):'Сохранённая работа недоступна');
+   const duration=version?.recipe?.descriptor?.durationSeconds??descriptor?.durationSeconds??32/3;
+   const row=el(d,'div',{className:'sn-audio'}),status=el(d,'small',{attributes:{'aria-live':'polite'}});
+   const progress=el(d,'div',{className:'sn-audio-progress',attributes:{role:'progressbar','aria-label':'Воспроизведение: '+title,'aria-valuemin':'0','aria-valuemax':'100','aria-valuenow':'0'}}),fill=el(d,'span',{className:'sn-audio-progress-fill'}),time=el(d,'span',{className:'sn-audio-time'});
+   progress.append(fill);let failure='',unavailable='',previewKey=null,previewDescriptor=null;
+   const matches=()=>snapshot.owner==='social'&&Boolean(key)&&(snapshot.key===key||snapshot.key===previewKey);
+   const start=async(preview=null)=>{
+    if(disposed)return;const token=++generation;failure='';
+    if(!audio?.getSnapshot)update({status:'loading',key:preview?.key??key,owner:'social',positionSeconds:0});
     try{
-     const result=version?await playTrackVersion(audio,version):descriptor?{ok:Boolean(await audio?.playDescriptor(descriptor))}:{ok:false,reason:'Версия недоступна. Исходник не подменён.'};
+     const result=preview?{ok:Boolean(await player.playDescriptor(preview))}:version?await playTrackVersion(player,version):descriptor?{ok:Boolean(await player.playDescriptor(descriptor))}:{ok:false,reason:'Версия недоступна. Исходник не подменён.'};
      if(disposed||token!==generation)return;
-     status.textContent=result.ok?'Играет':result.reason??'Не удалось воспроизвести запись.';
-    }catch{if(!disposed&&token===generation)status.textContent='Не удалось воспроизвести запись.';}
+     if(!result.ok)failure=result.reason??audio?.error??'Не удалось воспроизвести запись.';
+     if(!audio?.getSnapshot)update({status:result.ok?'playing':'error',key:preview?.key??key,owner:'social',positionSeconds:0});
+     refresh();
+    }catch{if(!disposed&&token===generation){failure='Не удалось воспроизвести запись.';refresh();}}
+   };
+   const play=button(d,'▶',()=>{
+    if(disposed)return;refresh();
+    if(matches()&&snapshot.status==='playing'){generation++;audio?.pause?.();if(!audio?.getSnapshot)update({...snapshot,status:'paused'});refresh();}
+    else if(!(matches()&&snapshot.status==='loading'))void start(matches()&&snapshot.key===previewKey?previewDescriptor:null);
    },{dataset:{socialAudio:version?.id??item?.id??'missing'},attributes:{'aria-label':'Слушать: '+title}});
-   row.append(play,el(d,'div',{className:'sn-audio-title',text:title}),button(d,'Ⅱ',()=>{generation++;audio?.pause?.();status.textContent='Пауза';},{attributes:{'aria-label':'Пауза: '+title}}),button(d,'■',()=>{stop();status.textContent='Остановлено';},{attributes:{'aria-label':'Остановить: '+title}}),el(d,'span',{className:'sn-audio-duration',text:'0:'+String(Math.round(version?.recipe?.descriptor?.durationSeconds??descriptor?.durationSeconds??32/3)).padStart(2,'0')}),status);
+   const halt=button(d,'■',()=>{if(!disposed&&matches()){failure='';stop();}},{attributes:{'aria-label':'Остановить: '+title}});
+   const body=el(d,'div',{className:'sn-audio-body'}),detail=el(d,'div',{className:'sn-audio-detail'});
+   detail.append(progress,time);body.append(el(d,'div',{className:'sn-audio-title',text:title}),detail);row.append(play,body,halt,status);
+   const render=()=>{
+    const own=matches(),state=own?snapshot.status:'stopped',playing=state==='playing',loading=state==='loading';
+    const position=own?Math.max(0,Math.min(duration,snapshot.positionSeconds||0)):0,percent=Math.round(position/duration*100);
+    play.textContent=playing?'Ⅱ':'▶';play.setAttribute('aria-label',(playing?'Пауза: ':'Слушать: ')+title);play.disabled=Boolean(unavailable)&&!(own&&snapshot.key===previewKey);play.setAttribute('aria-disabled',String(play.disabled||loading));
+    row.setAttribute('aria-busy',String(loading));halt.disabled=!own||state==='stopped';
+    progress.setAttribute('aria-valuenow',String(percent));progress.setAttribute('aria-valuetext',clock(position)+' из '+clock(duration));fill.style.setProperty('width',percent+'%');time.textContent=clock(position)+' / '+clock(duration);
+    status.textContent=failure||(loading?'Загрузка…':playing?(snapshot.key===previewKey?'Играет бит без голоса':'Играет'):state==='paused'?'Пауза':state==='error'?snapshot.error||'Не удалось воспроизвести запись.':'')||unavailable;
+   };
+   rows.add(render);
    if(version?.npc){
     const id=version.npc.characterId,name=battleCharacter(id)?.nickname??'Автор';
-    if(getState&&getMetadata&&navigate&&profileAccess(getState(),{characterId:id,nowMinute:metadataGameMinute(getMetadata())}).canView)row.append(button(d,name,()=>navigate('underweb://social/profile/'+id),{className:'sn-link',attributes:{'aria-label':'Страница автора: '+name}}));
-    const npc=npcPlaybackDescriptor(version);
-    if(!npc.ok){status.textContent=npc.reason;play.disabled=true;}
-    if(npc.previewDescriptor)row.append(button(d,'Предпросмотр бита — без голоса',async()=>{
-     if(disposed)return;const token=++generation;status.textContent='Загрузка бита…';
-     try{const ok=await audio?.playDescriptor(npc.previewDescriptor);if(!disposed&&token===generation)status.textContent=ok?'Играет бит без голоса':'Не удалось воспроизвести бит.';}
-     catch{if(!disposed&&token===generation)status.textContent='Не удалось воспроизвести бит.';}
-    },{attributes:{'aria-label':'Предпросмотр бита — без голоса'}}));
+    if(getState&&getMetadata&&navigate&&profileAccess(getState(),{characterId:id,nowMinute:metadataGameMinute(getMetadata())}).canView)row.append(button(d,name,()=>navigate('underweb://social/profile/'+id),{className:'sn-link sn-audio-extra',attributes:{'aria-label':'Страница автора: '+name}}));
+    const npc=npcPlaybackDescriptor(version);if(!npc.ok)unavailable=npc.reason;
+    if(npc.previewDescriptor){previewDescriptor={...npc.previewDescriptor,owner:'social'};previewKey=previewDescriptor.key;row.append(button(d,'Предпросмотр бита — без голоса',()=>void start(previewDescriptor),{className:'sn-button sn-audio-extra',attributes:{'aria-label':'Предпросмотр бита — без голоса'}}));}
    }
-   if(version&&onAnalyze)row.append(button(d,'Изучить трек · 45 мин',()=>onAnalyze({trackVersionId:version.id,reviewIds:[]})));
-   return row;
-  },stop,dispose(){disposed=true;generation++;for(const [node,handler]of listeners)node.removeEventListener('click',handler);listeners.length=0;}
+   if(version&&onAnalyze)row.append(button(d,'Изучить трек · 45 мин',()=>onAnalyze({trackVersionId:version.id,reviewIds:[]}),{className:'sn-button sn-audio-extra'}));
+   render();return row;
+  },stop,dispose(){if(disposed)return;disposed=true;generation++;unsubscribe?.();rows.clear();for(const [node,handler]of listeners)node.removeEventListener('click',handler);listeners.length=0;}
  };
 }
