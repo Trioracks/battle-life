@@ -2,10 +2,11 @@ import {battleCharacter} from './battle-demo-config.js?rev=42';
 import {judgeProfile} from './judge-profiles.js?rev=42';
 import {validGameMinute} from './game-minute.js?rev=42';
 import {profileAccess} from './social-profile-policy.js?rev=42';
+import {BATTLE_PUBLIC_SCORING} from './virtual-pc-catalog.js?rev=42';
 export const ROUND_LABELS=Object.freeze({selection:'Отбор','round-2':'1/16 финала','round-3':'1/8 финала','round-4':'Четвертьфинал','round-5':'Полуфинал',final:'Финал'});
 export function publicTournamentTrackIds(state,{battleId='makarevich-1',nowMinute}={}){return new Set(Object.keys(state.tournaments?.byId?.[battleId]?.rounds??{}).flatMap(roundId=>publicRoundTable(state,{battleId,roundId,nowMinute}).rows.map(r=>r.trackVersionId).filter(Boolean)));}
 export function publicRoundTable(state,{battleId='makarevich-1',roundId='selection',nowMinute,viewerId='player'}={}){
- const t=state.tournaments?.byId?.[battleId],round=t?.rounds?.[roundId],empty={battleId,roundId,title:ROUND_LABELS[roundId]??'Раунд',complete:false,rows:[],judges:[],awards:[],availableRounds:[],message:'Таблица этого раунда ещё не опубликована.'};
+ const t=state.tournaments?.byId?.[battleId],round=t?.rounds?.[roundId],empty={battleId,roundId,title:ROUND_LABELS[roundId]??'Раунд',complete:false,scoring:null,rows:[],judges:[],awards:[],availableRounds:[],message:'Таблица этого раунда ещё не опубликована.'};
  if(!validGameMinute(nowMinute)||!round||round.opensAt>nowMinute)return empty;
  const complete=round.status==='complete'&&round.completedAt<=nowMinute,selection=roundId==='selection',closed=nowMinute>=round.closesAt;
  const name=id=>id==='player'?(state.battleApplications?.find(a=>a.battleId===battleId)?.nickname??'Герой'):battleCharacter(id)?.nickname??'Участник';
@@ -25,5 +26,6 @@ export function publicRoundTable(state,{battleId='makarevich-1',roundId='selecti
   return {key,masked:false,participantId:id,name:name(id),trackVersionId,profileUrl:id===viewerId?'underweb://social/me':profileAccess(state,{viewerId,characterId:id,nowMinute}).canView?'underweb://social/profile/'+id:null,status,outcome,tone:status==='no_show'||outcome==='eliminated'?'danger':complete?'success':'normal',pairNumber:pairNumber??null,place:selection&&complete?place(id):null,scores,total,reviews:publicReviews};
  });
  const awards=published.filter(b=>b.ltr).map(b=>{const a=b.ltr,visible=rows.find(r=>r.participantId===a.participantId);return {judgeId:b.judgeId,judgeName:judgeProfile(b.judgeId)?.name??'Судья',name:name(a.participantId),profileUrl:visible?.profileUrl??null,trackVersionId:visible?.trackVersionId??null};});
- return {...empty,complete,opensAt:round.opensAt,closesAt:round.closesAt,completedAt:complete?round.completedAt:null,selection,rows,judges,awards,availableRounds:Object.values(t.rounds).filter(r=>r.opensAt<=nowMinute).sort((a,b)=>a.opensAt-b.opensAt).map(r=>({id:r.roundId,title:ROUND_LABELS[r.roundId]})),message:complete?'Полная панель опубликована. Итог закреплён.':closed?'Судейство продолжается. Проход ещё не определён.':'Приём работ открыт. Оценок пока нет.'};
+ const scoring=BATTLE_PUBLIC_SCORING[battleId]?.[roundId];
+ return {...empty,complete,scoring:scoring?{...scoring}:null,opensAt:round.opensAt,closesAt:round.closesAt,completedAt:complete?round.completedAt:null,selection,rows,judges,awards,availableRounds:Object.values(t.rounds).filter(r=>r.opensAt<=nowMinute).sort((a,b)=>a.opensAt-b.opensAt).map(r=>({id:r.roundId,title:ROUND_LABELS[r.roundId]})),message:complete?'Полная панель опубликована. Итог закреплён.':closed?'Судейство продолжается. Проход ещё не определён.':'Приём работ открыт. Оценок пока нет.'};
 }

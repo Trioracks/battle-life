@@ -8,6 +8,18 @@ import {resolveSocialRoute} from '../src/social-routing.js';
 import {mountUnderweb} from '../src/underweb-view.js';
 import {createSocialResultView} from '../src/social-result-view.js';
 const options={battleId:'makarevich-1',roundId:'selection',nowMinute:12000,viewerId:'player'};
+test('public scoring rules disclose selection scale independently of roster and only for public supported rounds',()=>{
+ const s=tableFixture(),t=s.tournaments.byId[options.battleId];
+ assert.deepEqual(publicRoundTable(s,options).scoring,{mode:'score',scale:50});
+ assert.equal(publicRoundTable(s,{...options,nowMinute:599}).scoring,null);
+ t.rounds['round-2']={...t.rounds.selection,roundId:'round-2',opensAt:13000,pairs:[]};
+ assert.equal(publicRoundTable(s,{...options,roundId:'round-2'}).scoring,null);
+ assert.deepEqual(publicRoundTable(s,{...options,roundId:'round-2',nowMinute:13000}).scoring,{mode:'comparison',scale:null});
+ s.tournaments.byId['concrete-echo']={...t,battleId:'concrete-echo'};
+ assert.equal(publicRoundTable(s,{...options,battleId:'concrete-echo'}).scoring,null);
+ const d=pcDocument(),host=d.createElement('main'),browser=mountUnderweb(host,{getState:()=>s,getMetadata:()=>({gameMinutes:12000,gameDay:9}),onChange:()=>true});
+ browser.navigate('underweb://battles/makarevich-1/rules');const text=allPc(host).map(n=>n.textContent).join(' ');assert.match(text,/5 оценок.*10 баллов.*50 баллов/);browser.dispose();
+});
 test('public table reveals only due reviews, hero always and qualifiers only after completed panel',()=>{
  const s=tableFixture(),early=publicRoundTable(s,{...options,nowMinute:11500});assert.equal(early.complete,false);assert.equal(early.rows.find(r=>r.participantId==='player').reviews.length,2);assert.equal(early.rows.filter(r=>r.masked).length,2);assert.ok(early.rows.every(r=>r.total===null));
  const done=publicRoundTable(s,options);assert.equal(done.complete,true);assert.equal(done.rows.find(r=>r.participantId==='mak-npc-01').name.length>0,true);assert.equal(done.rows.filter(r=>r.masked).length,1);
