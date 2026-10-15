@@ -19,6 +19,21 @@ $env:npm_config_update_notifier='false'
 
 The native command includes an actual 224-second manual sleep. Its optional WEEKPLAY_SMOKE=1 development mode waits only two seconds and deliberately records passed:false; it cannot establish week-long acceptance. WEEKPLAY_QA_DIR selects a separate evidence directory. Every run creates a fresh context and closes its own browser/server.
 
+The review supplement isolates the missing mounted-board publication transition without repeating the week:
+
+```powershell
+$env:WEEKPLAY_TRANSITION_ONLY='1'
+$env:WEEKPLAY_QA_PORT='4205'
+$env:WEEKPLAY_QA_DIR='artifacts/dossier-weekplay/task-10/transition-final'
+& 'C:/Program Files/nodejs/node.exe' tools/verify-dossier-weekplay.mjs
+& 'C:/Program Files/nodejs/node.exe' --test test/dossier-weekplay-integration.test.js test/rap-dossier-board.test.js test/rap-dossier-view.test.js
+Remove-Item Env:WEEKPLAY_TRANSITION_ONLY
+```
+
+This mode uses a fresh isolated host save immediately before publication: completed prior selection and its saved two-entrant bracket, but no next-round record, theme or announcement. Normal apartment time advances from minute 13430 through 13440; the actual social Worker generates the new round. The dossier stays mounted throughout. Assertions require new round/opponent cards, increased Worker commits, unchanged mounted view identity, no pre-cutoff disclosure (also querying the resulting state at the earlier cutoff), no unstudied judge assignment/private fields, zero PCM requests, and actual round-source/opponent-profile navigation from the cards. The small fixture intentionally isolates publication; it does not replace the retained 40-project live-week stress evidence.
+
+Final supplement passed on port4205: minute13430.884875→13440.012275 in36.7131 real seconds, ten additional Worker commits, same mounted dossier, zero PCM requests, and correct source/profile routes. No page errors or asset failures; owned resources, browser and server cleaned up. Evidence is `artifacts/dossier-weekplay/task-10/transition-final/evidence.json`; captures there are `before-round-publication.png`, `after-round-publication-1280.png`, `after-opponent-publication-1280.png`, `after-round-publication-390.png`, `published-round-source.png`, and `published-opponent-profile.png`. All six were visually inspected. The narrow capture shows the scrollable list's top/new-round boundary; desktop captures show both newly generated cards and their detail panels.
+
 ## Coverage
 
 - Twenty completed beat/text pairs (40 projects and 40 plans), twenty durable exported recordings, and twenty completed observations in the whole apartment host.
@@ -55,4 +70,4 @@ Thirty closed-view baselines remained exactly: 376 DOM nodes, 21 global listener
 
 The six native PCM renders passed with distinct hashes, finite samples, no clipping, nonzero intended sections and unchanged saved descriptors.
 
-The complete Node suite passed: 1,404 tests, 0 failures, 0 skipped (101.369 seconds). Focused integration/cache/fix coverage passed33/33. The full suite ran once on the final product and test tree.
+The complete Node suite passed at release commit 9decad8: 1,404 tests, 0 failures, 0 skipped (101.369 seconds). Focused integration/cache/fix coverage passed33/33. The review supplement adds one test and QA helpers only; product code is identical to that full-suite baseline. The focused integration/board/view command passes18/18; the full suite and 224-second week were not repeated for this QA-only supplement.

@@ -15,7 +15,35 @@ import {publicDossierCase,publicDossierTarget} from '../src/rap-dossier-cases.js
 import {topicFixture} from './helpers/round-topic-fixture.js';
 import {studySkills} from './helpers/analysis-fixture.js';
 import {dossierBoardFixture} from './helpers/dossier-board-fixture.js';
+import {dossierTransitionFixture} from './helpers/dossier-transition-fixture.js';
+import {mountRapDossier} from '../src/rap-dossier-view.js';
+import {pcDocument,allPc,findButton} from './helpers/virtual-pc-dom.js';
 const battleId='makarevich-1',caseId='battle:'+battleId;
+
+test('Worker-generated round appears in the already mounted board only at publication and routes its new cards',async()=>{
+ let state=dossierTransitionFixture(),minute=13439,request,worker;const calculate=createSocialWorkerRuntime(),urls=[];
+ const root=pcDocument().createElement('main'),ui=mountRapDossier(root,{getState:()=>state,getMetadata:()=>({gameMinutes:minute}),navigate:url=>urls.push(url)});
+ const cards=()=>allPc(root).filter(n=>n.dataset?.dossierNode),roundId='round:makarevich-1:round-2',opponentId='opponent:mak-npc-01';
+ const background=createSocialBackground({getState:()=>state,createWorker:()=>worker={postMessage:m=>request=structuredClone(m),terminate(){}},persist:()=>true,onState:next=>state=next});
+ try{
+  assert.deepEqual(Object.keys(state.tournaments.byId[battleId].rounds),['selection']);
+  background.tick(minute,{},0);worker.onmessage({data:calculate(request)});
+  assert.equal(state.tournaments.byId[battleId].rounds['round-2'],undefined);
+  assert.ok(!cards().some(n=>[roundId,opponentId].includes(n.dataset.dossierNode)));
+  const mounted=root.children[0];minute=13440;background.tick(minute,{},300);worker.onmessage({data:calculate(request)});
+  assert.equal(background.snapshot.error,'');assert.equal(state.tournaments.byId[battleId].currentRoundId,'round-2');
+  assert.ok(state.tournaments.byId[battleId].events.some(e=>e.type==='round-announced'&&e.roundId==='round-2'&&e.dueAt===13440));
+  // The same mounted view must consume the committed result on its normal tick.
+  await new Promise(resolve=>setTimeout(resolve,260));ui.update();assert.equal(root.children[0],mounted);
+  const round=cards().find(n=>n.dataset.dossierNode===roundId),opponent=cards().find(n=>n.dataset.dossierNode===opponentId);assert.ok(round);assert.ok(opponent);
+  const before=publicDossierCase(state,{caseId,nowMinute:13439}),after=publicDossierCase(state,{caseId,nowMinute:13440});
+  assert.ok(!before.nodes.some(n=>n.roundId==='round-2'||n.kind==='opponent'));
+  assert.ok(!after.edges.some(e=>e.kind==='judge'&&e.from===roundId));
+  for(const secret of ['qualities','heroSkillSnapshot','knownFacts','weights','recoveryData'])assert.ok(!JSON.stringify(after).includes('"'+secret+'"'));
+  round.click();findButton(root,'Открыть источник').click();opponent.click();findButton(root,'Открыть профиль').click();
+  assert.deepEqual(urls,['underweb://social/results/makarevich-1/round-2','underweb://social/profile/mak-npc-01']);
+ }finally{background.dispose();ui.dispose();}
+});
 
 test('manual sleep completes powered installer and publishes one durable notification backlog',()=>{
  const config=prepareApartmentConfig({bounds:[-2,2],spawn:[1,0,.8],speed:1,doorX:0,actions:{bed:{approach:[1,0,.8],pose:[1,.4,0],yaw:0,clip:'sleep',fade:true,duration:5}}});

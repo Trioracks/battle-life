@@ -34,6 +34,12 @@ try{
  const context=await browser.newContext({viewport:{width:1280,height:720},reducedMotion:'reduce'});await context.addInitScript(installWeekplayCounters);page=await context.newPage();page.setDefaultTimeout(45000);
  page.on('pageerror',e=>evidence.errors.push(e.message));page.on('response',r=>{if(r.status()>=400)evidence.assetFailures.push({status:r.status(),url:r.url()});});page.on('requestfailed',r=>{if(r.failure()?.errorText!=='net::ERR_ABORTED')evidence.assetFailures.push({url:r.url(),failure:r.failure()});});
  await page.goto(base+'/__week');
+ if(process.env.WEEKPLAY_TRANSITION_ONLY==='1'){
+  const {verifyWeekplayTransition}=await import('./qa/weekplay-transition.mjs');
+  evidence.transition=await verifyWeekplayTransition({page,base,out,evaluate,milestone});evidence.shots.push(...evidence.transition.shots);
+  for(const path of assetPaths)assert.equal(hash(await readFile(path)),assets[path],'frozen asset '+path);
+  assert.deepEqual(evidence.errors,[]);assert.deepEqual(evidence.assetFailures,[]);evidence.passed=true;await record();await context.close();
+ }else{
  evidence.recovery=await evaluate(async()=>{const {verifyWeekplayRecovery}=await import('/tools/qa/weekplay-recovery.mjs');return verifyWeekplayRecovery();});await milestone('Native stale Worker and save recovery verified',evidence.recovery);
  await evaluate(async()=>{const p=await import('/src/avatar-v3-profile.js?rev=43');if(!p.saveProfile(localStorage,p.createProfile({name:'Неделя проверки'})).ok)throw Error('profile seed');});
  await page.goto(base);await page.locator('#loading').waitFor({state:'hidden'});await page.locator('#continue-game').click();await page.waitForFunction(()=>weekQA.sleeping);
@@ -92,5 +98,6 @@ try{
  assert.deepEqual(evidence.errors,[]);assert.deepEqual(evidence.assetFailures,[]);
  for(const row of evidence.performance)assertNativeTargets(row,row.label);
  evidence.passed=process.env.WEEKPLAY_SMOKE!=='1';await record();await milestone('Native integration complete',{passed:evidence.passed});await context.close();
+ }
 }catch(error){evidence.failure=error.stack;if(page&&!page.isClosed())await page.screenshot({path:out+'/failure.png'}).catch(()=>{});throw error;}
 finally{try{await browser?.close();}finally{server.closeAllConnections();if(server.listening)await new Promise(done=>server.close(done));evidence.cleanup={browserClosed:!browser?.isConnected(),serverClosed:!server.listening};await record();}}
