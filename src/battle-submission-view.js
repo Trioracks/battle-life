@@ -1,5 +1,5 @@
-import {mountAudioFilePicker} from './pc-audio-file-picker.js?rev=41';
-import {attachSubmissionTrack} from './social-submission.js?rev=41';
+import {mountAudioFilePicker} from './pc-audio-file-picker.js?rev=42';
+import {attachSubmissionTrack} from './social-submission.js?rev=42';
 
 export function mountBattleSubmissionPicker(root,{getState,battleId,communityId=battleId,getGameMinute=()=>null,onChange,onClose=()=>{}}){
  return mountAudioFilePicker(root,{getState,onClose,describe:file=>{

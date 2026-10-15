@@ -1,5 +1,5 @@
 // Temporary balance: a novice's lucky decisions cannot buy professional execution.
-import {normalizeGenreSnapshot} from './genre-progression.js?rev=41';
+import {normalizeGenreSnapshot} from './genre-progression.js?rev=42';
 export const BEAT_RESULT_RULES=Object.freeze({max:110,performanceWeight:.8,base:.55,fitWeight:.55,decisionBonus:20,decisionExponent:6,weakerSkillBase:55,weakerSkillWeight:.55});
 const clamp=(x,hi=100)=>Math.max(0,Math.min(hi,x));
 const validSkills=s=>Number.isFinite(s?.beatmaking)&&Number.isFinite(s?.sound);

@@ -9,10 +9,10 @@ const browser=await chromium.launch({headless:true,executablePath:process.env.PL
 const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[],requests=[];
 page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));
 try{
- await page.route('**/__retired-drums',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><link rel="stylesheet" href="/virtual-pc.css?rev=41"><link rel="stylesheet" href="/desktop-apps.css?rev=41"><style>body{margin:0}</style><section id="virtual-pc"></section>'}));
+ await page.route('**/__retired-drums',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><link rel="stylesheet" href="/virtual-pc.css?rev=42"><link rel="stylesheet" href="/desktop-apps.css?rev=42"><style>body{margin:0}</style><section id="virtual-pc"></section>'}));
  const base=process.env.BATTLE_QA_URL||'http://127.0.0.1:4175';await page.goto(base+'/__retired-drums');
  await page.evaluate(async()=>{
-  const [ui,state,production]=await Promise.all(['virtual-pc-ui','virtual-pc-state','beat-production'].map(n=>import('/src/'+n+'.js?rev=41')));
+  const [ui,state,production]=await Promise.all(['virtual-pc-ui','virtual-pc-state','beat-production'].map(n=>import('/src/'+n+'.js?rev=42')));
   window.qa={state,production};window.pc=ui.mountVirtualPc(document.querySelector('#virtual-pc'));
   pc.showDesktop(state.createVirtualPcState({power:'on',download:{status:'installed'}}));pc.open('underweb');pc.navigateUnderweb('underweb://samples');
  });
@@ -30,7 +30,7 @@ try{
  await page.getByText(/старый луп удалён из игры/).waitFor();
  await page.screenshot({path:output+'/retired-project.png',animations:'disabled'});
  const result=await page.evaluate(async()=>{
-  const {BeatAudio}=await import('/src/beat-audio.js?rev=41');
+  const {BeatAudio}=await import('/src/beat-audio.js?rev=42');
   let s=qa.production.createBeat(qa.state.createVirtualPcState(),{id:'current',name:'Новый авторский бит'},{beatmaking:100},()=>0).state;
   s=qa.production.advanceBeatWork(qa.production.startBeatStage(s,'current',[5,5,5],{beatmaking:100}).state,1000).state;
   const audio=new BeatAudio(),ok=await audio.playProject(s.projects[0]);

@@ -1,10 +1,10 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=41';
-import {socialButton,socialHeading} from './social-dom.js?rev=41';
-import {gameDateTimeLabel} from './home-calendar.js?rev=41';
-import {requestResultReaction} from './social-result-reaction.js?rev=41';
+import {pcElement as el} from './virtual-pc-dom.js?rev=42';
+import {socialButton,socialHeading} from './social-dom.js?rev=42';
+import {gameDateTimeLabel} from './home-calendar.js?rev=42';
+import {requestResultReaction} from './social-result-reaction.js?rev=42';
 const statuses={accepting:'Приём работ',judging:'Ожидает итога',no_show:'Не сдал',bye:'Проход пустой ветки',empty:'Пустое место',hidden:'░░░░',qualified:'Прошёл',eliminated:'Выбыл',won:'Победа',technical_win:'Технический проход'};
 export function createBattleResultsTableView(d,{table,navigate,onAnalyze,audio,getState,commit,onResultViewed=()=>{},uiState={},isVisible=()=>true}={}){
- const root=el(d,'section',{className:'bt-results'});root.append(socialButton(d,'← Сообщество',()=>navigate('underweb://social/community/'+table.battleId),{className:'sn-link'}),socialHeading(d,'Таблица судейства · '+table.title),el(d,'p',{className:'sn-note',text:table.message}));
+ const root=el(d,'section',{className:'bt-results'});root.append(socialButton(d,'← Группа',()=>navigate('underweb://social/community/'+table.battleId),{className:'sn-link'}),socialHeading(d,'Таблица судейства · '+table.title),el(d,'p',{className:'sn-note',text:table.message}));
  const nav=el(d,'nav',{className:'sn-actions',attributes:{'aria-label':'Раунды турнира'}});for(const r of table.availableRounds)nav.append(socialButton(d,r.title,()=>navigate('underweb://social/results/'+table.battleId+'/'+r.id),{attributes:r.id===table.roundId?{'aria-current':'page'}:{}}));root.append(nav);
  if(table.closesAt!==undefined)root.append(el(d,'p',{text:'Сдача до '+gameDateTimeLabel(table.closesAt)}));
  const own=table.rows.find(r=>r.participantId==='player'),event=table.complete&&own&&getState?.().socialRuntime?.events?.find(e=>e.type==='round-result'&&e.battleId===table.battleId&&e.roundId===table.roundId);if(event&&commit)root.append(socialButton(d,'Открыть мой итог',()=>{if(commit(requestResultReaction(getState(),event.id)))onResultViewed(event.id);},{dataset:{resultSummary:event.id}}));

@@ -1,21 +1,21 @@
-import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=41';
-import {resolveUnderweb,BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=41';
-import {createBeatMarket} from './beat-market-view.js?rev=41';
-import {softwareForum,softwareMessage} from './pc-software-view.js?rev=41';
-import {downloadPresentation} from './virtual-pc-runtime.js?rev=41';
-import {mountBrowserDownloads} from './pc-browser-downloads-view.js?rev=41';
-import {createCommunityView} from './underweb-community-view.js?rev=41';
-import {communityDay} from './underweb-community.js?rev=41';
-import {homeDateLabel} from './home-calendar.js?rev=41';
-import {newsForDay} from './underweb-news.js?rev=41';
-import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=41';
-import {mountSocial} from './social-view.js?rev=41';
-import {activateSocial} from './social-runtime.js?rev=41';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=41';
-import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=41';
-import {ensureBattleWindow,currentBattleWindow,attemptForWindow} from './battle-windows.js?rev=41';
-import {showRegistrationNotice} from './social-dom.js?rev=41';
-import {publicRoundTable,ROUND_LABELS} from './battle-results-table.js?rev=41';
+import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=42';
+import {resolveUnderweb,BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=42';
+import {createBeatMarket} from './beat-market-view.js?rev=42';
+import {softwareForum,softwareMessage} from './pc-software-view.js?rev=42';
+import {downloadPresentation} from './virtual-pc-runtime.js?rev=42';
+import {mountBrowserDownloads} from './pc-browser-downloads-view.js?rev=42';
+import {createCommunityView} from './underweb-community-view.js?rev=42';
+import {communityDay} from './underweb-community.js?rev=42';
+import {homeDateLabel} from './home-calendar.js?rev=42';
+import {newsForDay} from './underweb-news.js?rev=42';
+import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=42';
+import {mountSocial} from './social-view.js?rev=42';
+import {activateSocial} from './social-runtime.js?rev=42';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=42';
+import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=42';
+import {ensureBattleWindow,currentBattleWindow,attemptForWindow} from './battle-windows.js?rev=42';
+import {showRegistrationNotice} from './social-dom.js?rev=42';
+import {publicRoundTable,ROUND_LABELS} from './battle-results-table.js?rev=42';
 const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-control '+(options.className??'')},fn);
 
 export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,onWork=()=>false,onSubmitTrack=()=>{},onResultViewed=()=>{},getSoftwareMessage=()=>'',isVisible=()=>true}){
@@ -166,5 +166,5 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   else if(route.type==='dump'){const node=pcFind(page,n=>n.dataset?.pcRole==='forum-transfer');if(node){const p=downloadPresentation(getState(),'client');node.textContent=`Загрузка: ${p.receivedMb.toFixed(2)} / ${p.totalMb} МБ · ${p.speedKbPerSecond} КБ/с${p.error?' · '+softwareMessage(p.error):''}`;}}
  },dispose(){closeRegistration?.();socialView?.dispose();downloadsView.dispose();root.replaceChildren();}};
 }
-import {currentRoundTopic} from './round-topics.js?rev=41';
-import {reactionVisibilitySignature} from './social-reactions-view.js?rev=41';
+import {currentRoundTopic} from './round-topics.js?rev=42';
+import {reactionVisibilitySignature} from './social-reactions-view.js?rev=42';

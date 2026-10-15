@@ -1,5 +1,5 @@
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=41';
-import {homeDateLabel} from './home-calendar.js?rev=41';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=42';
+import {homeDateLabel} from './home-calendar.js?rev=42';
 
 // A mounted picker owns its inputs, so host clock/needs updates cannot reset a query.
 export function mountProjectPicker(root,{items=[],onSelect=()=>{},onCancel=()=>{}}={}){

@@ -9,20 +9,19 @@ const output=process.env.FT_QA_DIR||resolve('artifacts/task8-browser-downloads')
 await mkdir(resolve('artifacts/v-krugu-qa/browser-temp'),{recursive:true});process.env.TEMP=process.env.TMP=resolve('artifacts/v-krugu-qa/browser-temp');
 const mime={'.js':'text/javascript','.json':'application/json','.html':'text/html','.css':'text/css','.glb':'model/gltf-binary','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.wav':'audio/wav','.mp3':'audio/mpeg','.woff2':'font/woff2'};
 const server=createServer(async(req,res)=>{try{const pathname=new URL(req.url,base).pathname,path=resolve(root,'.'+decodeURIComponent(pathname==='/'?'/index.html':pathname));if(!path.startsWith(root+sep)){res.writeHead(403);res.end();return;}res.writeHead(200,{'Content-Type':mime[extname(path)]||'application/octet-stream','Cache-Control':'no-store'});res.end(await readFile(path));}catch{res.writeHead(404);res.end();}});
-await new Promise((yes,no)=>{server.once('error',no);server.listen(4188,'127.0.0.1',yes);});
 const qaCase=process.env.PC_SOFTWARE_QA_CASES||'browser-downloads';
 let source=await readFile('src/apartment-app.js','utf8');
 source=source.replace('function update(dt,now,step=false){','function updateOriginal(dt,now,step=false){').replace("loading.hidden=true;setMode('menu');",`window.softwareQA={samples:[],get state(){return pcState},get pc(){return virtualPc},pause(value){paused=value},save(){persistPc(pcState)},quota(value){const real=window.localStorage;storage=value?{getItem:k=>real.getItem(k),setItem(){throw Error('QA quota');}}:real},resetMetrics(){this.samples=[];this.lastNow=null}};
 function update(dt,now,step=false){const start=performance.now();updateOriginal(dt,now,step);if(mode==='pc')softwareQA.samples.push({ms:performance.now()-start,dt:softwareQA.lastNow?now-softwareQA.lastNow:0});softwareQA.lastNow=now;}
 loading.hidden=true;setMode('menu');`);
-const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});const errors=[];
+let browser;const errors=[];
 const key='battle-life-virtual-pc-v1';
 async function fixture(seed){
  const context=await browser.newContext({viewport:{width:1280,height:720}}),page=await context.newPage();page.setDefaultTimeout(60000);page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/src/apartment-app.js*',r=>r.fulfill({contentType:'text/javascript',body:source}));
  await page.route('**/__software-fixture',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><body>Isolated software fixture</body>'}));
  if(seed){await page.goto(base+'/__software-fixture');await page.evaluate(async seed=>{
-  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=28'),import('/src/virtual-pc-state.js?rev=33')]);
+  const [{createProfile},{createVirtualPcState}]=await Promise.all([import('/src/avatar-v3-profile.js?rev=42'),import('/src/virtual-pc-state.js?rev=42')]);
   localStorage.setItem('battle-life-apartment-v3',JSON.stringify(createProfile({name:'Software QA'})));
   const pc=createVirtualPcState(seed);if(seed.legacy)delete pc.software;
   localStorage.setItem('battle-life-virtual-pc-v1',JSON.stringify(pc));localStorage.setItem('battle-life-apartment-v3-time',JSON.stringify({day:1,minutes:720,initialRest:false}));
@@ -49,6 +48,8 @@ async function install(page,{destination,screenshot}={}){
  await w.getByRole('button',{name:'Готово',exact:true}).click({timeout:45000});
 }
 try{
+ await new Promise((yes,no)=>{server.once('error',no);server.listen(4188,'127.0.0.1',yes);});
+ browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
  if(qaCase==='browser-downloads'){
   const {context,page}=await fixture({power:'on',software:{notebook:{receivedBytes:4000000}}});
   await page.locator('#continue-game').click();await enter(page);await launch(page,'underweb');await navigate(page,'underweb://dump/ft-studio');
@@ -128,4 +129,4 @@ try{
   await context.close();console.log('PASS partial reload has no retroactive credit, toolbar disabled appearance, final compact forum desktop/narrow');
  }
  assert.deepEqual(errors,[]);console.log('PASS zero browser page errors');
-}catch(error){for(const context of browser.contexts())for(const page of context.pages()){await page.screenshot({path:output+'/failure.png'}).catch(()=>{});console.log((await page.locator('body').innerText()).slice(-2500));}throw error;}finally{await browser.close();server.closeAllConnections();await new Promise(r=>server.close(r));}
+}catch(error){for(const context of browser?.contexts()??[])for(const page of context.pages()){await page.screenshot({path:output+'/failure.png'}).catch(()=>{});console.log((await page.locator('body').innerText()).slice(-2500));}throw error;}finally{try{await browser?.close();}finally{server.closeAllConnections();if(server.listening)await new Promise(r=>server.close(r));}}

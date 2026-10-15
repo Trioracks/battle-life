@@ -1,5 +1,5 @@
-import {SOFTWARE,METADATA_BYTES} from './pc-software-catalog.js?rev=41';
-import {normalizeSoftware,withSoftware,softwareDiskBytes} from './pc-software.js?rev=41';
+import {SOFTWARE,METADATA_BYTES} from './pc-software-catalog.js?rev=42';
+import {normalizeSoftware,withSoftware,softwareDiskBytes} from './pc-software.js?rev=42';
 const seconds=n=>Number.isFinite(n)?Math.max(0,Math.min(1,n)):0;
 export function normalizeBrowserDownloads(value){
  const seen=new Set(),items=[];

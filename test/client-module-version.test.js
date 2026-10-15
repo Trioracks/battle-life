@@ -22,13 +22,13 @@ test('home integration invalidates every changed dependency and its importers wi
  const affected=new Set(changed);let size;
  do{size=affected.size;for(const [file,imports]of graph)if(imports.some(dependency=>affected.has(dependency.file)))affected.add(file);}while(affected.size!==size);
  const html=await read('index.html');
- assert.match(html,/apartment-app\.js\?rev=41/);
- for(const style of ['apartment-v3','creator-v12','desktop-apps','rap-notebook','virtual-pc','social-network','phone-hud'])assert.ok(html.includes(style+'.css?rev=41'),style+' must invalidate changed styles');
- assert.ok((await read('desktop-apps.css')).includes('underweb-world.css?rev=41'));
+ assert.match(html,/apartment-app\.js\?rev=42/);
+ for(const style of ['apartment-v3','creator-v12','desktop-apps','rap-notebook','virtual-pc','social-network','phone-hud'])assert.ok(html.includes(style+'.css?rev=42'),style+' must invalidate changed styles');
+ assert.ok((await read('desktop-apps.css')).includes('underweb-world.css?rev=42'));
  const canonical=new Map();
  for(const [file,imports]of graph)for(const dependency of imports){
   if(!dependency.file.startsWith('src/'))continue;
-  assert.equal(dependency.query,'rev=41',file+' must load canonical '+dependency.file);
+  assert.equal(dependency.query,'rev=42',file+' must load canonical '+dependency.file);
   const previous=canonical.get(dependency.file);if(previous)assert.equal(previous,dependency.query);canonical.set(dependency.file,dependency.query);
  }
  for(const file of changed)assert.ok(graph.has(file),file+' is covered by the live entry graph');

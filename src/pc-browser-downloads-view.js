@@ -1,6 +1,6 @@
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=41';
-import {browserDownloadEntries} from './pc-browser-downloads.js?rev=41';
-import {softwareMessage} from './pc-software-view.js?rev=41';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=42';
+import {browserDownloadEntries} from './pc-browser-downloads.js?rev=42';
+import {softwareMessage} from './pc-software-view.js?rev=42';
 
 export function mountBrowserDownloads(root,{getState,onAction,getMessage=()=>''}){
  const d=root.ownerDocument,rows=new Map(),message=el(d,'p',{attributes:{role:'status'}});let expanded=true;

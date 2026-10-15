@@ -1,4 +1,4 @@
-import {BEAT_GENRES,BEAT_PRACTICE} from './beat-catalog.js?rev=41';
+import {BEAT_GENRES,BEAT_PRACTICE} from './beat-catalog.js?rev=42';
 const clamp=(v,max=100)=>Math.max(0,Math.min(max,Number.isFinite(v)?v:0));
 export const GENRES=Object.freeze([{id:'experimental',name:'Экспериментальный',targets:BEAT_PRACTICE.targets},...BEAT_GENRES]);
 export const genreById=id=>GENRES.find(g=>g.id===id);

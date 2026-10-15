@@ -1,10 +1,10 @@
-import {normalizeBeat} from './beat-production.js?rev=41';
-import {resolveBeatPlayback} from './beat-playback.js?rev=41';
-import {captureTrackVersion,canonicalTrackSignature} from './track-version.js?rev=41';
-import {softwareDiskBytes} from './pc-software.js?rev=41';
-import {drumById} from './beat-catalog.js?rev=41';
-import {beginnerById} from './beat-beginner-bank.js?rev=41';
-import {vocalById} from './vocal-catalog.js?rev=41';
+import {normalizeBeat} from './beat-production.js?rev=42';
+import {resolveBeatPlayback} from './beat-playback.js?rev=42';
+import {captureTrackVersion,canonicalTrackSignature} from './track-version.js?rev=42';
+import {softwareDiskBytes} from './pc-software.js?rev=42';
+import {drumById} from './beat-catalog.js?rev=42';
+import {beginnerById} from './beat-beginner-bank.js?rev=42';
+import {vocalById} from './vocal-catalog.js?rev=42';
 
 export const AUDIO_EXPORT_FOLDERS=Object.freeze(['documents','music','exports','downloads','projects']);
 export const AUDIO_EXPORT_KINDS=Object.freeze({beat:'Бит',vocal:'Вокал',track:'Полный трек'});

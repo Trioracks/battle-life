@@ -1,8 +1,8 @@
-import {normalizeSocial} from './social-state.js?rev=41';
-import {validGameMinute} from './game-minute.js?rev=41';
-import {startSubmissionUpload} from './social-upload.js?rev=41';
-import {normalizeOutgoingMessage} from './social-composer.js?rev=41';
-import {submissionSendContext} from './social-submission-validation.js?rev=41';
+import {normalizeSocial} from './social-state.js?rev=42';
+import {validGameMinute} from './game-minute.js?rev=42';
+import {startSubmissionUpload} from './social-upload.js?rev=42';
+import {normalizeOutgoingMessage} from './social-composer.js?rev=42';
+import {submissionSendContext} from './social-submission-validation.js?rev=42';
 export const ACK_TEMPLATES=Object.freeze([
  'Привет! Трек принят, спасибо за участие. После дедлайна передадим судьям.',
  'Работа на месте, вложение открылось. Ждём окончания приёма.',

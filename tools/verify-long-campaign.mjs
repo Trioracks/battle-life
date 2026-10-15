@@ -4,6 +4,8 @@ import {createRequire} from 'node:module';
 import {createServer} from 'node:http';
 import {mkdir,readFile,writeFile,access} from 'node:fs/promises';
 import {resolve,extname,sep} from 'node:path';
+import {summarizeNative as summarize,assertNativeTargets} from './qa/acceptance-metrics.mjs';
+import {verifyFinalWorkflows} from './qa/final-workflows.mjs';
 
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'C:/Users/zubko/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
 const root=resolve('.'),out=resolve(process.env.FT_QA_DIR||'artifacts/v-krugu-qa/long-campaign');
@@ -11,19 +13,14 @@ await mkdir(out+'/browser-temp',{recursive:true});process.env.TEMP=process.env.T
 const specified=process.argv.find(v=>v.startsWith('--label='))?.slice(8);
 const exists=await access(out+'/baseline.json').then(()=>true,()=>false),label=specified||(exists?'after':'baseline');
 assert.match(label,/^[a-z0-9-]+$/);
-const mime={'.js':'text/javascript','.json':'application/json','.html':'text/html','.css':'text/css','.glb':'model/gltf-binary','.png':'image/png','.jpg':'image/jpeg','.wav':'audio/wav','.mp3':'audio/mpeg','.woff2':'font/woff2'};
+assert.equal(await access(out+'/'+label+'.json').then(()=>true,()=>false),false,'Choose a new label; prior success and failure evidence is immutable');
+const mime={'.js':'text/javascript','.json':'application/json','.html':'text/html','.css':'text/css','.glb':'model/gltf-binary','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.wav':'audio/wav','.mp3':'audio/mpeg','.woff2':'font/woff2'};
 const server=createServer(async(req,res)=>{try{
  const pathname=new URL(req.url,'http://127.0.0.1').pathname,path=resolve(root,'.'+decodeURIComponent(pathname==='/'?'/index.html':pathname));
  if(!path.startsWith(root+sep)){res.writeHead(403);res.end();return;}
  const data=await readFile(path);res.writeHead(200,{'Content-Type':mime[extname(path)]||'application/octet-stream','Cache-Control':'no-store'});res.end(data);
 }catch{res.writeHead(404);res.end();}});
-await new Promise(r=>server.listen(0,'127.0.0.1',r));
-const base='http://127.0.0.1:'+server.address().port;
-const summarize=rows=>{
- const q=(a,p)=>a[Math.min(a.length-1,Math.floor(a.length*p))]??0;
- const update=rows.map(r=>r.ms).sort((a,b)=>a-b),frames=rows.map(r=>r.dt).filter(n=>n>0).sort((a,b)=>a-b);
- return {frames:rows.length,updateP50:q(update,.5),updateP95:q(update,.95),updateMax:update.at(-1)??0,frameP95:q(frames,.95),frameMax:frames.at(-1)??0,walking:rows.filter(r=>r.walking).length,targetsMet:q(update,.95)<=20&&q(frames,.95)<=25};
-};
+const port=Number(process.env.BATTLE_QA_PORT||4191),base='http://127.0.0.1:'+port;assert.notEqual(port,4173);
 const original=await readFile('src/apartment-app.js','utf8');
 const hook=`window.campaignQA={samples:[],walking:false,freezeUpdates:false,get state(){return pcState},get pc(){return virtualPc},get soundNodes(){return pcSounds.nodes.size},get phase(){return pcLifecycle.snapshot.phase},get motion(){return motion},reset(){this.samples=[];this.lastNow=null;}};
  function update(dt,now,step=false){
@@ -37,12 +34,13 @@ assert.ok(original.includes('function update(dt,now,step=false){'));
 assert.ok(original.includes("loading.hidden=true;setMode('menu');"));
 const source=original.replace('function update(dt,now,step=false){','function updateOriginal(dt,now,step=false){').replace("loading.hidden=true;setMode('menu');",hook+"loading.hidden=true;setMode('menu');");
 let browser;
-const desktopResources=process.argv.includes('--desktop-resources');
+const desktopOnly=process.argv.includes('--desktop-resources'),performanceOnly=process.argv.includes('--performance-only'),desktopResources=!performanceOnly;
 const report={label,performanceOnly:process.argv.includes('--performance-only'),desktopResources,base,createdAt:new Date().toISOString(),results:[],errors:[]};
 try{
+ await new Promise((yes,no)=>{server.once('error',no);server.listen(port,'127.0.0.1',yes);});
  browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE||'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',args:['--autoplay-policy=no-user-gesture-required']});
- const scenarios=desktopResources?[[20,1280,720],[20,1366,768],[20,1920,1080]]:[[1,1280,720],[5,1280,720],[10,1280,720],[20,1280,720],[20,1366,768],[20,1920,1080]];
- for(const [tracks,width,height]of process.argv.includes('--first-scenario')?scenarios.slice(0,1):scenarios){
+ const scenarios=process.argv.includes('--integration-only')?[]:[...desktopOnly?[]:[[1,1280,720],[5,1280,720],[10,1280,720],[20,1280,720],[20,1366,768],[20,1920,1080]],...performanceOnly?[]:[[20,1280,720,true],[20,1366,768,true],[20,1920,1080,true]]];
+ for(const [tracks,width,height,desktopResources=false]of process.argv.includes('--first-scenario')?scenarios.slice(0,1):scenarios){
   const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage();page.setDefaultTimeout(90000);
   if(desktopResources)await page.addInitScript(()=>{
    const request=window.requestAnimationFrame.bind(window),cancel=window.cancelAnimationFrame.bind(window),pending=new Map(),executed={studio:0,other:0};
@@ -75,12 +73,12 @@ try{
   for(const [key,times]of Object.entries(seed.costs))row.micro[key]=summarize(times.map(ms=>({ms,dt:0})));
   if(!desktopResources){await page.evaluate(()=>{campaignQA.walking=true;campaignQA.reset();});
   await page.waitForFunction(()=>campaignQA.samples.length>=180);
-  row.walking=summarize(await page.evaluate(()=>campaignQA.samples));assert.ok(row.walking.walking>0);
+  const samples=await page.evaluate(()=>campaignQA.samples);row.walking=summarize(samples);row.samples={walking:samples};assert.ok(row.walking.walking>0);
   await page.evaluate(()=>campaignQA.walking=false);await page.waitForFunction(()=>campaignQA.motion.phase==='idle');}
-  await page.locator('#actions [data-action="computer"]').click();await page.waitForFunction(()=>campaignQA.phase==='desktop');
+  await page.locator('#apartment').focus();await page.locator('#apartment').press('Enter');await page.locator('#actions [data-action="computer"]').click();await page.waitForFunction(()=>campaignQA.phase==='desktop');
   await page.evaluate(()=>campaignQA.pc.openNow('ft-studio'));await page.locator('.pc-window[data-window-id="ft-studio"]').waitFor();
   await page.evaluate(()=>campaignQA.reset());await page.waitForFunction(()=>campaignQA.samples.length>=180);
-  row.ft=summarize(await page.evaluate(()=>campaignQA.samples));
+  const ftSamples=await page.evaluate(()=>campaignQA.samples);row.ft=summarize(ftSamples);row.samples={...row.samples,ft:ftSamples};
   if(desktopResources){
    await page.evaluate(()=>campaignQA.pc.studioView.openProject(campaignQA.pc.state.projects.find(p=>p.id==='campaign-beat-20')));
    row.transferBefore=await page.evaluate(()=>campaignQA.pc.state.software.dossier.receivedBytes);
@@ -92,6 +90,7 @@ try{
     const data=await page.evaluate(()=>({samples:campaignQA.samples,raf:desktopRAF(),audio:campaignQA.pc.beatAudio.sources.length}));
     const {profile}=await profiler.send('Profiler.stop');await writeFile(`${out}/${label}-${width}x${height}-${app}.cpuprofile`,JSON.stringify(profile));
     row.desktop[app]={...summarize(data.samples),raf:data.raf,audio:data.audio};
+    await writeFile(`${out}/${label}-${width}x${height}-${app}-samples.json`,JSON.stringify(data.samples));
     assert.equal(data.raf.pending.studio,app==='ft-studio'?1:0);
    }
    await page.evaluate(()=>{for(const app of ['ft-studio','rap-notebook','underweb','torent'])campaignQA.pc.closeNow(app);});
@@ -121,7 +120,7 @@ try{
    const last=row.cycles.at(-1);assert.ok(last.jsEventListeners<=row.resourceBaseline.jsEventListeners,'live event handlers grew');
    row.transferAfter=await page.evaluate(()=>campaignQA.pc.state.software.dossier.receivedBytes);assert.ok(row.transferAfter>row.transferBefore,'background transfer stopped while torent was covered or closed');
    const history=await page.evaluate(()=>JSON.stringify({projects:campaignQA.state.projects.filter(p=>p.id!=='current'),plans:campaignQA.state.creativeWork.items.filter(i=>i.projectId!=='current')}));assert.equal(history,seed.history);row.historyPreserved=true;
-   await page.screenshot({path:`${out}/${label}-${width}x${height}.png`});await writeFile(`${out}/${label}.json`,JSON.stringify(report,null,2));console.log(JSON.stringify(row));await context.close();continue;
+   await page.screenshot({path:`${out}/${label}-${width}x${height}.png`});await writeFile(`${out}/${label}.json`,JSON.stringify(report,null,2));for(const [app,metric]of Object.entries(row.desktop))assertNativeTargets(metric,width+' '+app);assertNativeTargets(row.ft,width+' resource FT');console.log(JSON.stringify({...row,samples:undefined}));await context.close();continue;
   }
   const profiler=await context.newCDPSession(page);await profiler.send('Profiler.enable');await profiler.send('Profiler.start');
   await page.evaluate(()=>{if(!campaignHost.run())throw Error('Cannot start work');});await page.waitForFunction(()=>campaignQA.phase==='working');
@@ -133,8 +132,9 @@ try{
   row.currentStages=data.state.projects.find(p=>p.id==='current').stages.length;row.currentElapsed=data.state.music.job?.elapsed??null;
   await page.screenshot({path:`${out}/${label}-${tracks}-${width}x${height}.png`});
   await writeFile(`${out}/${label}-${tracks}-${width}x${height}-samples.json`,JSON.stringify({row,micro:seed.costs,samples:data.samples},null,2));
-  report.results.push(row);await writeFile(`${out}/${label}.json`,JSON.stringify(report,null,2));console.log(JSON.stringify(row));await context.close();
+  report.results.push(row);await writeFile(`${out}/${label}.json`,JSON.stringify(report,null,2));for(const key of ['walking','ft','work'])assertNativeTargets(row[key],tracks+' '+width+' '+key);console.log(JSON.stringify({...row,samples:undefined}));await context.close();
  }
+ if(!performanceOnly&&!process.argv.includes('--first-scenario'))report.integration=await verifyFinalWorkflows({browser,base,out,label,source,errors:report.errors});
  assert.deepEqual(report.errors,[]);console.log(`PASS isolated campaign history and native samples: ${out}/${label}.json`);
-}catch(error){report.errors.push(error.message);throw error;}
-finally{try{await browser?.close();}finally{await new Promise(r=>server.close(r));report.cleanup={browserClosed:Boolean(browser),serverClosed:true};await writeFile(`${out}/${label}.json`,JSON.stringify(report,null,2));}}
+}catch(error){report.errors.push(error.stack);for(const context of browser?.contexts()??[])for(const [index,page]of context.pages().entries()){await page.screenshot({path:`${out}/${label}-failure-${index}.png`}).catch(()=>{});const samples=await page.evaluate(()=>window.campaignQA?.samples??[]).catch(()=>[]);await writeFile(`${out}/${label}-failure-${index}-samples.json`,JSON.stringify(samples));}throw error;}
+finally{try{await browser?.close();}finally{server.closeAllConnections();if(server.listening)await new Promise(r=>server.close(r));report.cleanup={browserClosed:Boolean(browser),serverClosed:!server.listening};await writeFile(`${out}/${label}.json`,JSON.stringify(report,null,2));}}

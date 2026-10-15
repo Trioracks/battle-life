@@ -1,4 +1,4 @@
-import {beatResultSeed,beatResultSkills,normalizeResultMix} from './beat-result.js?rev=41';
+import {beatResultSeed,beatResultSkills,normalizeResultMix} from './beat-result.js?rev=42';
 // Versioned, saved per project. Never consult live skills during playback.
 const characters=['thin','muffled','crushed'];
 export function normalizeBeatMix(value){
