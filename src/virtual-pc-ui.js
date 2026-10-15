@@ -365,7 +365,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.refreshApp = (appId,{replaceContent=false}={}) => {
     const target=pc.shell?.getContentRoot(appId);if(!target)return;
     if(appId==='rap-dossier'){
-      if(!pc.dossierView)pc.dossierView=mountRapDossier(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,navigate:url=>{pc.open('underweb');pc.navigateUnderweb(url);},commit:result=>result.ok&&pc.persist(result.state,{atomic:true})});
+      if(!pc.dossierView)pc.dossierView=mountRapDossier(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,isVisible:()=>pc.viewVisible('rap-dossier'),onWork:()=>callbacks.onWork?.()??false,navigate:url=>{pc.open('underweb');pc.navigateUnderweb(url);},commit:result=>result.ok&&pc.persist(result.state,{atomic:true})});
       pc.dossierView.update();return;
     }
     if(appId==='rap-notebook'){
@@ -373,7 +373,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.notebookView.update();return;
     }
     if(appId==='underweb'){
-      if(!pc.underwebView)pc.underwebView=mountUnderweb(target,{onWork:()=>callbacks.onWork?.()??false,getState:()=>pc.state,getMetadata:()=>pc.metadata,isVisible:()=>pc.phase==='desktop'&&!pc.locked&&!root.hidden&&!document.hidden&&(!root.dataset.pcTransition||root.dataset.pcTransition==='desktop')&&pc.windows.activeId==='underweb'&&pc.windows.windows.some(w=>w.id==='underweb'&&w.mode!=='minimized'),onApply:(id,name)=>pc.persist(applyToBattle(pc.state,id,name)),onSubmitTrack:id=>pc.showSubmission(id),onResultViewed:callbacks.onResultViewed,onSoftware:pc.softwareAction,getSoftwareMessage:()=>pc.message,onChange:next=>{const saved=pc.persist(next,{atomic:true});pc.renderDesktop(false);return saved;},audio:pc.audioSession.forOwner('underweb')});
+      if(!pc.underwebView)pc.underwebView=mountUnderweb(target,{onWork:()=>callbacks.onWork?.()??false,onStudyTarget:target=>{pc.open('rap-dossier');pc.dossierView?.focusTarget(target);},getState:()=>pc.state,getMetadata:()=>pc.metadata,isVisible:()=>pc.phase==='desktop'&&!pc.locked&&!root.hidden&&!document.hidden&&(!root.dataset.pcTransition||root.dataset.pcTransition==='desktop')&&pc.windows.activeId==='underweb'&&pc.windows.windows.some(w=>w.id==='underweb'&&w.mode!=='minimized'),onApply:(id,name)=>pc.persist(applyToBattle(pc.state,id,name)),onSubmitTrack:id=>pc.showSubmission(id),onResultViewed:callbacks.onResultViewed,onSoftware:pc.softwareAction,getSoftwareMessage:()=>pc.message,onChange:next=>{const saved=pc.persist(next,{atomic:true});pc.renderDesktop(false);return saved;},audio:pc.audioSession.forOwner('underweb')});
       pc.underwebView.update();return;
     }
     if(appId==='ft-studio'){

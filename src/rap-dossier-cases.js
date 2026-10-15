@@ -2,11 +2,12 @@ import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=42';
 import {publicRoundTable,ROUND_LABELS} from './battle-results-table.js?rev=42';
 import {publicAnnouncedJudges} from './social-community-publications.js?rev=42';
 import {caseStudySources} from './rap-research-sources.js?rev=42';
-import {publicAnalysisReport} from './rap-analysis.js?rev=42';
+import {publicAnalysisReport,canStudyTrack} from './rap-analysis.js?rev=42';
 import {publicJudgeHypotheses} from './judge-dossier-analysis.js?rev=42';
 import {publicCharacterProfile} from './npc-social-profiles.js?rev=42';
 import {validGameMinute} from './game-minute.js?rev=42';
 import {isForecastReport,publicTrackForecast} from './rap-dossier-forecast.js?rev=42';
+import {profileAccess} from './social-profile-policy.js?rev=42';
 
 const array=v=>Array.isArray(v)?v:[],ids=v=>array(v).filter(x=>typeof x==='string');
 const unique=v=>[...new Set(v)].sort();
@@ -27,12 +28,14 @@ export function dossierCases(state,{nowMinute}={}){
  if(!validGameMinute(nowMinute))return [];
  return memo(state,'list',nowMinute,()=>[
   {id:'recordings',title:'Мои записи',kind:'recordings'},
+  ...(readableReports(state,nowMinute).length?[{id:'archive',title:'Архив наблюдений',kind:'archive'}]:[]),
   ...unique([...array(state.battleApplications).map(a=>a?.battleId),...array(state.battleSubmissions).filter(s=>s?.sentAt==null||s.sentAt<=nowMinute).map(s=>s?.battleId)].filter(id=>typeof id==='string')).map(battleId=>({id:'battle:'+battleId,title:title(battleId),battleId,kind:'battle'})),
  ]);
 }
 function buildCase(state,entry,caseId,nowMinute){
  const graph={id:caseId,title:entry?.title??'Дело недоступно',status:entry?'available':'unknown',nodes:[],edges:[]};if(!entry)return graph;
  const battleId=entry.battleId,byId=new Map(),savedReports=Object.values(state.rapAnalysis?.reports??{}),reports=savedReports.filter(r=>isForecastReport(r)&&r.createdAt<=nowMinute).sort((a,b)=>a.createdAt-b.createdAt||a.id.localeCompare(b.id));
+ if(entry.kind==='archive'){for(const versionId of unique(reports.map(r=>r.trackVersionId))){const target=publicDossierTarget(state,{reportId:reports.find(r=>r.trackVersionId===versionId).id,nowMinute});if(target)graph.nodes.push(target.node);}return graph;}
  const findings=Object.values(state.rapResearch?.findings??{}).filter(f=>f&&f.subject?.battleId===battleId&&typeof f.id==='string'&&validGameMinute(f.createdAt)&&f.createdAt<=nowMinute&&validGameMinute(f.cutoff)&&f.cutoff<=f.createdAt&&Array.isArray(f.reportIds));
  const add=(id,kind,node)=>{if(byId.has(id))return byId.get(id);const n={id,kind,title:'Неизвестно',status:'unknown',reportIds:[],findingIds:[],sourceIds:[],missingReportIds:[],reports:[],action:null,profileUrl:null,...node};byId.set(id,n);graph.nodes.push(n);return n;};
  const edge=(from,to,kind)=>{const id=from+'>'+kind+'>'+to;if(!graph.edges.some(e=>e.id===id))graph.edges.push({id,from,to,kind});};
@@ -92,4 +95,33 @@ function buildCase(state,entry,caseId,nowMinute){
 export function publicDossierCase(state,{caseId='recordings',nowMinute}={}){
  if(!validGameMinute(nowMinute))return freeze({id:caseId,title:'Дело недоступно',status:'unknown',nodes:[],edges:[]});
  return memo(state,'case:'+caseId,nowMinute,()=>buildCase(state,dossierCases(state,{nowMinute}).find(c=>c.id===caseId),caseId,nowMinute));
+}
+
+function readableReports(state,nowMinute){return Object.values(state.rapAnalysis?.reports??{}).filter(r=>isForecastReport(r)&&r.createdAt<=nowMinute).sort((a,b)=>a.createdAt-b.createdAt||a.id.localeCompare(b.id));}
+function validPublicVersion(state,id,nowMinute){const v=state.trackVersions?.byId?.[id];return v?.id===id&&v.schemaVersion===1&&typeof v.signature==='string'&&validGameMinute(v.createdAtMinute)&&v.createdAtMinute<=nowMinute&&v.recipe?.descriptor&&typeof v.name==='string'&&canStudyTrack(state,id,nowMinute)?v:null;}
+// A standalone public target is not a discovered battle assignment. Saved
+// observations stay readable even when the original recording is unavailable.
+export function publicDossierTarget(state,{trackVersionId,characterId,reportId,nowMinute,battleId='makarevich-1'}={}){
+ if(!validGameMinute(nowMinute))return null;
+ const reports=readableReports(state,nowMinute),report=reportId?reports.find(r=>r.id===reportId):null;
+ if(reportId&&!report)return null;
+ if(report)trackVersionId=report.trackVersionId;
+ const base={status:'unknown',reportIds:[],findingIds:[],sourceIds:[],missingReportIds:[],reports:[],action:null,profileUrl:null,layout:{column:0,row:0,parentId:null}};
+ if(trackVersionId){
+  const version=validPublicVersion(state,trackVersionId,nowMinute);if(!version&&!report)return null;
+  const subjectId=report?.subjectId??version.npc?.characterId??'player',owned=reports.filter(r=>r.trackVersionId===trackVersionId&&r.subjectId===subjectId),sameSource=version&&(version.npc?.characterId??'player')===subjectId;
+  const canView=profileAccess(state,{characterId:subjectId,nowMinute}).canView;
+  const node={...base,id:'track:'+trackVersionId,kind:'track',title:report?.trackName??version.name,trackVersionId,subjectId,status:sameSource?(owned.length?'studied':'available'):'unknown',reportIds:owned.map(r=>r.id),reports:owned.map(publicAnalysisReport),sourceIds:unique(owned.flatMap(r=>r.sourceIds).concat(sameSource?[trackVersionId]:[])),action:sameSource?{type:'startTrackStudy',request:{trackVersionId}}:null,profileUrl:canView?'underweb://social/'+(subjectId==='player'?'me':'profile/'+subjectId):null};
+  return freeze({caseId:report?'archive':'target:'+node.id,targetId:node.id,node});
+ }
+ if(characterId){
+  const profile=safely(()=>publicCharacterProfile(state,{characterId,nowMinute}),{});if(!profile.canView)return null;
+  const kind=profile.roles?.includes('judge')?'judge':'person',requestKind=kind==='judge'?'judge':'opponent',source=safely(()=>caseStudySources(state,{kind:requestKind,battleId,characterId,nowMinute}),{sourceIds:[]});
+  const found=Object.values(state.rapResearch?.findings??{}).filter(f=>f?.kind===requestKind&&f.subject?.battleId===battleId&&f.subject?.characterId===characterId&&typeof f.id==='string'&&validGameMinute(f.createdAt)&&f.createdAt<=nowMinute&&validGameMinute(f.cutoff)&&f.cutoff<=f.createdAt&&Array.isArray(f.reportIds));
+  const resultIds=unique(found.flatMap(f=>ids(f.reportIds))),owned=reports.filter(r=>r.subjectId===characterId||resultIds.includes(r.id)&&source.sourceIds.includes(r.trackVersionId)),missingReportIds=resultIds.filter(id=>!owned.some(r=>r.id===id));
+  const hypotheses=kind==='judge'?safely(()=>publicJudgeHypotheses(array(state.judgeDossier?.evidence).filter(e=>e.judgeId===characterId),nowMinute),[]):[];
+  const node={...base,id:kind+':'+characterId,kind,title:profile.name,battleId,characterId,status:missingReportIds.length?'unknown':kind==='judge'?(hypotheses.length?'studied':'unknown'):owned.length?'studied':'unknown',findingIds:found.map(f=>f.id),reportIds:unique([...owned.map(r=>r.id),...resultIds]),missingReportIds,reports:owned.map(publicAnalysisReport),sourceIds:source.sourceIds,profileUrl:'underweb://social/profile/'+characterId,action:{type:'startCaseStudy',request:{kind:requestKind,battleId,characterId}},hypotheses};
+  return freeze({caseId:'target:'+node.id,targetId:node.id,node});
+ }
+ return null;
 }

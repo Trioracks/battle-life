@@ -11,8 +11,8 @@ export function playerSocialProfile(state,metadata={}){
  return {id:'me',name:metadata.playerName??'Игрок',avatar:{mark:'Я',color:'#648577',src:portrait?.url},description:'Своя комната. Первые записи. Всё ещё впереди.',birthday:null,education:'скрыто',languages:['ru'],friends:social.friends,photos:portrait?[{id:'room',title:'Дома, за своим столом',date:'2012-09-01',src:portrait.url}]:[],audio:social.personalAudioIds,wall:social.posts};
 }
 const languages={ru:'Русский',en:'Английский',de:'Немецкий'};
-export function createSocialProfileView(d,{id='me',view='page',getState,getMetadata,navigate,commit,audio}){
- if(battleCharacter(id))return createNpcSocialProfileView(d,{id,view,getState,getMetadata,navigate,audio,commit});
+export function createSocialProfileView(d,{id='me',view='page',getState,getMetadata,navigate,commit,audio,onAnalyze}){
+ if(battleCharacter(id))return createNpcSocialProfileView(d,{id,view,getState,getMetadata,navigate,audio,commit,onAnalyze});
  const state=getState(),root=el(d,'section',{className:'sn-profile'});
  // Access is checked before constructing any private fields, including subpages.
  const access=profileAccess(state,id);if(!access.allowed){root.append(socialHeading(d,'Страница недоступна'),el(d,'p',{className:'sn-empty',text:access.reason}));return root;}

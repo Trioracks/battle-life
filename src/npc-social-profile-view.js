@@ -5,12 +5,13 @@ import {socialAvatar,socialButton,socialHeading,socialPhoto,socialPost} from './
 import {gameDateTimeLabel} from './home-calendar.js?rev=42';
 import {createPostReactionsView} from './social-reactions-view.js?rev=42';
 const statuses={submitted:'Сдал работу',no_show:'Не сдал',won:'Победа',lost:'Поражение',technical_win:'Технический проход',bye:'Проход пустой ветки',eliminated:'Выбыл'};
-export function createNpcSocialProfileView(d,{id,view='page',getState,getMetadata,navigate,audio,commit}){
+export function createNpcSocialProfileView(d,{id,view='page',getState,getMetadata,navigate,audio,commit,onAnalyze}){
  const root=el(d,'section',{className:'sn-profile'}),p=publicCharacterProfile(getState(),{characterId:id,nowMinute:metadataGameMinute(getMetadata())});
  if(!p.canView){root.append(socialHeading(d,'Страница недоступна'),el(d,'p',{className:'sn-empty',text:p.reason}));return root;}
  const url=kind=>'underweb://social/profile/'+id+(kind==='page'?'':'?view='+kind);
  const aside=el(d,'aside',{className:'sn-profile-aside'}),main=el(d,'div',{className:'sn-profile-main'});
  aside.append(socialAvatar(d,p.avatar,p.name,true));
+ if(onAnalyze){aside.append(socialButton(d,'Изучить в Рэп-досье',()=>onAnalyze({characterId:id})));if(!getState().software?.dossier?.installed)aside.append(el(d,'p',{className:'sn-note',text:'Для изучения скачай и установи Рэп-досье.'}));}
  for(const [kind,title]of [['page','Страница'],['photos','Фотографии'],['audio','Аудиозаписи'],['history','История баттлов']])aside.append(socialButton(d,title,()=>navigate(url(kind)),{attributes:kind===view?{'aria-current':'page'}:{}}));
  main.append(socialHeading(d,p.name),el(d,'p',{className:'sn-note',text:p.description}));
  if(view==='photos'){const gallery=el(d,'div',{className:'sn-photos'});p.photos.forEach(photo=>gallery.append(socialPhoto(d,photo)));main.append(gallery);if(!p.photos.length)main.append(el(d,'p',{text:'Личных фотографий нет.'}));}

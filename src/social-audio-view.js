@@ -55,6 +55,7 @@ export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze
    detail.append(progress,time);body.append(el(d,'div',{className:'sn-audio-title',text:title}),detail);row.append(play,body,halt,status);
    const render=()=>{
     const own=matches(),state=own?snapshot.status:'stopped',playing=state==='playing',loading=state==='loading';
+    if(own&&playing)failure='';
     const position=own?Math.max(0,Math.min(duration,snapshot.positionSeconds||0)):0,percent=Math.round(position/duration*100);
     play.textContent=playing?'Ⅱ':'▶';play.setAttribute('aria-label',(playing?'Пауза: ':'Слушать: ')+title);play.disabled=Boolean(unavailable)&&!(own&&snapshot.key===previewKey);play.setAttribute('aria-disabled',String(play.disabled||loading));
     row.setAttribute('aria-busy',String(loading));halt.disabled=!own||state==='stopped';
@@ -68,7 +69,7 @@ export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze
     const npc=npcPlaybackDescriptor(version);if(!npc.ok)unavailable=npc.reason;
     if(npc.previewDescriptor){previewDescriptor={...npc.previewDescriptor,owner:'social'};previewKey=previewDescriptor.key;row.append(button(d,'Предпросмотр бита — без голоса',()=>void start(previewDescriptor),{className:'sn-button sn-audio-extra',attributes:{'aria-label':'Предпросмотр бита — без голоса'}}));}
    }
-   if(version&&onAnalyze)row.append(button(d,'Изучить трек · 45 мин',()=>onAnalyze({trackVersionId:version.id,reviewIds:[]}),{className:'sn-button sn-audio-extra'}));
+   if(version&&onAnalyze){row.append(button(d,'Изучить трек · 45 мин',()=>onAnalyze({trackVersionId:version.id,reviewIds:[]}),{className:'sn-button sn-audio-extra'}));if(getState&&!getState().software?.dossier?.installed)row.append(el(d,'small',{className:'sn-audio-extra',text:'Для изучения скачай и установи Рэп-досье. Все разборы открываются в приложении.'}));}
    render();return row;
   },stop,releaseRows,dispose(){if(disposed)return;disposed=true;generation++;unsubscribe?.();for(const [row,entry]of rows)releaseRow(row,entry);}
  };

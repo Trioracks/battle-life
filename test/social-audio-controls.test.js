@@ -73,3 +73,9 @@ test('replacing owned rows releases their updates and handlers while an unattach
  assert.equal(writes,0,'removed rows must receive no later snapshot writes');assert.equal(retiredBar.getAttribute('aria-valuenow'),'50');assert.equal(bar(replacement).getAttribute('aria-valuenow'),'55');
  toggle(old).click();assert.equal(audio.status,'playing','retired controls must release their handlers without stopping the recording');
 });
+
+test('a successful retry from a duplicate row clears the first rows obsolete failure',async t=>{
+ const {row,ctx,audio}=fixture(t);ctx.state='suspended';ctx.resume=async()=>{throw Error('blocked');};const first=row(),second=row();toggle(first).click();await flush();
+ assert.ok(allPc(first).some(n=>/Не удалось/.test(n.textContent??'')));ctx.state='running';toggle(second).click();await flush();
+ assert.equal(audio.status,'playing');assert.ok(!allPc(first).some(n=>/Не удалось/.test(n.textContent??'')));
+});
