@@ -4,7 +4,7 @@ const axes=['text','performance','music','sound'];
 const strings=v=>Array.isArray(v)&&v.every(x=>typeof x==='string');
 const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
 export function isForecastReport(r){
- return Boolean(r&&typeof r.id==='string'&&typeof r.subjectId==='string'&&typeof r.trackVersionId==='string'&&typeof r.trackName==='string'&&Number.isFinite(r.createdAt)&&r.createdAt>=0&&strings(r.sourceIds)&&r.sourceIds.includes(r.trackVersionId)&&strings(r.reviewIds)&&r.heroSnapshot&&['intelligence','writing','flow','musicality','beatmaking','sound'].every(k=>Number.isFinite(r.heroSnapshot[k])&&r.heroSnapshot[k]>=0&&r.heroSnapshot[k]<=100)&&axes.every(k=>{
+ return Boolean(r&&typeof r.id==='string'&&typeof r.subjectId==='string'&&typeof r.trackVersionId==='string'&&typeof r.trackName==='string'&&(r.supersedes==null||typeof r.supersedes==='string')&&Number.isFinite(r.createdAt)&&r.createdAt>=0&&strings(r.sourceIds)&&r.sourceIds.includes(r.trackVersionId)&&strings(r.reviewIds)&&r.heroSnapshot&&['intelligence','writing','flow','musicality','beatmaking','sound'].every(k=>Number.isFinite(r.heroSnapshot[k])&&r.heroSnapshot[k]>=0&&r.heroSnapshot[k]<=100)&&axes.every(k=>{
   const o=r.observations?.[k];return o&&(o.band===null||Number.isInteger(o.band)&&o.band>=0&&o.band<=7)&&Number.isFinite(o.confidence)&&o.confidence>=0&&o.confidence<=1;
  }));
 }
@@ -14,7 +14,7 @@ function impression(report,hypotheses){
  const confidence=known.reduce((n,k)=>n+report.observations[k].confidence,0)/4;
  const learned=hypotheses.filter(h=>known.includes(h?.aspect)&&['several','confident'].includes(h.stage)&&strings(h.sources)&&h.sources.length);
  const evidence=new Set(learned.map(h=>h.judgeId+':'+h.aspect)).size;
- const width=clamp(.7-.5*confidence+(4-known.length)*.12-Math.min(.1,evidence*.03),.15,1);
+ const width=clamp(.7-.5*confidence+(4-known.length)*.12-Math.min(.1,evidence*.03),confidence<.4?.45:.15,1);
  const low=clamp(center-width/2,0,1-width);
  return {range:[low,low+width],confidence,known:known.length,sources:learned.flatMap(h=>h.sources)};
 }

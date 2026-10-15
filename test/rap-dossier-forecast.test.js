@@ -25,3 +25,15 @@ test('pair forecasts are qualitative, unknown with missing or same-version repor
  for(const other of [null,report(7,.9),{...report(1,.9,'other'),sourceIds:['wrong-version']}]){const f=api.publicTrackForecast({report:report(7,.9),scale:null,comparisonReport:other});assert.equal(f.range,null);assert.equal(f.comparison.status,'unknown');}
  const f=api.publicTrackForecast({report:report(7,.9),scale:null,comparisonReport:report(0,.9,'other')});assert.equal(f.comparison.status,'leans-own');assert.equal(f.range,null);assert.match(f.comparison.text,/не гарант/);assert.ok(!('probability' in f));
 });
+test('malformed optional report metadata is rejected while valid supersedes references remain usable',()=>{
+ for(const supersedes of [{raw:'private'},['private'],99,false]){const r={...report(),supersedes};assert.equal(api.isForecastReport(r),false);assert.equal(api.publicTrackForecast({report:r}).status,'unavailable');}
+ for(const supersedes of [undefined,null,'older-report'])assert.equal(api.publicTrackForecast({report:{...report(),supersedes}}).status,'estimated');
+});
+test('learned judge evidence cannot shrink low-confidence ranges below forty-five percent',()=>{
+ const judgeHypotheses=['text','performance','music','sound'].map(aspect=>({judgeId:'learned',aspect,stage:'confident',sources:['review:'+aspect]}));
+ for(const band of [0,4,7])for(const missing of [false,true]){
+  const r=report(band,.39);if(missing)r.observations.sound.band=null;
+  const f=api.publicTrackForecast({report:r,judgeHypotheses,scale:50});assert.match(f.confidenceText,/Неуверенное/);assert.ok(f.range[1]-f.range[0]>=22.5,`band ${band}, missing ${missing}: ${f.range}`);assert.ok(f.range[0]>=0&&f.range[1]<=50);
+ }
+ const high=api.publicTrackForecast({report:report(4,1),judgeHypotheses,scale:50});assert.ok(high.range[1]-high.range[0]>=7.5);assert.ok(high.range[1]-high.range[0]<22.5);
+});

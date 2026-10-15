@@ -4,7 +4,7 @@ import {performance} from 'node:perf_hooks';
 import {analysisFixture,studySkills} from './helpers/analysis-fixture.js';
 import {topicFixture} from './helpers/round-topic-fixture.js';
 import {startCaseStudy,advanceCaseStudy} from '../src/rap-research.js';
-import {startTrackStudy,advanceStudy,finishStudyReport} from '../src/rap-analysis.js';
+import {startTrackStudy,advanceStudy,finishStudyReport,normalizeRapAnalysis} from '../src/rap-analysis.js';
 const api=await import('../src/rap-dossier-cases.js').catch(e=>{if(e.code==='ERR_MODULE_NOT_FOUND')return {};throw e;});
 const battleId='makarevich-1',caseId='battle:'+battleId;
 const fixture=()=>{const s=topicFixture();s.software.dossier.installed=true;s.music.needs={satiety:100,energy:100};s.social.communityPublications={version:1,legacyCutoff:0};s.tournaments.byId[battleId].rounds.selection.submissions={};return s;};
@@ -106,4 +106,10 @@ test('battle discovery links each round only to reports from that public round',
  let s=fixture();s.trackVersions=analysisFixture().trackVersions;s.tournaments.byId[battleId].rounds.selection.submissions={player:'weak'};s=study(s,'battle');
  const g=graph(s,13800),prior=g.nodes.find(n=>n.kind==='round'&&n.roundId==='selection'),current=g.nodes.find(n=>n.kind==='round'&&n.roundId==='round-2');
  assert.equal(prior.reports.length,1);assert.equal(current.status,'studied');assert.deepEqual(current.reportIds,[]);assert.deepEqual(current.missingReportIds,[]);assert.equal(current.findingIds.length,1);
+});
+test('normalized report with malformed supersedes stays unknown without disclosing or freezing saved metadata',()=>{
+ const s=fixture(),v=analysisFixture().trackVersions.byId.weak;s.trackVersions.byId.weak=v;s.battleSubmissions=[{id:'submitted',battleId,roundId:'selection',trackVersionId:'weak',sentAt:100}];
+ const r=finishStudyReport(v,{id:'broken',subjectId:'player',trackVersionId:'weak',trackName:v.name,heroSnapshot:studySkills(80),reviewIds:[],seed:1,diversity:1},200);r.supersedes={rawPrivate:'must-not-disclose',nested:{weight:99}};
+ s.rapAnalysis=normalizeRapAnalysis({reports:{broken:r},sourceIds:['weak']});const saved=s.rapAnalysis.reports.broken,original=JSON.stringify(saved),metadata=saved.supersedes;assert.ok(saved);assert.equal(Object.isFrozen(metadata),false);
+ const g=graph(s,13800),track=g.nodes.find(n=>n.kind==='track');assert.ok(!JSON.stringify(g).includes('must-not-disclose'));assert.equal(Object.isFrozen(metadata),false);assert.equal(Object.isFrozen(metadata.nested),false);assert.equal(saved.supersedes,metadata);assert.equal(JSON.stringify(saved),original);assert.equal(track.status,'unknown');assert.deepEqual(track.missingReportIds,['broken']);assert.equal(track.reports.length,0);assert.equal(g.nodes.find(n=>n.kind==='forecast').forecast.status,'unavailable');
 });

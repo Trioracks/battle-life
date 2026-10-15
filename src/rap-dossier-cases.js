@@ -32,7 +32,7 @@ export function dossierCases(state,{nowMinute}={}){
 }
 function buildCase(state,entry,caseId,nowMinute){
  const graph={id:caseId,title:entry?.title??'Дело недоступно',status:entry?'available':'unknown',nodes:[],edges:[]};if(!entry)return graph;
- const battleId=entry.battleId,byId=new Map(),reports=Object.values(state.rapAnalysis?.reports??{}).filter(r=>isForecastReport(r)&&r.createdAt<=nowMinute).sort((a,b)=>a.createdAt-b.createdAt||a.id.localeCompare(b.id));
+ const battleId=entry.battleId,byId=new Map(),savedReports=Object.values(state.rapAnalysis?.reports??{}),reports=savedReports.filter(r=>isForecastReport(r)&&r.createdAt<=nowMinute).sort((a,b)=>a.createdAt-b.createdAt||a.id.localeCompare(b.id));
  const findings=Object.values(state.rapResearch?.findings??{}).filter(f=>f&&f.subject?.battleId===battleId&&typeof f.id==='string'&&validGameMinute(f.createdAt)&&f.createdAt<=nowMinute&&validGameMinute(f.cutoff)&&f.cutoff<=f.createdAt&&Array.isArray(f.reportIds));
  const add=(id,kind,node)=>{if(byId.has(id))return byId.get(id);const n={id,kind,title:'Неизвестно',status:'unknown',reportIds:[],findingIds:[],sourceIds:[],missingReportIds:[],reports:[],action:null,profileUrl:null,...node};byId.set(id,n);graph.nodes.push(n);return n;};
  const edge=(from,to,kind)=>{const id=from+'>'+kind+'>'+to;if(!graph.edges.some(e=>e.id===id))graph.edges.push({id,from,to,kind});};
@@ -51,7 +51,7 @@ function buildCase(state,entry,caseId,nowMinute){
   const v=state.trackVersions?.byId?.[versionId],valid=v&&v.id===versionId&&v.schemaVersion===1&&typeof v.signature==='string'&&validGameMinute(v.createdAtMinute)&&v.createdAtMinute<=nowMinute&&v.recipe?.descriptor&&typeof v.name==='string';
   const id='track:'+(versionId??'missing:'+referenceId),ownReports=valid?reports.filter(r=>r.trackVersionId===versionId&&r.subjectId===(v.npc?.characterId??'player')):[];
   const node=add(id,'track',{title:valid?v.name:'Запись недоступна',trackVersionId:versionId??null,subjectId:valid?v.npc?.characterId??'player':null,status:valid?(ownReports.length?'studied':'available'):'unknown',reportIds:ownReports.map(r=>r.id),reports:ownReports.map(publicAnalysisReport),sourceIds:valid?[versionId]:[],action:valid?{type:'startTrackStudy',request:{trackVersionId:versionId}}:null,layout:{column,row:graph.nodes.filter(n=>n.kind==='track').length,parentId}});
-  node.missingReportIds=unique(array(state.rapAnalysis?.recovery).filter(r=>r?.type==='report'&&r.recoveryData?.trackVersionId===versionId&&validGameMinute(r.recoveryData.createdAt)&&r.recoveryData.createdAt<=nowMinute).map(r=>r.id).filter(id=>typeof id==='string'));
+  node.missingReportIds=unique([...savedReports.filter(r=>r?.trackVersionId===versionId&&validGameMinute(r.createdAt)&&r.createdAt<=nowMinute&&!isForecastReport(r)).map(r=>r.id),...array(state.rapAnalysis?.recovery).filter(r=>r?.type==='report'&&r.recoveryData?.trackVersionId===versionId&&validGameMinute(r.recoveryData.createdAt)&&r.recoveryData.createdAt<=nowMinute).map(r=>r.id)].filter(id=>typeof id==='string'));
   if(node.missingReportIds.length)node.status='unknown';
   if(parentId)edge(parentId,id,'track');return node;
  };
