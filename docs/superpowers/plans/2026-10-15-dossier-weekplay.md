@@ -82,7 +82,7 @@
 
 ### Task 5: Browser download popover and durable history
 
-**Files:** Modify src/pc-browser-downloads.js, src/pc-browser-downloads-view.js, src/underweb-view.js, src/underweb-world.css, src/virtual-pc-ui.js only routing needed; test/pc-browser-downloads.test.js; create test/browser-download-popover.test.js.
+**Files:** Modify src/pc-browser-downloads.js, src/pc-browser-downloads-view.js, src/underweb-view.js, root underweb-world.css, src/virtual-pc-ui.js only routing needed; test/pc-browser-downloads.test.js; create test/browser-download-popover.test.js.
 
 **Interfaces:** clearCompletedBrowserDownloadHistory(state) -> {ok,state}; browserDownloadEntries(state,{includeHidden=false}={}) preserves current default return rows plus stable history visibility. Active queue/disk identity survives clear. Existing browse-metadata action opens virtual Explorer Downloads.
 
@@ -133,6 +133,8 @@
 **Files:** Replace src/rap-dossier-view.js presentation; add src/rap-dossier-board-view.js if needed for SVG layout responsibility; update dossier CSS, src/social-view.js, src/rap-analysis-view.js, src/social-audio-view.js and profile research view, src/virtual-pc-ui.js routing. Add test/rap-dossier-board.test.js and test/social-study-routing.test.js.
 
 **Interfaces:** mountRapDossier keeps getState/getMetadata/commit/navigate and adds existing on-study/app-focus callbacks as needed, documented to controller. It consumes Tasks 7/8 node actions and only public case graph. Social Study affordances request dossier focus with target IDs, never mount a report. All research detail/report views render inside dossier.
+
+**Carried review minor:** Task4 row-local failure text can remain after a duplicate row successfully retries the same recording. Clear obsolete matching failure on a successful snapshot and cover the duplicate retry with a regression. Preserve Task4 releaseRows(root) ownership when replacing social/dialog subtrees.
 
 - [ ] **Step 1:** Tests social me/groups/dialog/profile routes contain no analysis cards installed or not; installed Study opens target dossier, uninstalled routes to download with explanation. Board contains battle folder, submitted-track node with forecast beneath, public rounds/judges/opponent links; node selection shows focused detail, study launches correct frozen IDs. Test case switching, empty state, unavailable sources, keyboard/focus, narrow list, resize/fit and disposal without listener/RAF growth.
 - [ ] **Step 2:** Run `node --test test/rap-dossier-board.test.js test/social-study-routing.test.js`; capture RED.
