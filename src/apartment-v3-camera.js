@@ -23,10 +23,22 @@ export function cameraAllowsFirstPerson(state){return !['sleep','seated','eat'].
 export function cameraPose(mode,state,eyeHeight,look={yaw:0,pitch:0}){
  if(mode==='3D')return {position:[state.position[0],state.position[1]+eyeHeight,state.position[2]],yaw:look.yaw,pitch:look.pitch,fov:60,near:.03};
  const yaw=0,pitch=8,distance=8;
+ const aspect=look.aspect??1280/900;
+ if(state.clip==='sleep'){
+  // Frame the bedroom itself, rather than following the sleeping root back
+  // toward the kitchen. Portrait views keep the bed and sleeping hero primary.
+  // Cap vertical coverage before a tall screen exposes the shell's cut edges.
+  const wide=Math.max(0,Math.min(1,(aspect-1)/(16/9-1)));
+  const portrait=Math.max(0,Math.min(1,(.7-aspect)/.24));
+  const centerX=1.7+1.45*wide-.15*portrait,targetY=1.12,width=2.75+3.25*wide;
+  const rearDepth=distance/Math.cos(pitch*DEG)+1.72*Math.cos(pitch*DEG);
+  const fov=Math.min(22,2*Math.atan(width/(2*rearDepth*aspect))/DEG);
+  return {position:[centerX,targetY+distance*Math.tan(pitch*DEG),distance],target:[centerX,targetY,0],yaw,pitch,fov,near:.03};
+ }
  // Intermediate framing between the original close view and the wide overview.
  // Follow and edge limits still operate on the exact same furnished scene.
  const height=5.025/1.275,targetY=.83,fov=2*Math.atan(height/(2*distance/Math.cos(pitch*DEG)))/DEG;
- const aspect=look.aspect??1280/900,z=state.position?.[2]??.85;
+ const z=state.position?.[2]??.85;
  const depth=distance/Math.cos(pitch*DEG)-z*Math.cos(pitch*DEG)-(1-targetY)*Math.sin(pitch*DEG);
  const halfWidth=depth*Math.tan(fov*DEG/2)*aspect;
  const rooms=state.config?.layout?.rooms,left=rooms?.kitchen.x[0]??-8,right=rooms?.living.x[1]??8.5;

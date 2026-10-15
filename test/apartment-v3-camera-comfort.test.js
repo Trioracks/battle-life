@@ -9,6 +9,53 @@ import {CameraModes,cameraPose} from '../src/apartment-v3-camera.js';
 import {PerspectiveCamera,Vector3} from '../vendor/three/three.module.js';
 
 const config=prepareApartmentConfig(JSON.parse(fs.readFileSync(assetPath('scene.json'),'utf8')));
+function projectedCamera(state,aspect){
+ const pose=cameraPose('2D',state,1.63,{aspect}),camera=new PerspectiveCamera(pose.fov,aspect,pose.near,200);
+ camera.position.fromArray(pose.position);camera.lookAt(new Vector3(...pose.target));camera.updateMatrixWorld();
+ return point=>new Vector3(...point).project(camera);
+}
+function sleepingState(kind){
+ const motion=new ApartmentMotion(config);
+ if(kind==='initial')motion.startSleeping();
+ else{
+  motion.interact('bed',kind==='manual'?{mode:'manual'}:null);
+  for(let i=0;i<3000&&!(motion.sleeping&&motion.phase==='perform');i++)motion.tick(.05);
+ }
+ assert.equal(motion.sleeping,true);assert.equal(motion.clip,'sleep');return motion;
+}
+
+// A regression to the apartment-wide follow camera exposes the kitchen and
+// centers the bed; losing the aspect fit crops the bed on a narrow viewport.
+for(const [width,height] of [[1280,720],[1366,768],[1920,1080]])for(const kind of ['initial','manual','ordinary'])test(`${kind} sleep frames bed and hero left, desk right, and excludes kitchen at ${width}x${height}`,()=>{
+ const project=projectedCamera(sleepingState(kind),width/height);
+ for(const point of [[.68,.25,-.24],[2.84,1.18,-1.36],[.95,1.05,-.8],[2.55,1.05,-.8]]){
+  const p=project(point);assert.ok(p.x>-.96&&p.x<0&&Math.abs(p.y)<.95,`bed/hero must fit the left frame: ${point}: ${p.toArray()}`);
+ }
+ for(const point of [[3.55,0,-.35],[5.35,1.62,-1.4],[4.45,1.12,-.83]]){
+  const p=project(point);assert.ok(p.x>0&&p.x<.96&&Math.abs(p.y)<.95,`desk/computer must fit the right frame: ${point}: ${p.toArray()}`);
+ }
+ for(const point of [[-.7,0,-.34],[-.7,1.82,-1.06],[.12,2.94,-1.72],[.12,2.94,1.82]]){
+  const p=project(point);assert.ok(p.x<-1,`kitchen and partition crown stay left of frame: ${point}: ${p.toArray()}`);
+ }
+});
+test('narrow sleep view keeps the complete bed primary at 640x900',()=>{
+ const width=640,height=900;
+ const state=sleepingState('initial'),project=projectedCamera(state,width/height);
+ assert.ok(Math.abs(project([1.75,.8,-.8]).x)<.1,'bed remains the center of attention');
+ for(const point of [[.68,.25,-.24],[2.84,1.18,-1.36],[.95,1.05,-.8],[2.55,1.05,-.8]]){
+  const p=project(point);assert.ok(Math.abs(p.x)<.96&&Math.abs(p.y)<.95,`bed/hero must remain complete: ${point}: ${p.toArray()}`);
+ }
+ assert.ok(project([4.45,1.12,-.83]).x>1,'secondary desk may leave a narrow frame');
+});
+test('tall portrait sleep prioritizes the hero and room bounds over the entire bed width',()=>{
+ const project=projectedCamera(sleepingState('initial'),390/844);
+ const head=project([1.05,1.05,-.8]),bed=project([1.75,.8,-.8]);
+ assert.ok(Math.abs(head.x)<.95&&Math.abs(head.y)<.9,'sleeping hero remains readable');
+ assert.ok(Math.abs(bed.x)<.35,'bed remains primary despite its allowed edge crop');
+ for(const point of [[.86,.79,-.65],[.86,1.11,-.95]])assert.ok(Math.abs(project(point).x)<.95,'the authored hair/head silhouette has a visible margin');
+ assert.ok(project([1.75,3,-1.72]).y>1,'rear wall top excludes the exterior above it');
+ assert.ok(project([1.75,-.12,1.82]).y<-1,'floor underside stays below the frame');
+});
 test('new game defaults to 3D, temporarily sleeps in 2D and restores after standing',()=>{
  const camera=new CameraModes();assert.equal(camera.mode,'3D');
  camera.onMotionEvent({type:'started',id:'bed'});assert.equal(camera.mode,'2D');
