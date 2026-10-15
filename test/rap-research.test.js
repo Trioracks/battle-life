@@ -98,6 +98,25 @@ test('completed case observes tracks but only separate judge research learns tas
  assert.deepEqual(createVirtualPcState(done.state).rapResearch,done.state.rapResearch);
  const repeat=api.startCaseStudy(done.state,{...request,kind:'judge',characterId:'eparhiya',nowMinute:14000});assert.ok(repeat.findingId);assert.equal(repeat.state.rapResearch.job,null);
 });
+test('quarantined reports quarantine their completed finding and allow unchanged-source retry without duplicate XP',()=>{
+ let s=installed(topicFixture());s.trackVersions=analysisFixture().trackVersions;
+ s.tournaments.byId['makarevich-1'].rounds.selection.submissions={player:'weak'};
+ const req={...request,kind:'battle',nowMinute:19000};
+ const first=api.advanceCaseStudy(api.startCaseStudy(s,req).state,{gameMinutes:360,nowMinute:19360});assert.equal(first.finished,true);assert.equal(first.practiceGained,1);
+ const finding=structuredClone(Object.values(first.state.rapResearch.findings)[0]),reportId=finding.reportIds[0];
+ const corrupt=structuredClone(first.state);corrupt.rapAnalysis.reports[reportId].observations.text.confidence=2;
+ for(const reload of [false,true]){
+  let damaged=reload?createVirtualPcState(JSON.parse(JSON.stringify(corrupt))):structuredClone(corrupt);
+  if(reload){assert.equal(damaged.rapAnalysis.reports[reportId],undefined);assert.equal(damaged.rapAnalysis.recovery.length,1);assert.equal(damaged.rapResearch.findings[finding.id],undefined);assert.deepEqual(damaged.rapResearch.recovery[0].recoveryData,finding);}
+  damaged.music.needs={satiety:100,energy:100};
+  const retry=api.startCaseStudy(damaged,{...req,nowMinute:19360});assert.equal(retry.ok,true);assert.ok(retry.jobId);assert.equal(retry.findingId,undefined);
+  assert.equal(retry.state.rapResearch.recovery.length,1);assert.deepEqual(retry.state.rapResearch.recovery[0].recoveryData,finding);assert.deepEqual(retry.state.rapAnalysis.sourceIds,['weak']);
+  const repeated=createVirtualPcState(retry.state);assert.equal(repeated.rapResearch.recovery.length,1);assert.equal(repeated.rapAnalysis.recovery.length,1);
+  const done=api.advanceCaseStudy(repeated,{gameMinutes:360,nowMinute:19720});assert.equal(done.finished,true);assert.equal(done.practiceGained,0);assert.deepEqual(done.state.rapAnalysis.sourceIds,['weak']);
+  const replacement=Object.values(done.state.rapResearch.findings)[0];assert.notEqual(replacement.id,finding.id);assert.ok(replacement.reportIds.every(id=>done.state.rapAnalysis.reports[id]));
+  assert.deepEqual(done.state.rapResearch.recovery[0].recoveryData,finding);
+ }
+});
 test('judge with announced identity but no reviews completes explicitly unknown and future subject refuses',()=>{
  let s=installed(topicFixture()),characterId=s.roundThemes['makarevich-1:round-2'].authorJudgeId;
  const started=api.startCaseStudy(s,{...request,kind:'judge',characterId});assert.equal(started.ok,true);

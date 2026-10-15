@@ -30,6 +30,18 @@ export function normalizeRapResearch(raw){
  const sequence=Math.max(0,...[...Object.keys(findings),job?.id].map(key=>/^case-study:\d+$/.test(key??'')?Number(key.split(':')[1]):0));
  return {version:1,job,findings,nextSequence:Math.max(sequence+1,Number.isSafeInteger(raw?.nextSequence)&&raw.nextSequence>0?raw.nextSequence:1),recovery};
 }
+// Both ledgers must be normalized first: a rejected report cannot keep a case
+// marked complete and prevent the player from studying the same sources again.
+export function reconcileResearchFindings(research,analysis){
+ const invalid=Object.values(research.findings).filter(f=>{
+  const reports=f.reportIds.map(id=>analysis.reports[id]);
+  return reports.length!==f.trackVersionIds.length||reports.some(r=>!r||!f.trackVersionIds.includes(r.trackVersionId)||r.createdAt>f.createdAt)||new Set(reports.map(r=>r?.trackVersionId)).size!==f.trackVersionIds.length;
+ });
+ if(!invalid.length)return research;
+ const findings={...research.findings},recovery=[...research.recovery];
+ for(const finding of invalid){delete findings[finding.id];recovery.push({type:'finding',id:finding.id,recoveryData:clone(finding),reason:'Отчёт этого изучения недоступен или повреждён. Исходное изучение сохранено; источники можно изучить снова.'});}
+ return {...research,findings,recovery};
+}
 const otherWork=state=>state.music?.job||state.writing?.job||state.recording?.job||state.rapAnalysis?.job?.status==='active';
 const missingSources=(state,j)=>j.trackVersionIds.some(id=>!state.trackVersions?.byId?.[id])||j.reviewIds.some(id=>!state.judging?.results?.[id]);
 function availableSubject(state,subject,sources,nowMinute){
@@ -45,19 +57,19 @@ export function startCaseStudy(state,request={}){
  if(!validSubject(subject)||!validGameMinute(nowMinute))return fail('Не удалось определить предмет или дату изучения.');
  if(otherWork(state))return fail('Сначала приостанови текущую работу.');
  const blocked=workBlockReason(state);if(blocked)return fail(blocked);
- const research=normalizeRapResearch(state.rapResearch);
+ const analysis=normalizeRapAnalysis(state.rapAnalysis),research=reconcileResearchFindings(normalizeRapResearch(state.rapResearch),analysis),prepared={...state,rapAnalysis:analysis,rapResearch:research};
  if(research.job){
   if(!equal(research.job.subject,subject))return fail('Сначала заверши начатое изучение. Его источники не заменены.');
-  if(nowMinute<research.job.startedAt||missingSources(state,research.job))return {...fail('Источник недоступен; изучение сохранено на паузе.'),state:pauseCaseStudy({...state,rapResearch:research})};
-  research.job.status='active';return {ok:true,state:{...state,rapResearch:research},jobId:research.job.id};
+  if(nowMinute<research.job.startedAt||missingSources(state,research.job))return {...fail('Источник недоступен; изучение сохранено на паузе.'),state:pauseCaseStudy(prepared)};
+  research.job.status='active';return {ok:true,state:prepared,jobId:research.job.id};
  }
  const sources=caseStudySources(state,{...subject,nowMinute}),heroSnapshot=studyHeroSnapshot(request.heroSnapshot);
  if(!availableSubject(state,subject,sources,nowMinute))return fail('Этот предмет изучения ещё не опубликован.');
  const prior=Object.values(research.findings).find(f=>equal(f.subject,subject)&&equal(f.heroSnapshot,heroSnapshot)&&sameEvidence(f,sources));
- if(prior)return {ok:true,state,findingId:prior.id,reason:'Это изучение уже сохранено.'};
+ if(prior)return {ok:true,state:prepared,findingId:prior.id,reason:'Это изучение уже сохранено.'};
  const id='case-study:'+research.nextSequence++;
  research.job={id,kind:subject.kind,subject,...sources,heroSnapshot,startedAt:nowMinute,total:CASE_STUDY_MINUTES[subject.kind],elapsed:0,status:'active'};
- return {ok:true,state:{...state,rapResearch:research},jobId:id};
+ return {ok:true,state:prepared,jobId:id};
 }
 export function pauseCaseStudy(state){if(!state.rapResearch?.job||state.rapResearch.job.status==='paused')return state;return {...state,rapResearch:{...state.rapResearch,job:{...state.rapResearch.job,status:'paused'}}};}
 
