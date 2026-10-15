@@ -5,7 +5,7 @@ import {genreById} from '../../src/genre-progression.js';
 import {startVocalWork,advanceVocalWork} from '../../src/vocal-production.js';
 import {activateSocial,advanceSocial} from '../../src/social-runtime.js';
 import {attachSubmissionTrack,sendSubmission} from '../../src/social-submission.js';
-import {completeSubmissionUpload,completeSubmissionMessage} from './submission-fixtures.js';
+import {completeSubmissionUpload,completeSubmissionMessage,exportSubmissionFile} from './submission-fixtures.js';
 import {battleRandom} from '../../src/battle-seeding.js';
 export const BATTLE='makarevich-1';
 export const skillsAt=value=>Object.fromEntries(['intelligence','writing','musicality','flow','beatmaking','sound','charisma','confidence','resilience'].map(k=>[k,value]));
@@ -21,7 +21,7 @@ export function produceDemoTrack(input,{skill=100,seed=41,roundId='selection',no
  for(const kind of clean?['draft','clean','mix','master']:['draft']){reset();s=checked(startVocalWork(s,{beatId,textId,kind,sliders:[8,8,8]},skills,random));s=advanceVocalWork(s,1000).state;}
  return {state:s,beatId,textId,skills};
 }
-export function submitDemoTrack(state,beatId,nowMinute){let s=checked(attachSubmissionTrack(state,{communityId:BATTLE,projectId:beatId,nowMinute}));s=completeSubmissionUpload(s);s=completeSubmissionMessage(s,{nowMinute});return checked(sendSubmission(s,{communityId:BATTLE,nowMinute}));}
+export function submitDemoTrack(state,beatId,nowMinute){const fileId='export:'+beatId;let s=exportSubmissionFile(state,{projectId:beatId,fileId,nowMinute});s=checked(attachSubmissionTrack(s,{communityId:BATTLE,fileId,nowMinute}));s=completeSubmissionUpload(s);s=completeSubmissionMessage(s,{nowMinute});return checked(sendSubmission(s,{communityId:BATTLE,nowMinute}));}
 export function runDemo({skill=100,pairSkill=skill,seed=41,through='final',reload=false}={}){
  let s=freshDemo();const trace=[];
  for(let step=0;step<6;step++){

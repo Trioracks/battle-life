@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {mountSocialDialog} from '../src/social-dialog-view.js';
-import {submissionFixture,completeSubmissionUpload} from './helpers/submission-fixtures.js';
+import {exportedSubmissionFixture,completeSubmissionUpload} from './helpers/submission-fixtures.js';
 import {ensureBattleWindow} from '../src/battle-windows.js';
 import {attachSubmissionTrack} from '../src/social-submission.js';
 import {createVirtualPcState} from '../src/virtual-pc-state.js';
 import {pcDocument,findButton,allPc} from './helpers/virtual-pc-dom.js';
 function fixture(){
- const d=pcDocument();let state=completeSubmissionUpload(attachSubmissionTrack(ensureBattleWindow(submissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state,{communityId:'makarevich-1',projectId:'beat',nowMinute:601}).state),visible=true,fail=false,failCheckpoint=false,writes=0,attemptWrites=0,minute=601,view;
+ const d=pcDocument();let state=completeSubmissionUpload(attachSubmissionTrack(ensureBattleWindow(exportedSubmissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state,{communityId:'makarevich-1',fileId:'submission-file',nowMinute:601}).state),visible=true,fail=false,failCheckpoint=false,writes=0,attemptWrites=0,minute=601,view;
  const mount=()=>view=mountSocialDialog(d,{id:'makarevich-1',getState:()=>state,getMetadata:()=>({gameMinutes:minute,playerName:'Герой'}),navigate(){},isVisible:()=>visible,audio:{row:()=>d.createElement('div')},commit:r=>{if(!r.ok)return false;writes++;if(failCheckpoint)return false;if(r.state.battleSubmissions.length>state.battleSubmissions.length){attemptWrites++;if(fail)return false;}state=createVirtualPcState(r.state);view?.update();return true;}});mount();
  return {get view(){return view},get state(){return state},get writes(){return writes},get attempts(){return attemptWrites},mount,setVisible:v=>visible=v,setFail:v=>fail=v,setFailCheckpoint:v=>failCheckpoint=v,setMinute:v=>minute=v};
 }

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {submissionFixture,completeSubmissionUpload,completeSubmissionMessage} from './helpers/submission-fixtures.js';
+import {submissionFixture,completeSubmissionUpload,completeSubmissionMessage,exportSubmissionFile} from './helpers/submission-fixtures.js';
 import {createVirtualPcState} from '../src/virtual-pc-state.js';
 import {ensureBattleWindow} from '../src/battle-windows.js';
 import {ensureTournament} from '../src/battle-tournament.js';
@@ -39,7 +39,8 @@ test('old-round lyric may be submitted but is never labelled as the new round to
  let s=ensureBattleWindow(submissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state;
  s.projects.find(p=>p.kind==='beat').recording.text.snapshot.roundId='round-2';
  s.projects.find(p=>p.kind==='beat').recording.text.snapshot.themeId='makarevich-1:round-2';
- s=completeSubmissionMessage(completeSubmissionUpload(attachSubmissionTrack(s,{communityId:'makarevich-1',projectId:'beat',nowMinute:601}).state));
+ s=exportSubmissionFile(s);
+ s=completeSubmissionMessage(completeSubmissionUpload(attachSubmissionTrack(s,{communityId:'makarevich-1',fileId:'submission-file',nowMinute:601}).state));
  const sent=sendSubmission(s,{communityId:'makarevich-1',nowMinute:602});assert.equal(sent.ok,true,sent.reason);assert.equal(sent.state.battleSubmissions[0].topicMatch,false);
 });
 test('damaged published theme is quarantined through reload; never silently rerolled',()=>{

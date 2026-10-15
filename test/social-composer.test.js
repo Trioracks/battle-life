@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as composer from '../src/social-composer.js';
-import {submissionFixture,completeSubmissionUpload} from './helpers/submission-fixtures.js';
+import {exportedSubmissionFixture,completeSubmissionUpload} from './helpers/submission-fixtures.js';
 import {ensureBattleWindow} from '../src/battle-windows.js';
 import {attachSubmissionTrack,sendSubmission} from '../src/social-submission.js';
 import {createVirtualPcState,loadVirtualPcState,saveVirtualPcState,VIRTUAL_PC_STORAGE_KEY} from '../src/virtual-pc-state.js';
-const options={communityId:'makarevich-1',projectId:'beat',nowMinute:601};
-const ready=()=>completeSubmissionUpload(attachSubmissionTrack(ensureBattleWindow(submissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state,options).state);
+const options={communityId:'makarevich-1',fileId:'submission-file',nowMinute:601};
+const ready=()=>completeSubmissionUpload(attachSubmissionTrack(ensureBattleWindow(exportedSubmissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state,options).state);
 const tick=(s,t,extra={})=>composer.advanceSubmissionMessage(s,{activeSeconds:t,visible:true,powered:true,paused:false,...extra});
 
 test('damaged frozen lyric text isolates composer recovery without emptying the PC on load or save',()=>{

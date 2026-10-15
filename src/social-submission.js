@@ -20,8 +20,8 @@ export function acknowledgementFor(id,sentAt,roundId='selection'){
  const eligible=roundId==='selection'?ACK_TEMPLATES:ACK_TEMPLATES.filter(t=>!/отбор/i.test(t.body));
  return {ackAt:sentAt+1+hash%30,ackTemplateId:eligible[(hash>>>5)%eligible.length].id};
 }
-export function attachSubmissionTrack(state,{communityId,projectId,nowMinute}={}){
- return startSubmissionUpload(state,{communityId,projectId,nowMinute});
+export function attachSubmissionTrack(state,{communityId,fileId,nowMinute}={}){
+ return startSubmissionUpload(state,{communityId,fileId,nowMinute});
 }
 export function sendSubmission(state,{communityId,nowMinute}={}){
  const check=submissionSendContext(state,{communityId,nowMinute});if(!check.ok)return check;

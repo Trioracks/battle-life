@@ -6,7 +6,7 @@ import {TRACK_DSP_VERSION} from './track-version.js?rev=41';
 import {submissionCandidates} from './battle-submission.js?rev=41';
 import {normalizeOutgoingUpload} from './social-upload.js?rev=41';
 export function submissionSendContext(state,{communityId,nowMinute}={}){
- const fail=reason=>({ok:false,state,reason}),c=communityById(communityId),window=currentBattleWindow(state,c?.battleId,nowMinute),upload=normalizeOutgoingUpload(state.outgoingUpload,state.trackVersions);
+ const fail=reason=>({ok:false,state,reason}),c=communityById(communityId),window=currentBattleWindow(state,c?.battleId,nowMinute),upload=normalizeOutgoingUpload(state.outgoingUpload,state.trackVersions,state.audioExports);
  if(upload?.issue)return fail(upload.issue);
  if(!canSubmitToBattleWindow(state,window))return fail('В этом раунде ты не участвуешь или приём закрыт.');
  if(upload?.communityId===communityId&&upload.windowId!==window?.id)return fail('Вложение загружалось для другого раунда. Выбери файл заново.');

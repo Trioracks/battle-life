@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {submissionFixture,completeSubmissionUpload,completeSubmissionMessage} from './helpers/submission-fixtures.js';
+import {exportedSubmissionFixture,completeSubmissionUpload,completeSubmissionMessage} from './helpers/submission-fixtures.js';
 import {ensureBattleWindow} from '../src/battle-windows.js';
 import {attachSubmissionTrack,sendSubmission,ACK_TEMPLATES} from '../src/social-submission.js';
 import {createVirtualPcState} from '../src/virtual-pc-state.js';
-const options={communityId:'makarevich-1',projectId:'beat',nowMinute:601};
-const ready=(o={})=>ensureBattleWindow(submissionFixture(o),{battleId:'makarevich-1',nowMinute:600}).state;
+const options={communityId:'makarevich-1',fileId:'submission-file',nowMinute:601};
+const ready=(o={})=>ensureBattleWindow(exportedSubmissionFixture(o),{battleId:'makarevich-1',nowMinute:600}).state;
 test('attach freezes personal audio without posting or consuming attempt; double send and replacement fail',()=>{
  const attached=attachSubmissionTrack(ready(),options);assert.ok(attached.ok);assert.equal(attached.state.social.personalAudioIds.length,0);assert.equal(attached.state.battleSubmissions.length,0);assert.equal(attached.state.social.posts.length,0);
  const completed=completeSubmissionUpload(attached.state);assert.equal(completed.social.personalAudioIds.length,1);const again=attachSubmissionTrack(completed,options);assert.equal(again.ok,false);

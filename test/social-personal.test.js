@@ -7,7 +7,7 @@ import {advanceVirtualPcDurably} from '../src/virtual-pc-runtime.js';
 import {resolveSocialRoute} from '../src/social-routing.js';
 import {attachSubmissionTrack} from '../src/social-submission.js';
 import {ensureBattleWindow} from '../src/battle-windows.js';
-import {submissionFixture} from './helpers/submission-fixtures.js';
+import {exportedSubmissionFixture} from './helpers/submission-fixtures.js';
 test('schema1 seeds three histories once, preserves organizer data, money and frozen audio',()=>{
  const old=createVirtualPcState();old.social={schemaVersion:1,personalAudioIds:['track'],dialogs:{'makarevich-1':{messages:[{id:'old',body:'old wording'}],draftVersionId:'track',unread:true}}};const before=structuredClone(old);
  const next=personal.seedPersonalDialogs(old);assert.equal(next.social.schemaVersion,2);assert.equal(next.social.dialogs['makarevich-1'].draftVersionId,'track');assert.deepEqual(next.social.dialogs['makarevich-1'].messages,before.social.dialogs['makarevich-1'].messages);assert.deepEqual(next.trackVersions,before.trackVersions);assert.equal(next.music.cash,before.music.cash);
@@ -37,5 +37,5 @@ test('personal notifications are invisible before durable publication, retry is 
  const saved=advanceVirtualPcDurably(failed.state,{day:1,minutes:600},()=>true);assert.equal(saved.events.length,1);assert.equal(saved.state.social.dialogs.vitya.unread,true);assert.equal(advanceVirtualPcDurably(saved.state,{day:1,minutes:600},()=>true).events.length,0);
 });
 test('new organizer drafts have a community peer immediately, without requiring reload',()=>{
- const s=ensureBattleWindow(submissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state,r=attachSubmissionTrack(s,{communityId:'makarevich-1',projectId:'beat',nowMinute:601});assert.equal(r.ok,true);assert.deepEqual(r.state.social.dialogs['makarevich-1'].peer,{kind:'community',id:'makarevich-1'});
+ const s=ensureBattleWindow(exportedSubmissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state,r=attachSubmissionTrack(s,{communityId:'makarevich-1',fileId:'submission-file',nowMinute:601});assert.equal(r.ok,true);assert.deepEqual(r.state.social.dialogs['makarevich-1'].peer,{kind:'community',id:'makarevich-1'});
 });

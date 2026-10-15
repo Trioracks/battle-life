@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {submissionFixture,completeSubmissionUpload,completeSubmissionMessage} from './helpers/submission-fixtures.js';
+import {exportedSubmissionFixture,completeSubmissionUpload,completeSubmissionMessage} from './helpers/submission-fixtures.js';
 import {ensureBattleWindow} from '../src/battle-windows.js';
 import {attachSubmissionTrack,sendSubmission,dialogIsTyping,markDialogRead} from '../src/social-submission.js';
 import {advanceSocial} from '../src/social-runtime.js';
@@ -10,9 +10,9 @@ import {advanceComputerHomeFrame} from '../src/apartment-v3-runtime.js';
 import {ApartmentMotion} from '../src/apartment-v3-motion.js';
 import {ApartmentTime} from '../src/apartment-v3-time.js';
 function sentAt(end=false){
- let s=ensureBattleWindow(submissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state;
+ let s=ensureBattleWindow(exportedSubmissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state;
  const nowMinute=end?s.battleWindows[0].closesAt-.25:601;
- s=attachSubmissionTrack(s,{communityId:'makarevich-1',projectId:'beat',nowMinute}).state;
+ s=attachSubmissionTrack(s,{communityId:'makarevich-1',fileId:'submission-file',nowMinute}).state;
  return sendSubmission(completeSubmissionMessage(completeSubmissionUpload(s),{nowMinute}),{communityId:'makarevich-1',nowMinute}).state;
 }
 test('ack works with PC off; typing only last minute; reload and repeated stamp cannot duplicate',()=>{

@@ -4,10 +4,10 @@ import {scheduleSubmissionJudging,publishJudgeEvents,publicBattleResults} from '
 import {advanceSocial} from '../src/social-runtime.js';
 import {ensureBattleWindow} from '../src/battle-windows.js';
 import {attachSubmissionTrack,sendSubmission} from '../src/social-submission.js';
-import {submissionFixture,completeSubmissionUpload,completeSubmissionMessage} from './helpers/submission-fixtures.js';
+import {exportedSubmissionFixture,completeSubmissionUpload,completeSubmissionMessage} from './helpers/submission-fixtures.js';
 export function sentFixture(){
- let s=ensureBattleWindow(submissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state;
- s=attachSubmissionTrack(s,{communityId:'makarevich-1',projectId:'beat',nowMinute:601}).state;
+ let s=ensureBattleWindow(exportedSubmissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state;
+ s=attachSubmissionTrack(s,{communityId:'makarevich-1',fileId:'submission-file',nowMinute:601}).state;
  return sendSubmission(completeSubmissionMessage(completeSubmissionUpload(s)),{communityId:'makarevich-1',nowMinute:602}).state;
 }
 test('all judge decisions freeze once, but no public result exists before its due time',()=>{

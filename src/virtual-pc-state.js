@@ -124,6 +124,7 @@ function normalizeSnapshot(value,archiveCache=null) {
     const captured=captureTrackVersion({projects:[submission.track,...(submission.lyrics?[submission.lyrics]:[])],trackVersions},{projectId:submission.projectId,nowMinute:(submission.submittedDay-1)*1440});
     if(captured.ok){trackVersions=captured.state.trackVersions;submission.trackVersionId=captured.versionId;submission.timePrecision='day-only';}
   }
+  const audioExports=archive('audioExports',raw=>normalizeAudioExports(raw,trackVersions));
   return withSoftware({
     version: 1,
     noviceSchema: 1,
@@ -154,8 +155,8 @@ function normalizeSnapshot(value,archiveCache=null) {
     resultReactions:normalizeResultReactions(source.resultReactions),
     household:normalizeHousehold(source.household),
     battleApplications:normalizeApplications(source.battleApplications),
-    battleSubmissions,trackVersions,audioExports:archive('audioExports',raw=>normalizeAudioExports(raw,trackVersions)),npcTracks:normalizeNpcTracks(source.npcTracks),tournaments:normalizeTournaments(source.tournaments),battleHistory:normalizeBattleHistory(source.battleHistory),
-    outgoingUpload:normalizeOutgoingUpload(source.outgoingUpload,trackVersions),
+    battleSubmissions,trackVersions,audioExports,npcTracks:normalizeNpcTracks(source.npcTracks),tournaments:normalizeTournaments(source.tournaments),battleHistory:normalizeBattleHistory(source.battleHistory),
+    outgoingUpload:normalizeOutgoingUpload(source.outgoingUpload,trackVersions,audioExports),
     outgoingUploadRecovery:Array.isArray(source.outgoingUploadRecovery)?source.outgoingUploadRecovery.map(clone):[],
     outgoingMessage:normalizeOutgoingMessage(source.outgoingMessage,trackVersions),
     outgoingMessageRecovery:Array.isArray(source.outgoingMessageRecovery)?source.outgoingMessageRecovery.map(clone):[],
