@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {mountRapDossier} from '../src/rap-dossier-view.js';
 import {dossierBoardLayout} from '../src/rap-dossier-board-view.js';
-import {startTrackStudy,advanceStudy} from '../src/rap-analysis.js';
+import {startTrackStudy,advanceStudy,pauseStudy} from '../src/rap-analysis.js';
+import {startCaseStudy,advanceCaseStudy,pauseCaseStudy} from '../src/rap-research.js';
 import {analysisFixture,studySkills} from './helpers/analysis-fixture.js';
 import {topicFixture} from './helpers/round-topic-fixture.js';
 import {pcDocument,allPc,findButton} from './helpers/virtual-pc-dom.js';
@@ -10,7 +11,7 @@ const nodes=root=>allPc(root).filter(n=>n.dataset?.dossierNode);
 function setup(state=analysisFixture(),options={}){
  let minute=13440,visible=true,work=0;const d=pcDocument(),root=d.createElement('main');
  const ui=mountRapDossier(root,{getState:()=>state,getMetadata:()=>({gameMinutes:minute,skills:studySkills(60)}),commit:r=>{if(options.fail)return false;state=r.state;return true;},onWork:()=>{work++;return true;},isVisible:()=>visible});
- return {root,d,ui,get state(){return state;},get work(){return work;},time:n=>{minute=n;},visible:v=>{visible=v;}};
+ return {root,d,ui,get state(){return state;},get work(){return work;},replaceState:s=>{state=s;},time:n=>{minute=n;},visible:v=>{visible=v;}};
 }
 function battle(){const s=topicFixture();s.software.dossier.installed=true;s.music.needs={satiety:100,energy:100};s.trackVersions=analysisFixture().trackVersions;s.battleSubmissions=[{id:'submission',battleId:'makarevich-1',roundId:'round-2',trackVersionId:'weak',sentAt:13440}];return s;}
 test('battle graph renders connected folders and forecast below submitted recording',()=>{
@@ -50,4 +51,26 @@ test('several round forecasts for one submitted version have separate paper slot
 
 test('choosing a saved report keeps keyboard focus on its report selector',()=>{
  const state=advanceStudy(startTrackStudy(analysisFixture(),{trackVersionId:'weak',heroSnapshot:studySkills(40),nowMinute:100}).state,{gameMinutes:45,nowMinute:145}).state,x=setup(state),button=findButton(x.root,'Первая демка · study:1');button.focus();button.click();assert.equal(x.d.activeElement?.textContent,'Первая демка · study:1');x.ui.dispose();
+});
+
+test('battle is upper-central and desktop fit centers the composition in spare space',()=>{
+ const graph={id:'battle:test',nodes:['battle','round','judge','opponent','track'].map(kind=>({id:kind,kind}))},layout=dossierBoardLayout(graph),battleCard=layout.positions.get('battle');
+ assert.equal(battleCard.x+battleCard.width/2,layout.width/2);
+ for(const [id,p]of layout.positions)if(id!=='battle')assert.ok(battleCard.y+battleCard.height<=p.y);
+ const x=setup(battle());x.ui.focusTarget({caseId:'battle:makarevich-1'});const canvas=allPc(x.root).find(n=>n.className==='rd-board-canvas'),transform=canvas.getAttribute('style:transform');
+ assert.match(transform,/translate\([1-9][\d.]*px, [\d.]+px\) scale\(/);x.ui.dispose();
+});
+
+for(const active of ['track','battle'])test('current work prefers active '+active+' over the other paused job and preserves focus',()=>{
+ const track=s=>startTrackStudy(s,{trackVersionId:'weak',heroSnapshot:studySkills(60),nowMinute:13440}),research=s=>startCaseStudy(s,{kind:'battle',battleId:'makarevich-1',heroSnapshot:studySkills(60),nowMinute:13440});
+ const first=(active==='track'?research:track)(battle());assert.equal(first.ok,true);
+ const second=(active==='track'?track:research)((active==='track'?pauseCaseStudy:pauseStudy)(first.state));assert.equal(second.ok,true);
+ const x=setup(second.state),total=active==='track'?45:360,advance=active==='track'?advanceStudy:advanceCaseStudy;
+ assert.equal(x.state.rapAnalysis.job.status,active==='track'?'active':'paused');assert.equal(x.state.rapResearch.job.status,active==='battle'?'active':'paused');
+ assert.ok(allPc(x.root).some(n=>n.textContent==='Изучаю · 0 / '+total+' игровых минут'));
+ const pause=findButton(x.root,'Пауза');pause.focus();x.replaceState(advance(x.state,{gameMinutes:5,nowMinute:13445}).state);x.time(13445);x.ui.update();
+ assert.equal(x.d.activeElement,pause);assert.ok(allPc(x.root).some(n=>n.textContent==='Изучаю · 5 / '+total+' игровых минут'));
+ findButton(x.root,'К изучаемой карточке').click();assert.equal(nodes(x.root).find(n=>n.getAttribute('aria-pressed')==='true')?.dataset.dossierNode,active==='track'?'track:weak':'battle:makarevich-1');
+ findButton(x.root,'Пауза').click();assert.ok(allPc(x.root).some(n=>n.textContent==='На паузе · '+(active==='battle'?5:0)+' / 360 игровых минут'));
+ findButton(x.root,'К изучаемой карточке').click();assert.equal(nodes(x.root).find(n=>n.getAttribute('aria-pressed')==='true')?.dataset.dossierNode,'battle:makarevich-1');x.ui.dispose();
 });

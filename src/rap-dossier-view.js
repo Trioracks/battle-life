@@ -7,6 +7,7 @@ import {startTrackStudy,pauseStudy,effectiveStudySkills} from './rap-analysis.js
 import {startCaseStudy,pauseCaseStudy} from './rap-research.js?rev=42';
 import {mountDossierBoard,forecastText} from './rap-dossier-board-view.js?rev=42';
 const studyLabel=n=>n.kind==='track'?'Изучить трек · 45 мин':['battle','round'].includes(n.kind)?'Изучить '+(n.kind==='battle'?'баттл':'раунд')+' · 6 ч':'Изучить · 45 мин';
+const currentStudy=state=>{const jobs=[state.rapResearch?.job,state.rapAnalysis?.job];return jobs.find(job=>job?.status==='active')??jobs.find(Boolean);};
 export function mountRapDossier(root,{getState,getMetadata=()=>({}),navigate=()=>{},commit=()=>false,onWork=()=>false,isVisible=()=>true}){
  const d=root.ownerDocument;let caseId=null,targetRequest=null,selectedId=null,selectedReport=null,graph=null,board=null,disposed=false,lastKey='',lastRefs=[],lastMinute=null,lastProjection=-Infinity,error='';
  const shell=el(d,'section',{className:'rap-dossier',attributes:{'aria-label':'Рэп-досье'}}),header=el(d,'header',{className:'rd-head'}),controls=el(d,'div',{className:'rd-controls'}),cases=el(d,'select',{attributes:{'aria-label':'Выбрать дело'}}),rounds=el(d,'select',{attributes:{'aria-label':'Выбрать раунд'}}),body=el(d,'div',{className:'rd-body'}),boardRoot=el(d,'div',{className:'rd-board'}),detail=el(d,'aside',{className:'rd-detail'}),status=el(d,'p',{className:'rd-status',attributes:{role:'status'}}),progress=el(d,'div',{className:'rd-progress',attributes:{'aria-live':'polite'}});
@@ -23,8 +24,8 @@ export function mountRapDossier(root,{getState,getMetadata=()=>({}),navigate=()=
   if(result.ok&&result.jobId&&!onWork()){save({state:pauseCaseStudy(pauseStudy(getState()))});error='Изучение сохранено на паузе. Сначала сядь за компьютер.';}
   if(result.reportId)selectedReport=result.reportId;refresh(true);
  }
- const progressText=el(d,'span');progress.append(progressText,socialButton(d,'К изучаемой карточке',guarded(()=>{const s=getState(),j=s.rapResearch?.job??s.rapAnalysis?.job;if(j)focusTarget(j.subject?{...j.subject}:{trackVersionId:j.trackVersionId});})),socialButton(d,'Пауза',guarded(()=>{save({state:pauseCaseStudy(pauseStudy(getState()))});refresh(true);})));progress.hidden=true;
- function renderProgress(){const s=getState(),j=s.rapResearch?.job??s.rapAnalysis?.job;const text=j?(j.status==='paused'?'На паузе':'Изучаю')+' · '+Math.floor(j.elapsed)+' / '+j.total+' игровых минут':'';if(progressText.textContent!==text)progressText.textContent=text;progress.hidden=!j;}
+ const progressText=el(d,'span');progress.append(progressText,socialButton(d,'К изучаемой карточке',guarded(()=>{const j=currentStudy(getState());if(j)focusTarget(j.subject?{...j.subject}:{trackVersionId:j.trackVersionId});})),socialButton(d,'Пауза',guarded(()=>{save({state:pauseCaseStudy(pauseStudy(getState()))});refresh(true);})));progress.hidden=true;
+ function renderProgress(){const j=currentStudy(getState());const text=j?(j.status==='paused'?'На паузе':'Изучаю')+' · '+Math.floor(j.elapsed)+' / '+j.total+' игровых минут':'';if(progressText.textContent!==text)progressText.textContent=text;progress.hidden=!j;}
  function renderDetail(){
   const focus=detail.contains(d.activeElement)?d.activeElement?.dataset?.focusId:null;detail.replaceChildren();const n=graph?.nodes.find(n=>n.id===selectedId);detail.setAttribute('aria-label',n?'Детали: '+n.title:'Детали дела');
   if(!n){detail.append(el(d,'h2',{text:graph?.status==='unknown'?'Дело недоступно':'Выбери карточку'}),el(d,'p',{text:'Публичные факты, впечатления и предположения хранятся отдельно.'}));return;}
