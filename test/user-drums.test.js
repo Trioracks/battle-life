@@ -9,12 +9,13 @@ test('ten author patterns supplement a third of novice choices and stop at skill
  const counts=new Map();let author=0;
  for(let i=0;i<90;i++){
   const random=()=> (i+.5)/90;
-  const s=createBeat({projects:[]},{id:'p'+i,name:'Beat'},{beatmaking:49.99},random);
+  const state={projects:[],music:{genres:{version:1,xp:{experimental:50}}}};
+  const s=createBeat(state,{id:'p'+i,name:'Beat'},{beatmaking:49.99},random);
   assert.equal(s.ok,true);const b=s.state.projects[0],part=bank.beginnerById(b.drumId);
-  if(part?.authorship==='user'){author++;counts.set(part.id,(counts.get(part.id)||0)+1);assert.equal(part.key,null);}
+  if(part?.id.startsWith('user-drums-20261012-')){author++;counts.set(part.id,(counts.get(part.id)||0)+1);assert.equal(part.key,null);}
   assert.equal(normalizeBeat(JSON.parse(JSON.stringify(b))).drumId,b.drumId);
-  const high=createBeat({projects:[]},{id:'h'+i,name:'Beat'},{beatmaking:50},random);
-  assert.notEqual(bank.beginnerById(high.state.projects[0].drumId)?.authorship,'user');
+  const high=createBeat(state,{id:'h'+i,name:'Beat'},{beatmaking:50},random);
+  assert.equal(high.state.projects[0].drumId.startsWith('user-drums-20261012-'),false);
  }
  assert.equal(author,30);assert.equal(counts.size,10);assert.ok([...counts.values()].every(n=>n===3));
 });

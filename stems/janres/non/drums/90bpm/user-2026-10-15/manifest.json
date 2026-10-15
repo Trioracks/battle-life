@@ -1,0 +1,1284 @@
+{
+  "version": 1,
+  "source": "User supplied 2026-10-15",
+  "builder": "node tools/prepare-user-experimental.mjs",
+  "parts": [
+    {
+      "id": "user-experimental-20261015-family-01-drums",
+      "originalName": "untitled - Track 1.wav",
+      "source": "stems/janres/non/drums/90bpm/user-2026-10-15/family-01-drums.wav",
+      "sourceHash": "6e037d16c970d5905d38f27f1ce199889ca9671a88fcb373e34f8a0c89f2ce8c",
+      "path": "assets/audio/ft/user-experimental-v1/family-01-drums.wav",
+      "sha256": "5ddbca341dcf738fa3b1fdb5dbf61ee66e07e1d52d2a46a402606e36b2fcfa4f",
+      "role": "drums",
+      "kind": "drums",
+      "family": 1,
+      "key": null,
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "frames": 470400,
+      "sampleRate": 44100,
+      "channels": 2,
+      "original": {
+        "sampleRate": 48000,
+        "channels": 2,
+        "frames": 278333
+      },
+      "evidence": {
+        "signal": {
+          "frames": 255719,
+          "seconds": 5.79862,
+          "peak": 0.98075,
+          "rms": 0.11242,
+          "rmsDb": -18.9831,
+          "clippedSamples": 0,
+          "stereoDifferenceRms": 0,
+          "lowEnergyBelow200": 0.69707,
+          "centroidHz": 313.54875,
+          "spectralPeaks": [
+            {
+              "hz": 65.7618,
+              "note": "C2",
+              "share": 0.10674
+            },
+            {
+              "hz": 42.06363,
+              "note": "E1",
+              "share": 0.03258
+            },
+            {
+              "hz": 35.89961,
+              "note": "D1",
+              "share": 0.0317
+            },
+            {
+              "hz": 114.06664,
+              "note": "A#2",
+              "share": 0.02265
+            },
+            {
+              "hz": 247.23325,
+              "note": "B3",
+              "share": 0.02102
+            },
+            {
+              "hz": 48.12329,
+              "note": "G1",
+              "share": 0.01643
+            },
+            {
+              "hz": 120.27773,
+              "note": "B2",
+              "share": 0.01423
+            },
+            {
+              "hz": 126.57043,
+              "note": "B2",
+              "share": 0.01357
+            }
+          ],
+          "pitchClassEnergy": [
+            {
+              "note": "C",
+              "share": 0.33368
+            },
+            {
+              "note": "D",
+              "share": 0.14198
+            },
+            {
+              "note": "B",
+              "share": 0.13675
+            },
+            {
+              "note": "E",
+              "share": 0.11052
+            },
+            {
+              "note": "A",
+              "share": 0.07218
+            },
+            {
+              "note": "G",
+              "share": 0.06674
+            },
+            {
+              "note": "A#",
+              "share": 0.06615
+            },
+            {
+              "note": "F#",
+              "share": 0.03046
+            },
+            {
+              "note": "D#",
+              "share": 0.02651
+            },
+            {
+              "note": "F",
+              "share": 0.00907
+            },
+            {
+              "note": "C#",
+              "share": 0.00354
+            },
+            {
+              "note": "G#",
+              "share": 0.00243
+            }
+          ],
+          "activeStartSeconds": 0,
+          "activeEndSeconds": 5.35,
+          "onsetsSeconds": [
+            0.67,
+            2.01,
+            2.5,
+            2.67,
+            3.34,
+            4.67,
+            5.17
+          ],
+          "gridErrorSeconds": {
+            "bpm88": 0.05065,
+            "bpm90": 0.00429,
+            "bpm92": 0.05311
+          },
+          "barRms": [
+            0.1171,
+            0.11721
+          ],
+          "tailRms": 0.01342
+        },
+        "role": "Percussive broadband transients and low kick resonances, unlike stable 55/110Hz bass harmonics.",
+        "key": "Percussion: no assigned tonal key; kick resonances are not interpreted as harmonic bass notes.",
+        "timing": "90 BPM supplied; two bars = 5.333333s = 235200 decoded frames. Both bars have nonzero RMS; remainder is decay. Transient onset grid residuals and tail energy are measured above. Half/double-time interpretation is not independently proven.",
+        "subjectiveListening": false,
+        "confidence": "role high; tonal mode moderate"
+      },
+      "tailPolicy": "Raw tail archived intact; fold into two-bar steady-state cycle, repeat twice, 3ms seam fades",
+      "calibration": {
+        "raw": {
+          "lufs": -16.62,
+          "truePeak": -0.17,
+          "lra": 2.9
+        },
+        "buildGainDb": -1.1806657308778636,
+        "derived": {
+          "lufs": -17.09,
+          "truePeak": -0.91,
+          "lra": 2.1
+        },
+        "gainDb": -12.91,
+        "after": {
+          "lufs": -30,
+          "truePeak": -13.82,
+          "lra": 2.1
+        },
+        "peakLimited": false,
+        "targetLufs": -30,
+        "compression": false
+      }
+    },
+    {
+      "id": "user-experimental-20261015-family-02-drums",
+      "originalName": "untitled - Track 5.wav",
+      "source": "stems/janres/non/drums/90bpm/user-2026-10-15/family-02-drums.wav",
+      "sourceHash": "617cd7b1848f6961b92539b0bf6f30d03757c655e05c40a0c25aaba7d49168ce",
+      "path": "assets/audio/ft/user-experimental-v1/family-02-drums.wav",
+      "sha256": "989a9ff30a893347b3980402f7de45063799e292789801e59b148fecb70a7290",
+      "role": "drums",
+      "kind": "drums",
+      "family": 2,
+      "key": null,
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "frames": 470400,
+      "sampleRate": 44100,
+      "channels": 2,
+      "original": {
+        "sampleRate": 48000,
+        "channels": 2,
+        "frames": 277667
+      },
+      "evidence": {
+        "signal": {
+          "frames": 255106,
+          "seconds": 5.78472,
+          "peak": 0.97587,
+          "rms": 0.10604,
+          "rmsDb": -19.49028,
+          "clippedSamples": 0,
+          "stereoDifferenceRms": 0,
+          "lowEnergyBelow200": 0.56094,
+          "centroidHz": 298.07558,
+          "spectralPeaks": [
+            {
+              "hz": 65.34572,
+              "note": "C2",
+              "share": 0.07545
+            },
+            {
+              "hz": 247.20697,
+              "note": "B3",
+              "share": 0.04193
+            },
+            {
+              "hz": 39.52884,
+              "note": "D#1",
+              "share": 0.02531
+            },
+            {
+              "hz": 115.82967,
+              "note": "A#2",
+              "share": 0.01669
+            },
+            {
+              "hz": 222.27796,
+              "note": "A3",
+              "share": 0.00706
+            },
+            {
+              "hz": 143.9698,
+              "note": "D3",
+              "share": 0.00529
+            },
+            {
+              "hz": 81.00336,
+              "note": "E2",
+              "share": 0.00447
+            },
+            {
+              "hz": 267.87454,
+              "note": "C4",
+              "share": 0.00373
+            }
+          ],
+          "pitchClassEnergy": [
+            {
+              "note": "C",
+              "share": 0.38184
+            },
+            {
+              "note": "B",
+              "share": 0.20462
+            },
+            {
+              "note": "D#",
+              "share": 0.12603
+            },
+            {
+              "note": "A#",
+              "share": 0.0837
+            },
+            {
+              "note": "F#",
+              "share": 0.05606
+            },
+            {
+              "note": "A",
+              "share": 0.03885
+            },
+            {
+              "note": "D",
+              "share": 0.03513
+            },
+            {
+              "note": "E",
+              "share": 0.02908
+            },
+            {
+              "note": "G",
+              "share": 0.02174
+            },
+            {
+              "note": "F",
+              "share": 0.01041
+            },
+            {
+              "note": "G#",
+              "share": 0.00724
+            },
+            {
+              "note": "C#",
+              "share": 0.00531
+            }
+          ],
+          "activeStartSeconds": 0,
+          "activeEndSeconds": 5.3,
+          "onsetsSeconds": [
+            0.67,
+            1.51,
+            1.67,
+            2,
+            2.5,
+            2.67,
+            3.34,
+            4.34,
+            4.67,
+            5.17
+          ],
+          "gridErrorSeconds": {
+            "bpm88": 0.05018,
+            "bpm90": 0.004,
+            "bpm92": 0.05061
+          },
+          "barRms": [
+            0.0997,
+            0.1202
+          ],
+          "tailRms": 0.00591
+        },
+        "role": "Percussive broadband transients and low kick resonances, unlike stable 55/110Hz bass harmonics.",
+        "key": "Percussion: no assigned tonal key; kick resonances are not interpreted as harmonic bass notes.",
+        "timing": "90 BPM supplied; two bars = 5.333333s = 235200 decoded frames. Both bars have nonzero RMS; remainder is decay. Transient onset grid residuals and tail energy are measured above. Half/double-time interpretation is not independently proven.",
+        "subjectiveListening": false,
+        "confidence": "role high; tonal mode moderate"
+      },
+      "tailPolicy": "Raw tail archived intact; fold into two-bar steady-state cycle, repeat twice, 3ms seam fades",
+      "calibration": {
+        "raw": {
+          "lufs": -17.69,
+          "truePeak": -0.21,
+          "lra": 2.2
+        },
+        "buildGainDb": -0.913400779108787,
+        "derived": {
+          "lufs": -18.05,
+          "truePeak": -0.92,
+          "lra": 1.6
+        },
+        "gainDb": -11.95,
+        "after": {
+          "lufs": -30,
+          "truePeak": -12.87,
+          "lra": 1.6
+        },
+        "peakLimited": false,
+        "targetLufs": -30,
+        "compression": false
+      }
+    },
+    {
+      "id": "user-experimental-20261015-family-03-drums",
+      "originalName": "untitled - Track 9.wav",
+      "source": "stems/janres/non/drums/90bpm/user-2026-10-15/family-03-drums.wav",
+      "sourceHash": "4f9bde63694456a575a8964d38d6165edd36c6ad596176037ee19941306b835d",
+      "path": "assets/audio/ft/user-experimental-v1/family-03-drums.wav",
+      "sha256": "c6c807990d901637038fb7dd641ae9e6fcc862b3acc4f56d21244a861b4f2444",
+      "role": "drums",
+      "kind": "drums",
+      "family": 3,
+      "key": null,
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "frames": 470400,
+      "sampleRate": 44100,
+      "channels": 2,
+      "original": {
+        "sampleRate": 48000,
+        "channels": 2,
+        "frames": 313000
+      },
+      "evidence": {
+        "signal": {
+          "frames": 287569,
+          "seconds": 6.52084,
+          "peak": 0.97501,
+          "rms": 0.15054,
+          "rmsDb": -16.44723,
+          "clippedSamples": 0,
+          "stereoDifferenceRms": 0,
+          "lowEnergyBelow200": 0.77418,
+          "centroidHz": 204.78254,
+          "spectralPeaks": [
+            {
+              "hz": 65.62684,
+              "note": "C2",
+              "share": 0.10378
+            },
+            {
+              "hz": 39.42268,
+              "note": "D#1",
+              "share": 0.04536
+            },
+            {
+              "hz": 115.68515,
+              "note": "A#2",
+              "share": 0.0272
+            },
+            {
+              "hz": 247.24083,
+              "note": "B3",
+              "share": 0.02224
+            },
+            {
+              "hz": 57.64534,
+              "note": "A#1",
+              "share": 0.01063
+            },
+            {
+              "hz": 81.10858,
+              "note": "E2",
+              "share": 0.00816
+            },
+            {
+              "hz": 218.31028,
+              "note": "A3",
+              "share": 0.00462
+            },
+            {
+              "hz": 95.46408,
+              "note": "G2",
+              "share": 0.00418
+            }
+          ],
+          "pitchClassEnergy": [
+            {
+              "note": "C",
+              "share": 0.41944
+            },
+            {
+              "note": "D#",
+              "share": 0.18332
+            },
+            {
+              "note": "A#",
+              "share": 0.15022
+            },
+            {
+              "note": "B",
+              "share": 0.08941
+            },
+            {
+              "note": "E",
+              "share": 0.03811
+            },
+            {
+              "note": "A",
+              "share": 0.03784
+            },
+            {
+              "note": "G",
+              "share": 0.0286
+            },
+            {
+              "note": "D",
+              "share": 0.01885
+            },
+            {
+              "note": "F#",
+              "share": 0.01684
+            },
+            {
+              "note": "C#",
+              "share": 0.00885
+            },
+            {
+              "note": "F",
+              "share": 0.00568
+            },
+            {
+              "note": "G#",
+              "share": 0.00284
+            }
+          ],
+          "activeStartSeconds": 0,
+          "activeEndSeconds": 4.92,
+          "onsetsSeconds": [
+            0.34,
+            0.67,
+            0.84,
+            1.17,
+            1.5,
+            2,
+            2.17,
+            2.67,
+            3,
+            3.34,
+            3.5,
+            3.84,
+            4.17,
+            4.34,
+            4.67,
+            4.84
+          ],
+          "gridErrorSeconds": {
+            "bpm88": 0.05131,
+            "bpm90": 0.00375,
+            "bpm92": 0.05046
+          },
+          "barRms": [
+            0.15622,
+            0.17609
+          ],
+          "tailRms": 0.0006
+        },
+        "role": "Percussive broadband transients and low kick resonances, unlike stable 55/110Hz bass harmonics.",
+        "key": "Percussion: no assigned tonal key; kick resonances are not interpreted as harmonic bass notes.",
+        "timing": "90 BPM supplied; two bars = 5.333333s = 235200 decoded frames. Both bars have nonzero RMS; remainder is decay. Transient onset grid residuals and tail energy are measured above. Half/double-time interpretation is not independently proven.",
+        "subjectiveListening": false,
+        "confidence": "role high; tonal mode moderate"
+      },
+      "tailPolicy": "Raw tail archived intact; fold into two-bar steady-state cycle, repeat twice, 3ms seam fades",
+      "calibration": {
+        "raw": {
+          "lufs": -14.85,
+          "truePeak": -0.15,
+          "lra": 3.2
+        },
+        "buildGainDb": -0.6953177384323306,
+        "derived": {
+          "lufs": -15.63,
+          "truePeak": -0.85,
+          "lra": 0.9
+        },
+        "gainDb": -14.37,
+        "after": {
+          "lufs": -30,
+          "truePeak": -15.22,
+          "lra": 1
+        },
+        "peakLimited": false,
+        "targetLufs": -30,
+        "compression": false
+      }
+    },
+    {
+      "id": "user-experimental-20261015-family-04-drums",
+      "originalName": "untitled - Track 13.wav",
+      "source": "stems/janres/non/drums/90bpm/user-2026-10-15/family-04-drums.wav",
+      "sourceHash": "4bf6c8308437ccceb0d506ce4934374e26a33e39fb2f3845de00787cb04bcb30",
+      "path": "assets/audio/ft/user-experimental-v1/family-04-drums.wav",
+      "sha256": "99ee1121aa926b85430d3160141e191683aea6740af58dab1079120a62efc43a",
+      "role": "drums",
+      "kind": "drums",
+      "family": 4,
+      "key": null,
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "frames": 470400,
+      "sampleRate": 44100,
+      "channels": 2,
+      "original": {
+        "sampleRate": 48000,
+        "channels": 2,
+        "frames": 262333
+      },
+      "evidence": {
+        "signal": {
+          "frames": 241019,
+          "seconds": 5.46528,
+          "peak": 0.80549,
+          "rms": 0.11362,
+          "rmsDb": -18.89107,
+          "clippedSamples": 0,
+          "stereoDifferenceRms": 0.00012,
+          "lowEnergyBelow200": 0.89903,
+          "centroidHz": 197.94162,
+          "spectralPeaks": [
+            {
+              "hz": 65.54089,
+              "note": "C2",
+              "share": 0.08641
+            },
+            {
+              "hz": 39.53262,
+              "note": "D#1",
+              "share": 0.05083
+            },
+            {
+              "hz": 117.61185,
+              "note": "A#2",
+              "share": 0.02755
+            },
+            {
+              "hz": 127.28589,
+              "note": "C3",
+              "share": 0.01708
+            },
+            {
+              "hz": 144.81547,
+              "note": "D3",
+              "share": 0.00973
+            },
+            {
+              "hz": 149.68821,
+              "note": "D3",
+              "share": 0.00792
+            },
+            {
+              "hz": 81.44407,
+              "note": "E2",
+              "share": 0.00733
+            },
+            {
+              "hz": 95.55804,
+              "note": "G2",
+              "share": 0.00461
+            }
+          ],
+          "pitchClassEnergy": [
+            {
+              "note": "C",
+              "share": 0.44852
+            },
+            {
+              "note": "D#",
+              "share": 0.22396
+            },
+            {
+              "note": "A#",
+              "share": 0.1229
+            },
+            {
+              "note": "D",
+              "share": 0.07826
+            },
+            {
+              "note": "G",
+              "share": 0.04576
+            },
+            {
+              "note": "E",
+              "share": 0.03567
+            },
+            {
+              "note": "F#",
+              "share": 0.0201
+            },
+            {
+              "note": "F",
+              "share": 0.00963
+            },
+            {
+              "note": "C#",
+              "share": 0.00572
+            },
+            {
+              "note": "A",
+              "share": 0.0054
+            },
+            {
+              "note": "G#",
+              "share": 0.00257
+            },
+            {
+              "note": "B",
+              "share": 0.00152
+            }
+          ],
+          "activeStartSeconds": 0,
+          "activeEndSeconds": 4.75,
+          "onsetsSeconds": [
+            0.54,
+            0.67,
+            1.21,
+            1.55,
+            1.67,
+            2.01,
+            2.67,
+            3.21,
+            3.34,
+            3.88,
+            4.22,
+            4.34,
+            4.67
+          ],
+          "gridErrorSeconds": {
+            "bpm88": 0.04049,
+            "bpm90": 0.0241,
+            "bpm92": 0.05191
+          },
+          "barRms": [
+            0.11501,
+            0.11501
+          ],
+          "tailRms": 0.00012
+        },
+        "role": "Percussive broadband transients and low kick resonances, unlike stable 55/110Hz bass harmonics.",
+        "key": "Percussion: no assigned tonal key; kick resonances are not interpreted as harmonic bass notes.",
+        "timing": "90 BPM supplied; two bars = 5.333333s = 235200 decoded frames. Both bars have nonzero RMS; remainder is decay. Transient onset grid residuals and tail energy are measured above. Half/double-time interpretation is not independently proven.",
+        "subjectiveListening": false,
+        "confidence": "role high; tonal mode moderate"
+      },
+      "tailPolicy": "Raw tail archived intact; fold into two-bar steady-state cycle, repeat twice, 3ms seam fades",
+      "calibration": {
+        "raw": {
+          "lufs": -17.93,
+          "truePeak": -1.88,
+          "lra": 0.8
+        },
+        "buildGainDb": 0,
+        "derived": {
+          "lufs": -17.88,
+          "truePeak": -1.88,
+          "lra": 0.8
+        },
+        "gainDb": -12.12,
+        "after": {
+          "lufs": -29.99,
+          "truePeak": -14,
+          "lra": 0.7
+        },
+        "peakLimited": false,
+        "targetLufs": -30,
+        "compression": false
+      }
+    },
+    {
+      "id": "user-experimental-20261015-family-05-drums",
+      "originalName": "untitled - Track 17.wav",
+      "source": "stems/janres/non/drums/90bpm/user-2026-10-15/family-05-drums.wav",
+      "sourceHash": "7e011935c02544d70f972b5ade711958f79789ee898074156513d3f4aa4ad813",
+      "path": "assets/audio/ft/user-experimental-v1/family-05-drums.wav",
+      "sha256": "5529028eff3b52e2e4f60b79ca37ec5c2c3e3f25967f57016f0c060b3dbb4784",
+      "role": "drums",
+      "kind": "drums",
+      "family": 5,
+      "key": null,
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "frames": 470400,
+      "sampleRate": 44100,
+      "channels": 2,
+      "original": {
+        "sampleRate": 48000,
+        "channels": 2,
+        "frames": 287000
+      },
+      "evidence": {
+        "signal": {
+          "frames": 263682,
+          "seconds": 5.97918,
+          "peak": 0.72302,
+          "rms": 0.11167,
+          "rmsDb": -19.04119,
+          "clippedSamples": 0,
+          "stereoDifferenceRms": 0.0035,
+          "lowEnergyBelow200": 0.89023,
+          "centroidHz": 185.06953,
+          "spectralPeaks": [
+            {
+              "hz": 66.15483,
+              "note": "C2",
+              "share": 0.08954
+            },
+            {
+              "hz": 40.44912,
+              "note": "E1",
+              "share": 0.05125
+            },
+            {
+              "hz": 36.04831,
+              "note": "D1",
+              "share": 0.04519
+            },
+            {
+              "hz": 115.94057,
+              "note": "A#2",
+              "share": 0.0293
+            },
+            {
+              "hz": 126.17774,
+              "note": "B2",
+              "share": 0.01973
+            },
+            {
+              "hz": 108.57801,
+              "note": "A2",
+              "share": 0.01469
+            },
+            {
+              "hz": 131.53415,
+              "note": "C3",
+              "share": 0.01308
+            },
+            {
+              "hz": 53.66505,
+              "note": "A1",
+              "share": 0.01066
+            }
+          ],
+          "pitchClassEnergy": [
+            {
+              "note": "C",
+              "share": 0.30069
+            },
+            {
+              "note": "D",
+              "share": 0.16285
+            },
+            {
+              "note": "E",
+              "share": 0.1559
+            },
+            {
+              "note": "A#",
+              "share": 0.09167
+            },
+            {
+              "note": "A",
+              "share": 0.08071
+            },
+            {
+              "note": "F#",
+              "share": 0.06081
+            },
+            {
+              "note": "B",
+              "share": 0.05859
+            },
+            {
+              "note": "F",
+              "share": 0.03466
+            },
+            {
+              "note": "C#",
+              "share": 0.02982
+            },
+            {
+              "note": "G",
+              "share": 0.01531
+            },
+            {
+              "note": "G#",
+              "share": 0.00464
+            },
+            {
+              "note": "D#",
+              "share": 0.00434
+            }
+          ],
+          "activeStartSeconds": 0,
+          "activeEndSeconds": 5.33,
+          "onsetsSeconds": [
+            0.67,
+            1.17,
+            1.56,
+            1.78,
+            2,
+            2.5,
+            2.67,
+            2.84,
+            3.01,
+            3.17,
+            3.34,
+            3.84,
+            4,
+            4.22,
+            4.45,
+            4.67,
+            5.17
+          ],
+          "gridErrorSeconds": {
+            "bpm88": 0.05254,
+            "bpm90": 0.01569,
+            "bpm92": 0.0533
+          },
+          "barRms": [
+            0.1146,
+            0.12174
+          ],
+          "tailRms": 0.00576
+        },
+        "role": "Percussive broadband transients and low kick resonances, unlike stable 55/110Hz bass harmonics.",
+        "key": "Percussion: no assigned tonal key; kick resonances are not interpreted as harmonic bass notes.",
+        "timing": "90 BPM supplied; two bars = 5.333333s = 235200 decoded frames. Both bars have nonzero RMS; remainder is decay. Transient onset grid residuals and tail energy are measured above. Half/double-time interpretation is not independently proven.",
+        "subjectiveListening": false,
+        "confidence": "role high; tonal mode moderate"
+      },
+      "tailPolicy": "Raw tail archived intact; fold into two-bar steady-state cycle, repeat twice, 3ms seam fades",
+      "calibration": {
+        "raw": {
+          "lufs": -18.49,
+          "truePeak": -2.81,
+          "lra": 1.3
+        },
+        "buildGainDb": 0,
+        "derived": {
+          "lufs": -18.03,
+          "truePeak": -2.83,
+          "lra": 1.1
+        },
+        "gainDb": -11.97,
+        "after": {
+          "lufs": -30.01,
+          "truePeak": -14.8,
+          "lra": 1.1
+        },
+        "peakLimited": false,
+        "targetLufs": -30,
+        "compression": false
+      }
+    },
+    {
+      "id": "user-experimental-20261015-family-06-drums",
+      "originalName": "untitled - Track 21.wav",
+      "source": "stems/janres/non/drums/90bpm/user-2026-10-15/family-06-drums.wav",
+      "sourceHash": "1991d93de81d19e09e176ff458a493741f56ad1842dec6f6c95742be664fb124",
+      "path": "assets/audio/ft/user-experimental-v1/family-06-drums.wav",
+      "sha256": "b6bed8cf9df93f2f3d9fc68d1b8f6fb64fef231e36620a3ce3f5fac5f1643cbe",
+      "role": "drums",
+      "kind": "drums",
+      "family": 6,
+      "key": null,
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "frames": 470400,
+      "sampleRate": 44100,
+      "channels": 2,
+      "original": {
+        "sampleRate": 48000,
+        "channels": 2,
+        "frames": 274333
+      },
+      "evidence": {
+        "signal": {
+          "frames": 252044,
+          "seconds": 5.71528,
+          "peak": 0.97468,
+          "rms": 0.13287,
+          "rmsDb": -17.53163,
+          "clippedSamples": 0,
+          "stereoDifferenceRms": 0.00064,
+          "lowEnergyBelow200": 0.87002,
+          "centroidHz": 252.94551,
+          "spectralPeaks": [
+            {
+              "hz": 65.59977,
+              "note": "C2",
+              "share": 0.09262
+            },
+            {
+              "hz": 39.69876,
+              "note": "D#1",
+              "share": 0.04652
+            },
+            {
+              "hz": 115.37148,
+              "note": "A#2",
+              "share": 0.02753
+            },
+            {
+              "hz": 125.60696,
+              "note": "B2",
+              "share": 0.0144
+            },
+            {
+              "hz": 142.77809,
+              "note": "D3",
+              "share": 0.01037
+            },
+            {
+              "hz": 147.447,
+              "note": "D3",
+              "share": 0.00957
+            },
+            {
+              "hz": 81.99741,
+              "note": "E2",
+              "share": 0.00801
+            },
+            {
+              "hz": 95.71043,
+              "note": "G2",
+              "share": 0.00491
+            }
+          ],
+          "pitchClassEnergy": [
+            {
+              "note": "C",
+              "share": 0.39992
+            },
+            {
+              "note": "D#",
+              "share": 0.2011
+            },
+            {
+              "note": "A#",
+              "share": 0.11965
+            },
+            {
+              "note": "D",
+              "share": 0.08409
+            },
+            {
+              "note": "B",
+              "share": 0.07356
+            },
+            {
+              "note": "E",
+              "share": 0.03434
+            },
+            {
+              "note": "F#",
+              "share": 0.03427
+            },
+            {
+              "note": "G",
+              "share": 0.02534
+            },
+            {
+              "note": "F",
+              "share": 0.0095
+            },
+            {
+              "note": "C#",
+              "share": 0.00882
+            },
+            {
+              "note": "A",
+              "share": 0.00858
+            },
+            {
+              "note": "G#",
+              "share": 0.00083
+            }
+          ],
+          "activeStartSeconds": 0,
+          "activeEndSeconds": 5.17,
+          "onsetsSeconds": [
+            0.34,
+            0.67,
+            1.84,
+            2.01,
+            2.34,
+            2.5,
+            2.67,
+            3,
+            3.34,
+            4.5,
+            4.67
+          ],
+          "gridErrorSeconds": {
+            "bpm88": 0.04698,
+            "bpm90": 0.00424,
+            "bpm92": 0.05206
+          },
+          "barRms": [
+            0.14083,
+            0.13417
+          ],
+          "tailRms": 0.00037
+        },
+        "role": "Percussive broadband transients and low kick resonances, unlike stable 55/110Hz bass harmonics.",
+        "key": "Percussion: no assigned tonal key; kick resonances are not interpreted as harmonic bass notes.",
+        "timing": "90 BPM supplied; two bars = 5.333333s = 235200 decoded frames. Both bars have nonzero RMS; remainder is decay. Transient onset grid residuals and tail energy are measured above. Half/double-time interpretation is not independently proven.",
+        "subjectiveListening": false,
+        "confidence": "role high; tonal mode moderate"
+      },
+      "tailPolicy": "Raw tail archived intact; fold into two-bar steady-state cycle, repeat twice, 3ms seam fades",
+      "calibration": {
+        "raw": {
+          "lufs": -15.7,
+          "truePeak": -0.15,
+          "lra": 2.6
+        },
+        "buildGainDb": -0.6923936175471144,
+        "derived": {
+          "lufs": -15.86,
+          "truePeak": -0.85,
+          "lra": 1
+        },
+        "gainDb": -14.14,
+        "after": {
+          "lufs": -29.99,
+          "truePeak": -14.99,
+          "lra": 1
+        },
+        "peakLimited": false,
+        "targetLufs": -30,
+        "compression": false
+      }
+    },
+    {
+      "id": "user-experimental-20261015-family-07-drums",
+      "originalName": "untitled - Track 25.wav",
+      "source": "stems/janres/non/drums/90bpm/user-2026-10-15/family-07-drums.wav",
+      "sourceHash": "199b171bb2fc5bcccf9529dade4578d52ad31f95e05c5cbf23b8236c59849566",
+      "path": "assets/audio/ft/user-experimental-v1/family-07-drums.wav",
+      "sha256": "537bba23575d16030463da20a4572b40ed762edcb8dc9878fe00d88efede3d15",
+      "role": "drums",
+      "kind": "drums",
+      "family": 7,
+      "key": null,
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "frames": 470400,
+      "sampleRate": 44100,
+      "channels": 2,
+      "original": {
+        "sampleRate": 48000,
+        "channels": 2,
+        "frames": 288333
+      },
+      "evidence": {
+        "signal": {
+          "frames": 264906,
+          "seconds": 6.00694,
+          "peak": 0.97627,
+          "rms": 0.11011,
+          "rmsDb": -19.16368,
+          "clippedSamples": 0,
+          "stereoDifferenceRms": 0.00012,
+          "lowEnergyBelow200": 0.6617,
+          "centroidHz": 254.64704,
+          "spectralPeaks": [
+            {
+              "hz": 65.4242,
+              "note": "C2",
+              "share": 0.08932
+            },
+            {
+              "hz": 39.54427,
+              "note": "D#1",
+              "share": 0.0367
+            },
+            {
+              "hz": 247.32736,
+              "note": "B3",
+              "share": 0.03337
+            },
+            {
+              "hz": 115.74016,
+              "note": "A#2",
+              "share": 0.02152
+            },
+            {
+              "hz": 81.44038,
+              "note": "E2",
+              "share": 0.0061
+            },
+            {
+              "hz": 221.53917,
+              "note": "A3",
+              "share": 0.00603
+            },
+            {
+              "hz": 95.09748,
+              "note": "F#2",
+              "share": 0.00343
+            },
+            {
+              "hz": 267.62534,
+              "note": "C4",
+              "share": 0.00316
+            }
+          ],
+          "pitchClassEnergy": [
+            {
+              "note": "C",
+              "share": 0.42334
+            },
+            {
+              "note": "D#",
+              "share": 0.17112
+            },
+            {
+              "note": "B",
+              "share": 0.15502
+            },
+            {
+              "note": "A#",
+              "share": 0.0997
+            },
+            {
+              "note": "E",
+              "share": 0.03794
+            },
+            {
+              "note": "F#",
+              "share": 0.03512
+            },
+            {
+              "note": "A",
+              "share": 0.03165
+            },
+            {
+              "note": "D",
+              "share": 0.02007
+            },
+            {
+              "note": "G",
+              "share": 0.01489
+            },
+            {
+              "note": "G#",
+              "share": 0.00476
+            },
+            {
+              "note": "F",
+              "share": 0.00333
+            },
+            {
+              "note": "C#",
+              "share": 0.00305
+            }
+          ],
+          "activeStartSeconds": 0,
+          "activeEndSeconds": 5.11,
+          "onsetsSeconds": [
+            0.67,
+            1.21,
+            1.54,
+            1.88,
+            2.21,
+            2.54,
+            2.88,
+            3,
+            3.34,
+            3.67,
+            4,
+            4.34,
+            4.67
+          ],
+          "gridErrorSeconds": {
+            "bpm88": 0.04024,
+            "bpm90": 0.02179,
+            "bpm92": 0.06559
+          },
+          "barRms": [
+            0.09378,
+            0.13606
+          ],
+          "tailRms": 0.00362
+        },
+        "role": "Percussive broadband transients and low kick resonances, unlike stable 55/110Hz bass harmonics.",
+        "key": "Percussion: no assigned tonal key; kick resonances are not interpreted as harmonic bass notes.",
+        "timing": "90 BPM supplied; two bars = 5.333333s = 235200 decoded frames. Both bars have nonzero RMS; remainder is decay. Transient onset grid residuals and tail energy are measured above. Half/double-time interpretation is not independently proven.",
+        "subjectiveListening": false,
+        "confidence": "role high; tonal mode moderate"
+      },
+      "tailPolicy": "Raw tail archived intact; fold into two-bar steady-state cycle, repeat twice, 3ms seam fades",
+      "calibration": {
+        "raw": {
+          "lufs": -18.05,
+          "truePeak": -0.2,
+          "lra": 2.6
+        },
+        "buildGainDb": -0.706575914506248,
+        "derived": {
+          "lufs": -18.5,
+          "truePeak": -0.91,
+          "lra": 3.3
+        },
+        "gainDb": -11.5,
+        "after": {
+          "lufs": -30,
+          "truePeak": -12.41,
+          "lra": 3.3
+        },
+        "peakLimited": false,
+        "targetLufs": -30,
+        "compression": false
+      }
+    }
+  ]
+}

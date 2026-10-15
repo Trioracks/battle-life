@@ -4,6 +4,7 @@ import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=28';
 import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=28';
 import {advanceBeatWork,createBeat,startBeatStage,restoreMusicNeeds} from '../src/beat-production.js?rev=28';
 import {createStudioProject} from '../src/ft-studio-project.js?rev=28';
+import {beginnerById} from '../src/beat-beginner-bank.js';
 import {pcDocument,allPc,findButton,fire} from './helpers/virtual-pc-dom.js';
 function setup(){const d=pcDocument(),root=d.createElement('section');let launch,work=0;const pc=mountVirtualPc(root,{audio:{stop(){},dispose(){}},beatAudio:{play:async()=>true,stop(){},dispose(){}},setTimeoutFn:f=>(launch=f,1),clearTimeoutFn(){},onWork:()=>{work++;return true;}});pc.showDesktop(createVirtualPcState({power:'on',download:{status:'installed'}}));pc.syncHost({playerName:'Игрок',clockLabel:'10:00',skills:{beatmaking:40}});return {pc,root,launch:()=>launch(),work:()=>work};}
 const field=(root,label)=>allPc(root).find(n=>n.getAttribute('aria-label')===label);
@@ -11,7 +12,7 @@ test('FT creates a beat without tempo editing and retains inputs across host tic
  const s=setup();s.pc.open('ft-studio');s.launch();findButton(s.root,'Новый проект').click();
  const name=field(s.root,'Название бита');assert.ok(name);name.value='Город';fire(name,'input');name.focus();
  s.pc.syncHost({playerName:'Игрок',clockLabel:'10:01',skills:{beatmaking:40}});assert.equal(field(s.root,'Название бита'),name);assert.equal(name.value,'Город');
- findButton(s.root,'Начать проект').click();assert.equal(s.pc.state.projects[0].name,'Город');assert.match(s.pc.state.projects[0].drumId,/^(beginner-drums-|user-drums-20261012-)/);
+ findButton(s.root,'Начать проект').click();assert.equal(s.pc.state.projects[0].name,'Город');assert.equal(beginnerById(s.pc.state.projects[0].drumId)?.kind,'drums');
  assert.equal(allPc(s.root).filter(n=>n.type==='range').length,9);assert.equal(field(s.root,'BPM'),undefined);
  const groove=field(s.root,'Ровный грув');groove.value='9';fire(groove,'input');
  findButton(s.root,'Работать над битом').click();assert.equal(s.work(),1);assert.ok(s.pc.state.music.job);assert.equal(s.pc.state.music.job.sliders[0],9);

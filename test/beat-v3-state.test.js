@@ -10,8 +10,8 @@ test('v3_only_requires_name and uses the authored bank at every skill tier',()=>
   const r=make(skill);assert.equal(r.ok,true);
   const beat=r.state.projects[0];assert.equal(beat.version,3);assert.equal(beat.bpm,90);
   assert.equal(beat.productionMode,skill<25?'beginner':'automatic');
-  assert.equal(beat.drumId,skill<50?'user-drums-20261012-01':'beginner-drums-17');
-  assert.deepEqual(beat.audio,{bankVersion:1,bars:4,levelVersion:1,themeId:'beginner-theme-17',arrangementId:'beginner-arrangement-17'});
+  assert.equal(beat.drumId,'user-experimental-20261015-family-01-drums');
+  assert.deepEqual(beat.audio,{bankVersion:1,bars:4,levelVersion:1,themeId:'user-experimental-20261015-family-01-keys-a',arrangementId:'user-experimental-20261015-family-01-bass'});
  }
 });
 

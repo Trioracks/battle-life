@@ -70,9 +70,9 @@ export function createBeat(input,options={},skills={},random=Math.random){
  if(softwareDiskBytes(s).free<2000000)return result(s,false,'Недостаточно места для нового проекта.');
  if(options.assetId&&drumById(options.assetId)?.retired)return result(s,false,RETIRED_DRUM_MESSAGE);
  if(options.assetId&&!s.music.owned.some(a=>a.id===options.assetId))return result(s,false,'Этот луп ещё не получен.');
- const skill=effectiveBeatSkill(s,skills),parts=chooseBeginnerParts(random,{skill});
+ const skill=effectiveBeatSkill(s,skills),profile=genreSnapshot(s.music.genres,genre),parts=chooseBeginnerParts(random,{skill,genre,genreXP:profile.xp});
  const drumId=options.assetId||parts.drumsId;
- const beat=normalizeBeat({version:3,kind:'beat',id,name,genre,songFormVersion:1,createdDay:Number.isSafeInteger(options.gameDay)&&options.gameDay>0?options.gameDay:1,genreProfile:genreSnapshot(s.music.genres,genre),drumId,stages:[],mix:createBeatMix(id,{beatmaking:skill,sound:effectiveSoundSkill(s,skills)}),productionMode:skill<25?'beginner':'automatic',
+ const beat=normalizeBeat({version:3,kind:'beat',id,name,genre,songFormVersion:1,createdDay:Number.isSafeInteger(options.gameDay)&&options.gameDay>0?options.gameDay:1,genreProfile:profile,drumId,stages:[],mix:createBeatMix(id,{beatmaking:skill,sound:effectiveSoundSkill(s,skills)}),productionMode:skill<25?'beginner':'automatic',
   audio:{bankVersion:1,bars:4,levelVersion:1,themeId:parts.themeId,arrangementId:parts.arrangementId}});
  s.projects.push(beat);s.music.activeBeatId=id;return result(s);
 }

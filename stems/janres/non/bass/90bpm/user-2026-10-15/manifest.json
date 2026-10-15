@@ -1,0 +1,1336 @@
+{
+  "version": 1,
+  "source": "User supplied 2026-10-15",
+  "builder": "node tools/prepare-user-experimental.mjs",
+  "parts": [
+    {
+      "id": "user-experimental-20261015-family-01-bass",
+      "originalName": "untitled - Track 2.wav",
+      "source": "stems/janres/non/bass/90bpm/user-2026-10-15/family-01-bass.wav",
+      "sourceHash": "89ef3744cb12a79af35f5de62bb02ca10f8907d1624b8dfe785c8f5532dbcfe1",
+      "path": "assets/audio/ft/user-experimental-v1/family-01-bass.wav",
+      "sha256": "ac893bb363abc5bd6dd36bff0eb31741dadb5730941b8212037848be72ea76af",
+      "role": "bass",
+      "kind": "arrangement",
+      "family": 1,
+      "key": "A minor",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "frames": 470400,
+      "sampleRate": 44100,
+      "channels": 2,
+      "original": {
+        "sampleRate": 48000,
+        "channels": 2,
+        "frames": 258333
+      },
+      "evidence": {
+        "signal": {
+          "frames": 237344,
+          "seconds": 5.38195,
+          "peak": 0.29825,
+          "rms": 0.07802,
+          "rmsDb": -22.1554,
+          "clippedSamples": 0,
+          "stereoDifferenceRms": 0,
+          "lowEnergyBelow200": 0.92914,
+          "centroidHz": 134.48659,
+          "spectralPeaks": [
+            {
+              "hz": 109.78729,
+              "note": "A2",
+              "share": 0.20458
+            },
+            {
+              "hz": 164.82911,
+              "note": "E3",
+              "share": 0.07863
+            },
+            {
+              "hz": 65.17649,
+              "note": "C2",
+              "share": 0.07781
+            },
+            {
+              "hz": 196.10538,
+              "note": "G3",
+              "share": 0.05659
+            },
+            {
+              "hz": 55.13646,
+              "note": "A1",
+              "share": 0.05316
+            },
+            {
+              "hz": 130.67602,
+              "note": "C3",
+              "share": 0.01958
+            },
+            {
+              "hz": 220.34052,
+              "note": "A3",
+              "share": 0.01415
+            },
+            {
+              "hz": 261.17914,
+              "note": "C4",
+              "share": 0.00847
+            }
+          ],
+          "pitchClassEnergy": [
+            {
+              "note": "A",
+              "share": 0.51424
+            },
+            {
+              "note": "C",
+              "share": 0.20021
+            },
+            {
+              "note": "E",
+              "share": 0.16172
+            },
+            {
+              "note": "G",
+              "share": 0.10749
+            },
+            {
+              "note": "C#",
+              "share": 0.0094
+            },
+            {
+              "note": "B",
+              "share": 0.00449
+            },
+            {
+              "note": "D",
+              "share": 0.00071
+            },
+            {
+              "note": "G#",
+              "share": 0.00048
+            },
+            {
+              "note": "A#",
+              "share": 0.00048
+            },
+            {
+              "note": "F#",
+              "share": 0.00039
+            },
+            {
+              "note": "D#",
+              "share": 0.0002
+            },
+            {
+              "note": "F",
+              "share": 0.0002
+            }
+          ],
+          "activeStartSeconds": 0,
+          "activeEndSeconds": 5.34,
+          "onsetsSeconds": [
+            0.12,
+            0.21,
+            0.48,
+            0.67,
+            0.95,
+            1.33,
+            1.58,
+            1.85,
+            2,
+            2.12,
+            2.21,
+            2.48,
+            2.7,
+            2.79,
+            2.93,
+            3.02,
+            3.33,
+            3.43,
+            3.52,
+            3.61,
+            3.81,
+            4.01,
+            4.67,
+            4.76,
+            4.84,
+            4.93,
+            5.02
+          ],
+          "gridErrorSeconds": {
+            "bpm88": 0.04638,
+            "bpm90": 0.03321,
+            "bpm92": 0.041
+          },
+          "barRms": [
+            0.08355,
+            0.07282
+          ],
+          "tailRms": 0.01373
+        },
+        "role": "Stable A1/A2 bass harmonics, >88% spectral energy below 200Hz, low spectral centroid.",
+        "key": "A minor compatible (inferred, not authoritative key detection): A/C/E with G/D/B natural pitch classes across the family. Spectral partials can produce chromatic energy; exact instrument, voicing and mode remain uncertain.",
+        "timing": "90 BPM supplied; two bars = 5.333333s = 235200 decoded frames. Both bars have nonzero RMS; remainder is decay. Transient onset grid residuals and tail energy are measured above. Half/double-time interpretation is not independently proven.",
+        "subjectiveListening": false,
+        "confidence": "role high; tonal mode moderate"
+      },
+      "tailPolicy": "Raw tail archived intact; fold into two-bar steady-state cycle, repeat twice, 3ms seam fades",
+      "calibration": {
+        "raw": {
+          "lufs": -21.14,
+          "truePeak": -10.51,
+          "lra": 1.1
+        },
+        "buildGainDb": 0,
+        "derived": {
+          "lufs": -21.04,
+          "truePeak": -10.51,
+          "lra": 0.9
+        },
+        "gainDb": -7.46,
+        "after": {
+          "lufs": -28.49,
+          "truePeak": -17.97,
+          "lra": 0.9
+        },
+        "peakLimited": false,
+        "targetLufs": -28.5,
+        "compression": false
+      }
+    },
+    {
+      "id": "user-experimental-20261015-family-02-bass",
+      "originalName": "untitled - Track 6.wav",
+      "source": "stems/janres/non/bass/90bpm/user-2026-10-15/family-02-bass.wav",
+      "sourceHash": "493852f3f98bae2413f52dde55463a48ba512109ace634718e57d1610f5f0054",
+      "path": "assets/audio/ft/user-experimental-v1/family-02-bass.wav",
+      "sha256": "b81a151754107fa21531932c4d924e63a5a266f20ef915753c6a0f4f80a1e9df",
+      "role": "bass",
+      "kind": "arrangement",
+      "family": 2,
+      "key": "A minor",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "frames": 470400,
+      "sampleRate": 44100,
+      "channels": 2,
+      "original": {
+        "sampleRate": 48000,
+        "channels": 2,
+        "frames": 258333
+      },
+      "evidence": {
+        "signal": {
+          "frames": 237344,
+          "seconds": 5.38195,
+          "peak": 0.22053,
+          "rms": 0.05973,
+          "rmsDb": -24.47639,
+          "clippedSamples": 0,
+          "stereoDifferenceRms": 0,
+          "lowEnergyBelow200": 0.9355,
+          "centroidHz": 130.82296,
+          "spectralPeaks": [
+            {
+              "hz": 109.94161,
+              "note": "A2",
+              "share": 0.2687
+            },
+            {
+              "hz": 164.78659,
+              "note": "E3",
+              "share": 0.08732
+            },
+            {
+              "hz": 55.01423,
+              "note": "A1",
+              "share": 0.07664
+            },
+            {
+              "hz": 65.18336,
+              "note": "C2",
+              "share": 0.05526
+            },
+            {
+              "hz": 196.02642,
+              "note": "G3",
+              "share": 0.0374
+            },
+            {
+              "hz": 130.85272,
+              "note": "C3",
+              "share": 0.01253
+            },
+            {
+              "hz": 220.1771,
+              "note": "A3",
+              "share": 0.01237
+            },
+            {
+              "hz": 330.20127,
+              "note": "E4",
+              "share": 0.00674
+            }
+          ],
+          "pitchClassEnergy": [
+            {
+              "note": "A",
+              "share": 0.62397
+            },
+            {
+              "note": "E",
+              "share": 0.16782
+            },
+            {
+              "note": "C",
+              "share": 0.12782
+            },
+            {
+              "note": "G",
+              "share": 0.06553
+            },
+            {
+              "note": "C#",
+              "share": 0.00598
+            },
+            {
+              "note": "B",
+              "share": 0.00503
+            },
+            {
+              "note": "D",
+              "share": 0.00234
+            },
+            {
+              "note": "G#",
+              "share": 0.00044
+            },
+            {
+              "note": "A#",
+              "share": 0.00038
+            },
+            {
+              "note": "F#",
+              "share": 0.0003
+            },
+            {
+              "note": "D#",
+              "share": 0.0002
+            },
+            {
+              "note": "F",
+              "share": 0.00019
+            }
+          ],
+          "activeStartSeconds": 0,
+          "activeEndSeconds": 5.34,
+          "onsetsSeconds": [
+            0.12,
+            0.21,
+            0.32,
+            0.48,
+            2,
+            2.08,
+            2.17,
+            2.34,
+            2.43,
+            2.68,
+            2.95,
+            4.86
+          ],
+          "gridErrorSeconds": {
+            "bpm88": 0.04508,
+            "bpm90": 0.03111,
+            "bpm92": 0.0358
+          },
+          "barRms": [
+            0.06028,
+            0.05968
+          ],
+          "tailRms": 0.01597
+        },
+        "role": "Stable A1/A2 bass harmonics, >88% spectral energy below 200Hz, low spectral centroid.",
+        "key": "A minor compatible (inferred, not authoritative key detection): A/C/E with G/D/B natural pitch classes across the family. Spectral partials can produce chromatic energy; exact instrument, voicing and mode remain uncertain.",
+        "timing": "90 BPM supplied; two bars = 5.333333s = 235200 decoded frames. Both bars have nonzero RMS; remainder is decay. Transient onset grid residuals and tail energy are measured above. Half/double-time interpretation is not independently proven.",
+        "subjectiveListening": false,
+        "confidence": "role high; tonal mode moderate"
+      },
+      "tailPolicy": "Raw tail archived intact; fold into two-bar steady-state cycle, repeat twice, 3ms seam fades",
+      "calibration": {
+        "raw": {
+          "lufs": -22.69,
+          "truePeak": -13.13,
+          "lra": 0.6
+        },
+        "buildGainDb": 0,
+        "derived": {
+          "lufs": -22.61,
+          "truePeak": -12.03,
+          "lra": 0.9
+        },
+        "gainDb": -5.89,
+        "after": {
+          "lufs": -28.5,
+          "truePeak": -17.92,
+          "lra": 0.9
+        },
+        "peakLimited": false,
+        "targetLufs": -28.5,
+        "compression": false
+      }
+    },
+    {
+      "id": "user-experimental-20261015-family-03-bass",
+      "originalName": "untitled - Track 10.wav",
+      "source": "stems/janres/non/bass/90bpm/user-2026-10-15/family-03-bass.wav",
+      "sourceHash": "0404ccc97c36df3c9d9bb5080c89fa4127213eeba058bce3cf4aaaaa39d8484e",
+      "path": "assets/audio/ft/user-experimental-v1/family-03-bass.wav",
+      "sha256": "058b17cdd144799d40400f47b55cd8afe065e5cabb807993a81b2f24b0a28a3f",
+      "role": "bass",
+      "kind": "arrangement",
+      "family": 3,
+      "key": "A minor",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "frames": 470400,
+      "sampleRate": 44100,
+      "channels": 2,
+      "original": {
+        "sampleRate": 48000,
+        "channels": 2,
+        "frames": 256333
+      },
+      "evidence": {
+        "signal": {
+          "frames": 235506,
+          "seconds": 5.34027,
+          "peak": 0.26095,
+          "rms": 0.06563,
+          "rmsDb": -23.65806,
+          "clippedSamples": 0,
+          "stereoDifferenceRms": 0,
+          "lowEnergyBelow200": 0.90082,
+          "centroidHz": 152.38577,
+          "spectralPeaks": [
+            {
+              "hz": 109.99562,
+              "note": "A2",
+              "share": 0.13325
+            },
+            {
+              "hz": 164.51381,
+              "note": "E3",
+              "share": 0.07246
+            },
+            {
+              "hz": 65.30634,
+              "note": "C2",
+              "share": 0.03467
+            },
+            {
+              "hz": 55.10694,
+              "note": "A1",
+              "share": 0.03375
+            },
+            {
+              "hz": 195.81108,
+              "note": "G3",
+              "share": 0.02643
+            },
+            {
+              "hz": 131.16921,
+              "note": "C3",
+              "share": 0.01983
+            },
+            {
+              "hz": 220.55543,
+              "note": "A3",
+              "share": 0.01508
+            },
+            {
+              "hz": 144.64716,
+              "note": "D3",
+              "share": 0.00486
+            }
+          ],
+          "pitchClassEnergy": [
+            {
+              "note": "A",
+              "share": 0.49506
+            },
+            {
+              "note": "E",
+              "share": 0.2144
+            },
+            {
+              "note": "C",
+              "share": 0.15745
+            },
+            {
+              "note": "G",
+              "share": 0.07237
+            },
+            {
+              "note": "D",
+              "share": 0.02286
+            },
+            {
+              "note": "C#",
+              "share": 0.01393
+            },
+            {
+              "note": "D#",
+              "share": 0.0127
+            },
+            {
+              "note": "B",
+              "share": 0.00517
+            },
+            {
+              "note": "F#",
+              "share": 0.0034
+            },
+            {
+              "note": "A#",
+              "share": 0.00114
+            },
+            {
+              "note": "G#",
+              "share": 0.00096
+            },
+            {
+              "note": "F",
+              "share": 0.00056
+            }
+          ],
+          "activeStartSeconds": 0,
+          "activeEndSeconds": 5.19,
+          "onsetsSeconds": [
+            0.12,
+            0.33,
+            0.83,
+            0.93,
+            1.18,
+            1.51,
+            1.62,
+            1.84,
+            2.18,
+            2.33,
+            2.43,
+            2.68,
+            3.01,
+            3.12,
+            3.5,
+            3.58,
+            3.83,
+            4.18,
+            4.5,
+            4.83,
+            5,
+            5.08
+          ],
+          "gridErrorSeconds": {
+            "bpm88": 0.04857,
+            "bpm90": 0.02439,
+            "bpm92": 0.04405
+          },
+          "barRms": [
+            0.06567,
+            0.06567
+          ],
+          "tailRms": 0
+        },
+        "role": "Stable A1/A2 bass harmonics, >88% spectral energy below 200Hz, low spectral centroid.",
+        "key": "A minor compatible (inferred, not authoritative key detection): A/C/E with G/D/B natural pitch classes across the family. Spectral partials can produce chromatic energy; exact instrument, voicing and mode remain uncertain.",
+        "timing": "90 BPM supplied; two bars = 5.333333s = 235200 decoded frames. Both bars have nonzero RMS; remainder is decay. Transient onset grid residuals and tail energy are measured above. Half/double-time interpretation is not independently proven.",
+        "subjectiveListening": false,
+        "confidence": "role high; tonal mode moderate"
+      },
+      "tailPolicy": "Raw tail archived intact; fold into two-bar steady-state cycle, repeat twice, 3ms seam fades",
+      "calibration": {
+        "raw": {
+          "lufs": -22.37,
+          "truePeak": -11.66,
+          "lra": 0.1
+        },
+        "buildGainDb": 0,
+        "derived": {
+          "lufs": -22.34,
+          "truePeak": -11.66,
+          "lra": 0.4
+        },
+        "gainDb": -6.16,
+        "after": {
+          "lufs": -28.5,
+          "truePeak": -17.82,
+          "lra": 0.3
+        },
+        "peakLimited": false,
+        "targetLufs": -28.5,
+        "compression": false
+      }
+    },
+    {
+      "id": "user-experimental-20261015-family-04-bass",
+      "originalName": "untitled - Track 14.wav",
+      "source": "stems/janres/non/bass/90bpm/user-2026-10-15/family-04-bass.wav",
+      "sourceHash": "2126603b7ae259d26b3a2d3e827d74e39aeca8480b39593ca9447cc48d9758dd",
+      "path": "assets/audio/ft/user-experimental-v1/family-04-bass.wav",
+      "sha256": "d799a4c9132ada67e7fee0e411ad0c6df8cafcda5ba7baa0d5fc4b566cb8bd2e",
+      "role": "bass",
+      "kind": "arrangement",
+      "family": 4,
+      "key": "A minor",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "frames": 470400,
+      "sampleRate": 44100,
+      "channels": 2,
+      "original": {
+        "sampleRate": 48000,
+        "channels": 2,
+        "frames": 258333
+      },
+      "evidence": {
+        "signal": {
+          "frames": 237344,
+          "seconds": 5.38195,
+          "peak": 0.25788,
+          "rms": 0.06429,
+          "rmsDb": -23.83668,
+          "clippedSamples": 0,
+          "stereoDifferenceRms": 0,
+          "lowEnergyBelow200": 0.90009,
+          "centroidHz": 143.3327,
+          "spectralPeaks": [
+            {
+              "hz": 109.86594,
+              "note": "A2",
+              "share": 0.27405
+            },
+            {
+              "hz": 54.97362,
+              "note": "A1",
+              "share": 0.06941
+            },
+            {
+              "hz": 65.24188,
+              "note": "C2",
+              "share": 0.06533
+            },
+            {
+              "hz": 196.03358,
+              "note": "G3",
+              "share": 0.0397
+            },
+            {
+              "hz": 164.72856,
+              "note": "E3",
+              "share": 0.02835
+            },
+            {
+              "hz": 220.05347,
+              "note": "A3",
+              "share": 0.01665
+            },
+            {
+              "hz": 130.82067,
+              "note": "C3",
+              "share": 0.01201
+            },
+            {
+              "hz": 261.34892,
+              "note": "C4",
+              "share": 0.00605
+            }
+          ],
+          "pitchClassEnergy": [
+            {
+              "note": "A",
+              "share": 0.68383
+            },
+            {
+              "note": "C",
+              "share": 0.15761
+            },
+            {
+              "note": "G",
+              "share": 0.075
+            },
+            {
+              "note": "E",
+              "share": 0.06157
+            },
+            {
+              "note": "C#",
+              "share": 0.01607
+            },
+            {
+              "note": "D",
+              "share": 0.00347
+            },
+            {
+              "note": "A#",
+              "share": 0.00094
+            },
+            {
+              "note": "G#",
+              "share": 0.00073
+            },
+            {
+              "note": "B",
+              "share": 0.0004
+            },
+            {
+              "note": "F#",
+              "share": 0.00018
+            },
+            {
+              "note": "F",
+              "share": 0.00014
+            },
+            {
+              "note": "D#",
+              "share": 0.00006
+            }
+          ],
+          "activeStartSeconds": 0,
+          "activeEndSeconds": 5.34,
+          "onsetsSeconds": [
+            0.51,
+            0.62,
+            0.71,
+            0.98,
+            1.33,
+            1.43,
+            1.52,
+            1.61,
+            1.81,
+            2.67,
+            3.01,
+            3.12,
+            3.21,
+            3.68,
+            3.95
+          ],
+          "gridErrorSeconds": {
+            "bpm88": 0.04564,
+            "bpm90": 0.03067,
+            "bpm92": 0.03878
+          },
+          "barRms": [
+            0.06452,
+            0.06464
+          ],
+          "tailRms": 0.00634
+        },
+        "role": "Stable A1/A2 bass harmonics, >88% spectral energy below 200Hz, low spectral centroid.",
+        "key": "A minor compatible (inferred, not authoritative key detection): A/C/E with G/D/B natural pitch classes across the family. Spectral partials can produce chromatic energy; exact instrument, voicing and mode remain uncertain.",
+        "timing": "90 BPM supplied; two bars = 5.333333s = 235200 decoded frames. Both bars have nonzero RMS; remainder is decay. Transient onset grid residuals and tail energy are measured above. Half/double-time interpretation is not independently proven.",
+        "subjectiveListening": false,
+        "confidence": "role high; tonal mode moderate"
+      },
+      "tailPolicy": "Raw tail archived intact; fold into two-bar steady-state cycle, repeat twice, 3ms seam fades",
+      "calibration": {
+        "raw": {
+          "lufs": -22.67,
+          "truePeak": -11.77,
+          "lra": 0.5
+        },
+        "buildGainDb": 0,
+        "derived": {
+          "lufs": -22.63,
+          "truePeak": -11.77,
+          "lra": 0.7
+        },
+        "gainDb": -5.87,
+        "after": {
+          "lufs": -28.49,
+          "truePeak": -17.64,
+          "lra": 0.8
+        },
+        "peakLimited": false,
+        "targetLufs": -28.5,
+        "compression": false
+      }
+    },
+    {
+      "id": "user-experimental-20261015-family-05-bass",
+      "originalName": "untitled - Track 18.wav",
+      "source": "stems/janres/non/bass/90bpm/user-2026-10-15/family-05-bass.wav",
+      "sourceHash": "265349696571303b94c4a494d404918c0ca870d54398f0d68b73868172c3d112",
+      "path": "assets/audio/ft/user-experimental-v1/family-05-bass.wav",
+      "sha256": "66113f32214f585b32ca87be628c266a60bc06dc9df051632e618ecf3352da7c",
+      "role": "bass",
+      "kind": "arrangement",
+      "family": 5,
+      "key": "A minor",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "frames": 470400,
+      "sampleRate": 44100,
+      "channels": 2,
+      "original": {
+        "sampleRate": 48000,
+        "channels": 2,
+        "frames": 256333
+      },
+      "evidence": {
+        "signal": {
+          "frames": 235506,
+          "seconds": 5.34027,
+          "peak": 0.19009,
+          "rms": 0.04966,
+          "rmsDb": -26.0803,
+          "clippedSamples": 0,
+          "stereoDifferenceRms": 0,
+          "lowEnergyBelow200": 0.93482,
+          "centroidHz": 118.16367,
+          "spectralPeaks": [
+            {
+              "hz": 109.76115,
+              "note": "A2",
+              "share": 0.26151
+            },
+            {
+              "hz": 54.82144,
+              "note": "A1",
+              "share": 0.08203
+            },
+            {
+              "hz": 164.2711,
+              "note": "E3",
+              "share": 0.03954
+            },
+            {
+              "hz": 220.65662,
+              "note": "A3",
+              "share": 0.02212
+            },
+            {
+              "hz": 129.30551,
+              "note": "C3",
+              "share": 0.0097
+            },
+            {
+              "hz": 275.70931,
+              "note": "C#4",
+              "share": 0.00545
+            },
+            {
+              "hz": 143.77586,
+              "note": "D3",
+              "share": 0.00294
+            },
+            {
+              "hz": 81.91554,
+              "note": "E2",
+              "share": 0.0018
+            }
+          ],
+          "pitchClassEnergy": [
+            {
+              "note": "A",
+              "share": 0.85286
+            },
+            {
+              "note": "E",
+              "share": 0.0978
+            },
+            {
+              "note": "C",
+              "share": 0.02294
+            },
+            {
+              "note": "C#",
+              "share": 0.01571
+            },
+            {
+              "note": "D",
+              "share": 0.00735
+            },
+            {
+              "note": "F#",
+              "share": 0.00169
+            },
+            {
+              "note": "G",
+              "share": 0.00077
+            },
+            {
+              "note": "B",
+              "share": 0.00046
+            },
+            {
+              "note": "F",
+              "share": 0.00016
+            },
+            {
+              "note": "G#",
+              "share": 0.0001
+            },
+            {
+              "note": "D#",
+              "share": 0.00008
+            },
+            {
+              "note": "A#",
+              "share": 0.00008
+            }
+          ],
+          "activeStartSeconds": 0,
+          "activeEndSeconds": 5.3,
+          "onsetsSeconds": [
+            0.12,
+            0.25,
+            0.33,
+            0.5,
+            0.62,
+            1.36,
+            1.51,
+            1.62,
+            1.71,
+            1.83,
+            2.33,
+            3.33,
+            3.58,
+            3.85,
+            4.68,
+            4.95
+          ],
+          "gridErrorSeconds": {
+            "bpm88": 0.04173,
+            "bpm90": 0.02979,
+            "bpm92": 0.04277
+          },
+          "barRms": [
+            0.04689,
+            0.05234
+          ],
+          "tailRms": 0
+        },
+        "role": "Stable A1/A2 bass harmonics, >88% spectral energy below 200Hz, low spectral centroid.",
+        "key": "A minor compatible (inferred, not authoritative key detection): A/C/E with G/D/B natural pitch classes across the family. Spectral partials can produce chromatic energy; exact instrument, voicing and mode remain uncertain.",
+        "timing": "90 BPM supplied; two bars = 5.333333s = 235200 decoded frames. Both bars have nonzero RMS; remainder is decay. Transient onset grid residuals and tail energy are measured above. Half/double-time interpretation is not independently proven.",
+        "subjectiveListening": false,
+        "confidence": "role high; tonal mode moderate"
+      },
+      "tailPolicy": "Raw tail archived intact; fold into two-bar steady-state cycle, repeat twice, 3ms seam fades",
+      "calibration": {
+        "raw": {
+          "lufs": -24.07,
+          "truePeak": -14.42,
+          "lra": 0.9
+        },
+        "buildGainDb": 0,
+        "derived": {
+          "lufs": -24.11,
+          "truePeak": -14.42,
+          "lra": 2.1
+        },
+        "gainDb": -4.39,
+        "after": {
+          "lufs": -28.5,
+          "truePeak": -18.81,
+          "lra": 2.1
+        },
+        "peakLimited": false,
+        "targetLufs": -28.5,
+        "compression": false
+      }
+    },
+    {
+      "id": "user-experimental-20261015-family-06-bass",
+      "originalName": "untitled - Track 22.wav",
+      "source": "stems/janres/non/bass/90bpm/user-2026-10-15/family-06-bass.wav",
+      "sourceHash": "1d76cd46f67020d835659561ecd87b267c87fdd116e9fd25f35e2939bc4b3a53",
+      "path": "assets/audio/ft/user-experimental-v1/family-06-bass.wav",
+      "sha256": "d1fe1fa96d04e42dda81201dd068b0257740ddabd87f8e6854846cb149b82ee4",
+      "role": "bass",
+      "kind": "arrangement",
+      "family": 6,
+      "key": "A minor",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "frames": 470400,
+      "sampleRate": 44100,
+      "channels": 2,
+      "original": {
+        "sampleRate": 48000,
+        "channels": 2,
+        "frames": 258333
+      },
+      "evidence": {
+        "signal": {
+          "frames": 237344,
+          "seconds": 5.38195,
+          "peak": 0.141,
+          "rms": 0.04671,
+          "rmsDb": -26.61222,
+          "clippedSamples": 0,
+          "stereoDifferenceRms": 0,
+          "lowEnergyBelow200": 0.95139,
+          "centroidHz": 120.67911,
+          "spectralPeaks": [
+            {
+              "hz": 110.18284,
+              "note": "A2",
+              "share": 0.21506
+            },
+            {
+              "hz": 164.82386,
+              "note": "E3",
+              "share": 0.08415
+            },
+            {
+              "hz": 54.83272,
+              "note": "A1",
+              "share": 0.05376
+            },
+            {
+              "hz": 130.83747,
+              "note": "C3",
+              "share": 0.04476
+            },
+            {
+              "hz": 220.17467,
+              "note": "A3",
+              "share": 0.01637
+            },
+            {
+              "hz": 82.67112,
+              "note": "E2",
+              "share": 0.013
+            },
+            {
+              "hz": 98.1947,
+              "note": "G2",
+              "share": 0.0112
+            },
+            {
+              "hz": 123.91227,
+              "note": "B2",
+              "share": 0.01109
+            }
+          ],
+          "pitchClassEnergy": [
+            {
+              "note": "A",
+              "share": 0.6023
+            },
+            {
+              "note": "E",
+              "share": 0.21655
+            },
+            {
+              "note": "C",
+              "share": 0.1216
+            },
+            {
+              "note": "G",
+              "share": 0.02464
+            },
+            {
+              "note": "B",
+              "share": 0.02415
+            },
+            {
+              "note": "C#",
+              "share": 0.00838
+            },
+            {
+              "note": "F#",
+              "share": 0.00073
+            },
+            {
+              "note": "G#",
+              "share": 0.00062
+            },
+            {
+              "note": "D#",
+              "share": 0.00038
+            },
+            {
+              "note": "A#",
+              "share": 0.0003
+            },
+            {
+              "note": "D",
+              "share": 0.00018
+            },
+            {
+              "note": "F",
+              "share": 0.00016
+            }
+          ],
+          "activeStartSeconds": 0,
+          "activeEndSeconds": 5.35,
+          "onsetsSeconds": [
+            0.12,
+            0.21,
+            0.32,
+            1.01,
+            1.12,
+            1.21,
+            1.32,
+            1.41,
+            1.59,
+            2.01,
+            2.12,
+            2.21,
+            2.32,
+            2.43,
+            2.57,
+            2.68,
+            2.95,
+            3.04,
+            3.68,
+            3.95,
+            4.05,
+            4.68,
+            4.95,
+            5.03,
+            5.17,
+            5.31
+          ],
+          "gridErrorSeconds": {
+            "bpm88": 0.04297,
+            "bpm90": 0.03692,
+            "bpm92": 0.04139
+          },
+          "barRms": [
+            0.04692,
+            0.0469
+          ],
+          "tailRms": 0.01049
+        },
+        "role": "Stable A1/A2 bass harmonics, >88% spectral energy below 200Hz, low spectral centroid.",
+        "key": "A minor compatible (inferred, not authoritative key detection): A/C/E with G/D/B natural pitch classes across the family. Spectral partials can produce chromatic energy; exact instrument, voicing and mode remain uncertain.",
+        "timing": "90 BPM supplied; two bars = 5.333333s = 235200 decoded frames. Both bars have nonzero RMS; remainder is decay. Transient onset grid residuals and tail energy are measured above. Half/double-time interpretation is not independently proven.",
+        "subjectiveListening": false,
+        "confidence": "role high; tonal mode moderate"
+      },
+      "tailPolicy": "Raw tail archived intact; fold into two-bar steady-state cycle, repeat twice, 3ms seam fades",
+      "calibration": {
+        "raw": {
+          "lufs": -25.53,
+          "truePeak": -17.01,
+          "lra": 0.4
+        },
+        "buildGainDb": 0,
+        "derived": {
+          "lufs": -25.48,
+          "truePeak": -17.01,
+          "lra": 0.8
+        },
+        "gainDb": -3.02,
+        "after": {
+          "lufs": -28.5,
+          "truePeak": -20.03,
+          "lra": 0.8
+        },
+        "peakLimited": false,
+        "targetLufs": -28.5,
+        "compression": false
+      }
+    },
+    {
+      "id": "user-experimental-20261015-family-07-bass",
+      "originalName": "untitled - Track 26.wav",
+      "source": "stems/janres/non/bass/90bpm/user-2026-10-15/family-07-bass.wav",
+      "sourceHash": "d268882cc9338388997a8a88f04a759a85d8a89a95fc19faca8e00e3ab24f4bc",
+      "path": "assets/audio/ft/user-experimental-v1/family-07-bass.wav",
+      "sha256": "8859e543d782d57e3a6414a8ff2213a90bbd388177333e389626afea053f8dcc",
+      "role": "bass",
+      "kind": "arrangement",
+      "family": 7,
+      "key": "A minor",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "frames": 470400,
+      "sampleRate": 44100,
+      "channels": 2,
+      "original": {
+        "sampleRate": 48000,
+        "channels": 2,
+        "frames": 256333
+      },
+      "evidence": {
+        "signal": {
+          "frames": 235506,
+          "seconds": 5.34027,
+          "peak": 0.141,
+          "rms": 0.04374,
+          "rmsDb": -27.18225,
+          "clippedSamples": 0,
+          "stereoDifferenceRms": 0,
+          "lowEnergyBelow200": 0.88864,
+          "centroidHz": 169.29168,
+          "spectralPeaks": [
+            {
+              "hz": 109.99296,
+              "note": "A2",
+              "share": 0.13004
+            },
+            {
+              "hz": 164.81252,
+              "note": "E3",
+              "share": 0.04519
+            },
+            {
+              "hz": 147.03051,
+              "note": "D3",
+              "share": 0.04103
+            },
+            {
+              "hz": 130.85469,
+              "note": "C3",
+              "share": 0.03509
+            },
+            {
+              "hz": 55.00439,
+              "note": "A1",
+              "share": 0.02774
+            },
+            {
+              "hz": 174.40848,
+              "note": "F3",
+              "share": 0.02261
+            },
+            {
+              "hz": 65.32317,
+              "note": "C2",
+              "share": 0.02252
+            },
+            {
+              "hz": 195.82897,
+              "note": "G3",
+              "share": 0.01802
+            }
+          ],
+          "pitchClassEnergy": [
+            {
+              "note": "A",
+              "share": 0.4226
+            },
+            {
+              "note": "C",
+              "share": 0.14918
+            },
+            {
+              "note": "D",
+              "share": 0.1368
+            },
+            {
+              "note": "E",
+              "share": 0.12381
+            },
+            {
+              "note": "G",
+              "share": 0.07311
+            },
+            {
+              "note": "F",
+              "share": 0.07212
+            },
+            {
+              "note": "C#",
+              "share": 0.01097
+            },
+            {
+              "note": "B",
+              "share": 0.00643
+            },
+            {
+              "note": "A#",
+              "share": 0.00201
+            },
+            {
+              "note": "G#",
+              "share": 0.00148
+            },
+            {
+              "note": "F#",
+              "share": 0.00091
+            },
+            {
+              "note": "D#",
+              "share": 0.00058
+            }
+          ],
+          "activeStartSeconds": 0,
+          "activeEndSeconds": 5.29,
+          "onsetsSeconds": [
+            0.12,
+            0.21,
+            0.33,
+            0.43,
+            0.68,
+            1,
+            1.35,
+            1.67,
+            2.02,
+            2.35,
+            2.68,
+            3,
+            3.33,
+            3.58,
+            3.67,
+            4,
+            4.08,
+            4.17,
+            4.34,
+            4.68,
+            5
+          ],
+          "gridErrorSeconds": {
+            "bpm88": 0.04641,
+            "bpm90": 0.02079,
+            "bpm92": 0.04882
+          },
+          "barRms": [
+            0.04177,
+            0.04568
+          ],
+          "tailRms": 0
+        },
+        "role": "Stable A1/A2 bass harmonics, >88% spectral energy below 200Hz, low spectral centroid.",
+        "key": "A minor compatible (inferred, not authoritative key detection): A/C/E with G/D/B natural pitch classes across the family. Spectral partials can produce chromatic energy; exact instrument, voicing and mode remain uncertain.",
+        "timing": "90 BPM supplied; two bars = 5.333333s = 235200 decoded frames. Both bars have nonzero RMS; remainder is decay. Transient onset grid residuals and tail energy are measured above. Half/double-time interpretation is not independently proven.",
+        "subjectiveListening": false,
+        "confidence": "role high; tonal mode moderate"
+      },
+      "tailPolicy": "Raw tail archived intact; fold into two-bar steady-state cycle, repeat twice, 3ms seam fades",
+      "calibration": {
+        "raw": {
+          "lufs": -25.7,
+          "truePeak": -17.01,
+          "lra": 0.5
+        },
+        "buildGainDb": 0,
+        "derived": {
+          "lufs": -25.71,
+          "truePeak": -17.01,
+          "lra": 0.6
+        },
+        "gainDb": -2.79,
+        "after": {
+          "lufs": -28.5,
+          "truePeak": -19.8,
+          "lra": 0.6
+        },
+        "peakLimited": false,
+        "targetLufs": -28.5,
+        "compression": false
+      }
+    }
+  ]
+}
