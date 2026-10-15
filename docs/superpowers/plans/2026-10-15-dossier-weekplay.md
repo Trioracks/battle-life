@@ -148,7 +148,7 @@
 
 ### Task 10: Week-long integrated regression, performance and cache release
 
-**Files:** Create tools/verify-dossier-weekplay.mjs, test/dossier-weekplay-integration.test.js and docs/qa/2026-10-15-dossier-weekplay.md; mechanical rev42->43 asset/module cache graph including both Workers and root HTML. Reuse existing isolated QA helpers and only add focused helpers under tools/qa. Harden tools/verify-social-background-audio.mjs evaluation with a bounded watchdog closing the browser on timeout (Task3 deferred review finding); test timeout cleanup without a long wait. Product fixes require controller-approved scope if new root cause appears.
+**Files:** Create tools/verify-dossier-weekplay.mjs, test/dossier-weekplay-integration.test.js and docs/qa/2026-10-15-dossier-weekplay.md; mechanical rev42->43 asset/module cache graph including both Workers and root HTML. Reuse existing isolated QA helpers and only add focused helpers under tools/qa. Harden tools/verify-social-background-audio.mjs evaluation with a bounded watchdog closing the browser on timeout (Task3 deferred review finding); test timeout cleanup without a long wait. Correct src/phone-hud.js community-post footer to point to the group wall, preserving personal-message wording and covering both types (Task6 deferred minor, approved narrow scope). Other product fixes require controller-approved scope if new root cause appears.
 
 **Interfaces:** All prior task APIs; existing app public UI and test-only fixtures. No production debug endpoints or test-only methods.
 
