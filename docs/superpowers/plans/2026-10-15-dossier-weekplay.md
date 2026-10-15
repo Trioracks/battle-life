@@ -136,6 +136,8 @@
 
 ### Task 9: Detective caseboard and research routing
 
+**Approved projection integration:** Extend rap-dossier-cases.js with publicDossierTarget(state,{trackVersionId|characterId|reportId,nowMinute,battleId?}) returning a sanitized standalone target node and case/target IDs. It uses existing public source/report/profile validation; private targets rejected. Add a separate «Архив наблюдений» case for saved legacy reports (not NPC reports inside «Мои записи»). A readable saved report with missing source remains viewable, but study action is null unless source valid/public. A public judge/profile target can focus before folder discovery without marking a battle studied or inventing assignment edges. Test all of these boundaries. mountRapDossier may expose focusTarget and receive onWork/isVisible; social routes onStudyTarget to the app. Visible automatic refresh may be bounded to250ms; focus/actions use exact current cutoff, hidden views do no projection, no per-frame graph/history serialization. Measure mounted cadence.
+
 **Files:** Replace src/rap-dossier-view.js presentation; add src/rap-dossier-board-view.js if needed for SVG layout responsibility; update dossier CSS, src/social-view.js, src/rap-analysis-view.js, src/social-audio-view.js and profile research view, src/virtual-pc-ui.js routing. Add test/rap-dossier-board.test.js and test/social-study-routing.test.js.
 
 **Interfaces:** mountRapDossier keeps getState/getMetadata/commit/navigate and adds existing on-study/app-focus callbacks as needed, documented to controller. It consumes Tasks 7/8 node actions and only public case graph. Social Study affordances request dossier focus with target IDs, never mount a report. All research detail/report views render inside dossier.
