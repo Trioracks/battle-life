@@ -18,6 +18,11 @@ export function normalizePhone(raw){
 export function receivePhoneEvents(phone,events){
  const current=normalizePhone(phone);return normalizePhone({...current,queue:[...current.queue,...(Array.isArray(events)?events:[])]});
 }
+export function retirePhoneNotices(phone,ids){
+ const targets=new Set(ids),retired=(phone?.queue??[]).filter(e=>e.type==='community-post'&&targets.has(e.id));
+ if(!retired.length)return phone;
+ return normalizePhone({...phone,dismissedIds:[...(phone.dismissedIds??[]),...retired.map(e=>e.id)]});
+}
 export function hoverPhoneNotice(phone,eventId,inside){
  const current=normalizePhone(phone);if(current.activeId!==eventId)return current;
  if(inside)return {...current,hoveredIds:strings([...current.hoveredIds,eventId])};

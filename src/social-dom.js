@@ -2,6 +2,10 @@ import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=42';
 import {socialPhotoSource} from './social-portraits.js?rev=42';
 export const socialButton=(d,text,fn,extra={})=>pcButton(d,text,{className:'sn-button',...extra},fn);
 export function socialLink(d,text,url,navigate){const link=el(d,'a',{className:'sn-link',text,dataset:{focusId:text},attributes:{href:url}});link.addEventListener('click',e=>{e.preventDefault();navigate(url);});return link;}
+export function socialPeerLink(d,peer,name,navigate,avatar){
+ const url='underweb://social/'+(peer.kind==='community'?'community/':'profile/')+peer.id,link=socialLink(d,avatar?'':name,url,navigate);
+ if(avatar){link.setAttribute('aria-label','Открыть страницу: '+name);link.append(socialAvatar(d,avatar,name));}return link;
+}
 export function socialThumbCount(d,kind,count){
  const down=kind==='dislike',label=down?'Не нравится':'Нравится',root=el(d,'span',{className:'sn-thumb-count',attributes:{role:'img','aria-label':label+': '+count}}),make=(tag,attrs)=>{const n=d.createElementNS?d.createElementNS('http://www.w3.org/2000/svg',tag):d.createElement(tag);for(const [k,v]of Object.entries(attrs))n.setAttribute(k,v);return n;};
  const svg=make('svg',{viewBox:'0 0 24 24',width:18,height:18,'aria-hidden':'true',focusable:'false',class:'sn-thumb-icon'}),path=make('path',{d:'M3 10h4v11H3zM10 21h8a2 2 0 0 0 2-1.6l1.5-7A2 2 0 0 0 19.5 10H15l.7-4.1A3.4 3.4 0 0 0 13 2l-3 8z',fill:'none',stroke:'currentColor','stroke-width':1.7,'stroke-linejoin':'round',...(down?{transform:'rotate(180 12 12)'}:{})});svg.append(path);root.append(svg,el(d,'span',{text:String(count)}));return root;

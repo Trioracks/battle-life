@@ -17,6 +17,7 @@ import {startTrackStudy,pauseStudy,effectiveStudySkills} from './rap-analysis.js
 import {createRapAnalysisView} from './rap-analysis-view.js?rev=42';
 import {startJudgeStudy} from './judge-dossier-analysis.js?rev=42';
 import {reactionVisibilitySignature} from './social-reactions-view.js?rev=42';
+import {communityUnreadCounts,publicCommunityPosts,markCommunitySeen} from './social-community-publications.js?rev=42';
 export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,navigate,audio,onWork=()=>false,onResultViewed=()=>{},isVisible=()=>true}){
  const d=root.ownerDocument,shell=el(d,'section',{className:'sn-network',attributes:{'aria-label':SOCIAL_IDENTITY.name}}),head=el(d,'header',{className:'sn-top'});
  const brand=el(d,'strong',{className:'sn-brand'});brand.append(el(d,'span',{className:'sn-brandmark',text:SOCIAL_IDENTITY.mark}),el(d,'b',{text:SOCIAL_IDENTITY.name}));
@@ -26,8 +27,14 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
  grid.append(nav,content);shell.append(head,grid,message,el(d,'footer',{className:'sn-footer',text:SOCIAL_IDENTITY.name+' · '+SOCIAL_IDENTITY.year+' · Вымышленная локальная сеть'}));root.replaceChildren(shell);
  const analysisRoot=el(d,'div'),playback=createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze:startAnalysis}),expandedResults=new Set(),tableUiState={};let last='',query='',disposed=false,dialogView=null,messagesView=null,tableView=null,tableWasVisible=isVisible(),lastUnread=-1,closeRegistration=null,selectedReportId=null;
  function startAnalysis(options){const m=getMetadata(),r=(options.judgeId?startJudgeStudy:startTrackStudy)(getState(),{...options,heroSnapshot:effectiveStudySkills(getState(),m.skills),nowMinute:metadataGameMinute(m)});if(!r.ok||r.alreadyStudied){message.textContent=r.reason;return;}selectedReportId=r.reportId??r.jobId;if(!commit(r))return;if(r.jobId&&!onWork()){commit({ok:true,state:pauseStudy(getState())});message.textContent='Изучение сохранено на паузе. Сначала сядь за компьютер.';}}
- function updateBadge(){const count=unreadDialogCount(getState());if(count===lastUnread)return;lastUnread=count;const link=pcFind(nav,n=>n.dataset?.socialSection==='messages');link.replaceChildren();link.textContent='Мои сообщения';link.setAttribute('aria-label','Мои сообщения');link.setAttribute('title','Непрочитанных диалогов: '+count);if(count)link.append(el(d,'span',{className:'sn-unread-badge',text:'+'+count}));}
- const signature=()=>JSON.stringify([reactionVisibilitySignature(getState(),metadataGameMinute(getMetadata())),getState().rapAnalysis,getState().social,Object.keys(getState().trackVersions?.byId??{}),getState().communityAudio,getState().battleSubmissions,getState().battleApplications,getState().socialRuntime?.events,getState().battleKnowledge,getMetadata().playerName,getMetadata().portraitKey,(getState().battleWindows??[]).map(w=>battleDeadlineLabel(w,metadataGameMinute(getMetadata())))]);
+ let publicationCache=null,lastGroups=-1,readAttempt='';
+ function publications(){const state=getState(),minute=Math.floor(metadataGameMinute(getMetadata())),refs=[state.social,state.tournaments,state.roundThemes,state.socialReactions];if(publicationCache?.minute===minute&&refs.every((v,i)=>v===publicationCache.refs[i]))return publicationCache;
+  const posts=route.section==='community'?publicCommunityPosts(state,{communityId:route.communityId,nowMinute:minute}):[];
+  return publicationCache={minute,refs,counts:communityUnreadCounts(state,{nowMinute:minute}),ids:posts.map(p=>p.id).join('|')};
+ }
+ function updateBadge(){for(const [section,title,count,previous]of [['messages','Мои сообщения',unreadDialogCount(getState()),lastUnread],['groups','Мои группы',publications().counts.total,lastGroups]]){if(count===previous)continue;if(section==='messages')lastUnread=count;else lastGroups=count;const link=pcFind(nav,n=>n.dataset?.socialSection===section);link.replaceChildren();link.textContent=title;link.setAttribute('aria-label',title);link.setAttribute('title',(section==='groups'?'Непрочитанных публикаций: ':'Непрочитанных диалогов: ')+count);if(count)link.append(el(d,'span',{className:'sn-unread-badge',text:'+'+count}));}}
+ function readVisibleCommunity(){if(route.section!=='community')return;if(!isVisible()){readAttempt='';return;}const token=publications().ids;if(token===readAttempt)return;readAttempt=token;const result=markCommunitySeen(getState(),{communityId:route.communityId,nowMinute:metadataGameMinute(getMetadata())});if(result.state===getState())return;let saved;try{saved=onChange(result.state);}catch{saved=false;}if(saved===false||saved?.ok===false)message.textContent='Не удалось сохранить прочтение. Открой группу ещё раз.';updateBadge();}
+ const signature=()=>JSON.stringify([publications().ids,publications().counts,reactionVisibilitySignature(getState(),metadataGameMinute(getMetadata())),getState().rapAnalysis,getState().social,Object.keys(getState().trackVersions?.byId??{}),getState().communityAudio,getState().battleSubmissions,getState().battleApplications,getState().socialRuntime?.events,getState().battleKnowledge,getMetadata().playerName,getMetadata().portraitKey,(getState().battleWindows??[]).map(w=>battleDeadlineLabel(w,metadataGameMinute(getMetadata())))]);
  function commit(result){
   if(!result?.ok){message.textContent=result?.reason??'Не удалось выполнить действие.';return false;}
   let saved;try{saved=onChange(result.state);}catch{saved=false;}
@@ -37,9 +44,9 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
  function groups(){
   const section=el(d,'section');section.append(socialHeading(d,'Мои группы',listCommunities(getState()).length));
   const input=el(d,'input',{className:'sn-search',value:query,attributes:{'aria-label':'Поиск групп',placeholder:'Название или интерес…'}}),list=el(d,'div');section.append(input,list);
-  const fill=()=>{list.replaceChildren();for(const c of listCommunities(getState(),{query})){
+  const fill=()=>{list.replaceChildren();for(const c of listCommunities(getState(),{query,nowMinute:metadataGameMinute(getMetadata())})){
    const card=el(d,'article',{className:'sn-group-card'}),info=el(d,'div');info.append(socialButton(d,c.name,()=>navigate('underweb://social/community/'+c.id),{className:'sn-link'}),el(d,'p',{text:c.description}),el(d,'small',{text:c.displayMemberCount+' участников'+(c.subscribed?' · Вы подписаны':'')}));
-   card.append(socialAvatar(d,c.avatar,c.name),info);list.append(card);
+   if(c.unreadCount)info.append(el(d,'span',{className:'sn-unread-badge',text:'+'+c.unreadCount,attributes:{'aria-label':'Новых публикаций: '+c.unreadCount}}));card.append(socialAvatar(d,c.avatar,c.name),info);list.append(card);
   }if(!list.children.length)list.append(el(d,'p',{className:'sn-empty',text:'Групп по этому запросу нет.'}));};
   input.addEventListener('input',()=>{query=input.value;fill();});fill();return section;
  }
@@ -57,8 +64,8 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
   else if(route.section==='messages'){messagesView=mountSocialMessages(d,options);node=messagesView.root;}
   else if(route.section==='dialog'){dialogView=mountSocialDialog(d,{...options,peer:route.peer,id:route.communityId??route.profileId});node=dialogView.root;}
   else node=createSocialProfileView(d,{...options,id:route.profileId??'me',view:route.section==='profile'?route.view:['friends','photos','audio'].includes(route.section)?route.section:'page'});
-  playback.releaseRows(content);content.replaceChildren(analysisRoot,node);tableView?.layout();last=signature();
+  playback.releaseRows(content);content.replaceChildren(analysisRoot,node);tableView?.layout();readVisibleCommunity();last=signature();
   if(label){const field=pcFind(content,n=>identity(n)===label);field?.focus?.({preventScroll:true});if(Number.isInteger(start))field?.setSelectionRange?.(start,end);}
  }
- render();if(route.section==='me'||route.profileId==='me')void getMetadata().requestPlayerPortrait?.();return {tickOutgoingMessage:(dt,options)=>dialogView?.tickOutgoingMessage?.(dt,options),update(){if(disposed)return;if(last!==signature())render();else dialogView?.update();const visible=isVisible();if(visible&&!tableWasVisible)tableView?.layout();tableWasVisible=visible;updateBadge();},dispose(){disposed=true;closeRegistration?.();dialogView?.dispose();messagesView?.dispose();tableView?.dispose();playback.dispose();root.replaceChildren();}};
+ render();if(route.section==='me'||route.profileId==='me')void getMetadata().requestPlayerPortrait?.();return {tickOutgoingMessage:(dt,options)=>dialogView?.tickOutgoingMessage?.(dt,options),update(){if(disposed)return;if(last!==signature())render();else dialogView?.update();readVisibleCommunity();const visible=isVisible();if(visible&&!tableWasVisible)tableView?.layout();tableWasVisible=visible;updateBadge();},dispose(){disposed=true;closeRegistration?.();dialogView?.dispose();messagesView?.dispose();tableView?.dispose();playback.dispose();root.replaceChildren();}};
 }

@@ -5,6 +5,7 @@ import {createVirtualPcState} from '../src/virtual-pc-state.js';
 import {DEMO_PARTICIPANTS} from '../src/battle-demo-config.js';
 import {normalizeAppearance} from '../src/avatar-v3-profile.js';
 import {opponentFixture} from './helpers/social-profile-fixture.js';
+import {topicFixture} from './helpers/round-topic-fixture.js';
 import {recordBattleHistory} from '../src/battle-history.js';
 import {ensureNpcRoundTrack} from '../src/battle-npc.js';
 import {createSocialProfileView} from '../src/social-profile-view.js';
@@ -22,4 +23,4 @@ test('profile public projection filters future posts, tracks and histories and o
  const locked=publicCharacterProfile(s,{characterId:'mak-npc-02',nowMinute:14000});assert.equal(locked.canView,false);assert.equal(locked.posts,undefined);assert.equal(locked.appearance,undefined);
  const d=pcDocument(),view=createSocialProfileView(d,{id:'mak-npc-01',getState:()=>s,getMetadata:()=>({gameMinutes:14000}),navigate:()=>{},commit:()=>{},audio:{row:()=>d.createElement('div')}});assert.ok(findButton(view,'История баттлов'));assert.ok(!allPc(view).some(n=>n.textContent?.includes('Будущий секрет')));
 });
-test('the same canonical judge identity is reused in announcements and profiles',()=>{const s=opponentFixture(),p=publicCharacterProfile(s,{characterId:'eparhiya',nowMinute:14000});assert.equal(p.characterId,'eparhiya');assert.ok(p.roles.includes('judge'));assert.equal(p.canView,true);assert.equal(Object.values(s.npcSocialProfiles.byId).filter(x=>x.characterId==='eparhiya').length,1);});
+test('the same canonical judge identity is reused in announcements and profiles',()=>{const s=topicFixture(),p=publicCharacterProfile(s,{characterId:'eparhiya',nowMinute:14000});assert.equal(p.characterId,'eparhiya');assert.ok(p.roles.includes('judge'));assert.equal(p.canView,true);assert.equal(Object.values(s.npcSocialProfiles.byId).filter(x=>x.characterId==='eparhiya').length,1);});

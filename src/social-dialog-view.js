@@ -1,6 +1,6 @@
 import {pcElement as el} from './virtual-pc-dom.js?rev=42';
 import {communityById} from './social-catalog.js?rev=42';
-import {socialButton,socialAvatar,socialHeading} from './social-dom.js?rev=42';
+import {socialButton,socialPeerLink,socialHeading} from './social-dom.js?rev=42';
 import {sendSubmission,dialogIsTyping,markDialogRead} from './social-submission.js?rev=42';
 import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=42';
 import {gameDateTimeLabel} from './home-calendar.js?rev=42';
@@ -26,7 +26,8 @@ export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commi
  const send=socialButton(d,'Отправить',()=>{if(send.disabled)return;const result=startSubmissionMessage(getState(),{communityId:id,nowMinute:getMetadata().gameMinutes});if(!result.ok){commit(result);return;}if(result.state!==getState()&&!commit(result))return;blocked=false;composerError='';armed=true;void keyboard.unlock();tickOutgoingMessage(0,{paused:false});update();});
  const read=socialButton(d,'Отметить прочитанным',()=>commit(markDialogRead(getState(),id)),{className:'sn-link'});
  const register=socialButton(d,'Зарегистрироваться',()=>{const result=registerBattle(getState(),{battleId:c.battleId,playerName:getMetadata().playerName,nowMinute:metadataGameMinute(getMetadata())});if(commit(result))onRegistered(c.battleId);});
- root.append(socialHeading(d,'Сообщения · '+c.name),socialButton(d,'← Сообщество',()=>navigate('underweb://social/community/'+id),{className:'sn-link'}),history,typing,draft,uploadBox,composerBox);actions.append(register,attach,send,read);root.append(actions,notice,pickerHost);
+ const communityPeer={kind:'community',id},heading=socialHeading(d,'Сообщения · ');heading.append(socialPeerLink(d,communityPeer,c.name,navigate));
+ root.append(heading,socialButton(d,'← Сообщество',()=>navigate('underweb://social/community/'+id),{className:'sn-link'}),history,typing,draft,uploadBox,composerBox);actions.append(register,attach,send,read);root.append(actions,notice,pickerHost);
  const message=()=>{const m=getState().outgoingMessage;return m&&(m.issue||m.communityId===id)?m:null;};
  function flushProgress(){
   if(blocked)return false;
@@ -55,8 +56,9 @@ export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commi
    lastMessages=signature;audio.releaseRows?.(history);history.replaceChildren();
    for(const msg of dialog.messages??[]){
     const row=el(d,'article',{className:'sn-dialog-message '+(msg.sender==='player'?'sn-outgoing':'')}),body=el(d,'div');
-    body.append(el(d,'strong',{text:msg.sender==='player'?getMetadata().playerName??'Игрок':c.name}),el(d,'small',{text:gameDateTimeLabel(msg.at)}),el(d,'p',{text:msg.body}));
-    if(msg.trackVersionId)body.append(audio.row(d,{version:state.trackVersions?.byId?.[msg.trackVersionId]}));row.append(socialAvatar(d,msg.sender==='player'?{mark:'Я',color:'#688277'}:c.avatar),body);history.append(row);
+    const outgoing=msg.sender==='player',senderPeer=outgoing?{kind:'person',id:'me'}:communityPeer,name=outgoing?getMetadata().playerName??'Игрок':c.name;
+    body.append(socialPeerLink(d,senderPeer,name,navigate),el(d,'small',{text:gameDateTimeLabel(msg.at)}),el(d,'p',{text:msg.body}));
+    if(msg.trackVersionId)body.append(audio.row(d,{version:state.trackVersions?.byId?.[msg.trackVersionId]}));row.append(socialPeerLink(d,senderPeer,name,navigate,outgoing?{mark:'Я',color:'#688277'}:c.avatar),body);history.append(row);
    }
    if(!(dialog.messages?.length))history.append(el(d,'p',{className:'sn-empty',text:'Прикрепи готовый трек и отправь его организаторам. Свободных сообщений здесь нет.'}));
   }

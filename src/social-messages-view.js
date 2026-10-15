@@ -1,5 +1,5 @@
 import {pcElement as el} from './virtual-pc-dom.js?rev=42';
-import {socialAvatar,socialButton,socialHeading} from './social-dom.js?rev=42';
+import {socialAvatar,socialButton,socialHeading,socialPeerLink} from './social-dom.js?rev=42';
 import {searchDialogs,blockAndRemoveFriend} from './social-personal.js?rev=42';
 import {profileById} from './social-catalog.js?rev=42';
 import {gameDateTimeLabel as gameMinuteLabel} from './home-calendar.js?rev=42';
@@ -27,13 +27,15 @@ export function visibleDialogReader({id,getState,isVisible=()=>true,onRead=()=>{
 export function mountPersonalDialog(d,{id,getState,getMetadata,navigate,commit,isVisible,onRead}){
  const person=profileById(id),root=el(d,'section',{className:'sn-dialog'}),history=el(d,'div',{className:'sn-dialog-history'}),notice=el(d,'p',{className:'sn-note'});let last='',disposed=false;
  if(!person)return {root,update(){},dispose(){}};
- root.append(socialHeading(d,'Сообщения · '+person.name),socialButton(d,'← Мои сообщения',()=>navigate('underweb://social/messages'),{className:'sn-link'}),history);
+ const personPeer={kind:'person',id},heading=socialHeading(d,'Сообщения · ');heading.append(socialPeerLink(d,personPeer,person.name,navigate));
+ root.append(heading,socialButton(d,'← Мои сообщения',()=>navigate('underweb://social/messages'),{className:'sn-link'}),history);
  const block=socialButton(d,'Заблокировать и удалить из друзей',()=>commit(blockAndRemoveFriend(getState(),id)));if(id==='vitya')root.append(block);root.append(notice);
  const read=visibleDialogReader({id,getState,isVisible,onRead});
  function update(markRead=true){
   if(disposed)return;const state=getState(),dialog=state.social?.dialogs?.[id],signature=JSON.stringify(dialog?.messages??[]);
   if(last!==signature){last=signature;history.replaceChildren();for(const msg of dialog?.messages??[]){const outgoing=msg.sender==='player',name=outgoing?getMetadata().playerName??'Игрок':person.name,row=el(d,'article',{className:'sn-dialog-message'+(outgoing?' sn-outgoing':'')}),body=el(d,'div');
-   body.append(el(d,'strong',{text:name}),el(d,'small',{text:msg.archived?msg.dateLabel:gameMinuteLabel(msg.at)}),el(d,'p',{text:msg.body}));row.append(socialAvatar(d,outgoing?{mark:'Я',src:state.social?.playerPortrait?.url}:person.avatar,name),body);history.append(row);
+   const senderPeer=outgoing?{kind:'person',id:'me'}:personPeer;
+   body.append(socialPeerLink(d,senderPeer,name,navigate),el(d,'small',{text:msg.archived?msg.dateLabel:gameMinuteLabel(msg.at)}),el(d,'p',{text:msg.body}));row.append(socialPeerLink(d,senderPeer,name,navigate,outgoing?{mark:'Я',src:state.social?.playerPortrait?.url}:person.avatar),body);history.append(row);
   }}
   const blocked=state.social?.blockedProfileIds?.includes(id);block.hidden=Boolean(blocked);notice.textContent=blocked?'Пользователь заблокирован и удалён из друзей. История переписки сохранена.':id==='vitya'?'Ответить сейчас нельзя. Можно прочитать историю или заблокировать пользователя.':'Старая переписка. Сейчас ответ не требуется.';
   if(markRead)read();

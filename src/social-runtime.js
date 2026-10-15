@@ -9,6 +9,7 @@ import {SOCIAL_IDENTITY} from './social-identity.js?rev=42';
 import {advancePersonalDialogs} from './social-personal.js?rev=42';
 import {advanceBattleLifecycle} from './battle-judging-clock.js?rev=42';
 import {ensureSocialReactionPlans} from './social-reactions.js?rev=42';
+import {ensureCommunityPublications,publishCommunityNotices} from './social-community-publications.js?rev=42';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export function normalizeSocialRuntime(raw){
  const seen=new Set(),events=(Array.isArray(raw?.events)?raw.events:[]).filter(e=>e&&typeof e.id==='string'&&typeof e.type==='string'&&validGameMinute(e.dueAt)&&!seen.has(e.id)&&seen.add(e.id)).map(clone);
@@ -39,7 +40,8 @@ export function activateSocial(state,nowMinute,battleId='makarevich-1'){
 export function advanceSocial(input,nowMinute,options={}){
  const runtime=normalizeSocialRuntime(input.socialRuntime);
  if(!validGameMinute(nowMinute)||runtime.lastMinute!==null&&nowMinute<runtime.lastMinute)return {state:input,events:[]};
- const personal=advancePersonalDialogs(migrateLegacySocial(input,nowMinute).state,nowMinute);let state=personal.state;
+ const initialized=ensureCommunityPublications(input,nowMinute);
+ const personal=advancePersonalDialogs(migrateLegacySocial(initialized.state,nowMinute).state,nowMinute);let state=personal.state;
  const social=normalizeSocial(state.social),communityAudio=normalizeCommunityAudio(state.communityAudio),processed=new Set(runtime.events.map(e=>e.id)),due=[],submissions=(state.battleSubmissions??[]).map(clone);
  for(const s of submissions){
   if(s.version!==2||s.status==='recovery')continue;
@@ -60,10 +62,11 @@ export function advanceSocial(input,nowMinute,options={}){
  const lifecycle=advanceBattleLifecycle(state,nowMinute,options);if(lifecycle.reason)return {state:input,events:[],domainChanged:false,reason:lifecycle.reason};state=lifecycle.state;
  const battleEvents=lifecycle.events.map(e=>({source:SOCIAL_IDENTITY.name,sender:'Макаревич Баттл',...e})),notices=[];
  for(const roundId of new Set(battleEvents.filter(e=>e.type==='judge-review').map(e=>e.roundId))){const batch=battleEvents.filter(e=>e.type==='judge-review'&&e.roundId===roundId),last=batch.at(-1);notices.push({...last,id:'reviews:'+batch.map(e=>e.id).join('|'),type:'judge-review-batch',resultIds:batch.map(e=>e.resultId),text:'Новых отзывов о твоей работе: '+batch.length+'. Прочитай их в сообществе.'});}
- notices.push(...battleEvents.filter(e=>['judge-panel-complete','round-announced','round-result'].includes(e.type)));
+ notices.push(...battleEvents.filter(e=>['judge-panel-complete','round-result'].includes(e.type)));
  const publishedAudio={...state.communityAudio};for(const e of battleEvents.filter(e=>e.type==='round-closed')){const round=state.tournaments.byId[e.battleId].rounds[e.roundId];publishedAudio[e.communityId]=[...new Set([...(publishedAudio[e.communityId]??[]),...Object.values(round.submissions)])];}
  state={...state,communityAudio:publishedAudio,phone:receivePhoneEvents(state.phone,notices),socialRuntime:{...state.socialRuntime,events:[...state.socialRuntime.events,...battleEvents].sort((a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id))}};
  const judged=publishJudgeEvents(state,nowMinute);
  const reacted=ensureSocialReactionPlans(judged.state,nowMinute);
- return {state:reacted.state,domainChanged:lifecycle.changed||reacted.changed,events:[...personal.events,...events,...battleEvents,...judged.events].sort((a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id))};
+ const community=publishCommunityNotices(reacted.state,nowMinute);
+ return {state:community.state,domainChanged:initialized.changed||lifecycle.changed||reacted.changed||community.changed,events:[...personal.events,...events,...battleEvents,...judged.events,...community.events].sort((a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id))};
 }
