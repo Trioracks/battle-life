@@ -110,6 +110,8 @@
 
 ### Task 7: Installed-app research jobs and public evidence
 
+**Source boundary:** A round study covers that published round's works/reviews and publicly announced assignment IDs; battle study aggregates currently public rounds. Neither silently completes personal judge research. Learning a judge's preferences is a separate judge study using eligible earlier public evidence. Opponent study uses published prior works only, never current unreleased/future work.
+
 **Files:** Create src/rap-research.js and src/rap-research-sources.js; modify src/rap-analysis.js, src/judge-dossier-analysis.js, src/virtual-pc-state.js, src/home-creative-work.js, src/beat-work-view.js and creative-work mutual exclusion call sites. Add test/rap-research.test.js; extend test/rap-analysis.test.js and normalization/job tests. UI routing belongs to Task 9.
 
 **Interfaces:** normalizeRapResearch(raw) -> {version:1,job,findings,nextSequence,recovery}; startCaseStudy(state,{kind,battleId,roundId,characterId,heroSnapshot,nowMinute}) -> existing {ok,state,reason,jobId?,findingId?}, kind in battle/round/judge/opponent. advanceCaseStudy(state,{gameMinutes,nowMinute}) -> existing work-result shape; pauseCaseStudy(state) -> state. Store in state.rapResearch, foreground-owned. Public source provider consumes Task 6 canonical announcements and current published tournament track/review APIs; exports caseStudySources(state,request) -> {sourceIds,reviewIds,judgeIds,trackVersionIds,cutoff}. Finding stores kind/subject, frozen IDs/cutoff/heroSnapshot, createdAt and explicit empty evidence result. Completed per-track observations reuse existing study policy and immutable report shape in rapAnalysis.reports, not duplicate a new truth evaluator.
@@ -147,6 +149,8 @@
 - [ ] **Step 5:** Commit and report screenshots/accessibility checks.
 
 ### Task 10: Week-long integrated regression, performance and cache release
+
+**Carried Task6 minor:** Quarantined cadence currently selects new introduction copy for saved legacy judge posts (src/social-community-publications.js), although IDs/times/votes survive. Preserve genuinely published legacy bodies with a focused recovery regression; this narrow fix is approved. Do not fabricate past returning-judge assignments or weaken public source gates.
 
 **Files:** Create tools/verify-dossier-weekplay.mjs, test/dossier-weekplay-integration.test.js and docs/qa/2026-10-15-dossier-weekplay.md; mechanical rev42->43 asset/module cache graph including both Workers and root HTML. Reuse existing isolated QA helpers and only add focused helpers under tools/qa. Harden tools/verify-social-background-audio.mjs evaluation with a bounded watchdog closing the browser on timeout (Task3 deferred review finding); test timeout cleanup without a long wait. Correct src/phone-hud.js community-post footer to point to the group wall, preserving personal-message wording and covering both types (Task6 deferred minor, approved narrow scope). Other product fixes require controller-approved scope if new root cause appears.
 
