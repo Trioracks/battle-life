@@ -102,7 +102,7 @@ export function lyricRefinementReason(state,p,skills={}){
  return p.stages.some(stage=>stage.quality<ceiling)?'':'Письмо пока не позволяет улучшить этот текст. Повысь навык.';
 }
 export function startLyricWork(input,{projectId,kind='stage',sliders,beatId,gameDay=1}={},skills={},random=Math.random,plan=null){
- if(input.rapAnalysis?.job?.status==='active')return {ok:false,state:input,reason:'Сначала приостанови изучение трека.'};
+ if(input.rapAnalysis?.job?.status==='active'||input.rapResearch?.job?.status==='active')return {ok:false,state:input,reason:'Сначала приостанови изучение.'};
  if(input.recording?.job)return {state:input,ok:false,reason:'Сначала заверши запись.'};
  // Check the raw other job before normalization can discard unknown older projects.
  if(input.music?.job)return outcome(input,false,'Сначала закончи работу над битом.');
@@ -158,6 +158,7 @@ function makeSections(p){
  });
 }
 export function advanceLyricWork(input,requested,clock=null){
+ if(input.rapAnalysis?.job?.status==='active'||input.rapResearch?.job?.status==='active')return {state:input,minutes:0,finished:false,blocked:true,practiceGained:0,reason:'Сначала приостанови изучение.'};
  const s=normalized(input),j=s.writing.job,empty={state:s,minutes:0,finished:false,blocked:false,practiceGained:0};
  if(!j||!Number.isFinite(requested)||requested<=0)return empty;
  const p=normalizeLyric(s.projects.find(p=>p.id===j.projectId)),needs=s.music.needs,R=BEAT_RULES;

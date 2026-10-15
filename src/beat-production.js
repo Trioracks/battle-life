@@ -77,7 +77,7 @@ export function createBeat(input,options={},skills={},random=Math.random){
  s.projects.push(beat);s.music.activeBeatId=id;return result(s);
 }
 export function startBeatStage(input,id,values,skills={},random=Math.random,plan=null){
- if(input.rapAnalysis?.job?.status==='active')return result(input,false,'Сначала приостанови изучение трека.');
+ if(input.rapAnalysis?.job?.status==='active'||input.rapResearch?.job?.status==='active')return result(input,false,'Сначала приостанови изучение.');
  if(input.recording?.job)return result(input,false,'Сначала заверши запись.');
  const s=normalized(input),beat=normalizeBeat(s.projects.find(p=>p.id===id)),blocked=workBlockReason(s);
  if(input.writing?.job)return result(s,false,'Сначала закончи текущий текст.');
@@ -101,6 +101,7 @@ export function startBeatStage(input,id,values,skills={},random=Math.random,plan
  s.music.activeBeatId=id;return result(s);
 }
 export function advanceBeatWork(input,requested){
+ if(input.rapAnalysis?.job?.status==='active'||input.rapResearch?.job?.status==='active')return {state:input,minutes:0,finished:false,blocked:true,reason:'Сначала приостанови изучение.'};
  const s=normalized(input),job=s.music.job;
  if(!job||!Number.isFinite(requested)||requested<=0)return {state:s,minutes:0,finished:false,blocked:false};
  const current=normalizeBeat(s.projects.find(p=>p.id===job.beatId));

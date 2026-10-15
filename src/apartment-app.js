@@ -27,6 +27,7 @@ import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.j
 import {workCameraFrame} from './work-camera.js?rev=42';
 import {pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=42';
 import {pauseStudy} from './rap-analysis.js?rev=42';
+import {pauseCaseStudy} from './rap-research.js?rev=42';
 import {effectiveVocalSkill} from './vocal-production.js?rev=42';
 import {effectiveWritingSkill} from './lyric-production.js?rev=42';
 import {createCharacterSpeech,workNeedSpeech} from './character-speech.js?rev=42';
@@ -150,7 +151,7 @@ try{
     const textSound=lyricWorkAudio.sync({phase:writing?phase:'idle',hidden,job:writing?job:null});return writing?textSound:beatSound;
   };
   const workPanel=createBeatWorkPanel(document,{
-    onCancel:()=>{if(pcLifecycle.finishWork({blocked:true})){pcState=pauseStudy(pauseCreativeChain(pcState));virtualPc.syncState(pcState);syncWorkAudio();saveHomeTime(storage,homeTime);persistPc(pcState);}},
+    onCancel:()=>{if(pcLifecycle.finishWork({blocked:true})){pcState=pauseCaseStudy(pauseStudy(pauseCreativeChain(pcState)));virtualPc.syncState(pcState);syncWorkAudio();saveHomeTime(storage,homeTime);persistPc(pcState);}},
     onEnableAudio:()=>pcState.writing.job?lyricWorkAudio.enableAudio():workAudio.enableAudio(),
   });
   const workHud=workPanel.element;workHud.hidden=true;document.body.append(workHud);let lastWorkSave=0;

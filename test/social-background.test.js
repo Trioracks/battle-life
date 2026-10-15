@@ -40,6 +40,10 @@ test('unrelated work and needs continue while calculation uses the captured skil
  const h=harness();h.tick(600,0,{heroSkills:{writing:10}});const music={...h.state.music,practice:3,needs:{energy:31,satiety:49}},projects=[{id:'progress-in-flight',elapsed:12}];h.state={...h.state,music,projects};h.deliver();
  assert.equal(h.state.music,music);assert.equal(h.state.projects,projects);assert.equal(h.saves,1);
 });
+test('worker reply retains foreground research findings and analysis reference ownership',()=>{
+ const h=harness();h.tick();const rapResearch={version:1,job:{id:'case-study:1',elapsed:25},findings:{},nextSequence:2,recovery:[]},rapAnalysis={...h.state.rapAnalysis,sourceIds:['foreground-track']},judgeDossier={...h.state.judgeDossier,evidence:[]};
+ h.state={...h.state,rapResearch,rapAnalysis,judgeDossier};h.deliver();assert.equal(h.state.rapResearch,rapResearch);assert.equal(h.state.rapAnalysis,rapAnalysis);assert.equal(h.state.judgeDossier,judgeDossier);h.runtime.dispose();
+});
 
 test('registration and phone-read changes cannot be lost to an in-flight result',()=>{
  for(const key of ['battleApplications','phone']){const h=harness();h.tick();const changed=key==='phone'?{...h.state.phone,enabled:false}:[{battleId:'makarevich-1',nickname:'Now',status:'registered'}];h.state={...h.state,[key]:changed};h.deliver();assert.equal(h.saves,0);assert.equal(h.state[key],changed);}

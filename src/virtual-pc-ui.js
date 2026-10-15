@@ -30,6 +30,8 @@ import {mountRapNotebook} from './rap-notebook-view.js?rev=42';
 import {mountRapDossier} from './rap-dossier-view.js?rev=42';
 import {normalizeLyric} from './lyric-production.js?rev=42';
 import {pauseCreativeChain} from './creative-workflow.js?rev=42';
+import {pauseStudy} from './rap-analysis.js?rev=42';
+import {pauseCaseStudy} from './rap-research.js?rev=42';
 import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=42';
 
 const NOOP = () => {};
@@ -561,6 +563,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   pc.closeWindow = (id=pc.windows.activeId) => {
     if(pc.locked||pc.confirmClose||!id)return;
     if((id==='ft-studio'&&pc.state.music.job)||(id==='rap-notebook'&&pc.state.writing.job))pc.persist(pauseCreativeChain(pc.state));
+    if(id==='rap-dossier')pc.persist(pauseCaseStudy(pauseStudy(pc.state)));
     pc.closeNow(id);
   };
 
@@ -569,13 +572,13 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.cancelStudioLaunch();
     pc.cancelInstallerLaunch();
     pc.menu?.close();
-    pc.persist(pauseCreativeChain(pc.state));
+    pc.persist(pauseCaseStudy(pauseStudy(pauseCreativeChain(pc.state))));
     pc.audio.stop();pc.audioSession.stopOwner('creative-work');pc.callbacks.onLeave();
   };
 
   pc.requestShutdown = () => {
     if (pc.locked||pc.confirmClose) return;
-    pc.persist(pauseCreativeChain(pc.state));
+    pc.persist(pauseCaseStudy(pauseStudy(pauseCreativeChain(pc.state))));
     pc.cancelStudioLaunch();
     pc.cancelInstallerLaunch();
     pc.audio.stop();pc.audioSession.stopAll();pc.callbacks.onShutdown();

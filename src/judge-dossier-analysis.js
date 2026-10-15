@@ -1,6 +1,6 @@
 import config from '../data/analysis/demo-v2-policy.json' with {type:'json'};
 import {judgeProfile} from './judge-profiles.js?rev=42';
-import {startTrackStudy,publishedStudyReviews} from './rap-analysis.js?rev=42';
+import {startTrackStudy,publishedStudyReviews,studyInstallReason} from './rap-analysis.js?rev=42';
 import {beatResultSeed} from './beat-result.js?rev=42';
 import {validGameMinute} from './game-minute.js?rev=42';
 export const JUDGE_STUDY_POLICY=Object.freeze({...config.judgeStudy});
@@ -35,6 +35,8 @@ export function publicJudgeHypotheses(evidence,nowMinute){
 }
 export function startJudgeStudy(state,{judgeId,trackVersionId,reviewIds,analysisReportId,heroSnapshot,nowMinute}={}){
  const fail=reason=>({ok:false,state,reason}),report=state.rapAnalysis?.reports?.[analysisReportId];
+ const installation=studyInstallReason(state);if(installation)return fail(installation);
+ if(state.rapResearch?.job?.status==='active'||state.music?.job||state.writing?.job||state.recording?.job)return fail('Сначала приостанови текущую работу.');
  if(!report||report.trackVersionId!==trackVersionId||report.createdAt>nowMinute)return fail('Нужен законченный разбор именно этой версии трека.');
  if(!strings(reviewIds)||!reviewIds.length)return fail('Выбери опубликованный отзыв.');
  const available=new Set(publishedStudyReviews(state,{trackVersionId,nowMinute}).filter(r=>r.judgeId===judgeId).map(r=>r.id));if(reviewIds.some(id=>!available.has(id)))return fail('Отзыв ещё не опубликован или относится к другой работе либо судье.');

@@ -5,8 +5,10 @@ import {BEAT_RULES} from './beat-catalog.js?rev=42';
 import {advanceVocalWork,effectiveVocalSkill} from './vocal-production.js?rev=42';
 import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=42';
 import {advanceStudy} from './rap-analysis.js?rev=42';
+import {advanceCaseStudy,STUDY_MINUTES_PER_SECOND} from './rap-research.js?rev=42';
 import {gameMinuteStamp} from './game-minute.js?rev=42';
 export function creativeWorkDescriptor(state,skills={}){
+ if(state.rapResearch?.job?.status==='active'){const job=state.rapResearch.job;return {researching:true,studying:true,writing:false,recording:false,job,project:{id:job.id,kind:'study',name:{battle:'Изучение баттла',round:'Изучение раунда',judge:'Изучение судьи',opponent:'Изучение соперника'}[job.kind]},performance:'typing',chainProgress:null,skill:job.heroSnapshot.intelligence};}
  if(state.rapAnalysis?.job?.status==='active'){const job=state.rapAnalysis.job;return {studying:true,writing:false,recording:false,job,project:{id:job.id,kind:'study',name:job.trackName},performance:'typing',chainProgress:null,skill:job.heroSnapshot.intelligence};}
  const writing=Boolean(state.writing?.job),recording=!writing&&Boolean(state.recording?.job),job=writing?state.writing.job:recording?state.recording.job:state.music?.job;
  const id=writing?job?.projectId:job?.beatId,project=state.projects.find(p=>p.id===id);
@@ -15,7 +17,7 @@ export function creativeWorkDescriptor(state,skills={}){
 export function advanceCreativeWork(state,seconds,clock=null,skills={}){
  let descriptor=creativeWorkDescriptor(state,skills);
  if(!descriptor.job||!Number.isFinite(seconds)||seconds<=0)return {state,minutes:0,finished:false,blocked:false,practiceGained:0,stageFinished:false};
- if(descriptor.studying){const request=Math.min(seconds*descriptor.job.total/BEAT_RULES.workSeconds,descriptor.job.total-descriptor.job.elapsed),start=gameMinuteStamp(clock)??descriptor.job.startedAt+descriptor.job.elapsed;return advanceStudy(state,{gameMinutes:request,nowMinute:start+request});}
+ if(descriptor.studying){const request=Math.min(seconds*STUDY_MINUTES_PER_SECOND,descriptor.job.total-descriptor.job.elapsed),start=gameMinuteStamp(clock)??descriptor.job.startedAt+descriptor.job.elapsed;return (descriptor.researching?advanceCaseStudy:advanceStudy)(state,{gameMinutes:request,nowMinute:start+request});}
  const projectId=descriptor.project?.id,chain=state.creativeWork?.activeId===projectId;
  const key=descriptor.writing?'writing':'music',before=state[key]?.practice??0;
  let remaining=seconds,minutes=0,stageFinished=false,practiceGained=0,finished=false,blocked=false,reason='';

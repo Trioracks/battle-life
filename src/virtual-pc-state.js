@@ -22,6 +22,7 @@ import {normalizeBattleHistory} from './battle-history.js?rev=42';
 import {createPcSnapshotEncoder,decodePcSave,encodePcSave} from './pc-save-codec.js?rev=42';
 import {normalizeNpcSocialProfiles} from './npc-social-profiles.js?rev=42';
 import {normalizeRapAnalysis} from './rap-analysis.js?rev=42';
+import {normalizeRapResearch} from './rap-research.js?rev=42';
 import {normalizeDossier} from './rap-dossier.js?rev=42';
 import {normalizeJudgeDossier} from './judge-dossier-analysis.js?rev=42';
 import {drumById} from './beat-catalog.js?rev=42';
@@ -125,6 +126,11 @@ function normalizeSnapshot(value,archiveCache=null) {
     if(captured.ok){trackVersions=captured.state.trackVersions;submission.trackVersionId=captured.versionId;submission.timePrecision='day-only';}
   }
   const audioExports=archive('audioExports',raw=>normalizeAudioExports(raw,trackVersions));
+  const judging=archive('judging',normalizeJudging);
+  const rapAnalysis=normalizeRapAnalysis(source.rapAnalysis),rapResearch=normalizeRapResearch(source.rapResearch);
+  // Keep suspended work, including conflicting older saves, without completing it.
+  if(rapAnalysis.job&&(music.job||writing.job||recording.job||!source.software?.dossier?.installed))rapAnalysis.job.status='paused';
+  if(rapResearch.job&&(music.job||writing.job||recording.job||rapAnalysis.job?.status==='active'||!source.software?.dossier?.installed||rapResearch.job.trackVersionIds.some(id=>!trackVersions.byId[id])||rapResearch.job.reviewIds.some(id=>!judging.results[id])))rapResearch.job.status='paused';
   return withSoftware({
     version: 1,
     noviceSchema: 1,
@@ -140,7 +146,7 @@ function normalizeSnapshot(value,archiveCache=null) {
     community:normalizeCommunity(source.community),
     social:normalizeSocial(source.social),
     npcSocialProfiles:normalizeNpcSocialProfiles(source.npcSocialProfiles),
-    rapAnalysis:normalizeRapAnalysis(source.rapAnalysis),
+    rapAnalysis,rapResearch,
     rapDossier:normalizeDossier(source.rapDossier),
     socialReactions:normalizeSocialReactions(source.socialReactions),...normalizeRoundThemeState(source),judgeDossier:normalizeJudgeDossier(source.judgeDossier),
     battleWindows:normalizeBattleWindows(source.battleWindows),
@@ -150,7 +156,7 @@ function normalizeSnapshot(value,archiveCache=null) {
     phonePresentation:normalizePhonePresentation(source.phonePresentation),
     browserDownloads:normalizeBrowserDownloads(source.browserDownloads),
     battleKnowledge:normalizeBattleKnowledge(source.battleKnowledge),
-    judging:archive('judging',normalizeJudging),
+    judging,
     judgingSchedule:normalizeJudgingSchedule(source.judgingSchedule),
     resultReactions:normalizeResultReactions(source.resultReactions),
     household:normalizeHousehold(source.household),
