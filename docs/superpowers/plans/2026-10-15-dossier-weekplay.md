@@ -34,13 +34,13 @@
 
 ### Task 1: Accelerated background installation, manual sleep and food cue
 
-**Files:** Modify src/apartment-v3-time.js, src/apartment-v3-runtime.js, src/apartment-app.js, src/apartment-v3-motion.js, src/phone-view.js, src/sound-cues.js and existing bed context view; test/apartment-v3-time.test.js, test/pc-software.test.js; create test/sleep-background-work.test.js. Locate the existing context action factory before changing it; no new global HUD panel.
+**Files:** Modify src/apartment-v3-time.js, src/apartment-v3-runtime.js, src/apartment-app.js, src/apartment-v3-motion.js, src/phone-hud.js, src/sound-cues.js and existing bed context action factory in apartment-app.js; test/apartment-v3-time.test.js, test/pc-software.test.js; create test/sleep-background-work.test.js. No new global HUD panel. A focused atomic food-consumption helper may be extracted to test persistence/cue ordering.
 
 **Interfaces:** ApartmentTime.beginSleep({mode:'manual',minutesPerSecond:45}) -> boolean; snapshot.sleep.mode identifies manual sleep with finite values. Existing ordinary options unchanged. Add installationElapsedSeconds({activeSeconds,advancedGameMinutes,powered,paused}) -> number in src/pc-installation-clock.js; valid active game advancement contributes advancedGameMinutes*4, no duplicate desktop dt. Existing advanceInstallation(state, seconds) remains pure. Food cue goes through existing successful atomic consume callback.
 
 - [ ] **Step 1:** Write failing behavioral tests: ordinary installer still needs catalog seconds; powered 360-minute sleep finishes it, leaving PC keeps progress, off/pause/hidden/reload add zero; manual sleep remains asleep after 10080 minutes, snapshot reload resumes, manual wake ends; normal sleep still auto-wakes. Successful consumption produces one cue; refused/full/failed-save produces zero.
 - [ ] **Step 2:** Run `node --test test/apartment-v3-time.test.js test/pc-software.test.js test/sleep-background-work.test.js`; capture expected RED.
-- [ ] **Step 3:** Implement finite manual mode and explicit bed test action, continuous world catch-up and single installer host clock; keep menu and visibility guards. Add short filtered-noise crunch through current sound lifecycle. Update old real-time-only sleep contract tests intentionally, not assertions about implementation text.
+- [ ] **Step 3:** Implement finite manual mode and explicit contextual bed action `Спать до пробуждения (тест)` beside normal sleep; it carries mode into the bed motion request, not a persistent toolbar. Continuous world catch-up and single installer host clock keep menu and visibility guards. Add short filtered-noise crunch through current sound lifecycle. Update old real-time-only sleep contract tests intentionally, not assertions about implementation text.
 - [ ] **Step 4:** Run focused tests and `npm test`, capture GREEN/full results; self-review pause boundaries and persistence.
 - [ ] **Step 5:** Commit only owned files; report tests and public API changes.
 
