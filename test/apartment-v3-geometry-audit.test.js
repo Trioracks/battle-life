@@ -4,6 +4,24 @@ import {execFileSync} from 'node:child_process';
 const audit=records=>JSON.parse(execFileSync('F:/Python/python.exe',['-B','tools/audit-apartment-v3.py'],{cwd:new URL('../',import.meta.url),input:JSON.stringify({objects:records}),encoding:'utf8'}));
 const obj=(name,assembly,min,max,role='furniture')=>({name,assembly,min,max,role,materials:['wood']});
 
+test('pot audit rejects even shallow burial and collision with neighbouring furniture',()=>{
+ const grate=obj('burner-grate','stove',[-3.3,.994,-1.35],[-2.9,1.008,-1],'cooker-support');
+ const buried=obj('saucepan','pot',[-3.2,1.006,-1.3],[-3,1.16,-1.05],'cooking-pot');
+ assert.ok(audit([grate,buried]).errors.some(e=>e.includes('saucepan')));
+ const pot={...buried,min:[-3.2,1.01,-1.3]},neighbour=obj('neighbour','counter',[-3.15,1,-1.3],[-2.9,1.3,-1]);
+ assert.ok(audit([grate,pot,neighbour]).errors.some(e=>e.includes('neighbour')));
+ assert.deepEqual(audit([grate,pot]).errors,[]);
+});
+
+test('saucepan handle attaches to the exterior without protruding into the open vessel',()=>{
+ const support=obj('burner-grate','stove',[-3.24,.994,-.95],[-2.96,1.008,-.67],'cooker-support');
+ const pot=obj('saucepan','saucepan',[-3.233,1.01,-.943],[-2.967,1.16,-.677],'cooking-pot');
+ const bad=obj('saucepan-handle','saucepan',[-3.0,1.102,-.8325],[-2.76,1.142,-.7875],'detail');
+ assert.ok(audit([support,pot,bad]).errors.some(e=>e.includes('handle')&&e.includes('interior')));
+ const good={...bad,min:[-2.974,1.102,-.8325],max:[-2.734,1.142,-.7875]};
+ assert.deepEqual(audit([support,pot,good]).errors,[]);
+});
+
 test('named prop audit rejects sill penetration, unsupported mouse, buried pot and hood overlap',()=>{
  const fixed=[obj('window-sill','sill',[4,1,-1.5],[6,1.2,-1.07],'window-sill'),obj('desk-top','desk',[3,.74,-1.3],[5.6,.8275,-.45],'desktop'),obj('burner-grate','stove',[-3.3,.994,-1.35],[-2.9,1.008,-1],'cooker-support'),obj('upper-cupboard','cabinet',[-4,2,-1.6],[-3.8,2.6,-1],'upper-cabinet')];
  const bad=[obj('microphone-capsule','mic',[5,1.1,-1.15],[5.1,1.3,-1.05],'microphone'),obj('mouse','desk',[5,.85,-.6],[5.1,.9,-.5],'desk-prop'),obj('saucepan','pot',[-3.2,.99,-1.3],[-3,1.15,-1.05],'cooking-pot'),obj('hood-canopy','hood',[-3.9,2.1,-1.4],[-3,2.3,-1.1],'hood')];

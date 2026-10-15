@@ -26,8 +26,16 @@ def audit_records(objects, layout):
                 expanded = dict(min=[v-.015 for v in cabinet['min']], max=[v+.015 for v in cabinet['max']])
                 if overlap(o, expanded, 0):errors.append(o['name']+': hood must clear cabinet by 0.015m')
         if o['role'] == 'cooking-pot':
-            if not any(abs(o['min'][1]-s['max'][1]) <= .003 and all(min(o['max'][i],s['max'][i])>max(o['min'][i],s['min'][i]) for i in [0,2]) for s in supports):
+            if not any(-.00001 <= o['min'][1]-s['max'][1] <= .003 and all(min(o['max'][i],s['max'][i])>max(o['min'][i],s['min'][i]) for i in [0,2]) for s in supports):
                 errors.append(o['name']+': saucepan must rest on cooker grate')
+        if o['assembly']=='saucepan' or o['role']=='cooking-pot':
+            if o['name']=='saucepan-handle':
+                for vessel in objects:
+                    if vessel['role']=='cooking-pot' and o['min'][0]<vessel['max'][0]-.012:
+                        errors.append(o['name']+': handle intrudes into saucepan interior')
+            for neighbour in objects:
+                if neighbour['assembly']!=o['assembly'] and neighbour['role']!='cooker-support' and overlap(o,neighbour,.001):
+                    errors.append(o['name']+': saucepan intersects neighbour '+neighbour['name'])
         if o['role'] == 'chair-leg' and abs(o['min'][1]) > .008:
             errors.append(o['name']+': chair-leg must contact the floor')
         if o['role'] == 'desk-prop':
@@ -58,6 +66,7 @@ def semantics(name):
     for prefix, assembly, role in [('microphone-', 'microphone', 'microphone'), ('hood-', 'hood', 'hood'), ('upper-cupboard', 'upper-cabinet', 'upper-cabinet'), ('burner-grate', 'stove', 'cooker-support')]:
         if name.startswith(prefix):return assembly, role
     if name == 'saucepan':return 'saucepan', 'cooking-pot'
+    if name.startswith('saucepan-'):return 'saucepan', 'detail'
     if name == 'mouse':return 'desk', 'desk-prop'
     for prefix, assembly in [('dining-', 'dining'), ('chair-', 'chair'), ('desk-', 'desk'),
                               ('drawer-', 'desk'), ('crt-', 'desk'), ('keyboard', 'desk'),

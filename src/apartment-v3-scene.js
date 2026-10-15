@@ -86,7 +86,7 @@ export async function createApartmentScene(canvas,config){
   async function prepareComputerView(){if(!computer)throw Error('Computer surfaces are missing');await loadMode('3D');if(disposed)throw Error('Scene disposed');}
   const headViewCamera=new THREE.PerspectiveCamera(60,rect.width/rect.height,.03,far);
   const workViewCamera=new THREE.PerspectiveCamera(55,rect.width/rect.height,.03,far);let workCamera=null;
-  function setWorkCamera(value){workCamera=value?{kind:value.kind,progress:value.progress}:null;}
+  function setWorkCamera(value){workCamera=value?{...value}:null;}
   const living=config.layout?.rooms.living??{x:[0,8.5],height:3,rearZ:-1.72,frontZ:1.82};
   const workBounds={min:[living.x[0]+.25,1.05,living.rearZ+.2],max:[living.x[1]-.25,living.height-.3,living.frontZ-.2],obstacles:['computer','bed','wardrobe'].map(id=>config.actions[id]?.hit).filter(Boolean).map(([center,size])=>({min:center.map((v,i)=>v-size[i]/2),max:center.map((v,i)=>v+size[i]/2)}))};
   // Exported depth proxies are the exact solid sides of the middle partition.
@@ -223,7 +223,7 @@ export async function createApartmentScene(canvas,config){
     const exteriorProgress=Number.isFinite(threshold)?(state.position[0]-threshold)/1.75:(-state.position[2]-1.45)/.65;
     const thresholdShade=state.actionId==='entry'?1-.75*THREE.MathUtils.clamp(exteriorProgress,0,1):1;
     for(const [material,color] of actorColors)material.color.copy(color).multiplyScalar(thresholdShade);
-    animation.update({...state,fade:instant?1:state.fade,working:computerSnapshot.phase==='working',workPerformance:state.workPerformance??'typing'},dt,paused);
+    animation.update({...state,fade:instant?1:state.fade,working:computerSnapshot.phase==='working',workPerformance:state.workPerformance??'typing',workElapsedSeconds:workCamera?.elapsedSeconds,reducedMotion:workCamera?.reducedMotion??false},dt,paused);
     // Follow the actual hero root, including during transitions; no room snapping.
     hinge('passage',state.doorOpen*config.passageOpenAngle);
     const inAction=['perform','approach-depth'].includes(state.phase),lerp=1-Math.exp(-dt*6);

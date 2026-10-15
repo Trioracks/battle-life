@@ -61,10 +61,11 @@ test('work typing moves both forearms rapidly, freezes on pause, and restores se
  const clip=new AnimationClip('seated',1,[new QuaternionKeyframeTrack('forearm.L.quaternion',[0,1],[0,0,0,1,0,0,0,1]),new QuaternionKeyframeTrack('forearm.R.quaternion',[0,1],[0,0,0,1,0,0,0,1])]);
  const animation=new ApartmentAnimation(new AnimationMixer(root),[clip],.84),state={clip:'seated',fade:1,walkDistance:0,working:true};
  animation.update(state,1/60);const pose=left.quaternion.toArray();
- assert.ok(Math.abs(left.quaternion.x)>.01);assert.ok(Math.abs(right.quaternion.x)>.01);
+ // Contact-preserving taps are small but both arms still move at typing cadence.
+ for(const bone of [left,right])assert.ok(Math.abs(bone.quaternion.x)>.001&&Math.abs(bone.quaternion.x)<.0031);
  animation.update(state,1/60);assert.notDeepEqual(left.quaternion.toArray(),pose);
  const paused=left.quaternion.toArray();animation.update(state,1,true);assert.deepEqual(left.quaternion.toArray(),paused);
  for(let i=0;i<120;i++)animation.update(state,1/60);
- assert.ok(Math.abs(left.quaternion.x)<.15,'small wrist-plane taps, not cumulative arm drift');
+ assert.ok(Math.abs(left.quaternion.x)<.0031,'contact-preserving taps, not cumulative arm drift');
  animation.update({...state,working:false},0);assert.deepEqual(left.quaternion.toArray(),[0,0,0,1]);
 });

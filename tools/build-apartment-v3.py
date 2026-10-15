@@ -11,6 +11,7 @@ from apartment_v3_exterior import add_exterior, export_geometry
 from apartment_v3_roles import is_interior_static
 OUT,SOURCE_OUT=output_paths(sys.argv,ROOT)
 LAYOUT=load_layout()
+SAUCEPAN_HANDLE_X=-2.854
 bpy.context.preferences.filepaths.save_version=0
 LIGHTING_STATES=dict(off=dict(night='background-off.png',day='background-day-off.png'),living=dict(night='background-living.png',day='background-day-living.png'),kitchen=dict(night='background-kitchen.png',day='background-day-kitchen.png'),both=dict(night='background.png',day='background-day.png'))
 
@@ -53,6 +54,21 @@ def render_light_states():
                 bulbs[room].data.materials[0].node_tree.nodes.get('Principled BSDF').inputs['Emission Strength'].default_value=3 if enabled else 0
             render_scene.render.filepath=os.path.join(OUT,LIGHTING_STATES[state][period]);bpy.ops.render.render(write_still=True)
             print('V8_BACKDROP_READY',period,state,flush=True)
+
+if '--refresh-desk-props' in sys.argv:
+    # Refresh the authored prop after a visual review, keeping the full builder
+    # and saved source identical without reconstructing unrelated room meshes.
+    import importlib.util
+    bpy.ops.wm.open_mainfile(filepath=os.path.join(SOURCE_OUT,'apartment-cutaway-v3.blend'))
+    bpy.data.objects['saucepan-handle'].location.x=SAUCEPAN_HANDLE_X
+    spec=importlib.util.spec_from_file_location('apartment_audit',os.path.join(ROOT,'tools','audit-apartment-v3.py'))
+    audit_module=importlib.util.module_from_spec(spec);spec.loader.exec_module(audit_module)
+    audit=audit_module.audit_scene(bpy.context.scene,LAYOUT)
+    with open(os.path.join(OUT,'geometry-audit.json'),'w',encoding='utf8') as f:json.dump(audit,f,ensure_ascii=False,indent=2)
+    print('GEOMETRY_AUDIT',len(audit['errors']),'errors',len(audit['warnings']),'warnings',flush=True)
+    if audit['errors']:raise ValueError(str(audit['errors']))
+    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(SOURCE_OUT,'apartment-cutaway-v3.blend'))
+    if '--render-existing' not in sys.argv and '--static-existing' not in sys.argv:sys.exit(0)
 
 if '--static-existing' in sys.argv:
     import struct
@@ -297,8 +313,18 @@ for x in [-3.53,-3.1]:
         cylinder('gas-burner',(x,y,.979),.10,.032,M['dark'])
         for a in [0,math.pi/2]:o=cube('burner-grate',(x,y,1.001),(.28,.019,.014),M['dark'],.003);o.rotation_euler.z=a
 for j in range(4):cylinder('stove-knob',(-3.58+j*.17,.636,.807),.032,.041,M['dark'],(math.pi/2,0,0))
-cylinder('saucepan',(-3.11,1.18,1.083),.126,.15,M['metal'])
-cube('saucepan-handle',(-2.9,1.18,1.103),(.24,.045,.04),M['dark'])
+# Open vessel with a real inner wall/floor. Bottom clears the 1.008m grate by 2mm.
+pot_vertices=[];pot_faces=[];segments=32
+for radius,z in [(.123,1.010),(.133,1.160),(.121,1.160),(.113,1.022)]:
+    for i in range(segments):
+        a=i*math.tau/segments;pot_vertices.append((-3.10+radius*math.cos(a),.81+radius*math.sin(a),z))
+for ring in range(3):
+    for i in range(segments):
+        j=(i+1)%segments;pot_faces.append((ring*segments+i,ring*segments+j,(ring+1)*segments+j,(ring+1)*segments+i))
+pot_faces.extend([tuple(reversed(range(segments))),tuple(range(3*segments,4*segments))])
+pot_mesh=bpy.data.meshes.new('saucepan-vessel');pot_mesh.from_pydata(pot_vertices,[],pot_faces);pot_mesh.update()
+pot=bpy.data.objects.new('saucepan',pot_mesh);scene.collection.objects.link(pot);pot.data.materials.append(M['metal']);static.append(pot)
+cube('saucepan-handle',(SAUCEPAN_HANDLE_X,.81,1.122),(.24,.045,.04),M['dark'])
 cube('hood-canopy',(-3.30,1.30,2.15),(.90,.60,.22),M['cream'],.04)
 cube('hood-chimney',(-3.30,1.41,2.55),(.30,.27,.64),M['cream'])
 proxy('stove',(-3.32,1.045,.49),(.81,.79,.98))
@@ -399,9 +425,9 @@ led.rotation_euler.x=math.pi/2;led['apartment_role']='computer-live'
 normalize_computer_surface(led)
 computer_live=[glass,led]
 cube('crt-stand',(4.63,1.05,.85),(.28,.27,.1),M['plastic'])
-cube('keyboard',(4.58,.565,.851),(.59,.20,.035),M['plastic'],.008)
+cube('keyboard',(4.48,.565,.851),(.59,.20,.035),M['plastic'],.008)
 for row in range(4):
-    for col in range(12):cube('key',(4.32+col*.046,.491+row*.045,.874),(.037,.031,.008),M['cream'],.002)
+    for col in range(12):cube('key',(4.22+col*.046,.491+row*.045,.874),(.037,.031,.008),M['cream'],.002)
 o=cube('mouse',(5.01,.54,.8475),(.075,.12,.04),M['plastic'],.021)
 curve('mouse-cable',[(5.01,.60,.85),(5.1,.8,.836),(4.9,1.19,.83)],.005,M['dark'])
 cylinder('desk-mug',(5.36,.91,.89),.061,.14,M['cream'])

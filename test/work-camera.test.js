@@ -40,6 +40,22 @@ for(const kind of ['beat','lyrics'])test(kind+' chain drives one camera path acr
  }
 });
 test('recording frame uses vocal only for draft/clean; missing work yields no camera',()=>{
- for(const kind of ['draft','clean'])assert.deepEqual(workCameraFrame({recording:true,job:{kind,elapsed:5,total:10},performance:'rapping'}),{kind:'vocal',progress:.5});
+ for(const kind of ['draft','clean']){
+  const frame=workCameraFrame({recording:true,job:{kind,elapsed:30,total:60},performance:'rapping'});
+  assert.equal(frame.kind,'vocal');assert.equal(frame.progress,.5);
+  assert.equal(frame.elapsedSeconds,4);assert.equal(frame.durationSeconds,8);
+  assert.equal(frame.shot.phase,'screen');
+  assert.equal(workCameraFrame({recording:true,job:{kind,elapsed:20,total:60},performance:'rapping'}).shot.phase,'screen');
+ }
  assert.equal(workCameraFrame({job:null}),null);
+});
+
+test('vocal camera composes the microphone and rear shots from the persisted active clock',()=>{
+ const frame=elapsed=>workCameraFrame({performance:'rapping',recording:true,job:{kind:'draft',elapsed,total:60}});
+ const mic=workCameraPose({...input,...frame(5)}),rear=workCameraPose({...input,...frame(49)});
+ assert.ok(mic.position[0]>input.headPose.position[0]+.7,'mic shot sees the performer from the microphone side');
+ assert.ok(rear.position[2]>input.headPose.position[2]+.7,'rear shot sees shoulders and screen');
+ const restored=JSON.parse(JSON.stringify({performance:'rapping',recording:true,job:{kind:'draft',elapsed:30,total:60}}));
+ assert.deepEqual(workCameraFrame(restored),frame(30));
+ assert.equal(workCameraFrame(restored,{reducedMotion:true}).shot.bob,0);
 });

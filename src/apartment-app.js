@@ -69,6 +69,7 @@ try{
   const saved=loadProfile(storage);let profile=saved.profile;
   let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lastInstallationSave=0,lastBrowserDownloadSave=0,lightPreview='game';
   const pcRoot=$('#virtual-pc'),savedPc=loadVirtualPcState(storage);let pcState=preparePcRuntimeState(savedPc.state);
+  const motionPreference=window.matchMedia?.('(prefers-reduced-motion: reduce)');
   let pcStorageWarning=migration.ok?(savedPc.ok?'':'Сохранение виртуального ПК недоступно.'):migration.error;
   let virtualPc,workReward=0,workFinished=false,lastWorkJob=null,lastWorkBeat=null,lastWorkCamera=null,resultEpisode=null,failedReactionId=null;
   const submissionTransferClock=createSubmissionTransferClock();
@@ -359,15 +360,18 @@ try{
     }
     $('#camera-fade').style.opacity=pcLifecycle.snapshot.blackout??0;
     const workSound=syncWorkAudio(),workPhase=pcLifecycle.snapshot.phase;
+    const creativeFrame=creativeWorkDescriptor(pcState,profile?.skills);
+    const reducedMotion=motionPreference?.matches??false;
+    const cameraWork=workCameraFrame(creativeFrame,{reducedMotion});
     workHud.hidden=workPhase!=='working'&&!(workFinished&&['work-cover','work-in'].includes(workPhase));
     if(!workHud.hidden){
       const creative=creativeWorkDescriptor(pcState,profile?.skills),beat=lastWorkBeat??creative.project;
       const shownJob=creative.job??lastWorkJob;
       const genres=normalizeGenreProgression(pcState.music.genres),genreId=shownJob?.genreProfile?.id??beat?.genreProfile?.id??'experimental';
       const chainProgress=pcState.creativeWork?.items.some(i=>i.projectId===beat?.id)&&!shownJob?.output&&!['diss','story','chorus','adapt'].includes(shownJob?.kind)?creativeChainProgress(pcState,beat?.id):null;
-      workPanel.update({beat,job:shownJob,chainProgress,needs:pcState.music.needs,skill:shownJob?.output?.draft?effectiveVocalSkill(pcState,profile?.skills,shownJob.kind):beat?.kind==='lyrics'?effectiveWritingSkill(pcState,profile?.skills):effectiveBeatSkill(pcState,profile?.skills),genreProgress:{name:genreById(genreId).name,xp:genres.xp[genreId],cap:genreCap(genres,genreId)},clockLabel:homeTime.label,reward:workFinished?workReward:0,finished:workFinished,...workSound});
+      workPanel.update({beat,job:shownJob,recordingShot:cameraWork?.shot,chainProgress,needs:pcState.music.needs,skill:shownJob?.output?.draft?effectiveVocalSkill(pcState,profile?.skills,shownJob.kind):beat?.kind==='lyrics'?effectiveWritingSkill(pcState,profile?.skills):effectiveBeatSkill(pcState,profile?.skills),genreProgress:{name:genreById(genreId).name,xp:genres.xp[genreId],cap:genreCap(genres,genreId)},clockLabel:homeTime.label,reward:workFinished?workReward:0,finished:workFinished,...workSound});
     }
-    virtualPc.presentTransition(pcLifecycle.snapshot);
+    virtualPc.presentTransition(pcLifecycle.snapshot,{beat:creativeFrame.project,job:creativeFrame.job,shot:cameraWork?.shot,paused:paused||document.hidden||homeModalOpen()});
     if(resultEpisode?.returning&&pcLifecycle.snapshot.phase==='desktop'){
       const done=completeResultReaction(pcState,resultEpisode.reaction.id,{nowMinute:gameMinuteStamp(homeTime)});
       if(done.ok&&persistPc(done.state,{atomic:true}))virtualPc.syncState(pcState);
@@ -375,7 +379,6 @@ try{
       resultEpisode.ui.restore();resultEpisode=null;
     }
     view.setComputerPresentation(pcLifecycle.snapshot,pcState,profile?.name??'Игрок');
-    const cameraWork=workCameraFrame(creativeWorkDescriptor(pcState,profile?.skills));
     if(cameraWork)lastWorkCamera=cameraWork;else if(workFinished&&lastWorkCamera)lastWorkCamera={...lastWorkCamera,progress:1};
     view.setWorkCamera(['work-reveal','working','work-cover'].includes(workPhase)?lastWorkCamera:null);
     if(footsteps.update({clip:motion.clip,walkDistance:motion.walkDistance,paused:mode!=='game'||(paused&&!step)||document.hidden||homeModalOpen()}))cue('footstep');

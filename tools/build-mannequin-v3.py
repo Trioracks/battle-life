@@ -544,6 +544,14 @@ def set_pose(kind,phase):
             amount=math.sin(phase*2*math.pi+(0 if s>0 else .7))
             el=sh+Vector((s*.008,-.10,-.257))
             if kind in ['seated','eat']:wr=el+Vector((-s*.025,-.232,.034+.009*amount))
+            if kind=='seated':
+                # Keyboard is 0.545m forward of the seat, at world key top .878m.
+                # Solve a reachable wrist; preserve 276/235mm arm segments.
+                wr=Vector((s*.16,-.46,.862+.002*amount))
+                d=wr-sh;length=d.length;v=d.normalized();l1=.276;l2=.235
+                mid=(length*length+l1*l1-l2*l2)/(2*length)
+                down=Vector((0,0,-1));bend=(down-v*down.dot(v)).normalized()
+                el=sh+v*mid+bend*math.sqrt(max(0,l1*l1-mid*mid))
             elif kind=='wash':wr=el+Vector((-s*.04,-.23,.025+.028*amount))
             elif s>0:el=sh+Vector((0,-.21,-.17));wr=el+Vector((0,-.23,.025+.018*amount))
             if kind=='open-door':
@@ -559,6 +567,7 @@ def set_pose(kind,phase):
                 down=Vector((0,0,-1));bend=(down-v*down.dot(v)).normalized()
                 el=sh+v*mid+bend*math.sqrt(max(0,l1*l1-mid*mid))
         hand_tip=wr+(wr-el).normalized()*.105
+        if kind=='seated':hand_tip=wr+Vector((0,-.105,0))
         if kind=='switch' and side=='R':
             time=phase*.7
             tap=smooth((time-.035)/.22) if time<.38 else 1-smooth((time-.38)/.32)

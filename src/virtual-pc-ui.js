@@ -13,7 +13,7 @@ import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtu
 import { createVirtualPcState, diskUsage, saveStudioProject } from './virtual-pc-state.js?rev=41';
 import {diskAmount} from './virtual-pc-disk-view.js?rev=41';
 import {pcPresentation} from './virtual-pc-presentation.js?rev=41';
-import {createStudioWorkspace} from './ft-studio-view.js?rev=41';
+import {createStudioWorkspace,presentRecordingWorkspace} from './ft-studio-view.js?rev=41';
 import {mountUnderweb} from './underweb-view.js?rev=41';
 import {applyToBattle} from './virtual-pc-state.js?rev=41';
 import {mountBeatStudio} from './beat-studio-view.js?rev=41';
@@ -284,8 +284,8 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (pc.phase === 'desktop') pc.refreshDynamicState();
   };
 
-  let transitionLayer=null,transitionTitle=null,transitionSubtitle=null,transitionProgress=null;
-  pc.presentTransition = snapshot => {
+  let transitionLayer=null,transitionTitle=null,transitionSubtitle=null,transitionProgress=null,recordingLayer=null;
+  pc.presentTransition = (snapshot,recording=null) => {
     pc.desktopVisible=(snapshot.overlay??0)>0;
     if(!pc.desktopVisible)pc.studioView?.setVisible(false);
     if(pc.desktopVisible&&pc.desktopDirty){pc.desktopDirty=false;pc.refreshDynamicState();}
@@ -304,6 +304,13 @@ export function mountVirtualPc(root, callbacks = {}) {
     transitionLayer.hidden=p.screen==='desktop'||(p.screen==='off'&&snapshot.phase==='room');transitionLayer.dataset.screen=p.screen;
     transitionLayer.style.opacity='1';transitionLayer.style.filter=`brightness(${p.brightness})`;transitionTitle.textContent=p.title;transitionSubtitle.textContent=p.subtitle;
     transitionProgress.hidden=p.screen!=='loading';transitionProgress.value=p.progress;
+    const screenRecording=snapshot.phase==='working'&&recording?.shot?.phase==='screen'&&recording?.job;
+    if(screenRecording&&!recordingLayer){
+      recordingLayer=createStudioWorkspace(document,{projectName:recording.beat?.name});recordingLayer.dataset.pcRole='recording-screen';recordingLayer.inert=true;
+      Object.assign(recordingLayer.style,{position:'absolute',inset:'0',zIndex:'1000',background:'#171c1b'});root.append(recordingLayer);
+    }
+    if(recordingLayer){recordingLayer.hidden=!screenRecording;presentRecordingWorkspace(recordingLayer,screenRecording?recording:{});}
+    if(screenRecording){root.style.opacity='1';root.style.pointerEvents='none';}
     if(wasLocked&&!pc.locked&&snapshot.phase==='desktop')pc.shell?.focusActive();
     if(pc.desktopVisible)pc.studioView?.setVisible(pc.viewVisible('ft-studio')&&!pc.shutdownModal&&!pc.submissionModal&&!pc.uninstallModal);
   };

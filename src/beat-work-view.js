@@ -27,7 +27,11 @@ export function createBeatWorkPanel(document,{onCancel=()=>{},onEnableAudio=()=>
  }
  const foot=el(document,'div',{className:'beat-work-foot'}),audioStatus=node('audio','span','beat-work-audio'),enable=button(document,'Включить звук',{},onEnableAudio),cancel=button(document,'Прервать работу',{},onCancel);
  foot.append(audioStatus,enable,cancel);root.append(head,overallLabel,overall,progress,details,training,needs,foot);
- return {element:root,update({beat,job,chainProgress,needs:values={},skill:level=0,genreProgress,clockLabel='',reward:earned=0,finished=false,audioError='',needsGesture=false}={}){
+ return {element:root,update({beat,job,recordingShot,chainProgress,needs:values={},skill:level=0,genreProgress,clockLabel='',reward:earned=0,finished=false,audioError='',needsGesture=false}={}){
+  const recordingScreen=recordingShot?.phase==='screen';
+  root.dataset.recordingPhase=recordingShot?.phase??'';
+  root.style.zIndex=recordingScreen?'45':'';root.style.left=recordingScreen?'auto':'';root.style.right=recordingScreen?'24px':'';
+  details.hidden=needs.hidden=recordingScreen;
   overall.hidden=overallLabel.hidden=!chainProgress;overall.value=chainProgress?.overall??0;
   overallLabel.textContent='Общая готовность · '+Math.round(overall.value*100)+'% · '+((chainProgress?.index??0)+1)+' / 3';
   const writing=beat?.kind==='lyrics',stages=writing?LYRIC_STAGES:BEAT_STAGES,extra=writing&&job?.kind!=='stage'?({diss:'Диссовая часть',story:'Сюжетный куплет',chorus:'Припев',adapt:'Адаптация под бит',refine:'Доработка текста'})[job?.kind]:null;
@@ -55,7 +59,7 @@ export function createBeatWorkPanel(document,{onCancel=()=>{},onEnableAudio=()=>
   for(const key of ['satiety','energy']){const value=Math.max(0,Math.min(100,values[key]??0));nodes[key].value=value;nodes[key+'-value'].textContent=String(Math.round(value));}
   audioStatus.textContent=audioError||(needsGesture?'Звук приостановлен':writing?'Слышно, как герой печатает на клавиатуре':vocal?'Бит и вокал · '+vocal.name:'Сейчас звучит партия этого этапа');
   enable.hidden=!needsGesture&&!audioError;cancel.hidden=complete;
-  const studying=beat?.kind==='study'||job?.kind==='study';training.hidden=studying;
+  const studying=beat?.kind==='study'||job?.kind==='study';training.hidden=studying||recordingScreen;
   if(studying){title.textContent=beat?.name??'Изучение трека';stage.textContent='ИЗУЧЕНИЕ · 45 игровых минут';root.setAttribute('aria-label','Изучение трека');progress.setAttribute('aria-label','Изучение трека');genreRow.remove();reward.hidden=!finished;reward.textContent=finished?'Разбор сохранён'+(earned>0?' · новый источник наслушанности':''):'';audioStatus.textContent='Герой разбирает сохранённую запись';enable.hidden=true;}
  },dispose(){root.remove();}};
 }

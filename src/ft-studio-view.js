@@ -9,7 +9,49 @@ export const FT_TRACKS=Object.freeze([
  ...['Sound Design','Sub Bass','FX'].map(name=>({name,stage:2,color:'arrangement'})),
 ]);
 
-export function renderStudioTracks(root,beat){
+// Read-only recording surface. It consumes a job snapshot and owns no transport.
+export function presentRecordingWorkspace(root,{beat,job,shot,paused=false}={}){
+ const status=pcFind(root,n=>n.dataset?.ftRole==='recording-status');
+ const waveform=pcFind(root.recordingLane,n=>n.dataset?.ftRole==='recording-waveform');
+ const active=Boolean(job&&shot&&['draft','clean'].includes(job.kind));
+ status.hidden=waveform.hidden=!active;
+ root.recordingLane.hidden=!active;
+ if(!active)return;
+ if(!root.recordingLane.parentNode)pcFind(root,n=>n.className==='ft-grid-inner').append(root.recordingLane);
+ status.textContent=(paused?'Пауза':'REC')+' · '+(job.kind==='clean'?'Чистовая запись':'Черновая запись');
+ root.dataset.recordingPhase=shot.phase;
+ const key=[beat?.id,beat?.revision,beat?.stages?.length,beat?.recording?.revision,job.kind].join(':');
+ if(root.recordingKey!==key){
+  const form=createBeatSongForm(beat),bars=form?.bars??4;
+  root.recordingBars=bars;root.recordingBpm=beat?.bpm??90;root.dataset.recordingBars=String(bars);
+  root.recordingWindows=form?songPartWindows(form,3):[{startBar:0,bars}];
+  renderStudioTracks(root,beat,{timelineBars:bars});root.recordingKey=key;
+  const timeline=pcFind(root,n=>n.className==='ft-timeline');
+  timeline.replaceChildren(el(root.ownerDocument,'span',{className:'ft-track-corner',text:'ТАКТ'}));
+  for(let bar=1;bar<=bars;bar++)timeline.append(el(root.ownerDocument,'span',{text:String(bar)}));
+  timeline.style.gridTemplateColumns='110px repeat('+bars+',minmax(0,1fr))';
+  pcFind(root,n=>n.dataset?.ftRole==='section-markers').style.gridTemplateColumns=timeline.style.gridTemplateColumns;
+  pcFind(pcFind(root,n=>n.dataset?.ftRole==='recording-lane'),n=>n.className==='ft-lane-grid').style.backgroundSize=(16/bars*100)+'% 100%';
+  root.recordingWaveStyle??={background:waveform.style.background,clipPath:waveform.style.clipPath};
+  Object.assign(waveform.style,{width:'100%',position:'relative',background:'none',clipPath:'none'});
+  waveform.replaceChildren(...root.recordingWindows.map(()=>{
+   const region=el(root.ownerDocument,'div',{dataset:{ftRole:'recording-region'}});
+   Object.assign(region.style,root.recordingWaveStyle,{position:'absolute',top:'0',height:'32px'});return region;
+  }));
+  pcFind(root,n=>n.dataset?.ftRole==='session-name').textContent=beat?.name??'Запись';
+ }
+ const progress=Math.max(0,Math.min(1,shot.progress)),bars=root.recordingBars,position=progress*bars*4;
+ pcFind(root,n=>n.dataset?.ftRole==='playhead').style.left=(progress*100)+'%';
+ pcFind(root,n=>n.dataset?.ftRole==='recording-position').textContent=String(Math.floor(position/4)+1).padStart(2,'0')+' : '+String(Math.floor(position%4)+1).padStart(2,'0')+' : '+String(Math.floor((position%1)*1000)).padStart(3,'0');
+ pcFind(root,n=>n.dataset?.ftRole==='recording-tempo').textContent=String(root.recordingBpm);
+ pcFind(root,n=>n.dataset?.ftRole==='transport-status').textContent=paused?'Пауза записи':'Запись';
+ root.recordingWindows.forEach((window,index)=>{
+  const region=waveform.children[index];region.style.left=(window.startBar/bars*100)+'%';
+  region.style.width=(Math.max(0,Math.min(window.bars,progress*bars-window.startBar))/bars*100)+'%';
+ });
+}
+
+export function renderStudioTracks(root,beat,{timelineBars=16}={}){
  const d=root.ownerDocument,stage=beat?.stages?.length??0,form=createBeatSongForm(beat);
  const sections=pcFind(root,n=>n.dataset?.ftRole==='section-markers');sections.replaceChildren();sections.hidden=!form;
  if(form){
@@ -31,13 +73,14 @@ export function renderStudioTracks(root,beat){
   label.append(track.stage>=3?createPcIcon(d,'microphone',{size:14}):el(d,'i',{attributes:{'aria-hidden':'true'}}),el(d,'span',{text:track.name,dataset:{ftRole:'track-label'}}));
   if(track.muted)label.append(el(d,'small',{text:'OFF',attributes:{title:'Черновик заменён чистовой записью и больше не воспроизводится'}}));
   const lane=el(d,'div',{className:'ft-lane-grid',dataset:{ftRole:'lane'},attributes:{'aria-hidden':'true'}});
+  lane.style.backgroundSize=(16/timelineBars*100)+'% 100%';
   if(stage){
    const windows=form?songPartWindows(form,Math.min(3,track.stage)):[{startBar:0,bars:beat.version===3?4:2}];
    if(form)lane.style.position='relative';
    for(const window of windows){
     const sourceId=form?.version&&track.stage<3?(window.startBar===0?form.introSourceId:window.startBar===6?form.outroSourceId:[beat.drumId,beat.audio?.themeId,beat.audio?.arrangementId][track.stage]):null;
     const clip=el(d,'span',{className:'ft-audio-clip',text:sourceId?beginnerById(sourceId)?.name??track.name:track.name,dataset:{ftRole:'clip',color:track.color,startBar:String(window.startBar+1),bars:String(window.bars),...(sourceId?{sourceId,sourceBar:String((window.sourceBar??0)+1)}:{})}});
-    clip.style.marginLeft=(window.startBar*6.25)+'%';clip.style.width=(window.bars*6.25)+'%';
+    clip.style.marginLeft=(window.startBar*100/timelineBars)+'%';clip.style.width=(window.bars*100/timelineBars)+'%';
     if(form){clip.style.position='absolute';clip.style.top='2px';}lane.append(clip);
    }
   }
@@ -51,9 +94,9 @@ export function createStudioWorkspace(document,{projectName='Сеанс без �
  const header=el(document,'header',{className:'ft-top'});
  const brand=el(document,'div',{className:'ft-brand'});
  brand.append(el(document,'span',{className:'ft-monogram',text:'FT'}),el(document,'div',{className:'ft-brand-name',text:'FIELD TONE',attributes:{'aria-label':'FT Studio'}}));
- const session=el(document,'div',{className:'ft-session'});session.append(el(document,'small',{text:'STUDIO / SESSION 01'}),el(document,'strong',{text:projectName}));
- const readout=el(document,'div',{className:'ft-readout'});readout.append(el(document,'small',{text:'ПОЗИЦИЯ'}),el(document,'span',{text:'01 : 01 : 000'}));
- const tempo=el(document,'div',{className:'ft-tempo'});tempo.append(el(document,'strong',{text:'—'}),el(document,'small',{text:'BPM'}));
+ const session=el(document,'div',{className:'ft-session'});session.append(el(document,'small',{text:'STUDIO / SESSION 01'}),el(document,'strong',{text:projectName,dataset:{ftRole:'session-name'}}));
+ const readout=el(document,'div',{className:'ft-readout'});readout.append(el(document,'small',{text:'ПОЗИЦИЯ'}),el(document,'span',{text:'01 : 01 : 000',dataset:{ftRole:'recording-position'}}));
+ const tempo=el(document,'div',{className:'ft-tempo'});tempo.append(el(document,'strong',{text:'—',dataset:{ftRole:'recording-tempo'}}),el(document,'small',{text:'BPM'}));
  header.append(brand,session,readout,tempo);
  const body=el(document,'div',{className:'ft-body'}),library=el(document,'aside',{className:'ft-library',dataset:{ftRole:'library'}});
  library.append(el(document,'h2',{text:'Библиотека'}),el(document,'p',{className:'ft-section-note',text:'ЛОКАЛЬНОЕ ОКРУЖЕНИЕ'}));
@@ -69,8 +112,9 @@ export function createStudioWorkspace(document,{projectName='Сеанс без �
  const transport=el(document,'div',{className:'ft-transport',dataset:{ftRole:'transport'},attributes:{'aria-label':'Воспроизведение'}});
  for(const [label,glyph]of [['Play','▶'],['Pause','Ⅱ'],['Stop','■']])transport.append(button(document,glyph,{dataset:{ftAction:label.toLowerCase()},attributes:{'aria-label':label,title:label}}));
  const transportStatus=el(document,'span',{className:'ft-transport-status',text:'Готов',dataset:{ftRole:'transport-status'},attributes:{role:'status'}});
+ const recordingStatus=el(document,'strong',{text:'',dataset:{ftRole:'recording-status'},attributes:{role:'status'}});recordingStatus.hidden=true;recordingStatus.style.color='#ff6969';
  const toggles=el(document,'div',{className:'ft-panel-toggles'});
- transport.append(transportStatus,toggles);arrangement.append(transport);
+ transport.append(transportStatus,recordingStatus,toggles);arrangement.append(transport);
  const scroll=el(document,'div',{className:'ft-playlist-scroll',attributes:{tabindex:'0','aria-label':'Прокрутка дорожек'}});
  const grid=el(document,'div',{className:'ft-grid-inner'});scroll.append(grid);
  const timelineHeader=el(document,'div',{className:'ft-timeline-header'});
@@ -78,6 +122,11 @@ export function createStudioWorkspace(document,{projectName='Сеанс без �
  const timeline=el(document,'div',{className:'ft-timeline'});timeline.append(el(document,'span',{className:'ft-track-corner',text:'ТАКТ'}));
  for(let bar=1;bar<=16;bar++)timeline.append(el(document,'span',{text:String(bar)}));timelineHeader.append(timeline);grid.append(timelineHeader);
  grid.append(el(document,'div',{dataset:{ftRole:'lanes'}}));
+ const recordingLane=el(document,'div',{className:'ft-lane',dataset:{ftRole:'recording-lane'}});
+ recordingLane.append(el(document,'div',{className:'ft-lane-label',text:'Vocal / REC'}));
+ const recordingGrid=el(document,'div',{className:'ft-lane-grid'}),waveform=el(document,'div',{dataset:{ftRole:'recording-waveform'},attributes:{'aria-label':'Записываемая волна'}});waveform.hidden=true;
+ waveform.style.height='32px';waveform.style.background='repeating-linear-gradient(90deg,#e86b68 0 2px,transparent 2px 5px)';waveform.style.clipPath='polygon(0 45%,4% 20%,8% 35%,12% 5%,18% 30%,24% 15%,29% 40%,36% 10%,43% 25%,51% 4%,58% 35%,67% 15%,74% 30%,83% 5%,90% 25%,100% 40%,100% 60%,90% 75%,83% 95%,74% 70%,67% 85%,58% 65%,51% 96%,43% 75%,36% 90%,29% 60%,24% 85%,18% 70%,12% 95%,8% 65%,4% 80%,0 55%)';
+ recordingGrid.append(waveform);recordingLane.append(recordingGrid);recordingLane.hidden=true;root.recordingLane=recordingLane;
  const playheadArea=el(document,'div',{className:'ft-playhead-area',attributes:{'aria-hidden':'true'}});
  playheadArea.append(el(document,'i',{className:'ft-playhead',dataset:{ftRole:'playhead'}}));grid.append(playheadArea);
  arrangement.append(scroll);
