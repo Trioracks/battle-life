@@ -24,7 +24,7 @@ import {normalizeBeat} from './beat-production.js?rev=42';
 import {createBeatMarket} from './beat-market-view.js?rev=42';
 import * as software from './pc-software.js?rev=42';
 import {mountTorrent,mountInstaller,softwareMessage} from './pc-software-view.js?rev=42';
-import {startBrowserDownload,advanceBrowserDownloads} from './pc-browser-downloads.js?rev=42';
+import {startBrowserDownload,advanceBrowserDownloads,clearCompletedBrowserDownloadHistory} from './pc-browser-downloads.js?rev=42';
 import {SOFTWARE} from './pc-software-catalog.js?rev=42';
 import {mountRapNotebook} from './rap-notebook-view.js?rev=42';
 import {mountRapDossier} from './rap-dossier-view.js?rev=42';
@@ -232,6 +232,7 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
   pc.softwareAction = (action,id) => {
     let result;
+    if(action==='clear-download-history'){pc.persist(clearCompletedBrowserDownloadHistory(pc.state).state,{atomic:true});pc.renderDesktop(false);return;}
     if(['download-client','download-metadata','download-notebook'].includes(action)){
       const appId=action==='download-client'?'client':action==='download-notebook'?'notebook':id??'ft';
       result=startBrowserDownload(pc.state,{appId,kind:action==='download-client'?'installer':'metadata'});

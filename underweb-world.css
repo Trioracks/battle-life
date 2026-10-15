@@ -137,10 +137,21 @@
 #virtual-pc .uw-browser .uw-bookmarks strong{color:#c7b4ec;font-size:10px}
 #virtual-pc .uw-browser .uw-bookmarks button{color:#c9c8d6!important;font-size:11px!important}
 #virtual-pc .uw-browser .uw-status{background:#191923;color:#9e9cae;border-color:#383744;font-size:10px;padding:3px 10px}
-#virtual-pc .uw-browser .uw-downloads{flex:none;max-height:150px;overflow:auto;background:#242331;border-bottom:1px solid #494359;padding:8px 12px;color:#e4deed;font:11px Tahoma,sans-serif}
+#virtual-pc .uw-browser{--uw-download-surface:#272136;--uw-download-edge:#574667;--uw-download-muted:#c2b6d0;--uw-download-accent:#b798d7}
+.uw-download-control{position:relative;flex:none}
+#virtual-pc .uw-browser .uw-downloads{position:absolute;z-index:30;right:0;top:calc(100% + 9px);display:flex;flex-direction:column;width:min(360px,calc(100vw - 38px));max-height:min(520px,calc(100dvh - 170px));padding:0 14px;background:linear-gradient(145deg,#302640,var(--uw-download-surface) 70%);border:1px solid var(--uw-download-edge);border-radius:7px;box-shadow:0 12px 28px #08060e99;color:#f1eaf7;font:11px Tahoma,sans-serif}
+#virtual-pc .uw-browser .uw-downloads:before{content:'';position:absolute;right:9px;top:-6px;width:10px;height:10px;transform:rotate(45deg);background:#302640;border-top:1px solid var(--uw-download-edge);border-left:1px solid var(--uw-download-edge)}
 #virtual-pc .uw-browser .uw-downloads[hidden]{display:none}
-.uw-download-row{display:flex;align-items:center;gap:10px;margin-top:6px;min-height:25px}.uw-download-row>span{flex:1;overflow-wrap:anywhere}.uw-download-row progress{width:90px;height:9px;accent-color:#ad92d4}.uw-download-row small{max-width:35%;color:#bdb1c9}
-#virtual-pc .uw-browser .uw-download-row button{flex:none;border:1px solid #665674;border-radius:4px;padding:4px 8px;background:#3d344b;color:#f1e9f9;font-size:11px}
+.uw-download-header{display:flex;align-items:center;gap:7px;flex:none;min-height:48px;border-bottom:1px solid var(--uw-download-edge)}.uw-download-header>strong{flex:1;font-size:13px}.uw-download-list{min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#78628e transparent}.uw-download-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--uw-download-edge)}.uw-download-name{grid-column:1;font-weight:700;overflow-wrap:anywhere;line-height:1.4}.uw-download-row progress{grid-column:1;width:100%;height:5px;accent-color:var(--uw-download-accent)}.uw-download-row small{grid-column:1;color:var(--uw-download-muted);font-size:10px;line-height:1.4}.uw-download-row>button{grid-column:2;grid-row:1 / 4}.uw-download-footer{display:flex;justify-content:space-between;gap:12px;flex:none;padding:11px 0}.uw-download-empty{color:var(--uw-download-muted);margin:18px 0}.uw-download-message{color:#f3c9b4;line-height:1.5;flex:none;margin:10px 0 0}
+#virtual-pc .pc-window .uw-browser .uw-toolbar .uw-downloads button{padding:5px 9px;border:1px solid #645276;border-radius:4px;background:#483858;color:#f1e9f9;font:11px Tahoma,sans-serif;min-height:29px}
+#virtual-pc .pc-window .uw-browser .uw-toolbar .uw-download-header button{padding:3px 6px;border-color:transparent;background:transparent;font-size:16px}
+#virtual-pc .pc-window .uw-browser .uw-toolbar .uw-download-toggle{position:relative;font-size:18px;color:#d9c2ed;overflow:visible}
+#virtual-pc .pc-window .uw-browser .uw-toolbar .uw-download-toggle[aria-expanded=true]{border-color:#ac8bc9;background:#4b365c}
+#virtual-pc .uw-browser .uw-downloads button:focus-visible,#virtual-pc .uw-browser .uw-download-toggle:focus-visible{outline:2px solid #e2c4f7;outline-offset:2px}
+.uw-download-arrival{position:absolute;inset:-2px;display:grid;place-items:center;border-radius:5px;background:#b99bdb;color:#21162c;font-size:21px;pointer-events:none;animation:uw-download-arrival .7s ease-out both}
+@keyframes uw-download-arrival{0%{opacity:0;transform:translate(-35px,48px) scale(.75)}45%{opacity:1;transform:translate(0,0) scale(1.1)}70%{opacity:1;transform:scale(1);box-shadow:0 0 0 4px #b99bdb55}100%{opacity:0;transform:scale(1);box-shadow:0 0 0 8px #b99bdb00}}
+@media(prefers-reduced-motion:reduce){.uw-download-arrival{display:none;animation:none}}
+@media(max-width:600px){#virtual-pc .uw-browser .uw-downloads{max-height:calc(100dvh - 145px)}.uw-download-row{gap:5px 8px;padding:12px 0}}
 .uw-page{color:#2e3435}.uw-page:has(.uw-home){background:radial-gradient(ellipse at 20% 0,#35304b,transparent 65%),#171722}
 #virtual-pc .uw-home{max-width:1160px;padding:14px 26px 0;color:#e7e5f2;text-align:left}
 #virtual-pc .uw-home .uw-site-top{color:#aaa6ba;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;text-align:center}

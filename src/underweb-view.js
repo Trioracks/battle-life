@@ -27,8 +27,10 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  const back=button(d,'←',{attributes:{'aria-label':'Назад в Underweb'}},()=>travel(-1)),forward=button(d,'→',{attributes:{'aria-label':'Вперёд в Underweb'}},()=>travel(1));
  const home=button(d,'⌂',{attributes:{'aria-label':'Главная Underweb'}},()=>navigate('underweb://iskra'));
  const address=el(d,'input',{value:history[0],attributes:{'aria-label':'Адрес или поиск Underweb',autocomplete:'off',spellcheck:'false'}});
- const downloadsRoot=el(d,'section'),downloadsView=mountBrowserDownloads(downloadsRoot,{getState,onAction:onSoftware,getMessage:getSoftwareMessage});
- toolbar.append(back,forward,home,el(d,'span',{className:'uw-address-label',text:'Адрес'}),address,button(d,'Перейти',{},()=>navigate(address.value)),button(d,'Загрузки',{},()=>downloadsView.toggle()));
+ const downloadsRoot=el(d,'section'),downloadsAnchor=button(d,'↓',{className:'uw-download-toggle',attributes:{'aria-label':'Загрузки',title:'Загрузки'}},()=>downloadsView.toggle());
+ const downloadsView=mountBrowserDownloads(downloadsRoot,{anchor:downloadsAnchor,getState,onAction:onSoftware,getMessage:getSoftwareMessage}),downloadsControl=el(d,'div',{className:'uw-download-control'});
+ downloadsControl.append(downloadsAnchor,downloadsRoot);
+ toolbar.append(back,forward,home,el(d,'span',{className:'uw-address-label',text:'Адрес'}),address,button(d,'Перейти',{},()=>navigate(address.value)),downloadsControl);
  toolbar.addEventListener('submit',e=>{e.preventDefault();navigate(address.value);});
  const bookmarks=el(d,'nav',{className:'uw-bookmarks',attributes:{'aria-label':'Избранное Underweb'}});
  bookmarks.append(el(d,'strong',{text:'UNDERWEB'}),button(d,'Искра',{},()=>navigate('underweb://iskra')),button(d,SOCIAL_IDENTITY.name,{},()=>navigate('underweb://social/me')),button(d,'Баттлы',{},()=>navigate('underweb://battles')),button(d,'FT Studio',{},()=>navigate('underweb://software/ft-studio')));
@@ -36,7 +38,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  bookmarks.append(button(d,'Файловая помойка',{},()=>navigate('underweb://dump')));
  bookmarks.append(button(d,'Форум',{},()=>navigate('underweb://forum')));
  const page=el(d,'div',{className:'uw-page'}),status=el(d,'footer',{className:'uw-status',text:'Готово · Локальная сеть'});
- browser.append(toolbar,bookmarks,downloadsRoot,page,status);root.replaceChildren(browser);
+ browser.append(toolbar,bookmarks,page,status);root.replaceChildren(browser);
  function searchForm(query=''){
   const form=el(d,'form',{className:'uw-search-form'}),input=el(d,'input',{value:query,attributes:{'aria-label':'Поиск Искры',placeholder:'Баттлы, музыка, программы…',maxlength:'160',autocomplete:'off'}});
   form.append(input,button(d,'Найти',{},()=>navigate(input.value)));

@@ -2,28 +2,55 @@ import {SOFTWARE,METADATA_BYTES} from './pc-software-catalog.js?rev=42';
 import {normalizeSoftware,withSoftware,softwareDiskBytes} from './pc-software.js?rev=42';
 const seconds=n=>Number.isFinite(n)?Math.max(0,Math.min(1,n)):0;
 export function normalizeBrowserDownloads(value){
- const seen=new Set(),items=[];
+ const seen=new Set(),items=[],hiddenHistoryIds=[],recovery=(Array.isArray(value?.recovery)?value.recovery:[]).map(item=>structuredClone(item));
+ const recover=raw=>recovery.push({reason:'Повреждённая история загрузок. Исходные данные сохранены.',recoveryData:structuredClone(raw)});
+ if(value!=null&&value.version!==1)recover(value);
+ if(value?.recovery!=null&&!Array.isArray(value.recovery))recover(value.recovery);
+ if(value?.items!=null&&!Array.isArray(value.items))recover(value.items);
  for(const item of Array.isArray(value?.items)?value.items:[]){
-  const app=SOFTWARE[item?.appId],kind=item?.kind,id=item?.appId+':'+kind;
-  if(!app||!['installer','metadata'].includes(kind)||kind==='metadata'&&!app.metadataKey||seen.has(id))continue;
+  const app=Object.hasOwn(SOFTWARE,item?.appId)?SOFTWARE[item.appId]:null,kind=item?.kind,id=item?.appId+':'+kind;
+  if(!app||!['installer','metadata'].includes(kind)||kind==='metadata'&&!app.metadataKey||seen.has(id)){recover(item);continue;}
+  if(!Number.isFinite(item.elapsedSeconds)||item.elapsedSeconds<0||item.elapsedSeconds>1||!['','insufficient-space',undefined].includes(item.error))recover(item);
   seen.add(id);items.push({id,appId:app.id,kind,elapsedSeconds:seconds(item.elapsedSeconds),error:item.error==='insufficient-space'?item.error:''});
  }
- return {version:1,items};
+ if(value?.hiddenHistoryIds!=null&&!Array.isArray(value.hiddenHistoryIds))recover(value.hiddenHistoryIds);
+ for(const id of Array.isArray(value?.hiddenHistoryIds)?value.hiddenHistoryIds:[]){
+  if(typeof id==='string'&&seen.has(id)){if(!hiddenHistoryIds.includes(id))hiddenHistoryIds.push(id);}
+  else recover(id);
+ }
+ return {version:1,items,hiddenHistoryIds,recovery};
 }
-export function browserDownloadEntries(state){
- const s=state.software;
+export function browserDownloadEntries(state,{includeHidden=false}={}){
+ const s=state.software,hidden=new Set(state.browserDownloads?.hiddenHistoryIds??[]);
  return (state.browserDownloads?.items??[]).map(item=>{
   const app=SOFTWARE[item.appId],totalBytes=item.kind==='metadata'?METADATA_BYTES:app.downloadBytes;
   const receivedBytes=item.kind==='metadata'?(s[app.metadataKey]?totalBytes:Math.floor(totalBytes*item.elapsedSeconds)):s[item.appId].receivedBytes;
   return {...item,name:item.kind==='metadata'?app.torrent:app.archive,totalBytes,receivedBytes,complete:receivedBytes===totalBytes};
- });
+ }).filter(item=>includeHidden||!item.complete||!hidden.has(item.id));
+}
+export function clearCompletedBrowserDownloadHistory(state){
+ const queue=normalizeBrowserDownloads(state.browserDownloads),hidden=new Set(queue.hiddenHistoryIds);
+ for(const item of browserDownloadEntries(state))if(item.complete)hidden.add(item.id);
+ if(hidden.size===queue.hiddenHistoryIds.length)return {ok:true,state};
+ return {ok:true,state:{...state,browserDownloads:{...queue,hiddenHistoryIds:[...hidden]}}};
 }
 export function startBrowserDownload(state,{appId,kind}={}){
- const app=SOFTWARE[appId],fail=reason=>({ok:false,state,reason});
+ const app=Object.hasOwn(SOFTWARE,appId)?SOFTWARE[appId]:null,fail=reason=>({ok:false,state,reason});
  if(!app||!['installer','metadata'].includes(kind)||kind==='metadata'&&!app.metadataKey)return fail('unknown-app');
  if(state.power!=='on')return fail('pc-off');
  const soft=normalizeSoftware(state.software,state.download),queue=normalizeBrowserDownloads(state.browserDownloads);
- if(queue.items.some(item=>item.appId===appId&&item.kind===kind)||kind==='metadata'&&soft[app.metadataKey]||kind==='installer'&&soft[appId].receivedBytes===app.downloadBytes)return {ok:true,state,reason:''};
+ const id=appId+':'+kind,existing=queue.items.find(item=>item.id===id);
+ if(existing){
+  const complete=kind==='metadata'?soft[app.metadataKey]:soft[appId].receivedBytes===app.downloadBytes;
+  if(!queue.hiddenHistoryIds.includes(id)&&(!complete||queue.items.at(-1)===existing))return {ok:true,state,reason:''};
+  queue.hiddenHistoryIds=queue.hiddenHistoryIds.filter(value=>value!==id);
+  queue.items=[...queue.items.filter(item=>item.id!==id),existing];
+  return {ok:true,state:{...state,browserDownloads:queue},reason:''};
+ }
+ if(kind==='metadata'&&soft[app.metadataKey]||kind==='installer'&&soft[appId].receivedBytes===app.downloadBytes){
+  queue.items.push({id,appId,kind,elapsedSeconds:1,error:''});
+  return {ok:true,state:{...state,browserDownloads:queue},reason:''};
+ }
  const needed=kind==='metadata'?METADATA_BYTES:app.downloadBytes-soft[appId].receivedBytes;
  if(softwareDiskBytes(state).free<needed)return fail('insufficient-space');
  // A legacy client transfer becomes a browser transfer without losing bytes.
@@ -35,7 +62,10 @@ export function advanceBrowserDownloads(state,{activeSeconds=0,powered=state.pow
  if(!powered||state.power!=='on'||paused||!Number.isFinite(activeSeconds)||activeSeconds<=0)return {state,changed:false,completed:[]};
  const entries=browserDownloadEntries(state).filter(item=>!item.complete);
  if(!entries.length)return {state,changed:false,completed:[]};
- let next=withSoftware({...state,browserDownloads:normalizeBrowserDownloads(state.browserDownloads)},normalizeSoftware(state.software,state.download)),changed=false;const completed=[];
+ // Commands and load already validated the queue. Copy only live transfer rows;
+ // immutable visibility/recovery archives do not need per-frame normalization.
+ const queue={...state.browserDownloads,items:state.browserDownloads.items.map(item=>({...item}))};
+ let next=withSoftware({...state,browserDownloads:queue},normalizeSoftware(state.software,state.download)),changed=false;const completed=[];
  for(const entry of entries){
   const item=next.browserDownloads.items.find(item=>item.id===entry.id),app=SOFTWARE[item.appId],elapsed=Math.min(1,item.elapsedSeconds+activeSeconds);
   const desired=Math.floor(entry.totalBytes*elapsed)-entry.receivedBytes,added=Math.min(desired,Math.floor(softwareDiskBytes(next).free));
