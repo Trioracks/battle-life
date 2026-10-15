@@ -57,6 +57,8 @@ Controller visual review caught blank shell glyphs in the earlier QA screenshots
 
 Final `npm test` passed 1,260/1,260 tests, zero failures/skips, in 110338.312 ms; log `artifacts/task-11/full-test-final.log`. The earlier full log remains with its two stale revision-41 expectation failures; both tests now enforce revision 42. Focused final revision checks passed 9/9 and scoped acceptance checks passed 12/12. No dependency or engine update was performed.
 
+Review follow-up bounds the held native Worker wait: errors reject the awaited promise, absent replies time out after 15 seconds, and failure cleanup releases the Worker/context. Focused tests pass 7/7; the actual acceptance path passed execution-error, silent-reply deadline and unchanged real-success/reload cases in `artifacts/task-11/worker-reply-review-green/`. Full-suite numbers above belong to fix base `31a0b8f`; the controller requested focused checks for this QA-only fix, so broad profiles and the full suite were not repeated.
+
 Raw samples, profiles, failure JSON and screenshots remain under `artifacts/task-11/`. The original baseline and historical failures remain under `artifacts/v-krugu-qa/long-campaign/`; no previous result is replaced by a passing rerun. Existing campaign labels and FPS/layout evidence directories are protected against overwrite. Historical 20-pair update p95 was 257.2/265.9/266.0 ms at the three sizes; maxima 299.8/311.8/381.9 ms.
 
 ## Limits and retained provenance

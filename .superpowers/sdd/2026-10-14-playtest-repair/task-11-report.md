@@ -117,6 +117,45 @@ New files: `tools/qa/acceptance-metrics.mjs`, `tools/qa/final-workflows.mjs`, `t
 
 Final staging inspection confirmed exactly 162 scoped files, with zero backlog/stems/assets paths staged. All five final QA-tool syntax checks and `git diff --cached --check` passed. Existing unrelated untracked files remain. The controller owns the following independent task review and one broad final branch review.
 
+## Task review fix round 1 — bounded native Worker reply
+
+Fix base: `31a0b8f22623fb54fe500dc1cd995740b7652811`. Reviewer Important P2 verified: throwing in `native.onerror` does not reject the resolve-only `received` promise. Playwright's ordinary page timeout does not bound `page.evaluate`; failed or silent Workers could keep this acceptance path pending and prevent its failure-artifact/context-cleanup path.
+
+Used the receiving-code-review, TDD and verification instructions. No helpers/reviewers were dispatched. All shell calls retained scoped `require_escalated` execution. Production/game code is untouched.
+
+Implementation: added QA-only `tools/qa/held-worker-reply.js`. Native errors reject the awaited promise and prevent the default asynchronous error; unreadable replies and synchronous post failures also reject. A 15,000 ms default deadline bounds absent replies. Successful replies remain held until explicit delivery so concurrent domain updates are still exercised. `verifyFinalWorkflows` now disposes the background runtime and native bridge in `finally`; disposal clears the deadline, removes handlers and terminates once. The outer existing catch can therefore capture failure JSON/PNG and close its context.
+
+RED unit command: `node --test test/held-worker-reply.test.js`, exit 1: 3 tests, 0 pass, 3 fail, duration 138.5989 ms. Expected missing bounded-reply function assertion failed in all three cases.
+
+Added `tools/verify-final-workflow-worker.mjs` to exercise the actual acceptance function, not a duplicate test implementation. It routes the real social Worker to an executing error or a silent script, then runs the unchanged real-success case. A separate 10-second probe guard protects RED reproduction; a hit forces context closure and is a test failure. The successful case has a 90-second probe guard and does no frame profiling.
+
+Native command/environment, used once each with distinct output directories:
+
+```powershell
+$env:PLAYWRIGHT_MODULE_PATH='C:/Users/zubko/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright'
+$env:PLAYWRIGHT_CHROMIUM_EXECUTABLE='C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
+$env:FT_QA_DIR='D:/Project/Battle/artifacts/task-11/worker-reply-review-red'
+node tools/verify-final-workflow-worker.mjs *> artifacts/task-11/worker-reply-review-red.log
+$env:FT_QA_DIR='D:/Project/Battle/artifacts/task-11/worker-reply-review-green'
+node tools/verify-final-workflow-worker.mjs *> artifacts/task-11/worker-reply-review-green.log
+```
+
+Native RED exited 1. Error case remained pending until the external guard at 10022.645 ms; silent case at 10023.8443 ms. Both produced `acceptance wait remained pending` failures; the external safety cleanup then closed their contexts. Real success passed in 35832.9082 ms. Full results/log retained in `worker-reply-review-red/` and its sibling log; none were overwritten by GREEN.
+
+Focused GREEN command:
+
+```powershell
+node --test test/held-worker-reply.test.js test/playtest-acceptance.test.js test/native-qa-cleanup.test.js
+node --check tools/qa/final-workflows.mjs
+node --check tools/verify-final-workflow-worker.mjs
+```
+
+Exit 0: 7 tests, 7 pass, 0 fail/skipped, duration 476.1399 ms. Cases verify explicit held delivery/one termination, asynchronous error rejection without handler throw, explicit 20 ms absent-reply deadline, existing late-domain state retention and server launch-failure cleanup. Both syntax checks passed.
+
+Native GREEN exited 0. Actual acceptance error path settled in 1717.6976 ms including fixture setup; silent path in 1168.7027 ms with the injected 250 ms reply deadline. Both captured the expected failure JSON and a nonempty PNG before closing their context; zero remaining browser contexts and no asynchronous page errors. Real success passed in 36367.7289 ms with all 20 pairs/40 plans/20 vocals, four exports, final 1113 judging records and literal reload intact. All five archive hashes match the prior v5 hashes exactly. `results.json` records all three passed cases, errors `[]`, serverClosed/browserClosed true. No outer safety guard fired in GREEN.
+
+Self-review: worker ownership stays inside QA; no production API/cache revision changes. Error/timeout always reach the existing failure artifact catch and context finally. Successful delivery still occurs only after captured concurrent export/download/phone/upload changes. This is a harness-only fix: per controller instruction, the full suite and broad native profiles were not repeated; the prior 1260/1260 full-suite evidence remains at the fix base. Scoped files for this fix: this report, QA document, `tools/qa/final-workflows.mjs`, new `tools/qa/held-worker-reply.js`, new `tools/verify-final-workflow-worker.mjs`, new `test/held-worker-reply.test.js`.
+
 ## Retained limitations and upstream evidence
 
 Task12 native results and limitations are carried verbatim in substance to the committed QA document: exact descriptor/export/prepared-PCM identity, existing ≤2e-7 final native graph variance, no subjective listening or byte-identical final WAV. Original28 raw files remain recoverable in the drums/bass/keys-leads role archives, intake verified empty by Task12. No independent regeneration was performed.
