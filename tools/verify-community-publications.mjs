@@ -25,7 +25,7 @@ try{
  const setup=await page.evaluate(async()=>{
   const [{topicFixture},{mountSocial},{resolveSocialRoute},{subscribeCommunity},{ensureSocialReactionPlans},api,{createVirtualPcState}]=await Promise.all([import('/test/helpers/round-topic-fixture.js'),import('/src/social-view.js?rev=42'),import('/src/social-routing.js?rev=42'),import('/src/social-state.js?rev=42'),import('/src/social-reactions.js?rev=42'),import('/src/social-community-publications.js?rev=42'),import('/src/virtual-pc-state.js?rev=42')]);
   const state=subscribeCommunity(topicFixture(),'makarevich-1',true,{nowMinute:13440}).state;
-  window.qa={state,now:19920,visible:true,api,createVirtualPcState,address:'',view:null};
+  window.qa={state,now:19920,visible:true,api,createVirtualPcState,topicFixture,subscribeCommunity,ensureSocialReactionPlans,address:'',view:null};
   qa.state=ensureSocialReactionPlans(qa.state,qa.now).state;qa.state=api.publishCommunityNotices(qa.state,qa.now).state;
   qa.mount=url=>{qa.view?.dispose();qa.address=url;qa.view=mountSocial(document.querySelector('main'),{route:resolveSocialRoute(url),getState:()=>qa.state,getMetadata:()=>({gameMinutes:qa.now,playerName:'Макаревич Battle'}),onChange:s=>{qa.state=s;return true;},navigate:qa.mount,isVisible:()=>qa.visible});};
   qa.mount('underweb://social/groups');
@@ -69,6 +69,23 @@ try{
  assert.equal(await page.evaluate(()=>qa.api.communityUnreadCounts(qa.state,{nowMinute:qa.now}).total),1);
  await page.evaluate(()=>{qa.visible=true;qa.view.update();});assert.equal(await page.evaluate(()=>qa.api.communityUnreadCounts(qa.state,{nowMinute:qa.now}).total),0);
  await page.setViewportSize({width:640,height:900});await page.screenshot({path:out+'/community-compact.png',fullPage:true});
- assert.deepEqual(errors,[]);console.log('PASS native group +2 badge, keyboard open/read, room phone notice and no already-read replay, durable queue retirement, static like/focus/reload, inline judge name link and no panel wording, community/person/self heading/name/avatar routing, hidden/visible read, reduced motion, SVG MIME/decode; origin '+base);
+ await page.setViewportSize({width:1280,height:900});
+ for(const [duration,lastAt]of [[120,13543],[20160,32160]]){
+  await page.evaluate(({duration,lastAt})=>{let s=qa.topicFixture();s.tournaments.byId['makarevich-1'].rounds['round-2'].closesAt=13440+duration;s.roundThemes['makarevich-1:round-2'].closesAt=13440+duration;qa.state=qa.subscribeCommunity(s,'makarevich-1',true,{nowMinute:13440}).state;qa.now=lastAt-1;qa.state=qa.ensureSocialReactionPlans(qa.state,qa.now).state;qa.state=qa.api.publishCommunityNotices(qa.state,qa.now).state;qa.mount('underweb://social/groups');},{duration,lastAt});
+  assert.equal(await page.locator('[data-social-section="groups"] .sn-unread-badge').innerText(),'+2');
+  await page.evaluate(lastAt=>{qa.now=lastAt;qa.state=qa.ensureSocialReactionPlans(qa.state,qa.now).state;qa.state=qa.api.publishCommunityNotices(qa.state,qa.now).state;qa.view.update();},lastAt);
+  assert.equal(await page.locator('[data-social-section="groups"] .sn-unread-badge').innerText(),'+3');
+  await page.locator('.sn-group-card').getByRole('button',{name:'Макаревич Battle',exact:true}).click();
+  assert.equal(await page.locator('[data-reaction-post="announce:judge:klim-propavshiy"]').count(),1);assert.equal(await page.locator('.sn-post > p > a[href="underweb://social/profile/klim-propavshiy"]').count(),1);
+  assert.equal(await page.evaluate(()=>qa.state.phone.queue.length),0);await page.screenshot({path:out+'/cadence-'+duration+'-minutes.png',fullPage:true});
+ }
+ const beforeAssignment=await page.evaluate(()=>{let s=qa.topicFixture(),t=s.tournaments.byId['makarevich-1'];t.rounds.final={...t.rounds['round-2'],roundId:'final',opensAt:30000,closesAt:40080};s.roundThemes['makarevich-1:final']={...s.roundThemes['makarevich-1:round-2'],id:'makarevich-1:final',roundId:'final',opensAt:30000,closesAt:40080};t.events.push({id:'final',type:'round-announced',battleId:t.battleId,roundId:'final',dueAt:30000,themeId:'makarevich-1:final'});qa.now=34499;qa.state=qa.subscribeCommunity(s,'makarevich-1',true,{nowMinute:qa.now}).state;qa.state=qa.ensureSocialReactionPlans(qa.state,qa.now).state;qa.mount('underweb://social/groups');return qa.api.publicAnnouncedJudges(qa.state,{battleId:t.battleId,roundId:'final',nowMinute:qa.now}).map(j=>j.id);});
+ assert.deepEqual(beforeAssignment,['eparhiya']);
+ await page.evaluate(()=>{qa.now=34500;qa.state=qa.ensureSocialReactionPlans(qa.state,qa.now).state;qa.state=qa.api.publishCommunityNotices(qa.state,qa.now).state;qa.view.update();qa.phoneContext.pcPhase='room';qa.phoneContext.nowMinute=qa.now;qa.phone.update();});
+ assert.equal(await page.locator('[data-social-section="groups"] .sn-unread-badge').innerText(),'+1');assert.match(await page.locator('.bl-phone-body').innerText(),/тридцать третий/);
+ assert.deepEqual(await page.evaluate(()=>qa.state.phone.queue.map(p=>p.id)),['community-post:final:judge:thirty-third']);
+ await page.evaluate(()=>{qa.phoneContext.pcPhase='desktop';qa.phone.update();});await page.locator('.sn-group-card').getByRole('button',{name:'Макаревич Battle',exact:true}).click();
+ const returning=page.locator('.sn-post').filter({has:page.locator('[data-reaction-post="final:judge:thirty-third"]')}).locator('p > a');assert.equal(await returning.innerText(),'тридцать третий');await returning.focus();await page.keyboard.press('Enter');assert.equal(await page.evaluate(()=>qa.address),'underweb://social/profile/thirty-third');assert.equal(await page.evaluate(()=>qa.state.phone.queue.length),0);
+ assert.deepEqual(errors,[]);console.log('PASS native short/long deadline cadence boundaries, current-round returning assignment/notice/inline link, group +2 badge, keyboard open/read, room phone notice and no already-read replay, durable queue retirement, static like/focus/reload, inline judge name link and no panel wording, community/person/self heading/name/avatar routing, hidden/visible read, reduced motion, SVG MIME/decode; origin '+base);
  await page.evaluate(()=>{qa.view.dispose();qa.phone.dispose();});await context.close();
 }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}

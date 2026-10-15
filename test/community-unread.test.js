@@ -65,3 +65,16 @@ test('published judge name itself is a semantic profile link inside the announce
  const announcement=allPc(root).find(n=>n.dataset?.reactionPost==='announce:judge:eparhiya').parentElement;
  const link=allPc(announcement.children[2]).find(n=>n.tagName==='A');assert.ok(link);assert.equal(link.textContent,'епархия');assert.equal(link.getAttribute('href'),'underweb://social/profile/eparhiya');view.dispose();
 });
+test('cadence quarantine cannot advance the unread baseline or create a phone flood',()=>{
+ let s=topicFixture();s.social.subscriptions=[id];s.social.communityPublications={version:99,legacyCutoff:'bad'};s.socialRuntime.lastMinute=13440;s=createVirtualPcState(s);
+ for(const minute of [13440,19920,30000]){s.socialRuntime.lastMinute=minute;assert.equal(api.communityUnreadCounts(s,{nowMinute:minute}).total,1);s=api.publishCommunityNotices(s,minute).state;assert.deepEqual(s.phone.queue.map(e=>e.id),['community-post:announce']);}
+ s=api.markCommunitySeen(s,opts(30000)).state;s.socialRuntime.lastMinute=40000;
+ assert.equal(api.communityUnreadCounts(s,{nowMinute:40000}).total,0);assert.equal(api.publishCommunityNotices(s,40000).state.phone.queue.length,0);
+});
+test('a returning judge current-round announcement has one durable notice and clears on read',()=>{
+ let s=topicFixture(),t=s.tournaments.byId[id];t.rounds.final={...t.rounds['round-2'],roundId:'final',opensAt:30000,closesAt:40080};s.roundThemes[id+':final']={...s.roundThemes[id+':round-2'],id:id+':final',roundId:'final',opensAt:30000,closesAt:40080};t.events.push({id:'final',type:'round-announced',battleId:id,roundId:'final',dueAt:30000,themeId:id+':final'});
+ s=subscribeCommunity(s,id,true,{nowMinute:34499}).state;s=api.publishCommunityNotices(s,34500).state;
+ assert.equal(api.communityUnreadCounts(s,{nowMinute:34500}).total,1);assert.deepEqual(s.phone.queue.map(e=>e.id),['community-post:final:judge:thirty-third']);
+ s=api.publishCommunityNotices(createVirtualPcState(s),34500).state;assert.equal(s.phone.queue.length,1);
+ s=api.markCommunitySeen(s,opts(34500)).state;assert.equal(s.phone.queue.length,0);assert.equal(api.communityUnreadCounts(s,{nowMinute:34500}).total,0);
+});

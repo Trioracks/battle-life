@@ -7,7 +7,17 @@ import {SOCIAL_IDENTITY} from './social-identity.js?rev=42';
 
 const record=v=>v&&typeof v==='object'&&!Array.isArray(v);
 const ordered=(a,b)=>a.at-b.at||a.id.localeCompare(b.id);
-const cutoff=state=>state.social?.communityPublications?.legacyCutoff??(validGameMinute(state.socialRuntime?.lastMinute)?state.socialRuntime.lastMinute:0);
+const validCadence=p=>p?.version===1&&validGameMinute(p.legacyCutoff);
+const quarantined=state=>state.social?.communityPublicationRecovery?.some(r=>r.id==='cadence')||state.social?.communityPublications!=null&&!validCadence(state.social.communityPublications);
+const cutoff=state=>quarantined(state)?null:validCadence(state.social?.communityPublications)?state.social.communityPublications.legacyCutoff:validGameMinute(state.socialRuntime?.lastMinute)?state.socialRuntime.lastMinute:0;
+const savedJudgePost=(state,id)=>{const p=state.socialReactions?.plans?.[id];return p?.version===1&&p.postId===id&&p.context==='judge-announcement'&&validGameMinute(p.startAt)?p:null;};
+function judgePublicationMinute(opensAt,closesAt,index,count){
+ const duration=closesAt-opensAt;if(!validGameMinute(closesAt)||duration<=0)return null;
+ // Preserve the seven-day offsets proportionally in shorter windows. Longer
+ // windows retain +6h for the first post and deadline minus one day for the last.
+ const scale=Math.min(1,duration/(7*1440)),first=opensAt+360*scale,last=closesAt-1440*scale;
+ return Math.max(opensAt,Math.min(closesAt-Math.min(1,duration/7),Math.round(first+(count>1?index*(last-first)/(count-1):0))));
+}
 // Additive save fields: invalid records are retained for recovery, never guessed.
 export function normalizeCommunityPublicationState(raw={}){
  const recovery=Array.isArray(raw.communityPublicationRecovery)?structuredClone(raw.communityPublicationRecovery):[],communityReads={};
@@ -28,21 +38,25 @@ export function publicCommunityPosts(state,{communityId,nowMinute}={}){
  const c=communityById(communityId);if(!c||!validGameMinute(nowMinute))return [];
  const authorName=c.name+' · организаторы',base={communityId:c.id,authorId:c.id,authorName},posts=c.history.map(p=>({...base,authorName:c.name,id:p.id,at:0,kind:'static',body:p.body}));
  if(!c.battleId)return posts.sort(ordered);
- const seen=new Set(),legacyCutoff=cutoff(state),announcements=publicRoundAnnouncements(state,{battleId:c.battleId,nowMinute});
+ const seen=new Set(),legacyCutoff=cutoff(state),recovering=quarantined(state),announcements=publicRoundAnnouncements(state,{battleId:c.battleId,nowMinute});
  // Pre-theme saves already exposed these panels. Keep that public evidence only
  // through the saved cutoff; never use a future or damaged theme as a disclosure.
- for(const e of state.tournaments?.byId?.[c.battleId]?.events??[])if(e.type==='round-announced'&&validGameMinute(e.dueAt)&&e.dueAt<=Math.min(nowMinute,legacyCutoff)&&!announcements.some(p=>p.id===e.id))announcements.push({id:e.id,at:e.dueAt,roundId:e.roundId});
+ for(const e of state.tournaments?.byId?.[c.battleId]?.events??[])if(e.type==='round-announced'&&validGameMinute(e.dueAt)&&e.dueAt<=nowMinute&&!announcements.some(p=>p.id===e.id)){
+  const hasEvidence=recovering&&(state.tournaments.byId[c.battleId].rounds?.[e.roundId]?.judgeIds??[]).some(id=>savedJudgePost(state,e.id+':judge:'+id));
+  if(legacyCutoff!==null&&e.dueAt<=legacyCutoff||hasEvidence)announcements.push({id:e.id,at:e.dueAt,roundId:e.roundId});
+ }
  for(const p of announcements.sort(ordered)){
   const round=state.tournaments?.byId?.[c.battleId]?.rounds?.[p.roundId];if(!round)continue;
   const shared={...base,battleId:c.battleId,roundId:p.roundId};
   if(p.body)posts.push({...shared,id:p.id,at:p.at,kind:'round-theme',body:p.body,judgeId:p.authorJudgeId});
   const mode=state.tournaments.byId[c.battleId].bracket?.mode;
   if(p.roundId==='round-2'&&mode)posts.push({...shared,id:p.id+':seeding',at:p.at,kind:'seeding',body:'Пары опубликованы. '+(mode==='random'?'Случайный посев':mode==='opposite'?'Посев по отбору: встречный':'Посев по отбору: соседние места')+'. Дальше играем по фиксированной сетке, без перестановок.'});
-  const fresh=(round.judgeIds??[]).filter(id=>!seen.has(id)),first=p.at+360,last=Math.max(first,Math.min(p.at+6*1440,round.closesAt-1440));
-  for(const [index,judgeId]of fresh.entries()){
-   seen.add(judgeId);const id=p.id+':judge:'+judgeId,saved=state.socialReactions?.plans?.[id];
-   const old=p.at<=legacyCutoff,at=old?(validGameMinute(saved?.startAt)?saved.startAt:p.at):Math.round(first+(fresh.length>1?index*(last-first)/(fresh.length-1):0));
-   if(at>nowMinute)continue;
+  const old=legacyCutoff!==null&&p.at<=legacyCutoff,judges=[...new Set(round.judgeIds??[])].filter(id=>!old||!seen.has(id)||savedJudgePost(state,p.id+':judge:'+id));
+  for(const [index,judgeId]of judges.entries()){
+   seen.add(judgeId);const id=p.id+':judge:'+judgeId,saved=savedJudgePost(state,id);
+   if(recovering&&!saved)continue;
+   const at=saved?saved.startAt:old?p.at:judgePublicationMinute(p.at,round.closesAt,index,judges.length);
+   if(at===null||at>nowMinute)continue;
    const name=judgeProfile(judgeId)?.name??'Судья';
    const body=old?'В составе панели этого раунда — '+name+'. Страница открыта, отзывы появятся после окончания приёма.':[
     'Знакомим с судьёй раунда: '+name+'. Публичная страница доступна; отзывы будут опубликованы после приёма работ.',
@@ -56,14 +70,13 @@ export function publicCommunityPosts(state,{communityId,nowMinute}={}){
 }
 export function publicAnnouncedJudges(state,{battleId='makarevich-1',roundId,nowMinute}={}){
  const c=SOCIAL_COMMUNITIES.find(c=>c.battleId===battleId);if(!c)return [];
- const posts=publicCommunityPosts(state,{communityId:c.id,nowMinute}),round=state.tournaments?.byId?.[battleId]?.rounds?.[roundId];
- if(roundId&&!posts.some(p=>p.roundId===roundId&&['round-theme','judge-announcement'].includes(p.kind)))return [];
- const known=new Map();for(const p of posts)if(['round-theme','judge-announcement'].includes(p.kind)&&p.judgeId&&!known.has(p.judgeId))known.set(p.judgeId,{id:p.judgeId,name:judgeProfile(p.judgeId)?.name??'Судья',announcedAt:p.at,profileUrl:'underweb://social/profile/'+p.judgeId});
- return [...known.values()].filter(p=>!roundId||round?.judgeIds?.includes(p.id));
+ const posts=publicCommunityPosts(state,{communityId:c.id,nowMinute});
+ const known=new Map();for(const p of posts)if((!roundId||p.roundId===roundId)&&['round-theme','judge-announcement'].includes(p.kind)&&p.judgeId&&!known.has(p.judgeId))known.set(p.judgeId,{id:p.judgeId,name:judgeProfile(p.judgeId)?.name??'Судья',announcedAt:p.at,profileUrl:'underweb://social/profile/'+p.judgeId});
+ return [...known.values()];
 }
 const cursorFor=(posts,at)=>({at,ids:posts.filter(p=>p.at===at).map(p=>p.id).sort()});
 const unread=(post,cursor)=>post.at>cursor.at||post.at===cursor.at&&!cursor.ids.includes(post.id);
-const readCursor=(state,id)=>state.social?.communityReads?.[id]??cursorFor(publicCommunityPosts(state,{communityId:id,nowMinute:cutoff(state)}),cutoff(state));
+const readCursor=(state,id)=>{const baseline=cutoff(state)??0;return state.social?.communityReads?.[id]??cursorFor(publicCommunityPosts(state,{communityId:id,nowMinute:baseline}),baseline);};
 export function ensureCommunityPublications(state,nowMinute){
  if(!validGameMinute(nowMinute)||state.social?.communityPublications)return {state,changed:false};
  const social={...state.social,...normalizeCommunityPublicationState(state.social)},legacyCutoff=cutoff(state);
