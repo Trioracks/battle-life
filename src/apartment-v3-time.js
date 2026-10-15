@@ -12,7 +12,9 @@ function validSnapshot(value) {
 }
 
 function validSleep(value) {
+  if (isRecord(value) && value.mode === 'manual') return positiveFinite(value.minutesPerSecond);
   return isRecord(value) && positiveFinite(value.minutes) && positiveFinite(value.seconds)
+    && (value.mode === undefined || value.mode === 'normal')
     && Number.isFinite(value.elapsedSeconds) && value.elapsedSeconds >= 0 && value.elapsedSeconds < value.seconds;
 }
 
@@ -46,7 +48,8 @@ export class ApartmentTime {
     this.lights = Object.fromEntries(['living','kitchen'].map(room=>[room,typeof saved.lights?.[room]==='boolean'?saved.lights[room]:true]));
     this.initialRest = typeof saved.initialRest === 'boolean' ? saved.initialRest : saved.day === 1 && saved.minutes >= 1410;
     if (validSleep(saved.sleep)) {
-      this.#setSleep(saved.sleep.minutes, saved.sleep.seconds, saved.sleep.elapsedSeconds);
+      if (saved.sleep.mode === 'manual') this.#setManualSleep(saved.sleep.minutesPerSecond);
+      else this.#setSleep(saved.sleep.minutes, saved.sleep.seconds, saved.sleep.elapsedSeconds);
     }
   }
 
@@ -56,8 +59,19 @@ export class ApartmentTime {
     this.initialRest = false;
   }
 
+  #setManualSleep(minutesPerSecond) {
+    this.#sleep = { mode: 'manual', minutesPerSecond };
+    this.initialRest = false;
+  }
+
   beginSleep(options = {}) {
     if (this.isSleeping || !isRecord(options)) return false;
+    if (options.mode === 'manual') {
+      if (!positiveFinite(options.minutesPerSecond)) return false;
+      this.#setManualSleep(options.minutesPerSecond);
+      return true;
+    }
+    if (options.mode !== undefined && options.mode !== 'normal') return false;
     const { minutes = 360, seconds = 8 } = options;
     if (!positiveFinite(minutes) || !positiveFinite(seconds)) return false;
     this.#setSleep(minutes, seconds);
@@ -85,6 +99,10 @@ export class ApartmentTime {
       return { sleepCompleted: false };
     }
     const sleep = this.#sleep;
+    if (sleep.mode === 'manual') {
+      this.advanceMinutes(dt * sleep.minutesPerSecond);
+      return { sleepCompleted: false };
+    }
     sleep.elapsedSeconds = Math.min(sleep.seconds, sleep.elapsedSeconds + dt);
     // Avoid requiring an extra frame because repeated fractional deltas sum a few ulps short.
     const completed = sleep.seconds - sleep.elapsedSeconds <= Number.EPSILON * Math.max(1, sleep.seconds) * 64;
@@ -117,15 +135,18 @@ export class ApartmentTime {
     if (this.mealReady) snapshot.mealReady = true;
     if (!this.lights.living || !this.lights.kitchen) snapshot.lights = {...this.lights};
     if (this.isSleeping) {
-      const { minutes, seconds, elapsedSeconds } = this.#sleep;
-      snapshot.sleep = { minutes, seconds, elapsedSeconds };
+      if (this.#sleep.mode === 'manual') snapshot.sleep = { ...this.#sleep };
+      else {
+        const { minutes, seconds, elapsedSeconds } = this.#sleep;
+        snapshot.sleep = { minutes, seconds, elapsedSeconds };
+      }
     }
     return snapshot;
   }
 
-  get isSleeping() { return this.#sleep !== null && this.#sleep.elapsedSeconds < this.#sleep.seconds; }
-  get sleepProgress() { return this.#sleep ? this.#sleep.elapsedSeconds / this.#sleep.seconds : 0; }
-  get sleepTargetLabel() { return this.#sleep ? timeLabel(this.#sleep.targetMinutes) : null; }
+  get isSleeping() { return this.#sleep !== null && (this.#sleep.mode === 'manual' || this.#sleep.elapsedSeconds < this.#sleep.seconds); }
+  get sleepProgress() { return this.#sleep && this.#sleep.mode !== 'manual' ? this.#sleep.elapsedSeconds / this.#sleep.seconds : 0; }
+  get sleepTargetLabel() { return this.#sleep && this.#sleep.mode !== 'manual' ? timeLabel(this.#sleep.targetMinutes) : null; }
   get light() { return homeLight(this.minutes); }
   get period() { return this.light.period; }
   get label() { return timeLabel(this.minutes); }

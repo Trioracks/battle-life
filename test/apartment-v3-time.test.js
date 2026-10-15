@@ -128,6 +128,38 @@ test('partial sleep survives a save and resumes only its remaining six real seco
   saveHomeTime(storage,restored);assert.equal(loadHomeTime(storage).isSleeping,false);
 });
 
+test('manual sleep keeps advancing through a week until an explicit wake',()=>{
+  const clock=new ApartmentTime({day:1,minutes:600});
+  assert.equal(clock.beginSleep({mode:'manual',minutesPerSecond:45}),true);
+  assert.deepEqual(clock.tick(224),{sleepCompleted:false});
+  assert.equal(clock.day,8);assert.equal(clock.minutes,600);assert.equal(clock.isSleeping,true);
+  assert.equal(clock.sleepTargetLabel,null);assert.equal(clock.sleepProgress,0);
+  assert.deepEqual(clock.snapshot().sleep,{mode:'manual',minutesPerSecond:45});
+  assert.equal(clock.cancelSleep(),true);clock.tick(4);
+  assert.equal(clock.isSleeping,false);assert.equal(clock.label,'10:01');
+});
+
+test('manual sleep survives finite JSON persistence without offline clock credit',()=>{
+  const data=new Map(),storage={setItem:(key,value)=>data.set(key,value),getItem:key=>data.get(key)??null};
+  const clock=new ApartmentTime({day:1,minutes:1315});clock.beginSleep({mode:'manual',minutesPerSecond:45});clock.tick(2);
+  assert.equal(saveHomeTime(storage,clock),true);
+  const restored=loadHomeTime(storage);
+  assert.equal(restored.label,'23:25');assert.equal(restored.isSleeping,true);
+  assert.deepEqual(restored.snapshot().sleep,{mode:'manual',minutesPerSecond:45});
+  assert.equal(JSON.stringify(restored.snapshot()).includes('null'),false);
+  restored.tick(2);assert.equal(restored.day,2);assert.equal(restored.label,'00:55');
+  restored.completeAction('bed');assert.equal(restored.isSleeping,false);
+});
+
+test('invalid manual rates and unknown modes cannot start or restore sleep',()=>{
+  const clock=new ApartmentTime({day:2,minutes:600});
+  for(const options of [{mode:'other'},{mode:'manual',minutesPerSecond:0},{mode:'manual',minutesPerSecond:-1},{mode:'manual',minutesPerSecond:Infinity},{mode:'manual',minutesPerSecond:'45'}]){
+    assert.equal(clock.beginSleep(options),false);assert.equal(clock.isSleeping,false);
+    const restored=new ApartmentTime({day:2,minutes:600,initialRest:false,sleep:options});
+    assert.equal(restored.isSleeping,false);assert.equal(restored.minutes,600);
+  }
+});
+
 test('invalid sleep parameters and tick deltas cannot poison the game clock',()=>{
   const clock=new ApartmentTime({day:2,minutes:600});
   assert.equal(typeof clock.beginSleep,'function');

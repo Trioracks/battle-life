@@ -97,7 +97,7 @@ test('installation ignores invalid deltas and pauses while powered off',()=>{
  assert.equal(software.advanceInstallation({...paused.state,power:'on'},8).state.software.client.installed,true);
 });
 
-test('saved installation resumes its elapsed seconds without credit from game time or offline time',()=>{
+test('loading installation reanchors game time without manufacturing offline progress',()=>{
  let s=startInstallation(createVirtualPcState({power:'on',software:{ft:{receivedBytes:800000000}}}),'ft');
  s=software.advanceInstallation(s,12.5).state;
  const raw=JSON.stringify(s),restored=loadVirtualPcState({getItem:()=>raw}).state;

@@ -86,7 +86,7 @@ export function advanceInstaller(input,{back=false}={}){
  if(w.step==='summary'){w.elapsedSeconds=0;w.error='';}
  if(w.step==='finish'){s.software.installer=null;return {...result(withSoftware(s,s.software)),openAppId:w.openAfterInstall?SOFTWARE[w.appId].desktopAppId:null};}w.step=steps[index+1];return result(withSoftware(s,s.software));
 }
-// Installation uses only active real-time deltas supplied by the host, never a saved clock.
+// Installation uses active elapsed seconds supplied by the host, never a saved clock.
 export function advanceInstallation(input,seconds){
  const s=copy(input),w=s.software.installer,tick={...result(s),advancedSeconds:0,completed:false};
  if(!Number.isFinite(seconds)||seconds<=0||s.power!=='on'||w?.step!=='install')return tick;

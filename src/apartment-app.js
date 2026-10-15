@@ -1,7 +1,7 @@
 import {ApartmentMotion} from './apartment-v3-motion.js?rev=42';
 import {ApartmentTime,loadHomeTime,saveHomeTime as saveHomeTimeRaw} from './apartment-v3-time.js?rev=42';
 import {districts,getDistrictLocations} from './calikfornia.js?rev=42';
-import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction} from './apartment-v3-runtime.js?rev=42';
+import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction,consumeHomeFood} from './apartment-v3-runtime.js?rev=42';
 import {playSoundCue} from './sound-cues.js?rev=42';
 import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=42';
 import {DEFAULT_APPEARANCE,loadProfile,saveProfile} from './avatar-v3-profile.js?rev=42';
@@ -17,6 +17,7 @@ import {playIndoorFootstep} from './indoor-footsteps.js?rev=42';
 import {createFootstepCadence} from './footstep-cadence.js?rev=42';
 import {restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=42';
 import {advanceInstallation} from './pc-software.js?rev=42';
+import {installationElapsedSeconds} from './pc-installation-clock.js?rev=42';
 import {advanceBrowserDownloads} from './pc-browser-downloads.js?rev=42';
 import {createBeatWorkPanel} from './beat-work-view.js?rev=42';
 import {normalizeGenreProgression,genreById,genreCap} from './genre-progression.js?rev=42';
@@ -28,7 +29,6 @@ import {pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?r
 import {pauseStudy} from './rap-analysis.js?rev=42';
 import {effectiveVocalSkill} from './vocal-production.js?rev=42';
 import {effectiveWritingSkill} from './lyric-production.js?rev=42';
-import {consumeFood} from './home-food.js?rev=42';
 import {createCharacterSpeech,workNeedSpeech} from './character-speech.js?rev=42';
 import {mountHomeNeedsView,mountCharacterSpeech} from './home-needs-view.js?rev=42';
 import {migrateNoviceSave} from './home-profile-migration.js?rev=42';
@@ -82,7 +82,7 @@ try{
   const speech=createCharacterSpeech({beep:()=>{if(audio?.state==='running'&&!document.hidden)playSoundCue('speech',audio);}}),speechView=mountCharacterSpeech(speechRoot);
   const fridgeView=mountHomeNeedsView(fridgeRoot,{
     returnFocus:canvas,onClose:()=>{if(motion.actionId==='fridge'&&motion.phase==='perform')motion.leaveAction();last=performance.now();},
-    onConsume:id=>{const result=consumeFood(pcState,id);if(result.ok){persistPc(result.state);virtualPc.syncState(pcState);}fridgeView.update(pcState,pcStorageWarning);},
+    onConsume:id=>{const result=consumeHomeFood(pcState,id,{persist:next=>persistPc(next,{atomic:true}),cue});if(result.ok)virtualPc.syncState(pcState);fridgeView.update(pcState,pcStorageWarning);},
   });
   const wardrobeRoot=document.createElement('section');document.body.append(wardrobeRoot);
   const wardrobeView=mountHomeWardrobeView(wardrobeRoot,{
@@ -251,23 +251,33 @@ try{
   for(const district of districts){const b=document.createElement('button');b.textContent=district.name;b.dataset.district=district.id;b.addEventListener('click',()=>showDistrict(district.id));$('#districts').append(b);}
   showDistrict('north-sloboda');
   $('#return-home').addEventListener('click',()=>{if(motion.returnHome()){setMode('game');resumeAnimation();cue('door');}});
-  function act(id){if(homeModalOpen()||pcLifecycle.pending||pcLifecycle.snapshot.phase!=='room')return;resumeAnimation();if(id==='computer'&&workBlockReason(pcState)){message=workBlockReason(pcState);messageUntil=performance.now()+6000;speech.say(workNeedSpeech(pcState));return;}if(id==='entry'){if(!motion.busy)setMode('door');return;}const result=id==='computer'?{allowed:beginPcCutscene(motion)}:startHomeAction(motion,homeTime,id);if(result.allowed){if(id==='computer'){pcPrepareError=false;virtualPc.prepareAudio();pcSounds.unlock().catch(()=>{});pcLifecycle.prepare();}}else if(result.reason){message=result.reason;messageUntil=performance.now()+5000;}}
+  function act(id,sleepOptions){if(homeModalOpen()||pcLifecycle.pending||pcLifecycle.snapshot.phase!=='room')return;resumeAnimation();if(id==='computer'&&workBlockReason(pcState)){message=workBlockReason(pcState);messageUntil=performance.now()+6000;speech.say(workNeedSpeech(pcState));return;}if(id==='entry'){if(!motion.busy)setMode('door');return;}const result=id==='computer'?{allowed:beginPcCutscene(motion)}:startHomeAction(motion,homeTime,id,sleepOptions);if(result.allowed){if(id==='computer'){pcPrepareError=false;virtualPc.prepareAudio();pcSounds.unlock().catch(()=>{});pcLifecycle.prepare();}}else if(result.reason){message=result.reason;messageUntil=performance.now()+5000;}}
   $('#door-peek').addEventListener('click',()=>{setMode('game');act('peephole');});
   $('#door-exit').addEventListener('click',()=>{setMode('game');resumeAnimation();motion.interact('entry');});
   $('#door-cancel').addEventListener('click',()=>setMode('game'));
   function stopPeeking(){setMode('game');if(motion.actionId==='peephole'&&motion.phase==='perform')motion.leaveAction();}
   $('#peek-close').addEventListener('click',stopPeeking);
-  for(const [id,label] of Object.entries({dining:'Обеденный стол',computer:'Компьютер',wardrobe:'Шкаф',bed:'Кровать',sink:'Посуда',stove:'Плита',fridge:'Холодильник',passage:'Другая комната',entry:'Входная дверь','light-living':'Выключатель в комнате','light-kitchen':'Выключатель на кухне'})){
+  let actionMenuContext=null;
+  function openActionMenu(context=null){
+    if(homeModalOpen()||motion.busy||pcLifecycle.pending||pcLifecycle.snapshot.phase!=='room')return;
+    actionMenuContext=context;
+    for(const b of $('#actions').children){b.hidden=context==='bed'?b.dataset.action!=='bed':b.dataset.sleepMode==='manual';if(b.dataset.action==='bed'&&b.dataset.sleepMode!=='manual')b.textContent=context==='bed'?'Лечь спать':b.dataset.label;}
+    $('#apartment-actions').setAttribute('aria-label',context==='bed'?'Кровать: варианты сна':'Действия в квартире');$('#apartment-actions').hidden=false;
+    $('#actions button:not([hidden]):not(:disabled)')?.focus();
+  }
+  for(const [key,label] of Object.entries({dining:'Обеденный стол',computer:'Компьютер',wardrobe:'Шкаф',bed:'Кровать','bed-manual':'Спать до пробуждения (тест)',sink:'Посуда',stove:'Плита',fridge:'Холодильник',passage:'Другая комната',entry:'Входная дверь','light-living':'Выключатель в комнате','light-kitchen':'Выключатель на кухне'})){
+    const id=key==='bed-manual'?'bed':key,manual=key==='bed-manual';
     if(!config.actions[id])continue;
-    const b=document.createElement('button');b.textContent=label;b.dataset.action=id;b.addEventListener('click',()=>{$('#apartment-actions').hidden=true;act(id);canvas.focus();});
+    const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.label=label;b.dataset.action=id;if(manual){b.dataset.sleepMode='manual';b.hidden=true;}
+    b.addEventListener('click',()=>{if(id==='bed'&&actionMenuContext!=='bed'){openActionMenu('bed');return;}$('#apartment-actions').hidden=true;act(id,manual?{mode:'manual',minutesPerSecond:45}:undefined);canvas.focus();});
     if(config.actions[id]?.lightRoom)b.setAttribute('aria-label',label);
     $('#actions').append(b);
   }
-  canvas.addEventListener('pointerdown',e=>{if(homeModalOpen()||!lookInput.canPick(e)||cameraFade||mode!=='game')return;const hit=view.pick(e);resumeAnimation();if(hit.id)act(hit.id);else if(hit.hero)motion.faceCamera();else if(Number.isFinite(hit.x))moveInRoom(motion,pcLifecycle,hit.x);});
+  canvas.addEventListener('pointerdown',e=>{if(homeModalOpen()||!lookInput.canPick(e)||cameraFade||mode!=='game')return;const hit=view.pick(e);resumeAnimation();if(hit.id==='bed')openActionMenu('bed');else if(hit.id)act(hit.id);else if(hit.hero)motion.faceCamera();else if(Number.isFinite(hit.x))moveInRoom(motion,pcLifecycle,hit.x);});
   canvas.addEventListener('pointermove',e=>{if(mode!=='game'){canvas.style.cursor='default';return;}const delta=lookInput.move(e);if(delta){view.modes.look(...delta);canvas.style.cursor='grabbing';$('#hover-label').textContent='';return;}const hit=view.pick(e);canvas.style.cursor=hit.id||hit.hero?'pointer':'crosshair';
     const action=config.actions[hit.id];$('#hover-label').textContent=action?.lightRoom?(homeTime.lights[action.lightRoom]?'Выключить':'Включить')+' свет '+(action.lightRoom==='living'?'в комнате':'на кухне'):action?.label??(hit.hero?'Повернуться к камере':'');});
   canvas.addEventListener('pointerleave',()=>$('#hover-label').textContent='');
-  canvas.addEventListener('keydown',e=>{if(mode==='game'&&!homeModalOpen()&&pcLifecycle.snapshot.phase==='room'&&['Enter',' '].includes(e.key)){e.preventDefault();$('#apartment-actions').hidden=false;$('#actions button:not(:disabled)')?.focus();}});
+  canvas.addEventListener('keydown',e=>{if(mode==='game'&&!homeModalOpen()&&pcLifecycle.snapshot.phase==='room'&&['Enter',' '].includes(e.key)){e.preventDefault();openActionMenu();}});
   $('#close-apartment-actions').addEventListener('click',()=>{$('#apartment-actions').hidden=true;canvas.focus();});
   $('#rig-toggle').addEventListener('click',()=>{if(!debug)return;$('#inspector').hidden=!$('#inspector').hidden;$('#rig-toggle').setAttribute('aria-expanded',String(!$('#inspector').hidden));});
   $('#show-bones').addEventListener('change',e=>skeleton=e.target.checked);$('#hold').addEventListener('change',e=>hold=e.target.checked);
@@ -275,6 +285,16 @@ try{
   $('#step').addEventListener('click',()=>{paused=true;$('#pause').textContent='Продолжить';update(1/30,performance.now(),true);});$('#face').addEventListener('click',()=>motion.faceCamera());
   document.addEventListener('keydown',e=>{if(e.defaultPrevented||e.key!=='Escape')return;if(!$('#apartment-actions').hidden){$('#apartment-actions').hidden=true;canvas.focus();e.preventDefault();}else if(mode==='peephole')stopPeeking();else if(mode==='door')setMode('game');else if(mode==='pc')virtualPc.closeWindow();else if(mode==='game')setMode('menu');});
   function update(dt,now,step=false){
+    const installationMinuteBefore=gameMinuteStamp(homeTime),installationRunning=pcState.software.installer?.step==='install';
+    function tickInstallation(){
+      if(!installationRunning||pcState.software.installer?.step!=='install')return;
+      const seconds=installationElapsedSeconds({activeSeconds:dt,advancedGameMinutes:gameMinuteStamp(homeTime)-installationMinuteBefore,powered:pcState.power==='on',paused:!['game','pc'].includes(mode)||(paused&&!step)||document.hidden||homeModalOpen()});
+      if(seconds<=0)return;
+      const installation=advanceInstallation(pcState,seconds);
+      if(installation.completed||!installation.ok||now-lastInstallationSave>=1000){persistPc(installation.state,{atomic:true});lastInstallationSave=now;}
+      else pcState=installation.state;
+      virtualPc.syncState(pcState);
+    }
     const browserPaused=!['game','pc'].includes(mode)||(paused&&!step)||document.hidden;
     const browserDownload=advanceBrowserDownloads(pcState,{activeSeconds:dt,powered:pcState.power==='on',paused:browserPaused});
     if(browserDownload.changed){
@@ -289,19 +309,14 @@ try{
     if(mode!=='game'||cameraFade||document.hidden){speech.tick(0,{present:false});speechView.update(speech.snapshot);}
     cameraLabel();
     view.setComputerPresentation(pcLifecycle.snapshot,pcState,profile?.name??'Игрок');
-    // Installation belongs to the powered PC, including while room dialogs are open.
-    if(['game','pc'].includes(mode)&&(!paused||step)&&!document.hidden&&pcState.power==='on'&&pcState.software.installer?.step==='install'){
-      const installation=advanceInstallation(pcState,dt);pcState=installation.state;virtualPc.syncState(pcState);
-      if(installation.completed||!installation.ok||now-lastInstallationSave>=1000){persistPc(pcState);lastInstallationSave=now;}
-    }
-    if(cameraFade){view.render(motion,0,{paused:true});return;}
+    if(cameraFade){tickInstallation();view.render(motion,0,{paused:true});return;}
     view.setRoomLights(homeTime.lights);
     if(mode==='creator'){
       const delta=Math.atan2(Math.sin(previewTarget-previewYaw),Math.cos(previewTarget-previewYaw));previewYaw+=delta*(1-Math.exp(-dt*9));
       $('#preview-zoom').value=creator.selection.zoom;
       view.renderPreview(dt,previewYaw,$('#preview-stage').getBoundingClientRect(),creator.selection.zone,creator.selection.zoom);return;
     }
-    if(wardrobeView.isOpen){view.renderPreview(dt,wardrobeView.yaw,wardrobeView.previewRect,'body',1);return;}
+    if(wardrobeView.isOpen){tickInstallation();view.renderPreview(dt,wardrobeView.yaw,wardrobeView.previewRect,'body',1);return;}
     if(mode==='peephole'){view.renderPeephole($('#peek-stage').getBoundingClientRect());return;}
     if(mode==='menu'||mode==='destinations'||mode==='door'){view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));view.render(motion,0,{paused:true});return;}
     let events=[];
@@ -337,6 +352,9 @@ try{
       }
       socialBackground.tick(gameMinuteStamp(homeTime),{heroSkills:profile?.skills},now);
     }
+    // One powered host tick follows accepted world advancement; game minutes and
+    // frame seconds are alternatives, so accelerated sleep cannot count twice.
+    tickInstallation();
     for(const event of events){
       view.modes.onMotionEvent(event);cameraLabel();
       if(sounds[event.id]&&(event.type==='swap'||(event.type==='started'&&!config.actions[event.id].fade)))cue(sounds[event.id]);
@@ -401,8 +419,10 @@ try{
     if(debug)$('#state').textContent=`${motion.phase} · ${motion.clip} · x ${motion.position[0].toFixed(2)} · камера ${motion.cameraX.toFixed(2)} · ${Math.round(motion.yaw*180/Math.PI)}° · дверь ${Math.round(motion.doorOpen*100)}% · ${Math.round(frameRate)} FPS`;
     $('#controls').hidden=mode!=='game'||!motion.sleeping&&!motion.actionId&&now>=messageUntil;
     $('#wake').hidden=!motion.sleeping;
-    $('#sleep-progress').hidden=!motion.sleeping;$('#sleep-progress').value=homeTime.sleepProgress;
-    if(motion.sleeping)status.textContent=`Сон · до ${homeTime.sleepTargetLabel??'утра'} · время идёт быстрее${hold?' · осмотр приостановил время':''}`;
+    const manualSleep=homeTime.isSleeping&&homeTime.sleepTargetLabel===null;
+    $('#wake').textContent=manualSleep?'Проснуться':'Проснуться раньше';
+    $('#sleep-progress').hidden=!motion.sleeping||manualSleep;$('#sleep-progress').value=homeTime.sleepProgress;
+    if(motion.sleeping)status.textContent=`Сон · ${manualSleep?'до пробуждения (тест)':'до '+(homeTime.sleepTargetLabel??'утра')} · время идёт быстрее${hold?' · осмотр приостановил время':''}`;
     else if(motion.phase.startsWith('entry-'))status.textContent=motion.phase.startsWith('entry-return')||motion.phase==='entry-close'?'Возвращается домой…':'Выходит из квартиры…';
     else if(motion.phase.startsWith('return'))status.textContent=motion.actionId==='bed'?'Просыпается…':'Заканчивает действие…';
     else if(motion.phase==='perform')status.textContent=names[motion.actionId]+' · клик по полу — закончить';

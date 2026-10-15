@@ -8,7 +8,7 @@ export class ApartmentMotion {
     this.config=config;this.position=[...config.spawn];this.yaw=0;this.targetYaw=0;
     this.phase='idle';this.clip='idle';this.actionId=null;this.targetX=this.position[0];
     this.fade=0;this.phaseTime=0;this.walkDistance=0;this.doorOpen=0;this.events=[];
-    this.doorAuthorized=false;this.sleeping=false;this.entryOpen=0;this.outside=false;
+    this.doorAuthorized=false;this.sleeping=false;this.entryOpen=0;this.outside=false;this.sleepOptions=null;
   }
   get cameraX(){return this.position[0];}
   get action(){return this.config.actions[this.actionId]??null;}
@@ -18,7 +18,8 @@ export class ApartmentMotion {
     return offset>=min&&offset<=max;
   }
   setPhase(phase){this.phase=phase;this.phaseTime=0;}
-  startWalk(x,id=null){
+  startWalk(x,id=null,sleepOptions=null){
+    this.sleepOptions=id==='bed'?sleepOptions:null;
     this.actionId=id;this.targetX=clamp(x,...this.config.bounds);this.setPhase('walk');
     const from=this.position[0]-this.config.doorX,to=this.targetX-this.config.doorX;
     if(from*to<0||(from===0&&to!==0))this.doorAuthorized=true;
@@ -34,20 +35,20 @@ export class ApartmentMotion {
     }else this.startWalk(x);
     return true;
   }
-  interact(id){
+  interact(id,sleepOptions=null){
     if(this.busy)return false;
     const a=this.config.actions[id];if(!a)return false;
     if(a.crossRoom)return this.move(this.position[0]>this.config.doorX ? -1.5 : 1.5);
     if(this.phase==='perform'){
-      this.pending={x:a.approach[0],id};this.leaveAction();
-    }else this.startWalk(a.approach[0],id);
+      this.pending={x:a.approach[0],id,sleepOptions};this.leaveAction();
+    }else this.startWalk(a.approach[0],id,sleepOptions);
     return true;
   }
   faceCamera(){if(this.phase!=='idle')return;this.targetYaw=0;this.setPhase('face');}
   startSleeping(){
     const bed=this.config.actions.bed;if(!bed)return false;
     this.actionId='bed';this.position=[...bed.pose];this.yaw=this.targetYaw=bed.yaw;
-    this.targetX=this.position[0];this.fade=0;this.pending=null;this.sleeping=true;
+    this.targetX=this.position[0];this.fade=0;this.pending=null;this.sleeping=true;this.sleepOptions=null;
     this.doorAuthorized=false;this.doorOpen=0;this.events=[];this.startPerform();
     return true;
   }
@@ -76,12 +77,13 @@ export class ApartmentMotion {
     this.actionId=null;this.clip='idle';
   }
   finishReturn(){
-    this.setPhase('idle');if(this.pending){const p=this.pending;this.pending=null;this.startWalk(p.x,p.id);}
+    this.setPhase('idle');if(this.pending){const p=this.pending;this.pending=null;this.startWalk(p.x,p.id,p.sleepOptions);}
   }
   startPerform(){
     if(this.actionId==='bed'&&this.action.clockDriven)this.sleeping=true;
     this.interactionTriggered=false;
-    this.clip=this.action.clip;this.setPhase('perform');this.events.push({type:'started',id:this.actionId});
+    this.clip=this.action.clip;this.setPhase('perform');
+    const event={type:'started',id:this.actionId};if(this.actionId==='bed'&&this.sleepOptions)event.sleepOptions={...this.sleepOptions};this.events.push(event);
   }
   drainEvents(){return this.events.splice(0);}
   tick(rawDelta,holdAction=false){

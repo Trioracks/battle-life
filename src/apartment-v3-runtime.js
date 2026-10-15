@@ -1,14 +1,23 @@
 import {advanceApartmentFrame} from './apartment-v3-frame.js?rev=42';
 import {wardrobeAction} from './home-wardrobe.js?rev=42';
+import {consumeFood} from './home-food.js?rev=42';
 
 import {advanceVirtualPc,advanceVirtualPcDurably} from './virtual-pc-runtime.js?rev=42';
 
 export function canStartHomeAction(id,clock){
   return id==='dining'&&!clock.mealReady?{allowed:false,reason:'Сначала приготовь еду на плите'}:{allowed:true,reason:''};
 }
-export function startHomeAction(motion,clock,id){
+export function startHomeAction(motion,clock,id,sleepOptions){
   const check=canStartHomeAction(id,clock);
-  return check.allowed?{allowed:motion.interact(id),reason:''}:check;
+  return check.allowed?{allowed:motion.interact(id,sleepOptions),reason:''}:check;
+}
+
+export function consumeHomeFood(state,id,{persist=()=>false,cue=()=>{}}={}){
+  const result=consumeFood(state,id);if(!result.ok)return result;
+  let saved=false;try{const value=persist(result.state);saved=value===true||value?.ok===true;}catch{/* Retain the previous meal on a failed save. */}
+  if(!saved)return {ok:false,reason:'save-failed',state};
+  try{cue('crunch');}catch{/* Optional audio cannot undo a durable meal. */}
+  return result;
 }
 
 export function prepareApartmentConfig(exported){
@@ -24,7 +33,7 @@ export function advanceHomeFrame(motion,clock,dt,hold=false){
   const elapsed=advanceApartmentFrame(motion,dt,hold),events=motion.drainEvents();
   for(const event of events){
     if(event.type==='interacted')clock.toggleRoomLight(motion.config.actions[event.id]?.lightRoom);
-    if(event.type==='started'&&event.id==='bed')clock.beginSleep();
+    if(event.type==='started'&&event.id==='bed')clock.beginSleep(event.sleepOptions);
     if(event.type==='completed')clock.completeAction(event.id);
   }
   if(clock.isSleeping&&!motion.sleeping)clock.cancelSleep();
