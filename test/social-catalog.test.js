@@ -8,9 +8,12 @@ test('six distinct fictional archive recordings live only in Makarevich and crea
  assert.equal(demos.length,6);assert.ok(demos.every(d=>d.communityId==='makarevich-1'&&d.archive));
  assert.deepEqual(demos.map(d=>d.title),['Свет в окне','До последнего автобуса','Лестничная клетка','Сторона Б','После смены','Соседний двор']);
  assert.equal(new Set(demos.map(d=>d.author)).size,6);assert.ok(demos.every(d=>SOCIAL_PROFILES.some(p=>p.name===d.author&&p.fictional)));
- assert.equal(new Set(demos.map(d=>JSON.stringify(backgroundAudioDescriptor(d).parts))).size,6);
+ assert.equal(new Set(demos.map(d=>backgroundAudioDescriptor(d).parts.find(p=>p.id.startsWith('beginner-theme-')).id)).size,6,'archive authors have different primary melodies, not only different drums');
  assert.deepEqual(demos.map(d=>d.seed),[100,101,102,103,104,116]);
  const state=createVirtualPcState(),before=state.battleSubmissions.length;communityById('makarevich-1');assert.equal(state.battleSubmissions.length,before);
+});
+test('archive rows use complete eight-bar demo durations',()=>{
+ for(const demo of SOCIAL_COMMUNITIES.flatMap(c=>c.audio))assert.ok(Math.abs(backgroundAudioDescriptor(demo).durationSeconds-64/3)<1e-9,demo.id+' lasts eight bars at 90 BPM');
 });
 test('twenty original communities cover everyday life, with stable dated history and one battle link',()=>{
  assert.equal(SOCIAL_COMMUNITIES.length,20);assert.equal(new Set(SOCIAL_COMMUNITIES.map(c=>c.id)).size,20);
