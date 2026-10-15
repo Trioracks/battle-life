@@ -88,7 +88,7 @@
 
 - [ ] **Step 1:** Test latest three newest entries, initial closed/new transfer opens, Escape/outside close, details lists full history, folder action navigates, clearing completed excludes active partial, preserves files/bytes through reload and repeat download does not duplicate storage. Test no-room error.
 - [ ] **Step 2:** Run `node --test test/pc-browser-downloads.test.js test/browser-download-popover.test.js`; record RED.
-- [ ] **Step 3:** Add validated history visibility independent of transfers/files; toolbar-anchored overlay with remaining seconds (existing one-second transfer), details/clear/folder actions. Keep user manual installer-open flow. No full-width expanded strip.
+- [ ] **Step 3:** Add validated history visibility independent of transfers/files; toolbar-anchored overlay with remaining seconds (existing one-second transfer), details/clear/folder actions. A short download-to-toolbar arrival/highlight acknowledges a new transfer; suppress nonessential movement under reduced motion. Keep user manual installer-open flow. No full-width expanded strip.
 - [ ] **Step 4:** Run focused/full suite; native screenshot and keyboard/outside interaction, including browser window close/reopen listener cleanup.
 - [ ] **Step 5:** Commit and report migration contract.
 
