@@ -9,6 +9,7 @@ import {battleRandom} from './battle-seeding.js?rev=43';
 import {publicTournamentTrackIds} from './battle-results-table.js?rev=43';
 import {publicCharacterProfile} from './npc-social-profiles.js?rev=43';
 import {completeJudgeEvidence} from './judge-dossier-analysis.js?rev=43';
+import {validRapReport,reconcileResearchFindings} from './rap-report-schema.js?rev=43';
 export const STUDY_POLICY=Object.freeze({...config.study});
 export const ANALYSIS_AXES=['text','performance','music','sound'];
 export const ANALYSIS_LABELS=['Ужасно','Очень плохо','Плохо','Средне','Хорошо','Очень хорошо','Отлично','Легендарно'];
@@ -26,7 +27,7 @@ export function effectiveStudySkills(state,skills={}){return snapshot({...skills
 export function normalizeRapAnalysis(raw){
  const reports={},recovery=Array.isArray(raw?.recovery)?clone(raw.recovery):[],j=raw?.job;
  for(const [id,r]of Object.entries(record(raw?.reports)?raw.reports:{})){
-  if(r?.id===id&&typeof r.subjectId==='string'&&typeof r.trackVersionId==='string'&&validGameMinute(r.createdAt)&&validSnapshot(r.heroSnapshot)&&strings(r.sourceIds)&&strings(r.reviewIds)&&typeof r.trackName==='string'&&ANALYSIS_AXES.every(k=>record(r.observations?.[k])&&(r.observations[k].band===null||Number.isInteger(r.observations[k].band)&&r.observations[k].band>=0&&r.observations[k].band<8)&&Number.isFinite(r.observations[k].confidence)&&r.observations[k].confidence>=0&&r.observations[k].confidence<=1))reports[id]=clone(r);
+  if(r?.id===id&&validRapReport(r))reports[id]=clone(r);
   else recovery.push({type:'report',id,recoveryData:clone(r),reason:'Повреждённый отчёт сохранён отдельно.'});
  }
  let job=null;
@@ -57,13 +58,14 @@ export function startTrackStudy(state,{trackVersionId,reviewIds=[],heroSnapshot,
  const reviews=[...new Set(reviewIds)].sort(),published=new Set(publishedStudyReviews(state,{trackVersionId,nowMinute}).map(r=>r.id));
  if(reviews.some(id=>!published.has(id)))return fail('Можно изучать только опубликованный отзыв о выбранной версии.');
  const a=normalizeRapAnalysis(state.rapAnalysis),hero=snapshot(heroSnapshot),v=state.trackVersions.byId[trackVersionId];
- if(a.job){if(a.job.trackVersionId!==trackVersionId)return fail('Сначала заверши начатое изучение.');a.job.status='active';return {ok:true,state:{...state,rapAnalysis:a},jobId:a.job.id};}
+ const prepared={...state,rapAnalysis:a,...(state.rapResearch?{rapResearch:reconcileResearchFindings(state.rapResearch,a)}:{})};
+ if(a.job){if(a.job.trackVersionId!==trackVersionId)return fail('Сначала заверши начатое изучение.');a.job.status='active';return {ok:true,state:prepared,jobId:a.job.id};}
  const prior=Object.values(a.reports).filter(r=>r.trackVersionId===trackVersionId).sort((a,b)=>a.createdAt-b.createdAt);
  const existing=prior.find(r=>JSON.stringify(r.heroSnapshot)===JSON.stringify(hero)&&JSON.stringify(r.reviewIds)===JSON.stringify(reviews));
- if(existing)return {ok:true,state,reportId:existing.id,reason:'Этот разбор уже сохранён.'};
+ if(existing)return {ok:true,state:prepared,reportId:existing.id,reason:'Этот разбор уже сохранён.'};
  const id='study:'+a.nextSequence++,seed=beatResultSeed(trackVersionId+':'+JSON.stringify(hero)+':'+reviews.join('|'));
  a.job={id,kind:'study',trackVersionId,trackName:v.name,subjectId:v.npc?.characterId??'player',heroSnapshot:hero,reviewIds:reviews,seed,diversity:a.sourceIds.length,total:STUDY_POLICY.durationGameMinutes,elapsed:0,status:'active',startedAt:nowMinute,supersedes:prior.at(-1)?.id??null};
- return {ok:true,state:{...state,rapAnalysis:a},jobId:id};
+ return {ok:true,state:prepared,jobId:id};
 }
 export function pauseStudy(state){if(!state.rapAnalysis?.job)return state;return {...state,rapAnalysis:{...state.rapAnalysis,job:{...state.rapAnalysis.job,status:'paused'}}};}
 function profileSkill(hero,axis){return axis==='text'?hero.writing:axis==='performance'?(hero.flow+hero.musicality)/2:axis==='music'?(hero.musicality+hero.beatmaking)/2:hero.sound;}

@@ -6,6 +6,7 @@ import {createPublicAnalysisReportView} from './rap-analysis-view.js?rev=43';
 import {startTrackStudy,pauseStudy,effectiveStudySkills} from './rap-analysis.js?rev=43';
 import {startCaseStudy,pauseCaseStudy} from './rap-research.js?rev=43';
 import {mountDossierBoard,forecastText} from './rap-dossier-board-view.js?rev=43';
+import {gameDateTimeLabel} from './home-calendar.js?rev=43';
 const studyLabel=n=>n.kind==='track'?'Изучить трек · 45 мин':['battle','round'].includes(n.kind)?'Изучить '+(n.kind==='battle'?'баттл':'раунд')+' · 6 ч':'Изучить · 45 мин';
 const currentStudy=state=>{const jobs=[state.rapResearch?.job,state.rapAnalysis?.job];return jobs.find(job=>job?.status==='active')??jobs.find(Boolean);};
 export function mountRapDossier(root,{getState,getMetadata=()=>({}),navigate=()=>{},commit=()=>false,onWork=()=>false,isVisible=()=>true}){
@@ -34,18 +35,22 @@ export function mountRapDossier(root,{getState,getMetadata=()=>({}),navigate=()=
   if(n.scoring)detail.append(el(d,'p',{text:n.scoring.mode==='score'?'Публичная шкала: '+n.scoring.scale:'Сравнение работ в паре'}));
   if(n.action)detail.append(socialButton(d,studyLabel(n),guarded(()=>study(n))));else if(n.kind!=='forecast')detail.append(el(d,'p',{className:'rd-unknown',text:'Изучение недоступно: источник не найден или ещё не опубликован.'}));
   detail.append(el(d,'h3',{text:'Наблюдения героя'}));
+  if(n.studyOutcome?.status==='completed-empty')detail.append(el(d,'p',{className:'rd-unknown',text:'Изучение завершено. На момент '+gameDateTimeLabel(n.studyOutcome.cutoff)+' подходящих опубликованных работ или отзывов не найдено.'}));
+  if(n.studyOutcome?.status==='damaged')detail.append(el(d,'p',{className:'rd-unknown',text:'Результат изучения повреждён. Исходные данные сохранены для восстановления.'}));
   for(const report of n.reports??[])detail.append(socialButton(d,report.trackName+' · '+report.id,guarded(()=>{selectedReport=report.id;renderDetail();})));
-  const report=n.reports?.find(r=>r.id===selectedReport)??n.reports?.at(-1);if(report)detail.append(createPublicAnalysisReportView(d,report));else detail.append(el(d,'p',{className:'rd-unknown',text:'Наблюдений пока нет. Неизвестное не означает плохое.'}));
+  const report=n.reports?.find(r=>r.id===selectedReport)??n.reports?.at(-1);if(report)detail.append(createPublicAnalysisReportView(d,report));else if(!n.studyOutcome)detail.append(el(d,'p',{className:'rd-unknown',text:'Наблюдений пока нет. Неизвестное не означает плохое.'}));
+  if(n.quotes?.length)detail.append(el(d,'h3',{text:'Сохранённые цитаты'}));
+  for(const q of n.quotes??[]){detail.append(el(d,'blockquote',{text:q.comment}),el(d,'small',{text:q.judgeName+' · опубликовано: '+gameDateTimeLabel(q.publishedAt)+(q.recordedAt==null?'':' · сохранено: '+gameDateTimeLabel(q.recordedAt))}));if(q.profileUrl)detail.append(socialButton(d,'Профиль автора цитаты',guarded(()=>navigate(q.profileUrl))));if(q.sourceUrl)detail.append(socialButton(d,'Открыть источник цитаты',guarded(()=>navigate(q.sourceUrl))));else if(q.reportId)detail.append(socialButton(d,'Открыть разбор источника цитаты',guarded(()=>focusTarget({reportId:q.reportId}))));else detail.append(el(d,'small',{text:'Исходная запись недоступна; цитата сохранена.'}));}
   for(const h of n.hypotheses??[])detail.append(el(d,'p',{text:h.statement}),el(d,'small',{text:h.confidenceText}));
   if(n.missingReportIds?.length)detail.append(el(d,'p',{className:'rd-unknown',text:'Сохранённый отчёт недоступен. Исходные данные сохранены для восстановления.'}));
   const forecasts=n.forecast?[n]:graph.nodes.filter(f=>f.kind==='forecast'&&f.layout?.parentId===n.id);
   if(forecasts.length){detail.append(el(d,'h3',{text:'Моё предположение'}));for(const f of forecasts)detail.append(el(d,'p',{className:'rd-forecast-value',text:forecastText(f.forecast)}),el(d,'p',{text:f.forecast?.confidenceText??'Недостаточно данных.'}));}
-  detail.append(el(d,'h3',{text:'Источники'}));for(const id of n.sourceIds??[])detail.append(el(d,'small',{text:id}));if(!n.sourceIds?.length)detail.append(el(d,'p',{text:'Нет подтверждённых источников.'}));if(focus)pcFind(detail,n=>n.dataset?.focusId===focus)?.focus?.({preventScroll:true});
+  detail.append(el(d,'h3',{text:'Источники'}));for(const source of n.sourceLinks??[])if(source.url)detail.append(socialButton(d,source.name+' · открыть источник',guarded(()=>navigate(source.url))));else if(source.reportId)detail.append(socialButton(d,source.name+' · открыть разбор',guarded(()=>focusTarget({reportId:source.reportId}))));for(const id of n.sourceIds??[])detail.append(el(d,'small',{text:id}));if(!n.sourceIds?.length)detail.append(el(d,'p',{text:'Нет подтверждённых источников.'}));if(focus)pcFind(detail,n=>n.dataset?.focusId===focus)?.focus?.({preventScroll:true});
  }
  function refresh(force=false){
   if(disposed||(!force&&!isVisible()))return;renderProgress();const s=getState(),minute=now(),clock=globalThis.performance?.now?.()??Date.now();
-  const refs=[s.battleApplications,s.battleSubmissions,s.audioExports,s.trackVersions,s.tournaments,s.roundThemes,s.social,s.socialReactions?.plans,s.socialRuntime?.events,s.rapResearch?.findings,s.rapResearch?.recovery,s.rapAnalysis?.reports,s.rapAnalysis?.recovery,s.judgeDossier?.evidence,s.battleHistory,s.npcSocialProfiles,s.judging?.results];
-  const unchanged=refs.every((v,i)=>v===lastRefs[i]),finished=lastRefs.length&&(s.rapResearch?.findings!==lastRefs[9]||s.rapAnalysis?.reports!==lastRefs[11]);if(!force&&!finished&&(unchanged&&minute===lastMinute||clock-lastProjection<250))return;
+  const refs=[s.battleApplications,s.battleSubmissions,s.audioExports,s.trackVersions,s.tournaments,s.roundThemes,s.social,s.socialReactions?.plans,s.socialRuntime?.events,s.rapResearch?.findings,s.rapResearch?.recovery,s.rapAnalysis?.reports,s.rapAnalysis?.recovery,s.judgeDossier?.evidence,s.battleHistory,s.npcSocialProfiles,s.judging?.results,s.rapDossier,s.rapDossier?.cards];
+  const unchanged=refs.every((v,i)=>v===lastRefs[i]),finished=lastRefs.length&&(s.rapResearch?.findings!==lastRefs[9]||s.rapAnalysis?.reports!==lastRefs[11]||s.rapDossier!==lastRefs[17]||s.rapDossier?.cards!==lastRefs[18]);if(!force&&!finished&&(unchanged&&minute===lastMinute||clock-lastProjection<250))return;
   lastRefs=refs;lastMinute=minute;lastProjection=clock;const entries=[...dossierCases(s,{nowMinute:minute})];if(caseId===null)caseId=entries.some(c=>c.id==='archive')?'archive':entries.find(c=>c.kind==='battle')?.id??'recordings';
   const target=targetRequest?publicDossierTarget(s,{...targetRequest,nowMinute:minute}):null;
   const next=target?{id:target.caseId,title:target.node.title,status:'available',nodes:[target.node],edges:[]}:publicDossierCase(s,{caseId,nowMinute:minute});if(target)entries.push({id:target.caseId,title:target.node.title});

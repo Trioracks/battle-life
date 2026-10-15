@@ -8,17 +8,34 @@ import {publicCharacterProfile} from './npc-social-profiles.js?rev=43';
 import {validGameMinute} from './game-minute.js?rev=43';
 import {isForecastReport,publicTrackForecast} from './rap-dossier-forecast.js?rev=43';
 import {profileAccess} from './social-profile-policy.js?rev=43';
+import {publicDossierCard} from './rap-dossier.js?rev=43';
+import {validResearchFinding} from './rap-research.js?rev=43';
 
 const array=v=>Array.isArray(v)?v:[],ids=v=>array(v).filter(x=>typeof x==='string');
 const unique=v=>[...new Set(v)].sort();
 const safely=(fn,fallback)=>{try{return fn();}catch{return fallback;}};
 const title=id=>BATTLE_BRIEFS.find(b=>b.id===id)?.title??'Сохранённое дело';
+const legacyCard=(state,characterId,nowMinute)=>safely(()=>publicDossierCard(state,{characterId,nowMinute}),{reports:[],quotes:[],sources:[],hypotheses:[]});
+const savedCharacters=(state,nowMinute)=>Object.keys(state.rapDossier?.cards??{}).filter(id=>{const c=legacyCard(state,id,nowMinute);return c.reports.length||c.quotes.length;});
+function mergeLegacy(node,card){
+ node.reports=[...new Map([...node.reports,...card.reports].map(r=>[r.id,r])).values()];
+ node.reportIds=unique([...node.reportIds,...card.reports.map(r=>r.id)]);
+ node.sourceIds=unique([...node.sourceIds,...card.sources.map(s=>s.trackVersionId),...card.quotes.map(q=>q.id)]);
+ node.quotes=card.quotes.map(q=>({...q,sourceUrl:card.sources.find(s=>s.trackVersionId===q.trackVersionId)?.url??null,reportId:card.reports.find(r=>r.trackVersionId===q.trackVersionId)?.id??null}));
+ node.sourceLinks=card.sources.map(s=>({...s,reportId:card.reports.find(r=>r.trackVersionId===s.trackVersionId)?.id??null}));
+ if(node.reports.length&&!node.missingReportIds.length)node.status='studied';
+}
+function studyOutcome(found,damaged=false){
+ if(damaged)return {status:'damaged'};
+ const latest=found.filter(validResearchFinding).sort((a,b)=>b.createdAt-a.createdAt)[0];
+ return latest?{status:latest.evidenceStatus==='unknown'?'completed-empty':'completed',cutoff:latest.cutoff,createdAt:latest.createdAt}:null;
+}
 function freeze(value){if(value&&typeof value==='object'&&!Object.isFrozen(value)){Object.values(value).forEach(freeze);Object.freeze(value);}return value;}
 // Small bounded cache, keyed by archive references and exact public cutoff. Do
 // not normalize or serialize save archives here. A fractional minute can publish
 // evidence; even an earlier query in the same minute must not reuse a later view.
 const cache=new Map();
-function references(s){return [s.battleApplications,s.battleSubmissions,s.audioExports,s.trackVersions,s.tournaments,s.roundThemes,s.social,s.socialReactions?.plans,s.socialRuntime?.events,s.socialRuntime?.lastMinute,s.rapResearch?.findings,s.rapResearch?.recovery,s.rapAnalysis?.reports,s.rapAnalysis?.recovery,s.judgeDossier?.evidence,s.battleHistory,s.npcSocialProfiles,s.judging?.results];}
+function references(s){return [s.battleApplications,s.battleSubmissions,s.audioExports,s.trackVersions,s.tournaments,s.roundThemes,s.social,s.socialReactions?.plans,s.socialRuntime?.events,s.socialRuntime?.lastMinute,s.rapResearch?.findings,s.rapResearch?.recovery,s.rapAnalysis?.reports,s.rapAnalysis?.recovery,s.judgeDossier?.evidence,s.battleHistory,s.npcSocialProfiles,s.judging?.results,s.rapDossier,s.rapDossier?.cards];}
 function memo(s,key,nowMinute,build){
  const refs=references(s),previous=cache.get(key);
  if(previous?.nowMinute===nowMinute&&refs.every((r,i)=>r===previous.refs[i]))return previous.value;
@@ -28,14 +45,14 @@ export function dossierCases(state,{nowMinute}={}){
  if(!validGameMinute(nowMinute))return [];
  return memo(state,'list',nowMinute,()=>[
   {id:'recordings',title:'Мои записи',kind:'recordings'},
-  ...(readableReports(state,nowMinute).length?[{id:'archive',title:'Архив наблюдений',kind:'archive'}]:[]),
+  ...(readableReports(state,nowMinute).length||savedCharacters(state,nowMinute).length?[{id:'archive',title:'Архив наблюдений',kind:'archive'}]:[]),
   ...unique([...array(state.battleApplications).map(a=>a?.battleId),...array(state.battleSubmissions).filter(s=>s?.sentAt==null||s.sentAt<=nowMinute).map(s=>s?.battleId)].filter(id=>typeof id==='string')).map(battleId=>({id:'battle:'+battleId,title:title(battleId),battleId,kind:'battle'})),
  ]);
 }
 function buildCase(state,entry,caseId,nowMinute){
  const graph={id:caseId,title:entry?.title??'Дело недоступно',status:entry?'available':'unknown',nodes:[],edges:[]};if(!entry)return graph;
  const battleId=entry.battleId,byId=new Map(),savedReports=Object.values(state.rapAnalysis?.reports??{}),reports=savedReports.filter(r=>isForecastReport(r)&&r.createdAt<=nowMinute).sort((a,b)=>a.createdAt-b.createdAt||a.id.localeCompare(b.id));
- if(entry.kind==='archive'){for(const versionId of unique(reports.map(r=>r.trackVersionId))){const target=publicDossierTarget(state,{reportId:reports.find(r=>r.trackVersionId===versionId).id,nowMinute});if(target)graph.nodes.push(target.node);}return graph;}
+ if(entry.kind==='archive'){for(const versionId of unique(reports.map(r=>r.trackVersionId))){const target=publicDossierTarget(state,{reportId:reports.find(r=>r.trackVersionId===versionId).id,nowMinute});if(target)graph.nodes.push(target.node);}for(const characterId of savedCharacters(state,nowMinute)){const target=publicDossierTarget(state,{characterId,nowMinute});if(target)graph.nodes.push({...target.node,layout:{column:1,row:graph.nodes.length,parentId:null}});}return graph;}
  const findings=Object.values(state.rapResearch?.findings??{}).filter(f=>f&&f.subject?.battleId===battleId&&typeof f.id==='string'&&validGameMinute(f.createdAt)&&f.createdAt<=nowMinute&&validGameMinute(f.cutoff)&&f.cutoff<=f.createdAt&&Array.isArray(f.reportIds));
  const add=(id,kind,node)=>{if(byId.has(id))return byId.get(id);const n={id,kind,title:'Неизвестно',status:'unknown',reportIds:[],findingIds:[],sourceIds:[],missingReportIds:[],reports:[],action:null,profileUrl:null,...node};byId.set(id,n);graph.nodes.push(n);return n;};
  const edge=(from,to,kind)=>{const id=from+'>'+kind+'>'+to;if(!graph.edges.some(e=>e.id===id))graph.edges.push({id,from,to,kind});};
@@ -47,6 +64,8 @@ function buildCase(state,entry,caseId,nowMinute){
   node.reportIds=unique(found.flatMap(f=>ids(f.reportIds)));node.missingReportIds=unique([...node.reportIds.filter(id=>!reports.some(r=>r.id===id&&sourceIds.includes(r.trackVersionId))),...recovered.flatMap(f=>ids(f.reportIds))]);
   node.reports=reports.filter(r=>node.reportIds.includes(r.id)&&!node.missingReportIds.includes(r.id)).map(publicAnalysisReport);
   node.status=node.missingReportIds.length||recovered.length?'unknown':found.length?'studied':'unknown';
+  node.studyOutcome=studyOutcome(found,node.missingReportIds.length||recovered.length);
+  if(node.characterId)mergeLegacy(node,legacyCard(state,node.characterId,nowMinute));
  };
  const sources=(kind,extra={})=>safely(()=>caseStudySources(state,{kind,battleId,...extra,nowMinute}),{sourceIds:[],judgeIds:[],trackVersionIds:[]});
  const track=(versionId,referenceId,parentId,column=1)=>{
@@ -106,7 +125,7 @@ export function publicDossierTarget(state,{trackVersionId,characterId,reportId,n
  const reports=readableReports(state,nowMinute),report=reportId?reports.find(r=>r.id===reportId):null;
  if(reportId&&!report)return null;
  if(report)trackVersionId=report.trackVersionId;
- const base={status:'unknown',reportIds:[],findingIds:[],sourceIds:[],missingReportIds:[],reports:[],action:null,profileUrl:null,layout:{column:0,row:0,parentId:null}};
+ const base={status:'unknown',reportIds:[],findingIds:[],sourceIds:[],missingReportIds:[],reports:[],studyOutcome:null,action:null,profileUrl:null,layout:{column:0,row:0,parentId:null}};
  if(trackVersionId){
   const version=validPublicVersion(state,trackVersionId,nowMinute);if(!version&&!report)return null;
   const subjectId=report?.subjectId??version.npc?.characterId??'player',owned=reports.filter(r=>r.trackVersionId===trackVersionId&&r.subjectId===subjectId),sameSource=version&&(version.npc?.characterId??'player')===subjectId;
@@ -115,12 +134,14 @@ export function publicDossierTarget(state,{trackVersionId,characterId,reportId,n
   return freeze({caseId:report?'archive':'target:'+node.id,targetId:node.id,node});
  }
  if(characterId){
-  const profile=safely(()=>publicCharacterProfile(state,{characterId,nowMinute}),{});if(!profile.canView)return null;
-  const kind=profile.roles?.includes('judge')?'judge':'person',requestKind=kind==='judge'?'judge':'opponent',source=safely(()=>caseStudySources(state,{kind:requestKind,battleId,characterId,nowMinute}),{sourceIds:[]});
+  const profile=safely(()=>publicCharacterProfile(state,{characterId,nowMinute}),{}),legacy=legacyCard(state,characterId,nowMinute);if(!profile.canView&&!legacy.reports.length&&!legacy.quotes.length)return null;
+  const kind=profile.roles?.includes('judge')||legacy.quotes.some(q=>q.judgeId===characterId)?'judge':'person',requestKind=kind==='judge'?'judge':'opponent',source=profile.canView?safely(()=>caseStudySources(state,{kind:requestKind,battleId,characterId,nowMinute}),{sourceIds:[]}):{sourceIds:[]};
   const found=Object.values(state.rapResearch?.findings??{}).filter(f=>f?.kind===requestKind&&f.subject?.battleId===battleId&&f.subject?.characterId===characterId&&typeof f.id==='string'&&validGameMinute(f.createdAt)&&f.createdAt<=nowMinute&&validGameMinute(f.cutoff)&&f.cutoff<=f.createdAt&&Array.isArray(f.reportIds));
   const resultIds=unique(found.flatMap(f=>ids(f.reportIds))),owned=reports.filter(r=>r.subjectId===characterId||resultIds.includes(r.id)&&source.sourceIds.includes(r.trackVersionId)),missingReportIds=resultIds.filter(id=>!owned.some(r=>r.id===id));
   const hypotheses=kind==='judge'?safely(()=>publicJudgeHypotheses(array(state.judgeDossier?.evidence).filter(e=>e.judgeId===characterId),nowMinute),[]):[];
-  const node={...base,id:kind+':'+characterId,kind,title:profile.name,battleId,characterId,status:missingReportIds.length?'unknown':kind==='judge'?(hypotheses.length?'studied':'unknown'):owned.length?'studied':'unknown',findingIds:found.map(f=>f.id),reportIds:unique([...owned.map(r=>r.id),...resultIds]),missingReportIds,reports:owned.map(publicAnalysisReport),sourceIds:source.sourceIds,profileUrl:'underweb://social/profile/'+characterId,action:{type:'startCaseStudy',request:{kind:requestKind,battleId,characterId}},hypotheses};
+  const recovered=array(state.rapResearch?.recovery).some(r=>r?.type==='finding'&&r.recoveryData?.subject?.characterId===characterId&&r.recoveryData.subject.battleId===battleId&&validGameMinute(r.recoveryData.createdAt)&&r.recoveryData.createdAt<=nowMinute);
+  const node={...base,id:kind+':'+characterId,kind,title:profile.canView?profile.name:legacy.name,battleId,characterId,status:missingReportIds.length?'unknown':kind==='judge'?(hypotheses.length?'studied':'unknown'):owned.length?'studied':'unknown',findingIds:found.map(f=>f.id),reportIds:unique([...owned.map(r=>r.id),...resultIds]),missingReportIds,reports:owned.map(publicAnalysisReport),sourceIds:source.sourceIds,profileUrl:legacy.profileUrl,action:profile.canView?{type:'startCaseStudy',request:{kind:requestKind,battleId,characterId}}:null,hypotheses,studyOutcome:studyOutcome(found,missingReportIds.length||recovered)};
+  mergeLegacy(node,legacy);
   return freeze({caseId:'target:'+node.id,targetId:node.id,node});
  }
  return null;

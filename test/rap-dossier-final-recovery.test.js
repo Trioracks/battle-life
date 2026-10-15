@@ -1,0 +1,60 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {dossierLegacyFixture} from './helpers/dossier-legacy-fixture.js';
+import {topicFixture} from './helpers/round-topic-fixture.js';
+import {studySkills} from './helpers/analysis-fixture.js';
+import {dossierCases,publicDossierCase,publicDossierTarget} from '../src/rap-dossier-cases.js';
+import {publicDossierCard} from '../src/rap-dossier.js';
+import {startCaseStudy,advanceCaseStudy} from '../src/rap-research.js';
+import {mountRapDossier} from '../src/rap-dossier-view.js';
+import {pcDocument,findButton,allPc} from './helpers/virtual-pc-dom.js';
+test('legacy evidence joins discovered judge board and invalidates same-minute cached graph',()=>{
+ const old=dossierLegacyFixture();let s=topicFixture();s.software.dossier.installed=true;s.music.needs={satiety:100,energy:100};
+ s=advanceCaseStudy(startCaseStudy(s,{kind:'battle',battleId:'makarevich-1',heroSnapshot:studySkills(70),nowMinute:13440}).state,{gameMinutes:360,nowMinute:13800}).state;
+ const request={caseId:'battle:makarevich-1',nowMinute:13800},before=publicDossierCase(s,request);
+ s={...s,rapDossier:old.rapDossier,rapAnalysis:old.rapAnalysis,judgeDossier:old.judgeDossier};
+ const after=publicDossierCase(s,request),judge=after.nodes.find(n=>n.characterId==='eparhiya');assert.notEqual(after,before);assert.ok(judge.reports.some(r=>r.id==='study:1'));assert.equal(judge.quotes[0].id,'r');
+ const changed={...s,rapDossier:{...s.rapDossier,cards:{...s.rapDossier.cards,eparhiya:{...s.rapDossier.cards.eparhiya,quotes:[]}}}};
+ assert.equal(publicDossierCase(changed,request).nodes.find(n=>n.characterId==='eparhiya').quotes.length,0);
+});
+test('legacy judge association and quotation remain reachable in archive and target with public cutoffs and sanitized fields',()=>{
+ const s=dossierLegacyFixture(),before=structuredClone(s),request={characterId:'eparhiya',nowMinute:195};
+ s.rapDossier.cards.eparhiya.quotes[0].privateWeights={secret:true};
+ const target=publicDossierTarget(s,request);assert.equal(target?.node.reports[0]?.id,'study:1');assert.equal(target.node.quotes[0].comment,before.rapDossier.cards.eparhiya.quotes[0].comment);
+ assert.ok(target.node.quotes[0].judgeName);assert.equal(target.node.quotes[0].publishedAt,150);
+ assert.equal(target.node.profileUrl,null);assert.equal(target.node.quotes[0].profileUrl,null);
+ for(const secret of ['privateWeights','heroSnapshot','qualities','recoveryData'])assert.ok(!JSON.stringify(target).includes(secret));
+ assert.deepEqual(publicDossierTarget(s,{...request,nowMinute:194})?.node?.quotes??[],[]);
+ const graph=publicDossierCase(s,{caseId:'archive',nowMinute:195});assert.ok(graph.nodes.some(n=>n.characterId==='eparhiya'&&n.reports.some(r=>r.id==='study:1')));
+ assert.deepEqual(s.rapResearch.findings,{});assert.deepEqual(s.rapAnalysis,before.rapAnalysis);
+ delete s.trackVersions.byId.weak;s.trackVersions={...s.trackVersions};
+ assert.equal(publicDossierTarget(s,request).node.reports[0].id,'study:1');
+ s.rapDossier={...s.rapDossier,cards:{...s.rapDossier.cards,eparhiya:{...s.rapDossier.cards.eparhiya,reportIds:[]}}};s.rapAnalysis={...s.rapAnalysis,reports:{}};
+ assert.ok(dossierCases(s,{nowMinute:195}).some(c=>c.id==='archive'));assert.equal(publicDossierCase(s,{caseId:'archive',nowMinute:195}).nodes[0].quotes.length,1);
+ s.rapDossier.cards.eparhiya.quotes[0].publishedAt=196;s.rapDossier={...s.rapDossier};assert.deepEqual(publicDossierCard(s,request).quotes,[]);
+});
+test('missing legacy audio retains quote and routes to saved report without an unavailable profile',()=>{
+ const s=dossierLegacyFixture();delete s.trackVersions.byId.weak;s.battleSubmissions=[];
+ const root=pcDocument().createElement('main'),ui=mountRapDossier(root,{getState:()=>s,getMetadata:()=>({gameMinutes:195})});ui.focusTarget({characterId:'eparhiya'});
+ assert.equal(findButton(root,'Профиль автора цитаты'),undefined);findButton(root,'Открыть разбор источника цитаты').click();assert.ok(allPc(root).some(n=>n.textContent==='Первая демка'));assert.equal(findButton(root,'Изучить трек · 45 мин'),undefined);ui.dispose();
+});
+test('mounted legacy details refresh from card references and provide quote attribution and source navigation',()=>{
+ let s=dossierLegacyFixture();const d=pcDocument(),root=d.createElement('main'),routes=[];
+ const ui=mountRapDossier(root,{getState:()=>s,getMetadata:()=>({gameMinutes:195}),navigate:url=>routes.push(url)});ui.focusTarget({characterId:'eparhiya'});
+ assert.ok(allPc(root).some(n=>n.textContent?.includes('Без дисса сюда зачем?')));assert.ok(allPc(root).some(n=>n.textContent?.includes('01.09.2012 02:30')));
+ findButton(root,'Открыть источник цитаты').click();assert.deepEqual(routes,['underweb://social/results/makarevich-1/selection']);
+ s={...s,rapDossier:{...s.rapDossier,cards:{...s.rapDossier.cards,eparhiya:{...s.rapDossier.cards.eparhiya,quotes:[{...s.rapDossier.cards.eparhiya.quotes[0],comment:'Обновлённая сохранённая цитата'}]}}}};ui.update();
+ assert.ok(allPc(root).some(n=>n.textContent==='Обновлённая сохранённая цитата'));ui.dispose();
+});
+test('completed empty study is distinguished from unstudied and damaged study without exposing snapshots',()=>{
+ let s=topicFixture();s.software.dossier.installed=true;s.music.needs={satiety:100,energy:100};const characterId=s.roundThemes['makarevich-1:round-2'].authorJudgeId;
+ const request={kind:'judge',characterId,battleId:'makarevich-1',heroSnapshot:studySkills(70),nowMinute:13440};
+ assert.equal(publicDossierTarget(s,request).node.studyOutcome,null);
+ s=advanceCaseStudy(startCaseStudy(s,request).state,{gameMinutes:45,nowMinute:13485}).state;
+ const target=publicDossierTarget(s,{...request,nowMinute:13485});assert.deepEqual(target.node.studyOutcome,{status:'completed-empty',cutoff:13440,createdAt:13485});assert.ok(!JSON.stringify(target).includes('heroSnapshot'));
+ const root=pcDocument().createElement('main'),ui=mountRapDossier(root,{getState:()=>s,getMetadata:()=>({gameMinutes:13485})});ui.focusTarget({characterId});
+ assert.ok(allPc(root).some(n=>n.className==='rd-node-caption'&&/Изучение завершено/.test(n.textContent)));
+ assert.ok(allPc(root).some(n=>/Изучение завершено/.test(n.textContent)&&/10.09.2012 08:00/.test(n.textContent)));assert.ok(!allPc(root).some(n=>n.textContent==='Наблюдений пока нет. Неизвестное не означает плохое.'));ui.dispose();
+ const finding=Object.values(s.rapResearch.findings)[0];s.rapResearch={...s.rapResearch,findings:{},recovery:[{type:'finding',recoveryData:finding}]};
+ assert.deepEqual(publicDossierTarget(s,{...request,nowMinute:13485}).node.studyOutcome,{status:'damaged'});
+});

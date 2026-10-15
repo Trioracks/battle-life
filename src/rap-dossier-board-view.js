@@ -12,7 +12,7 @@ export function dossierBoardLayout(graph){
   const x={judge:20,round:202,battle:390,track:590,opponent:790,person:20}[n.kind]??20;
   const y=n.kind==='battle'?30:n.kind==='opponent'?210:n.kind==='track'?trackY:210+i*158;
   if(n.kind==='track')trackY+=140+(forecastCounts.get(n.id)??0)*110;
-  const compact=graph.id==='recordings'||graph.id==='archive'||graph.id.startsWith('target:');positions.set(n.id,{x:compact?(i%3)*200+30:x,y:compact?30+Math.floor(i/3)*160:y,width:166,height:n.kind==='battle'?150:108});
+  const compact=graph.id==='recordings'||graph.id==='archive'||graph.id.startsWith('target:'),slot=positions.size;positions.set(n.id,{x:compact?(slot%3)*200+30:x,y:compact?30+Math.floor(slot/3)*160:y,width:166,height:n.kind==='battle'?150:108});
  }
  const forecastRows=new Map();for(const n of graph.nodes.filter(n=>n.kind==='forecast')){const parentId=n.layout?.parentId,parent=positions.get(parentId),i=forecastRows.get(parentId)??0;forecastRows.set(parentId,i+1);positions.set(n.id,{x:parent?.x??590,y:(parent?.y??30)+124+i*110,width:166,height:94});}
  const width=Math.max(620,...[...positions.values()].map(p=>p.x+p.width+24)),height=Math.max(440,...[...positions.values()].map(p=>p.y+p.height+30));
@@ -26,7 +26,7 @@ export function mountDossierBoard(root,{graph,selectedId,onSelect}){
  canvas.append(svg);
  for(const n of graph.nodes){const p=layout.positions.get(n.id),card=socialButton(d,'',()=>{if(!disposed)onSelect(n.id);},{className:'rd-node rd-node-'+n.kind,dataset:{dossierNode:n.id,boardX:String(p.x),boardY:String(p.y)},attributes:{'aria-label':(labels[n.kind]??'Карточка')+': '+n.title,'aria-pressed':String(selectedId===n.id)}});
   card.style.setProperty('--node-x',p.x+'px');card.style.setProperty('--node-y',p.y+'px');card.style.setProperty('--node-width',p.width+'px');card.style.setProperty('--node-height',p.height+'px');
-  card.append(el(d,'span',{className:'rd-pin',attributes:{'aria-hidden':'true'}}),el(d,'small',{className:'rd-node-kind',text:labels[n.kind]??'ЗАМЕТКА'}),el(d,'strong',{text:n.title}),el(d,'span',{className:'rd-node-caption',text:n.kind==='forecast'?forecastText(n.forecast):n.status==='studied'?'Есть наблюдения':n.status==='available'?'Источник доступен':'Пока неизвестно'}));
+  card.append(el(d,'span',{className:'rd-pin',attributes:{'aria-hidden':'true'}}),el(d,'small',{className:'rd-node-kind',text:labels[n.kind]??'ЗАМЕТКА'}),el(d,'strong',{text:n.title}),el(d,'span',{className:'rd-node-caption',text:n.kind==='forecast'?forecastText(n.forecast):n.studyOutcome?.status==='completed-empty'?'Изучение завершено · источников нет':n.studyOutcome?.status==='damaged'?'Результат недоступен':n.status==='studied'?'Есть наблюдения':n.status==='available'?'Источник доступен':'Пока неизвестно'}));
   cards.set(n.id,card);canvas.append(card);
  }
  canvas.style.setProperty('width',layout.width+'px');canvas.style.setProperty('height',layout.height+'px');surface.append(canvas);root.replaceChildren(surface);

@@ -6,6 +6,8 @@ import {normalizeRapAnalysis,studyInstallReason,studyHeroSnapshot,validStudyHero
 import {completeJudgeEvidence} from './judge-dossier-analysis.js?rev=43';
 import {publicCharacterProfile} from './npc-social-profiles.js?rev=43';
 import {caseStudySources} from './rap-research-sources.js?rev=43';
+import {validRapReport,reconcileResearchFindings} from './rap-report-schema.js?rev=43';
+export {reconcileResearchFindings};
 
 export const CASE_STUDY_MINUTES=Object.freeze({battle:360,round:360,judge:45,opponent:45});
 export const STUDY_MINUTES_PER_SECOND=45/8;
@@ -15,7 +17,7 @@ const snapshotKeys=['sourceIds','reviewIds','judgeIds','trackVersionIds'];
 const validSubject=s=>record(s)&&id(s.battleId)&&Object.hasOwn(CASE_STUDY_MINUTES,s.kind)&&(s.kind!=='round'||id(s.roundId))&&(!['judge','opponent'].includes(s.kind)||id(s.characterId));
 const validSnapshot=s=>snapshotKeys.every(k=>ids(s?.[k]))&&s.reviewIds.every(id=>s.sourceIds.includes(id))&&s.trackVersionIds.every(id=>s.sourceIds.includes(id))&&validGameMinute(s.cutoff)&&validStudyHeroSnapshot(s.heroSnapshot);
 const validJob=j=>record(j)&&id(j.id)&&validSubject(j.subject)&&j.kind===j.subject.kind&&validSnapshot(j)&&j.total===CASE_STUDY_MINUTES[j.kind]&&Number.isFinite(j.elapsed)&&j.elapsed>=0&&j.elapsed<j.total&&['active','paused'].includes(j.status)&&validGameMinute(j.startedAt)&&j.cutoff<=j.startedAt;
-const validFinding=f=>record(f)&&id(f.id)&&validSubject(f.subject)&&f.kind===f.subject.kind&&validSnapshot(f)&&validGameMinute(f.createdAt)&&f.createdAt>=f.cutoff&&ids(f.reportIds)&&['unknown','observed'].includes(f.evidenceStatus)&&(f.evidenceStatus==='unknown'?f.reportIds.length===0:f.reportIds.length>0);
+export const validResearchFinding=f=>record(f)&&id(f.id)&&validSubject(f.subject)&&f.kind===f.subject.kind&&validSnapshot(f)&&validGameMinute(f.createdAt)&&f.createdAt>=f.cutoff&&ids(f.reportIds)&&['unknown','observed'].includes(f.evidenceStatus)&&(f.evidenceStatus==='unknown'?f.reportIds.length===0:f.reportIds.length>0);
 const subjectOf=({kind,battleId='makarevich-1',roundId,characterId})=>({kind,battleId,...(kind==='round'?{roundId}:{}),...(['judge','opponent'].includes(kind)?{characterId}:{})});
 const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const sameEvidence=(a,b)=>snapshotKeys.every(k=>equal(a[k],b[k]));
@@ -24,23 +26,11 @@ export function normalizeRapResearch(raw){
  const recovery=Array.isArray(raw?.recovery)?clone(raw.recovery):[],findings={};
  const recover=(type,data,key)=>recovery.push({type,...(key?{id:key}:{}),recoveryData:clone(data),reason:'Повреждённое изучение сохранено отдельно и не завершено автоматически.'});
  if(raw!=null&&(!record(raw)||raw.version!==undefined&&raw.version!==1)){recover('research',raw);return {version:1,job:null,findings,nextSequence:1,recovery};}
- for(const [key,f]of Object.entries(record(raw?.findings)?raw.findings:{})){if(f?.id===key&&validFinding(f))findings[key]=clone(f);else recover('finding',f,key);}
+ for(const [key,f]of Object.entries(record(raw?.findings)?raw.findings:{})){if(f?.id===key&&validResearchFinding(f))findings[key]=clone(f);else recover('finding',f,key);}
  if(raw?.findings!=null&&!record(raw.findings))recover('findings',raw.findings);
  let job=null;if(raw?.job!=null){if(validJob(raw.job)&&!findings[raw.job.id])job=clone(raw.job);else recover('job',raw.job);}
  const sequence=Math.max(0,...[...Object.keys(findings),job?.id].map(key=>/^case-study:\d+$/.test(key??'')?Number(key.split(':')[1]):0));
  return {version:1,job,findings,nextSequence:Math.max(sequence+1,Number.isSafeInteger(raw?.nextSequence)&&raw.nextSequence>0?raw.nextSequence:1),recovery};
-}
-// Both ledgers must be normalized first: a rejected report cannot keep a case
-// marked complete and prevent the player from studying the same sources again.
-export function reconcileResearchFindings(research,analysis){
- const invalid=Object.values(research.findings).filter(f=>{
-  const reports=f.reportIds.map(id=>analysis.reports[id]);
-  return reports.length!==f.trackVersionIds.length||reports.some(r=>!r||!f.trackVersionIds.includes(r.trackVersionId)||r.createdAt>f.createdAt)||new Set(reports.map(r=>r?.trackVersionId)).size!==f.trackVersionIds.length;
- });
- if(!invalid.length)return research;
- const findings={...research.findings},recovery=[...research.recovery];
- for(const finding of invalid){delete findings[finding.id];recovery.push({type:'finding',id:finding.id,recoveryData:clone(finding),reason:'Отчёт этого изучения недоступен или повреждён. Исходное изучение сохранено; источники можно изучить снова.'});}
- return {...research,findings,recovery};
 }
 const otherWork=state=>state.music?.job||state.writing?.job||state.recording?.job||state.rapAnalysis?.job?.status==='active';
 const missingSources=(state,j)=>j.trackVersionIds.some(id=>!state.trackVersions?.byId?.[id])||j.reviewIds.some(id=>!state.judging?.results?.[id]);
@@ -78,7 +68,7 @@ function completeCase(state,j,createdAt){
  let next={...state,rapAnalysis:analysis},practiceGained=0;
  for(const trackVersionId of j.trackVersionIds){
   const version=state.trackVersions.byId[trackVersionId],reviewIds=j.reviewIds.filter(id=>state.judging.results[id]?.trackVersionId===trackVersionId);
-  const prior=Object.values(analysis.reports).filter(r=>r.trackVersionId===trackVersionId).sort((a,b)=>a.createdAt-b.createdAt);
+  const prior=Object.values(analysis.reports).filter(r=>validRapReport(r)&&r.trackVersionId===trackVersionId).sort((a,b)=>a.createdAt-b.createdAt);
   let report=prior.find(r=>equal(r.heroSnapshot,j.heroSnapshot)&&equal(r.reviewIds,reviewIds));
   const reportJob={id:report?.id??'study:'+analysis.nextSequence++,trackVersionId,trackName:version.name,subjectId:version.npc?.characterId??'player',heroSnapshot:j.heroSnapshot,reviewIds,seed:beatResultSeed(trackVersionId+':'+JSON.stringify(j.heroSnapshot)+':'+reviewIds.join('|')),diversity:old.sourceIds.length,supersedes:prior.at(-1)?.id??null};
   if(!report){report=finishStudyReport(version,reportJob,createdAt);analysis.reports[report.id]=report;}

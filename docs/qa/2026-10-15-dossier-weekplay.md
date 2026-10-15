@@ -71,3 +71,27 @@ Thirty closed-view baselines remained exactly: 376 DOM nodes, 21 global listener
 The six native PCM renders passed with distinct hashes, finite samples, no clipping, nonzero intended sections and unchanged saved descriptors.
 
 The complete Node suite passed at release commit 9decad8: 1,404 tests, 0 failures, 0 skipped (101.369 seconds). Focused integration/cache/fix coverage passed33/33. The review supplement adds one test and QA helpers only; product code is identical to that full-suite baseline. The focused integration/board/view command passes18/18; the full suite and 224-second week were not repeated for this QA-only supplement.
+
+## Consolidated final-review corrections
+
+The final review wave, based on 80d254c, unifies saved-report validation across reload, reuse, finding reconciliation and forecast. Malformed supersedes metadata and incompatible source/version references quarantine the original report and dependent finding; both same-source case retry and direct track retry start replacement work without awarding source XP again. Valid historical reports remain readable after their original recording disappears.
+
+Sanitized legacy card reports and quotations now remain reachable through the archive and relevant person/judge details. The projection uses the existing public card's publication, recording and profile gates, copies only public quote fields, preserves the original card, and never creates research findings. Quote details show attribution and calendar dates with a keyboard-usable source link or saved-report fallback. Card references invalidate the mounted board and domain cache. Mixed archive cards have separate positions.
+
+Completed empty research now has an explicit card caption and detail with its public cutoff date. It differs from never studied and damaged-source states; it does not invent observations or reveal skill snapshots.
+
+```powershell
+& 'C:/Program Files/nodejs/node.exe' tools/verify-dossier-final-fix.mjs
+& 'C:/Program Files/nodejs/node.exe' --test test/rap-analysis.test.js test/rap-research.test.js test/rap-dossier-final-recovery.test.js test/rap-dossier-cases.test.js test/rap-dossier-targets.test.js test/rap-dossier-board.test.js test/rap-dossier-view.test.js test/rap-dossier.test.js test/rap-dossier-forecast.test.js test/judge-dossier-analysis.test.js test/client-module-version.test.js test/v-krugu-revision.test.js
+$env:npm_config_cache='D:/Codex/Caches/npm'
+$env:npm_config_update_notifier='false'
+& 'C:/Program Files/nodejs/npm.cmd' test
+```
+
+Final results: focused/cache **88/88**, complete suite **1415/1415**, zero failures/cancellations/skips, full duration **101030.5585 ms**. The cache checks cover revision43, the reachable application graph and both Workers. Logs are under `artifacts/dossier-weekplay/final-fix/` (`focused-final.log`, `full.log`). The final product/test/helper tree was unchanged after this full run.
+
+Native evidence: `artifacts/dossier-weekplay/final-fix/native/evidence.json`, passed:true, errors:[], assetFailures:[], browserClosed:true and serverClosed:true. Existing native Edge ran headlessly in a fresh context on isolated4206 with browser scratch on D:. The real PC/dossier view exposed the legacy judge report with no fabricated findings, displayed the dated quote, and keyboard Enter opened `underweb://social/results/makarevich-1/selection`. SVG MIME was image/svg+xml and native decoded width150. Desktop archive cards did not overlap; completed-empty details were readable at1280×900 and390×844 with no document horizontal overflow.
+
+All six captures were inspected: `legacy-judge-report.png`, `legacy-quote-attribution.png`, `legacy-quote-source.png`, `legacy-archive.png`, `completed-empty-study.png`, and `completed-empty-narrow.png`. The quote screenshot includes attribution, dates and source control; the source screenshot shows the public selection table.
+
+This is focused native UI evidence, not a new whole-apartment timing or weekplay measurement. Timing/lifecycle code was unchanged, so the retained224-second week and cold-frame evidence above remain the applicable measurements. Headless/browser and subjective-listening limitations remain: no subjective audio claim, no claim that every cold frame meets the steady p95 target. The user's4173 origin, existing saves, frozen assets and prior evidence directories were untouched.

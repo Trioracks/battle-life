@@ -8,6 +8,10 @@ import {analysisFixture,studySkills} from './helpers/analysis-fixture.js';
 import {topicFixture} from './helpers/round-topic-fixture.js';
 import {pcDocument,allPc,findButton} from './helpers/virtual-pc-dom.js';
 const nodes=root=>allPc(root).filter(n=>n.dataset?.dossierNode);
+test('archive records and legacy people occupy distinct usable paper slots',()=>{
+ const graph={id:'archive',nodes:[{id:'track:a',kind:'track'},{id:'judge:a',kind:'judge'},{id:'person:a',kind:'person'}]},positions=[...dossierBoardLayout(graph).positions.values()];
+ for(let i=0;i<positions.length;i++)for(let j=i+1;j<positions.length;j++){const a=positions[i],b=positions[j];assert.ok(a.x+a.width<=b.x||b.x+b.width<=a.x||a.y+a.height<=b.y||b.y+b.height<=a.y,'archive cards must not overlap');}
+});
 function setup(state=analysisFixture(),options={}){
  let minute=13440,visible=true,work=0;const d=pcDocument(),root=d.createElement('main');
  const ui=mountRapDossier(root,{getState:()=>state,getMetadata:()=>({gameMinutes:minute,skills:studySkills(60)}),commit:r=>{if(options.fail)return false;state=r.state;return true;},onWork:()=>{work++;return true;},isVisible:()=>visible});

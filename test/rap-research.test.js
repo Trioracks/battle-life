@@ -5,7 +5,7 @@ import {topicFixture} from './helpers/round-topic-fixture.js';
 import {opponentFixture} from './helpers/social-profile-fixture.js';
 import {createVirtualPcState} from '../src/virtual-pc-state.js';
 import {advanceCreativeWork,creativeWorkDescriptor} from '../src/home-creative-work.js';
-import {startTrackStudy} from '../src/rap-analysis.js';
+import {startTrackStudy,advanceStudy} from '../src/rap-analysis.js';
 import {uninstallSoftware} from '../src/pc-software.js';
 import {createBeat,startBeatStage,advanceBeatWork} from '../src/beat-production.js';
 import {createBeatWorkAudio} from '../src/beat-work-audio.js';
@@ -116,6 +116,27 @@ test('quarantined reports quarantine their completed finding and allow unchanged
   const replacement=Object.values(done.state.rapResearch.findings)[0];assert.notEqual(replacement.id,finding.id);assert.ok(replacement.reportIds.every(id=>done.state.rapAnalysis.reports[id]));
   assert.deepEqual(done.state.rapResearch.recovery[0].recoveryData,finding);
  }
+});
+test('malformed report metadata and source association recover on reload and allow both retry paths without XP duplication',()=>{
+ for(const corruptReport of [r=>{r.supersedes={broken:true};},r=>{r.sourceIds=['another-version'];}]){
+  let s=installed(topicFixture());s.trackVersions=analysisFixture().trackVersions;s.tournaments.byId['makarevich-1'].rounds.selection.submissions={player:'weak'};
+  const req={...request,kind:'battle',nowMinute:19000},first=api.advanceCaseStudy(api.startCaseStudy(s,req).state,{gameMinutes:360,nowMinute:19360});
+  const finding=Object.values(first.state.rapResearch.findings)[0],id=finding.reportIds[0];corruptReport(first.state.rapAnalysis.reports[id]);const original=structuredClone(first.state.rapAnalysis.reports[id]);
+  for(const reload of [false,true])for(const kind of ['case','track']){
+   const damaged=reload?createVirtualPcState(first.state):structuredClone(first.state);damaged.music.needs={satiety:100,energy:100};
+   if(reload){assert.equal(damaged.rapAnalysis.reports[id],undefined);assert.deepEqual(damaged.rapAnalysis.recovery[0].recoveryData,original);assert.equal(damaged.rapResearch.findings[finding.id],undefined);}
+   const retry=kind==='case'?api.startCaseStudy(damaged,{...req,nowMinute:19360}):startTrackStudy(damaged,{trackVersionId:'weak',heroSnapshot:studySkills(80),nowMinute:19360});
+   assert.ok(retry.jobId,kind+' retry must start work');assert.deepEqual(retry.state.rapAnalysis.sourceIds,['weak']);
+   assert.equal(retry.state.rapResearch.findings[finding.id],undefined,kind+' retry quarantines its dependent finding');assert.deepEqual(retry.state.rapResearch.recovery[0].recoveryData,finding);
+   const done=kind==='case'?api.advanceCaseStudy(retry.state,{gameMinutes:360,nowMinute:19720}):advanceStudy(retry.state,{gameMinutes:45,nowMinute:19405});assert.equal(done.finished,true);assert.equal(done.practiceGained,0);
+  }
+ }
+});
+test('valid historical reports and completed findings survive missing original version on reload',()=>{
+ let s=installed(topicFixture());s.trackVersions=analysisFixture().trackVersions;s.tournaments.byId['makarevich-1'].rounds.selection.submissions={player:'weak'};
+ s=api.advanceCaseStudy(api.startCaseStudy(s,{...request,kind:'battle',nowMinute:19000}).state,{gameMinutes:360,nowMinute:19360}).state;
+ delete s.rapAnalysis.reports['study:1'].supersedes;const reports=structuredClone(s.rapAnalysis.reports),findings=structuredClone(s.rapResearch.findings);delete s.trackVersions.byId.weak;
+ const loaded=createVirtualPcState(s);assert.deepEqual(loaded.rapAnalysis.reports,reports);assert.deepEqual(loaded.rapResearch.findings,findings);
 });
 test('judge with announced identity but no reviews completes explicitly unknown and future subject refuses',()=>{
  let s=installed(topicFixture()),characterId=s.roundThemes['makarevich-1:round-2'].authorJudgeId;
