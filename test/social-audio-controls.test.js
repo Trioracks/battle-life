@@ -64,3 +64,12 @@ test('playback errors are explicit and retryable, and view disposal releases its
  ctx.state='running';toggle(node).click();await flush();assert.equal(audio.status,'playing');view.dispose();ctx.currentTime+=10;tick();
  assert.equal(time(node).textContent,'0:00 / 0:20');
 });
+
+test('replacing owned rows releases their updates and handlers while an unattached replacement stays live',async t=>{
+ const {row,view,d,ctx,audio,tick}=fixture(t),host=d.createElement('section'),old=row();host.append(old);toggle(old).click();await flush();
+ const retiredBar=bar(old),setAttribute=retiredBar.setAttribute.bind(retiredBar);let writes=0;retiredBar.setAttribute=(...args)=>{writes++;setAttribute(...args);};
+ const replacement=row();ctx.currentTime=20.04;tick();assert.equal(bar(replacement).getAttribute('aria-valuenow'),'50','construction before attachment must keep its registration');
+ view.releaseRows(host);host.replaceChildren(replacement);writes=0;ctx.currentTime=21.04;tick();
+ assert.equal(writes,0,'removed rows must receive no later snapshot writes');assert.equal(retiredBar.getAttribute('aria-valuenow'),'50');assert.equal(bar(replacement).getAttribute('aria-valuenow'),'55');
+ toggle(old).click();assert.equal(audio.status,'playing','retired controls must release their handlers without stopping the recording');
+});

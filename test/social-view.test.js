@@ -45,6 +45,27 @@ test('saved audio catches errors without stopping the app session on page dispos
  assert.equal(played.length,1);assert.equal(played[0].owner,'social');assert.ok(allPc(s.root).some(n=>n.textContent?.includes('Не удалось')));const before=stopped;s.view.dispose();assert.equal(stopped,before);
 });
 
+function observedPlayback(state){
+ let snapshot={status:'playing',key:'version:'+state.social.personalAudioIds[0],owner:'social',positionSeconds:0,durationSeconds:20,error:''},notify=()=>{};
+ return {getSnapshot:()=>snapshot,subscribe(listener){notify=listener;listener(snapshot);return ()=>{notify=()=>{};};},emit(positionSeconds){snapshot={...snapshot,positionSeconds};notify(snapshot);}};
+}
+function countAttributeWrites(node){
+ const set=node.setAttribute.bind(node);let writes=0;node.setAttribute=(...args)=>{writes++;set(...args);};return ()=>writes;
+}
+test('same-page social rerenders release old audio rows before the next snapshot',()=>{
+ const state=subscriptionFixture(),audio=observedPlayback(state),s=setup('audio',{state,audio});
+ const old=allPc(s.root).find(n=>n.getAttribute?.('role')==='progressbar'),writes=countAttributeWrites(old);
+ state.social.subscriptions.push('concrete-echo');s.view.update();const current=allPc(s.root).find(n=>n.getAttribute?.('role')==='progressbar');assert.notEqual(current,old);
+ audio.emit(5);assert.equal(writes(),0);assert.equal(old.getAttribute('aria-valuenow'),'0');assert.ok(Number(current.getAttribute('aria-valuenow'))>0);s.view.dispose();
+});
+test('dialog history and draft replacement release only their removed audio rows',()=>{
+ const state=subscriptionFixture(),id=state.social.personalAudioIds[0];state.social.dialogs['makarevich-1']={messages:[{id:'sent',sender:'player',trackVersionId:id,at:600,body:'Готово'}],draftVersionId:id};
+ const audio=observedPlayback(state),s=setup('dialog/makarevich-1',{state,audio,metadata:{gameMinutes:600}}),old=allPc(s.root).filter(n=>n.getAttribute?.('role')==='progressbar'),writes=old.map(countAttributeWrites);assert.equal(old.length,2);
+ state.social.dialogs['makarevich-1'].messages.push({id:'answer',sender:'organizer',at:601,body:'Ответ'});state.social.dialogs['makarevich-1'].draftVersionId='';s.view.update();audio.emit(5);
+ assert.deepEqual(writes.map(count=>count()),[0,0]);for(const node of old)assert.equal(node.getAttribute('aria-valuenow'),'0');
+ const current=allPc(s.root).filter(n=>n.getAttribute?.('role')==='progressbar');assert.equal(current.length,1);assert.ok(Number(current[0].getAttribute('aria-valuenow'))>0);s.view.dispose();
+});
+
 for(const label of ['Нравится','Не нравится'])test('voting keeps focus on the same post after its '+label+' count changes',()=>{
  const s=setup('community/makarevich-1',{state:ensureSocialReactionPlans(topicFixture(),13440).state,metadata:{gameMinutes:13440}}),reaction=()=>allPc(s.root).find(n=>n.dataset?.reactionPost==='announce');
  const control=findButton(reaction(),label+': 0');control.focus();control.click();const voted=findButton(reaction(),label+': 1');assert.ok(voted);assert.equal(s.d.activeElement===voted,true,'focus follows the same post and vote, not another zero-count control');assert.equal(voted.getAttribute('aria-pressed'),'true');

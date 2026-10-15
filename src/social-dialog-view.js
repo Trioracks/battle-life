@@ -52,7 +52,7 @@ export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commi
  function update(markRead=true){
   if(disposed)return;if(!isVisible()){flushProgress();keyboard.sync({phase:'idle'});}const state=getState(),dialog=state.social?.dialogs?.[id]??{},window=currentBattleWindow(state,c.battleId,getMetadata().gameMinutes),attempt=window&&attemptForWindow(state,window),now=getMetadata().gameMinutes;
   const signature=JSON.stringify(dialog.messages??[]);if(signature!==lastMessages){
-   lastMessages=signature;history.replaceChildren();
+   lastMessages=signature;audio.releaseRows?.(history);history.replaceChildren();
    for(const msg of dialog.messages??[]){
     const row=el(d,'article',{className:'sn-dialog-message '+(msg.sender==='player'?'sn-outgoing':'')}),body=el(d,'div');
     body.append(el(d,'strong',{text:msg.sender==='player'?getMetadata().playerName??'Игрок':c.name}),el(d,'small',{text:gameDateTimeLabel(msg.at)}),el(d,'p',{text:msg.body}));
@@ -60,7 +60,7 @@ export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commi
    }
    if(!(dialog.messages?.length))history.append(el(d,'p',{className:'sn-empty',text:'Прикрепи готовый трек и отправь его организаторам. Свободных сообщений здесь нет.'}));
   }
-  if(lastDraft!==(dialog.draftVersionId??'')){lastDraft=dialog.draftVersionId??'';draft.replaceChildren();if(lastDraft)draft.append(el(d,'strong',{text:'Вложение · ещё не отправлено'}),audio.row(d,{version:state.trackVersions?.byId?.[lastDraft]}));}
+  if(lastDraft!==(dialog.draftVersionId??'')){lastDraft=dialog.draftVersionId??'';audio.releaseRows?.(draft);draft.replaceChildren();if(lastDraft)draft.append(el(d,'strong',{text:'Вложение · ещё не отправлено'}),audio.row(d,{version:state.trackVersions?.byId?.[lastDraft]}));}
   typing.textContent=dialogIsTyping(state,id,now)?c.name+' печатает…':'';
   const registered=state.battleApplications?.some(a=>a.battleId===c.battleId),deadline=battleDeadlineLabel(window,now);register.hidden=Boolean(registered);register.disabled=Boolean(window)&&!deadline.open;
   const upload=uploadPresentation(state),ownUpload=upload&&(upload.status==='error'||upload.communityId===id),waiting=ownUpload&&upload.status!=='ready';
@@ -76,5 +76,5 @@ export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commi
   picker?.update();
   if(markRead)autoRead();
  }
- update(false);return {root,update,tickOutgoingMessage,dispose(){disposed=true;flushProgress();keyboard.dispose();picker?.dispose();root.replaceChildren();}};
+ update(false);return {root,update,tickOutgoingMessage,dispose(){disposed=true;flushProgress();keyboard.dispose();picker?.dispose();audio.releaseRows?.(root);root.replaceChildren();}};
 }

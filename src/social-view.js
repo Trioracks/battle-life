@@ -57,7 +57,7 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
   else if(route.section==='messages'){messagesView=mountSocialMessages(d,options);node=messagesView.root;}
   else if(route.section==='dialog'){dialogView=mountSocialDialog(d,{...options,peer:route.peer,id:route.communityId??route.profileId});node=dialogView.root;}
   else node=createSocialProfileView(d,{...options,id:route.profileId??'me',view:route.section==='profile'?route.view:['friends','photos','audio'].includes(route.section)?route.section:'page'});
-  content.replaceChildren(analysisRoot,node);tableView?.layout();last=signature();
+  playback.releaseRows(content);content.replaceChildren(analysisRoot,node);tableView?.layout();last=signature();
   if(label){const field=pcFind(content,n=>identity(n)===label);field?.focus?.({preventScroll:true});if(Number.isInteger(start))field?.setSelectionRange?.(start,end);}
  }
  render();if(route.section==='me'||route.profileId==='me')void getMetadata().requestPlayerPortrait?.();return {tickOutgoingMessage:(dt,options)=>dialogView?.tickOutgoingMessage?.(dt,options),update(){if(disposed)return;if(last!==signature())render();else dialogView?.update();const visible=isVisible();if(visible&&!tableWasVisible)tableView?.layout();tableWasVisible=visible;updateBadge();},dispose(){disposed=true;closeRegistration?.();dialogView?.dispose();messagesView?.dispose();tableView?.dispose();playback.dispose();root.replaceChildren();}};

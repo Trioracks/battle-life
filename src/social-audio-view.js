@@ -11,9 +11,12 @@ export const backgroundAudioDescriptor=item=>archiveDescriptor(typeof item==='st
 const clock=seconds=>{const n=Math.max(0,Math.floor(seconds+1e-6));return Math.floor(n/60)+':'+String(n%60).padStart(2,'0');};
 const idle=()=>({status:'stopped',key:'',owner:null,positionSeconds:0});
 export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze}={}){
- let disposed=false,generation=0,snapshot=audio?.getSnapshot?.()??idle();const listeners=[],rows=new Set();
- const button=(d,text,handler,options)=>{const node=socialButton(d,text,handler,options);listeners.push([node,handler]);return node;};
- const update=next=>{if(disposed)return;snapshot=next;for(const render of rows)render();};
+ let disposed=false,generation=0,snapshot=audio?.getSnapshot?.()??idle();const rows=new Map();
+ const releaseRow=(row,entry)=>{entry.active=false;for(const [node,handler]of entry.listeners)node.removeEventListener('click',handler);entry.listeners.length=0;rows.delete(row);};
+ // Called before an owner replaces its content. Newly constructed rows outside
+ // that subtree keep their registration even before their first attachment.
+ const releaseRows=root=>{for(const [row,entry]of rows)if(root.contains(row))releaseRow(row,entry);};
+ const update=next=>{if(disposed)return;snapshot=next;for(const entry of rows.values())entry.render();};
  const refresh=()=>update(audio?.getSnapshot?.()??snapshot);
  const unsubscribe=audio?.subscribe?.(update);
  const stop=()=>{generation++;audio?.stop?.();if(!audio?.getSnapshot)snapshot=idle();refresh();};
@@ -22,6 +25,8 @@ export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze
  const player={playDescriptor:descriptor=>audio?.playDescriptor?.(descriptor,{loop:false}),stop:()=>audio?.stop?.(),get error(){return audio?.error??'';}};
  return {
   row(d,{version,item}){
+   const entry={active:true,listeners:[],render:null};
+   const button=(d,text,handler,options)=>{const node=socialButton(d,text,handler,options);entry.listeners.push([node,handler]);return node;};
    const descriptor=version?null:item?backgroundAudioDescriptor(item):null,key=version?'version:'+version.id:descriptor?.key;
    const title=version?.name??(item?[(item.archive?item.author:null),item.title].filter(Boolean).join(' — '):'Сохранённая работа недоступна');
    const duration=version?.recipe?.descriptor?.durationSeconds??descriptor?.durationSeconds??32/3;
@@ -30,22 +35,22 @@ export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze
    progress.append(fill);let failure='',unavailable='',previewKey=null,previewDescriptor=null;
    const matches=()=>snapshot.owner==='social'&&Boolean(key)&&(snapshot.key===key||snapshot.key===previewKey);
    const start=async(preview=null)=>{
-    if(disposed)return;const token=++generation;failure='';
+    if(disposed||!entry.active)return;const token=++generation;failure='';
     if(!audio?.getSnapshot)update({status:'loading',key:preview?.key??key,owner:'social',positionSeconds:0});
     try{
      const result=preview?{ok:Boolean(await player.playDescriptor(preview))}:version?await playTrackVersion(player,version):descriptor?{ok:Boolean(await player.playDescriptor(descriptor))}:{ok:false,reason:'Версия недоступна. Исходник не подменён.'};
-     if(disposed||token!==generation)return;
+     if(disposed||!entry.active||token!==generation)return;
      if(!result.ok)failure=result.reason??audio?.error??'Не удалось воспроизвести запись.';
      if(!audio?.getSnapshot)update({status:result.ok?'playing':'error',key:preview?.key??key,owner:'social',positionSeconds:0});
      refresh();
-    }catch{if(!disposed&&token===generation){failure='Не удалось воспроизвести запись.';refresh();}}
+    }catch{if(!disposed&&entry.active&&token===generation){failure='Не удалось воспроизвести запись.';refresh();}}
    };
    const play=button(d,'▶',()=>{
-    if(disposed)return;refresh();
+    if(disposed||!entry.active)return;refresh();
     if(matches()&&snapshot.status==='playing'){generation++;audio?.pause?.();if(!audio?.getSnapshot)update({...snapshot,status:'paused'});refresh();}
     else if(!(matches()&&snapshot.status==='loading'))void start(matches()&&snapshot.key===previewKey?previewDescriptor:null);
    },{dataset:{socialAudio:version?.id??item?.id??'missing'},attributes:{'aria-label':'Слушать: '+title}});
-   const halt=button(d,'■',()=>{if(!disposed&&matches()){failure='';stop();}},{attributes:{'aria-label':'Остановить: '+title}});
+   const halt=button(d,'■',()=>{if(!disposed&&entry.active&&matches()){failure='';stop();}},{attributes:{'aria-label':'Остановить: '+title}});
    const body=el(d,'div',{className:'sn-audio-body'}),detail=el(d,'div',{className:'sn-audio-detail'});
    detail.append(progress,time);body.append(el(d,'div',{className:'sn-audio-title',text:title}),detail);row.append(play,body,halt,status);
    const render=()=>{
@@ -56,7 +61,7 @@ export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze
     progress.setAttribute('aria-valuenow',String(percent));progress.setAttribute('aria-valuetext',clock(position)+' из '+clock(duration));fill.style.setProperty('width',percent+'%');time.textContent=clock(position)+' / '+clock(duration);
     status.textContent=failure||(loading?'Загрузка…':playing?(snapshot.key===previewKey?'Играет бит без голоса':'Играет'):state==='paused'?'Пауза':state==='error'?snapshot.error||'Не удалось воспроизвести запись.':'')||unavailable;
    };
-   rows.add(render);
+   entry.render=render;rows.set(row,entry);
    if(version?.npc){
     const id=version.npc.characterId,name=battleCharacter(id)?.nickname??'Автор';
     if(getState&&getMetadata&&navigate&&profileAccess(getState(),{characterId:id,nowMinute:metadataGameMinute(getMetadata())}).canView)row.append(button(d,name,()=>navigate('underweb://social/profile/'+id),{className:'sn-link sn-audio-extra',attributes:{'aria-label':'Страница автора: '+name}}));
@@ -65,6 +70,6 @@ export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze
    }
    if(version&&onAnalyze)row.append(button(d,'Изучить трек · 45 мин',()=>onAnalyze({trackVersionId:version.id,reviewIds:[]}),{className:'sn-button sn-audio-extra'}));
    render();return row;
-  },stop,dispose(){if(disposed)return;disposed=true;generation++;unsubscribe?.();rows.clear();for(const [node,handler]of listeners)node.removeEventListener('click',handler);listeners.length=0;}
+  },stop,releaseRows,dispose(){if(disposed)return;disposed=true;generation++;unsubscribe?.();for(const [row,entry]of rows)releaseRow(row,entry);}
  };
 }
