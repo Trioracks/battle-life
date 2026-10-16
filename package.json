@@ -9,7 +9,8 @@
     "audit:source": "node tools/audit-publication.mjs source --root .",
     "audit:site": "node tools/audit-publication.mjs site --root dist/public-preview",
     "test": "node tools/run-tests.mjs --profile public",
-    "test:local-assets": "node tools/run-tests.mjs --profile local-assets"
+    "test:local-assets": "node tools/run-tests.mjs --profile local-assets",
+    "qa:preview": "node tools/verify-public-preview.mjs"
   },
   "devDependencies": {"playwright": "1.62.1"}
 }
