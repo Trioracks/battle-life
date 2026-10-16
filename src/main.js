@@ -1,20 +1,26 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
-import { easeInOut, keyboardArmPose, seatPose, turnAngle } from './animation-timing.js';
+import { easeInOut, keyboardArmPose, seatPose, sideWalkPose, turnAngle } from './animation-timing.js?rev=side-walk-v2';
 import { GESTURE_STYLES, PERFORMANCE_SECONDS, performanceStyleAt, shuffledStyles } from './battle-director.js';
 import { clickIntent } from './click-intent.js';
+import { avatarModelPlan } from './avatar-model-plan.js';
 import { stepCharacter } from './character-motion.js';
 import { presentActionProgress } from './action-progress.js';
-import { advanceCampaign, createCampaign, getInventorySummary, loadCampaign, saveCampaign } from './game-state.js';
-import { appearanceGeometry, createRapper, cycleLookPart, LOOK_PART_LABELS, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
+import { advanceCampaign, createCampaign, loadCampaign, saveCampaign } from './game-state.js';
+import { newGameState, startScreenState } from './start-screen.js';
+import { allocationsFromSkills, appearanceGeometry, createRapper, cycleLookPart, frontFacingFaceLayout, LOOK_PART_LABELS, lookOptionLabel, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, STAT_KEYS, statLabels, validateAllocations } from './creator.js';
 import { canStartApartmentAction, describeApartmentAction, getApartmentAction } from './apartment-actions.js';
-import { APARTMENT_DESK, APARTMENT_FLOOR_Y, APARTMENT_MICROPHONE, APARTMENT_ROOMS, APARTMENT_SPAWN, apartmentWalkTargets, cameraTargetX, getApartmentRoom } from './apartment-layout.js';
-import { createActionTransition, phaseAfterApproach } from './action-transitions.js';
+import { APARTMENT_ACTOR_FOREGROUND_Z, APARTMENT_DESK, APARTMENT_ENTRY_DOOR, APARTMENT_FLOOR_Y, APARTMENT_INTERIOR_DOOR, APARTMENT_MICROPHONE, APARTMENT_ROOMS, APARTMENT_SPAWN, apartmentWalkTargets, cameraTargetX, getApartmentRoom } from './apartment-layout.js';
+import { actionUsesDeskSeat, createActionTransition, phaseAfterApproach } from './action-transitions.js';
+import { actionYaw, avatarFacingForYaw, cameraYaw, shouldPauseWalkForTurn, walkYaw } from './apartment-orientation.js';
 import { playSoundCue } from './sound-cues.js';
+import { loadApartmentScene } from './apartment-scene.js';
+import { loadAvatarRig } from './avatar-rig.js';
 import { desktopApps, getDesktopAction, openDesktopApp } from './desktop-apps.js';
 import { closeDesktopWindow, desktopShellLabels, desktopTaskbarLabel, finishDesktopBoot, openDesktopWindow, resumeDesktopWindow, shutdownDesktopSession, startDesktopSession } from './desktop-session.js';
+import { getBankOverview, getBattleDetail, getBattleList, getJobListing, getMarketCatalog } from './desktop-view-models.js';
 import { dequeueNotification, enqueueNotification } from './phone-notifications.js';
 import { districts, getDistrictLocations, startLocationAction, travelTo } from './calikfornia.js';
-import { completeShift, getJob, jobIds } from './jobs.js';
+import { jobIds } from './jobs.js';
 import { buyFood, cookMeal, eatMeal, sleep, washDishes } from './household.js';
 import { MAKAREWITCH_VI, registerForTournament, researchTournament } from './tournament.js';
 import { chooseBeat, getTrackStepStatus, masterTrack, mixTrack, polishDraft, recordAtMicrophone, startDraft, submitTrack } from './track-project.js';
@@ -33,6 +39,9 @@ const needElements = {
   health: document.querySelector('#need-health'),
   leisure: document.querySelector('#need-leisure'),
 };
+const startScreen = document.querySelector('#start-screen');
+const startNewGame = document.querySelector('#start-new-game');
+const startContinue = document.querySelector('#start-continue');
 const creatorModal = document.querySelector('#creator-modal');
 const creatorForm = document.querySelector('#creator-form');
 const creatorStats = document.querySelector('#creator-stats');
@@ -40,9 +49,11 @@ const creatorPoints = document.querySelector('#creator-points');
 const creatorError = document.querySelector('#creator-error');
 const creatorPreviewCanvas = document.querySelector('#creator-preview');
 const creatorLookControls = document.querySelector('#creator-look-controls');
+const creatorOpen = document.querySelector('#creator-open');
 const interactionDock = document.querySelector('#interaction-dock');
 const worldTooltip = document.querySelector('#world-tooltip');
 const actorBubble = document.querySelector('#actor-bubble');
+const transitionFade = document.querySelector('#transition-fade');
 const desktopScreen = document.querySelector('#desktop-screen');
 const desktopContent = document.querySelector('#desktop-content');
 const desktopClose = document.querySelector('#desktop-close');
@@ -54,9 +65,8 @@ const mapDistricts = document.querySelector('#map-districts');
 const mapLocationPanel = document.querySelector('#map-location-panel');
 const mapClose = document.querySelector('#map-close');
 let campaign = loadCampaign() ?? createCampaign();
-saveCampaign(campaign);
-let creatorAllocations = Object.fromEntries(STAT_KEYS.map((key) => [key, 0]));
-let creatorLook = campaign.player?.look ?? { hair: 'bald', face: 'clean', top: 'hoodie', pants: 'cargo' };
+let creatorAllocations = campaign.player ? allocationsFromSkills(campaign.player.skills) : Object.fromEntries(STAT_KEYS.map((key) => [key, 0]));
+let creatorLook = campaign.player?.look ?? normalizeLook({ hair: 'bald', face: 'clean', top: 'hoodie', pants: 'cargo', footwear: 'sneakers' });
 let creatorSelectedPart = 'hair';
 let audioContext = null;
 let desktopOpen = false;
@@ -64,6 +74,11 @@ let desktopBootTimer = null;
 let desktopSession = shutdownDesktopSession();
 let desktopSubView = 'home';
 let desktopStartMenuOpen = false;
+let desktopBattleId = null;
+let desktopJobId = null;
+let desktopMarketStore = 'shesterochka';
+let desktopCartItem = null;
+let desktopBankTab = 'overview';
 const room = { left: APARTMENT_ROOMS.kitchen.left, right: APARTMENT_ROOMS.living.right };
 const livingRoomOffset = 2.2;
 const kitchenRoomOffset = -1;
@@ -134,7 +149,7 @@ function renderActorBubble(content) {
 }
 
 function updateActorBubble() {
-  if (gameMode !== 'apartment') return renderActorBubble(null);
+  if (entryMode !== 'apartment' || gameMode !== 'apartment') return renderActorBubble(null);
   if (actor.computerTask) {
     const task = actor.computerTask;
     const progress = presentActionProgress(task, actor.actionElapsed, 2.45);
@@ -192,6 +207,56 @@ function desktopWindowMarkup(title, body) {
   return `<section class="desktop-window"><header class="desktop-window__bar"><span>${title}</span><button type="button" data-desktop-window-close aria-label="Закрыть окно">×</button></header><div class="desktop-window__body">${body}</div></section>${desktopStartMenuMarkup()}`;
 }
 
+function desktopProfileMarkup() {
+  const player = campaign.player;
+  return `<aside class="repset-profile"><b>${player?.nickname?.slice(0, 2).toUpperCase() ?? 'MC'}</b><strong>${player?.nickname ?? 'Новый MC'}</strong><span>${campaign.tournament.registered ? 'Участник MAKAREWITCH VI' : 'Ищет первый баттл'}</span><small>Письмо ${player?.skills?.writing ?? 10} · Флоу ${player?.skills?.flow ?? 10}</small></aside>`;
+}
+
+function renderBattlesBody() {
+  if (!desktopBattleId) {
+    const battles = getBattleList(campaign);
+    return `<section class="desktop-page repset-layout">${desktopProfileMarkup()}<div><p>Доступные баттлы и следы прошлых раундов. Открой карточку, чтобы увидеть тему и подать заявку.</p><div class="battle-list">${battles.map((battle) => `<button type="button" class="desktop-card" data-battle-detail="${battle.id}"><small>${battle.registered ? 'ЗАЯВКА ПРИНЯТА' : 'ПРИЁМ ОТКРЫТ'}</small><strong>${battle.title}</strong><span>${battle.description}</span><em>Дедлайн: ${battle.deadline}</em></button>`).join('')}</div></div></section>`;
+  }
+  const detail = getBattleDetail(campaign, desktopBattleId);
+  if (!detail) {
+    desktopBattleId = null;
+    return renderBattlesBody();
+  }
+  const registeredActions = !detail.canApply
+    ? `<div class="desktop-grid"><button class="desktop-icon" data-battle="research"><b>⌕</b><span>Изучить архив</span><small>1 ч · комментарии и скрытые предпочтения</small></button><button class="desktop-icon" data-battle="track"><b>♫</b><span>Моя заявка</span><small>Сделать и сдать трек</small></button>${campaign.tournament.submitted && !campaign.tournament.selection ? '<button class="desktop-icon" data-battle="results"><b>!</b><span>Судьи отсудили</span><small>Открыть комментарии и баллы</small></button>' : ''}</div>`
+    : `<button class="primary-button desktop-primary" type="button" data-battle-apply="${detail.id}">${detail.applyLabel}</button>`;
+  return `<section class="desktop-page"><button class="desktop-back" data-battle-detail-back>← К списку баттлов</button><div class="battle-detail"><div><small>ОНЛАЙН-ОТБОР · ЛОКАЛЬНЫЙ ДИВИЗИОН</small><h2>${detail.title}</h2><p>${detail.description}</p><p><strong>Тема:</strong> ${detail.theme}<br><strong>Дедлайн:</strong> ${detail.deadline}</p></div><aside><strong>Участники</strong>${detail.participants.map((name) => `<span>${name}</span>`).join('')}</aside></div><section class="archive-panel"><strong>Архив и комментарии</strong>${detail.archiveComments.map((comment) => `<p>${comment}</p>`).join('')}${detail.visibleHints.length ? `<small>Открыто анализом: ${detail.visibleHints.join(', ')}</small>` : '<small>Изучи архив после регистрации, чтобы открыть скрытый фокус.</small>'}</section>${registeredActions}${campaign.tournament.selection ? `<p class="selection-result"><strong>${campaign.tournament.selection.passed ? 'Ты прошёл отбор.' : 'Ты не прошёл отбор.'}</strong> ${campaign.tournament.selection.total}/30</p>` : ''}</section>`;
+}
+
+function renderJobsBody() {
+  if (desktopJobId) {
+    const job = getJobListing(desktopJobId);
+    if (!job) {
+      desktopJobId = null;
+      return renderJobsBody();
+    }
+    return `<section class="desktop-page"><button class="desktop-back" data-job-detail-back>← Все вакансии</button><div class="job-detail"><b>${job.employer.avatar}</b><div><small>РАБОТОДАТЕЛЬ</small><h2>${job.label}</h2><p>${job.employer.name}</p></div></div><dl class="desktop-facts"><div><dt>Район</dt><dd>${job.district}</dd></div><div><dt>График</dt><dd>${job.schedule}</dd></div><div><dt>Оплата</dt><dd>${job.payLabel}</dd></div><div><dt>Нужно бодрости</dt><dd>${job.minEnergy}</dd></div></dl><blockquote>${job.employer.review}</blockquote><button type="button" class="primary-button desktop-primary" data-job-map="${job.id}">Показать на карте</button></section>`;
+  }
+  return `<section class="desktop-page"><p>Выбери вакансию и прочитай условия. Смена начинается только после поездки к месту на карте.</p><div class="desktop-grid">${jobIds.map((id) => { const job = getJobListing(id); return `<button class="desktop-icon" data-job-detail="${id}"><b>${job.employer.avatar}</b><span>${job.label}</span><small>${job.schedule} · ${job.payLabel}</small></button>`; }).join('')}</div></section>`;
+}
+
+function renderMarketBody() {
+  const catalog = getMarketCatalog(campaign);
+  const store = catalog.stores.find((item) => item.id === desktopMarketStore) ?? catalog.stores[0];
+  const product = desktopCartItem ? store.products.find((item) => item.id === desktopCartItem) : null;
+  const cart = product ? `<aside class="market-cart"><strong>Корзина</strong><span>${product.label} · ${product.price} ₽</span><small>После оплаты: ${catalog.balanceAfter(product.id).toLocaleString('ru-RU')} ₽ · курьер через ${product.deliveryMinutes} мин</small><button type="button" class="primary-button desktop-primary" data-market-checkout="${product.id}">Оформить заказ</button></aside>` : '<aside class="market-cart"><strong>Корзина пуста</strong><small>Добавь продукт, чтобы увидеть точную сумму и время доставки.</small></aside>';
+  return `<section class="desktop-page"><p><strong>Наличные: ${catalog.cash.toLocaleString('ru-RU')} ₽.</strong> В холодильнике: ${catalog.inventory.ingredients} ингредиентов, ${catalog.inventory.cookedMeals} готовых порций; посуды: ${catalog.inventory.dirtyDishes}.</p><div class="desktop-tabs">${catalog.stores.map((item) => `<button type="button" class="${item.id === store.id ? 'is-active' : ''}" data-market-store="${item.id}">${item.name}</button>`).join('')}</div><div class="market-layout"><div class="desktop-grid">${store.products.map((item) => `<button class="desktop-icon" data-market-add="${item.id}"><b>▣</b><span>${item.label}</span><small>${item.price} ₽ · +${item.ingredients} ингредиента · ${item.deliveryMinutes} мин</small></button>`).join('')}</div>${cart}</div></section>`;
+}
+
+function renderBillsBody() {
+  const bank = getBankOverview(campaign);
+  const bill = bank.bills[0];
+  const panel = desktopBankTab === 'bills'
+    ? `<div class="bank-bill"><strong>${bill.label}</strong><span>${bill.amount.toLocaleString('ru-RU')} ₽ · ${bill.status === 'due' ? 'к оплате' : 'ещё не наступил'}</span><small>Общий долг: ${bill.debt.toLocaleString('ru-RU')} ₽. При просрочке доходы гасят его автоматически.</small></div>`
+    : `<div class="bank-bill"><strong>Переводы</strong><span>В первом срезе переводы недоступны.</span><small>Этот раздел появится вместе с платежами знакомым и услугами звукарей.</small></div>`;
+  return `<section class="desktop-page"><h2>Карта и счета</h2><p class="bank-balance">${bank.balance.toLocaleString('ru-RU')} ₽</p><div class="desktop-tabs"><button type="button" class="${desktopBankTab === 'overview' ? 'is-active' : ''}" data-bank-tab="overview">Переводы</button><button type="button" class="${desktopBankTab === 'bills' ? 'is-active' : ''}" data-bank-tab="bills">Счета</button></div>${panel}</section>`;
+}
+
 function renderDesktop(view = 'home') {
   if (desktopSession.state !== 'ready') return;
   if (view === 'home') {
@@ -233,15 +298,14 @@ function renderDesktop(view = 'home') {
   }
   const opened = openDesktopApp(desktopSession.window);
   if (!opened) return renderDesktop();
-  const inventory = getInventorySummary(campaign);
   const body = view === 'jobs'
-    ? `<p>Выбери смену. Деньги выдают наличными после работы; нагрузка различается.</p><div class="desktop-grid">${jobIds.map((id) => { const job = getJob(id); return `<button class="desktop-icon" data-job="${id}"><b>₽</b><span>${job.label}</span><small>${job.duration / 60} ч · ${job.pay} ₽</small></button>`; }).join('')}</div>`
+    ? renderJobsBody()
     : view === 'market'
-      ? `<p><strong>Наличные: ${campaign.cash.toLocaleString('ru-RU')} ₽.</strong> В холодильнике: ${inventory.ingredients} ингредиентов, ${inventory.cookedMeals} готовых порций, грязной посуды — ${inventory.dirtyDishes}.</p><p>Заказ оплачивается сразу; курьер привезёт продукты домой за 40 минут игрового времени.</p><div class="desktop-grid"><button class="desktop-icon" data-market="groceries"><b>▣</b><span>Заказать продукты</span><small>380 ₽ · +3 ингредиента · доставка 40 мин</small></button></div>`
+      ? renderMarketBody()
       : view === 'battles'
-        ? `<p>${MAKAREWITCH_VI.description}</p><p><strong>Дедлайн: 20 сентября, 23:59.</strong> ${campaign.tournament.researchHints.length ? `Найдено: ${campaign.tournament.researchHints.join(', ')}.` : ''}</p><div class="desktop-grid">${campaign.tournament.registered ? `<button class="desktop-icon" data-battle="research"><b>⌕</b><span>Изучить архив</span><small>1 ч · комментарии и скрытые предпочтения</small></button><button class="desktop-icon" data-battle="track"><b>♫</b><span>Моя заявка</span><small>Сделать и сдать трек</small></button>${campaign.tournament.submitted && !campaign.tournament.selection ? `<button class="desktop-icon" data-battle="results"><b>!</b><span>Судьи отсудили</span><small>Открыть комментарии и баллы</small></button>` : ''}` : `<button class="desktop-icon" data-battle="register"><b>◈</b><span>Участвовать</span><small>Зарегистрироваться на MAKAREWITCH VI</small></button>`}</div>${campaign.tournament.selection ? `<p><strong>${campaign.tournament.selection.passed ? 'Ты прошёл отбор.' : 'Ты не прошёл отбор.'}</strong> ${campaign.tournament.selection.total}/30<br>${campaign.tournament.selection.scores.map((score) => `${score.judge}: ${score.value}/10 — ${score.comment}`).join('<br>')}</p>` : `<p>${MAKAREWITCH_VI.comments.join('<br>')}</p>`}`
-      : view === 'bills'
-        ? `<p><strong>Наличные: ${campaign.cash.toLocaleString('ru-RU')} ₽</strong><br>Аренда: ${campaign.rent.amount.toLocaleString('ru-RU')} ₽ · 1 октября<br>Долг: ${campaign.rent.debt.toLocaleString('ru-RU')} ₽ · статус: ${campaign.rent.status === 'due' ? 'к оплате' : 'ещё не наступил'}.</p><p>При просрочке все доходы будут уходить в счёт общего долга.</p>`
+        ? renderBattlesBody()
+        : view === 'bills'
+        ? renderBillsBody()
         : `<p>${opened.app.description}. Этот раздел готов к игровому действию.</p>`;
   desktopContent.innerHTML = desktopWindowMarkup(opened.app.label, `<section class="desktop-page"><button class="desktop-back" data-desktop-back>← Рабочий стол</button><h2>${opened.app.label}</h2>${body}<div id="desktop-page-actions"></div></section>`);
 }
@@ -305,23 +369,74 @@ desktopContent.addEventListener('click', (event) => {
     renderDesktop();
     return;
   }
-  const jobButton = event.target.closest('[data-job]');
-  if (jobButton) {
-    const result = completeShift(campaign, jobButton.dataset.job);
+  const battleDetail = event.target.closest('[data-battle-detail]');
+  if (battleDetail) {
+    desktopBattleId = battleDetail.dataset.battleDetail;
+    renderDesktop('battles');
+    return;
+  }
+  if (event.target.closest('[data-battle-detail-back]')) {
+    desktopBattleId = null;
+    renderDesktop('battles');
+    return;
+  }
+  const battleApply = event.target.closest('[data-battle-apply]');
+  if (battleApply) {
+    const result = registerForTournament(campaign, battleApply.dataset.battleApply);
     campaign = result.state;
     saveCampaign(campaign);
     renderCampaignHud();
-    notify('РАБОТА', result.message);
-    renderDesktop('jobs');
+    notify('MAKAREWITCH VI', result.message);
+    renderDesktop('battles');
+    return;
   }
-  const marketButton = event.target.closest('[data-market]');
-  if (marketButton) {
-    const result = buyFood(campaign, marketButton.dataset.market);
+  const jobDetail = event.target.closest('[data-job-detail]');
+  if (jobDetail) {
+    desktopJobId = jobDetail.dataset.jobDetail;
+    renderDesktop('jobs');
+    return;
+  }
+  if (event.target.closest('[data-job-detail-back]')) {
+    desktopJobId = null;
+    renderDesktop('jobs');
+    return;
+  }
+  const jobMap = event.target.closest('[data-job-map]');
+  if (jobMap) {
+    const job = getJobListing(jobMap.dataset.jobMap);
+    notify('РАБОТА', `Вакансия «${job.label}» отмечена на карте.`);
+    closeDesktop();
+    openMap(job.district);
+    return;
+  }
+  const marketStore = event.target.closest('[data-market-store]');
+  if (marketStore) {
+    desktopMarketStore = marketStore.dataset.marketStore;
+    renderDesktop('market');
+    return;
+  }
+  const marketAdd = event.target.closest('[data-market-add]');
+  if (marketAdd) {
+    desktopCartItem = marketAdd.dataset.marketAdd;
+    renderDesktop('market');
+    return;
+  }
+  const marketCheckout = event.target.closest('[data-market-checkout]');
+  if (marketCheckout) {
+    const result = buyFood(campaign, marketCheckout.dataset.marketCheckout);
     campaign = result.state;
     saveCampaign(campaign);
     renderCampaignHud();
     notify('МАРКЕТ', result.message);
+    desktopCartItem = null;
     renderDesktop('market');
+    return;
+  }
+  const bankTab = event.target.closest('[data-bank-tab]');
+  if (bankTab) {
+    desktopBankTab = bankTab.dataset.bankTab;
+    renderDesktop('bills');
+    return;
   }
   const battleButton = event.target.closest('[data-battle]');
   if (battleButton) {
@@ -341,14 +456,7 @@ desktopContent.addEventListener('click', (event) => {
       startDesktopAction('research-archive', () => researchTournament(campaign));
       return;
     }
-    const result = battleButton.dataset.battle === 'register'
-      ? registerForTournament(campaign, MAKAREWITCH_VI.id)
-      : researchTournament(campaign);
-    campaign = result.state;
-    saveCampaign(campaign);
-    renderCampaignHud();
-    notify('MAKAREWITCH VI', result.message);
-    renderDesktop('battles');
+    return;
   }
   const trackButton = event.target.closest('[data-track-step]');
   if (trackButton) {
@@ -396,8 +504,8 @@ function renderMap(selectedDistrictId) {
   mapLocationPanel.innerHTML = `<p class="map-location-panel__eyebrow">${selectedDistrict.name}</p><h2>${selectedDistrict.role}</h2><p>${selectedDistrict.minutes ? `Дорога заняла ${selectedDistrict.minutes} мин.` : 'Ты в домашнем районе.'}</p>${locations.map((location) => `<button class="map-location" data-location="${location.id}"><b>${location.kind === 'job' ? '₽' : location.kind === 'market' ? '▣' : '◌'}</b><span><strong>${location.label}</strong><small>${location.description}</small></span><em>${location.kind === 'job' ? 'Начать смену' : location.kind === 'market' ? 'Заказать' : 'Осмотреть'}</em></button>`).join('')}`;
 }
 
-function openMap() {
-  const location = campaign.location === 'north-sloboda-home' ? 'north-sloboda' : campaign.location;
+function openMap(selectedDistrictId) {
+  const location = selectedDistrictId ?? (campaign.location === 'north-sloboda-home' ? 'north-sloboda' : campaign.location);
   renderMap(location);
   mapScreen.classList.remove('is-hidden');
 }
@@ -450,14 +558,56 @@ function selectedLook() {
 }
 
 function lookValueLabel(part, value) {
-  const labels = {
-    hair: { bald: 'Лысый', crop: 'Короткие', mohawk: 'Ирокез' },
-    face: { clean: 'Без бороды', mustache: 'Усы', beard: 'Борода' },
-    top: { hoodie: 'Худи', bomber: 'Бомбер', jacket: 'Куртка' },
-    pants: { cargo: 'Карго', jeans: 'Джинсы', shorts: 'Шорты' },
-  };
-  return labels[part]?.[value] ?? value;
+  return lookOptionLabel(part, value);
 }
+
+function openCreator() {
+  const player = campaign.player;
+  if (player) {
+    creatorForm.elements.name.value = player.name;
+    creatorForm.elements.nickname.value = player.nickname;
+    creatorAllocations = allocationsFromSkills(player.skills);
+    creatorLook = normalizeLook(player.look);
+  } else {
+    creatorForm.reset();
+    creatorForm.elements.name.value = 'Миша';
+    creatorForm.elements.nickname.value = '';
+    creatorAllocations = Object.fromEntries(STAT_KEYS.map((key) => [key, 0]));
+    creatorLook = normalizeLook({ hair: 'bald', face: 'clean', top: 'hoodie', pants: 'cargo', footwear: 'sneakers' });
+    creatorSelectedPart = 'hair';
+  }
+  entryMode = 'creator';
+  startScreen.classList.add('is-hidden');
+  creatorError.textContent = '';
+  renderCreator();
+  creatorModal.classList.remove('is-hidden');
+  resizeCreatorPreview();
+}
+
+function renderStartScreen() {
+  const state = startScreenState(campaign);
+  startContinue.classList.toggle('is-hidden', !state.canContinue);
+  startNewGame.textContent = state.canContinue ? 'Новая игра →' : 'Новая игра →';
+  startScreen.classList.remove('is-hidden');
+}
+
+function enterApartment() {
+  if (!campaign.player) return;
+  entryMode = 'apartment';
+  startScreen.classList.add('is-hidden');
+  creatorModal.classList.add('is-hidden');
+  applyAvatarLook(actor, campaign.player.look);
+  sceneTitle.textContent = `КВАРТИРА · ${campaign.player.nickname.toUpperCase()}`;
+  setStatus();
+}
+
+startNewGame.addEventListener('click', () => {
+  campaign = newGameState();
+  saveCampaign(campaign);
+  openCreator();
+});
+
+startContinue.addEventListener('click', enterApartment);
 
 creatorStats.addEventListener('click', (event) => {
   const button = event.target.closest('button[data-stat]');
@@ -487,6 +637,8 @@ creatorPreviewCanvas.addEventListener('click', (event) => {
   renderCreator();
 });
 
+creatorOpen.addEventListener('click', openCreator);
+
 creatorForm.addEventListener('submit', (event) => {
   event.preventDefault();
   try {
@@ -499,10 +651,7 @@ creatorForm.addEventListener('submit', (event) => {
     });
     campaign = { ...campaign, player };
     saveCampaign(campaign);
-    applyAvatarLook(actor, player.look);
-    sceneTitle.textContent = `КВАРТИРА · ${player.nickname.toUpperCase()}`;
-    creatorModal.classList.add('is-hidden');
-    setStatus();
+    enterApartment();
   } catch (error) {
     creatorError.textContent = error.message;
   }
@@ -510,8 +659,8 @@ creatorForm.addEventListener('submit', (event) => {
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+// Apartment is presented as a flat 2.5D diorama: no context-dependent real-time shadows.
+renderer.shadowMap.enabled = false;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const scene = new THREE.Scene();
@@ -628,39 +777,55 @@ function addRoom() {
   box(roomGroup, [16, 6.7, .18], colors.wall, [1, 3.25, -1.35]);
   box(roomGroup, [16, .13, .22], colors.floorLine, [1, .08, -1.12]);
 
-  plane(kitchenRoom, [5.25, 6.3], 0x485342, [-2.6, 3.2, -1.24], { emissive: 0x182016, emissiveIntensity: .34 });
+  // Кухня читается как отдельная зона: бело-чёрные обои крупной клеткой и светлый кафель.
+  plane(kitchenRoom, [5.25, 6.3], 0xefeee6, [-2.6, 3.2, -1.24], { emissive: 0x44443d, emissiveIntensity: .18 });
+  for (let column = 0; column < 4; column += 1) {
+    for (let row = 0; row < 5; row += 1) {
+      if ((column + row) % 2 !== 0) continue;
+      plane(kitchenRoom, [1.3, 1.26], 0x222825, [-4.55 + column * 1.3, .64 + row * 1.26, -1.225], { emissive: 0x070908, emissiveIntensity: .28 });
+    }
+  }
+  for (let tileX = -5.0; tileX < .3; tileX += .72) {
+    for (let tileZ = -1.0; tileZ <= 1.02; tileZ += .68) {
+      const alternate = (Math.round((tileX + 5) / .72) + Math.round((tileZ + 1) / .68)) % 2 === 0;
+      box(kitchenRoom, [.68, .035, .64], alternate ? 0xf4f2e9 : 0xd9dad2, [tileX, .025, tileZ], { castShadow: false });
+    }
+  }
   plane(livingRoom, [8.95, 6.3], 0x3c5053, [1.5, 3.2, -1.24], { emissive: 0x122428, emissiveIntensity: .32 });
 
-  for (let x = -6.7; x < 8.6; x += 1.1) {
-    box(roomGroup, [.035, 6.2, .04], 0x738070, [x, 3.15, -1.23], { castShadow: false });
+  for (let x = -2.8; x < 6.5; x += 1.1) {
+    box(livingRoom, [.035, 6.2, .04], 0x738070, [x, 3.15, -1.23], { castShadow: false });
   }
 
   const windowGroup = new THREE.Group();
-  windowGroup.position.set(1.25, 3.75, -1.19);
-  windowGroup.scale.set(.64, .82, 1);
+  windowGroup.position.set(1.15, 3.08, -1.19);
+  windowGroup.scale.set(.72, .76, 1);
   livingRoom.add(windowGroup);
-  box(windowGroup, [3.9, 2.36, .14], colors.woodDark, [0, 0, 0]);
-  plane(windowGroup, [3.54, 2.04], 0x263b4b, [0, 0, .09], { emissive: 0x132937, emissiveIntensity: .8 });
-  for (const [x, width, height, y] of [[-1.35, .72, 1.15, -.46], [-.52, .63, 1.42, -.33], [.22, .83, .98, -.52], [1.14, .66, 1.58, -.25]]) {
-    box(windowGroup, [width, height, .025], 0x9b443d, [x, y, .12], { emissive: 0x3b100c, emissiveIntensity: .45 });
-    for (let floor = y - height / 2 + .18; floor < y + height / 2; floor += .24) box(windowGroup, [width * .72, .045, .03], 0xe0aa58, [x, floor, .14], { emissive: 0x5c3213, emissiveIntensity: 1.2 });
-  }
-  box(windowGroup, [.12, 2.16, .1], colors.wood, [0, 0, .14]);
-  box(windowGroup, [3.68, .11, .1], colors.wood, [0, 0, .14]);
+  box(windowGroup, [4.1, 2.48, .14], colors.woodDark, [0, 0, 0], { castShadow: false, receiveShadow: false });
+  plane(windowGroup, [3.74, 2.12], 0x273c4c, [0, 0, .09], { emissive: 0x122a3a, emissiveIntensity: .75 });
+  box(windowGroup, [3.58, .52, .018], 0x9a4841, [0, -.8, .11], { castShadow: false, receiveShadow: false });
+  box(windowGroup, [1.12, .84, .018], 0x7c403d, [-1.08, -.36, .115], { castShadow: false, receiveShadow: false });
+  box(windowGroup, [.12, 2.26, .1], colors.wood, [0, 0, .14], { castShadow: false, receiveShadow: false });
+  box(windowGroup, [3.86, .11, .1], colors.wood, [0, 0, .14], { castShadow: false, receiveShadow: false });
+  box(windowGroup, [4.26, .16, .24], 0x8a694b, [0, -1.3, .16], { castShadow: false, receiveShadow: false });
 
   const divider = new THREE.Group();
   divider.name = 'kitchen-doorway';
-  divider.position.set(-.93, 1.55, -.72);
+  divider.position.set(-.93, 0, -.72);
   roomGroup.add(divider);
-  box(divider, [.16, 3.24, .35], 0x34413d, [0, 0, 0]);
-  box(divider, [1.16, .14, .4], colors.wood, [-.5, 1.54, .02]);
+  const doorwayWidth = APARTMENT_INTERIOR_DOOR.width;
+  const doorwayHeight = APARTMENT_INTERIOR_DOOR.height;
+  box(divider, [.18, doorwayHeight, .35], 0x392d27, [-doorwayWidth / 2, doorwayHeight / 2, 0]);
+  box(divider, [.18, doorwayHeight, .35], 0x392d27, [doorwayWidth / 2, doorwayHeight / 2, 0]);
+  box(divider, [doorwayWidth + .36, .2, .4], colors.woodDark, [0, doorwayHeight, .02]);
+  box(divider, [doorwayWidth + .16, .1, .32], 0xb69c70, [0, doorwayHeight - .17, .12], { emissive: 0x3c270d, emissiveIntensity: .4 });
   const interiorDoor = new THREE.Group();
   interiorDoor.name = 'interior-door-panel';
-  interiorDoor.position.set(.08, 0, .02);
+  interiorDoor.position.set(doorwayWidth / 2 - .08, 0, .02);
   divider.add(interiorDoor);
-  box(interiorDoor, [.92, 2.48, .13], 0x6b4935, [-.46, -.28, 0]);
-  box(interiorDoor, [.72, 2.24, .04], 0x2f403a, [-.46, -.27, .09]);
-  box(interiorDoor, [.06, .06, .07], colors.amber, [-.08, -.25, .15], { emissive: 0x6c3e09, emissiveIntensity: .85 });
+  box(interiorDoor, [doorwayWidth - .16, doorwayHeight - .24, .13], 0x79533c, [-(doorwayWidth - .16) / 2, (doorwayHeight - .24) / 2, 0]);
+  box(interiorDoor, [doorwayWidth - .48, doorwayHeight - .58, .04], 0x25312e, [-(doorwayWidth - .16) / 2, (doorwayHeight - .24) / 2, .09]);
+  box(interiorDoor, [.08, .08, .08], colors.amber, [-.18, doorwayHeight * .48, .15], { emissive: 0x6c3e09, emissiveIntensity: .85 });
 
   const bedFrame = new THREE.Group();
   bedFrame.position.set(-.95, 0, -.12);
@@ -767,29 +932,37 @@ function addRoom() {
   cylinder(mic, .075, .065, .24, 0x8ba19e, [0, .49, 0]);
   box(mic, [.23, .035, .035], 0x33433f, [0, .55, .03]);
 
-  box(livingRoom, [.82, 3.25, .12], 0x49362e, [5.44, 1.63, -.76]);
-  box(livingRoom, [.66, 2.98, .05], 0x263332, [5.44, 1.63, -.67]);
+  // Входная дверь — самостоятельный объект, а не тёмная полоса у края кадра.
+  const exitDoor = new THREE.Group();
+  exitDoor.name = 'apartment-entry-door';
+  exitDoor.position.set(5.44, 0, -.76);
+  livingRoom.add(exitDoor);
+  const entryDoorWidth = APARTMENT_ENTRY_DOOR.width;
+  const entryDoorHeight = APARTMENT_ENTRY_DOOR.height;
+  // The frame stays in the wall; only this panel is allowed to rotate from its hinge.
+  box(exitDoor, [.16, entryDoorHeight, .2], 0x2b231f, [-entryDoorWidth / 2, entryDoorHeight / 2, 0]);
+  box(exitDoor, [.16, entryDoorHeight, .2], 0x2b231f, [entryDoorWidth / 2, entryDoorHeight / 2, 0]);
+  box(exitDoor, [entryDoorWidth + .16, .16, .2], 0x2b231f, [0, entryDoorHeight - .08, 0]);
+  const entryDoorPanel = new THREE.Group();
+  entryDoorPanel.name = 'apartment-entry-door-panel';
+  entryDoorPanel.position.set(entryDoorWidth / 2 - .11, 0, .14);
+  exitDoor.add(entryDoorPanel);
+  box(entryDoorPanel, [entryDoorWidth, entryDoorHeight - .23, .09], 0x714b37, [-entryDoorWidth / 2, (entryDoorHeight - .23) / 2, 0]);
+  box(entryDoorPanel, [entryDoorWidth - .42, 1.2, .035], 0x4d3027, [-entryDoorWidth / 2, entryDoorHeight * .67, .06]);
+  box(entryDoorPanel, [entryDoorWidth - .42, 1.2, .035], 0x4d3027, [-entryDoorWidth / 2, entryDoorHeight * .28, .06]);
+  box(entryDoorPanel, [.11, .11, .07], 0xe0ae50, [-entryDoorWidth * .23, entryDoorHeight * .47, .1], { emissive: 0x6a4009, emissiveIntensity: .85 });
+  box(entryDoorPanel, [.06, .06, .07], 0x1b1c1b, [-entryDoorWidth / 2, entryDoorHeight * .84, .1]);
+  box(exitDoor, [entryDoorWidth + .08, .12, .46], 0x1d2221, [0, .07, .1]);
+  plane(exitDoor, [.74, .22], 0x3b5f46, [0, entryDoorHeight + .02, .22], { emissive: 0x143821, emissiveIntensity: .9 });
 
   actionHit('bed', livingRoom, [.15, .82, .1], [3.3, 1.2, 1.15]);
   actionHit('fridge', kitchenRoom, [-4.72, 1.12, .02], [1.2, 2.42, .95]);
   actionHit('stove', kitchenRoom, [-3.66, .95, .02], [.95, .75, .98]);
   actionHit('sink', kitchenRoom, [-2.49, .98, .02], [.84, .78, .98]);
   actionHit('microphone', livingRoom, [APARTMENT_MICROPHONE.x - livingRoomOffset, APARTMENT_MICROPHONE.baseY + .3, .28], [.72, .86, .9]);
-  actionHit('door', livingRoom, [5.44, 1.63, .04], [.95, 3.45, .8]);
-
-  // The exit sits above and beside the shelf so it remains readable at every viewport width.
-  const exitArrow = new THREE.ArrowHelper(
-    new THREE.Vector3(1, 0, 0),
-    new THREE.Vector3(5.12, 3.88, .42),
-    .92,
-    0xe6bd58,
-    .28,
-    .18,
-  );
-  livingRoom.add(exitArrow);
-  plane(livingRoom, [1.34, .42], 0x5d4727, [5.2, 3.88, .23], { emissive: 0x3e2808, emissiveIntensity: .7 });
-  box(livingRoom, [.12, 4.2, .34], 0x313936, [5.92, 2.08, -.12]);
-  return { roomGroup, livingRoom, kitchenRoom, interiorDoor, computerHitArea, computerHighlight, actionHitAreas, actionHighlights };
+  actionHit('door', livingRoom, [5.44, entryDoorHeight / 2, .04], [entryDoorWidth + .35, entryDoorHeight + .2, .8]);
+  box(livingRoom, [.12, 4.2, .34], 0x313936, [6.62, 2.08, -.12]);
+  return { roomGroup, livingRoom, kitchenRoom, interiorDoor, entryDoorPanel, computerHitArea, computerHighlight, actionHitAreas, actionHighlights };
 }
 
 function makeLimb(parent, name, z, color, upperLength, lowerLength) {
@@ -799,6 +972,18 @@ function makeLimb(parent, name, z, color, upperLength, lowerLength) {
   const upper = box(pivot, [.28, upperLength, .28], color, [0, -upperLength / 2, z]);
   const lowerPivot = new THREE.Group();
   lowerPivot.position.set(0, -upperLength, z);
+  pivot.add(lowerPivot);
+  const lower = box(lowerPivot, [.25, lowerLength, .25], color, [0, -lowerLength / 2, 0]);
+  return { pivot, lowerPivot, upper, lower };
+}
+
+function createCharacterLimb(parent, name, color, upperLength, lowerLength) {
+  const pivot = new THREE.Group();
+  pivot.name = `avatar-${name}-pivot`;
+  parent.add(pivot);
+  const upper = box(pivot, [.28, upperLength, .28], color, [0, -upperLength / 2, 0]);
+  const lowerPivot = new THREE.Group();
+  lowerPivot.position.set(0, -upperLength, 0);
   pivot.add(lowerPivot);
   const lower = box(lowerPivot, [.25, lowerLength, .25], color, [0, -lowerLength / 2, 0]);
   return { pivot, lowerPivot, upper, lower };
@@ -814,7 +999,12 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
     turn: null,
     actionElapsed: 0,
     seatStartX: 0,
+    seatStartZ: APARTMENT_ACTOR_FOREGROUND_Z,
     seatTargetX: deskX - .45,
+    seatTargetZ: .02,
+    standStartZ: APARTMENT_ACTOR_FOREGROUND_Z,
+    actionStartZ: APARTMENT_ACTOR_FOREGROUND_Z,
+    actionTargetZ: APARTMENT_ACTOR_FOREGROUND_Z,
     destinationX: null,
     interaction: null,
     pendingIntent: null,
@@ -825,11 +1015,12 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
     actionCuePlayed: false,
     bubble: null,
     computerTask: null,
+    seatRevealUntil: 0,
+    look: normalizeLook(),
   };
-  actor.group.position.x = actor.state.x;
+  actor.group.position.x = x;
   actor.group.add(actor.model);
   parent.add(actor.group);
-
   const shadow = new THREE.Mesh(new THREE.CircleGeometry(.62, 24), new THREE.MeshBasicMaterial({ color: 0x0a0e0e, transparent: true, opacity: .42 }));
   shadow.rotation.x = -Math.PI / 2;
   shadow.scale.y = .4;
@@ -837,94 +1028,87 @@ function createCharacter(parent = scene, { x = APARTMENT_SPAWN.x } = {}) {
   actor.group.add(shadow);
   actor.shadow = shadow;
 
+  const rig = new THREE.Group();
+  rig.name = 'avatar-three-mesh-rig';
+  actor.model.add(rig);
+  actor.meshRig = rig;
+
+  const [torsoPlan, headPlan, leftEarPlan, rightEarPlan] = avatarModelPlan(actor.look).parts;
   const topStyles = {};
   const tee = new THREE.Group();
   tee.name = 'avatar-top-tee';
-  actor.model.add(tee);
-  const teeTorso = box(tee, [.72, .84, .48], 0x6e7c74, [0, 1.48, 0]);
-  const teeSleeveLeft = box(tee, [.24, .28, .5], 0x6e7c74, [-.47, 1.79, 0]);
-  const teeSleeveRight = box(tee, [.24, .28, .5], 0x6e7c74, [.47, 1.79, 0]);
-  topStyles.tee = { group: tee, meshes: [teeTorso, teeSleeveLeft, teeSleeveRight] };
+  rig.add(tee);
+  const teeTorso = box(tee, torsoPlan.size, 0x6e7c74, torsoPlan.position);
+  topStyles.tee = { group: tee, meshes: [teeTorso] };
 
   const hoodie = new THREE.Group();
   hoodie.name = 'avatar-top-hoodie';
-  actor.model.add(hoodie);
+  rig.add(hoodie);
   const hoodieTorso = box(hoodie, [.76, .98, .52], colors.hoodie, [0, 1.48, 0]);
   const hoodiePouch = box(hoodie, [.54, .22, .08], colors.hoodie, [0, 1.21, .3]);
   const hood = new THREE.Mesh(new THREE.TorusGeometry(.31, .09, 8, 12, Math.PI), material(colors.hoodie));
   hood.rotation.x = Math.PI / 2;
   hood.position.set(0, 1.95, -.27);
+  hood.castShadow = true;
   hoodie.add(hood);
   topStyles.hoodie = { group: hoodie, meshes: [hoodieTorso, hoodiePouch, hood] };
 
   const jacket = new THREE.Group();
   jacket.name = 'avatar-top-jacket';
-  actor.model.add(jacket);
+  rig.add(jacket);
   const jacketTorso = box(jacket, [.78, .96, .54], 0x2e5361, [0, 1.48, 0]);
-  const jacketLapels = [
-    box(jacket, [.2, .6, .09], 0x6b8b92, [-.2, 1.6, .32]),
-    box(jacket, [.2, .6, .09], 0x6b8b92, [.2, 1.6, .32]),
-  ];
-  jacketLapels[0].rotation.z = -.3;
-  jacketLapels[1].rotation.z = .3;
-  topStyles.jacket = { group: jacket, meshes: [jacketTorso, ...jacketLapels] };
+  topStyles.jacket = { group: jacket, meshes: [jacketTorso] };
 
-  box(actor.model, [.53, .57, .48], colors.skin, [0, 2.32, 0]);
-  const hair = box(actor.model, [.55, .09, .51], 0x17151b, [0, 2.64, 0]);
-  const mustache = new THREE.Group();
-  mustache.name = 'avatar-profile-mustache';
-  actor.model.add(mustache);
-  const beard = new THREE.Group();
-  beard.name = 'avatar-profile-beard';
-  actor.model.add(beard);
-  for (const side of [-1, 1]) {
-    box(mustache, [.045, .055, .19], 0x1b1718, [side * .3, 2.31, .16]);
-    box(beard, [.055, .2, .3], 0x1b1718, [side * .3, 2.13, .12]);
-  }
+  box(rig, headPlan.size, colors.skin, headPlan.position);
+  const hair = box(rig, [.55, .09, .51], 0x17151b, [0, 2.64, 0]);
+  box(rig, leftEarPlan.size, colors.skin, leftEarPlan.position);
+  box(rig, rightEarPlan.size, colors.skin, rightEarPlan.position);
+
+  const face = new THREE.Group();
+  face.name = 'avatar-physical-face';
+  rig.add(face);
+  const faceLayout = frontFacingFaceLayout();
+  const eyeMaterial = material(0xe9eadf, { emissive: 0x6b6d60, emissiveIntensity: .16 });
+  faceLayout.eyeXs.forEach((eyeX) => {
+    const eye = new THREE.Mesh(new THREE.BoxGeometry(.1, .09, .05), eyeMaterial);
+    eye.position.set(eyeX, 2.43, faceLayout.faceZ);
+    eye.castShadow = true;
+    face.add(eye);
+    const brow = box(face, [.15, .035, .055], 0x2a2020, [eyeX, 2.52, faceLayout.faceZ]);
+    brow.rotation.z = eyeX < 0 ? .1 : -.1;
+  });
+  box(face, [.055, .12, .07], 0xc48769, [0, 2.34, .295]);
+  box(face, [.2, .035, .055], 0x994f4b, [0, 2.2, .295]);
+  const mustache = box(face, [.26, .055, .06], 0x1b1718, [0, 2.31, .31]);
+  const beard = box(face, [.37, .2, .065], 0x1b1718, [0, 2.13, .31]);
   mustache.visible = false;
   beard.visible = false;
-  const face = new THREE.Group();
-  face.name = 'avatar-face';
-  actor.model.add(face);
-  for (const side of [-1, 1]) box(face, [.12, .18, .17], colors.skin, [side * .34, 2.32, .01]);
-  const eyeMaterial = material(0xe9eadf, { emissive: 0x6b6d60, emissiveIntensity: .16 });
-  for (const side of [-1, 1]) {
-    const eye = new THREE.Mesh(new THREE.BoxGeometry(.045, .09, .1), eyeMaterial);
-    eye.position.set(side * .285, 2.43, .08);
-    face.add(eye);
-    const brow = box(face, [.045, .035, .15], 0x2a2020, [side * .29, 2.52, .08]);
-    brow.rotation.x = side < 0 ? .1 : -.1;
-    box(face, [.055, .12, .08], 0xc48769, [side * .29, 2.34, .29]);
-    box(face, [.045, .035, .17], 0x994f4b, [side * .295, 2.2, .14]);
-  }
 
-  actor.backArm = makeLimb(actor.model, 'backArm', -.31, 0x1f2930, .62, .52);
-  actor.frontArm = makeLimb(actor.model, 'frontArm', .31, 0x34444d, .62, .52);
-  actor.backArm.pivot.position.set(0, 1.83, 0);
-  actor.frontArm.pivot.position.set(0, 1.83, 0);
-  box(actor.backArm.lowerPivot, [.22, .21, .22], colors.skin, [0, -.6, 0]);
-  box(actor.frontArm.lowerPivot, [.22, .21, .22], colors.skin, [0, -.6, 0]);
+  actor.backArm = createCharacterLimb(rig, 'left-arm', 0x2e5361, .62, .52);
+  actor.frontArm = createCharacterLimb(rig, 'right-arm', 0x2e5361, .62, .52);
+  actor.backArm.pivot.position.set(-.42, 1.83, -.1);
+  actor.frontArm.pivot.position.set(.42, 1.83, .1);
+  box(actor.backArm.lowerPivot, [.22, .21, .22], colors.skin, [0, -.6, .01]);
+  box(actor.frontArm.lowerPivot, [.22, .21, .22], colors.skin, [0, -.6, .01]);
 
-  actor.backLeg = makeLimb(actor.model, 'backLeg', -.19, 0x33423f, .68, .6);
-  actor.frontLeg = makeLimb(actor.model, 'frontLeg', .19, colors.pants, .68, .6);
-  actor.backLeg.pivot.position.set(0, 1.03, 0);
-  actor.frontLeg.pivot.position.set(0, 1.03, 0);
+  actor.backLeg = createCharacterLimb(rig, 'left-leg', colors.pants, .68, .6);
+  actor.frontLeg = createCharacterLimb(rig, 'right-leg', colors.pants, .68, .6);
+  actor.backLeg.pivot.position.set(-.19, 1.03, -.03);
+  actor.frontLeg.pivot.position.set(.19, 1.03, .03);
   box(actor.backLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
   box(actor.frontLeg.lowerPivot, [.39, .16, .32], colors.shoe, [.1, -.64, .01]);
 
-  actor.model.rotation.y = profileFaceLayout().rightYaw;
   actor.lookParts = {
     topStyles,
     hair,
     mustache,
     beard,
-    frontLeg: actor.frontLeg.upper,
-    backLeg: actor.backLeg.upper,
-    frontShin: actor.frontLeg.lower,
-    backShin: actor.backLeg.lower,
-    frontArm: actor.frontArm.upper,
-    backArm: actor.backArm.upper,
+    armMeshes: [actor.backArm.upper, actor.backArm.lower, actor.frontArm.upper, actor.frontArm.lower],
+    pantsMeshes: [actor.backLeg.upper, actor.frontLeg.upper],
+    lowerLegMeshes: [actor.backLeg.lower, actor.frontLeg.lower],
   };
+  actor.model.rotation.y = profileFaceLayout().rightYaw;
+  updateFacePresentation(actor);
   return actor;
 }
 
@@ -933,22 +1117,31 @@ function applyAvatarLook(target, look = {}) {
   const geometry = appearanceGeometry(normalizedLook);
   const topColors = { tee: 0x6e7c74, hoodie: colors.hoodie, jacket: 0x2e5361 };
   const pantsColors = { cargo: colors.pants, jeans: 0x303d63, shorts: 0x77715b };
-  const topColor = topColors[normalizedLook.top];
-  Object.entries(target.lookParts.topStyles).forEach(([id, style]) => {
-    style.group.visible = id === normalizedLook.top;
-    style.meshes.forEach((mesh) => mesh.material.color.setHex(topColor));
+  target.look = normalizedLook;
+  target.authoredRig?.setLook(normalizedLook);
+  if (!target.lookParts) return;
+  Object.entries(target.lookParts.topStyles).forEach(([style, definition]) => {
+    definition.group.visible = style === normalizedLook.top;
+    setAvatarMeshColor(definition.meshes, topColors[style]);
   });
-  target.lookParts.frontArm.material.color.setHex(topColor);
-  target.lookParts.backArm.material.color.setHex(topColor);
-  target.lookParts.frontLeg.material.color.setHex(pantsColors[normalizedLook.pants]);
-  target.lookParts.backLeg.material.color.setHex(pantsColors[normalizedLook.pants]);
-  target.lookParts.frontShin.material.color.setHex(geometry.lowerLegsVisible ? colors.skin : pantsColors[normalizedLook.pants]);
-  target.lookParts.backShin.material.color.setHex(geometry.lowerLegsVisible ? colors.skin : pantsColors[normalizedLook.pants]);
+  setAvatarMeshColor(target.lookParts.armMeshes, topColors[normalizedLook.top]);
+  setAvatarMeshColor(target.lookParts.pantsMeshes, pantsColors[normalizedLook.pants]);
+  setAvatarMeshColor(target.lookParts.lowerLegMeshes, geometry.lowerLegsVisible ? colors.skin : pantsColors[normalizedLook.pants]);
   target.lookParts.hair.visible = normalizedLook.hair !== 'bald';
   target.lookParts.hair.scale.set(1, normalizedLook.hair === 'mohawk' ? 2.2 : 1, normalizedLook.hair === 'mohawk' ? .38 : 1);
   target.lookParts.hair.position.y = normalizedLook.hair === 'mohawk' ? 2.72 : 2.64;
   target.lookParts.mustache.visible = normalizedLook.face === 'mustache';
   target.lookParts.beard.visible = normalizedLook.face === 'beard';
+  updateFacePresentation(target);
+}
+
+function setAvatarMeshColor(meshes, color) {
+  meshes.forEach((mesh) => mesh.material.color.setHex(color));
+}
+
+function updateFacePresentation(target) {
+  if (!target.meshRig) return;
+  target.activeAvatarView = avatarFacingForYaw(target.model.rotation.y).face;
 }
 
 function createEggOpponent(parent, x = 3.75) {
@@ -1106,9 +1299,10 @@ function createBattleScene() {
   };
 }
 
-const { roomGroup, interiorDoor, computerHitArea, computerHighlight, actionHitAreas, actionHighlights } = addRoom();
+const { roomGroup, interiorDoor, entryDoorPanel, computerHitArea, computerHighlight, actionHitAreas, actionHighlights } = addRoom();
 const interactiveObjects = actionHitAreas;
 const actor = createCharacter();
+actor.group.position.z = APARTMENT_ACTOR_FOREGROUND_Z;
 const actorFootOffset = .37;
 
 function anchorActorToFloor(target, floorY = APARTMENT_FLOOR_Y) {
@@ -1132,8 +1326,53 @@ const creatorPreviewActor = createCharacter(creatorPreviewScene, { x: 0 });
 anchorActorToFloor(creatorPreviewActor);
 creatorPreviewActor.model.rotation.y = profileFaceLayout().previewYaw;
 applyAvatarLook(creatorPreviewActor, creatorLook);
+
+let authoredApartment = null;
+let authoredAvatar = null;
+let authoredPreviewAvatar = null;
+
+function replaceBlockoutWithAuthoredApartment() {
+  return Promise.all([
+    loadApartmentScene({ scene }),
+    loadAvatarRig({ look: campaign.player?.look ?? creatorLook }),
+    loadAvatarRig({ look: creatorLook }),
+  ]).then(([apartment, worldAvatar, previewAvatar]) => {
+    // The earlier blockout stays in memory only as a fallback for a failed load.
+    // It is never drawn once the authored scene is ready.
+    roomGroup.visible = false;
+    actor.model.visible = false;
+    creatorPreviewActor.model.visible = false;
+
+    worldAvatar.root.position.y = -actorFootOffset;
+    previewAvatar.root.position.y = -actorFootOffset;
+    actor.group.add(worldAvatar.root);
+    creatorPreviewActor.group.add(previewAvatar.root);
+    actor.authoredRig = worldAvatar;
+    creatorPreviewActor.authoredRig = previewAvatar;
+    authoredAvatar = worldAvatar;
+    authoredPreviewAvatar = previewAvatar;
+    authoredApartment = apartment;
+
+    const chairSeat = apartment.root.getObjectByName('chair-seat');
+    if (chairSeat) {
+      const seatCenter = new THREE.Box3().setFromObject(chairSeat).getCenter(new THREE.Vector3());
+      actor.seatTargetX = seatCenter.x;
+      actor.seatTargetZ = seatCenter.z + .28;
+    }
+
+    interactiveObjects.splice(0, interactiveObjects.length, ...apartment.hitAreas);
+    Object.keys(actionHighlights).forEach((id) => { delete actionHighlights[id]; });
+    Object.assign(actionHighlights, apartment.highlights);
+  }).catch((error) => {
+    // The game stays playable with the local fallback when a model download fails.
+    console.error('Не удалось загрузить авторскую квартиру:', error);
+  });
+}
+
+replaceBlockoutWithAuthoredApartment();
 const battle = createBattleScene();
 let gameMode = 'apartment';
+let entryMode = 'start';
 
 scene.add(new THREE.HemisphereLight(0x97c7cf, 0x1d211a, 1.55));
 const keyLight = new THREE.DirectionalLight(0xefe0b4, 2.1);
@@ -1155,6 +1394,10 @@ function setStatus() {
     status.textContent = 'Садится за компьютер.';
     return;
   }
+  if (actor.mode === 'turningToRecordDesk' || actor.mode === 'sittingToRecord') {
+    status.textContent = 'Садится к настольному микрофону.';
+    return;
+  }
   if (actor.mode === 'standingUp') {
     status.textContent = 'Встаёт от компьютера.';
     return;
@@ -1166,6 +1409,26 @@ function setStatus() {
   status.textContent = 'Кликни по комнате, чтобы отправить героя в нужную точку.';
 }
 
+function resetLimbPose(performer) {
+  for (const limb of [performer.frontArm, performer.backArm, performer.frontLeg, performer.backLeg]) {
+    limb.pivot.rotation.x = 0;
+    limb.pivot.rotation.z = 0;
+    limb.lowerPivot.rotation.x = 0;
+    limb.lowerPivot.rotation.z = 0;
+  }
+}
+
+function applySideWalkPose(performer) {
+  const pose = sideWalkPose(performer.phase, performer.state.facing);
+  resetLimbPose(performer);
+  performer.frontLeg.pivot.rotation.x = pose.frontLeg;
+  performer.backLeg.pivot.rotation.x = pose.backLeg;
+  performer.frontLeg.lowerPivot.rotation.x = pose.frontKnee;
+  performer.backLeg.lowerPivot.rotation.x = pose.backKnee;
+  performer.frontArm.pivot.rotation.x = pose.frontArm;
+  performer.backArm.pivot.rotation.x = pose.backArm;
+}
+
 function updatePose(delta, elapsed) {
   if (actor.mode === 'typing') {
     applySeatPose(1, elapsed);
@@ -1175,32 +1438,14 @@ function updatePose(delta, elapsed) {
   actor.model.position.set(0, 0, 0);
   actor.model.rotation.z = 0;
   if (!actor.state.moving) {
-    const breath = Math.sin(elapsed * 2.4) * .035;
-    actor.model.position.y = breath;
-    actor.frontArm.pivot.rotation.z = -.06 + breath;
-    actor.backArm.pivot.rotation.z = .04 - breath;
-    actor.frontArm.lowerPivot.rotation.z = 0;
-    actor.backArm.lowerPivot.rotation.z = 0;
-    actor.frontLeg.pivot.rotation.z = 0;
-    actor.backLeg.pivot.rotation.z = 0;
-    actor.frontLeg.lowerPivot.rotation.z = 0;
-    actor.backLeg.lowerPivot.rotation.z = 0;
+    resetLimbPose(actor);
     actor.shadow.scale.set(1, 1, 1);
     return;
   }
 
-  actor.phase += delta * 13;
-  const stride = Math.sin(actor.phase) * .66;
-  actor.frontLeg.pivot.rotation.z = stride;
-  actor.backLeg.pivot.rotation.z = -stride;
-  actor.frontLeg.lowerPivot.rotation.z = Math.max(0, -stride) * .74;
-  actor.backLeg.lowerPivot.rotation.z = Math.max(0, stride) * .74;
-  actor.frontArm.pivot.rotation.z = -stride * .73;
-  actor.backArm.pivot.rotation.z = stride * .73;
-  actor.frontArm.lowerPivot.rotation.z = 0;
-  actor.backArm.lowerPivot.rotation.z = 0;
-  actor.model.position.y = Math.abs(Math.sin(actor.phase * 2)) * .055;
-  actor.shadow.scale.set(.96 + Math.abs(stride) * .16, .86, 1);
+  actor.phase += delta * 10;
+  applySideWalkPose(actor);
+  actor.shadow.scale.set(.98, .92, 1);
 }
 
 function startTurn(targetAngle, duration = .28) {
@@ -1217,12 +1462,14 @@ function updateTurn(delta) {
   actor.turn.elapsed = Math.min(actor.turn.elapsed + delta, actor.turn.duration);
   const progress = actor.turn.elapsed / actor.turn.duration;
   actor.model.rotation.y = turnAngle(actor.turn.from, actor.turn.target, progress);
+  updateFacePresentation(actor);
   if (progress === 1) actor.turn = null;
 }
 
 function applySeatPose(progress, elapsed) {
   const pose = seatPose(progress);
   const arms = keyboardArmPose(progress, elapsed * 11);
+  resetLimbPose(actor);
   actor.model.position.y = pose.bodyY;
   actor.frontLeg.pivot.rotation.z = pose.thighAngle;
   actor.backLeg.pivot.rotation.z = pose.thighAngle * .92;
@@ -1235,20 +1482,41 @@ function applySeatPose(progress, elapsed) {
   actor.shadow.scale.set(1 + progress * .2, 1 - progress * .45, 1);
 }
 
+function playPoseFade({ cueId = 'chair-scrape', swap }) {
+  if (actor.isTransitioning) return;
+  actor.isTransitioning = true;
+  transitionFade.classList.add('is-active');
+  window.setTimeout(() => {
+    swap();
+    cue(cueId);
+    transitionFade.classList.remove('is-active');
+    window.setTimeout(() => { actor.isTransitioning = false; }, 180);
+  }, 180);
+}
+
 function beginSeatSequence() {
-  actor.mode = 'turningToDesk';
-  actor.actionElapsed = 0;
-  actor.seatStartX = actor.state.x;
+  actor.mode = 'fadingSeat';
   actor.state = { ...actor.state, moving: false };
-  startTurn(Math.PI / 2, .34);
+  playPoseFade({
+    swap: () => {
+      actor.state = { ...actor.state, x: actor.seatTargetX, moving: false };
+      actor.group.position.set(actor.seatTargetX, actor.group.position.y, actor.seatTargetZ);
+      actor.mode = 'typing';
+      actor.actionElapsed = 0;
+      // Keep the settled pose visible long enough to read before the desktop UI covers it.
+      actor.seatRevealUntil = performance.now() + 820;
+      startTurn(actionYaw('computer'), .18);
+    },
+  });
 }
 
 function beginStandingSequence() {
   actor.mode = 'standingUp';
   actor.actionElapsed = 0;
+  actor.standStartZ = actor.group.position.z;
 }
 
-function beginApartmentAction(actionId) {
+function beginApartmentAction(actionId, { skipFade = false } = {}) {
   const action = getApartmentAction(actionId);
   const availability = canStartApartmentAction(actionId, campaign.needs);
   if (!action || !availability.allowed) {
@@ -1257,6 +1525,27 @@ function beginApartmentAction(actionId) {
   }
   if (actionId === 'computer') {
     beginSeatSequence();
+    return;
+  }
+  if (actionId === 'bed' && !skipFade) {
+    actor.mode = 'fadingBed';
+    actor.state = { ...actor.state, moving: false };
+    playPoseFade({
+      cueId: 'sleep',
+      swap: () => beginApartmentAction('bed', { skipFade: true }),
+    });
+    return;
+  }
+  if (actionUsesDeskSeat(actionId)) {
+    actor.activeApartmentAction = action;
+    actor.actionTransition = createActionTransition({ actionId, fromRoom: 'living', toRoom: 'living', transition: 'desk-fade' });
+    actor.actionCuePlayed = false;
+    actor.actionElapsed = 0;
+    actor.seatStartX = actor.state.x;
+    actor.seatStartZ = actor.group.position.z;
+    actor.state = { ...actor.state, moving: false };
+    actor.mode = 'turningToRecordDesk';
+    startTurn(actionYaw(actionId), .24);
     return;
   }
   if (actionId === 'door') {
@@ -1268,14 +1557,17 @@ function beginApartmentAction(actionId) {
     actionId: action.id,
     fromRoom: actor.pendingActionSourceRoom ?? targetRoom,
     toRoom: targetRoom,
+    transition: action.id === 'bed' ? 'bed-fade' : 'visible',
   });
   actor.pendingActionSourceRoom = null;
   actor.actionCuePlayed = false;
   actor.bubble = null;
   actor.mode = 'apartmentAction';
-  actor.actionElapsed = 0;
+  actor.actionElapsed = actionId === 'bed' && skipFade ? .64 : 0;
   actor.state = { ...actor.state, moving: false };
-  startTurn(Math.PI / 2, .22);
+  actor.actionStartZ = actor.group.position.z;
+  actor.actionTargetZ = action.id === 'bed' ? .14 : .02;
+  startTurn(actionYaw(actionId), .22);
 }
 
 function completeApartmentAction(action) {
@@ -1323,33 +1615,31 @@ function completeApartmentAction(action) {
 
 function applyApartmentActionPose(action, elapsed) {
   actor.model.position.y = 0;
-  actor.frontLeg.pivot.rotation.z = 0;
-  actor.backLeg.pivot.rotation.z = 0;
-  actor.frontLeg.lowerPivot.rotation.z = 0;
-  actor.backLeg.lowerPivot.rotation.z = 0;
-  actor.frontArm.lowerPivot.rotation.z = 0;
-  actor.backArm.lowerPivot.rotation.z = 0;
+  resetLimbPose(actor);
   const beat = Math.sin(elapsed * 7);
   if (action.animation === 'sleep') {
     applySeatPose(.22, elapsed);
-    actor.model.position.set(.04, .38, .24);
+    // Rotation happens around the feet; shift the sleeping body back onto the mattress first.
+    actor.model.position.set(-1.08, .64, -.04);
     actor.model.rotation.z = -Math.PI / 2;
     actor.shadow.scale.set(1.58, .62, 1);
     return;
   }
   if (action.animation === 'record') {
-    actor.frontArm.pivot.rotation.z = .86 + beat * .24;
-    actor.backArm.pivot.rotation.z = -.52 - beat * .12;
-    actor.frontArm.lowerPivot.rotation.z = -.64;
-    actor.backArm.lowerPivot.rotation.z = .35;
-    actor.model.position.y = Math.abs(beat) * .035;
+    // Домашний микрофон стоит на столе: запись идёт из сидячей позы, не стоя перед стойкой.
+    applySeatPose(1, elapsed);
+    actor.frontArm.pivot.rotation.z = .36 + beat * .05;
+    actor.frontArm.lowerPivot.rotation.z = -.46 + beat * .04;
+    actor.backArm.pivot.rotation.z = .3 - beat * .04;
+    actor.backArm.lowerPivot.rotation.z = -.42;
+    actor.model.position.y += Math.abs(beat) * .018;
     return;
   }
   if (action.animation === 'cook' || action.animation === 'wash') {
-    actor.frontArm.pivot.rotation.z = .88 + beat * .15;
-    actor.backArm.pivot.rotation.z = .74 - beat * .12;
-    actor.frontArm.lowerPivot.rotation.z = -.92;
-    actor.backArm.lowerPivot.rotation.z = -.8;
+    actor.frontArm.pivot.rotation.z = .44 + beat * .08;
+    actor.backArm.pivot.rotation.z = .34 - beat * .06;
+    actor.frontArm.lowerPivot.rotation.z = -.48;
+    actor.backArm.lowerPivot.rotation.z = -.43;
     return;
   }
   actor.frontArm.pivot.rotation.z = .4 + beat * .1;
@@ -1363,18 +1653,21 @@ function applyApartmentActionStartPose(action, elapsed) {
     return;
   }
   if (action.animation === 'record') {
-    actor.frontArm.pivot.rotation.z = .22;
-    actor.backArm.pivot.rotation.z = -.16;
+    applySeatPose(.82, elapsed);
     return;
   }
   if (action.animation === 'cook' || action.animation === 'wash') {
-    actor.frontArm.pivot.rotation.z = .24;
-    actor.backArm.pivot.rotation.z = .18;
+    actor.frontArm.pivot.rotation.z = .18;
+    actor.backArm.pivot.rotation.z = .14;
   }
 }
 
 function requestMove(targetX, interaction = null) {
   if (actor.mode === 'typing') {
+    if (performance.now() < actor.seatRevealUntil) {
+      updatePose(0, elapsed);
+      return true;
+    }
     actor.pendingIntent = { type: 'walk', targetX, interaction };
     beginStandingSequence();
     return;
@@ -1399,11 +1692,13 @@ function requestFaceCamera() {
   actor.destinationX = null;
   actor.interaction = null;
   actor.state = { ...actor.state, moving: false };
-  startTurn(profileFaceLayout().faceCameraYaw, .28);
+  startTurn(cameraYaw(), .28);
 }
 
 function updateApartmentCamera() {
-  const targetX = cameraTargetX(actor.state.x);
+  // The first apartment is one readable cutaway, not a close follow camera.
+  // Keeping both rooms in frame makes the doors and destinations clear.
+  const targetX = 0;
   camera.position.x = targetX;
   camera.lookAt(targetX, 2.15, 0);
 }
@@ -1411,8 +1706,11 @@ function updateApartmentCamera() {
 function updateInteriorDoor(delta) {
   const doorCentreX = (APARTMENT_ROOMS.kitchen.right + APARTMENT_ROOMS.living.left) / 2;
   const shouldOpen = actor.usesInteriorDoor || (actor.state.moving && Math.abs(actor.state.x - doorCentreX) < .78);
-  const targetYaw = shouldOpen ? -Math.PI / 2 : 0;
-  interiorDoor.rotation.y = THREE.MathUtils.lerp(interiorDoor.rotation.y, targetYaw, 1 - Math.exp(-delta * 10));
+  const interiorTargetYaw = shouldOpen ? -Math.PI / 2 : 0;
+  interiorDoor.rotation.y = THREE.MathUtils.lerp(interiorDoor.rotation.y, interiorTargetYaw, 1 - Math.exp(-delta * 10));
+  const isLeaving = actor.interaction === 'action:door' || actor.activeApartmentAction?.id === 'door';
+  const entryTargetYaw = isLeaving ? -Math.PI / 2 : 0;
+  entryDoorPanel.rotation.y = THREE.MathUtils.lerp(entryDoorPanel.rotation.y, entryTargetYaw, 1 - Math.exp(-delta * 10));
 }
 
 function applyIntent(intent) {
@@ -1443,6 +1741,7 @@ function updateAction(delta, elapsed) {
     const progress = Math.min(actor.actionElapsed / .34, 1);
     actor.state = { ...actor.state, x: THREE.MathUtils.lerp(actor.seatStartX, actor.seatTargetX, easeInOut(progress)), moving: false };
     actor.group.position.x = actor.state.x;
+    actor.group.position.z = THREE.MathUtils.lerp(actor.seatStartZ, actor.seatTargetZ, easeInOut(progress));
     updatePose(0, elapsed);
     if (progress === 1) {
       actor.mode = 'sittingDown';
@@ -1461,13 +1760,37 @@ function updateAction(delta, elapsed) {
     return true;
   }
 
+  if (actor.mode === 'turningToRecordDesk') {
+    const progress = Math.min(actor.actionElapsed / .34, 1);
+    actor.state = { ...actor.state, x: THREE.MathUtils.lerp(actor.seatStartX, actor.seatTargetX, easeInOut(progress)), moving: false };
+    actor.group.position.x = actor.state.x;
+    actor.group.position.z = THREE.MathUtils.lerp(actor.seatStartZ, actor.seatTargetZ, easeInOut(progress));
+    updatePose(0, elapsed);
+    if (progress === 1) {
+      actor.mode = 'sittingToRecord';
+      actor.actionElapsed = 0;
+    }
+    return true;
+  }
+
+  if (actor.mode === 'sittingToRecord') {
+    const progress = Math.min(actor.actionElapsed / .48, 1);
+    applySeatPose(progress, elapsed);
+    if (progress === 1) {
+      actor.mode = 'apartmentAction';
+      actor.actionElapsed = .64;
+    }
+    return true;
+  }
+
   if (actor.mode === 'standingUp') {
     const progress = 1 - Math.min(actor.actionElapsed / .4, 1);
     applySeatPose(progress, elapsed);
+    actor.group.position.z = THREE.MathUtils.lerp(APARTMENT_ACTOR_FOREGROUND_Z, actor.standStartZ, progress);
     if (progress === 0) {
       actor.mode = 'walking';
       actor.actionElapsed = 0;
-      startTurn(actor.state.facing === 1 ? profileFaceLayout().rightYaw : profileFaceLayout().leftYaw, .24);
+      startTurn(walkYaw(actor.state.facing), .24);
       const pendingIntent = actor.pendingIntent;
       actor.pendingIntent = null;
       if (pendingIntent) applyIntent(pendingIntent);
@@ -1503,6 +1826,8 @@ function updateAction(delta, elapsed) {
     return true;
   }
   if (actor.mode === 'apartmentAction') {
+    const depthProgress = Math.min(actor.actionElapsed / .28, 1);
+    actor.group.position.z = THREE.MathUtils.lerp(actor.actionStartZ, actor.actionTargetZ, easeInOut(depthProgress));
     const phase = phaseAfterApproach(actor.actionTransition, actor.actionElapsed);
     if (phase.id === 'turn') updatePose(0, elapsed);
     if (phase.id === 'start') applyApartmentActionStartPose(actor.activeApartmentAction, elapsed);
@@ -1518,9 +1843,11 @@ function updateAction(delta, elapsed) {
       const action = actor.activeApartmentAction;
       actor.activeApartmentAction = null;
       actor.actionTransition = null;
-      actor.mode = 'walking';
+      actor.standStartZ = actor.group.position.z;
+      actor.mode = actionUsesDeskSeat(action.id) ? 'standingUp' : 'walking';
       actor.actionElapsed = 0;
       actor.model.rotation.z = 0;
+      if (!actionUsesDeskSeat(action.id)) actor.group.position.z = APARTMENT_ACTOR_FOREGROUND_Z;
       completeApartmentAction(action);
     }
     return true;
@@ -1532,6 +1859,13 @@ function updateAction(delta, elapsed) {
 function updateApartment(delta, elapsed) {
   updateTurn(delta);
   if (updateAction(delta, elapsed)) {
+    updateInteriorDoor(delta);
+    updateApartmentCamera(delta);
+    setStatus();
+    return;
+  }
+  if (actor.destinationX !== null && shouldPauseWalkForTurn(actor.turn)) {
+    updatePose(0, elapsed);
     updateInteriorDoor(delta);
     updateApartmentCamera(delta);
     setStatus();
@@ -1562,7 +1896,7 @@ function updateApartment(delta, elapsed) {
       const previousFacing = actor.state.facing;
       actor.state = stepCharacter(actor.state, { left: direction < 0, right: direction > 0 }, delta, room);
       if (actor.state.facing !== previousFacing) {
-        startTurn(actor.state.facing === 1 ? profileFaceLayout().rightYaw : profileFaceLayout().leftYaw);
+        startTurn(walkYaw(actor.state.facing));
       }
       actor.group.position.x = actor.state.x;
     }
@@ -1573,24 +1907,43 @@ function updateApartment(delta, elapsed) {
   setStatus();
 }
 
+function updateAuthoredAvatar(target, delta, { preview = false } = {}) {
+  const rig = target.authoredRig;
+  if (!rig) return;
+  const action = target.activeApartmentAction;
+  const clip = preview
+    ? 'idle'
+    : target.state.moving
+      ? 'walk'
+      : target.mode === 'typing' || target.mode === 'sittingDown' || target.mode === 'turningToDesk' || target.mode === 'turningToRecordDesk' || target.mode === 'sittingToRecord' || action?.id === 'microphone'
+        ? 'desk-idle'
+        : action?.id === 'bed'
+          ? 'lie-down'
+          : action?.id === 'stove' || action?.id === 'sink' || action?.id === 'fridge'
+            ? 'kitchen-work'
+            : action?.id === 'door'
+              ? 'door-reach'
+              : 'idle';
+  rig.play(clip);
+  rig.root.position.copy(target.model.position);
+  rig.root.position.y -= actorFootOffset;
+  rig.root.rotation.copy(target.model.rotation);
+  rig.update(delta);
+}
+
 function resetStagePose(performer, facing) {
   performer.model.position.set(0, 0, 0);
   performer.model.rotation.set(0, facing === 1 ? 0 : -Math.PI, 0);
-  performer.frontArm.pivot.rotation.z = 0;
-  performer.backArm.pivot.rotation.z = 0;
-  performer.frontArm.lowerPivot.rotation.z = 0;
-  performer.backArm.lowerPivot.rotation.z = 0;
-  performer.frontLeg.pivot.rotation.z = 0;
-  performer.backLeg.pivot.rotation.z = 0;
-  performer.frontLeg.lowerPivot.rotation.z = 0;
-  performer.backLeg.lowerPivot.rotation.z = 0;
+  resetLimbPose(performer);
   performer.shadow.scale.set(1, 1, 1);
+  updateFacePresentation(performer);
 }
 
 function applyStageWalk(performer, delta, direction) {
   performer.phase += delta * 13;
   const stride = Math.sin(performer.phase) * .66;
   performer.model.rotation.y = direction > 0 ? 0 : -Math.PI;
+  resetLimbPose(performer);
   performer.frontLeg.pivot.rotation.z = stride;
   performer.backLeg.pivot.rotation.z = -stride;
   performer.frontLeg.lowerPivot.rotation.z = Math.max(0, -stride) * .74;
@@ -1600,6 +1953,7 @@ function applyStageWalk(performer, delta, direction) {
   performer.frontArm.lowerPivot.rotation.z = 0;
   performer.backArm.lowerPivot.rotation.z = 0;
   performer.model.position.y = Math.abs(Math.sin(performer.phase * 2)) * .055;
+  updateFacePresentation(performer);
 }
 
 function moveStageActor(performer, targetX, delta) {
@@ -1628,6 +1982,7 @@ function applyRapGesture(performer, gesture, elapsed, facing) {
     performer.backArm.pivot.rotation.z = .92 - beat * .14;
     performer.frontArm.lowerPivot.rotation.z = -.58;
     performer.backArm.lowerPivot.rotation.z = -.48;
+    updateFacePresentation(performer);
     return;
   }
   if (gesture === 'shoulder-rock') {
@@ -1636,6 +1991,7 @@ function applyRapGesture(performer, gesture, elapsed, facing) {
     performer.backArm.pivot.rotation.z = -.22 - beat * .42;
     performer.frontLeg.pivot.rotation.z = secondaryBeat * .08;
     performer.backLeg.pivot.rotation.z = -secondaryBeat * .08;
+    updateFacePresentation(performer);
     return;
   }
   if (gesture === 'crowd-turn') {
@@ -1643,6 +1999,7 @@ function applyRapGesture(performer, gesture, elapsed, facing) {
     performer.frontArm.pivot.rotation.z = .78;
     performer.backArm.pivot.rotation.z = -.42;
     performer.frontArm.lowerPivot.rotation.z = -.42;
+    updateFacePresentation(performer);
     return;
   }
   performer.frontArm.pivot.rotation.z = 1.38 + beat * .08;
@@ -1650,6 +2007,7 @@ function applyRapGesture(performer, gesture, elapsed, facing) {
   performer.backArm.pivot.rotation.z = -.28 + beat * .18;
   performer.backArm.lowerPivot.rotation.z = .36;
   performer.model.rotation.z = -.045;
+  updateFacePresentation(performer);
 }
 
 function updateStageAudience(elapsed) {
@@ -1763,15 +2121,23 @@ function updateBattle(delta, elapsed) {
 
 function render() {
   const delta = Math.min(clock.getDelta(), .05);
-  if (gameMode === 'apartment') updateApartment(delta, clock.elapsedTime);
-  else updateBattle(delta, clock.elapsedTime);
-  updateActorBubble();
+  if (entryMode === 'apartment') {
+    if (gameMode === 'apartment') updateApartment(delta, clock.elapsedTime);
+    else updateBattle(delta, clock.elapsedTime);
+    updateAuthoredAvatar(actor, delta);
+    updateActorBubble();
+  } else {
+    renderActorBubble(null);
+  }
   if (!creatorModal.classList.contains('is-hidden')) {
     creatorPreviewActor.model.rotation.y = profileFaceLayout().previewYaw;
+    creatorPreviewActor.model.scale.x = 1;
     creatorPreviewActor.model.position.y = Math.sin(clock.elapsedTime * .65) * .025;
+    updateFacePresentation(creatorPreviewActor);
+    updateAuthoredAvatar(creatorPreviewActor, delta, { preview: true });
     creatorPreviewRenderer.render(creatorPreviewScene, creatorPreviewCamera);
   }
-  renderer.render(scene, camera);
+  if (entryMode === 'apartment') renderer.render(scene, camera);
   requestAnimationFrame(render);
 }
 
@@ -1785,13 +2151,13 @@ function resize() {
   const width = window.innerWidth;
   const height = window.innerHeight;
   const aspect = width / height;
-  const viewHeight = Math.max(5.3, 8.8 / aspect);
+  const viewHeight = Math.max(7.1, 14 / aspect);
   camera.left = -viewHeight * aspect / 2;
   camera.right = viewHeight * aspect / 2;
   camera.top = viewHeight / 2;
   camera.bottom = -viewHeight / 2;
   camera.updateProjectionMatrix();
-  camera.lookAt(camera.position.x, 2.15, 0);
+  camera.lookAt(0, 2.15, 0);
   renderer.setSize(width, height, false);
   resizeCreatorPreview();
 }
@@ -1811,7 +2177,7 @@ function pointFromPointerEvent(event) {
 }
 
 canvas.addEventListener('pointermove', (event) => {
-  if (gameMode !== 'apartment') {
+  if (entryMode !== 'apartment' || gameMode !== 'apartment') {
     Object.values(actionHighlights).forEach((highlight) => { highlight.visible = false; });
     clearWorldTooltip();
     canvas.style.cursor = 'default';
@@ -1831,7 +2197,7 @@ canvas.addEventListener('pointerleave', () => {
 });
 
 canvas.addEventListener('pointerdown', (event) => {
-  if (event.button !== 0 || gameMode !== 'apartment') return;
+  if (event.button !== 0 || entryMode !== 'apartment' || gameMode !== 'apartment') return;
   const { hitComputer, hitAction, worldPoint } = pointFromPointerEvent(event);
   const intent = clickIntent({
     hitAction,
@@ -1846,9 +2212,6 @@ canvas.addEventListener('pointerdown', (event) => {
 resize();
 renderCampaignHud();
 renderCreator();
-if (campaign.player) {
-  creatorModal.classList.add('is-hidden');
-  sceneTitle.textContent = `КВАРТИРА · ${campaign.player.nickname.toUpperCase()}`;
-}
+renderStartScreen();
 setStatus();
 render();

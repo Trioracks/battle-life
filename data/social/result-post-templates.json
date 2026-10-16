@@ -1,0 +1,23 @@
+[
+ {"id":"outcome-qualified-1","outcomes":["qualified"],"mood":"joy","body":"Мой ник остался в сетке. Радуюсь, но следующую работу за меня никто не запишет."},
+ {"id":"outcome-qualified-2","outcomes":["qualified"],"mood":"relief","body":"Проход есть. Наконец выдохнул: до объявления всё представлял худший вариант."},
+ {"id":"outcome-qualified-3","outcomes":["qualified"],"mood":"surprise","body":"Открывал итог с тяжёлой головой, а теперь надо собираться на следующий раунд."},
+ {"id":"outcome-qualified-4","outcomes":["qualified"],"mood":"respect","body":"Остаюсь в баттле. Спасибо тем, кто слушал; этот проход не отменяет того, над чем ещё работать."},
+ {"id":"outcome-selection-loss-1","outcomes":["selection_loss"],"mood":"hurt","body":"В отборе остановился. Обидно видеть, как турнир идёт дальше без моего ника."},
+ {"id":"outcome-selection-loss-2","outcomes":["selection_loss"],"mood":"self_irony","body":"Планировал уже следующий раунд, а надо было сначала пройти отбор. Планировщик из меня сильнее участника."},
+ {"id":"outcome-selection-loss-3","outcomes":["selection_loss"],"mood":"anger","body":"Не попал в проход. Злюсь, но менять задним числом результат не получится. Пойду проветрю голову."},
+ {"id":"outcome-pair-loss-1","outcomes":["pair_loss"],"mood":"hurt","body":"Эту пару проиграл. Пока тяжело отделить одну неудачу от ощущения, что всё зря."},
+ {"id":"outcome-pair-loss-2","outcomes":["pair_loss"],"mood":"respect","body":"На этом мой турнир закончился. Соперник идёт дальше; я оставлю себе опыт этой встречи."},
+ {"id":"outcome-pair-loss-3","outcomes":["pair_loss"],"mood":"self_irony","body":"Сетка стала короче, и меня в ней уже нет. Зато в следующий раз хотя бы узнаю это чувство."},
+ {"id":"outcome-pair-loss-4","outcomes":["pair_loss"],"mood":"anger","body":"Пара не в мою пользу. Хочется спорить сразу со всем экраном. Лучше сначала отойду от клавиатуры."},
+ {"id":"outcome-no-show-1","outcomes":["no_show"],"mood":"hurt","body":"Не отправил работу в срок. В таблице несдача — тут уже не на судей обижаться."},
+ {"id":"outcome-no-show-2","outcomes":["no_show"],"mood":"self_irony","body":"Можно сколько угодно представлять хороший трек. Но дедлайн принимает файл, а не планы. У меня несдача."},
+ {"id":"outcome-no-show-3","outcomes":["no_show"],"mood":"relief","body":"Раунд закрылся без моей работы. Не буду изображать, будто меня не поняли: слушать было нечего."},
+ {"id":"outcome-technical-1","outcomes":["technical_win"],"mood":"surprise","body":"Технический проход. Место дальше есть, но называть это победой в прослушанной паре было бы странно."},
+ {"id":"outcome-technical-2","outcomes":["technical_win"],"mood":"relief","body":"Сетка пропустила дальше без полноценного сравнения. Выдохнул, но силы этим ещё не проверил."},
+ {"id":"outcome-technical-3","outcomes":["technical_win"],"mood":"respect","body":"Проход по правилам, без судейской борьбы в этой паре. Принимаю как есть, ничего себе не приписываю."},
+ {"id":"outcome-champion-1","outcomes":["champion"],"mood":"joy","body":"Финал мой. Перечитываю итог и всё ещё не очень верю, что это уже конец турнира."},
+ {"id":"outcome-champion-2","outcomes":["champion"],"mood":"relief","body":"Последняя пара закончилась победой. Можно наконец перестать жить от дедлайна до дедлайна."},
+ {"id":"outcome-champion-3","outcomes":["champion"],"mood":"respect","body":"Выиграл финал. Спасибо тем, кто был рядом: одной последней строкой весь этот путь не описать."},
+ {"id":"outcome-grateful-loss","outcomes":["selection_loss","pair_loss"],"requiresPraise":true,"mood":"respect","body":"Не прошёл дальше, но один добрый отзыв всё-таки оставлю здесь. Спасибо судье за эти слова — поражение их не отменяет."}
+]

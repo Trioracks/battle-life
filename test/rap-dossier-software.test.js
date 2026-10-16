@@ -1,0 +1,9 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import * as software from '../src/pc-software.js';
+import {SOFTWARE} from '../src/pc-software-catalog.js';
+import {createVirtualPcState} from '../src/virtual-pc-state.js';
+import {advanceVirtualPc} from '../src/virtual-pc-runtime.js';
+import {desktopApps,resolveUnderweb} from '../src/virtual-pc-catalog.js';
+test('dossier is discoverable by search before installation',()=>{assert.ok(resolveUnderweb('Рэп-досье').results.some(r=>r.url==='underweb://dump/dossier'));});
+test('dossier follows metadata→torent→archive→installer→desktop and uninstall/reinstall keeps observations',()=>{let s=createVirtualPcState({power:'on',software:{client:{installed:true}},lastGameMinute:0});assert.ok(SOFTWARE.dossier);assert.equal(resolveUnderweb('underweb://dump/dossier').topic,'dossier');s=software.downloadMetadata(s,'dossier').state;assert.equal(s.software.dossier.receivedBytes,0);s=software.openMetadata(s,'dossier').state;s=advanceVirtualPc(s,{day:1,minutes:1}).state;s=createVirtualPcState(JSON.parse(JSON.stringify(s)));s=advanceVirtualPc(s,{day:1,minutes:100}).state;assert.equal(s.software.dossier.receivedBytes,SOFTWARE.dossier.downloadBytes);s=software.openInstaller(s,'dossier').state;for(let i=0;i<3;i++)s=software.advanceInstaller(s).state;s=software.advanceInstallation(s,5).state;s=createVirtualPcState(JSON.parse(JSON.stringify(s)));s=software.advanceInstallation(s,100).state;const done=software.advanceInstaller(s);assert.equal(done.openAppId,'rap-dossier');s=done.state;assert.ok(desktopApps(s).some(a=>a.id==='rap-dossier'));const before=structuredClone(s.rapAnalysis);s=software.uninstallSoftware(s,'dossier').state;assert.deepEqual(s.rapAnalysis,before);assert.ok(!desktopApps(s).some(a=>a.id==='rap-dossier'));assert.equal(software.openInstaller(s,'dossier').ok,true);});

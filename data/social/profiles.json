@@ -1,0 +1,602 @@
+[
+  {
+    "id": "anya",
+    "name": "Анна Лесная",
+    "occupation": "student",
+    "description": "Учусь, фотографирую друзей, опаздываю на автобус.",
+    "education": "Колледж связи",
+    "birthday": null,
+    "languages": [
+      "ru",
+      "en"
+    ],
+    "fictional": true,
+    "known": true,
+    "avatar": {
+      "mark": "АЛ",
+      "src": "./assets/social/photos/anya-avatar.jpg",
+      "color": "#6c8293",
+      "scene": 0
+    },
+    "photos": [
+      {
+        "id": "anya-summer",
+        "src": "./assets/social/photos/anya-01.jpg",
+        "title": "Двор в августе",
+        "date": "2012-08-26",
+        "scene": 0
+      },
+      {
+        "id": "anya-walk",
+        "title": "В парке после занятий",
+        "date": "2012-08-28",
+        "src": "./assets/social/photos/anya-02.jpg"
+      }
+    ],
+    "friends": [
+      "vitya",
+      "dasha"
+    ],
+    "audio": [],
+    "wall": [
+      {
+        "id": "anya-post",
+        "date": "2012-08-31",
+        "body": "В конце лета всё ещё хочется гулять до темноты.",
+        "likes": 0,
+        "comments": []
+      }
+    ]
+  },
+  {
+    "id": "vitya",
+    "name": "Витя Кольцов",
+    "occupation": "mechanic",
+    "description": "Починю велосипед. Музыку слушаю по дороге.",
+    "education": "скрыто",
+    "birthday": null,
+    "languages": [
+      "ru"
+    ],
+    "fictional": true,
+    "known": true,
+    "avatar": {
+      "mark": "ВК",
+      "src": "./assets/social/photos/vitya-avatar.jpg",
+      "color": "#907763",
+      "scene": 1
+    },
+    "photos": [
+      {
+        "id": "vitya-summer",
+        "src": "./assets/social/photos/vitya-01.jpg",
+        "title": "По дороге домой",
+        "date": "2012-08-26",
+        "scene": 1
+      },
+      {
+        "id": "vitya-bench",
+        "title": "На старой скамейке",
+        "date": "2012-08-29",
+        "src": "./assets/social/photos/vitya-02.jpg"
+      }
+    ],
+    "friends": [
+      "anya",
+      "dasha"
+    ],
+    "audio": [],
+    "wall": [
+      {
+        "id": "vitya-post",
+        "date": "2012-08-31",
+        "body": "Поменял цепь, теперь слышно не велосипед, а улицу.",
+        "likes": 1,
+        "comments": []
+      }
+    ]
+  },
+  {
+    "id": "dasha",
+    "name": "Дарья Светлова",
+    "occupation": "photographer",
+    "description": "На плёнке даже плохой день выглядит тёплым.",
+    "education": "Школа искусств",
+    "birthday": "14 мая",
+    "languages": [
+      "ru",
+      "en"
+    ],
+    "fictional": true,
+    "known": true,
+    "avatar": {
+      "mark": "ДС",
+      "src": "./assets/social/photos/dasha-avatar.jpg",
+      "color": "#81906e",
+      "scene": 2
+    },
+    "photos": [
+      {
+        "id": "dasha-summer",
+        "src": "./assets/social/photos/dasha-01.jpg",
+        "title": "Последний день лета",
+        "date": "2012-08-26",
+        "scene": 2
+      },
+      {
+        "id": "dasha-park",
+        "title": "Пока не кончилось лето",
+        "date": "2012-08-30",
+        "src": "./assets/social/photos/dasha-02.jpg"
+      }
+    ],
+    "friends": [
+      "anya",
+      "vitya"
+    ],
+    "audio": [],
+    "wall": [
+      {
+        "id": "dasha-post",
+        "date": "2012-08-31",
+        "body": "Забрала фотографии. Половина лета уместилась в конверт.",
+        "likes": 2,
+        "comments": []
+      }
+    ]
+  },
+  {
+    "id": "sergey",
+    "name": "Сергей Паяльник",
+    "occupation": "technician",
+    "description": "Чиню компьютеры. Запасные винтики никогда не лишние.",
+    "education": "Технический колледж",
+    "birthday": null,
+    "languages": [
+      "ru"
+    ],
+    "fictional": true,
+    "known": false,
+    "avatar": {
+      "mark": "СП",
+      "color": "#84778e",
+      "scene": 3
+    },
+    "photos": [
+      {
+        "id": "sergey-summer",
+        "title": "Наше место у реки",
+        "date": "2012-08-26",
+        "scene": 3
+      }
+    ],
+    "friends": [
+      "anya",
+      "vitya",
+      "dasha"
+    ],
+    "audio": [],
+    "wall": [
+      {
+        "id": "sergey-post",
+        "date": "2012-08-31",
+        "body": "Диск с драйверами нашёлся в коробке из-под печенья.",
+        "likes": 3,
+        "comments": []
+      }
+    ]
+  },
+  {
+    "id": "olya",
+    "name": "Оля Рябинина",
+    "occupation": "student",
+    "description": "Книги, чай и первая пара в восемь.",
+    "education": "Университет",
+    "birthday": null,
+    "languages": [
+      "ru",
+      "de"
+    ],
+    "fictional": true,
+    "known": false,
+    "avatar": {
+      "mark": "ОР",
+      "color": "#6c8293",
+      "scene": 4
+    },
+    "photos": [
+      {
+        "id": "olya-summer",
+        "title": "Двор в августе",
+        "date": "2012-08-26",
+        "scene": 4
+      }
+    ],
+    "friends": [
+      "anya",
+      "vitya",
+      "dasha"
+    ],
+    "audio": [],
+    "wall": [
+      {
+        "id": "olya-post",
+        "date": "2012-08-31",
+        "body": "Тетради купила. Морально к сентябрю ещё не готова.",
+        "likes": 4,
+        "comments": []
+      }
+    ]
+  },
+  {
+    "id": "misha",
+    "name": "Миша Нечётный",
+    "occupation": "musician",
+    "description": "Гитара, домашние записи, соседи снизу.",
+    "education": "скрыто",
+    "birthday": null,
+    "languages": [
+      "ru"
+    ],
+    "fictional": true,
+    "known": false,
+    "avatar": {
+      "mark": "МН",
+      "color": "#907763",
+      "scene": 5
+    },
+    "photos": [
+      {
+        "id": "misha-summer",
+        "title": "По дороге домой",
+        "date": "2012-08-26",
+        "scene": 5
+      }
+    ],
+    "friends": [
+      "anya",
+      "vitya",
+      "dasha"
+    ],
+    "audio": [],
+    "wall": [
+      {
+        "id": "misha-post",
+        "date": "2012-08-31",
+        "body": "С третьего дубля попал в начало. Сосед одобрил стуком.",
+        "likes": 5,
+        "comments": []
+      }
+    ]
+  },
+  {
+    "id": "igor",
+    "name": "Игорь Полянский",
+    "occupation": "driver",
+    "description": "Люблю электрички и дороги, на которых ещё не был.",
+    "education": "скрыто",
+    "birthday": null,
+    "languages": [
+      "ru"
+    ],
+    "fictional": true,
+    "known": false,
+    "avatar": {
+      "mark": "ИП",
+      "color": "#81906e",
+      "scene": 0
+    },
+    "photos": [
+      {
+        "id": "igor-summer",
+        "title": "Последний день лета",
+        "date": "2012-08-26",
+        "scene": 0
+      }
+    ],
+    "friends": [
+      "anya",
+      "vitya",
+      "dasha"
+    ],
+    "audio": [],
+    "wall": [
+      {
+        "id": "igor-post",
+        "date": "2012-08-31",
+        "body": "За городом уже пахнет осенью.",
+        "likes": 6,
+        "comments": []
+      }
+    ]
+  },
+  {
+    "id": "tamara",
+    "name": "Тамара Ключникова",
+    "occupation": "librarian",
+    "description": "Книги, цветы и новости нашего дома.",
+    "education": "Педагогический институт",
+    "birthday": null,
+    "languages": [
+      "ru"
+    ],
+    "fictional": true,
+    "known": false,
+    "avatar": {
+      "mark": "ТК",
+      "color": "#84778e",
+      "scene": 1
+    },
+    "photos": [
+      {
+        "id": "tamara-summer",
+        "title": "Наше место у реки",
+        "date": "2012-08-26",
+        "scene": 1
+      }
+    ],
+    "friends": [
+      "anya",
+      "vitya",
+      "dasha"
+    ],
+    "audio": [],
+    "wall": [
+      {
+        "id": "tamara-post",
+        "date": "2012-08-31",
+        "body": "На подоконнике зацвело. Значит, не зря поливала.",
+        "likes": 0,
+        "comments": []
+      }
+    ]
+  },
+  {
+    "id": "nina",
+    "name": "Нина Иголкина",
+    "occupation": "seamstress",
+    "description": "Починить можно почти всё. Не только одежду.",
+    "education": "скрыто",
+    "birthday": null,
+    "languages": [
+      "ru"
+    ],
+    "fictional": true,
+    "known": false,
+    "avatar": {
+      "mark": "НИ",
+      "color": "#6c8293",
+      "scene": 2
+    },
+    "photos": [
+      {
+        "id": "nina-summer",
+        "title": "Двор в августе",
+        "date": "2012-08-26",
+        "scene": 2
+      }
+    ],
+    "friends": [
+      "anya",
+      "vitya",
+      "dasha"
+    ],
+    "audio": [],
+    "wall": [
+      {
+        "id": "nina-post",
+        "date": "2012-08-31",
+        "body": "Рыжий кот считает мою ткань своей кроватью.",
+        "likes": 1,
+        "comments": []
+      }
+    ]
+  },
+  {
+    "id": "max",
+    "name": "Макс Климов",
+    "occupation": "student",
+    "description": "Старые игры, новое прохождение.",
+    "education": "Школа № 17",
+    "birthday": "8 ноября",
+    "languages": [
+      "ru",
+      "en"
+    ],
+    "fictional": true,
+    "known": false,
+    "avatar": {
+      "mark": "МК",
+      "color": "#907763",
+      "scene": 3
+    },
+    "photos": [
+      {
+        "id": "max-summer",
+        "title": "По дороге домой",
+        "date": "2012-08-26",
+        "scene": 3
+      }
+    ],
+    "friends": [
+      "anya",
+      "vitya",
+      "dasha"
+    ],
+    "audio": [],
+    "wall": [
+      {
+        "id": "max-post",
+        "date": "2012-08-31",
+        "body": "Сохраняйтесь перед сложным местом. Это совет и себе тоже.",
+        "likes": 2,
+        "comments": []
+      }
+    ]
+  },
+  {
+    "id": "pasha",
+    "name": "Паша Синицын",
+    "occupation": "courier",
+    "description": "Работаю, играю в футбол, хочу выспаться.",
+    "education": "скрыто",
+    "birthday": null,
+    "languages": [
+      "ru"
+    ],
+    "fictional": true,
+    "known": false,
+    "avatar": {
+      "mark": "ПС",
+      "color": "#81906e",
+      "scene": 4
+    },
+    "photos": [
+      {
+        "id": "pasha-summer",
+        "title": "Последний день лета",
+        "date": "2012-08-26",
+        "scene": 4
+      }
+    ],
+    "friends": [
+      "anya",
+      "vitya",
+      "dasha"
+    ],
+    "audio": [],
+    "wall": [
+      {
+        "id": "pasha-post",
+        "date": "2012-08-31",
+        "body": "Последний заказ был в доме без номера. Нашёл по собаке.",
+        "likes": 3,
+        "comments": []
+      }
+    ]
+  },
+  {
+    "id": "sever",
+    "name": "Северный Переход",
+    "occupation": "musician",
+    "description": "Собираю демки по вечерам. На баттле узнаем друг друга лучше.",
+    "education": "скрыто",
+    "birthday": null,
+    "languages": [
+      "ru"
+    ],
+    "fictional": true,
+    "known": false,
+    "avatar": {
+      "mark": "СП",
+      "color": "#84778e",
+      "scene": 5
+    },
+    "photos": [
+      {
+        "id": "sever-summer",
+        "title": "Наше место у реки",
+        "date": "2012-08-26",
+        "scene": 5
+      }
+    ],
+    "friends": [
+      "anya",
+      "vitya",
+      "dasha"
+    ],
+    "audio": [],
+    "wall": [
+      {
+        "id": "sever-post",
+        "date": "2012-08-31",
+        "body": "Не всё, что записал, хочется сразу выкладывать.",
+        "likes": 4,
+        "comments": []
+      }
+    ]
+  },
+  {
+    "id": "echo-kid",
+    "name": "Эхо с лестницы",
+    "occupation": "musician",
+    "description": "Короткие куплеты, длинные паузы.",
+    "education": "скрыто",
+    "birthday": null,
+    "languages": [
+      "ru"
+    ],
+    "fictional": true,
+    "known": false,
+    "avatar": {
+      "mark": "Эс",
+      "color": "#6c8293",
+      "scene": 0
+    },
+    "photos": [
+      {
+        "id": "echo-kid-summer",
+        "title": "Двор в августе",
+        "date": "2012-08-26",
+        "scene": 0
+      }
+    ],
+    "friends": [
+      "anya",
+      "vitya",
+      "dasha"
+    ],
+    "audio": [],
+    "wall": [
+      {
+        "id": "echo-kid-post",
+        "date": "2012-08-31",
+        "body": "Новый черновик пока останется у меня.",
+        "likes": 5,
+        "comments": []
+      }
+    ]
+  },
+  {
+    "id": "lena",
+    "name": "Лена Ветрова",
+    "occupation": "designer",
+    "description": "Рисую вывески и иногда заблуждаюсь по дороге домой.",
+    "education": "Школа искусств",
+    "birthday": null,
+    "languages": [
+      "ru",
+      "en"
+    ],
+    "fictional": true,
+    "known": false,
+    "avatar": {
+      "mark": "ЛВ",
+      "color": "#907763",
+      "scene": 1
+    },
+    "photos": [
+      {
+        "id": "lena-summer",
+        "title": "По дороге домой",
+        "date": "2012-08-26",
+        "scene": 1
+      }
+    ],
+    "friends": [
+      "anya",
+      "vitya",
+      "dasha"
+    ],
+    "audio": [],
+    "wall": [
+      {
+        "id": "lena-post",
+        "date": "2012-08-31",
+        "body": "На крыше магазина поселилась смешная антенна.",
+        "likes": 6,
+        "comments": []
+      }
+    ]
+  }
+]

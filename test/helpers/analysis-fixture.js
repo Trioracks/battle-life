@@ -1,0 +1,3 @@
+import {createVirtualPcState} from '../../src/virtual-pc-state.js';
+export const studySkills=value=>Object.fromEntries(['intelligence','writing','flow','musicality','beatmaking','sound'].map(k=>[k,value]));
+export function analysisFixture(){const s=createVirtualPcState({power:'on',software:{dossier:{installed:true}}});s.music.needs={satiety:100,energy:100};s.trackVersions.byId.weak={schemaVersion:1,id:'weak',trackId:'beat',name:'Первая демка',signature:'frozen-a',createdAtMinute:100,recipe:{descriptor:{parts:[],durationSeconds:21}},qualities:{text:3,performance:3,music:3,sound:3},facts:[],availability:{}};return s;}

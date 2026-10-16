@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "tool": "built-in image_gen",
+  "date": "2026-10-13",
+  "prompts": [
+    {
+      "id": "mak-cover-01",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for an original fictional 2012 DIY hip-hop battle game. Primary request: abandoned rusty shopping cart in the courtyard of Soviet-era apartment blocks, low camera angle. Style: rough handmade paper collage with torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige, rusty red, subtle old-print grain. One clear large visual motif readable as a 160px thumbnail, enough quiet texture for an HTML title overlay. No actual text, lettering, numerals, logos, trademarks, watermarks or border UI. Single square cover, not a sheet of variants.",
+      "sourceFile": "exec-6c15b309-6076-4f43-b82f-18c4ad6dde77.png"
+    },
+    {
+      "id": "mak-cover-02",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: A surreal old alarm clock shaped like a metaphorical cartoon bomb with a little glowing bulb and loose wires on an old wooden table. Whimsical object surrealism, not a realistic functional device or schematic, no numerals on clock face.",
+      "sourceFile": "exec-ed762297-4590-4769-a9b2-5f5745d51602.png"
+    },
+    {
+      "id": "mak-cover-03",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: A large cracked mirror reflects a faceless blank white paper mask. Bold rough shapes, intimate close-up.",
+      "sourceFile": "exec-a3b3f891-a9cd-4e11-9a3a-3d22b1747d27.png"
+    },
+    {
+      "id": "mak-cover-04",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: An empty plain room with one chair, traces of old adhesive tape on the wall and generous empty space. Quiet, lonely.",
+      "sourceFile": "exec-13136a54-1b98-444e-9961-c577ada39788.png"
+    },
+    {
+      "id": "mak-cover-05",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: Soviet-era apartment blocks, a concrete staircase, torn blank posters at dusk. Low angle layered city architecture.",
+      "sourceFile": "exec-c79eede4-a40d-4bd5-a675-e53767406406.png"
+    },
+    {
+      "id": "mak-cover-06",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: Charred sheet of blank paper, ashes and a surviving bright rusty-red ink stain, torn burnt edges; no writing.",
+      "sourceFile": "exec-74a5cd41-5084-41e4-a5ce-5ebc3da8a80a.png"
+    },
+    {
+      "id": "mak-cover-07",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: Empty railway platform at dusk with a departing old train and an unprinted old paper ticket large in the foreground.",
+      "sourceFile": "exec-386083b9-53b1-405e-acee-7926baa5aebd.png"
+    },
+    {
+      "id": "mak-cover-08",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: A crumpled handmade paper crown lying inside a rough chalk circle on dark concrete, viewed from slightly above. Crown and circle both clear.",
+      "sourceFile": "exec-865f2b7a-7045-482e-9814-e985f022b564.png"
+    },
+    {
+      "id": "mak-cover-09",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: Old unlabeled neighborhood map, faded snapshot photographs and pin marks assembled in a tactile paper collage. Photographs show indistinct courtyards, no identifiable real people.",
+      "sourceFile": "exec-73113342-c117-4cdd-a523-0efb1660bb12.png"
+    },
+    {
+      "id": "mak-cover-10",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: One slightly open wooden door in the middle of roughly sketched maze corridors on torn paper, simple bold labyrinth plan blending into physical doorway.",
+      "sourceFile": "exec-a1489bb2-ca88-4909-a5ab-58af861c066f.png"
+    },
+    {
+      "id": "mak-cover-11",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: Old cheap microphone and tangled cable on rough wooden surface; sound visualized as jagged torn strips of paper. Strong microphone silhouette.",
+      "sourceFile": "exec-752029a6-8139-4667-8cd4-18e1680ff31d.png"
+    },
+    {
+      "id": "mak-cover-12",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: A long deliberately abstract human shadow stretched across a dim apartment stairwell landing, shadow only, no actual person or face. Evocative but not grotesque.",
+      "sourceFile": "exec-63d89c0b-d848-4871-ba95-5996a913bd3b.png"
+    },
+    {
+      "id": "mak-cover-13",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: An old alarm clock with blank unnumbered dial by a window in cold early dawn, a long narrow beam of light crossing a worn tabletop. Quiet morning.",
+      "sourceFile": "exec-9f1e161f-5144-4c28-b520-6836cb0e4474.png"
+    },
+    {
+      "id": "mak-cover-14",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: Wet glass of an old bus shelter, large raindrops, blurred empty street beyond and a patch of icy blue cold light. Strong sense of cold rain.",
+      "sourceFile": "exec-36ef6367-27cd-4fa5-9cb2-800be46ec477.png"
+    },
+    {
+      "id": "mak-cover-15",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: An enormous faded empty blue-grey sky occupying most of the frame and a tiny weathered roof at the bottom. Old photocopied printing texture, sparse composition.",
+      "sourceFile": "exec-899d8233-306b-4030-8c6c-86b3482d87e2.png"
+    },
+    {
+      "id": "mak-cover-16",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: An empty trouser pocket turned inside out, a torn blank receipt and a single crooked red-pencil X mark. Close tactile still life; no receipt writing or numbers.",
+      "sourceFile": "exec-5873c239-6ab5-4b01-b710-7de196334d9f.png"
+    },
+    {
+      "id": "mak-cover-17",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: A blank paper theatre mask beside an old microphone stand on an empty makeshift small stage. Clear stage space, no performer.",
+      "sourceFile": "exec-8c4ae98d-f3ec-49dd-ac99-cbeb4f23341e.png"
+    },
+    {
+      "id": "mak-cover-18",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: An unlabeled schematic route map on crumpled paper blended with receding railway tracks. A few bold route lines, no readable labels, no text.",
+      "sourceFile": "exec-43ddcaaf-0c21-4c2e-9184-784c062db9c3.png"
+    },
+    {
+      "id": "mak-cover-19",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: An old bulky CRT television on a battered table with a broken broadcast signal displayed as broad rough abstract interference bands. No logo, no numbers, no writing.",
+      "sourceFile": "exec-44fec78a-0e6e-40a4-9072-d52d91f70f1a.png"
+    },
+    {
+      "id": "mak-cover-20",
+      "prompt": "Use case: stylized-concept. Asset type: square reusable theme cover for original fictional 2012 DIY hip-hop battle game. Style: rough handmade paper collage, torn photographic cutouts, photocopy halftone, charcoal, faded blue, dirty beige and rusty red, old-print grain. One bold large focal motif readable at 160px, quiet texture for HTML overlay. No text, lettering, numbers, logos, trademarks, watermark or UI. One square artwork, no variants sheet. Subject: A faded reflection of an apartment courtyard inside a large broken mirror shard, framed with torn old photographic paper. Clearly a mirror fragment reflecting the courtyard, intimate still life.",
+      "sourceFile": "exec-25079f5d-5dc6-4545-95d1-2dd6e34d5144.png"
+    }
+  ]
+}

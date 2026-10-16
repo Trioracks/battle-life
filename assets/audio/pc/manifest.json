@@ -1,0 +1,7 @@
+{
+  "startup": {"path": null, "status": "procedural", "provenance": "Original ascending four-note sine motif in virtual-pc-sounds.js, not a Windows recording."},
+  "shutdown": {"path": null, "status": "procedural", "provenance": "Original descending three-note sine motif in virtual-pc-sounds.js."},
+  "studio": {"path": null, "status": "procedural", "provenance": "Original short Field Tone launch motif in virtual-pc-sounds.js."},
+  "bios": {"status": "procedural", "provenance": "Original four-pulse oscillator cue in virtual-pc-sounds.js"},
+  "click": {"status": "procedural", "provenance": "Original quiet oscillator click in virtual-pc-sounds.js"}
+}
