@@ -54,3 +54,4 @@
 body[data-mode=game]:has(#apartment:focus-visible) #home-input-hint{display:block}
 #apartment-actions{position:fixed;z-index:85;left:50%;bottom:22px;transform:translateX(-50%);width:460px;max-width:calc(100vw - 32px);max-height:calc(100dvh - 100px);overflow:auto;padding:14px;background:#142024f5;border:2px solid var(--line);box-shadow:4px 4px #080e12}
 #apartment-actions #actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}#apartment-actions button{font-size:9px;padding:9px}#close-apartment-actions{margin-top:12px}
+.release-info{margin-top:18px;max-width:470px;color:var(--cream,#cad0bc);font-size:8px;line-height:1.9;overflow-wrap:anywhere}.release-info p{margin:5px 0}.release-info:focus-visible{outline:2px solid var(--gold);outline-offset:5px}

@@ -1,11 +1,11 @@
-import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=43';
-import {beginnerById} from './beat-beginner-bank.js?rev=43';
-import {resolveBeatPlayback} from './beat-playback.js?rev=43';
-import {connectBeatMix} from './beat-mix.js?rev=43';
-import {connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=43';
-import {vocalById} from './vocal-catalog.js?rev=43';
-import {descriptorOutputGain} from './audio-levels.js?rev=43';
-import {createBeatPcmProcessor} from './beat-pcm-background.js?rev=43';
+import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=44';
+import {beginnerById} from './beat-beginner-bank.js?rev=44';
+import {resolveBeatPlayback} from './beat-playback.js?rev=44';
+import {connectBeatMix} from './beat-mix.js?rev=44';
+import {connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=44';
+import {vocalById} from './vocal-catalog.js?rev=44';
+import {descriptorOutputGain} from './audio-levels.js?rev=44';
+import {createBeatPcmProcessor} from './beat-pcm-background.js?rev=44';
 
 // Authored placeholder PCM, not a remix of third-party music. Sliders never enter here.
 export function primitiveSamples(kind,rate=44100){

@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Battle Life — первый вечер</title>
-  <link rel="stylesheet" href="./apartment-v3.css?rev=43">
-  <link rel="stylesheet" href="./creator-v12.css?rev=43">
-  <link rel="stylesheet" href="./virtual-pc.css?rev=43">
-  <link rel="stylesheet" href="./desktop-apps.css?rev=43">
-  <link rel="stylesheet" href="./rap-notebook.css?rev=43">
-  <link rel="stylesheet" href="./rap-dossier.css?rev=43">
-  <link rel="stylesheet" href="./social-network.css?rev=43">
-  <link rel="stylesheet" href="./phone-hud.css?rev=43">
+  <link rel="stylesheet" href="./apartment-v3.css?rev=44">
+  <link rel="stylesheet" href="./creator-v12.css?rev=44">
+  <link rel="stylesheet" href="./virtual-pc.css?rev=44">
+  <link rel="stylesheet" href="./desktop-apps.css?rev=44">
+  <link rel="stylesheet" href="./rap-notebook.css?rev=44">
+  <link rel="stylesheet" href="./rap-dossier.css?rev=44">
+  <link rel="stylesheet" href="./social-network.css?rev=44">
+  <link rel="stylesheet" href="./phone-hud.css?rev=44">
   <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
 </head>
 <body>
@@ -22,7 +22,7 @@
   <section id="controls" hidden><div class="activity-row"><div id="activity" role="status">Загрузка…</div><span id="room" class="home-visually-hidden">ЖИЛАЯ КОМНАТА</span></div><progress id="sleep-progress" aria-label="Прошедшее время сна" max="1" value="0" hidden></progress><button id="wake" class="primary" hidden>Проснуться раньше</button></section>
   <p id="home-input-hint">Enter / пробел — действия в квартире</p>
   <section id="apartment-actions" hidden aria-label="Действия в квартире"><nav id="actions" aria-label="Взаимодействия в квартире"></nav><button id="close-apartment-actions">Закрыть · Escape</button></section>
-  <section id="main-menu" class="screen" hidden aria-labelledby="menu-title"><div class="menu-copy"><p class="eyebrow">ПЕРВЫЙ ВЕЧЕР / ПЕРВАЯ ЗАПИСЬ</p><h2 id="menu-title">BATTLE<br><span>LIFE</span></h2><p class="menu-description">За окном — чужие окна.<br>Здесь — твоя комната и ещё не написанный трек.</p><div class="menu-actions"><button id="new-game" class="primary">Новая игра <span>↗</span></button><button id="continue-game" hidden>Продолжить</button></div><p id="save-note" class="small-note"></p><a class="legacy-link" href="./legacy.html">Прежний прототип кампании ↗</a></div><div class="menu-foot">КВАРТИРА <span>01 / НАЧАЛО</span></div></section>
+  <section id="main-menu" class="screen" hidden aria-labelledby="menu-title"><div class="menu-copy"><p class="eyebrow">ПЕРВЫЙ ВЕЧЕР / ПЕРВАЯ ЗАПИСЬ</p><h2 id="menu-title">BATTLE<br><span>LIFE</span></h2><p class="menu-description">За окном — чужие окна.<br>Здесь — твоя комната и ещё не написанный трек.</p><div class="menu-actions"><button id="new-game" class="primary">Новая игра <span>↗</span></button><button id="continue-game" hidden>Продолжить</button></div><p id="save-note" class="small-note"></p><div id="release-info"></div></div><div class="menu-foot">КВАРТИРА <span>01 / НАЧАЛО</span></div></section>
   <section id="creator" class="screen" hidden aria-labelledby="creator-title">
     <header class="creator-heading"><div><p class="eyebrow">BATTLE LIFE · НОВАЯ ИГРА</p><h2 id="creator-title">Создание персонажа</h2></div><p>Первый вечер.<br>Всё остальное — ещё впереди.</p></header>
     <nav class="creator-tabs" aria-label="Создание персонажа"><button type="button" id="appearance-tab" aria-pressed="true">I · Внешность</button><button type="button" id="clothing-tab" aria-pressed="false">II · Одежда</button></nav>
@@ -49,6 +49,6 @@
   <section id="peephole" class="screen" hidden aria-labelledby="peek-title"><div class="peek-heading"><p class="eyebrow">ЗА ДВЕРЬЮ</p><h2 id="peek-title">Лестничная площадка</h2></div><div id="peek-stage" aria-label="Вид через дверной глазок"></div><div class="peek-footer"><p>Дверь закрыта. В подъезде никого.</p><button id="peek-close">Отойти от глазка</button></div></section>
   <section id="virtual-pc" hidden aria-label="Виртуальный домашний компьютер"></section>
   <section id="loading"><p class="brand">BATTLE LIFE / ПЕРВЫЙ ВЕЧЕР</p><h2>Включаем свет в квартире</h2><div class="loader-line"></div><p>Загружаются квартира, персонаж и его гардероб.</p></section>
-<script type="module" src="./src/apartment-app.js?rev=43"></script>
+<script type="module" src="./src/apartment-app.js?rev=44"></script>
 </body>
 </html>

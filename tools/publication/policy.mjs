@@ -7,7 +7,7 @@ const textTypes = new Set(['.html','.css','.js','.mjs','.cjs','.json','.md','.tx
 const runtimeText = new Set(['.html','.css','.js','.mjs','.json','.txt','.svg']);
 const binaries = new Set(['.png','.jpg','.jpeg','.glb','.ttf']);
 const assetJson = new Set(['assets/apartment/v3/scene.json','assets/apartment/v3/rig.json','assets/models/apartment-first-location.manifest.json','assets/models/avatar.manifest.json','assets/npc-photos/manifest.json','assets/social/photos/manifest.json']);
-const rootRuntime = new Set(['index.html','legacy.html','style.css','apartment-v3.css','creator-v12.css','desktop-apps.css','phone-hud.css','rap-dossier.css','rap-notebook.css','social-network.css','underweb-world.css','virtual-pc.css','version.json']);
+const rootRuntime = new Set(['index.html','legacy.html','style.css','apartment-v3.css','creator-v12.css','desktop-apps.css','phone-hud.css','rap-dossier.css','rap-notebook.css','social-network.css','underweb-world.css','virtual-pc.css','version.json','release.json','.nojekyll']);
 const rootSource = new Set([...rootRuntime,'README.md','AGENTS.md','LICENSE','LICENSE.md','NOTICE','NOTICE.md','package.json','package-lock.json','.gitignore','.local-audio.example.json','Запустить игру.cmd']);
 
 export function publicationPathReason(relativePath, target) {

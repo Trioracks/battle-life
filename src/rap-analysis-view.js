@@ -1,6 +1,6 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=43';
-import {socialHeading} from './social-dom.js?rev=43';
-import {gameDateTimeLabel} from './home-calendar.js?rev=43';
+import {pcElement as el} from './virtual-pc-dom.js?rev=44';
+import {socialHeading} from './social-dom.js?rev=44';
+import {gameDateTimeLabel} from './home-calendar.js?rev=44';
 const names={text:'Текст',performance:'Исполнение',music:'Музыка',sound:'Звук'};
 export function createPublicAnalysisReportView(d,p){
  const root=el(d,'article',{className:'sn-analysis-report',attributes:{'aria-label':'Субъективный отчёт'}});if(!p)return root;

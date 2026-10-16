@@ -1,15 +1,15 @@
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=43';
-import {publicRoundTable,ROUND_LABELS} from './battle-results-table.js?rev=43';
-import {publicAnnouncedJudges} from './social-community-publications.js?rev=43';
-import {caseStudySources} from './rap-research-sources.js?rev=43';
-import {publicAnalysisReport,canStudyTrack} from './rap-analysis.js?rev=43';
-import {publicJudgeHypotheses} from './judge-dossier-analysis.js?rev=43';
-import {publicCharacterProfile} from './npc-social-profiles.js?rev=43';
-import {validGameMinute} from './game-minute.js?rev=43';
-import {isForecastReport,publicTrackForecast} from './rap-dossier-forecast.js?rev=43';
-import {profileAccess} from './social-profile-policy.js?rev=43';
-import {publicDossierCard} from './rap-dossier.js?rev=43';
-import {validResearchFinding} from './rap-research.js?rev=43';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=44';
+import {publicRoundTable,ROUND_LABELS} from './battle-results-table.js?rev=44';
+import {publicAnnouncedJudges} from './social-community-publications.js?rev=44';
+import {caseStudySources} from './rap-research-sources.js?rev=44';
+import {publicAnalysisReport,canStudyTrack} from './rap-analysis.js?rev=44';
+import {publicJudgeHypotheses} from './judge-dossier-analysis.js?rev=44';
+import {publicCharacterProfile} from './npc-social-profiles.js?rev=44';
+import {validGameMinute} from './game-minute.js?rev=44';
+import {isForecastReport,publicTrackForecast} from './rap-dossier-forecast.js?rev=44';
+import {profileAccess} from './social-profile-policy.js?rev=44';
+import {publicDossierCard} from './rap-dossier.js?rev=44';
+import {validResearchFinding} from './rap-research.js?rev=44';
 
 const array=v=>Array.isArray(v)?v:[],ids=v=>array(v).filter(x=>typeof x==='string');
 const unique=v=>[...new Set(v)].sort();

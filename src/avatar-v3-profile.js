@@ -1,8 +1,8 @@
-import { STAT_KEYS, validateAllocations } from './creator.js?rev=43';
-import {createWardrobe,validWardrobe,canWear} from './home-wardrobe.js?rev=43';
-import {closedFootwearId,migrateClosedFootwear,reserveFootwearBackup} from './avatar-footwear-migration.js?rev=43';
+import { STAT_KEYS, validateAllocations } from './creator.js?rev=44';
+import {createWardrobe,validWardrobe,canWear} from './home-wardrobe.js?rev=44';
+import {closedFootwearId,migrateClosedFootwear,reserveFootwearBackup} from './avatar-footwear-migration.js?rev=44';
 
-export { STAT_KEYS, statLabels as STAT_LABELS } from './creator.js?rev=43';
+export { STAT_KEYS, statLabels as STAT_LABELS } from './creator.js?rev=44';
 
 function category(label, options) {
   return Object.freeze({

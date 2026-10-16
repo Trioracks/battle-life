@@ -1,4 +1,4 @@
-import {BEAT_RULES} from './beat-catalog.js?rev=43';
+import {BEAT_RULES} from './beat-catalog.js?rev=44';
 export function workNeedSpeech(state) {
  const needs=state.music?.needs;
  return needs?.satiety<=BEAT_RULES.minSatiety+1e-7?'Не могу работать, хочу поесть.':needs?.energy<=BEAT_RULES.minEnergy+1e-7?'Не могу работать, хочу поспать.':'';

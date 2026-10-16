@@ -1,5 +1,5 @@
-import {recordingShot} from './recording-shots.js?rev=43';
-import {BEAT_RULES} from './beat-catalog.js?rev=43';
+import {recordingShot} from './recording-shots.js?rev=44';
+import {BEAT_RULES} from './beat-catalog.js?rev=44';
 const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const smooth=x=>{const t=clamp(x);return t*t*(3-2*t);};
 const mix=(a,b,t)=>a.map((v,i)=>v+(b[i]-v)*t);

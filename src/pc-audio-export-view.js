@@ -1,7 +1,7 @@
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=43';
-import {AUDIO_EXPORT_FOLDERS,AUDIO_EXPORT_KINDS,createAudioExport} from './pc-audio-exports.js?rev=43';
-import {EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=43';
-import {gameDateTimeLabel} from './home-calendar.js?rev=43';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=44';
+import {AUDIO_EXPORT_FOLDERS,AUDIO_EXPORT_KINDS,createAudioExport} from './pc-audio-exports.js?rev=44';
+import {EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=44';
+import {gameDateTimeLabel} from './home-calendar.js?rev=44';
 
 export function mountAudioExport(root,{getState,projectId,getMetadata=()=>({}),onCommit,onClose=()=>{}}){
  const d=root.ownerDocument,form=el(d,'form'),kind=el(d,'select',{attributes:{'aria-label':'Вид аудиофайла'}}),folder=el(d,'select',{attributes:{'aria-label':'Папка экспорта'}}),name=el(d,'input',{attributes:{'aria-label':'Имя аудиофайла',maxlength:'120'}}),notice=el(d,'p',{className:'ft-warning',attributes:{role:'status'}}),availability=el(d,'p',{className:'ft-production-note'});

@@ -1,5 +1,5 @@
-import {USER_EXPERIMENTAL_BANK,USER_EXPERIMENTAL_RECIPES} from './beat-user-experimental-bank.js?rev=43';
-export {USER_EXPERIMENTAL_BANK} from './beat-user-experimental-bank.js?rev=43';
+import {USER_EXPERIMENTAL_BANK,USER_EXPERIMENTAL_RECIPES} from './beat-user-experimental-bank.js?rev=44';
+export {USER_EXPERIMENTAL_BANK} from './beat-user-experimental-bank.js?rev=44';
 const legacyBank = ['drums','theme','arrangement'].flatMap(kind =>
   Array.from({length:16}, (_,index) => {
     const number=String(index+1).padStart(2,'0');

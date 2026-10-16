@@ -5,6 +5,9 @@
   "engines": {"node": ">=24 <25"},
   "scripts": {
     "start": "node tools/serve-preview.mjs",
+    "build:preview": "node tools/build-preview.mjs",
+    "audit:source": "node tools/audit-publication.mjs source --root .",
+    "audit:site": "node tools/audit-publication.mjs site --root dist/public-preview",
     "test": "node tools/run-tests.mjs --profile public",
     "test:local-assets": "node tools/run-tests.mjs --profile local-assets"
   },
