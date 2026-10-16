@@ -20,7 +20,7 @@ async function scheduledWatchdog(){
 test('hosted QA watchdog leaves eight minutes outside its two-viewport budget',async()=>{
  const watchdog=await scheduledWatchdog();
  assert.equal(watchdog.interval,1_320_000,'full hosted QA has a 22-minute overall deadline');
- const workflow=await fs.readFile(new URL('../.github/workflows/pages.yml',import.meta.url),'utf8');
+ const workflow=(await fs.readFile(new URL('../.github/workflows/pages.yml',import.meta.url),'utf8')).replace(/\r\n/g,'\n');
  const checks=workflow.match(/^  checks-build:\n[\s\S]*?^    timeout-minutes: (\d+)$/m);
  const deploy=workflow.match(/^  deploy:\n[\s\S]*?^    timeout-minutes: (\d+)$/m);
  assert.ok(checks,'missing checks-build timeout');assert.ok(deploy,'missing deploy timeout');
