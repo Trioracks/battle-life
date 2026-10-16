@@ -36,5 +36,7 @@ development branch or import its Git history. The snapshot origin is recorded in
 - Only successful master push/manual runs may deploy. PRs validate their exact
   head SHA with read-only permissions and work before Pages is configured.
   Deployment alone gets Pages/OIDC writes. Keep official action SHA pins,
-  publication-only cancellation and the last current-master check. Do not add
+  publication-only FIFO serialization (`queue: max`, `cancel-in-progress: false`)
+  and the last current-master check. A late older build must not cancel active
+  or replace pending newer deployments. Do not add
   tokens or automatically enable Pages. See the [release checklist](docs/release-checklist.md).

@@ -19,6 +19,38 @@ function bashExecutable(){
  }
  assert.fail('Cannot find the Bash bundled with Git for Windows');
 }
+function publicationPolicy(){
+ const match=job('deploy').match(/^    concurrency:\n((?:^      .+\n)+)/m);assert.ok(match,'missing publication concurrency');
+ const entries=Object.fromEntries([...match[1].matchAll(/^      ([a-z-]+): (.+)$/gm)].map(([,key,value])=>[key,value]));
+ return {group:entries.group,queue:entries.queue??'single',cancelInProgress:entries['cancel-in-progress']==='true'};
+}
+function runMasterGuard(remote,release,run=release){
+ const match=job('deploy').match(/id: current-master\n        shell: bash\n        run: \|\n([\s\S]*?)(?=^      -)/m);assert.ok(match,'missing final current-master guard');
+ const script=match[1].replace(/^          /gm,'');
+ // Substitute the network boundary only; execute the actual workflow shell guard.
+ const fake='git() { if [[ "$1" != ls-remote || "$2" != --exit-code || "$3" != https://github.com/Trioracks/battle-life.git || "$4" != refs/heads/master ]]; then return 99; fi; if [[ "$REMOTE" == failure ]]; then return 2; fi; if [[ -n "$REMOTE" ]]; then printf "%s\\trefs/heads/master\\n" "$REMOTE"; fi; }\n';
+ return spawnSync(bashExecutable(),['--noprofile','--norc','-c',fake+script],{encoding:'utf8',env:{...process.env,REMOTE:remote,RELEASE_SHA:release,GITHUB_SHA:run,GITHUB_SERVER_URL:'https://github.com',GITHUB_REPOSITORY:'Trioracks/battle-life'}});
+}
+// Model the documented GitHub admission boundary using the actual policy above:
+// cancel-in-progress may cancel the active job; default single replaces pending;
+// max retains FIFO admission order up to 100 pending jobs. The real SHA guard
+// determines which admitted revision can publish, independently of build order.
+function admitPublication(state,incoming,policy){
+ if(!state.active){state.active=incoming;return;}
+ if(policy.cancelInProgress){state.cancelled.push(state.active);state.active=null;}
+ if(policy.queue==='single')state.cancelled.push(...state.pending.splice(0));
+ if(state.pending.length<(policy.queue==='max'?100:1))state.pending.push(incoming);
+ else state.cancelled.push(incoming);
+}
+function finishPublications(state,currentMaster){
+ const published=[],rejected=[];
+ for(const revision of [state.active,...state.pending].filter(Boolean)){
+  const result=runMasterGuard(currentMaster,revision);
+  if(result.status===0)published.push(revision);
+  else{assert.equal(result.status,1,result.stderr||result.error?.message);rejected.push(revision);}
+ }
+ return {published,rejected,cancelled:state.cancelled};
+}
 
 test('only successful master push/manual runs can deploy',()=>{
  for(const [event,ref,result,want]of [
@@ -48,7 +80,8 @@ test('only the guarded deployment owns publication permissions, environment and 
  assert.equal((source.match(/pages: write/g)||[]).length,1);assert.equal((source.match(/id-token: write/g)||[]).length,1);
  assert.match(deploy,/permissions:\n      contents: read\n      pages: write\n      id-token: write/);
  assert.match(deploy,/environment:\n      name: github-pages\n      url: \$\{\{ steps.deployment.outputs.page_url \}\}/);
- assert.equal((source.match(/concurrency:/g)||[]).length,1);assert.match(deploy,/concurrency:\n      group: pages-publication\n      cancel-in-progress: true/);
+ assert.equal((source.match(/concurrency:/g)||[]).length,1);
+ assert.deepEqual(publicationPolicy(),{group:'pages-publication',queue:'max',cancelInProgress:false});
  assert.match(deploy,/release_sha: \$\{\{ needs\['checks-build'\].outputs.release_sha \}\}/);
  assert.ok(deploy.indexOf('actions/configure-pages@')<deploy.indexOf('id: current-master'));
  assert.match(deploy,/id: current-master[\s\S]+?\n      - name: Deploy Pages\n        id: deployment\n        uses: actions\/deploy-pages@/);
@@ -70,19 +103,28 @@ test('the only uploaded artifact is the audited runtime tree and all official ac
  for(const [,action,sha,version]of actions)assert.deepEqual([sha,version],expected.get(action));
 });
 
+test('late older build cannot cancel the newer active deployment',()=>{
+ const older='a'.repeat(40),newer='b'.repeat(40),state={active:newer,pending:[],cancelled:[]};
+ admitPublication(state,older,publicationPolicy());
+ assert.deepEqual(state,{active:newer,pending:[older],cancelled:[]});
+ assert.deepEqual(finishPublications(state,newer),{published:[newer],rejected:[older],cancelled:[]});
+});
+
+test('late older build cannot replace the newer pending deployment',()=>{
+ const first='c'.repeat(40),older='a'.repeat(40),newer='b'.repeat(40),state={active:first,pending:[newer],cancelled:[]};
+ admitPublication(state,older,publicationPolicy());
+ assert.deepEqual(state,{active:first,pending:[newer,older],cancelled:[]});
+ assert.deepEqual(finishPublications(state,newer),{published:[newer],rejected:[first,older],cancelled:[]});
+});
+
 test('the final publication guard rejects a slow old build, mismatched checkout and remote failure',()=>{
- const deploy=job('deploy'),match=deploy.match(/id: current-master\n        shell: bash\n        run: \|\n([\s\S]*?)(?=^      -)/m);assert.ok(match,'missing final current-master guard');
- const script=match[1].replace(/^          /gm,'');
- const bash=bashExecutable();
  for(const [remote,release,run,want]of [
   ['a'.repeat(40),'a'.repeat(40),'a'.repeat(40),0],
   ['b'.repeat(40),'a'.repeat(40),'a'.repeat(40),1],
   ['a'.repeat(40),'b'.repeat(40),'a'.repeat(40),1],
   ['','a'.repeat(40),'a'.repeat(40),1],
   ['failure','a'.repeat(40),'a'.repeat(40),2]]){
-  // Substitute the network boundary only; execute the actual workflow shell guard.
-  const fake='git() { if [[ "$1" != ls-remote || "$2" != --exit-code || "$3" != https://github.com/Trioracks/battle-life.git || "$4" != refs/heads/master ]]; then return 99; fi; if [[ "$REMOTE" == failure ]]; then return 2; fi; if [[ -n "$REMOTE" ]]; then printf "%s\\trefs/heads/master\\n" "$REMOTE"; fi; }\n';
-  const result=spawnSync(bash,['--noprofile','--norc','-c',fake+script],{encoding:'utf8',env:{...process.env,REMOTE:remote,RELEASE_SHA:release,GITHUB_SHA:run,GITHUB_SERVER_URL:'https://github.com',GITHUB_REPOSITORY:'Trioracks/battle-life'}});
+  const result=runMasterGuard(remote,release,run);
   assert.equal(result.status,want,result.stderr||result.error?.message);
  }
 });

@@ -89,7 +89,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     concurrency:
       group: pages-publication
-      cancel-in-progress: true
+      queue: max
+      cancel-in-progress: false
     outputs:
       page_url: ${{ steps.deployment.outputs.page_url }}
       release_sha: ${{ needs['checks-build'].outputs.release_sha }}
@@ -98,8 +99,8 @@ jobs:
     steps:
       - name: Configure existing Pages source
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
-      # Concurrency alone cannot reject an old build that finishes after a newer
-      # deployment. Check current master inside the publication lock, last.
+      # Keep active and pending publications when a slow older build arrives.
+      # Queue admission order can differ from commit order; check master last.
       - name: Reject stale master immediately before publication
         id: current-master
         shell: bash
