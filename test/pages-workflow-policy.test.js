@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import {spawnSync} from 'node:child_process';
 import vm from 'node:vm';
 import test from 'node:test';
@@ -73,6 +74,37 @@ test('PR checks have read-only tokens, exact head checkout, full history and no 
  assert.match(checks,/git merge-base/);assert.match(checks,/git rev-parse HEAD/);assert.match(checks,/AUDIT_HEAD/);
  assert.doesNotMatch(checks,/local-full|test:local-assets|asset-root|4173|D:\\/);
  assert.match(checks,/--root dist\/public-preview --output-dir "\$RUNNER_TEMP\/public-preview-qa"/);
+});
+
+test('job-level environments do not use the unavailable runner context',()=>{
+ for(const name of ['checks-build','deploy']){
+  const environments=[...job(name).matchAll(/^    env:\n((?:^      .+\n)+)/gm)];
+  for(const [,environment]of environments)assert.doesNotMatch(environment,/\$\{\{\s*runner\s*\./,`${name} job env cannot access runner context`);
+ }
+});
+
+test('runner temporary paths are exported before any action setup or downloads',()=>{
+ const checks=job('checks-build');
+ const initialization=checks.match(/^      - name: [^\n]+\n        id: runner-environment\n        shell: bash\n        run: \|\n((?:^          .*\n)+)/m);
+ assert.ok(initialization,'missing runner environment initialization shell step');
+ for(const boundary of ['uses: actions/','run: npm ci','run: npx playwright install']){
+  assert.ok(checks.indexOf(boundary)>initialization.index,`initialize runner paths before ${boundary}`);
+ }
+ const script=initialization[1].replace(/^          /gm,'');
+ const scratch=fs.mkdtempSync(path.join(os.tmpdir(),'pages runner env-'));
+ try{
+  const output=path.join(scratch,'github env').replaceAll('\\','/');
+  for(const runnerTemp of ['/hosted-runner/temp','/hosted runner/temp space']){
+   fs.writeFileSync(output,'');
+   const result=spawnSync(bashExecutable(),['--noprofile','--norc','-c',script],{encoding:'utf8',env:{...process.env,RUNNER_TEMP:runnerTemp,GITHUB_ENV:output}});
+   assert.equal(result.status,0,result.stderr||result.error?.message);
+   const exported=Object.fromEntries(fs.readFileSync(output,'utf8').trim().split(/\r?\n/).map(line=>{const separator=line.indexOf('=');return [line.slice(0,separator),line.slice(separator+1)];}));
+   assert.deepEqual(exported,{
+    TEMP:runnerTemp,TMP:runnerTemp,
+    npm_config_cache:`${runnerTemp}/npm-cache`,PLAYWRIGHT_BROWSERS_PATH:`${runnerTemp}/playwright`
+   });
+  }
+ }finally{fs.rmSync(scratch,{recursive:true,force:true});}
 });
 
 test('only the guarded deployment owns publication permissions, environment and concurrency',()=>{

@@ -17,13 +17,15 @@ jobs:
       release_sha: ${{ steps.revision.outputs.sha }}
     env:
       BATTLE_PYTHON: python3
-      TEMP: ${{ runner.temp }}
-      TMP: ${{ runner.temp }}
-      npm_config_cache: ${{ runner.temp }}/npm-cache
-      PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/playwright
       AUDIT_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
       AUDIT_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
     steps:
+      - name: Initialize runner temporary paths
+        id: runner-environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s\n' "TEMP=$RUNNER_TEMP" "TMP=$RUNNER_TEMP" "npm_config_cache=$RUNNER_TEMP/npm-cache" "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/playwright" >> "$GITHUB_ENV"
       - name: Checkout exact public revision
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
