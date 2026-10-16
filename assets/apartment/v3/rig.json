@@ -1,0 +1,208 @@
+{
+  "height": 1.85,
+  "forward": "local +Z in glTF",
+  "wardrobe": "All look-{category}-{value} meshes bind to the same 19-bone armature. Show exactly one value per category; none hides the category.",
+  "looks": {
+    "hair": [
+      "bald",
+      "lake",
+      "buzz",
+      "crop",
+      "parted",
+      "bowl",
+      "messy",
+      "longshag"
+    ],
+    "face": [
+      "oval",
+      "square",
+      "long"
+    ],
+    "beard": [
+      "none",
+      "stubble",
+      "short",
+      "full",
+      "goatee",
+      "chinstrap"
+    ],
+    "mustache": [
+      "none",
+      "pencil",
+      "classic",
+      "walrus",
+      "handlebar",
+      "horseshoe"
+    ],
+    "top": [
+      "tee",
+      "shirt",
+      "hoodie",
+      "sweater",
+      "tank",
+      "turtleneck"
+    ],
+    "bottom": [
+      "jeans",
+      "skinny",
+      "breeches",
+      "shorts",
+      "sports"
+    ],
+    "footwear": [
+      "sneakers",
+      "canvas",
+      "boots",
+      "ankleboots",
+      "highcanvas"
+    ]
+  },
+  "walk": {
+    "strideDistance": 0.9,
+    "duration": 1.0,
+    "stanceFraction": 0.6,
+    "swingClearance": 0.045,
+    "soleProfile": [
+      [
+        0.06468,
+        0.004
+      ],
+      [
+        0.06468,
+        0.004
+      ],
+      [
+        0.022539999999999998,
+        0.004
+      ],
+      [
+        -0.147,
+        0.004
+      ],
+      [
+        -0.20776,
+        0.004
+      ],
+      [
+        -0.20776,
+        0.004
+      ],
+      [
+        -0.147,
+        0.004
+      ],
+      [
+        0.022539999999999998,
+        0.004
+      ],
+      [
+        0.06798,
+        0.016
+      ],
+      [
+        0.06798,
+        0.016
+      ],
+      [
+        0.02369,
+        0.016
+      ],
+      [
+        -0.1545,
+        0.016
+      ],
+      [
+        -0.21836,
+        0.016
+      ],
+      [
+        -0.21836,
+        0.016
+      ],
+      [
+        -0.1545,
+        0.016
+      ],
+      [
+        0.02369,
+        0.016
+      ],
+      [
+        0.066,
+        0.03
+      ],
+      [
+        0.066,
+        0.03
+      ],
+      [
+        0.023,
+        0.03
+      ],
+      [
+        -0.15,
+        0.03
+      ],
+      [
+        -0.212,
+        0.03
+      ],
+      [
+        -0.212,
+        0.03
+      ],
+      [
+        -0.15,
+        0.03
+      ],
+      [
+        0.023,
+        0.03
+      ]
+    ],
+    "pelvisHeightRange": [
+      0.8649362325668335,
+      0.9008301496505737
+    ],
+    "heelStrikeDegrees": -12,
+    "toeOffDegrees": 24
+  },
+  "clips": {
+    "idle": {
+      "frames": 61,
+      "loop": true
+    },
+    "walk": {
+      "frames": 31,
+      "loop": true
+    },
+    "seated": {
+      "frames": 61,
+      "loop": true
+    },
+    "eat": {
+      "frames": 61,
+      "loop": true
+    },
+    "sleep": {
+      "frames": 61,
+      "loop": true
+    },
+    "wash": {
+      "frames": 61,
+      "loop": true
+    },
+    "reach": {
+      "frames": 61,
+      "loop": true
+    },
+    "open-door": {
+      "frames": 61,
+      "loop": false
+    },
+    "switch": {
+      "frames": 22,
+      "loop": false
+    }
+  }
+}

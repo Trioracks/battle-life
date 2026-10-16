@@ -1,0 +1,74 @@
+{
+  "asset": "apartment-first-location.glb",
+  "view": "2.5d-side-cutaway",
+  "roots": [
+    {
+      "name": "architecture",
+      "anchor": "floor-lane"
+    },
+    {
+      "name": "kitchen",
+      "anchor": "kitchen-floor"
+    },
+    {
+      "name": "living",
+      "anchor": "living-floor"
+    },
+    {
+      "name": "interior-door",
+      "anchor": "interior-door-panel"
+    },
+    {
+      "name": "entry-door",
+      "anchor": "entry-door-slab"
+    },
+    {
+      "name": "desk",
+      "anchor": "desk-top"
+    },
+    {
+      "name": "bed",
+      "anchor": "bed-mattress"
+    },
+    {
+      "name": "sink",
+      "anchor": "sink-basin"
+    },
+    {
+      "name": "stove",
+      "anchor": "stove-top"
+    },
+    {
+      "name": "fridge",
+      "anchor": "fridge-body"
+    },
+    {
+      "name": "computer",
+      "anchor": "crt-screen"
+    },
+    {
+      "name": "desktop-mic",
+      "anchor": "mic-capsule"
+    },
+    {
+      "name": "chair",
+      "anchor": "chair-seat"
+    }
+  ],
+  "actor_lane": {
+    "x": [
+      -6.6,
+      6.6
+    ],
+    "y": [
+      -1.85,
+      -1.25
+    ],
+    "z": 0.0
+  },
+  "seat_anchor": {
+    "x": 2.25,
+    "y": -0.1,
+    "z": 1.1
+  }
+}

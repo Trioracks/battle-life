@@ -27,3 +27,25 @@ export function keyboardArmPose(progress, rhythm) {
     backElbow: 2.06 * reach + tap * .45,
   };
 }
+
+// In the apartment the actor turns the complete mesh 90° around Y to walk left
+// or right. A limb therefore needs to swing about its local X axis: that maps
+// to the horizontal screen plane after the actor turns. Rotating about Z would
+// instead move the limb into scene depth and read as an unwanted vertical lift.
+export function sideWalkPose(phase, facing) {
+  const rawStride = Math.sin(phase) * .58;
+  const stride = Math.abs(rawStride) < 1e-9 ? 0 : rawStride;
+  const direction = facing >= 0 ? 1 : -1;
+  const frontLeg = stride === 0 ? 0 : -stride * direction;
+  const backLeg = stride === 0 ? 0 : stride * direction;
+
+  return {
+    axis: 'x',
+    frontLeg,
+    backLeg,
+    frontKnee: Math.max(0, -frontLeg) * .55,
+    backKnee: Math.max(0, -backLeg) * .55,
+    frontArm: frontLeg === 0 ? 0 : -frontLeg * .58,
+    backArm: backLeg === 0 ? 0 : -backLeg * .58,
+  };
+}

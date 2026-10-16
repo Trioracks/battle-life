@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { appearanceGeometry, createRapper, cycleLookPart, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, validateAllocations } from '../src/creator.js';
+import { allocationsFromSkills, appearanceGeometry, createRapper, cycleLookPart, frontFacingFaceLayout, lookOptionLabel, lookPartAtPreviewHeight, normalizeLook, profileFaceLayout, selectAppearancePart, validateAllocations } from '../src/creator.js';
 
 test('creator turns ten allocated points into visible 10–50 skills', () => {
   const rapper = createRapper({
@@ -24,16 +24,17 @@ test('creator turns ten allocated points into visible 10–50 skills', () => {
   assert.equal(rapper.nickname, 'Ночной Маяк');
   assert.equal(rapper.skills.intelligence, 30);
   assert.equal(rapper.skills.resilience, 10);
-  assert.deepEqual(rapper.look, { hair: 'mohawk', face: 'mustache', top: 'tee', pants: 'jeans' });
+  assert.deepEqual(rapper.look, { hair: 'mohawk', face: 'mustache', top: 'tee', pants: 'trousers', footwear: 'sneakers' });
 });
 
 test('creator cycles body-zone appearance without adding a cap back into saved look', () => {
-  const base = { hair: 'bald', face: 'clean', top: 'hoodie', pants: 'cargo' };
+  const base = { hair: 'bald', face: 'clean', top: 'hoodie', pants: 'cargo', footwear: 'canvas' };
 
   assert.deepEqual(cycleLookPart(base, 'hair', 1), { ...base, hair: 'crop' });
   assert.deepEqual(cycleLookPart(base, 'face', -1), { ...base, face: 'mustache' });
   assert.deepEqual(cycleLookPart(base, 'top', -1), { ...base, top: 'tee' });
-  assert.deepEqual(cycleLookPart(base, 'pants', 1), { ...base, pants: 'jeans' });
+  assert.deepEqual(cycleLookPart(base, 'pants', 1), { ...base, pants: 'trousers' });
+  assert.deepEqual(cycleLookPart(base, 'footwear', 1), { ...base, footwear: 'shoes' });
   assert.equal(Object.hasOwn(cycleLookPart({ ...base, cap: 'red' }, 'hair', 1), 'cap'), false);
 });
 
@@ -46,13 +47,28 @@ test('creator keeps a shirt option and defaults an unknown top to it', () => {
   assert.equal(Object.hasOwn(normalized, 'cap'), false);
 });
 
-test('creator appearance geometry reveals calves only for shorts', () => {
-  assert.deepEqual(appearanceGeometry({ top: 'tee', pants: 'shorts', face: 'beard' }), {
-    top: 'short-sleeve',
+test('creator presents every persisted appearance value with a Russian label', () => {
+  assert.equal(lookOptionLabel('top', 'tee'), 'Футболка');
+  assert.equal(lookOptionLabel('top', 'sweater'), 'Свитер');
+  assert.equal(lookOptionLabel('pants', 'shorts'), 'Шорты');
+  assert.equal(lookOptionLabel('footwear', 'boots'), 'Сапоги');
+});
+
+test('creator appearance geometry describes clothing, legs and footwear from the saved look', () => {
+  assert.deepEqual(appearanceGeometry({ top: 'tee', pants: 'shorts', footwear: 'sandals', face: 'beard' }), {
+    top: 'tee',
+    legStyle: 'shorts',
+    footwear: 'sandals',
     lowerLegsVisible: true,
     facialHair: 'beard',
   });
-  assert.equal(appearanceGeometry({ top: 'jacket', pants: 'jeans' }).lowerLegsVisible, false);
+  assert.deepEqual(appearanceGeometry({ top: 'sports', pants: 'sports', footwear: 'canvas', face: 'clean' }), {
+    top: 'tee',
+    legStyle: 'sports',
+    footwear: 'canvas',
+    lowerLegsVisible: false,
+    facialHair: 'clean',
+  });
 });
 
 test('creator selection changes only to a known clicked appearance part', () => {
@@ -60,12 +76,35 @@ test('creator selection changes only to a known clicked appearance part', () => 
   assert.equal(selectAppearancePart('top', 'missing'), 'top');
 });
 
-test('creator profile face follows the same sideways orientation as the apartment actor', () => {
+test('creator and apartment retain front, back and smooth sideways-facing yaws', () => {
   assert.deepEqual(profileFaceLayout(), {
-    previewYaw: Math.PI / 2,
+    previewYaw: 0,
     rightYaw: Math.PI / 2,
     leftYaw: -Math.PI / 2,
     faceCameraYaw: 0,
+    backYaw: Math.PI,
+  });
+});
+
+test('front-facing character has two eyes but a single central nose', () => {
+  assert.deepEqual(frontFacingFaceLayout(), {
+    earXs: [-.34, .34],
+    eyeXs: [-.17, .17],
+    faceZ: .27,
+  });
+});
+
+test('existing MC profile reopens with its original distributed points', () => {
+  assert.deepEqual(allocationsFromSkills({ intelligence: 30, writing: 20, musicality: 10 }), {
+    intelligence: 2,
+    writing: 1,
+    musicality: 0,
+    flow: 0,
+    beatmaking: 0,
+    sound: 0,
+    charisma: 0,
+    confidence: 0,
+    resilience: 0,
   });
 });
 
@@ -74,6 +113,7 @@ test('creator maps a click on the preview body to the closest appearance zone', 
   assert.equal(lookPartAtPreviewHeight(.42), 'face');
   assert.equal(lookPartAtPreviewHeight(.61), 'top');
   assert.equal(lookPartAtPreviewHeight(.86), 'pants');
+  assert.equal(lookPartAtPreviewHeight(.98), 'footwear');
 });
 
 test('creator refuses an allocation above the 50-point per-stat ceiling', () => {
@@ -93,9 +133,19 @@ test('creator refuses an allocation above the 50-point per-stat ceiling', () => 
   assert.match(result.message, /50/);
 });
 
-test('creator requires exactly ten points and a nickname', () => {
+test('creator requires exactly ten points and uses the name when nickname is blank', () => {
   const allocation = { intelligence: 1, writing: 1, musicality: 1, flow: 1, beatmaking: 1, sound: 1, charisma: 1, confidence: 1, resilience: 1 };
 
   assert.deepEqual(validateAllocations(allocation), { valid: false, total: 9, message: 'Распредели все 10 очков.' });
-  assert.throws(() => createRapper({ name: 'Миша', nickname: ' ', allocations: { ...allocation, intelligence: 2 }, look: {} }), /никнейм/i);
+  assert.equal(createRapper({ name: 'Миша', nickname: ' ', allocations: { ...allocation, intelligence: 2 }, look: {} }).nickname, 'Миша');
+});
+
+test('creator migrates retired outfit ids and fills in every new appearance category', () => {
+  assert.deepEqual(normalizeLook({ hair: 'crop', face: 'beard', top: 'jacket', pants: 'jeans' }), {
+    hair: 'crop',
+    face: 'beard',
+    top: 'sweater',
+    pants: 'trousers',
+    footwear: 'sneakers',
+  });
 });

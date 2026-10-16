@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "provenance": "authored-game-calibration",
+  "selectionCutoffTie": "seeded-lottery",
+  "pairExactTie": "preferred-aspect-then-seeded-lottery",
+  "ltr": "personal-raw-maximum-then-seeded-lottery",
+  "ltrGrantsBonuses": false,
+  "publicPairScore": "binary-vote"
+}

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createActionTransition, phaseAfterApproach, transitionPhaseAt } from '../src/action-transitions.js';
+import { actionUsesDeskSeat, createActionTransition, phaseAfterApproach, transitionPhaseAt } from '../src/action-transitions.js';
 
 test('sleep cannot jump directly from walking to a lying pose', () => {
   const transition = createActionTransition({ actionId: 'bed', fromRoom: 'living', toRoom: 'living' });
@@ -24,4 +24,17 @@ test('object pose begins only after the settled turn and start phases', () => {
   assert.equal(phaseAfterApproach(transition, 0).id, 'turn');
   assert.equal(phaseAfterApproach(transition, .3).id, 'start');
   assert.equal(phaseAfterApproach(transition, .65).id, 'perform');
+});
+
+test('recording at the desk microphone uses the seated computer pose', () => {
+  assert.equal(actionUsesDeskSeat('microphone'), true);
+  assert.equal(actionUsesDeskSeat('stove'), false);
+});
+
+test('desk transfer is hidden behind a short fade before the seated pose appears', () => {
+  const transition = createActionTransition({ actionId: 'computer', fromRoom: 'living', toRoom: 'living', transition: 'desk-fade' });
+
+  assert.equal(transitionPhaseAt(transition, 1.29).id, 'fade-out');
+  assert.equal(transitionPhaseAt(transition, 1.50).id, 'swap-pose');
+  assert.equal(transitionPhaseAt(transition, 1.54).id, 'fade-in');
 });

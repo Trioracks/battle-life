@@ -7,11 +7,26 @@ const actionPhases = Object.freeze([
   Object.freeze({ id: 'perform', seconds: Infinity }),
 ]);
 
-export function createActionTransition({ actionId, fromRoom, toRoom }) {
+const fadePhases = Object.freeze([
+  Object.freeze({ id: 'walk', seconds: 1 }),
+  Object.freeze({ id: 'turn', seconds: .28 }),
+  Object.freeze({ id: 'fade-out', seconds: .2 }),
+  Object.freeze({ id: 'swap-pose', seconds: .04 }),
+  Object.freeze({ id: 'fade-in', seconds: .2 }),
+  Object.freeze({ id: 'start', seconds: .36 }),
+  Object.freeze({ id: 'perform', seconds: Infinity }),
+]);
+
+export function actionUsesDeskSeat(actionId) {
+  return actionId === 'microphone';
+}
+
+export function createActionTransition({ actionId, fromRoom, toRoom, transition = 'visible' }) {
   return Object.freeze({
     actionId,
     route: Object.freeze(routeBetweenRooms(fromRoom, toRoom)),
-    phases: actionPhases,
+    transition,
+    phases: transition === 'desk-fade' || transition === 'bed-fade' ? fadePhases : actionPhases,
   });
 }
 

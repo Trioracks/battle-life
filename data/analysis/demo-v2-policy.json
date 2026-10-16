@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "provenance": "calibration",
+  "contentMix": {"step": 10, "manualWritingThreshold": 25, "automaticDistribution": "uniform-66-triples", "distance": "L1/200", "legacyRetention": 1},
+  "study": {"durationGameMinutes": 45, "revealTrueNumbers": false, "baseAccuracy": 0.1, "intelligenceWeight": 0.3, "profileWeight": 0.45, "diversityWeight": 0.15, "diversitySources": 12, "relativeCenter": 5, "relativeSlope": 0.75, "noiseAmplitude": 1.8, "segmentSkill": 50, "segmentConfidence": 0.5, "unknownBelow": 0.2},
+  "tournament": {"selectionPlaces": 32, "pairWindowMinutes": 10080, "pairing": "neighbors", "noShowBasePercent": 5, "noShowSkillGapDivisor": 2, "nextAnnouncementDelayMinutes": 1440},
+  "judging": {"quietHours": 6, "hourlyProbabilityPoints": 3, "guaranteedHour": 40},
+  "profiles": {"personalCount": 6, "poolSize": 32}
+  ,"judgeStudy": {"minimumProfile":25,"maximumCompetenceGap":35,"profileWeight":0.5,"intelligenceWeight":0.3,"reportWeight":0.2,"minimumConfidence":0.35,"severalSources":2,"confidentSources":4,"confidentThreshold":0.65}
+}

@@ -1,3 +1,5 @@
+import { normalizeLook } from './creator.js?rev=44';
+
 const SAVE_KEY = 'battle-life-campaign-v1';
 
 const startClock = Object.freeze({ year: 2026, month: 9, day: 17, minutes: 19 * 60 });
@@ -95,7 +97,9 @@ export function loadCampaign(storage = globalThis.localStorage) {
   const serialized = storage?.getItem(SAVE_KEY);
   if (!serialized) return null;
   try {
-    return JSON.parse(serialized);
+    const campaign = JSON.parse(serialized);
+    if (campaign?.player?.look) campaign.player.look = normalizeLook(campaign.player.look);
+    return campaign;
   } catch {
     return null;
   }

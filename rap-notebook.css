@@ -1,0 +1,82 @@
+.rap-notebook {
+  height:100%; min-height:0; display:flex; flex-direction:column; position:relative;
+  background:#f4f3ee; color:#263345; font:13px Tahoma,Arial,sans-serif;
+}
+.rn-toolbar { display:flex; gap:5px; flex-wrap:wrap; padding:8px; background:linear-gradient(#fafafa,#e3e7eb); border-bottom:1px solid #b7bec8; }
+.rap-notebook button { font:inherit; color:#24354a; background:linear-gradient(#fff,#e0e6eb); border:1px solid #a7b4c4; border-radius:2px; padding:7px 11px; cursor:pointer; }
+.rap-notebook button:hover:not(:disabled) { border-color:#497fae; background:#e4f0ff; }
+.rap-notebook button:disabled { opacity:.5; cursor:default; }
+.rap-notebook :focus-visible { outline:2px solid #24649c; outline-offset:2px; }
+.rn-tab { padding:8px 14px; background:#e9eef4; border-bottom:1px solid #aabaca; color:#355678; overflow-wrap:anywhere; }
+.rn-body { display:flex; min-height:0; flex:1; overflow:hidden; }
+.rn-sheet { background:white; flex:1; min-width:0; overflow:auto; padding:22px 20px 40px 10px; box-shadow:inset 42px 0 #f3f4f6; }
+.rn-meta { padding:0 12px 16px 44px; border-bottom:1px solid #e2e7ec; margin-bottom:18px; overflow-wrap:anywhere; }
+.rn-meta h1 { font-size:22px; font-weight:500; margin:0 0 10px; color:#223e65; }
+#virtual-pc .rap-notebook .rn-meta p { font-size:11px; color:#6f7b87; line-height:1.8; margin:2px 0; }
+.rn-section { margin-bottom:25px; }
+.rn-section h2 { font:600 12px Tahoma,sans-serif; color:#628247; margin:0 0 12px 44px; }
+.rn-line { display:grid; grid-template-columns:44px minmax(0,1fr); min-height:28px; font:16px/1.8 Consolas,'Courier New',monospace; }
+.rn-line-gap { margin-top:17px; }
+.rn-line-number { align-self:start; text-align:right; padding-right:15px; color:#a0a7b0; font-size:11px; line-height:29px; user-select:none; }
+.rn-line-body { min-width:0; }
+.rn-line-body[data-indent="1"] { padding-left:12px; }
+.rn-line-body[data-indent="2"] { padding-left:24px; }
+.rn-line-body[data-indent="3"] { padding-left:36px; }
+.rn-words { min-width:0; overflow-wrap:anywhere; }
+.rn-word { display:inline-block; margin-right:5px; max-width:100%; overflow-wrap:anywhere; }
+.rn-error { text-decoration:underline wavy #d44a43; text-decoration-thickness:1px; text-underline-offset:4px; }
+.rn-note { display:block; margin:1px 0 7px; color:#8b7055; font:italic 12px/1.6 Tahoma,Arial,sans-serif; overflow-wrap:anywhere; }
+.rn-line[data-unfinished="true"] .rn-words { color:#78818a; }
+.rn-work { width:218px; flex:none; padding:18px; background:#f1f4f7; border-left:1px solid #ced7df; overflow:auto; font-size:12px; line-height:1.6; }
+.rn-work small { font-size:9px; letter-spacing:1.6px; color:#708496; }
+.rn-work h2 { font-size:17px; line-height:1.4; }
+.rn-work label { display:block; }
+.rn-work input { display:block; width:100%; }
+.rn-work hr { border:0; border-top:1px solid #d1d9e1; margin:22px 0; }
+.rn-done { color:#477752; }
+.rn-status { padding:7px 12px; font-size:11px; background:#e9edf1; border-top:1px solid #bec9d4; flex:none; }
+.rn-welcome { font:30px Georgia,serif; color:#537598; margin:45px 0 12px 44px; }
+/* The XP shell styles all window paragraphs: keep this outside the line gutter. */
+#virtual-pc .rap-notebook .rn-empty { margin:18px 12px 0 44px; max-width:430px; color:#89929c; line-height:1.8; }
+.rn-cover { position:absolute; inset:0; background:#15314b55; display:flex; justify-content:center; align-items:center; padding:20px; z-index:3; backdrop-filter:blur(2px); }
+.rn-dialog { width:min(470px,100%); max-height:100%; overflow:auto; padding:24px; background:#f7f8fa; border:1px solid #8b9cac; box-shadow:0 15px 60px #152c5a44; }
+.rn-dialog h2 { font-size:20px; margin:0 0 18px; }
+.rn-dialog form { display:flex; flex-wrap:wrap; gap:10px; }
+.rn-dialog select,.rn-dialog input { width:100%; padding:8px; color:#263345; background:#fff; border:1px solid #aabaca; font:inherit; }
+.rn-dialog>button { display:block; width:100%; text-align:left; margin:8px 0; }
+#virtual-pc .rap-notebook .rn-dialog p { font-size:12px; line-height:1.6; color:#667483; }
+#virtual-pc .rap-notebook .rn-dialog-hint { margin:4px 0; }
+.rn-message { color:#a43324!important; }
+.rn-dialog button:last-child { margin-top:0; }
+.rn-dialog form>button { min-height:36px; align-self:start; }
+#virtual-pc .rap-notebook .rn-prose { margin:0 12px 18px 44px; font:16px/2 Consolas,'Courier New',monospace; overflow-wrap:anywhere; }
+.rn-create-action { display:flex; align-items:center; flex-direction:column; gap:10px; padding:26px 12px; margin:12px auto; text-align:center; }
+.rn-create-action progress { width:min(280px,100%); height:7px; accent-color:#446e73; }
+.rap-notebook button.rn-primary { padding:12px 30px; background:#365e66; color:#fff; border-color:#294b52; }
+@media(max-width:700px) {
+  .rn-work { width:160px; padding:12px; }
+  .rn-sheet { padding-right:8px; }
+  .rn-meta h1 { font-size:18px; }
+  .rn-line { font-size:14px; }
+  .rn-toolbar { gap:3px; }
+  .rap-notebook button { padding:6px 8px; }
+}
+@media(max-width:480px) {
+  .rn-body { flex-direction:column; overflow:auto; }
+  .rn-sheet { min-height:280px; overflow:visible; }
+  .rn-work { width:auto; border-left:0; border-top:1px solid #ced7df; }
+  .rn-cover { padding:8px; }
+  .rn-dialog { padding:16px; }
+}
+.rn-content-budget {margin:16px 0;padding:12px;border:1px solid #c6d1d9;background:#e8eff3;color:#304452}
+.rn-content-budget h3 {margin:0 0 8px}
+.rn-content-budget label {display:block;margin:8px 0}
+.rn-content-budget input {display:block;width:100%}
+.project-picker {display:flex;flex-direction:column;gap:8px;min-height:0;width:100%}
+.project-picker>input,.project-picker select {box-sizing:border-box;min-width:0;padding:7px;font:inherit;color:#263345;background:#fff;border:1px solid #aabaca}
+.project-picker-filters {display:flex;gap:6px}
+.project-picker-filters select {flex:1;width:50%}
+.project-picker-list {max-height:300px;overflow:auto;display:flex;flex-direction:column;gap:3px}
+.project-picker-group {margin:9px 0 3px;font:600 11px Tahoma,Arial,sans-serif;color:#667483}
+.ft-dialog-card .project-picker-group {color:#c2c8b5}
+#virtual-pc .project-picker button.project-picker-row {display:block;width:100%;margin:0;padding:7px 9px;text-align:left;line-height:1.35;white-space:normal;overflow-wrap:anywhere}

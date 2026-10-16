@@ -5,8 +5,9 @@ export const STAT_KEYS = Object.freeze([
 export const LOOK_OPTIONS = Object.freeze({
   hair: Object.freeze(['bald', 'crop', 'mohawk']),
   face: Object.freeze(['clean', 'beard', 'mustache']),
-  top: Object.freeze(['tee', 'hoodie', 'jacket']),
-  pants: Object.freeze(['cargo', 'jeans', 'shorts']),
+  top: Object.freeze(['tee', 'hoodie', 'sweater']),
+  pants: Object.freeze(['shorts', 'breeches', 'sports', 'cargo', 'trousers']),
+  footwear: Object.freeze(['sandals', 'sneakers', 'canvas', 'shoes', 'boots']),
 });
 
 export const LOOK_PART_LABELS = Object.freeze({
@@ -14,7 +15,23 @@ export const LOOK_PART_LABELS = Object.freeze({
   face: 'Лицо',
   top: 'Верх',
   pants: 'Низ',
+  footwear: 'Обувь',
 });
+
+const lookValueLabels = Object.freeze({
+  hair: Object.freeze({ bald: 'Лысый', crop: 'Короткие', mohawk: 'Ирокез' }),
+  face: Object.freeze({ clean: 'Без бороды', mustache: 'Усы', beard: 'Борода' }),
+  top: Object.freeze({ tee: 'Футболка', hoodie: 'Худи', sweater: 'Свитер' }),
+  pants: Object.freeze({ shorts: 'Шорты', breeches: 'Бриджи', sports: 'Спортивные штаны', cargo: 'Карго', trousers: 'Брюки' }),
+  footwear: Object.freeze({ sandals: 'Сандалии', sneakers: 'Кроссовки', canvas: 'Кеды', shoes: 'Туфли', boots: 'Сапоги' }),
+});
+
+const retiredLookValues = Object.freeze({
+  top: Object.freeze({ jacket: 'sweater' }),
+  pants: Object.freeze({ jeans: 'trousers' }),
+});
+
+const defaultLookValues = Object.freeze({ footwear: 'sneakers' });
 
 const labels = Object.freeze({
   intelligence: 'Интеллект',
@@ -34,7 +51,8 @@ function allocationValue(allocations, key) {
 
 function normalLookPart(part, value) {
   const options = LOOK_OPTIONS[part];
-  return options?.includes(value) ? value : options?.[0];
+  const migratedValue = retiredLookValues[part]?.[value] ?? value;
+  return options?.includes(migratedValue) ? migratedValue : (defaultLookValues[part] ?? options?.[0]);
 }
 
 export function normalizeLook(look = {}) {
@@ -53,7 +71,9 @@ export function cycleLookPart(look, part, direction) {
 export function appearanceGeometry(look) {
   const normalized = normalizeLook(look);
   return {
-    top: normalized.top === 'tee' ? 'short-sleeve' : normalized.top,
+    top: normalized.top,
+    legStyle: normalized.pants,
+    footwear: normalized.footwear,
     lowerLegsVisible: normalized.pants === 'shorts',
     facialHair: normalized.face,
   };
@@ -63,13 +83,34 @@ export function selectAppearancePart(currentPart, clickedPart) {
   return Object.hasOwn(LOOK_OPTIONS, clickedPart) ? clickedPart : currentPart;
 }
 
+export function lookOptionLabel(part, value) {
+  return lookValueLabels[part]?.[value] ?? value;
+}
+
 export function profileFaceLayout() {
   return {
-    previewYaw: Math.PI / 2,
+    previewYaw: 0,
     rightYaw: Math.PI / 2,
     leftYaw: -Math.PI / 2,
     faceCameraYaw: 0,
+    backYaw: Math.PI,
   };
+}
+
+export function frontFacingFaceLayout() {
+  return {
+    earXs: [-.34, .34],
+    eyeXs: [-.17, .17],
+    faceZ: .27,
+  };
+}
+
+export function allocationsFromSkills(skills = {}) {
+  return Object.fromEntries(STAT_KEYS.map((key) => {
+    const visibleValue = Number(skills[key]);
+    const allocation = Number.isFinite(visibleValue) ? Math.round((visibleValue - 10) / 10) : 0;
+    return [key, Math.max(0, Math.min(4, allocation))];
+  }));
 }
 
 export function lookPartAtPreviewHeight(relativeY) {
@@ -77,7 +118,8 @@ export function lookPartAtPreviewHeight(relativeY) {
   if (y < .33) return 'hair';
   if (y < .51) return 'face';
   if (y < .73) return 'top';
-  return 'pants';
+  if (y < .92) return 'pants';
+  return 'footwear';
 }
 
 export function validateAllocations(allocations) {
@@ -95,12 +137,11 @@ export function validateAllocations(allocations) {
 export function createRapper({ name, nickname, allocations, look }) {
   const validation = validateAllocations(allocations);
   if (!validation.valid) throw new Error(validation.message);
-  if (!nickname?.trim()) throw new Error('Нужен никнейм рэпера.');
   if (!name?.trim()) throw new Error('Нужно имя героя.');
 
   return {
     name: name.trim(),
-    nickname: nickname.trim(),
+    nickname: nickname?.trim() || name.trim(),
     skills: Object.fromEntries(STAT_KEYS.map((key) => [key, 10 + allocationValue(allocations, key) * 10])),
     look: normalizeLook(look),
   };
