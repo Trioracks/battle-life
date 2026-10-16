@@ -12,7 +12,7 @@ permissions:
 jobs:
   checks-build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     outputs:
       release_sha: ${{ steps.revision.outputs.sha }}
     env:

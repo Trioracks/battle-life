@@ -3,10 +3,36 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import vm from 'node:vm';
 import {startPreviewServer} from '../tools/serve-preview.mjs';
 
 const harness=()=>import('../tools/verify-public-preview.mjs');
 const revision='1234567890123456789012345678901234567890';
+async function scheduledWatchdog(){
+ const source=await fs.readFile(new URL('../tools/verify-public-preview.mjs',import.meta.url),'utf8');
+ const assignment=source.match(/^  watchdog=setTimeout\(.+;$/m);
+ assert.ok(assignment,'missing QA watchdog scheduling');
+ let callback,interval,closed=0;
+ const report={pageErrors:[]};
+ vm.runInNewContext(assignment[0],{report,browser:{close(){closed++;}},setTimeout(expire,milliseconds){callback=expire;interval=milliseconds;}});
+ return {report,interval,expire:()=>callback(),closed:()=>closed};
+}
+test('hosted QA watchdog leaves eight minutes outside its two-viewport budget',async()=>{
+ const watchdog=await scheduledWatchdog();
+ assert.equal(watchdog.interval,1_320_000,'full hosted QA has a 22-minute overall deadline');
+ const workflow=await fs.readFile(new URL('../.github/workflows/pages.yml',import.meta.url),'utf8');
+ const checks=workflow.match(/^  checks-build:\n[\s\S]*?^    timeout-minutes: (\d+)$/m);
+ const deploy=workflow.match(/^  deploy:\n[\s\S]*?^    timeout-minutes: (\d+)$/m);
+ assert.ok(checks,'missing checks-build timeout');assert.ok(deploy,'missing deploy timeout');
+ assert.equal(Number(checks[1]),30);assert.equal(Number(deploy[1]),10);
+ assert.equal(Number(checks[1])*60_000-watchdog.interval,480_000,'setup, tests, audits, build and upload retain eight minutes');
+});
+test('expired QA watchdog records failure and closes the owned browser',async()=>{
+ const watchdog=await scheduledWatchdog();
+ assert.deepEqual(watchdog.report.pageErrors,[]);assert.equal(watchdog.closed(),0);
+ watchdog.expire();
+ assert.deepEqual(watchdog.report.pageErrors,['QA watchdog expired']);assert.equal(watchdog.closed(),1);
+});
 async function artifact(t){
  const root=await fs.mkdtemp(path.join(os.tmpdir(),'preview-qa-policy-'));
  t.after(()=>fs.rm(root,{recursive:true,force:true}));

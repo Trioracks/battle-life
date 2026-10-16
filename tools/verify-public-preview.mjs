@@ -204,7 +204,8 @@ export async function verifyPublicPreview(options={}){
   }
   browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,timeout:30000});
   report.browserVersion=browser.version();report.browserExecutable=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE??'locked Playwright default';
-  watchdog=setTimeout(()=>{report.pageErrors.push('QA watchdog expired');void browser.close();},14*60*1000);
+  // Hosted software rendering covers both viewports; the 30-minute job leaves eight minutes outside this QA deadline.
+  watchdog=setTimeout(()=>{report.pageErrors.push('QA watchdog expired');void browser.close();},22*60*1000);
   if(config.live){
    const context=await browser.newContext();contexts.add(context);
    const response=await context.request.get(new URL('release.json',report.url).href,{timeout:30000});assert.equal(response.status(),200);validateLiveRelease(await response.json(),config.manifest);await context.close();contexts.delete(context);
