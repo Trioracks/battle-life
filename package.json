@@ -2,7 +2,11 @@
   "name": "battle-rapper-visual-spike",
   "private": true,
   "type": "module",
+  "engines": {"node": ">=24 <25"},
   "scripts": {
-    "test": "node --test"
-  }
+    "start": "node tools/serve-preview.mjs",
+    "test": "node tools/run-tests.mjs --profile public",
+    "test:local-assets": "node tools/run-tests.mjs --profile local-assets"
+  },
+  "devDependencies": {"playwright": "1.62.1"}
 }

@@ -48,18 +48,10 @@ test('invalid synthesis requests cannot allocate arbitrary lengths or return wro
   for(const args of [['other',0],['drums',16],['theme',-1],['theme',.5],['drums',0,NaN],['drums',0,1e9]]) assert.throws(() => synth.renderBeginnerPart(...args), RangeError);
 });
 
-test('shipped WAVs match deterministic manifest and decode as mono PCM16 four-bar loops', async () => {
-  assert.ok(Array.isArray(bank.BEGINNER_BANK), 'catalogue must be implemented');
-  const manifest = JSON.parse(await readFile(new URL('../assets/audio/ft/beginner-v1/manifest.json',import.meta.url),'utf8'));
-  assert.equal(manifest.parts.length,48);
-  for(const part of bank.BEGINNER_BANK) {
-    if(!part.path.includes('/beginner-v1/'))continue;
-    const wav=await readFile(new URL('../'+part.path,import.meta.url));
-    assert.equal(wav.toString('ascii',0,4),'RIFF');assert.equal(wav.toString('ascii',8,12),'WAVE');
-    const channels=part.id==='beginner-theme-16'?2:1;
-    assert.equal(wav.readUInt16LE(20),1);assert.equal(wav.readUInt16LE(22),channels);
-    assert.equal(wav.readUInt32LE(24),44100);assert.equal(wav.readUInt16LE(34),16);
-    assert.equal(wav.readUInt32LE(40),940800*channels);assert.equal(wav.length,940800*channels+44);
-    assert.equal(manifest.parts.find(p=>p.id===part.id).sha256,digest(wav));
-  }
+
+
+test('beginner text manifest retains all 48 legacy IDs and digest declarations',async()=>{
+ const manifest=JSON.parse(await readFile(new URL('../assets/audio/ft/beginner-v1/manifest.json',import.meta.url)));
+ assert.equal(manifest.parts.length,48);
+ for(const part of manifest.parts){assert.ok(bank.beginnerById(part.id));assert.match(part.sha256,/^[a-f0-9]{64}$/);}
 });

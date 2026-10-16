@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {execFileSync} from 'node:child_process';
+import {execPython} from './helpers/python.js';
 test('incremental static export excludes courtyard, cutaway mask, depth and live objects',()=>{
  const code=`import sys,json;sys.path.insert(0,'tools')
 from types import SimpleNamespace
@@ -11,6 +11,6 @@ for role in ['exterior','cutaway-mask','computer-live']:
  obj=SimpleNamespace(name='renamed-by-artist',type='MESH',get=lambda key:role)
  result[role]=is_interior_static(obj,set())
 print(json.dumps(result))`;
- const result=JSON.parse(execFileSync('F:/Python/python.exe',['-B','-c',code],{cwd:new URL('../',import.meta.url),encoding:'utf8'}));
+ const result=JSON.parse(execPython(['-B','-c',code],{cwd:new URL('../',import.meta.url),encoding:'utf8'}));
  assert.deepEqual(result,{'rear-living':true,'first-person-ceiling-living':true,'dining-chair-pad':true,'block-east-body':false,'exterior-courtyard-ground':false,'factory-stack-west':false,'cutaway-surround.001':false,'depth-bed':false,'hinge-entry':false,exterior:false,'cutaway-mask':false,'computer-live':false});
 });

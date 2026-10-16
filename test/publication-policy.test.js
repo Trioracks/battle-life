@@ -24,7 +24,7 @@ function binaryGlb(doc,bytes) {
 }
 function git(repo, ...args) { return execFileSync('git', ['-C', repo, ...args], { encoding:'utf8', stdio:['ignore','pipe','pipe'] }).trim(); }
 async function fixture(t) {
-  const root = await mkdtemp(path.join(process.platform === 'win32' ? 'D:/Codex/Temp' : tmpdir(), 'publication-'));
+  const root = await mkdtemp(path.join(tmpdir(), 'publication-'));
   t.after(() => rm(root, {recursive:true, force:true})); return root;
 }
 async function repository(root) {
@@ -46,6 +46,9 @@ test('policy rejects excluded paths, disguised media and invalid formats while r
   assert.equal(classifyPublicationFile('assets/audio/pc/manifest.json',Buffer.from('{}'),{target:'site'}).allowed,true);
   assert.equal(classifyPublicationFile('assets/audio/ft/vocals-v1/manifest.json',Buffer.from('{}'),{target:'source'}).allowed,true);
   assert.equal(classifyPublicationFile('assets/audio/ft/vocals-v1/manifest.json',Buffer.from('{}'),{target:'site'}).allowed,false);
+  assert.equal(classifyPublicationFile('.local-audio.example.json',Buffer.from('{"assetRoot":"example"}'),{target:'source'}).allowed,true);
+  assert.equal(classifyPublicationFile('.local-audio.example.json',Buffer.from('{}'),{target:'site'}).allowed,false);
+  assert.equal(classifyPublicationFile('.local-audio.json',Buffer.from('{}'),{target:'source'}).allowed,false);
 });
 
 test('policy retains ordinary separator comments without mistaking them for encoded MP3', () => {

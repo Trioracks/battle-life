@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {execFileSync} from 'node:child_process';
-const audit=records=>JSON.parse(execFileSync('F:/Python/python.exe',['-B','tools/audit-apartment-v3.py'],{cwd:new URL('../',import.meta.url),input:JSON.stringify({objects:records}),encoding:'utf8'}));
+import {execPython} from './helpers/python.js';
+const audit=records=>JSON.parse(execPython(['-B','tools/audit-apartment-v3.py'],{cwd:new URL('../',import.meta.url),input:JSON.stringify({objects:records}),encoding:'utf8'}));
 const obj=(name,assembly,min,max,role='furniture')=>({name,assembly,min,max,role,materials:['wood']});
 
 test('pot audit rejects even shallow burial and collision with neighbouring furniture',()=>{

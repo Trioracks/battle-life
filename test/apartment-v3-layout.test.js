@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {execFileSync} from 'node:child_process';
+import {execPython} from './helpers/python.js';
 import fs from 'node:fs';
 import {assetPath} from './helpers/apartment-assets.js';
 
@@ -9,7 +9,7 @@ test('installed manifest agrees with all canonical routes and room extents',()=>
  const actual=JSON.parse(fs.readFileSync(assetPath('scene.json'))),expected=exported();
  for(const key of ['layout','bounds','entryDoor','entryExit','peepholeCamera','actions'])assert.deepEqual(actual[key],expected[key],key);
 });
-function exported(){return JSON.parse(execFileSync('F:/Python/python.exe',['-B','tools/apartment_v3_layout.py'],{cwd:root,encoding:'utf8'}));}
+function exported(){return JSON.parse(execPython(['-B','tools/apartment_v3_layout.py'],{cwd:root,encoding:'utf8'}));}
 test('expanded routes share the moved door, exit and walking bounds',()=>{
  const c=exported();assert.deepEqual(c.bounds,[-7.6,8.15]);assert.equal(c.entryDoor.hinge[0],8.5);
  assert.equal(c.entryDoor.threshold,8.55);assert.equal(c.entryDoor.closedBounds,8.15);assert.equal(c.entryExit.position[0],10.35);
