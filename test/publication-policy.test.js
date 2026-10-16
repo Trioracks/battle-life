@@ -11,10 +11,17 @@ import { exportPublicSource } from '../tools/export-public-source.mjs';
 
 const js = Buffer.from("const path='x.wav';");
 const wave = Buffer.from('524946462400000057415645666d7420100000000100010044ac000088580100020010006461746100000000', 'hex');
-const png = Buffer.from('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000b49444154789c636000020000050001a5f645400000000049454e44ae426082','hex');
+const png = Buffer.from('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000b49444154789c6360000200000500017a5eab3f0000000049454e44ae426082','hex');
 function pngMetadata(kind,payload) {
   const chunk=Buffer.alloc(payload.length+12); chunk.writeUInt32BE(payload.length); chunk.write(kind,4); payload.copy(chunk,8); chunk.writeUInt32BE(crc32(chunk.subarray(4,-4)),chunk.length-4);
   return Buffer.concat([png.subarray(0,33),chunk,png.subarray(33)]);
+}
+function pngChunk(kind,payload=Buffer.alloc(0)) {
+  const chunk=Buffer.alloc(payload.length+12);chunk.writeUInt32BE(payload.length);chunk.write(kind,4);payload.copy(chunk,8);chunk.writeUInt32BE(crc32(chunk.subarray(4,-4)),chunk.length-4);return chunk;
+}
+function pngImage(data,{width=1,height=1,depth=8,color=6,interlace=0,chunks}={}) {
+  const header=Buffer.alloc(13);header.writeUInt32BE(width);header.writeUInt32BE(height,4);header[8]=depth;header[9]=color;header[12]=interlace;
+  return Buffer.concat([png.subarray(0,8),pngChunk('IHDR',header),...(chunks??[pngChunk('IDAT',data)]),pngChunk('IEND')]);
 }
 function binaryGlb(doc,bytes) {
   const text=Buffer.from(JSON.stringify(doc)),json=Buffer.alloc(Math.ceil(text.length/4)*4,32);text.copy(json);
@@ -85,6 +92,61 @@ test('PNG palette payloads cannot contain a complete gzip WAV archive', () => {
     assert.equal(classifyPublicationFile('assets/ui/palette.png',pngMetadata('PLTE',palette),{target}).allowed,false);
     assert.equal(classifyPublicationFile('assets/ui/palette.png',pngMetadata('PLTE',Buffer.alloc(3)),{target}).allowed,true);
   }
+});
+
+for(const target of ['source','site']) test('PNG rejects a CRC-correct gzip archive in IDAT for '+target,()=>{
+  const archive=gzipSync(wave);assert.deepEqual(gunzipSync(archive),wave);
+  assert.equal(classifyPublicationFile('assets/ui/archive.png',pngImage(archive),{target}).allowed,false);
+});
+
+const pixelStream=deflateSync(Buffer.alloc(5));
+for(const [name,data,options] of [
+  ['non-zlib bytes',Buffer.from('not compressed pixels')],
+  ['truncated zlib stream',pixelStream.subarray(0,-1)],
+  ['invalid checksum',Buffer.concat([pixelStream.subarray(0,-1),Buffer.from([2])])],
+  ['trailing bytes',Buffer.concat([pixelStream,Buffer.from([0])])],
+  ['second zlib stream',Buffer.concat([pixelStream,pixelStream])],
+  ['trailing gzip archive',Buffer.concat([pixelStream,gzipSync(wave)])],
+  ['short decoded scanline',deflateSync(Buffer.alloc(4))],
+  ['oversized decoded stream',deflateSync(Buffer.alloc(1024*1024))],
+  ['invalid row filter',deflateSync(Buffer.from([5,0,0,0,0]))],
+  ['oversized image dimensions',pixelStream,{width:0x7fffffff,height:0x7fffffff}],
+  ['zero width',pixelStream,{width:0}],
+  ['invalid bit depth',pixelStream,{depth:3}],
+  ['invalid color type',pixelStream,{color:1}],
+  ['invalid interlace method',pixelStream,{interlace:2}],
+  ['missing indexed palette',deflateSync(Buffer.alloc(2)),{color:3}],
+  ['missing image data',pixelStream,{chunks:[]}],
+  ['non-consecutive IDAT chunks',pixelStream,{chunks:[pngChunk('IDAT',pixelStream.subarray(0,4)),pngChunk('tEXt',Buffer.from('note\0test')),pngChunk('IDAT',pixelStream.subarray(4))]}],
+  ['duplicate header',pixelStream,{chunks:[pngChunk('IHDR',png.subarray(16,29)),pngChunk('IDAT',pixelStream)]}]
+]) test('PNG rejects '+name,()=>{
+  for(const target of ['source','site']) assert.equal(classifyPublicationFile('assets/ui/invalid.png',pngImage(data,options),{target}).allowed,false,target);
+});
+
+test('PNG retains split IDAT, legal filter bytes, packed samples, indexed palettes and Adam7 passes',()=>{
+  const cases=[png,pngImage(pixelStream,{chunks:[pngChunk('IDAT',pixelStream.subarray(0,4)),pngChunk('IDAT'),pngChunk('IDAT',pixelStream.subarray(4))]}),
+    pngImage(deflateSync(Buffer.from([0,1,2,3,4,1,5,6,7,8,2,9,10,11,12,3,13,14,15,16,4,17,18,19,20])),{height:5}),
+    pngImage(deflateSync(Buffer.from([0,0x80])),{color:0,depth:1}),
+    pngImage(null,{color:3,chunks:[pngChunk('PLTE',Buffer.alloc(3)),pngChunk('IDAT',deflateSync(Buffer.alloc(2)))]}),
+    // 3x3 RGBA Adam7: nonempty passes have row sizes 5,5,9,5,5,13.
+    pngImage(deflateSync(Buffer.alloc(42)),{width:3,height:3,interlace:1})];
+  for(const bytes of cases)for(const target of ['source','site'])assert.equal(classifyPublicationFile('assets/ui/valid.png',bytes,{target}).allowed,true);
+});
+
+test('PNG preserves legitimate compressed pixels containing an archive signature',()=>{
+  const raw=Buffer.concat([Buffer.from([0]),Buffer.from('504b0304','hex')]);
+  for(const target of ['source','site'])assert.equal(classifyPublicationFile('assets/ui/pixels.png',pngImage(deflateSync(raw,{level:0})),{target}).allowed,true);
+});
+
+test('PNG rejects bad chunk CRCs and invalid Adam7 row filters',()=>{
+  const corrupt=Buffer.from(png);corrupt[29]^=1;
+  const raw=Buffer.alloc(42);raw[29]=5;
+  for(const bytes of [corrupt,pngImage(deflateSync(raw),{width:3,height:3,interlace:1})])assert.equal(classifyPublicationFile('assets/ui/invalid.png',bytes,{target:'site'}).allowed,false);
+});
+
+test('GLB embedded PNG images require a complete valid image stream',()=>{
+  const image=pngImage(gzipSync(wave)),doc={asset:{version:'2.0'},buffers:[{byteLength:image.length}],bufferViews:[{buffer:0,byteLength:image.length}],images:[{bufferView:0,mimeType:'image/png'}]};
+  for(const target of ['source','site'])assert.equal(classifyPublicationFile('assets/models/image.glb',binaryGlb(doc,image),{target}).allowed,false);
 });
 
 test('binary provenance metadata retains isolated sync-like bytes but rejects complete audio frame chains', () => {

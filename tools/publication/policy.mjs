@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { inflateSync } from 'node:zlib';
+import { inflateSync, crc32 } from 'node:zlib';
 
 export const MAX_FILE_BYTES = 95 * 1024 * 1024;
 export const MAX_SITE_BYTES = 350 * 1024 * 1024;
@@ -206,11 +206,58 @@ function validTtf(b) {
   return coveredBinaryRegions(b,ranges,directoryEnd);
 }
 
-function validBinary(ext,b) {
-  if (ext==='.png') {
-    if (!b.subarray(0,8).equals(Buffer.from('89504e470d0a1a0a','hex')) || b.toString('ascii',12,16)!=='IHDR') return false;
-    let p=8; while(p+12<=b.length) { const size=b.readUInt32BE(p); if(size>b.length-p-12) return false; const kind=b.toString('ascii',p+4,p+8),payload=b.subarray(p+8,p+8+size); if(kind==='PLTE' && !safeBinaryMetadata(payload,{scanAudioFrames:false})) return false; if(!['IHDR','PLTE','IDAT','IEND'].includes(kind) && !safePngMetadata(kind,payload)) return false; p+=size+12; if(kind==='IEND') return size===0 && p===b.length; } return false;
+function validPng(b) {
+  if(b.length<33 || !b.subarray(0,8).equals(Buffer.from('89504e470d0a1a0a','hex')) || b.readUInt32BE(8)!==13 || b.toString('ascii',12,16)!=='IHDR') return false;
+  const width=b.readUInt32BE(16),height=b.readUInt32BE(20),depth=b[24],color=b[25],interlace=b[28];
+  const depths={0:[1,2,4,8,16],2:[8,16],3:[1,2,4,8],4:[8,16],6:[8,16]};
+  if(!width || !height || width>0x7fffffff || height>0x7fffffff || !depths[color]?.includes(depth) || b[26]!==0 || b[27]!==0 || interlace>1) return false;
+  const bits=depth*({0:1,2:3,3:1,4:2,6:4}[color]),rows=[];
+  // Adam7 passes: x/y start and x/y stride. Empty passes have no filter bytes.
+  const passes=interlace?[[0,0,8,8],[4,0,8,8],[0,4,4,8],[2,0,4,4],[0,2,2,4],[1,0,2,2],[0,1,1,2]]:[[0,0,1,1]];
+  let expected=0;
+  for(const [x,y,dx,dy]of passes) {
+    const columns=Math.max(0,Math.ceil((width-x)/dx)),count=Math.max(0,Math.ceil((height-y)/dy));
+    if(!columns || !count) continue;
+    const stride=1+Math.ceil(columns*bits/8);expected+=stride*count;rows.push({stride,count});
   }
+  // Bound both decompression output and row-validation work before inflating.
+  if(!Number.isSafeInteger(expected) || expected>MAX_FILE_BYTES) return false;
+  let p=8,imageStart=-1,imageEnd=0,compressedSize=0,endedData=false,palette=false;
+  while(p+12<=b.length) {
+    const size=b.readUInt32BE(p);if(size>b.length-p-12) return false;
+    const kind=b.toString('ascii',p+4,p+8),payload=b.subarray(p+8,p+8+size),end=p+size+12;
+    if(crc32(b.subarray(p+4,end-4))!==b.readUInt32BE(end-4)) return false;
+    if(kind==='IHDR') { if(p!==8) return false; }
+    else if(kind==='IDAT') {
+      if(endedData || color===3 && !palette) return false;
+      if(imageStart<0) imageStart=p;
+      imageEnd=end;compressedSize+=size;
+    } else {
+      if(imageStart>=0) endedData=true;
+      if(kind==='PLTE') {
+        if(palette || imageStart>=0 || [0,4].includes(color) || !size || size%3 || size>768 || color===3 && size/3>2**depth || !safeBinaryMetadata(payload,{scanAudioFrames:false})) return false;
+        palette=true;
+      } else if(kind==='IEND') {
+        if(size || end!==b.length || imageStart<0 || !compressedSize) return false;
+        // Copy consecutive chunk payloads without a per-chunk object array.
+        const compressed=Buffer.allocUnsafe(compressedSize);let offset=0;
+        for(let q=imageStart;q<imageEnd;) { const length=b.readUInt32BE(q);b.copy(compressed,offset,q+8,q+8+length);offset+=length;q+=length+12; }
+        // inflateSync requires zlib (not gzip), a complete checksum/end marker,
+        // and info exposes consumed input so trailing payloads cannot be ignored.
+        const {buffer,engine}=inflateSync(compressed,{maxOutputLength:expected,info:true});
+        if(engine.bytesWritten!==compressedSize || buffer.length!==expected) return false;
+        offset=0;
+        for(const {stride,count}of rows) for(let row=0;row<count;row++,offset+=stride) if(buffer[offset]>4) return false;
+        return true;
+      } else if(!safePngMetadata(kind,payload)) return false;
+    }
+    p=end;
+  }
+  return false;
+}
+
+function validBinary(ext,b) {
+  if (ext==='.png') return validPng(b);
   if (ext==='.jpg'||ext==='.jpeg') return validJpeg(b);
   if (ext==='.glb') return validGlb(b);
   if (ext==='.ttf') return validTtf(b);
