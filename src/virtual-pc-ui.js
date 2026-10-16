@@ -17,7 +17,7 @@ import {createStudioWorkspace,presentRecordingWorkspace} from './ft-studio-view.
 import {mountUnderweb} from './underweb-view.js?rev=43';
 import {applyToBattle} from './virtual-pc-state.js?rev=43';
 import {mountBeatStudio} from './beat-studio-view.js?rev=43';
-import {BeatAudio} from './beat-audio.js?rev=43';
+import {createGameAudio} from './game-audio.js?rev=43';
 import {createPcAudioSession} from './pc-audio-session.js?rev=43';
 import {createPcRoomOutput} from './pc-room-audio.js?rev=43';
 import {normalizeBeat} from './beat-production.js?rev=43';
@@ -125,7 +125,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     setTimeoutFn: callbacks.setTimeoutFn ?? ((...args) => globalThis.setTimeout(...args)),
     clearTimeoutFn: callbacks.clearTimeoutFn ?? (timer => globalThis.clearTimeout(timer)),
     audio: callbacks.audio ?? new FtStudioAudio(),
-    beatAudio: callbacks.beatAudio ?? new BeatAudio({outputFactory:createPcRoomOutput}),
+    beatAudio: callbacks.beatAudio ?? createGameAudio({engineOptions:{outputFactory:createPcRoomOutput}}),
     studioView:null,
     notebookView:null,
     dossierView:null,

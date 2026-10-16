@@ -35,7 +35,7 @@ export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze
    progress.append(fill);let failure='',unavailable='',previewKey=null,previewDescriptor=null;
    const matches=()=>snapshot.owner==='social'&&Boolean(key)&&(snapshot.key===key||snapshot.key===previewKey);
    const start=async(preview=null)=>{
-    if(disposed||!entry.active)return;const token=++generation;failure='';
+    if(disposed||!entry.active||audio?.capabilities?.recordedPlayback===false)return;const token=++generation;failure='';
     if(!audio?.getSnapshot)update({status:'loading',key:preview?.key??key,owner:'social',positionSeconds:0});
     try{
      const result=preview?{ok:Boolean(await player.playDescriptor(preview))}:version?await playTrackVersion(player,version):descriptor?{ok:Boolean(await player.playDescriptor(descriptor))}:{ok:false,reason:'Версия недоступна. Исходник не подменён.'};
@@ -46,7 +46,7 @@ export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze
     }catch{if(!disposed&&entry.active&&token===generation){failure='Не удалось воспроизвести запись.';refresh();}}
    };
    const play=button(d,'▶',()=>{
-    if(disposed||!entry.active)return;refresh();
+    if(disposed||!entry.active||audio?.capabilities?.recordedPlayback===false)return;refresh();
     if(matches()&&snapshot.status==='playing'){generation++;audio?.pause?.();if(!audio?.getSnapshot)update({...snapshot,status:'paused'});refresh();}
     else if(!(matches()&&snapshot.status==='loading'))void start(matches()&&snapshot.key===previewKey?previewDescriptor:null);
    },{dataset:{socialAudio:version?.id??item?.id??'missing'},attributes:{'aria-label':'Слушать: '+title}});
@@ -54,20 +54,20 @@ export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze
    const body=el(d,'div',{className:'sn-audio-body'}),detail=el(d,'div',{className:'sn-audio-detail'});
    detail.append(progress,time);body.append(el(d,'div',{className:'sn-audio-title',text:title}),detail);row.append(play,body,halt,status);
    const render=()=>{
-    const own=matches(),state=own?snapshot.status:'stopped',playing=state==='playing',loading=state==='loading';
+    const recorded=audio?.capabilities?.recordedPlayback!==false,own=recorded&&matches(),state=own?snapshot.status:'stopped',playing=state==='playing',loading=state==='loading';
     if(own&&playing)failure='';
     const position=own?Math.max(0,Math.min(duration,snapshot.positionSeconds||0)):0,percent=Math.round(position/duration*100);
-    play.textContent=playing?'Ⅱ':'▶';play.setAttribute('aria-label',(playing?'Пауза: ':'Слушать: ')+title);play.disabled=Boolean(unavailable)&&!(own&&snapshot.key===previewKey);play.setAttribute('aria-disabled',String(play.disabled||loading));
+    play.textContent=playing?'Ⅱ':'▶';play.setAttribute('aria-label',(playing?'Пауза: ':'Слушать: ')+title);play.disabled=!recorded||Boolean(unavailable)&&!(own&&snapshot.key===previewKey);play.setAttribute('aria-disabled',String(play.disabled||loading));
     row.setAttribute('aria-busy',String(loading));halt.disabled=!own||state==='stopped';
     progress.setAttribute('aria-valuenow',String(percent));progress.setAttribute('aria-valuetext',clock(position)+' из '+clock(duration));fill.style.setProperty('width',percent+'%');time.textContent=clock(position)+' / '+clock(duration);
-    status.textContent=failure||(loading?'Загрузка…':playing?(snapshot.key===previewKey?'Играет бит без голоса':'Играет'):state==='paused'?'Пауза':state==='error'?snapshot.error||'Не удалось воспроизвести запись.':'')||unavailable;
+    status.textContent=(!recorded?audio.capabilities.reason:'')||failure||(loading?'Загрузка…':playing?(snapshot.key===previewKey?'Играет бит без голоса':'Играет'):state==='paused'?'Пауза':state==='error'?snapshot.error||'Не удалось воспроизвести запись.':'')||unavailable;
    };
    entry.render=render;rows.set(row,entry);
    if(version?.npc){
     const id=version.npc.characterId,name=battleCharacter(id)?.nickname??'Автор';
     if(getState&&getMetadata&&navigate&&profileAccess(getState(),{characterId:id,nowMinute:metadataGameMinute(getMetadata())}).canView)row.append(button(d,name,()=>navigate('underweb://social/profile/'+id),{className:'sn-link sn-audio-extra',attributes:{'aria-label':'Страница автора: '+name}}));
     const npc=npcPlaybackDescriptor(version);if(!npc.ok)unavailable=npc.reason;
-    if(npc.previewDescriptor){previewDescriptor={...npc.previewDescriptor,owner:'social'};previewKey=previewDescriptor.key;row.append(button(d,'Предпросмотр бита — без голоса',()=>void start(previewDescriptor),{className:'sn-button sn-audio-extra',attributes:{'aria-label':'Предпросмотр бита — без голоса'}}));}
+    if(npc.previewDescriptor){previewDescriptor={...npc.previewDescriptor,owner:'social'};previewKey=previewDescriptor.key;const preview=button(d,'Предпросмотр бита — без голоса',()=>void start(previewDescriptor),{className:'sn-button sn-audio-extra',attributes:{'aria-label':'Предпросмотр бита — без голоса'}});preview.disabled=audio?.capabilities?.recordedPlayback===false;row.append(preview);}
    }
    if(version&&onAnalyze){row.append(button(d,'Изучить трек · 45 мин',()=>onAnalyze({trackVersionId:version.id,reviewIds:[]}),{className:'sn-button sn-audio-extra'}));if(getState&&!getState().software?.dossier?.installed)row.append(el(d,'small',{className:'sn-audio-extra',text:'Для изучения скачай и установи Рэп-досье. Все разборы открываются в приложении.'}));}
    render();return row;

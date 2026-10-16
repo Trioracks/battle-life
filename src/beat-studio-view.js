@@ -38,7 +38,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onC
  function startRecording(kind,textId,sliders){
   const beat=currentBeat();if(!beat)return;
   const r=startVocalWork(getState(),{beatId:beat.id,kind,textId,sliders},getMetadata().skills);message=r.reason??'';
-  if(r.ok){closeDialog({restore:false});Promise.resolve(audio.unlock?.()).catch(()=>{});audio.stop();onChange(r.state);if(onWork?.()===false)message='Запись сохранена. Вернись к ПК, чтобы продолжить.';}render();
+  if(r.ok){closeDialog({restore:false});if(audio.capabilities?.recordedPlayback!==false)Promise.resolve(audio.unlock?.()).catch(()=>{});audio.stop();onChange(r.state);if(onWork?.()===false)message='Запись сохранена. Вернись к ПК, чтобы продолжить.';}render();
  }
  function change(next){onChange(next);render();}
  function closeDialog({restore=true}={}){
@@ -169,7 +169,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onC
      const r=startCreativeChain(getState(),{kind:'beat',projectId:beat.id,stageSliders,gameDay:getMetadata().gameDay},getMetadata().skills);message=r.reason;
      if(r.ok){
       // Resume AudioContext in the click gesture, before the cinematic transition.
-      Promise.resolve(audio.unlock?.()).catch(()=>{});audio.stop();onChange(r.state);
+      if(audio.capabilities?.recordedPlayback!==false)Promise.resolve(audio.unlock?.()).catch(()=>{});audio.stop();onChange(r.state);
       if(onWork?.()===false)message='Работа сохранена. Вернись к ПК и продолжи этап.';
      }render();
     });work.disabled=Boolean(beat.audioIssue);workflow.append(work);
@@ -186,18 +186,18 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onC
  }
  function updateSummary(){const s=getState();summary.textContent='Битмейкинг '+effectiveBeatSkill(s,getMetadata().skills).toFixed(2)+' · сытость '+Math.round(s.music.needs.satiety)+' · энергия '+Math.round(s.music.needs.energy)+(s.music.infected?' · ⚠ вирус замедляет ПК':'');}
  function updateTransport(){
-  const beat=currentBeat(),available=!!beat?.stages.length&&!beat.audioIssue;
+  const beat=currentBeat(),recorded=audio.capabilities?.recordedPlayback!==false,available=recorded&&!!beat?.stages.length&&!beat.audioIssue;
   const current=audio.getSnapshot?.(),expected=available?resolveBeatPlayback(beat):null;
-  const snapshot=current?.owner==='studio'&&expected?.ok&&current.key===expected.descriptor.key?current:{status:'stopped',positionSeconds:0};
+  const snapshot=recorded&&current?.owner==='studio'&&expected?.ok&&current.key===expected.descriptor.key?current:{status:'stopped',positionSeconds:0};
   controls.play.disabled=!available||snapshot.status==='loading'||snapshot.status==='playing';
   controls.pause.disabled=!['playing','loading'].includes(snapshot.status);controls.stop.disabled=!['playing','loading','paused'].includes(snapshot.status);
   const position=snapshot.owner==='work'?0:snapshot.positionSeconds??0,beatPosition=position*90/60;
   readout.textContent=String(Math.floor(beatPosition/4)+1).padStart(2,'0')+' : '+String(Math.floor(beatPosition%4)+1).padStart(2,'0')+' : '+String(Math.floor((beatPosition%1)*1000)).padStart(3,'0');
   playhead.style.left=(position/(60/90*4*16)*100)+'%';
-  status.textContent=(beat?.audioIssue?'Источник звука недоступен':snapshot.error)||({loading:'Загрузка звука…',playing:'Играет',paused:'Пауза',error:'Звук недоступен',stopped:available?'Готов к прослушиванию':'Нет готового слоя'}[snapshot.status]??'Готов');
+  status.textContent=(!recorded?audio.capabilities.reason:'')||(beat?.audioIssue?'Источник звука недоступен':snapshot.error)||({loading:'Загрузка звука…',playing:'Играет',paused:'Пауза',error:'Звук недоступен',stopped:available?'Готов к прослушиванию':'Нет готового слоя'}[snapshot.status]??'Готов');
   transport.dataset.status=snapshot.status;
  }
- controls.play.addEventListener('click',()=>{const beat=currentBeat();if(!beat)return;Promise.resolve(audio.playProject(beat)).then(()=>{if(!disposed)updateTransport();});updateTransport();});
+ controls.play.addEventListener('click',()=>{const beat=currentBeat();if(!beat||audio.capabilities?.recordedPlayback===false)return;Promise.resolve(audio.playProject(beat)).then(()=>{if(!disposed)updateTransport();});updateTransport();});
  controls.pause.addEventListener('click',()=>{audio.pause();updateTransport();});
  controls.stop.addEventListener('click',()=>{audio.stop();updateTransport();});
  const tick=()=>{frame=null;if(disposed||!visible)return;updateTransport();frame=requestFrame?.(tick)??null;};

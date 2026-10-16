@@ -33,7 +33,7 @@ export function mountAudioExport(root,{getState,projectId,getMetadata=()=>({}),o
 export function mountAudioFilePlayer(root,{audio}){
  const d=root.ownerDocument,node=el(d,'section',{className:'pc-audio-player',attributes:{'aria-label':'Аудиоплеер'}}),title=el(d,'strong'),facts=el(d,'small'),status=el(d,'span',{attributes:{role:'status'}}),controls=el(d,'div');let file=null,disposed=false,generation=0;
  async function play(){
-  if(!file||disposed)return;const token=++generation;status.textContent='Загрузка звука…';
+  if(!file||disposed||audio?.capabilities?.recordedPlayback===false)return;const token=++generation;status.textContent='Загрузка звука…';
   let ok=false;try{ok=await audio?.playDescriptor(file.descriptor);}catch{/* Present the playback error locally. */}
   if(disposed||token!==generation)return;status.textContent=ok?'Играет':audio?.getSnapshot?.().error||'Не удалось воспроизвести аудиофайл.';update();
  }
@@ -41,8 +41,9 @@ export function mountAudioFilePlayer(root,{audio}){
  controls.append(start,pause,stop);node.append(title,facts,controls,status);node.hidden=true;root.append(node);
  function update(){
   if(!file||disposed)return;const snapshot=audio?.getSnapshot?.()??{status:'stopped'};
+  if(audio?.capabilities?.recordedPlayback===false){start.disabled=pause.disabled=stop.disabled=true;status.textContent=audio.capabilities.reason;return;}
   start.disabled=['loading','playing'].includes(snapshot.status);pause.disabled=!['loading','playing'].includes(snapshot.status);stop.disabled=!['loading','playing','paused'].includes(snapshot.status);
   if(snapshot.status==='playing')status.textContent='Играет';else if(snapshot.status==='paused')status.textContent='Пауза';else if(snapshot.status==='error')status.textContent=snapshot.error;else if(snapshot.status==='stopped')status.textContent='Остановлено';
  }
- return {open(next){if(disposed)return;generation++;audio?.stop();file=next;node.hidden=false;title.textContent=file.filename;facts.textContent=AUDIO_EXPORT_KINDS[file.kind]+' · '+gameDateTimeLabel(file.createdAtMinute)+' · версия '+(file.trackVersionId??file.sourceRevision.beat);void play();},update,dispose(){disposed=true;generation++;audio?.stop();node.remove();}};
+ return {open(next){if(disposed)return;generation++;audio?.stop();file=next;node.hidden=false;title.textContent=file.filename;facts.textContent=AUDIO_EXPORT_KINDS[file.kind]+' · '+gameDateTimeLabel(file.createdAtMinute)+' · версия '+(file.trackVersionId??file.sourceRevision.beat);if(audio?.capabilities?.recordedPlayback===false)update();else void play();},update,dispose(){if(disposed)return;disposed=true;generation++;audio?.stop();node.remove();}};
 }

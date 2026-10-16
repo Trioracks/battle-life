@@ -13,7 +13,7 @@ export function createPcAudioSession(audio){
  function forOwner(id){
   if(adapters.has(id))return adapters.get(id);
   const play=async(method,args)=>{
-   if(disposed)return false;
+   if(disposed||audio.capabilities?.recordedPlayback===false)return false;
    if(owner!==id){stopAll();owner=id;}
    const token=++generation;
    const pending=audio[method](...args);notify();
@@ -22,6 +22,7 @@ export function createPcAudioSession(audio){
    return false;
   };
   const adapter={
+   get capabilities(){return audio.capabilities;},
    play:(...args)=>play('play',args),playProject:(...args)=>play('playProject',args),playDescriptor:(...args)=>play('playDescriptor',args),
    unlock:()=>disposed?Promise.resolve():audio.unlock?.(),
    getSnapshot:()=>snapshot(id),

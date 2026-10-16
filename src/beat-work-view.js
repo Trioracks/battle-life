@@ -27,7 +27,7 @@ export function createBeatWorkPanel(document,{onCancel=()=>{},onEnableAudio=()=>
  }
  const foot=el(document,'div',{className:'beat-work-foot'}),audioStatus=node('audio','span','beat-work-audio'),enable=button(document,'Включить звук',{},onEnableAudio),cancel=button(document,'Прервать работу',{},onCancel);
  foot.append(audioStatus,enable,cancel);root.append(head,overallLabel,overall,progress,details,training,needs,foot);
- return {element:root,update({beat,job,recordingShot,chainProgress,needs:values={},skill:level=0,genreProgress,clockLabel='',reward:earned=0,finished=false,audioError='',needsGesture=false}={}){
+ return {element:root,update({beat,job,recordingShot,chainProgress,needs:values={},skill:level=0,genreProgress,clockLabel='',reward:earned=0,finished=false,audioError='',audioNotice='',needsGesture=false}={}){
   const recordingScreen=recordingShot?.phase==='screen';
   root.dataset.recordingPhase=recordingShot?.phase??'';
   root.style.zIndex=recordingScreen?'45':'';root.style.left=recordingScreen?'auto':'';root.style.right=recordingScreen?'24px':'';
@@ -57,8 +57,8 @@ export function createBeatWorkPanel(document,{onCancel=()=>{},onEnableAudio=()=>
   reward.hidden=!complete;reward.textContent=complete?(earned>0?'Практика +'+formatLevel(earned)+' · этап завершён':'Этап завершён · навык на максимуме'):'';
   nodes.minutes.textContent=Math.floor(job?.elapsed??0)+' / '+(job?.total??0)+' мин';
   for(const key of ['satiety','energy']){const value=Math.max(0,Math.min(100,values[key]??0));nodes[key].value=value;nodes[key+'-value'].textContent=String(Math.round(value));}
-  audioStatus.textContent=audioError||(needsGesture?'Звук приостановлен':writing?'Слышно, как герой печатает на клавиатуре':vocal?'Бит и вокал · '+vocal.name:'Сейчас звучит партия этого этапа');
-  enable.hidden=!needsGesture&&!audioError;cancel.hidden=complete;
+  audioStatus.textContent=audioNotice||audioError||(needsGesture?'Звук приостановлен':writing?'Слышно, как герой печатает на клавиатуре':vocal?'Бит и вокал · '+vocal.name:'Сейчас звучит партия этого этапа');
+  enable.hidden=Boolean(audioNotice)||!needsGesture&&!audioError;cancel.hidden=complete;
   const studying=beat?.kind==='study'||job?.kind==='study';training.hidden=studying||recordingScreen;
   if(studying){title.textContent=beat?.name??'Изучение трека';stage.textContent='ИЗУЧЕНИЕ · '+(job?.total??45)+' игровых минут';const studyLabel={battle:'Изучение баттла',round:'Изучение раунда',judge:'Изучение судьи',opponent:'Изучение соперника'}[job?.kind]??'Изучение трека';root.setAttribute('aria-label',studyLabel);progress.setAttribute('aria-label',studyLabel);genreRow.remove();reward.hidden=!finished;reward.textContent=finished?'Разбор сохранён'+(earned>0?' · новый источник наслушанности':''):'';audioStatus.textContent='Герой изучает опубликованные материалы';enable.hidden=true;}
  },dispose(){root.remove();}};
