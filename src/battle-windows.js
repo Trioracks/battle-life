@@ -1,6 +1,6 @@
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=44';
-import {battleRoster,BATTLE_ROUND_IDS} from './battle-roster.js?rev=44';
-import {validGameMinute} from './game-minute.js?rev=44';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=45';
+import {battleRoster,BATTLE_ROUND_IDS} from './battle-roster.js?rev=45';
+import {validGameMinute} from './game-minute.js?rev=45';
 const clone=v=>JSON.parse(JSON.stringify(v)),ids=new Set(BATTLE_BRIEFS.map(b=>b.id));
 export const isBattleWindowId=(id,battleId)=>BATTLE_ROUND_IDS.some(round=>id===battleId+':'+round+':1');
 export function currentBattleWindow(state,battleId,nowMinute=Infinity){

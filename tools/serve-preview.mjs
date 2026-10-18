@@ -5,10 +5,11 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 import {publicationPathReason} from './publication/policy.mjs';
 import {assertNoLinks,localAssetPath,validateLocalAssetRoot} from '../test/helpers/local-assets.js';
 import {BEGINNER_BANK,USER_DRUM_BANK,USER_EXPERIMENTAL_BANK} from '../src/beat-beginner-bank.js';
-import {VOCALS} from '../src/vocal-catalog.js';
+import {ALL_VOCALS} from '../src/vocal-catalog.js';
+import {JURA_EXPERIMENTAL_BANK} from '../src/beat-jura-experimental-bank.js';
 import {BUILD_INFO} from '../src/build-info.js';
 
-const audioRoutes=new Set([...BEGINNER_BANK,...USER_DRUM_BANK,...USER_EXPERIMENTAL_BANK,...VOCALS].map(part=>part.path.replace(/^\.\//,'')));
+const audioRoutes=new Set([...BEGINNER_BANK,...USER_DRUM_BANK,...USER_EXPERIMENTAL_BANK,...JURA_EXPERIMENTAL_BANK,...ALL_VOCALS].map(part=>part.path.replace(/^\.\//,'')));
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.glb':'model/gltf-binary','.woff':'font/woff','.woff2':'font/woff2','.ttf':'font/ttf','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.svg':'image/svg+xml','.txt':'text/plain; charset=utf-8','.wav':'audio/wav'};
 export async function startPreviewServer({root=fileURLToPath(new URL('../',import.meta.url)),port=4180,prefix='/battle-life/',profile='public-preview',assetRoot=null}={}){
  if(!['public-preview','local-full'].includes(profile))throw new Error('Unknown preview profile');

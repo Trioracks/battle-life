@@ -24,6 +24,22 @@ async function fixture(t){
  return {root,put,options:{root,revision,sourceCommit:sha,builtAt:'2026-10-16T00:00:00.000Z'}};
 }
 test('builder exists as the public artifact API',async()=>{assert.equal(typeof (await builder()).buildPreview,'function');});
+
+for(const bank of ['npc-gans-v1','jura-experimental-v2'])test('imported '+bank+' metadata ships as JSON without admitting physical audio',async t=>{
+ const f=await fixture(t),manifest='assets/audio/ft/'+bank+'/manifest.json';
+ await f.put('src/apartment-app.js',`import voice from '../${manifest}?rev=45' with {type:'json'}; export {voice};`);
+ await f.put(manifest,JSON.stringify({parts:[{id:'npc-gans-01',path:'./stems/source-library/voices/gans/take.wav'}]}));
+ await f.put('assets/audio/ft/npc-gans-v1/01.wav','private audio');
+ const result=await (await builder()).buildPreview(f.options);
+ assert.ok(result.files.some(file=>file.path===manifest));
+ assert.ok(!result.files.some(file=>file.path.endsWith('.wav')));
+ assert.deepEqual(JSON.parse(await fs.readFile(path.join(f.root,'dist/public-preview',manifest),'utf8')),{parts:[{id:'npc-gans-01',path:'./stems/source-library/voices/gans/take.wav'}]});
+});
+
+test('an excluded static JSON import fails closed instead of producing a browser 404',async t=>{
+ const f=await fixture(t);await f.put('src/apartment-app.js',"import data from '../assets/audio/ft/unreviewed/manifest.json' with {type:'json'}; export {data};");
+ await assert.rejects((await builder()).buildPreview(f.options),/Missing or excluded runtime dependency.*unreviewed/);
+});
 test('artifact uses real revision, excludes private files and reproduces fixed-time bytes',async t=>{
  const f=await fixture(t);for(const name of ['assets/audio/ft/a.wav','stems/raw.txt','tools/raw.js','test/raw.js','.local-audio.json','archive.zip','legacy.html','src/unreachable.js'])await f.put(name,'private');
  const {buildPreview}=await builder(),first=await buildPreview(f.options),second=await buildPreview(f.options);

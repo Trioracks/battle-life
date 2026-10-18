@@ -1,10 +1,10 @@
-import {normalizeBeat} from './beat-production.js?rev=44';
-import {resolveBeatPlayback} from './beat-playback.js?rev=44';
-import {captureTrackVersion,canonicalTrackSignature} from './track-version.js?rev=44';
-import {softwareDiskBytes} from './pc-software.js?rev=44';
-import {drumById} from './beat-catalog.js?rev=44';
-import {beginnerById} from './beat-beginner-bank.js?rev=44';
-import {vocalById} from './vocal-catalog.js?rev=44';
+import {normalizeBeat} from './beat-production.js?rev=45';
+import {resolveBeatPlayback} from './beat-playback.js?rev=45';
+import {captureTrackVersion,canonicalTrackSignature} from './track-version.js?rev=45';
+import {softwareDiskBytes} from './pc-software.js?rev=45';
+import {drumById} from './beat-catalog.js?rev=45';
+import {beginnerById} from './beat-beginner-bank.js?rev=45';
+import {vocalById,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=45';
 
 export const AUDIO_EXPORT_FOLDERS=Object.freeze(['documents','music','exports','downloads','projects']);
 export const AUDIO_EXPORT_KINDS=Object.freeze({beat:'Бит',vocal:'Вокал',track:'Полный трек'});
@@ -23,13 +23,14 @@ export function audioExportBytes(durationSeconds){return 44+Math.ceil(durationSe
 const supportedSource=value=>!drumById(value)?.retired&&(['primitive','melody','bass'].includes(value)||Boolean(beginnerById(value)||drumById(value)||vocalById(value)));
 function validDescriptor(d){
  return object(d)&&finiteJson(d)&&typeof d.key==='string'&&typeof d.owner==='string'&&Number.isFinite(d.durationSeconds)&&d.durationSeconds>0&&Number.isSafeInteger(audioExportBytes(d.durationSeconds))&&Array.isArray(d.parts)&&d.parts.length>0&&d.parts.every(p=>
-  object(p)&&id(p.id)&&supportedSource(p.id)&&Number.isFinite(p.loopSeconds)&&p.loopSeconds>0&&(p.vocal===undefined||object(p.vocal))&&
+  object(p)&&id(p.id)&&supportedSource(p.id)&&Number.isFinite(p.loopSeconds)&&p.loopSeconds>0&&(p.vocal===undefined||object(p.vocal))&&(!vocalById(p.id)||object(p.vocal)&&vocalById(p.id).voiceId===(p.voiceId===undefined?DEFAULT_VOICE_ID:p.voiceId))&&
   (p.windows===undefined||Array.isArray(p.windows)&&p.windows.length>0&&p.windows.every(w=>object(w)&&Number.isFinite(w.startBar)&&w.startBar>=0&&Number.isFinite(w.bars)&&w.bars>0&&Number.isFinite(w.sourceBar)&&w.sourceBar>=0)));
 }
 const nameKey=v=>v.normalize('NFC').toLowerCase();
 function validFile(f,trackVersions){
  if(f?.version!==1||!id(f.id)||!id(f.projectId)||!Object.hasOwn(AUDIO_EXPORT_KINDS,f.kind)||!AUDIO_EXPORT_FOLDERS.includes(f.folderId)||audioExportFilename(f.filename)!==f.filename||!Number.isFinite(f.createdAtMinute)||f.createdAtMinute<0||!object(f.sourceRevision)||typeof f.sourceRevision.beat!=='string'||!finiteJson(f.sourceRevision)||!validDescriptor(f.descriptor)||f.bytes!==audioExportBytes(f.descriptor.durationSeconds))return false;
  const vocals=f.descriptor.parts.filter(p=>p.vocal);
+ if(f.kind!=='beat'&&!vocals.every(p=>vocalById(p.id)?.voiceId===(f.voiceId===undefined?DEFAULT_VOICE_ID:f.voiceId)))return false;
  if(f.kind==='beat')return vocals.length===0&&f.trackVersionId===null;
  if(f.kind==='vocal')return vocals.length===f.descriptor.parts.length&&f.trackVersionId===null;
  const version=trackVersions?.byId?.[f.trackVersionId];
@@ -69,6 +70,6 @@ export function createAudioExport(state,{id:fileId,projectId,kind,folderId,filen
   descriptor=clone(playback.descriptor);descriptor.parts=descriptor.parts.filter(p=>kind==='vocal'?Boolean(p.vocal):!p.vocal);
  }
  const bytes=audioExportBytes(descriptor.durationSeconds);if(softwareDiskBytes(state).free<bytes)return fail('Недостаточно места на виртуальном диске для аудиофайла.');
- const file={version:1,id:fileId,projectId,kind,folderId,filename:name,createdAtMinute:nowMinute,bytes,descriptor,sourceRevision,trackVersionId};
+ const file={version:1,id:fileId,projectId,kind,...(kind!=='beat'?{voiceId:beat.recording.voiceId??DEFAULT_VOICE_ID}:{}),folderId,filename:name,createdAtMinute:nowMinute,bytes,descriptor,sourceRevision,trackVersionId};
  return {ok:true,state:{...next,audioExports:{...archive,files:[...archive.files,file]}},fileId,reason:''};
 }

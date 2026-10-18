@@ -54,6 +54,7 @@ export async function buildPreview({root=fileURLToPath(new URL('../',import.meta
     if((!relative&&['src','vendor','data','assets'].includes(entry.name))||relative&& !/^assets\/audio(?:\/|$)/.test(name))await walk(name);
     else if(name==='assets/audio')await walk(name);
     else if(name==='assets/audio/pc')await walk(name);
+    else if(name==='assets/audio/ft'||/^assets\/audio\/ft\/(?:npc-(?:jura|artem|gans|kapa)-v1|jura-experimental-v2)$/.test(name))await walk(name);
    }else if(!publicationPathReason(name,'site')&&name!=='legacy.html'){
     if(entry.isSymbolicLink())throw Error(`Linked runtime input: ${name}`);
     const info=await fs.lstat(path.join(root,name));if(!info.isFile())throw Error(`Non-regular runtime input: ${name}`);inventory.set(name,info.size);
@@ -92,7 +93,7 @@ export async function buildPreview({root=fileURLToPath(new URL('../',import.meta
   const clean=decodeURIComponent(raw.split(/[?#]/)[0]);
   const name=path.posix.normalize(path.posix.join(base??(raw.startsWith('assets/')||raw.startsWith('./assets/')?'':path.posix.dirname(from)),clean));
   if(name.startsWith('../')||name==='..')throw Error(`Escaping dependency in ${from}: ${raw}`);
-  if(/^assets\/audio\//.test(name)&&name!=='assets/audio/pc/manifest.json')return;
+  if(!module&&/^assets\/audio\//.test(name)&&publicationPathReason(name,'site'))return;
   select(name);
  }
  for(const match of html.matchAll(/\b(?:src|href)=["']([^"']+)["']/g))reference(match[1],'index.html');

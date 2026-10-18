@@ -1,0 +1,1809 @@
+{
+  "version": 1,
+  "batch": "gans-kapa-20261018-v1",
+  "builder": "node tools/prepare-gans-kapa-local.mjs",
+  "archiveManifest": "stems/source-library/batches/gans-kapa-20261018-v1.json",
+  "parts": [
+    {
+      "id": "gans-experimental-20261018-bass-3",
+      "kind": "arrangement",
+      "path": "./assets/audio/ft/experimental-gans-v1/bass-3.wav",
+      "source": "stems/source-library/instruments/gans-kapa-20261018-v1/bass/bass 3.mp3",
+      "sourceHash": "b45250782a8df615ca35f8460e8eb3ad4c6699817682ca7abbc58acf84eb4381",
+      "sha256": "ed4a0e1cc70b5959f85b51df93b9591029a2fad094c6158b6cbe5fc0e243e94d",
+      "sampleRate": 44100,
+      "channels": 2,
+      "frames": 470400,
+      "seconds": 10.666666666666666,
+      "bpm": 90,
+      "bpmProvenance": "User supplied 90 BPM folder; measured onset spacings support quarter/eighth-beat grid after encoder prefix. Not an independent exact-tempo estimate.",
+      "cycleBars": 2,
+      "playbackBars": 4,
+      "cycleFrames": 235200,
+      "trimFrames": 1011,
+      "sourceFrames": 239199,
+      "foldedTailFrames": 2988,
+      "tailPolicy": "Only measured <=40ms quiet encoder prefix removed, retaining 2ms before first signal. Entire remaining source tail folded into 2-bar cycle; repeated to 4 bars; 3ms seam fade; no pitch/time shift.",
+      "tonalEvidence": {
+        "key": "A minor compatible",
+        "confidence": "medium; spectral compatibility inference, not authoritative key detection",
+        "basis": "A1/A2 dominant with E partials; A 74.9%, E 15.2% of extracted pitch-class peak energy."
+      },
+      "evidence": {
+        "frames": 239199,
+        "seconds": 5.42401,
+        "peak": 0.31228,
+        "rms": 0.06661,
+        "rmsDb": -23.52981,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0,
+        "lowEnergyBelow200": 0.90496,
+        "centroidHz": 136.67485,
+        "spectralPeaks": [
+          {
+            "hz": 109.59086,
+            "note": "A2",
+            "share": 0.22063
+          },
+          {
+            "hz": 54.70618,
+            "note": "A1",
+            "share": 0.07749
+          },
+          {
+            "hz": 163.79817,
+            "note": "E3",
+            "share": 0.04677
+          },
+          {
+            "hz": 220.83276,
+            "note": "A3",
+            "share": 0.01951
+          },
+          {
+            "hz": 327.68982,
+            "note": "E4",
+            "share": 0.00906
+          },
+          {
+            "hz": 120.81661,
+            "note": "B2",
+            "share": 0.00855
+          },
+          {
+            "hz": 83.14049,
+            "note": "E2",
+            "share": 0.00713
+          },
+          {
+            "hz": 157.40426,
+            "note": "D#3",
+            "share": 0.00626
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A",
+            "share": 0.74922
+          },
+          {
+            "note": "E",
+            "share": 0.15249
+          },
+          {
+            "note": "B",
+            "share": 0.02665
+          },
+          {
+            "note": "D#",
+            "share": 0.02353
+          },
+          {
+            "note": "C#",
+            "share": 0.01946
+          },
+          {
+            "note": "D",
+            "share": 0.01157
+          },
+          {
+            "note": "C",
+            "share": 0.00886
+          },
+          {
+            "note": "F",
+            "share": 0.00281
+          },
+          {
+            "note": "F#",
+            "share": 0.00214
+          },
+          {
+            "note": "A#",
+            "share": 0.00131
+          },
+          {
+            "note": "G",
+            "share": 0.00107
+          },
+          {
+            "note": "G#",
+            "share": 0.0009
+          }
+        ],
+        "activeStartSeconds": 0.02,
+        "activeEndSeconds": 5.37,
+        "onsetsSeconds": [
+          0.04,
+          0.59,
+          0.69,
+          1.04,
+          1.36,
+          1.48,
+          1.69,
+          2.04,
+          2.36,
+          2.48,
+          2.71,
+          3.03,
+          3.11,
+          5.09,
+          5.19,
+          5.3
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.03364,
+          "bpm90": 0.0375,
+          "bpm92": 0.05038
+        },
+        "barRms": [
+          0.0727,
+          0.06076
+        ],
+        "tailRms": 0.03685
+      },
+      "calibration": {
+        "buildGainDb": 0,
+        "gainDb": -6.11,
+        "targetLufs": -28.5,
+        "derived": {
+          "lufs": -22.39,
+          "truePeak": -10.11,
+          "lra": 2
+        },
+        "after": {
+          "lufs": -28.5,
+          "truePeak": -16.22,
+          "lra": 2
+        }
+      }
+    },
+    {
+      "id": "gans-experimental-20261018-drums-2",
+      "kind": "drums",
+      "path": "./assets/audio/ft/experimental-gans-v1/drums-2.wav",
+      "source": "stems/source-library/instruments/gans-kapa-20261018-v1/drums/drumm 2.mp3",
+      "sourceHash": "a872dc823137d71e5692d8b17809d521b30e0d061df8ed7552c5c9a43cb0234a",
+      "sha256": "1d945292bc928f7bebe9f2f0b646afa784b93277bf4405d1e92ca6c8f6ac0a7b",
+      "sampleRate": 44100,
+      "channels": 2,
+      "frames": 470400,
+      "seconds": 10.666666666666666,
+      "bpm": 90,
+      "bpmProvenance": "User supplied 90 BPM folder; measured onset spacings support quarter/eighth-beat grid after encoder prefix. Not an independent exact-tempo estimate.",
+      "cycleBars": 2,
+      "playbackBars": 4,
+      "cycleFrames": 235200,
+      "trimFrames": 955,
+      "sourceFrames": 237081,
+      "foldedTailFrames": 926,
+      "tailPolicy": "Only measured <=40ms quiet encoder prefix removed, retaining 2ms before first signal. Entire remaining source tail folded into 2-bar cycle; repeated to 4 bars; 3ms seam fade; no pitch/time shift.",
+      "tonalEvidence": {
+        "key": null,
+        "confidence": "unassigned",
+        "basis": "Percussion; low A-region kick resonance, no musical key assigned."
+      },
+      "evidence": {
+        "frames": 237081,
+        "seconds": 5.37599,
+        "peak": 0.59631,
+        "rms": 0.09763,
+        "rmsDb": -20.20792,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.03032,
+        "lowEnergyBelow200": 0.87344,
+        "centroidHz": 412.55374,
+        "spectralPeaks": [
+          {
+            "hz": 53.54398,
+            "note": "A1",
+            "share": 0.1948
+          },
+          {
+            "hz": 72.19106,
+            "note": "D2",
+            "share": 0.01932
+          },
+          {
+            "hz": 77.95195,
+            "note": "D#2",
+            "share": 0.0172
+          },
+          {
+            "hz": 83.63224,
+            "note": "E2",
+            "share": 0.01516
+          },
+          {
+            "hz": 89.4383,
+            "note": "F2",
+            "share": 0.01153
+          },
+          {
+            "hz": 96.26084,
+            "note": "G2",
+            "share": 0.01081
+          },
+          {
+            "hz": 107.89138,
+            "note": "A2",
+            "share": 0.00987
+          },
+          {
+            "hz": 161.71082,
+            "note": "E3",
+            "share": 0.00862
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A",
+            "share": 0.5237
+          },
+          {
+            "note": "E",
+            "share": 0.08128
+          },
+          {
+            "note": "D",
+            "share": 0.07541
+          },
+          {
+            "note": "D#",
+            "share": 0.06801
+          },
+          {
+            "note": "F",
+            "share": 0.04471
+          },
+          {
+            "note": "G",
+            "share": 0.04402
+          },
+          {
+            "note": "G#",
+            "share": 0.03471
+          },
+          {
+            "note": "A#",
+            "share": 0.0327
+          },
+          {
+            "note": "F#",
+            "share": 0.02997
+          },
+          {
+            "note": "B",
+            "share": 0.02956
+          },
+          {
+            "note": "C",
+            "share": 0.01873
+          },
+          {
+            "note": "C#",
+            "share": 0.01719
+          }
+        ],
+        "activeStartSeconds": 0.02,
+        "activeEndSeconds": 5.2,
+        "onsetsSeconds": [
+          0.04,
+          0.7,
+          1.38,
+          2.03,
+          2.88,
+          3.04,
+          3.37,
+          4.04,
+          4.38,
+          4.7
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.03505,
+          "bpm90": 0.03933,
+          "bpm92": 0.049
+        },
+        "barRms": [
+          0.08951,
+          0.10586
+        ],
+        "tailRms": 0.00001
+      },
+      "calibration": {
+        "buildGainDb": 0,
+        "gainDb": -11.73,
+        "targetLufs": -30,
+        "derived": {
+          "lufs": -18.27,
+          "truePeak": -4.44,
+          "lra": 1.3
+        },
+        "after": {
+          "lufs": -29.99,
+          "truePeak": -16.17,
+          "lra": 1.3
+        }
+      }
+    },
+    {
+      "id": "gans-experimental-20261018-lead-2",
+      "kind": "theme",
+      "path": "./assets/audio/ft/experimental-gans-v1/lead-2.wav",
+      "source": "stems/source-library/instruments/gans-kapa-20261018-v1/lead/lead 2.mp3",
+      "sourceHash": "2607e9efbe5ba32fc7ee380eb1f6ca7940dad5ef14b5913a51478101c9b3ffba",
+      "sha256": "4dc5f481cdec9e490438f3d2a469af11abf0e8f2760c6ba7e1dfe422f952ea56",
+      "sampleRate": 44100,
+      "channels": 2,
+      "frames": 470400,
+      "seconds": 10.666666666666666,
+      "bpm": 90,
+      "bpmProvenance": "User supplied 90 BPM folder; measured onset spacings support quarter/eighth-beat grid after encoder prefix. Not an independent exact-tempo estimate.",
+      "cycleBars": 2,
+      "playbackBars": 4,
+      "cycleFrames": 235200,
+      "trimFrames": 1113,
+      "sourceFrames": 245549,
+      "foldedTailFrames": 9236,
+      "tailPolicy": "Only measured <=40ms quiet encoder prefix removed, retaining 2ms before first signal. Entire remaining source tail folded into 2-bar cycle; repeated to 4 bars; 3ms seam fade; no pitch/time shift.",
+      "tonalEvidence": {
+        "key": "A minor compatible",
+        "confidence": "medium; spectral compatibility inference, not authoritative key detection",
+        "basis": "A 35.9%, E 28.7%, C 17.9% of extracted pitch-class peak energy; compatible triad, limited evidence for complete scale."
+      },
+      "evidence": {
+        "frames": 245549,
+        "seconds": 5.568,
+        "peak": 0.26542,
+        "rms": 0.03707,
+        "rmsDb": -28.61933,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.02387,
+        "lowEnergyBelow200": 0.00717,
+        "centroidHz": 610.87815,
+        "spectralPeaks": [
+          {
+            "hz": 220.35964,
+            "note": "A3",
+            "share": 0.08957
+          },
+          {
+            "hz": 330.28131,
+            "note": "E4",
+            "share": 0.07252
+          },
+          {
+            "hz": 261.24467,
+            "note": "C4",
+            "share": 0.03947
+          },
+          {
+            "hz": 440.06509,
+            "note": "A4",
+            "share": 0.03439
+          },
+          {
+            "hz": 522.04422,
+            "note": "C5",
+            "share": 0.02034
+          },
+          {
+            "hz": 667.06029,
+            "note": "E5",
+            "share": 0.01421
+          },
+          {
+            "hz": 587.39112,
+            "note": "D5",
+            "share": 0.01057
+          },
+          {
+            "hz": 660.36501,
+            "note": "E5",
+            "share": 0.00984
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A",
+            "share": 0.35857
+          },
+          {
+            "note": "E",
+            "share": 0.2869
+          },
+          {
+            "note": "C",
+            "share": 0.17853
+          },
+          {
+            "note": "G",
+            "share": 0.04435
+          },
+          {
+            "note": "D",
+            "share": 0.03794
+          },
+          {
+            "note": "B",
+            "share": 0.03764
+          },
+          {
+            "note": "C#",
+            "share": 0.01654
+          },
+          {
+            "note": "F#",
+            "share": 0.01192
+          },
+          {
+            "note": "G#",
+            "share": 0.00964
+          },
+          {
+            "note": "A#",
+            "share": 0.00832
+          },
+          {
+            "note": "D#",
+            "share": 0.0063
+          },
+          {
+            "note": "F",
+            "share": 0.00334
+          }
+        ],
+        "activeStartSeconds": 0.03,
+        "activeEndSeconds": 5.46,
+        "onsetsSeconds": [
+          0.04,
+          0.14,
+          0.37,
+          0.71,
+          0.81,
+          1.03,
+          1.54,
+          1.88,
+          2.04,
+          2.37,
+          3.38,
+          3.48,
+          3.7,
+          4.03,
+          4.2,
+          4.54,
+          4.81,
+          5.03
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.03697,
+          "bpm90": 0.03444,
+          "bpm92": 0.04957
+        },
+        "barRms": [
+          0.03707,
+          0.03828
+        ],
+        "tailRms": 0.0183
+      },
+      "calibration": {
+        "buildGainDb": 0,
+        "gainDb": -1.61,
+        "targetLufs": -27,
+        "derived": {
+          "lufs": -25.39,
+          "truePeak": -11.49,
+          "lra": 2.2
+        },
+        "after": {
+          "lufs": -27,
+          "truePeak": -13.1,
+          "lra": 2.2
+        }
+      }
+    }
+  ],
+  "sourceAnalysis": [
+    {
+      "source": "stems/source-library/instruments/gans-kapa-20261018-v1/bass/bass 1.mp3",
+      "sourceHash": "cf31255329c1472d96db32e6d39f190aa3c0697532de43ff7606133d2083768a",
+      "evidence": {
+        "frames": 937743,
+        "seconds": 21.26401,
+        "peak": 0.14235,
+        "rms": 0.01272,
+        "rmsDb": -37.91169,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.01427,
+        "lowEnergyBelow200": 0.63108,
+        "centroidHz": 396.64854,
+        "spectralPeaks": [
+          {
+            "hz": 110.04478,
+            "note": "A2",
+            "share": 0.19475
+          },
+          {
+            "hz": 55.02464,
+            "note": "A1",
+            "share": 0.13594
+          },
+          {
+            "hz": 219.96508,
+            "note": "A3",
+            "share": 0.0333
+          },
+          {
+            "hz": 165.7041,
+            "note": "E3",
+            "share": 0.01751
+          },
+          {
+            "hz": 274.80321,
+            "note": "C#4",
+            "share": 0.01657
+          },
+          {
+            "hz": 330.83215,
+            "note": "E4",
+            "share": 0.01281
+          },
+          {
+            "hz": 385.80682,
+            "note": "G4",
+            "share": 0.00701
+          },
+          {
+            "hz": 492.16958,
+            "note": "B4",
+            "share": 0.0053
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A",
+            "share": 0.76911
+          },
+          {
+            "note": "E",
+            "share": 0.07354
+          },
+          {
+            "note": "C#",
+            "share": 0.04286
+          },
+          {
+            "note": "G",
+            "share": 0.02931
+          },
+          {
+            "note": "B",
+            "share": 0.02393
+          },
+          {
+            "note": "D",
+            "share": 0.0146
+          },
+          {
+            "note": "D#",
+            "share": 0.01201
+          },
+          {
+            "note": "A#",
+            "share": 0.00864
+          },
+          {
+            "note": "F#",
+            "share": 0.00746
+          },
+          {
+            "note": "G#",
+            "share": 0.00667
+          },
+          {
+            "note": "F",
+            "share": 0.00656
+          },
+          {
+            "note": "C",
+            "share": 0.00532
+          }
+        ],
+        "activeStartSeconds": 0.07,
+        "activeEndSeconds": 8.13,
+        "onsetsSeconds": [
+          0.43,
+          0.63,
+          0.74,
+          0.85,
+          1.05,
+          1.14,
+          1.87,
+          2.24,
+          2.38,
+          2.47,
+          2.56
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.03603,
+          "bpm90": 0.04727,
+          "bpm92": 0.04747
+        },
+        "barRms": [
+          0.0308,
+          0.01762
+        ],
+        "tailRms": 0.00226
+      },
+      "barRmsAll": [
+        0.0308,
+        0.01762,
+        0.00519,
+        0.00177,
+        0.00059,
+        0.0002,
+        0.00007,
+        0.00002
+      ],
+      "selectedForDemo": false,
+      "cycleAssessment": "21.264s container; significant signal spans ~8.13s and quieter tail continues. No short cycle asserted, no derived trim; original fully preserved."
+    },
+    {
+      "source": "stems/source-library/instruments/gans-kapa-20261018-v1/bass/bass 2.mp3",
+      "sourceHash": "0e89ed7fc52ee7f821609f5739c72a89eeda0923e6708b7c65398d17f102648b",
+      "evidence": {
+        "frames": 346097,
+        "seconds": 7.848,
+        "peak": 0.14579,
+        "rms": 0.01887,
+        "rmsDb": -34.48293,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.0243,
+        "lowEnergyBelow200": 0.00034,
+        "centroidHz": 1057.55679,
+        "spectralPeaks": [
+          {
+            "hz": 657.44545,
+            "note": "E5",
+            "share": 0.02446
+          },
+          {
+            "hz": 634.89041,
+            "note": "D#5",
+            "share": 0.02223
+          },
+          {
+            "hz": 691.00565,
+            "note": "F5",
+            "share": 0.01594
+          },
+          {
+            "hz": 431.66757,
+            "note": "A4",
+            "share": 0.01429
+          },
+          {
+            "hz": 426.41659,
+            "note": "G#4",
+            "share": 0.01127
+          },
+          {
+            "hz": 663.67853,
+            "note": "E5",
+            "share": 0.01125
+          },
+          {
+            "hz": 680.0927,
+            "note": "F5",
+            "share": 0.00875
+          },
+          {
+            "hz": 1364.73927,
+            "note": "F6",
+            "share": 0.00825
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "E",
+            "share": 0.24486
+          },
+          {
+            "note": "A",
+            "share": 0.17474
+          },
+          {
+            "note": "D#",
+            "share": 0.14774
+          },
+          {
+            "note": "F",
+            "share": 0.14112
+          },
+          {
+            "note": "G#",
+            "share": 0.08345
+          },
+          {
+            "note": "A#",
+            "share": 0.05489
+          },
+          {
+            "note": "C",
+            "share": 0.05265
+          },
+          {
+            "note": "C#",
+            "share": 0.0302
+          },
+          {
+            "note": "B",
+            "share": 0.02527
+          },
+          {
+            "note": "D",
+            "share": 0.02417
+          },
+          {
+            "note": "G",
+            "share": 0.01163
+          },
+          {
+            "note": "F#",
+            "share": 0.00929
+          }
+        ],
+        "activeStartSeconds": 0.06,
+        "activeEndSeconds": 5.24,
+        "onsetsSeconds": [
+          0.14,
+          0.49,
+          1.81,
+          2.03,
+          2.12,
+          2.25,
+          2.33,
+          2.77,
+          2.98,
+          3.32,
+          3.47,
+          3.74,
+          3.93,
+          4.22,
+          4.62,
+          4.81,
+          4.99
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.04278,
+          "bpm90": 0.03686,
+          "bpm92": 0.03488
+        },
+        "barRms": [
+          0.01742,
+          0.02728
+        ],
+        "tailRms": 0.00057
+      },
+      "barRmsAll": [
+        0.01742,
+        0.02728,
+        0.00057
+      ],
+      "selectedForDemo": false,
+      "cycleAssessment": "Not selected; duration and full bar/tail measurements retained for later review."
+    },
+    {
+      "source": "stems/source-library/instruments/gans-kapa-20261018-v1/bass/bass 3.mp3",
+      "sourceHash": "b45250782a8df615ca35f8460e8eb3ad4c6699817682ca7abbc58acf84eb4381",
+      "evidence": {
+        "frames": 239199,
+        "seconds": 5.42401,
+        "peak": 0.31228,
+        "rms": 0.06661,
+        "rmsDb": -23.52981,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0,
+        "lowEnergyBelow200": 0.90496,
+        "centroidHz": 136.67485,
+        "spectralPeaks": [
+          {
+            "hz": 109.59086,
+            "note": "A2",
+            "share": 0.22063
+          },
+          {
+            "hz": 54.70618,
+            "note": "A1",
+            "share": 0.07749
+          },
+          {
+            "hz": 163.79817,
+            "note": "E3",
+            "share": 0.04677
+          },
+          {
+            "hz": 220.83276,
+            "note": "A3",
+            "share": 0.01951
+          },
+          {
+            "hz": 327.68982,
+            "note": "E4",
+            "share": 0.00906
+          },
+          {
+            "hz": 120.81661,
+            "note": "B2",
+            "share": 0.00855
+          },
+          {
+            "hz": 83.14049,
+            "note": "E2",
+            "share": 0.00713
+          },
+          {
+            "hz": 157.40426,
+            "note": "D#3",
+            "share": 0.00626
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A",
+            "share": 0.74922
+          },
+          {
+            "note": "E",
+            "share": 0.15249
+          },
+          {
+            "note": "B",
+            "share": 0.02665
+          },
+          {
+            "note": "D#",
+            "share": 0.02353
+          },
+          {
+            "note": "C#",
+            "share": 0.01946
+          },
+          {
+            "note": "D",
+            "share": 0.01157
+          },
+          {
+            "note": "C",
+            "share": 0.00886
+          },
+          {
+            "note": "F",
+            "share": 0.00281
+          },
+          {
+            "note": "F#",
+            "share": 0.00214
+          },
+          {
+            "note": "A#",
+            "share": 0.00131
+          },
+          {
+            "note": "G",
+            "share": 0.00107
+          },
+          {
+            "note": "G#",
+            "share": 0.0009
+          }
+        ],
+        "activeStartSeconds": 0.02,
+        "activeEndSeconds": 5.37,
+        "onsetsSeconds": [
+          0.04,
+          0.59,
+          0.69,
+          1.04,
+          1.36,
+          1.48,
+          1.69,
+          2.04,
+          2.36,
+          2.48,
+          2.71,
+          3.03,
+          3.11,
+          5.09,
+          5.19,
+          5.3
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.03364,
+          "bpm90": 0.0375,
+          "bpm92": 0.05038
+        },
+        "barRms": [
+          0.0727,
+          0.06076
+        ],
+        "tailRms": 0.03685
+      },
+      "barRmsAll": [
+        0.0727,
+        0.06076,
+        0.03685
+      ],
+      "selectedForDemo": true,
+      "cycleAssessment": "Two-bar phrase at supplied 90 BPM with active energy in both bars and measured post-cycle tail. Full tail folded, not discarded."
+    },
+    {
+      "source": "stems/source-library/instruments/gans-kapa-20261018-v1/drums/drumm 1.mp3",
+      "sourceHash": "6ae5a36a78c31526ee9f17dc55fc007c9ad952012ddfa279461f8ac9194c254c",
+      "evidence": {
+        "frames": 237081,
+        "seconds": 5.37599,
+        "peak": 0.46526,
+        "rms": 0.08075,
+        "rmsDb": -21.85666,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.02103,
+        "lowEnergyBelow200": 0.89037,
+        "centroidHz": 400.98618,
+        "spectralPeaks": [
+          {
+            "hz": 53.54315,
+            "note": "A1",
+            "share": 0.21129
+          },
+          {
+            "hz": 72.19165,
+            "note": "D2",
+            "share": 0.02022
+          },
+          {
+            "hz": 77.95028,
+            "note": "D#2",
+            "share": 0.01809
+          },
+          {
+            "hz": 83.68599,
+            "note": "E2",
+            "share": 0.01571
+          },
+          {
+            "hz": 89.50915,
+            "note": "F2",
+            "share": 0.01132
+          },
+          {
+            "hz": 96.24649,
+            "note": "G2",
+            "share": 0.011
+          },
+          {
+            "hz": 107.96377,
+            "note": "A2",
+            "share": 0.01033
+          },
+          {
+            "hz": 161.80562,
+            "note": "E3",
+            "share": 0.00903
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A",
+            "share": 0.53987
+          },
+          {
+            "note": "E",
+            "share": 0.08047
+          },
+          {
+            "note": "D",
+            "share": 0.07387
+          },
+          {
+            "note": "D#",
+            "share": 0.06809
+          },
+          {
+            "note": "F",
+            "share": 0.04286
+          },
+          {
+            "note": "G",
+            "share": 0.04205
+          },
+          {
+            "note": "G#",
+            "share": 0.03318
+          },
+          {
+            "note": "A#",
+            "share": 0.03062
+          },
+          {
+            "note": "F#",
+            "share": 0.02873
+          },
+          {
+            "note": "B",
+            "share": 0.02707
+          },
+          {
+            "note": "C",
+            "share": 0.017
+          },
+          {
+            "note": "C#",
+            "share": 0.01618
+          }
+        ],
+        "activeStartSeconds": 0.02,
+        "activeEndSeconds": 5.2,
+        "onsetsSeconds": [
+          0.04,
+          0.7,
+          1.04,
+          1.38,
+          2.03,
+          2.54,
+          2.88,
+          3.36
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.02386,
+          "bpm90": 0.03792,
+          "bpm92": 0.06076
+        },
+        "barRms": [
+          0.09637,
+          0.06213
+        ],
+        "tailRms": 0.00001
+      },
+      "barRmsAll": [
+        0.09637,
+        0.06213,
+        0.00001
+      ],
+      "selectedForDemo": false,
+      "cycleAssessment": "Not selected; duration and full bar/tail measurements retained for later review."
+    },
+    {
+      "source": "stems/source-library/instruments/gans-kapa-20261018-v1/drums/drumm 2.mp3",
+      "sourceHash": "a872dc823137d71e5692d8b17809d521b30e0d061df8ed7552c5c9a43cb0234a",
+      "evidence": {
+        "frames": 237081,
+        "seconds": 5.37599,
+        "peak": 0.59631,
+        "rms": 0.09763,
+        "rmsDb": -20.20792,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.03032,
+        "lowEnergyBelow200": 0.87344,
+        "centroidHz": 412.55374,
+        "spectralPeaks": [
+          {
+            "hz": 53.54398,
+            "note": "A1",
+            "share": 0.1948
+          },
+          {
+            "hz": 72.19106,
+            "note": "D2",
+            "share": 0.01932
+          },
+          {
+            "hz": 77.95195,
+            "note": "D#2",
+            "share": 0.0172
+          },
+          {
+            "hz": 83.63224,
+            "note": "E2",
+            "share": 0.01516
+          },
+          {
+            "hz": 89.4383,
+            "note": "F2",
+            "share": 0.01153
+          },
+          {
+            "hz": 96.26084,
+            "note": "G2",
+            "share": 0.01081
+          },
+          {
+            "hz": 107.89138,
+            "note": "A2",
+            "share": 0.00987
+          },
+          {
+            "hz": 161.71082,
+            "note": "E3",
+            "share": 0.00862
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A",
+            "share": 0.5237
+          },
+          {
+            "note": "E",
+            "share": 0.08128
+          },
+          {
+            "note": "D",
+            "share": 0.07541
+          },
+          {
+            "note": "D#",
+            "share": 0.06801
+          },
+          {
+            "note": "F",
+            "share": 0.04471
+          },
+          {
+            "note": "G",
+            "share": 0.04402
+          },
+          {
+            "note": "G#",
+            "share": 0.03471
+          },
+          {
+            "note": "A#",
+            "share": 0.0327
+          },
+          {
+            "note": "F#",
+            "share": 0.02997
+          },
+          {
+            "note": "B",
+            "share": 0.02956
+          },
+          {
+            "note": "C",
+            "share": 0.01873
+          },
+          {
+            "note": "C#",
+            "share": 0.01719
+          }
+        ],
+        "activeStartSeconds": 0.02,
+        "activeEndSeconds": 5.2,
+        "onsetsSeconds": [
+          0.04,
+          0.7,
+          1.38,
+          2.03,
+          2.88,
+          3.04,
+          3.37,
+          4.04,
+          4.38,
+          4.7
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.03505,
+          "bpm90": 0.03933,
+          "bpm92": 0.049
+        },
+        "barRms": [
+          0.08951,
+          0.10586
+        ],
+        "tailRms": 0.00001
+      },
+      "barRmsAll": [
+        0.08951,
+        0.10586,
+        0.00001
+      ],
+      "selectedForDemo": true,
+      "cycleAssessment": "Two-bar phrase at supplied 90 BPM with active energy in both bars and measured post-cycle tail. Full tail folded, not discarded."
+    },
+    {
+      "source": "stems/source-library/instruments/gans-kapa-20261018-v1/drums/drumm 3.mp3",
+      "sourceHash": "e34919b1ae36904ba5899e849765ae8bf6dfcc18edf44dce76ffa113a027eb24",
+      "evidence": {
+        "frames": 275184,
+        "seconds": 6.24,
+        "peak": 0.94217,
+        "rms": 0.1344,
+        "rmsDb": -17.43177,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.02419,
+        "lowEnergyBelow200": 0.90877,
+        "centroidHz": 495.82382,
+        "spectralPeaks": [
+          {
+            "hz": 59.18375,
+            "note": "A#1",
+            "share": 0.08242
+          },
+          {
+            "hz": 71.60902,
+            "note": "D2",
+            "share": 0.03488
+          },
+          {
+            "hz": 77.4214,
+            "note": "D#2",
+            "share": 0.01928
+          },
+          {
+            "hz": 96.3757,
+            "note": "G2",
+            "share": 0.01512
+          },
+          {
+            "hz": 83.62165,
+            "note": "E2",
+            "share": 0.01389
+          },
+          {
+            "hz": 89.55486,
+            "note": "F2",
+            "share": 0.01333
+          },
+          {
+            "hz": 131.77142,
+            "note": "C3",
+            "share": 0.01229
+          },
+          {
+            "hz": 126.46484,
+            "note": "B2",
+            "share": 0.0118
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A#",
+            "share": 0.2849
+          },
+          {
+            "note": "D#",
+            "share": 0.11892
+          },
+          {
+            "note": "D",
+            "share": 0.11512
+          },
+          {
+            "note": "E",
+            "share": 0.09696
+          },
+          {
+            "note": "G",
+            "share": 0.06732
+          },
+          {
+            "note": "B",
+            "share": 0.06409
+          },
+          {
+            "note": "F",
+            "share": 0.05711
+          },
+          {
+            "note": "G#",
+            "share": 0.04986
+          },
+          {
+            "note": "C#",
+            "share": 0.04467
+          },
+          {
+            "note": "C",
+            "share": 0.04269
+          },
+          {
+            "note": "F#",
+            "share": 0.03106
+          },
+          {
+            "note": "A",
+            "share": 0.02731
+          }
+        ],
+        "activeStartSeconds": 0.02,
+        "activeEndSeconds": 5.16,
+        "onsetsSeconds": [
+          0.04,
+          0.37,
+          0.7,
+          0.87,
+          1.04,
+          1.7,
+          2.03,
+          2.37,
+          2.54,
+          2.7,
+          3.03,
+          3.2,
+          3.37,
+          3.7,
+          4.03,
+          4.37,
+          4.54,
+          4.7,
+          5.04
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.03684,
+          "bpm90": 0.03544,
+          "bpm92": 0.0519
+        },
+        "barRms": [
+          0.13978,
+          0.15078
+        ],
+        "tailRms": 0.00013
+      },
+      "barRmsAll": [
+        0.13978,
+        0.15078,
+        0.00013
+      ],
+      "selectedForDemo": false,
+      "cycleAssessment": "Not selected; duration and full bar/tail measurements retained for later review."
+    },
+    {
+      "source": "stems/source-library/instruments/gans-kapa-20261018-v1/lead/lead 1.mp3",
+      "sourceHash": "c0d3deb918b516f5e847182df9dccb8a4ab8e72c8bd3b88889c46f6a52d19d33",
+      "evidence": {
+        "frames": 237081,
+        "seconds": 5.37599,
+        "peak": 0.13425,
+        "rms": 0.01277,
+        "rmsDb": -37.87419,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.0171,
+        "lowEnergyBelow200": 0,
+        "centroidHz": 6807.25495,
+        "spectralPeaks": [
+          {
+            "hz": 3386.8293,
+            "note": "G#7",
+            "share": 0.00383
+          },
+          {
+            "hz": 1962.72241,
+            "note": "B6",
+            "share": 0.00268
+          },
+          {
+            "hz": 3754.19569,
+            "note": "A#7",
+            "share": 0.00264
+          },
+          {
+            "hz": 3698.31881,
+            "note": "A#7",
+            "share": 0.00258
+          },
+          {
+            "hz": 3609.13369,
+            "note": "A7",
+            "share": 0.00258
+          },
+          {
+            "hz": 3445.09299,
+            "note": "A7",
+            "share": 0.00245
+          },
+          {
+            "hz": 1609.36188,
+            "note": "G6",
+            "share": 0.00237
+          },
+          {
+            "hz": 3539.21997,
+            "note": "A7",
+            "share": 0.00228
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A#",
+            "share": 0.19059
+          },
+          {
+            "note": "A",
+            "share": 0.16731
+          },
+          {
+            "note": "B",
+            "share": 0.14708
+          },
+          {
+            "note": "G#",
+            "share": 0.12865
+          },
+          {
+            "note": "G",
+            "share": 0.09475
+          },
+          {
+            "note": "C#",
+            "share": 0.05565
+          },
+          {
+            "note": "D",
+            "share": 0.05307
+          },
+          {
+            "note": "F",
+            "share": 0.04382
+          },
+          {
+            "note": "C",
+            "share": 0.04174
+          },
+          {
+            "note": "F#",
+            "share": 0.03021
+          },
+          {
+            "note": "D#",
+            "share": 0.02545
+          },
+          {
+            "note": "E",
+            "share": 0.02168
+          }
+        ],
+        "activeStartSeconds": 0.03,
+        "activeEndSeconds": 5.02,
+        "onsetsSeconds": [
+          0.04,
+          0.26,
+          0.7,
+          0.88,
+          0.98,
+          1.54,
+          2.05,
+          2.2,
+          3.37,
+          4.87
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.03482,
+          "bpm90": 0.041,
+          "bpm92": 0.05183
+        },
+        "barRms": [
+          0.01434,
+          0.0111
+        ],
+        "tailRms": 0.0005
+      },
+      "barRmsAll": [
+        0.01434,
+        0.0111,
+        0.0005
+      ],
+      "selectedForDemo": false,
+      "cycleAssessment": "Not selected; duration and full bar/tail measurements retained for later review."
+    },
+    {
+      "source": "stems/source-library/instruments/gans-kapa-20261018-v1/lead/lead 2.mp3",
+      "sourceHash": "2607e9efbe5ba32fc7ee380eb1f6ca7940dad5ef14b5913a51478101c9b3ffba",
+      "evidence": {
+        "frames": 245549,
+        "seconds": 5.568,
+        "peak": 0.26542,
+        "rms": 0.03707,
+        "rmsDb": -28.61933,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.02387,
+        "lowEnergyBelow200": 0.00717,
+        "centroidHz": 610.87815,
+        "spectralPeaks": [
+          {
+            "hz": 220.35964,
+            "note": "A3",
+            "share": 0.08957
+          },
+          {
+            "hz": 330.28131,
+            "note": "E4",
+            "share": 0.07252
+          },
+          {
+            "hz": 261.24467,
+            "note": "C4",
+            "share": 0.03947
+          },
+          {
+            "hz": 440.06509,
+            "note": "A4",
+            "share": 0.03439
+          },
+          {
+            "hz": 522.04422,
+            "note": "C5",
+            "share": 0.02034
+          },
+          {
+            "hz": 667.06029,
+            "note": "E5",
+            "share": 0.01421
+          },
+          {
+            "hz": 587.39112,
+            "note": "D5",
+            "share": 0.01057
+          },
+          {
+            "hz": 660.36501,
+            "note": "E5",
+            "share": 0.00984
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A",
+            "share": 0.35857
+          },
+          {
+            "note": "E",
+            "share": 0.2869
+          },
+          {
+            "note": "C",
+            "share": 0.17853
+          },
+          {
+            "note": "G",
+            "share": 0.04435
+          },
+          {
+            "note": "D",
+            "share": 0.03794
+          },
+          {
+            "note": "B",
+            "share": 0.03764
+          },
+          {
+            "note": "C#",
+            "share": 0.01654
+          },
+          {
+            "note": "F#",
+            "share": 0.01192
+          },
+          {
+            "note": "G#",
+            "share": 0.00964
+          },
+          {
+            "note": "A#",
+            "share": 0.00832
+          },
+          {
+            "note": "D#",
+            "share": 0.0063
+          },
+          {
+            "note": "F",
+            "share": 0.00334
+          }
+        ],
+        "activeStartSeconds": 0.03,
+        "activeEndSeconds": 5.46,
+        "onsetsSeconds": [
+          0.04,
+          0.14,
+          0.37,
+          0.71,
+          0.81,
+          1.03,
+          1.54,
+          1.88,
+          2.04,
+          2.37,
+          3.38,
+          3.48,
+          3.7,
+          4.03,
+          4.2,
+          4.54,
+          4.81,
+          5.03
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.03697,
+          "bpm90": 0.03444,
+          "bpm92": 0.04957
+        },
+        "barRms": [
+          0.03707,
+          0.03828
+        ],
+        "tailRms": 0.0183
+      },
+      "barRmsAll": [
+        0.03707,
+        0.03828,
+        0.0183
+      ],
+      "selectedForDemo": true,
+      "cycleAssessment": "Two-bar phrase at supplied 90 BPM with active energy in both bars and measured post-cycle tail. Full tail folded, not discarded."
+    },
+    {
+      "source": "stems/source-library/instruments/gans-kapa-20261018-v1/lead/lead 3.mp3",
+      "sourceHash": "5507e48ad69eaa3a3d595fe17d6f199f1380070712b4be8d88acb79be5de2cde",
+      "evidence": {
+        "frames": 323871,
+        "seconds": 7.34401,
+        "peak": 0.4784,
+        "rms": 0.07907,
+        "rmsDb": -22.04022,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.04976,
+        "lowEnergyBelow200": 0.04541,
+        "centroidHz": 447.12329,
+        "spectralPeaks": [
+          {
+            "hz": 219.22277,
+            "note": "A3",
+            "share": 0.11299
+          },
+          {
+            "hz": 522.92037,
+            "note": "C5",
+            "share": 0.07803
+          },
+          {
+            "hz": 328.12579,
+            "note": "E4",
+            "share": 0.05785
+          },
+          {
+            "hz": 391.48692,
+            "note": "G4",
+            "share": 0.05058
+          },
+          {
+            "hz": 658.64609,
+            "note": "E5",
+            "share": 0.03818
+          },
+          {
+            "hz": 439.36448,
+            "note": "A4",
+            "share": 0.02878
+          },
+          {
+            "hz": 586.04927,
+            "note": "D5",
+            "share": 0.01591
+          },
+          {
+            "hz": 310.64263,
+            "note": "D#4",
+            "share": 0.01584
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A",
+            "share": 0.34277
+          },
+          {
+            "note": "E",
+            "share": 0.22602
+          },
+          {
+            "note": "C",
+            "share": 0.19385
+          },
+          {
+            "note": "G",
+            "share": 0.13165
+          },
+          {
+            "note": "D#",
+            "share": 0.04941
+          },
+          {
+            "note": "D",
+            "share": 0.03639
+          },
+          {
+            "note": "B",
+            "share": 0.0068
+          },
+          {
+            "note": "G#",
+            "share": 0.00566
+          },
+          {
+            "note": "C#",
+            "share": 0.00483
+          },
+          {
+            "note": "A#",
+            "share": 0.00162
+          },
+          {
+            "note": "F",
+            "share": 0.00069
+          },
+          {
+            "note": "F#",
+            "share": 0.00031
+          }
+        ],
+        "activeStartSeconds": 0.04,
+        "activeEndSeconds": 5.6,
+        "onsetsSeconds": [
+          0.05,
+          0.39,
+          0.74,
+          0.89,
+          1.05,
+          1.55,
+          1.9,
+          2.21,
+          2.32,
+          3.23,
+          4.06,
+          4.41,
+          4.51,
+          4.73,
+          4.88
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.03873,
+          "bpm90": 0.052,
+          "bpm92": 0.04704
+        },
+        "barRms": [
+          0.09211,
+          0.09305
+        ],
+        "tailRms": 0.00983
+      },
+      "barRmsAll": [
+        0.09211,
+        0.09305,
+        0.00983
+      ],
+      "selectedForDemo": false,
+      "cycleAssessment": "Not selected; duration and full bar/tail measurements retained for later review."
+    }
+  ]
+}

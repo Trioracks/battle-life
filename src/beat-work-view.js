@@ -1,7 +1,7 @@
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=44';
-import {BEAT_STAGES} from './beat-catalog.js?rev=44';
-import {LYRIC_STAGES} from './lyric-production.js?rev=44';
-import {VOCAL_STAGES} from './vocal-production.js?rev=44';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=45';
+import {BEAT_STAGES} from './beat-catalog.js?rev=45';
+import {LYRIC_STAGES} from './lyric-production.js?rev=45';
+import {VOCAL_STAGES} from './vocal-production.js?rev=45';
 const trainingLevel=value=>Math.max(0,Math.min(100,Number.isFinite(value)?value:0));
 const formatLevel=value=>trainingLevel(value).toFixed(2);
 

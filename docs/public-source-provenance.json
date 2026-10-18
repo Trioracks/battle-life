@@ -5206,5 +5206,745 @@
       "sha256": "1181dbda296e063bffb9adf2bc96caf385bc0304406d1351772934d56facbe74",
       "blob": "49104dce215f05365c6e042e70948d8f924adcf0"
     }
+  ],
+  "updates": [
+    {
+      "date": "2026-10-18",
+      "kind": "reviewed-text-forward-port",
+      "sourceBase": "b773a928a5de456b5edf3e0521d8c5223cc352ad",
+      "sourceHead": "60f5187bdc6f54cf64d62d4d9fcef13bf4b48aa3",
+      "publicBase": "5a6e8d7232c615e8870f74c0a79fd0c8e808ca29",
+      "publicClientRevision": 45,
+      "sourceInventoryDigest": "f31e98bfdcfec1c3014fca5c845f5619efac5cae674c453a74027d1726c7df95",
+      "sourceInventory": [
+        {
+          "path": "assets/audio/ft/experimental-gans-v1/manifest.json",
+          "bytes": 42167,
+          "sha256": "9f9cc39927a2185af7f58e8684b37d2c6f695d5c36127c4a0a7605ae57e119e5",
+          "sourceHeadBlob": null,
+          "workingStatus": "untracked"
+        },
+        {
+          "path": "assets/audio/ft/jura-experimental-v1/manifest.json",
+          "bytes": 33685,
+          "sha256": "7ca97945c32ab51d457ff5ad5707f614ed0bb7be0dbb79526625a6eaee098e3a",
+          "sourceHeadBlob": "bb3d24544c94436d2f0fcafa7e287a7889ed5bd2",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "assets/audio/ft/jura-experimental-v2/manifest.json",
+          "bytes": 25693,
+          "sha256": "5542c01bd92563b61d760e2fd200d613062d135492c3290549067da303267311",
+          "sourceHeadBlob": "dbc6b24a403f1688dd2f74b50f129de362c5984c",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "assets/audio/ft/npc-artem-v1/manifest.json",
+          "bytes": 29413,
+          "sha256": "90f821627350e2774d23ddcdc4cf11152038b8da8f64e68fa1fcb225552b05f7",
+          "sourceHeadBlob": "9b0964d671060dd024910bc1067da9db517e57a1",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "assets/audio/ft/npc-gans-v1/manifest.json",
+          "bytes": 56346,
+          "sha256": "7d91ab2d60d0ad89f979d15cd0449bf9044fa888a16e5ffa90418fc0fcd3fc3f",
+          "sourceHeadBlob": null,
+          "workingStatus": "untracked"
+        },
+        {
+          "path": "assets/audio/ft/npc-jura-v1/manifest.json",
+          "bytes": 27379,
+          "sha256": "74350c9574c13247e7426e12e729a784ab91d5d5ed6cce22e260935d5f756260",
+          "sourceHeadBlob": "070b7c3c27545a88388709b3fc991cf3597dee2a",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "assets/audio/ft/npc-kapa-v1/manifest.json",
+          "bytes": 45751,
+          "sha256": "4b855b2d363313e77901c139707349b281d6cac60ec08cc0db1c7933c2480264",
+          "sourceHeadBlob": null,
+          "workingStatus": "untracked"
+        },
+        {
+          "path": "creator-v12.css",
+          "bytes": 13094,
+          "sha256": "15d2b5bdd599be0da3c8afc0b8e00c309b9c05179ecca22df420d02d3c3514c4",
+          "sourceHeadBlob": "53426eaafaec89f04f2599a9531db7d5700afc9d",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "data/audio/npc-voices.json",
+          "bytes": 684,
+          "sha256": "36143fed3ce67eb407db1e0223aa623441f00d2a867ddc762e8db43c359f3f7c",
+          "sourceHeadBlob": "955fa274508361525a9b3934894e705232ad247a",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "index.html",
+          "bytes": 10432,
+          "sha256": "3cebde561c0ba8f581683e0505a003e08408dd60102a48d77c46212703f46ed4",
+          "sourceHeadBlob": "ab75e446b2e2864da9cafc2e74cd18f241972894",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/apartment-actions.js",
+          "bytes": 2619,
+          "sha256": "5d1f9082f97c394fc82f8d84e18d63dbca5cbdc7747c900a78720d5a2246311b",
+          "sourceHeadBlob": "1cefc38e19326450ac4a21a57da9b8a698f2c11f",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "src/apartment-app.js",
+          "bytes": 46347,
+          "sha256": "f0792ef5089febc15df024434a33d57722de805fd1e61289ea0bbc34573df739",
+          "sourceHeadBlob": "6d0a7d1bd744e27ae2089037ebb733d033a0657b",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/apartment-v3-creator-session.js",
+          "bytes": 1021,
+          "sha256": "7dbcb56b0765b29f4bb53a953dbd163e32cf723607ef620d66a27b695c40e0f1",
+          "sourceHeadBlob": "17f0995cd5f258a33f723801268ceacfe423f273",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/apartment-v3-new-game.js",
+          "bytes": 1125,
+          "sha256": "c85a2de1f9cc3cb791e34411d5463011149cc8f9977537c95b6d0b2565f07e66",
+          "sourceHeadBlob": "30f9d38d0d378281afab972c2afeb43eb833a749",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/avatar-v3-profile.js",
+          "bytes": 8119,
+          "sha256": "08f5ee61baf7f33bf31f89abdbaf7fdb7ad41d145d55119ddc450419bf9d5dad",
+          "sourceHeadBlob": "aa408b3faaab6e0196a12145117d431a0f10dc97",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/battle-npc-audio.js",
+          "bytes": 2330,
+          "sha256": "5e2f3462e2ce6c6539d3c404d60f155c01a302512ecdb48f0c9c460906c969a6",
+          "sourceHeadBlob": "e5aa7ef4687af553336df822caf28c35f1fb2f42",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/battle-npc.js",
+          "bytes": 8535,
+          "sha256": "5dd2db1d27a2af2a61f956e3c9a42d0679f63ec1d31e9efc90a60c06710e9935",
+          "sourceHeadBlob": "3371e8453942be941054b81f3e0b62b1389627d3",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/beat-audio.js",
+          "bytes": 10439,
+          "sha256": "427e67910b85bf45630d0216826860e8a78fb290bdeecc2e54834d0420eda7cf",
+          "sourceHeadBlob": "44e8920f96edc1b4db927b9a0dad2756ddeaffb0",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/beat-beginner-bank.js",
+          "bytes": 3786,
+          "sha256": "94f4bc81170f0b30597d7b3e2e55dfc61b5a1935ed9127d0c49b58aa71a6d5dc",
+          "sourceHeadBlob": "ec3c161539b16fdaafbd19cdf300978c63bd9bea",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "src/beat-jura-experimental-bank.js",
+          "bytes": 1329,
+          "sha256": "9f6b4b5e09db010405c23dbbc4ec69b5dce51ba8f6fb1968781a37109cc289cc",
+          "sourceHeadBlob": "6defcade53537e9d4c27f9dd0303652b65628958",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "src/beat-playback.js",
+          "bytes": 4470,
+          "sha256": "c8b40b43a684e308a85f1aca5492a1ad91f463517b04e54d55dfa87e80119ec2",
+          "sourceHeadBlob": "95a2177bb7cadb0ef1ef349fc260875f849b2580",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/beat-production.js",
+          "bytes": 13597,
+          "sha256": "801fe4562206bbbd5005962953955e6b80d30b72546948fbc170d3b6a1fd8373",
+          "sourceHeadBlob": "6e80019bdb14dede4bf2bd85f879ce9a084c476a",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/character-voice-selector.js",
+          "bytes": 494,
+          "sha256": "86de8af11d859efd5cda0ea4b601ca1380afe012c4148cda4d8ceb3d417ab623",
+          "sourceHeadBlob": null,
+          "workingStatus": "untracked"
+        },
+        {
+          "path": "src/home-profile-migration.js",
+          "bytes": 4941,
+          "sha256": "41cc8d0203bbef19bdacd0cd9647a8581c7aa89b4f212b5b1828e7ed7bd1057a",
+          "sourceHeadBlob": "4a58c5b0e4394265826475bc7facc7fb211b76ae",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/npc-vocal-catalog.js",
+          "bytes": 5180,
+          "sha256": "738cf45bb9384271c1eeb7a1e05df3c32b6177a162a475ac45f2ed45ca2fb798",
+          "sourceHeadBlob": "19aab446ada3b9e8d084d09ff0f6519a3751587b",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/pc-audio-exports.js",
+          "bytes": 7918,
+          "sha256": "2de5b8aaae8a7784917f84c07a39761c4161659d69b41e2956908e69f9403370",
+          "sourceHeadBlob": "be0b3edea87746a2256510ab87a607d0e6923e90",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/source-levels.js",
+          "bytes": 782,
+          "sha256": "13bf19d827a627325177a65917764a768304b1cf1193f8cc2b5536187ca21a60",
+          "sourceHeadBlob": "702e363fca895f8b4d8e0b45098e423706ac65a2",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "src/track-version-audio.js",
+          "bytes": 2365,
+          "sha256": "cbb1de41ee5817770c59c64caf2b244edfb0cf7505b7f2147333c77964ff83ca",
+          "sourceHeadBlob": "979aa0b4bedf98dc93f4f84efb89504f22b59c65",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/virtual-pc-state.js",
+          "bytes": 22985,
+          "sha256": "3ae078fb0c03c6c3e88cf3159a0a972dddadc88b687ba38e448caede755bd8b2",
+          "sourceHeadBlob": "ca926ecaa09a939782e68c9628333b5e5d3856f4",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/vocal-catalog.js",
+          "bytes": 1805,
+          "sha256": "c7d407bad62fe93e638bae749df67d82762c4b891e7f4945cc4ea784776537c4",
+          "sourceHeadBlob": "b7e0e558d4d7ab84f360462082bfb68a1728da7f",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/vocal-production.js",
+          "bytes": 8794,
+          "sha256": "3d06ea8c626bb54ef851818919051bc5157ddc215e4e7ab688f00571106652b4",
+          "sourceHeadBlob": "ab7e14333faf637f1ce5bdc62c0d0b194f3a899b",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "src/vocal-result.js",
+          "bytes": 3981,
+          "sha256": "6774843f4790d67d1b73f6287f52968dc5c990a00821bf5e12a6ad299915ed56",
+          "sourceHeadBlob": "239117a4e3feed6a5436f3fa7a12fe078ccc9871",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "test/artem-local.test.js",
+          "bytes": 9789,
+          "sha256": "d0b77a4a0c5d967e11eb9d762f733b25731fc3540706b2d9d8c257db44ce5c04",
+          "sourceHeadBlob": "7e10d774e13f0438b9b54d224bada9e3b7a67100",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "test/avatar-v3-profile.test.js",
+          "bytes": 13546,
+          "sha256": "62870b34dcc393ff58328c552bda367aee8695d516f668ce94bcb53b15c91f44",
+          "sourceHeadBlob": "ad4cd36d03e3ae380bb1648b1535f5730aef564b",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "test/battle-content-manifest.test.js",
+          "bytes": 3710,
+          "sha256": "dbdd082cbda17a48e2ba65e030d82b0438b262e7f89801e81dc96bfa8a8e6755",
+          "sourceHeadBlob": "1f3a1cc8c9f8822016244f1fe92c205382fdbf3c",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "test/battle-npc-audio.test.js",
+          "bytes": 3377,
+          "sha256": "87ce5a7fb1839376c83b86f834a9b0f21d218380caff5de55613e1046d51f3ab",
+          "sourceHeadBlob": "b7794f152b65003f0173960a98624274a72a02dc",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "test/beat-production.test.js",
+          "bytes": 9044,
+          "sha256": "26e3c32b4ce17fa3539e86bd92a67375305c0659348d7342e7a033e171f5b549",
+          "sourceHeadBlob": "e19ad1d8a52d81dc600c4951c1f174538bc9e544",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "test/beat-skill-ladder.test.js",
+          "bytes": 12926,
+          "sha256": "0bc9ce3b115faefcd092c90a74b585b6ecc4d093f171f9c865d9b7e5075b5bbb",
+          "sourceHeadBlob": "88d0ce56155e2a4a8eaeaa2585ae95134ff2461a",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "test/client-module-version.test.js",
+          "bytes": 5094,
+          "sha256": "0134fa0ca2bf9d07c8428cf5eada0bdcea6112e480cbfe800ece586a88582935",
+          "sourceHeadBlob": "7b73c95a0fc2b45b20738285edcd9c72e6a14deb",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "test/fixtures/npc-jura-frozen-voice.json",
+          "bytes": 811,
+          "sha256": "f3ed44e972ebe82c905089e7825ae5a0571d61a52fa72abaf701dbf8e16863cd",
+          "sourceHeadBlob": "7399329eae61a9c8b3967309cd57e9dfc8dcd439",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "test/flow-genre-curve.test.js",
+          "bytes": 16042,
+          "sha256": "a624bc43aea62e20db58b3c191910c3e149578df8f4251bdab3258409ce60490",
+          "sourceHeadBlob": null,
+          "workingStatus": "untracked"
+        },
+        {
+          "path": "test/gans-kapa-intake.test.mjs",
+          "bytes": 4698,
+          "sha256": "53536e0e5fb7e556526be745835ee5fe8eb7792051743a8478b212dc79c0835d",
+          "sourceHeadBlob": null,
+          "workingStatus": "untracked"
+        },
+        {
+          "path": "test/gans-kapa-preparation.test.mjs",
+          "bytes": 2323,
+          "sha256": "dbf4644e25ba668c3f502c277b28d2fe823beca17227dba34b7344a5d24811d1",
+          "sourceHeadBlob": null,
+          "workingStatus": "untracked"
+        },
+        {
+          "path": "test/gans-mix-preview.test.js",
+          "bytes": 6416,
+          "sha256": "0f3d28bc87bd519981a2371e551d9619b5a88fb6ad2108cf5ec1054d33d703b2",
+          "sourceHeadBlob": null,
+          "workingStatus": "untracked"
+        },
+        {
+          "path": "test/jura-local.test.js",
+          "bytes": 8752,
+          "sha256": "28c0b538690e09ece498752ba1d96f9089d7aa635e0e89d819274929c1f3e61b",
+          "sourceHeadBlob": "9ee924c00cb4c43a778b3e367012418eb5af4bfc",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "test/sleep-background-work.test.js",
+          "bytes": 8502,
+          "sha256": "aabb5af73934e62f5503034615ed8cdf184e676c2f8536ac669c6f9e7a60bc52",
+          "sourceHeadBlob": "ff1f93e203360e45f21cfeb23bfee556fbf433bd",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "test/user-experimental.test.js",
+          "bytes": 9111,
+          "sha256": "c431d0cf8dbba9b552b10dab3a30f7a026b905c2e2518fff5fbf02253f718a50",
+          "sourceHeadBlob": "9c6a9f2f96c17e35f1d0d5786f5b7b84fc14418e",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "test/v-krugu-revision.test.js",
+          "bytes": 2546,
+          "sha256": "34596a45464dcfb540fddd441ca05ca80c96be2cf4262e649ee021979507ecae",
+          "sourceHeadBlob": "020e3dbe396398e609bb39871bb87f5b32042f43",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "test/vocal-production.test.js",
+          "bytes": 10396,
+          "sha256": "d59f80f4d4ec7519d65b7b11e79de09e38bbe56e666659c0d0a1ff0e634ac005",
+          "sourceHeadBlob": "3ed60b837ad050eff0da538b0346a38448c0acbf",
+          "workingStatus": "modified"
+        },
+        {
+          "path": "test/voice-choice.test.js",
+          "bytes": 16798,
+          "sha256": "c3988772a60e4eda55b3ef3232281a4e007c1b584e0b292016fbf8758089b53e",
+          "sourceHeadBlob": null,
+          "workingStatus": "untracked"
+        },
+        {
+          "path": "tools/archive-local-sources.ps1",
+          "bytes": 5737,
+          "sha256": "f947766a683a201897ac935d57e8fef02bf969d623a543e3a1ae4b13776e888c",
+          "sourceHeadBlob": "146e01145e4839b3752d33b46dbc38944fa76083",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "tools/audio/beat-skill-ladder-fixture.json",
+          "bytes": 1458,
+          "sha256": "b91db02d7f370f03d2dc7f5aec6cab2a025d33c2d6b3e0c42e7de2ee736fde76",
+          "sourceHeadBlob": "64b495bbb70118436167c65e074fc0a4b7036767",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "tools/audio/beat-skill-ladder.mjs",
+          "bytes": 11253,
+          "sha256": "fa4f3c964ff2439bc021a1b7a9d2db8f6dbd5dfbff71268f689fa35f31b9fda9",
+          "sourceHeadBlob": "f9f123c8532e705be3beb0ea615cbbf60391a9d3",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "tools/audio/flow-genre-curve.mjs",
+          "bytes": 15021,
+          "sha256": "4c2c74ef7fab2e8350cea48d8c541459d4fbea0a6b41ef5152c5e9be0340598b",
+          "sourceHeadBlob": null,
+          "workingStatus": "untracked"
+        },
+        {
+          "path": "tools/audio/gans-mix-preview.mjs",
+          "bytes": 5092,
+          "sha256": "7e538cc4436be6bd4742f065da47ea26abca0f5d183c5ff73e3d0f7c95dc61f0",
+          "sourceHeadBlob": null,
+          "workingStatus": "untracked"
+        },
+        {
+          "path": "tools/audio/npc-demo-fixture.mjs",
+          "bytes": 2296,
+          "sha256": "77683d1a53c839121ac5945e2ea37ba8a234284cce895641c0f4fdf3c0e8429b",
+          "sourceHeadBlob": "01ab73a33103a85fb3849e5d1d38b9cc35679321",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "tools/prepare-gans-kapa-local.mjs",
+          "bytes": 10936,
+          "sha256": "e0b766bfa7c01e611d47214a3dbc6941be6ade9705b07c0506349213cfb6908f",
+          "sourceHeadBlob": null,
+          "workingStatus": "untracked"
+        },
+        {
+          "path": "tools/render-beat-skill-ladder.mjs",
+          "bytes": 10631,
+          "sha256": "20eb592ce4f5eedcfb92f03bbd443822ecca218f50f0e3d8c81d94ca0f827986",
+          "sourceHeadBlob": "932f2e766047586ff134540452d380a3f53180d8",
+          "workingStatus": "committed"
+        },
+        {
+          "path": "tools/render-flow-genre-curve.mjs",
+          "bytes": 13228,
+          "sha256": "0f91a59033a6f56d91bd8db4007368e285f874accc2be53900b7df64f5c6311b",
+          "sourceHeadBlob": null,
+          "workingStatus": "untracked"
+        },
+        {
+          "path": "tools/render-gans-mix-preview.mjs",
+          "bytes": 11388,
+          "sha256": "77493d0f23ba5c1d4299a1bd9993d527db08e755c4739b85cab25c8a0b7fe3a7",
+          "sourceHeadBlob": null,
+          "workingStatus": "untracked"
+        }
+      ],
+      "workingPatch": {
+        "algorithm": "sha256 of UTF-8 JSON.stringify(inventory) in listed order; each entry hashes exact working bytes, including untracked text",
+        "digest": "1e3e9f4251a9c2365cde513860f22cd40587f5d9ddf9607de1afe327f079037d",
+        "inventory": [
+          {
+            "path": "assets/audio/ft/experimental-gans-v1/manifest.json",
+            "bytes": 42167,
+            "sha256": "9f9cc39927a2185af7f58e8684b37d2c6f695d5c36127c4a0a7605ae57e119e5",
+            "sourceHeadBlob": null,
+            "workingStatus": "untracked"
+          },
+          {
+            "path": "assets/audio/ft/npc-gans-v1/manifest.json",
+            "bytes": 56346,
+            "sha256": "7d91ab2d60d0ad89f979d15cd0449bf9044fa888a16e5ffa90418fc0fcd3fc3f",
+            "sourceHeadBlob": null,
+            "workingStatus": "untracked"
+          },
+          {
+            "path": "assets/audio/ft/npc-kapa-v1/manifest.json",
+            "bytes": 45751,
+            "sha256": "4b855b2d363313e77901c139707349b281d6cac60ec08cc0db1c7933c2480264",
+            "sourceHeadBlob": null,
+            "workingStatus": "untracked"
+          },
+          {
+            "path": "creator-v12.css",
+            "bytes": 13094,
+            "sha256": "15d2b5bdd599be0da3c8afc0b8e00c309b9c05179ecca22df420d02d3c3514c4",
+            "sourceHeadBlob": "53426eaafaec89f04f2599a9531db7d5700afc9d",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "data/audio/npc-voices.json",
+            "bytes": 684,
+            "sha256": "36143fed3ce67eb407db1e0223aa623441f00d2a867ddc762e8db43c359f3f7c",
+            "sourceHeadBlob": "955fa274508361525a9b3934894e705232ad247a",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "index.html",
+            "bytes": 10432,
+            "sha256": "3cebde561c0ba8f581683e0505a003e08408dd60102a48d77c46212703f46ed4",
+            "sourceHeadBlob": "ab75e446b2e2864da9cafc2e74cd18f241972894",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/apartment-app.js",
+            "bytes": 46347,
+            "sha256": "f0792ef5089febc15df024434a33d57722de805fd1e61289ea0bbc34573df739",
+            "sourceHeadBlob": "6d0a7d1bd744e27ae2089037ebb733d033a0657b",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/apartment-v3-creator-session.js",
+            "bytes": 1021,
+            "sha256": "7dbcb56b0765b29f4bb53a953dbd163e32cf723607ef620d66a27b695c40e0f1",
+            "sourceHeadBlob": "17f0995cd5f258a33f723801268ceacfe423f273",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/apartment-v3-new-game.js",
+            "bytes": 1125,
+            "sha256": "c85a2de1f9cc3cb791e34411d5463011149cc8f9977537c95b6d0b2565f07e66",
+            "sourceHeadBlob": "30f9d38d0d378281afab972c2afeb43eb833a749",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/avatar-v3-profile.js",
+            "bytes": 8119,
+            "sha256": "08f5ee61baf7f33bf31f89abdbaf7fdb7ad41d145d55119ddc450419bf9d5dad",
+            "sourceHeadBlob": "aa408b3faaab6e0196a12145117d431a0f10dc97",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/battle-npc-audio.js",
+            "bytes": 2330,
+            "sha256": "5e2f3462e2ce6c6539d3c404d60f155c01a302512ecdb48f0c9c460906c969a6",
+            "sourceHeadBlob": "e5aa7ef4687af553336df822caf28c35f1fb2f42",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/battle-npc.js",
+            "bytes": 8535,
+            "sha256": "5dd2db1d27a2af2a61f956e3c9a42d0679f63ec1d31e9efc90a60c06710e9935",
+            "sourceHeadBlob": "3371e8453942be941054b81f3e0b62b1389627d3",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/beat-audio.js",
+            "bytes": 10439,
+            "sha256": "427e67910b85bf45630d0216826860e8a78fb290bdeecc2e54834d0420eda7cf",
+            "sourceHeadBlob": "44e8920f96edc1b4db927b9a0dad2756ddeaffb0",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/beat-playback.js",
+            "bytes": 4470,
+            "sha256": "c8b40b43a684e308a85f1aca5492a1ad91f463517b04e54d55dfa87e80119ec2",
+            "sourceHeadBlob": "95a2177bb7cadb0ef1ef349fc260875f849b2580",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/beat-production.js",
+            "bytes": 13597,
+            "sha256": "801fe4562206bbbd5005962953955e6b80d30b72546948fbc170d3b6a1fd8373",
+            "sourceHeadBlob": "6e80019bdb14dede4bf2bd85f879ce9a084c476a",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/character-voice-selector.js",
+            "bytes": 494,
+            "sha256": "86de8af11d859efd5cda0ea4b601ca1380afe012c4148cda4d8ceb3d417ab623",
+            "sourceHeadBlob": null,
+            "workingStatus": "untracked"
+          },
+          {
+            "path": "src/home-profile-migration.js",
+            "bytes": 4941,
+            "sha256": "41cc8d0203bbef19bdacd0cd9647a8581c7aa89b4f212b5b1828e7ed7bd1057a",
+            "sourceHeadBlob": "4a58c5b0e4394265826475bc7facc7fb211b76ae",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/npc-vocal-catalog.js",
+            "bytes": 5180,
+            "sha256": "738cf45bb9384271c1eeb7a1e05df3c32b6177a162a475ac45f2ed45ca2fb798",
+            "sourceHeadBlob": "19aab446ada3b9e8d084d09ff0f6519a3751587b",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/pc-audio-exports.js",
+            "bytes": 7918,
+            "sha256": "2de5b8aaae8a7784917f84c07a39761c4161659d69b41e2956908e69f9403370",
+            "sourceHeadBlob": "be0b3edea87746a2256510ab87a607d0e6923e90",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/track-version-audio.js",
+            "bytes": 2365,
+            "sha256": "cbb1de41ee5817770c59c64caf2b244edfb0cf7505b7f2147333c77964ff83ca",
+            "sourceHeadBlob": "979aa0b4bedf98dc93f4f84efb89504f22b59c65",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/virtual-pc-state.js",
+            "bytes": 22985,
+            "sha256": "3ae078fb0c03c6c3e88cf3159a0a972dddadc88b687ba38e448caede755bd8b2",
+            "sourceHeadBlob": "ca926ecaa09a939782e68c9628333b5e5d3856f4",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/vocal-catalog.js",
+            "bytes": 1805,
+            "sha256": "c7d407bad62fe93e638bae749df67d82762c4b891e7f4945cc4ea784776537c4",
+            "sourceHeadBlob": "b7e0e558d4d7ab84f360462082bfb68a1728da7f",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/vocal-production.js",
+            "bytes": 8794,
+            "sha256": "3d06ea8c626bb54ef851818919051bc5157ddc215e4e7ab688f00571106652b4",
+            "sourceHeadBlob": "ab7e14333faf637f1ce5bdc62c0d0b194f3a899b",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "src/vocal-result.js",
+            "bytes": 3981,
+            "sha256": "6774843f4790d67d1b73f6287f52968dc5c990a00821bf5e12a6ad299915ed56",
+            "sourceHeadBlob": "239117a4e3feed6a5436f3fa7a12fe078ccc9871",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "test/artem-local.test.js",
+            "bytes": 9789,
+            "sha256": "d0b77a4a0c5d967e11eb9d762f733b25731fc3540706b2d9d8c257db44ce5c04",
+            "sourceHeadBlob": "7e10d774e13f0438b9b54d224bada9e3b7a67100",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "test/avatar-v3-profile.test.js",
+            "bytes": 13546,
+            "sha256": "62870b34dcc393ff58328c552bda367aee8695d516f668ce94bcb53b15c91f44",
+            "sourceHeadBlob": "ad4cd36d03e3ae380bb1648b1535f5730aef564b",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "test/battle-content-manifest.test.js",
+            "bytes": 3710,
+            "sha256": "dbdd082cbda17a48e2ba65e030d82b0438b262e7f89801e81dc96bfa8a8e6755",
+            "sourceHeadBlob": "1f3a1cc8c9f8822016244f1fe92c205382fdbf3c",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "test/battle-npc-audio.test.js",
+            "bytes": 3377,
+            "sha256": "87ce5a7fb1839376c83b86f834a9b0f21d218380caff5de55613e1046d51f3ab",
+            "sourceHeadBlob": "b7794f152b65003f0173960a98624274a72a02dc",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "test/client-module-version.test.js",
+            "bytes": 5094,
+            "sha256": "0134fa0ca2bf9d07c8428cf5eada0bdcea6112e480cbfe800ece586a88582935",
+            "sourceHeadBlob": "7b73c95a0fc2b45b20738285edcd9c72e6a14deb",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "test/flow-genre-curve.test.js",
+            "bytes": 16042,
+            "sha256": "a624bc43aea62e20db58b3c191910c3e149578df8f4251bdab3258409ce60490",
+            "sourceHeadBlob": null,
+            "workingStatus": "untracked"
+          },
+          {
+            "path": "test/gans-kapa-intake.test.mjs",
+            "bytes": 4698,
+            "sha256": "53536e0e5fb7e556526be745835ee5fe8eb7792051743a8478b212dc79c0835d",
+            "sourceHeadBlob": null,
+            "workingStatus": "untracked"
+          },
+          {
+            "path": "test/gans-kapa-preparation.test.mjs",
+            "bytes": 2323,
+            "sha256": "dbf4644e25ba668c3f502c277b28d2fe823beca17227dba34b7344a5d24811d1",
+            "sourceHeadBlob": null,
+            "workingStatus": "untracked"
+          },
+          {
+            "path": "test/gans-mix-preview.test.js",
+            "bytes": 6416,
+            "sha256": "0f3d28bc87bd519981a2371e551d9619b5a88fb6ad2108cf5ec1054d33d703b2",
+            "sourceHeadBlob": null,
+            "workingStatus": "untracked"
+          },
+          {
+            "path": "test/jura-local.test.js",
+            "bytes": 8752,
+            "sha256": "28c0b538690e09ece498752ba1d96f9089d7aa635e0e89d819274929c1f3e61b",
+            "sourceHeadBlob": "9ee924c00cb4c43a778b3e367012418eb5af4bfc",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "test/v-krugu-revision.test.js",
+            "bytes": 2546,
+            "sha256": "34596a45464dcfb540fddd441ca05ca80c96be2cf4262e649ee021979507ecae",
+            "sourceHeadBlob": "020e3dbe396398e609bb39871bb87f5b32042f43",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "test/vocal-production.test.js",
+            "bytes": 10396,
+            "sha256": "d59f80f4d4ec7519d65b7b11e79de09e38bbe56e666659c0d0a1ff0e634ac005",
+            "sourceHeadBlob": "3ed60b837ad050eff0da538b0346a38448c0acbf",
+            "workingStatus": "modified"
+          },
+          {
+            "path": "test/voice-choice.test.js",
+            "bytes": 16798,
+            "sha256": "c3988772a60e4eda55b3ef3232281a4e007c1b584e0b292016fbf8758089b53e",
+            "sourceHeadBlob": null,
+            "workingStatus": "untracked"
+          },
+          {
+            "path": "tools/audio/flow-genre-curve.mjs",
+            "bytes": 15021,
+            "sha256": "4c2c74ef7fab2e8350cea48d8c541459d4fbea0a6b41ef5152c5e9be0340598b",
+            "sourceHeadBlob": null,
+            "workingStatus": "untracked"
+          },
+          {
+            "path": "tools/audio/gans-mix-preview.mjs",
+            "bytes": 5092,
+            "sha256": "7e538cc4436be6bd4742f065da47ea26abca0f5d183c5ff73e3d0f7c95dc61f0",
+            "sourceHeadBlob": null,
+            "workingStatus": "untracked"
+          },
+          {
+            "path": "tools/prepare-gans-kapa-local.mjs",
+            "bytes": 10936,
+            "sha256": "e0b766bfa7c01e611d47214a3dbc6941be6ade9705b07c0506349213cfb6908f",
+            "sourceHeadBlob": null,
+            "workingStatus": "untracked"
+          },
+          {
+            "path": "tools/render-flow-genre-curve.mjs",
+            "bytes": 13228,
+            "sha256": "0f91a59033a6f56d91bd8db4007368e285f874accc2be53900b7df64f5c6311b",
+            "sourceHeadBlob": null,
+            "workingStatus": "untracked"
+          },
+          {
+            "path": "tools/render-gans-mix-preview.mjs",
+            "bytes": 11388,
+            "sha256": "77493d0f23ba5c1d4299a1bd9993d527db08e755c4739b85cab25c8a0b7fe3a7",
+            "sourceHeadBlob": null,
+            "workingStatus": "untracked"
+          }
+        ]
+      },
+      "notes": [
+        "Original snapshot sourceCommit, publicBase and files remain unchanged above. This update combines source HEAD with the explicitly hashed uncommitted text inventory; it does not claim those bytes were committed in source HEAD.",
+        "Three-way text forward-port against sourceBase; public audio guards, release UI, CI pins, deployment restrictions and budgets retained. Public history is independent of the local source history.",
+        "Only text code/catalogs/manifests and tests were transferred; no physical audio, source stems, archives, Blender, rendered previews, local saves/settings or private research.",
+        "Five runtime-imported text manifests ship on the site: four NPC voice packs and Jura experimental v2 calibration. Other manifests are source metadata only.",
+        "Offline rendered DSP and physical-source checks are under test/local-assets; public tests retain curve, save, voice identity and rotation contracts."
+      ]
+    }
   ]
 }

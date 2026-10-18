@@ -1,8 +1,9 @@
-import { STAT_KEYS, validateAllocations } from './creator.js?rev=44';
-import {createWardrobe,validWardrobe,canWear} from './home-wardrobe.js?rev=44';
-import {closedFootwearId,migrateClosedFootwear,reserveFootwearBackup} from './avatar-footwear-migration.js?rev=44';
+import { STAT_KEYS, validateAllocations } from './creator.js?rev=45';
+import {normalizeVoiceId} from './vocal-catalog.js?rev=45';
+import {createWardrobe,validWardrobe,canWear} from './home-wardrobe.js?rev=45';
+import {closedFootwearId,migrateClosedFootwear,reserveFootwearBackup} from './avatar-footwear-migration.js?rev=45';
 
-export { STAT_KEYS, statLabels as STAT_LABELS } from './creator.js?rev=44';
+export { STAT_KEYS, statLabels as STAT_LABELS } from './creator.js?rev=45';
 
 function category(label, options) {
   return Object.freeze({
@@ -82,6 +83,7 @@ export function createProfile(input = {}) {
     version: 4,
     noviceSchema: 1,
     name: name.trim(),
+    voiceId:normalizeVoiceId(input.voiceId),
     skills: Object.fromEntries(STAT_KEYS.map((key) => [key, 10])),
     appearance: look,
     wardrobe: createWardrobe(look),
@@ -101,7 +103,7 @@ function validateProfile(input) {
   }));
   if(input.version===3){const validation=validateAllocations(allocations);if(!validation.valid)throw Error(validation.message);}
   else if(input.noviceSchema!==1||!validWardrobe(input.wardrobe)||!canWear(input,input.appearance))throw Error('Гардероб сохранённого героя имеет неверный формат.');
-  return {...input,name:input.name.trim(),skills:{...input.skills},appearance:normalizeAppearance(input.appearance),...(input.version===4?{wardrobe:JSON.parse(JSON.stringify(input.wardrobe))}:{})};
+  return {...input,voiceId:normalizeVoiceId(input.voiceId),name:input.name.trim(),skills:{...input.skills},appearance:normalizeAppearance(input.appearance),...(input.version===4?{wardrobe:JSON.parse(JSON.stringify(input.wardrobe))}:{})};
 }
 
 export function saveProfile(storage, profile) {

@@ -1,5 +1,5 @@
-import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=44';
-import {socialPhotoSource} from './social-portraits.js?rev=44';
+import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=45';
+import {socialPhotoSource} from './social-portraits.js?rev=45';
 export const socialButton=(d,text,fn,extra={})=>pcButton(d,text,{className:'sn-button',...extra},fn);
 export function socialLink(d,text,url,navigate){const link=el(d,'a',{className:'sn-link',text,dataset:{focusId:text},attributes:{href:url}});link.addEventListener('click',e=>{e.preventDefault();navigate(url);});return link;}
 export function socialPeerLink(d,peer,name,navigate,avatar){

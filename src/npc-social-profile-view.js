@@ -1,9 +1,9 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=44';
-import {publicCharacterProfile} from './npc-social-profiles.js?rev=44';
-import {metadataGameMinute} from './social-registration.js?rev=44';
-import {socialAvatar,socialButton,socialHeading,socialPhoto,socialPost} from './social-dom.js?rev=44';
-import {gameDateTimeLabel} from './home-calendar.js?rev=44';
-import {createPostReactionsView} from './social-reactions-view.js?rev=44';
+import {pcElement as el} from './virtual-pc-dom.js?rev=45';
+import {publicCharacterProfile} from './npc-social-profiles.js?rev=45';
+import {metadataGameMinute} from './social-registration.js?rev=45';
+import {socialAvatar,socialButton,socialHeading,socialPhoto,socialPost} from './social-dom.js?rev=45';
+import {gameDateTimeLabel} from './home-calendar.js?rev=45';
+import {createPostReactionsView} from './social-reactions-view.js?rev=45';
 const statuses={submitted:'Сдал работу',no_show:'Не сдал',won:'Победа',lost:'Поражение',technical_win:'Технический проход',bye:'Проход пустой ветки',eliminated:'Выбыл'};
 export function createNpcSocialProfileView(d,{id,view='page',getState,getMetadata,navigate,audio,commit,onAnalyze}){
  const root=el(d,'section',{className:'sn-profile'}),p=publicCharacterProfile(getState(),{characterId:id,nowMinute:metadataGameMinute(getMetadata())});

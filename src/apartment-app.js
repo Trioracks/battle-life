@@ -1,52 +1,54 @@
-import {ApartmentMotion} from './apartment-v3-motion.js?rev=44';
-import {ApartmentTime,loadHomeTime,saveHomeTime as saveHomeTimeRaw} from './apartment-v3-time.js?rev=44';
-import {districts,getDistrictLocations} from './calikfornia.js?rev=44';
-import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction,consumeHomeFood} from './apartment-v3-runtime.js?rev=44';
-import {playSoundCue} from './sound-cues.js?rev=44';
-import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=44';
-import {DEFAULT_APPEARANCE,loadProfile,saveProfile} from './avatar-v3-profile.js?rev=44';
-import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=44';
-import {createNewGameSession} from './apartment-v3-new-game.js?rev=44';
-import {advanceVirtualPcDurably,gameMinuteStamp,createSubmissionTransferClock} from './virtual-pc-runtime.js?rev=44';
-import {createVirtualPcState,preparePcRuntimeState,primePcSaveArchives,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=44';
-import {createSocialBackground} from './social-background.js?rev=44';
-import {mountVirtualPc} from './virtual-pc-ui.js?rev=44';
-import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=44';
-import {PcSounds} from './virtual-pc-sounds.js?rev=44';
-import {playIndoorFootstep} from './indoor-footsteps.js?rev=44';
-import {createFootstepCadence} from './footstep-cadence.js?rev=44';
-import {restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=44';
-import {advanceInstallation} from './pc-software.js?rev=44';
-import {installationElapsedSeconds} from './pc-installation-clock.js?rev=44';
-import {advanceBrowserDownloads} from './pc-browser-downloads.js?rev=44';
-import {createBeatWorkPanel} from './beat-work-view.js?rev=44';
-import {normalizeGenreProgression,genreById,genreCap} from './genre-progression.js?rev=44';
-import {createBeatWorkAudio} from './beat-work-audio.js?rev=44';
-import {createLyricWorkAudio} from './lyric-work-audio.js?rev=44';
-import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.js?rev=44';
-import {workCameraFrame} from './work-camera.js?rev=44';
-import {pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=44';
-import {pauseStudy} from './rap-analysis.js?rev=44';
-import {pauseCaseStudy} from './rap-research.js?rev=44';
-import {effectiveVocalSkill} from './vocal-production.js?rev=44';
-import {effectiveWritingSkill} from './lyric-production.js?rev=44';
-import {createCharacterSpeech,workNeedSpeech} from './character-speech.js?rev=44';
-import {mountHomeNeedsView,mountCharacterSpeech} from './home-needs-view.js?rev=44';
-import {migrateNoviceSave} from './home-profile-migration.js?rev=44';
-import {mountHomeWardrobeView} from './home-wardrobe-view.js?rev=44';
-import {mountPhoneHud} from './phone-hud.js?rev=44';
-import {nextSafeResultReaction,completeResultReaction} from './social-result-reaction.js?rev=44';
-import {captureDesktopReturn} from './desktop-return-state.js?rev=44';
-import {createPlayerPortraitController,portraitKey} from './social-portraits.js?rev=44';
+import {ApartmentMotion} from './apartment-v3-motion.js?rev=45';
+import {sleepOptionsForActionMenu} from './apartment-actions.js?rev=45';
+import {ApartmentTime,loadHomeTime,saveHomeTime as saveHomeTimeRaw} from './apartment-v3-time.js?rev=45';
+import {districts,getDistrictLocations} from './calikfornia.js?rev=45';
+import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction,consumeHomeFood} from './apartment-v3-runtime.js?rev=45';
+import {playSoundCue} from './sound-cues.js?rev=45';
+import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=45';
+import {DEFAULT_APPEARANCE,loadProfile,saveProfile} from './avatar-v3-profile.js?rev=45';
+import {mountVoiceSelector} from './character-voice-selector.js?rev=45';
+import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=45';
+import {createNewGameSession} from './apartment-v3-new-game.js?rev=45';
+import {advanceVirtualPcDurably,gameMinuteStamp,createSubmissionTransferClock} from './virtual-pc-runtime.js?rev=45';
+import {createVirtualPcState,preparePcRuntimeState,primePcSaveArchives,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=45';
+import {createSocialBackground} from './social-background.js?rev=45';
+import {mountVirtualPc} from './virtual-pc-ui.js?rev=45';
+import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=45';
+import {PcSounds} from './virtual-pc-sounds.js?rev=45';
+import {playIndoorFootstep} from './indoor-footsteps.js?rev=45';
+import {createFootstepCadence} from './footstep-cadence.js?rev=45';
+import {restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=45';
+import {advanceInstallation} from './pc-software.js?rev=45';
+import {installationElapsedSeconds} from './pc-installation-clock.js?rev=45';
+import {advanceBrowserDownloads} from './pc-browser-downloads.js?rev=45';
+import {createBeatWorkPanel} from './beat-work-view.js?rev=45';
+import {normalizeGenreProgression,genreById,genreCap} from './genre-progression.js?rev=45';
+import {createBeatWorkAudio} from './beat-work-audio.js?rev=45';
+import {createLyricWorkAudio} from './lyric-work-audio.js?rev=45';
+import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.js?rev=45';
+import {workCameraFrame} from './work-camera.js?rev=45';
+import {pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=45';
+import {pauseStudy} from './rap-analysis.js?rev=45';
+import {pauseCaseStudy} from './rap-research.js?rev=45';
+import {effectiveVocalSkill} from './vocal-production.js?rev=45';
+import {effectiveWritingSkill} from './lyric-production.js?rev=45';
+import {createCharacterSpeech,workNeedSpeech} from './character-speech.js?rev=45';
+import {mountHomeNeedsView,mountCharacterSpeech} from './home-needs-view.js?rev=45';
+import {migrateNoviceSave} from './home-profile-migration.js?rev=45';
+import {mountHomeWardrobeView} from './home-wardrobe-view.js?rev=45';
+import {mountPhoneHud} from './phone-hud.js?rev=45';
+import {nextSafeResultReaction,completeResultReaction} from './social-result-reaction.js?rev=45';
+import {captureDesktopReturn} from './desktop-return-state.js?rev=45';
+import {createPlayerPortraitController,portraitKey} from './social-portraits.js?rev=45';
 
-import {mountReleaseInfo} from './release-info-view.js?rev=44';
+import {mountReleaseInfo} from './release-info-view.js?rev=45';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 mountReleaseInfo($('#release-info'));
 let audio=null,paused=false,skeleton=false,hold=false,stepVariation=0;
 const cue=id=>{try{audio??=new AudioContext();if(audio.state==='suspended')audio.resume().catch(()=>{});if(id==='footstep')playIndoorFootstep(audio,stepVariation++);else playSoundCue(id,audio);}catch{/* Sound is optional. */}};
 try{
-  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=44');
+  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=45');
   const response=await fetch('./assets/apartment/v3/scene.json',{cache:'no-cache'});if(!response.ok)throw Error('Scene manifest '+response.status);
   const config=prepareApartmentConfig(await response.json()),view=await createApartmentScene(canvas,config);
   const footsteps=createFootstepCadence(config.stride);
@@ -207,6 +209,7 @@ try{
     $('#start-game').disabled=!$('#character-name').value.trim();
   }
   const creator=mountCreator($('#appearance-fields'),next=>{appearance=next;view.setAppearance(appearance);},{categoryRoot:$('#creator-categories')});
+  const voiceSelector=mountVoiceSelector($('#character-voice'));
   let creatorSession=null;
   for(const [id,icon] of [['appearance-tab','face'],['clothing-tab','top'],['preview-body','rotate'],['cancel-creator','back'],['start-game','confirm']])decorateCreatorButton($('#'+id),icon);
   $('#character-name').addEventListener('input',updateStats);
@@ -219,6 +222,7 @@ try{
       if(!home.homeSaved||!home.pcSaved){message='Новая игра начата, но браузер не подтвердил сохранение.';messageUntil=performance.now()+8000;}
     },restore(look){view.setAppearance(look);setMode('menu');}});
     $('#name-error').textContent='';$('#character-name').setAttribute('aria-invalid','false');
+    voiceSelector.reset();$('#voice-error').textContent='';$('#character-voice').setAttribute('aria-invalid','false');
     creator.reset();appearance=creator.selection.appearance;$('#preview-zoom').value=1;$('#character-name').value='';$('#creator-error').textContent='';
     previewYaw=previewTarget=0;for(const b of $('#preview-angles').children){b.classList.toggle('active',b.dataset.yaw==='0');b.setAttribute('aria-pressed',String(b.dataset.yaw==='0'));}
     view.setAppearance(appearance);selectCreatorSection('appearance');creator.selection.frame('body');updateStats();setMode('creator');$('#character-name').focus();
@@ -228,7 +232,9 @@ try{
   $('#next-step').addEventListener('click',()=>selectCreatorSection('clothing'));
   for(const section of ['appearance','clothing'])$('#'+section+'-tab').addEventListener('click',()=>selectCreatorSection(section));
   $('#creator-form').addEventListener('submit',e=>{
-    e.preventDefault();const result=creatorSession?.submit({name:$('#character-name').value,appearance});if(!result)return;
+    e.preventDefault();const result=creatorSession?.submit({name:$('#character-name').value,voiceId:voiceSelector.value,appearance});if(!result)return;
+    $('#voice-error').textContent=result.errors?.voiceId??'';$('#character-voice').setAttribute('aria-invalid',String(Boolean(result.errors?.voiceId)));
+    if(result.errors?.voiceId)$('#character-voice').focus();
     $('#name-error').textContent=result.errors?.name??'';
     $('#character-name').setAttribute('aria-invalid',String(Boolean(result.errors?.name)));
     if(result.errors?.name)$('#character-name').focus();
@@ -273,7 +279,7 @@ try{
     const id=key==='bed-manual'?'bed':key,manual=key==='bed-manual';
     if(!config.actions[id])continue;
     const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.label=label;b.dataset.action=id;if(manual){b.dataset.sleepMode='manual';b.hidden=true;}
-    b.addEventListener('click',()=>{if(id==='bed'&&actionMenuContext!=='bed'){openActionMenu('bed');return;}$('#apartment-actions').hidden=true;act(id,manual?{mode:'manual',minutesPerSecond:45}:undefined);canvas.focus();});
+    b.addEventListener('click',()=>{if(id==='bed'&&actionMenuContext!=='bed'){openActionMenu('bed');return;}$('#apartment-actions').hidden=true;act(id,sleepOptionsForActionMenu(manual));canvas.focus();});
     if(config.actions[id]?.lightRoom)b.setAttribute('aria-label',label);
     $('#actions').append(b);
   }

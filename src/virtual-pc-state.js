@@ -1,36 +1,38 @@
-import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=44';
-import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=44';
-import {normalizeCreativeWork} from './creative-workflow.js?rev=44';
-import {normalizeBattleSubmissions} from './battle-submission.js?rev=44';
-import {normalizeRecordingState} from './vocal-production.js?rev=44';
-import {normalizeTrackVersions,captureTrackVersion} from './track-version.js?rev=44';
-import {normalizeAudioExports} from './pc-audio-exports.js?rev=44';
-import {normalizeSocial} from './social-state.js?rev=44';
-import {normalizeOutgoingUpload} from './social-upload.js?rev=44';
-import {normalizeOutgoingMessage} from './social-composer.js?rev=44';
-import {normalizeBattleWindows} from './battle-windows.js?rev=44';
-import {normalizeSocialRuntime,normalizeCommunityAudio} from './social-runtime.js?rev=44';
-import {normalizePhone} from './phone-notifications.js?rev=44';
-import {normalizePhonePresentation} from './phone-presentation.js?rev=44';
-import {normalizeBattleKnowledge} from './battle-knowledge.js?rev=44';
-import {normalizeJudging} from './judge-comments.js?rev=44';
-import {normalizeJudgingSchedule} from './social-judging-events.js?rev=44';
-import {normalizeResultReactions} from './social-result-reaction.js?rev=44';
-import {normalizeNpcTracks} from './battle-npc.js?rev=44';
-import {normalizeTournaments} from './battle-tournament.js?rev=44';
-import {normalizeBattleHistory} from './battle-history.js?rev=44';
-import {createPcSnapshotEncoder,decodePcSave,encodePcSave} from './pc-save-codec.js?rev=44';
-import {normalizeNpcSocialProfiles} from './npc-social-profiles.js?rev=44';
-import {normalizeRapAnalysis} from './rap-analysis.js?rev=44';
-import {normalizeRapResearch,reconcileResearchFindings} from './rap-research.js?rev=44';
-import {normalizeDossier} from './rap-dossier.js?rev=44';
-import {normalizeJudgeDossier} from './judge-dossier-analysis.js?rev=44';
-import {drumById} from './beat-catalog.js?rev=44';
-import {normalizeCommunity} from './underweb-community.js?rev=44';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=44';
-import {normalizeHousehold} from './home-food.js?rev=44';
-import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=44';
-import {normalizeBrowserDownloads} from './pc-browser-downloads.js?rev=44';
+import {normalizeMusic,normalizeBeat} from './beat-production.js?rev=45';
+import {normalizeVoiceId} from './vocal-catalog.js?rev=45';
+import {normalizePlayerVocalBag} from './npc-vocal-catalog.js?rev=45';
+import {normalizeWriting,normalizeLyric} from './lyric-production.js?rev=45';
+import {normalizeCreativeWork} from './creative-workflow.js?rev=45';
+import {normalizeBattleSubmissions} from './battle-submission.js?rev=45';
+import {normalizeRecordingState} from './vocal-production.js?rev=45';
+import {normalizeTrackVersions,captureTrackVersion} from './track-version.js?rev=45';
+import {normalizeAudioExports} from './pc-audio-exports.js?rev=45';
+import {normalizeSocial} from './social-state.js?rev=45';
+import {normalizeOutgoingUpload} from './social-upload.js?rev=45';
+import {normalizeOutgoingMessage} from './social-composer.js?rev=45';
+import {normalizeBattleWindows} from './battle-windows.js?rev=45';
+import {normalizeSocialRuntime,normalizeCommunityAudio} from './social-runtime.js?rev=45';
+import {normalizePhone} from './phone-notifications.js?rev=45';
+import {normalizePhonePresentation} from './phone-presentation.js?rev=45';
+import {normalizeBattleKnowledge} from './battle-knowledge.js?rev=45';
+import {normalizeJudging} from './judge-comments.js?rev=45';
+import {normalizeJudgingSchedule} from './social-judging-events.js?rev=45';
+import {normalizeResultReactions} from './social-result-reaction.js?rev=45';
+import {normalizeNpcTracks} from './battle-npc.js?rev=45';
+import {normalizeTournaments} from './battle-tournament.js?rev=45';
+import {normalizeBattleHistory} from './battle-history.js?rev=45';
+import {createPcSnapshotEncoder,decodePcSave,encodePcSave} from './pc-save-codec.js?rev=45';
+import {normalizeNpcSocialProfiles} from './npc-social-profiles.js?rev=45';
+import {normalizeRapAnalysis} from './rap-analysis.js?rev=45';
+import {normalizeRapResearch,reconcileResearchFindings} from './rap-research.js?rev=45';
+import {normalizeDossier} from './rap-dossier.js?rev=45';
+import {normalizeJudgeDossier} from './judge-dossier-analysis.js?rev=45';
+import {drumById} from './beat-catalog.js?rev=45';
+import {normalizeCommunity} from './underweb-community.js?rev=45';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=45';
+import {normalizeHousehold} from './home-food.js?rev=45';
+import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=45';
+import {normalizeBrowserDownloads} from './pc-browser-downloads.js?rev=45';
 export const VIRTUAL_PC_STORAGE_KEY = 'battle-life-virtual-pc-v1';
 export const VIRTUAL_DISK_MB = 16000;
 export const SYSTEM_RESERVED_MB = 14000;
@@ -96,6 +98,9 @@ function freezeArchive(value){if(!value||typeof value!=='object'||immutableArchi
 export function preparePcRuntimeState(state){freezeArchive(state.trackVersions);freezeArchive(state.judging);freezeArchive(state.audioExports);return state;}
 function normalizeSnapshot(value,archiveCache=null) {
   const source = isRecord(value) ? value : {};
+  const voiceId=normalizeVoiceId(source.voiceId);
+  let playerVocalBag=normalizePlayerVocalBag(source.playerVocalBag,voiceId);
+  if(!playerVocalBag&&source.projects?.some(p=>p.recording?.voiceId!==undefined))playerVocalBag={blocked:true};
   const archive=(key,normalize)=>{
     if(!archiveCache)return normalize(source[key]);
     const old=archiveCache.get(key);if(old?.input===source[key]&&immutableArchives.has(source[key]))return old.value;
@@ -104,7 +109,8 @@ function normalizeSnapshot(value,archiveCache=null) {
     const value=normalize(source[key]);archiveCache.set(key,{input:source[key],inputJson,value,json:JSON.stringify(value)});return value;
   };
   const projects = Array.isArray(source.projects) ? source.projects.map(normalizeProject).filter(Boolean) : [];
-  const music=normalizeMusic(source.music,projects),writing=normalizeWriting(source.writing,projects),recording=normalizeRecordingState(source.recording,projects);
+  const music=normalizeMusic(source.music,projects),writing=normalizeWriting(source.writing,projects),recording=normalizeRecordingState(source.recording,projects,{voiceId,playerVocalBag});
+  if(source.recording?.job?.kind==='draft'&&source.recording.job.output?.voiceId!==undefined&&!recording.job)playerVocalBag={blocked:true};
   // BL-001 archives are inert history, never candidates for automatic job resumption.
   // Keep them even if the player later edits the text or deletes its old project.
   const retiredSourceWork=(Array.isArray(source.retiredSourceWork)?source.retiredSourceWork:[])
@@ -134,6 +140,7 @@ function normalizeSnapshot(value,archiveCache=null) {
   return withSoftware({
     version: 1,
     noviceSchema: 1,
+    voiceId,playerVocalBag,
     ...(typeof source.noviceMigration==='string'?{noviceMigration:source.noviceMigration}:{}),
     power: source.power === 'on' ? 'on' : 'off',
     wallpaper: wallpaperIds.has(source.wallpaper) ? source.wallpaper : 'courtyard',
@@ -354,5 +361,5 @@ export function loadVirtualPcState(storage) {
     return { ok: false, state: createVirtualPcState() };
   }
 }
-import {normalizeRoundThemeState} from './round-topics.js?rev=44';
-import {normalizeSocialReactions} from './social-reactions.js?rev=44';
+import {normalizeRoundThemeState} from './round-topics.js?rev=45';
+import {normalizeSocialReactions} from './social-reactions.js?rev=45';

@@ -1,4 +1,4 @@
-import {PcTransition} from './virtual-pc-transition.js?rev=44';
+import {PcTransition} from './virtual-pc-transition.js?rev=45';
 export const pcNeedsSceneFrame=(snapshot,mode)=>mode!=='pc'||snapshot.overlay<1;
 export function beginPcCutscene(motion){
  if(motion.busy||!motion.config.actions.computer)return false;

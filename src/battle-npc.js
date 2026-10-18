@@ -1,13 +1,14 @@
-import {DEMO_BATTLE,DEMO_PARTICIPANTS} from './battle-demo-config.js?rev=44';
-import {createLyric,startLyricWork,advanceLyricWork,LYRIC_STAGES} from './lyric-production.js?rev=44';
-import {createBeat,startBeatStage,advanceBeatWork} from './beat-production.js?rev=44';
-import {genreById} from './genre-progression.js?rev=44';
-import {createVocalTake} from './vocal-result.js?rev=44';
-import {lyricOutcomes,beatOutcomes,vocalOutcomes,combineProductionOutcomes} from './production-outcomes.js?rev=44';
-import {resolveBeatPlayback} from './beat-playback.js?rev=44';
-import {createBeatSongForm,songPartWindows} from './beat-song-form.js?rev=44';
-import {canonicalTrackSignature,normalizeTrackVersions,TRACK_DSP_VERSION} from './track-version.js?rev=44';
-import {beatResultSeed} from './beat-result.js?rev=44';
+import {DEMO_BATTLE,DEMO_PARTICIPANTS} from './battle-demo-config.js?rev=45';
+import {createLyric,startLyricWork,advanceLyricWork,LYRIC_STAGES} from './lyric-production.js?rev=45';
+import {createBeat,startBeatStage,advanceBeatWork} from './beat-production.js?rev=45';
+import {genreById} from './genre-progression.js?rev=45';
+import {createVocalTake} from './vocal-result.js?rev=45';
+import {lyricOutcomes,beatOutcomes,vocalOutcomes,combineProductionOutcomes} from './production-outcomes.js?rev=45';
+import {resolveBeatPlayback} from './beat-playback.js?rev=45';
+import {createBeatSongForm,songPartWindows} from './beat-song-form.js?rev=45';
+import {canonicalTrackSignature,normalizeTrackVersions,TRACK_DSP_VERSION} from './track-version.js?rev=45';
+import {beatResultSeed} from './beat-result.js?rev=45';
+import {normalizeNpcVoices,selectNpcVocal} from './npc-vocal-catalog.js?rev=45';
 const clone=v=>structuredClone(v),record=v=>v!==null&&typeof v==='object'&&!Array.isArray(v),rounds=new Set(['selection','round-2','round-3','round-4','round-5','final']);
 const clamp=v=>Math.max(0,Math.min(100,v));
 export const npcMeanSkill=skills=>DEMO_BATTLE.noShow.skillKeys.reduce((n,key)=>n+skills[key],0)/DEMO_BATTLE.noShow.skillKeys.length;
@@ -18,7 +19,7 @@ export function normalizeNpcTracks(raw){
   if(item?.policyVersion===2&&typeof item.trackVersionId==='string'&&typeof item.characterId==='string'&&rounds.has(item.roundId)&&item.battleId===DEMO_BATTLE.battleId&&key===[item.battleId,item.roundId,item.characterId].join(':'))Object.defineProperty(byRound,key,{value:clone(item),enumerable:true,writable:true,configurable:true});
   else recovery.push({key,recoveryData:clone(item),reason:'Повреждённая связь NPC-работы. Автоматическая перегенерация запрещена.'});
  }
- return {version:2,byRound,recovery};
+ return {version:2,byRound,recovery,voices:normalizeNpcVoices(raw?.voices)};
 }
 export function ensureNpcRoundTrack(state,{characterId,battleId,roundId,nowMinute}={}){
  const fail=reason=>({ok:false,state,reason}),person=DEMO_PARTICIPANTS.find(p=>p.characterId===characterId);
@@ -26,6 +27,8 @@ export function ensureNpcRoundTrack(state,{characterId,battleId,roundId,nowMinut
  const key=[battleId,roundId,characterId].join(':'),registry=normalizeNpcTracks(state.npcTracks),versions=normalizeTrackVersions(state.trackVersions),existing=registry.byRound[key];
  if(existing){const v=versions.byId[existing.trackVersionId];return v?.npc?.characterId===characterId&&v.npc.roundId===roundId?{ok:true,state,trackVersionId:existing.trackVersionId,reason:''}:fail('Сохранённая работа NPC недоступна. Исходник не заменён.');}
  if(registry.recovery.some(r=>r.key===key))return fail('Связь сохранённой работы требует восстановления. Новый трек не создан.');
+ if(!registry.voices[characterId]&&Object.values(versions.byId).some(v=>v.npc?.characterId===characterId&&v.npc.audioStatus==='complete'))return fail('Сохранённая история голоса NPC недоступна. Новый дубль не выбран.');
+ const voiceSelection=selectNpcVocal(registry.voices,{characterId,seed:person.seed,playerVoiceId:state.voiceId});if(!voiceSelection.ok)return fail(voiceSelection.reason);
  const seed=beatResultSeed(person.seed+':'+key),random=randomFor(seed),form=(random()*2-1)*person.formVariation;
  const skills=Object.fromEntries(Object.entries(person.skills).map(([k,v])=>[k,Math.round(clamp(v+form))]));
  const decisions=(targets,skill)=>targets.map(target=>skill<25?Math.floor(random()*11):Math.max(0,Math.min(10,Math.round(target+(random()*2-1)*(1-skill/100)*6))));
@@ -44,12 +47,15 @@ export function ensureNpcRoundTrack(state,{characterId,battleId,roundId,nowMinut
   const descriptor=clone(playback.descriptor),songForm=createBeatSongForm({...beat,recording});
   descriptor.owner='social';descriptor.key='npc:'+key;descriptor.outputGain=.55*10**(((mixed?3:0)+(mastered?1:0))/20);
   if(songForm){descriptor.durationSeconds=songForm.durationSeconds;descriptor.parts.forEach((p,i)=>p.windows=songPartWindows(songForm,i));}
+  const source=voiceSelection.asset,voiceId=source?.voiceId??person.voiceId;
+  if(source){const vocal={id:source.id,loopSeconds:32/3,sourceGainDb:source.sourceGainDb??0,vocal:{...take,quality:Math.min(take.ceiling,take.quality+(mixed?2:0)+(mastered?2:0)),postGain:(mixed?2:0)+(mastered?2:0),vocalGainDb:mastered?.5:mixed?-1:-2,...(beat.genreProfile?{genreProfile:beat.genreProfile}:{})}};if(songForm)vocal.windows=songPartWindows(songForm,3);descriptor.parts.push(vocal);}
   const outcome=combineProductionOutcomes(lyricOutcomes({project:lyrics}),beatOutcomes({recipe:beat,descriptor}),vocalOutcomes({take,recording}));
-  const id='npc-track:'+key+':v2',requiredAssets=[...descriptor.parts.map(p=>({id:p.id,kind:'instrument'})),{id:'npc-take:'+characterId+':'+roundId,kind:'vocal',voiceId:person.voiceId,characterId}];
+  const id='npc-track:'+key+':v2',requiredAssets=[...descriptor.parts.filter(p=>!p.vocal).map(p=>({id:p.id,kind:'instrument'})),{id:source?.id??'npc-take:'+characterId+':'+roundId,kind:'vocal',voiceId,characterId}];
   const recipe={beat,lyrics,npcTake:take,npcRecording:recording,descriptor,dspVersion:TRACK_DSP_VERSION},signature=canonicalTrackSignature({recipe,qualities:outcome.qualities,facts:outcome.facts,availability:outcome.availability});
-  const version={schemaVersion:1,id,trackId:beatId,name:person.nickname+' — '+(roundId==='selection'?'На отбор':roundId),createdAtMinute:nowMinute,sourceRevision:{policy:2,lyrics:lyrics.revision},signature,recipe,qualities:outcome.qualities,facts:outcome.facts,availability:{...outcome.availability,'audio.npcVoice':'missing'},legacy:{limitedEvidence:false},npc:{characterId,battleId,roundId,seed,voiceId:person.voiceId,skills,meanSkill:npcMeanSkill(skills),diagnosticIndex:Object.values(outcome.qualities).reduce((n,q)=>n+q,0)/4*5,policyVersion:2,requiredAssets,audioStatus:'awaiting-voice',sourceRef:person.sourceRef}};
+  const version={schemaVersion:1,id,trackId:beatId,name:person.nickname+' — '+(roundId==='selection'?'На отбор':roundId),createdAtMinute:nowMinute,sourceRevision:{policy:2,lyrics:lyrics.revision},signature,recipe,qualities:outcome.qualities,facts:outcome.facts,availability:{...outcome.availability,'audio.npcVoice':source?'available':'missing'},legacy:{limitedEvidence:false},npc:{characterId,battleId,roundId,seed,voiceId,skills,meanSkill:npcMeanSkill(skills),diagnosticIndex:Object.values(outcome.qualities).reduce((n,q)=>n+q,0)/4*5,policyVersion:2,requiredAssets,audioStatus:source?'complete':'awaiting-voice',sourceRef:person.sourceRef}};
   if(Object.hasOwn(versions.byId,id))return fail('ID работы уже существует без связи раунда. Перезапись запрещена.');
   versions.byId[id]=clone(version);registry.byRound[key]={battleId,roundId,characterId,trackVersionId:id,policyVersion:2};
+  registry.voices=voiceSelection.state;
   return {ok:true,state:{...state,npcTracks:registry,trackVersions:versions},trackVersionId:id,reason:''};
  }catch(error){return fail('Не удалось собрать работу NPC: '+error.message);}
 }

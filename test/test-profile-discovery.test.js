@@ -13,7 +13,7 @@ test('public discovery retains all mixed logical files and excludes only explici
  for(const file of ['beat-beginner-bank','beat-bank-expansion','user-drums','user-experimental','vocal-assets'])assert.ok(suite.selected.includes(`test/${file}.test.js`),file);
  assert.ok(suite.selected.length>250);assert.ok(suite.excluded.length>=6);
  assert.ok(suite.excluded.every(entry=>entry.path.startsWith('test/local-assets/')&&entry.reason));
- const local=discoverTests({profile:'local-assets'}),platformExcluded=process.platform==='win32'?0:1;
+ const local=discoverTests({profile:'local-assets'}),platformExcluded=process.platform==='win32'?0:2;
  assert.equal(local.selected.length,suite.selected.length+suite.excluded.length-platformExcluded);
  assert.equal(local.excluded.length,platformExcluded);
  if(platformExcluded)assert.match(local.excluded[0].reason,/Windows-only/);
@@ -23,6 +23,11 @@ test('empty discovery and an explicit local run without banks fail closed',t=>{
  assert.throws(()=>discoverTests({root:dir,profile:'public'}),/empty|no .*tests/i);
  const run=spawnSync(process.execPath,['tools/run-tests.mjs','--profile','local-assets','--asset-root',dir],{encoding:'utf8'});
  assert.notEqual(run.status,0);assert.match(run.stderr,/missing.*bank|missing.*asset/i);
+});
+
+test('public discovery runs mjs preparation contracts and retains voice and curve logic',()=>{
+ const suite=discoverTests({profile:'public'});
+ for(const name of ['test/gans-kapa-preparation.test.mjs','test/voice-choice.test.js','test/flow-genre-curve.test.js','test/beat-skill-ladder.test.js'])assert.ok(suite.selected.includes(name),name);
 });
 test('local asset resolution requires an explicit real root and rejects escaping paths',t=>{
  const dir=fs.mkdtempSync(path.join(tmpdir(),'asset-root-'));t.after(()=>fs.rmSync(dir,{recursive:true}));fs.writeFileSync(path.join(dir,'sample.txt'),'fixture');

@@ -40,11 +40,11 @@ test('explicit experimental genre XP gates one third of new selections, independ
  }
 });
 
-test('legacy calls and retained two-thirds keep the existing conditional one-third user drum policy',()=>{
+test('legacy calls and retained half keep the existing conditional one-third user drum policy',()=>{
  let oldAuthors=0;
  for(let i=0;i<90;i++){
   const u=(i+.5)/90,legacy=bank.chooseBeginnerParts(()=>u,{skill:49.999});
-  assert.deepEqual(bank.chooseBeginnerParts(()=>1/3+u*2/3,{skill:49.999,genre:'experimental',genreXP:0}),legacy);
+  assert.deepEqual(bank.chooseBeginnerParts(()=>1/2+u/2,{skill:49.999,genre:'experimental',genreXP:0}),legacy);
   assert.equal(Object.values(legacy).some(isNew),false);
   if(legacy.drumsId.startsWith('user-drums-20261012-'))oldAuthors++;
   assert.equal(bank.chooseBeginnerParts(()=>u,{skill:50}).drumsId.startsWith('user-drums-20261012-'),false);

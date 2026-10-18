@@ -1,5 +1,5 @@
-import {APPEARANCE_OPTIONS} from './avatar-v3-profile.js?rev=44';
-import {WARDROBE_STYLES,WARDROBE_CLOTHING,canWear,wearAppearance} from './home-wardrobe.js?rev=44';
+import {APPEARANCE_OPTIONS} from './avatar-v3-profile.js?rev=45';
+import {WARDROBE_STYLES,WARDROBE_CLOTHING,canWear,wearAppearance} from './home-wardrobe.js?rev=45';
 
 export function mountHomeWardrobeView(root,{onPreview=()=>{},onApply=()=>({ok:true}),onClose=()=>{},returnFocus}={}){
  const doc=root.ownerDocument;let profile=null,draft=null,controls=[],sections=[],categoryButtons=[],yaw=0,category='top';
