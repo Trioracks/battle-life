@@ -1,6 +1,6 @@
 import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=43';
-import {canVocalStage,effectiveVocalSkill,VOCAL_STAGES,recordingQuality} from './vocal-production.js?rev=43';
-import {latestReadyLyrics} from './lyric-production.js?rev=43';
+import {canVocalStage,effectiveVocalSkill,VOCAL_STAGES,recordingQuality} from './vocal-production.js?rev=45';
+import {latestReadyLyrics} from './lyric-production.js?rev=45';
 export function appendRecordingControls({document:d,beat,state,skills={},workflow,panel,onPickText,onStart}){
  const recording=beat.recording,job=state.recording?.job,current=job?.beatId===beat.id?job:null;
  const busy=Boolean(state.music.job||state.writing?.job||job&&!current),texts=latestReadyLyrics(state.projects);

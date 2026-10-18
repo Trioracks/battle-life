@@ -1,0 +1,1234 @@
+{
+  "version": 1,
+  "builder": "node tools/prepare-jura-local.mjs",
+  "originals": [
+    {
+      "path": "Новая папка/beats 90 bpm/drumm.mp3",
+      "bytes": 65157,
+      "sha256": "f2ab9b394c2f9eafc3038b0d05cf5caed41bf000dd25e1a0722e8fba93f8e760"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/drumm 2.mp3",
+      "bytes": 129093,
+      "sha256": "8a7b93a94135a08c611f34b2d7d59f89838a1a6e4277e1cd9d2cc7354ab9d5c8"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/bass.mp3",
+      "bytes": 73797,
+      "sha256": "d33355968ef6a78e3f644ca35fa48e0ea0ce02526a2de24d62189c087c7afcc0"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/bass 2.mp3",
+      "bytes": 142341,
+      "sha256": "c0bde6facdc5e347041f889e9b944f7b9f2a6ab0bd0142ec19ea94e78098398e"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/lead.mp3",
+      "bytes": 199941,
+      "sha256": "4810ae159e956c2da9658873db77d685b27519b891a9217b37c130b932878c0f"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/lead 2.mp3",
+      "bytes": 266757,
+      "sha256": "8d37e96c081942a11a829295f3174aa978a615d6a115dde717fa2ed4a3251763"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_2.wav",
+      "bytes": 1038850,
+      "sha256": "7d5d596e9073cac7489d5e69bcf520bd47684ccd5ffe7a2f52b22cd9ae4aa0e2"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_3.wav",
+      "bytes": 1040182,
+      "sha256": "5d3f89f99918823b85d2841e814a4588bd2cb816ced25a486d30acdaf0871487"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_4.wav",
+      "bytes": 1038850,
+      "sha256": "93ff47e219061019a3e43551d420930ffb95d04182b209751d58041e583b887c"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_5.wav",
+      "bytes": 1026850,
+      "sha256": "4780b0634c52a0ce7285c95353983ab2240e266fcc977762c50ca28993213b95"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_6.wav",
+      "bytes": 1033514,
+      "sha256": "29595f02f64205ffbdfa438de4fef4fd9cdd2d4f75c323162650c92c7fd68fc3"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_7.wav",
+      "bytes": 1045514,
+      "sha256": "901dffeb72d2f0a7bc83c511584432e00fb7fdc77c79bb74b9ade6dfd07c50e7"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_8.wav",
+      "bytes": 1034850,
+      "sha256": "36cdd709f4d2e8b8a900835a601f8e93469917852c170e4595b432b6a5186ef5"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_9.wav",
+      "bytes": 1032182,
+      "sha256": "1b3c5ee1c3db96cd530d12b49a8d8514299e7b1097895daa8d8c004ccf1a481d"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_10.wav",
+      "bytes": 1041514,
+      "sha256": "640f59254f6b1cecad4433d3dd55137bb3684f7dff4bb1736074df84e106e9ea"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_11.wav",
+      "bytes": 998850,
+      "sha256": "3f38714e88b4b71751c5d43eecc851c91f753455fe4dc25f6ddc8150d12f7bef"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_12.wav",
+      "bytes": 1006850,
+      "sha256": "d4b3a261a671517ac1bfe25fe3e0ccaa3f2fd62552be2f4f5da4c5714b1ae25d"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_13.wav",
+      "bytes": 985514,
+      "sha256": "8ec3976926510443353d65ab2cd62eca1b6d557bfc23f58cbcdbe964c98afdf4"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_14.wav",
+      "bytes": 1029514,
+      "sha256": "417909dc0d8b70d764fc058da1c3fcae9708811111d5b8560fdc67cb7db3aa36"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_15.wav",
+      "bytes": 1036182,
+      "sha256": "c994029cfc628fd150ac1f0ea63849e00afd8a3e6922c2010280c41b82c2b9fb"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_16.wav",
+      "bytes": 1036182,
+      "sha256": "37777bac25cbba1e8dfed2a719c93b72b177dc10eb330d62b87aa1b79e9e1a10"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_17.wav",
+      "bytes": 1012182,
+      "sha256": "c92f39c27c9e450413a3d4ef0f9ca35fa41ac4ad373fa4e40587dce1227537b0"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_18.wav",
+      "bytes": 1021514,
+      "sha256": "7c8bac03264c1b77fcf6fe18d8b04bf37dd6a1b02cf4d972b4c86be6a7e9e50a"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_19.wav",
+      "bytes": 977514,
+      "sha256": "d927858253102ad0938391ef77c4207e288b6ce9af844bffc026cff11f574016"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_20.wav",
+      "bytes": 980182,
+      "sha256": "c8302c8e92882dd030ec998b2406f829edfd53f97186294bbaaf9a107c755797"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_21.wav",
+      "bytes": 1021514,
+      "sha256": "e191cd20d4b51030e8aa37c0ab7405191e5ecd0bddaa17778ec9c4503d9f7f4e"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_22.wav",
+      "bytes": 980182,
+      "sha256": "2e90a1a787d2e07da651851d6206d4dd6a4e004cb2fcbfa3798e17a5b59fd577"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_23.wav",
+      "bytes": 1021514,
+      "sha256": "d8388aa82b810635842f37cfe079230ee4a98dbbdcba31db7d95eaac63641396"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_24.wav",
+      "bytes": 1001514,
+      "sha256": "b2381293f49880fffc4d3240e583d189089b5c3b96293780c6a44a8b1add7415"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_25.wav",
+      "bytes": 1008182,
+      "sha256": "ae0e0ac2aeb3b0d1e7a2bc9d47edc59854c86b3a8013908ac93fa9cc0173409e"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_26.wav",
+      "bytes": 877514,
+      "sha256": "ee5dec4b1d2cb2f6173351e7e3347c7016a075d05114a71cd1dc1d311806b7f6"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_27.wav",
+      "bytes": 1020182,
+      "sha256": "0dc67421d272c89b950b2297b80a9109c1c1058d9ae5767a72426461a3eda032"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_28.wav",
+      "bytes": 997514,
+      "sha256": "d416d18b533b59bacb91c0f2526ac480d8aa75e328d0b624595c8fa3e7fcad41"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_29.wav",
+      "bytes": 1026850,
+      "sha256": "cb7b52d7a0fbc5267ada7ce742388f705d479c6d96e753f8bb39caee259b6e14"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_30.wav",
+      "bytes": 1037514,
+      "sha256": "fb2a145789fc82d2cf3b628c62872f92d9e35c8c5df3a46038b7ddf67f9c87c3"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_31.wav",
+      "bytes": 1034850,
+      "sha256": "2688a0a4ef8bcd3997c2e52cf23b6c1d02f2d9ee178dd3766d40ce53ae44c920"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_32.wav",
+      "bytes": 1038850,
+      "sha256": "018a10cf01ffd027dcfa03588406a14bf439b6dc2a4467d24f4e60bc0d3bce90"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_33.wav",
+      "bytes": 1034850,
+      "sha256": "8b29bc1fb6033197a8c8b6d7954b8935cdc5a8bd1f2b8a66a4f0f89ebba8e473"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_34.wav",
+      "bytes": 1041514,
+      "sha256": "9d153e1f32421e475b2abb7fb0db69680ee7b0296b8fdc17d62b7efd9723c5d7"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_35.wav",
+      "bytes": 1037514,
+      "sha256": "2d42bdbe81ff8eeff51563ddf477b8858a333130d8dc2b4d570615535fc2bac1"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_36.wav",
+      "bytes": 1018850,
+      "sha256": "145041d100bbd2bff4cac5035de9ba3c46712f4a0ef5bbf380cb4950a9b31fd4"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_37.wav",
+      "bytes": 1029514,
+      "sha256": "3e05c594ff10ca745921582842c8b2518ccaf269f855629d1ed1514c3914dc83"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_38.wav",
+      "bytes": 1006850,
+      "sha256": "df1c6bd1198d11b314ebc1e79df073ce83bca0badf3e9d0e812950b879275ed4"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_39.wav",
+      "bytes": 961514,
+      "sha256": "f2020f7779aacdd5eb8f08a8567f7ba7b4f1df5708253004595fa5caf079c7a2"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_40.wav",
+      "bytes": 1008182,
+      "sha256": "fb12bcacb07b47d604602ae038344be8dfabfda4d33f5a933ae3fbbda8fd0137"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_41.wav",
+      "bytes": 1022850,
+      "sha256": "7495e95dbd9034ead996be3786b13ee935832359615427041c82382f7ac54d49"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_42.wav",
+      "bytes": 1013514,
+      "sha256": "fb23a992974c6041b82fa20e0a0d8843b32cca73fb3e1e4756233877c1a1eba9"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_43.wav",
+      "bytes": 1004182,
+      "sha256": "44859058876081dcdbfd30dec6affb640d775f703670ffc23ca6ca140a48caad"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_44.wav",
+      "bytes": 1005514,
+      "sha256": "f88282c91d35d5d2888b22f3ebffd72359f607ff471c29100ec36b1be4fe61a9"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_45.wav",
+      "bytes": 1038850,
+      "sha256": "2c25c0f868c0c520c15a0c1ee6e8929e091f0555d4c722cdd7f4c567b5b9e0a5"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_46.wav",
+      "bytes": 1036182,
+      "sha256": "4f638974dadaab77d6277b21911298951a650c88dec447149080de718d0dd4b4"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_47.wav",
+      "bytes": 1026850,
+      "sha256": "ed3903a606cff19d3f3fd68f390ecd37b3676821537173ffe8cce43d07161d05"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_48.wav",
+      "bytes": 1018850,
+      "sha256": "9ebc59492a4f45e7f4adab788109ed570cd04b119d94f23651ba26c62781d655"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_49.wav",
+      "bytes": 984182,
+      "sha256": "27da760d0b9dd3712f9a276333e9f2257a6575dffac11e93e6b6b3a631ebe1c2"
+    },
+    {
+      "path": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC.wav",
+      "bytes": 1038850,
+      "sha256": "a48157e7be804cd7f074b928f40e0eef14964068e7d54ee7ca93d104d6c2acd7"
+    }
+  ],
+  "parts": [
+    {
+      "id": "jura-experimental-20261018-drumm",
+      "name": "Авторский эксперимент / drumm",
+      "kind": "drums",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 1,
+      "key": null,
+      "authorship": "user",
+      "path": "assets/audio/ft/jura-experimental-v1/drumm.wav",
+      "source": "Новая папка/beats 90 bpm/drumm.mp3",
+      "sourceHash": "f2ab9b394c2f9eafc3038b0d05cf5caed41bf000dd25e1a0722e8fba93f8e760",
+      "sha256": "c60cadbbcac3a09e18f02d822056d4dd900e4b8af0704e2deb6d9e37d134e3d8",
+      "sampleRate": 44100,
+      "frames": 470400,
+      "evidence": {
+        "frames": 119600,
+        "seconds": 2.71202,
+        "peak": 0.95197,
+        "rms": 0.19436,
+        "rmsDb": -14.22793,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.01846,
+        "lowEnergyBelow200": 0.91211,
+        "centroidHz": 312.44087,
+        "spectralPeaks": [
+          {
+            "hz": 53.83155,
+            "note": "A1",
+            "share": 0.13248
+          },
+          {
+            "hz": 58.14624,
+            "note": "A#1",
+            "share": 0.09534
+          },
+          {
+            "hz": 78.06209,
+            "note": "D#2",
+            "share": 0.0211
+          },
+          {
+            "hz": 83.46137,
+            "note": "E2",
+            "share": 0.01773
+          },
+          {
+            "hz": 72.94547,
+            "note": "D2",
+            "share": 0.01452
+          },
+          {
+            "hz": 102.18392,
+            "note": "G#2",
+            "share": 0.01395
+          },
+          {
+            "hz": 107.51983,
+            "note": "A2",
+            "share": 0.01165
+          },
+          {
+            "hz": 96.78979,
+            "note": "G2",
+            "share": 0.01004
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A",
+            "share": 0.36668
+          },
+          {
+            "note": "A#",
+            "share": 0.26675
+          },
+          {
+            "note": "D#",
+            "share": 0.0664
+          },
+          {
+            "note": "D",
+            "share": 0.06442
+          },
+          {
+            "note": "E",
+            "share": 0.06198
+          },
+          {
+            "note": "G#",
+            "share": 0.04475
+          },
+          {
+            "note": "B",
+            "share": 0.04071
+          },
+          {
+            "note": "G",
+            "share": 0.03303
+          },
+          {
+            "note": "C",
+            "share": 0.01885
+          },
+          {
+            "note": "C#",
+            "share": 0.01446
+          },
+          {
+            "note": "F#",
+            "share": 0.0125
+          },
+          {
+            "note": "F",
+            "share": 0.00946
+          }
+        ],
+        "activeStartSeconds": 0.02,
+        "activeEndSeconds": 2.54,
+        "onsetsSeconds": [
+          0.7,
+          1.21,
+          2.03
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.01682,
+          "bpm90": 0.03556,
+          "bpm92": 0.06333
+        },
+        "barRms": [
+          0.196,
+          0
+        ],
+        "tailRms": null
+      },
+      "trimFrames": 893,
+      "tailPolicy": "Entire remaining decoded decay folded into measured musical cycle; 3ms seam fades; no transpose or time stretch",
+      "tonalEvidence": "Percussion; kick resonances are not a key.",
+      "calibration": {
+        "buildGainDb": -0.48760727422464906,
+        "gainDb": -16.98,
+        "targetLufs": -30,
+        "derived": {
+          "lufs": -13.02,
+          "truePeak": -0.87,
+          "lra": 1.9
+        },
+        "after": {
+          "lufs": -30.04,
+          "truePeak": -17.85,
+          "lra": 1.9
+        }
+      }
+    },
+    {
+      "id": "jura-experimental-20261018-drumm-2",
+      "name": "Авторский эксперимент / drumm-2",
+      "kind": "drums",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "key": null,
+      "authorship": "user",
+      "path": "assets/audio/ft/jura-experimental-v1/drumm-2.wav",
+      "source": "Новая папка/beats 90 bpm/drumm 2.mp3",
+      "sourceHash": "8a7b93a94135a08c611f34b2d7d59f89838a1a6e4277e1cd9d2cc7354ab9d5c8",
+      "sha256": "25fa92fb19ee5d1b387d49b5888f209a3162a347c2201de33bf51e4621dcbef2",
+      "sampleRate": 44100,
+      "frames": 470400,
+      "evidence": {
+        "frames": 237081,
+        "seconds": 5.37599,
+        "peak": 0.95197,
+        "rms": 0.25846,
+        "rmsDb": -11.75216,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.01935,
+        "lowEnergyBelow200": 0.95606,
+        "centroidHz": 157.49864,
+        "spectralPeaks": [
+          {
+            "hz": 54.22323,
+            "note": "A1",
+            "share": 0.1153
+          },
+          {
+            "hz": 78.14779,
+            "note": "D#2",
+            "share": 0.0211
+          },
+          {
+            "hz": 82.91229,
+            "note": "E2",
+            "share": 0.0185
+          },
+          {
+            "hz": 73.50723,
+            "note": "D2",
+            "share": 0.01577
+          },
+          {
+            "hz": 102.26293,
+            "note": "G#2",
+            "share": 0.01442
+          },
+          {
+            "hz": 106.99258,
+            "note": "A2",
+            "share": 0.01216
+          },
+          {
+            "hz": 97.54709,
+            "note": "G2",
+            "share": 0.01148
+          },
+          {
+            "hz": 126.02319,
+            "note": "B2",
+            "share": 0.00799
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A",
+            "share": 0.49196
+          },
+          {
+            "note": "E",
+            "share": 0.09053
+          },
+          {
+            "note": "D",
+            "share": 0.08596
+          },
+          {
+            "note": "D#",
+            "share": 0.08008
+          },
+          {
+            "note": "G#",
+            "share": 0.06323
+          },
+          {
+            "note": "B",
+            "share": 0.06132
+          },
+          {
+            "note": "G",
+            "share": 0.0529
+          },
+          {
+            "note": "C",
+            "share": 0.02705
+          },
+          {
+            "note": "C#",
+            "share": 0.02048
+          },
+          {
+            "note": "F#",
+            "share": 0.01522
+          },
+          {
+            "note": "A#",
+            "share": 0.00897
+          },
+          {
+            "note": "F",
+            "share": 0.00229
+          }
+        ],
+        "activeStartSeconds": 0.02,
+        "activeEndSeconds": 5.2,
+        "onsetsSeconds": [
+          0.7,
+          1.21,
+          2.37,
+          2.71,
+          3.37,
+          3.71,
+          3.87,
+          4.21,
+          4.37,
+          4.7
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.03841,
+          "bpm90": 0.03867,
+          "bpm92": 0.04804
+        },
+        "barRms": [
+          0.24438,
+          0.27377
+        ],
+        "tailRms": 0
+      },
+      "trimFrames": 893,
+      "tailPolicy": "Entire remaining decoded decay folded into measured musical cycle; 3ms seam fades; no transpose or time stretch",
+      "tonalEvidence": "Percussion; kick resonances are not a key.",
+      "calibration": {
+        "buildGainDb": -0.48760727422464906,
+        "gainDb": -18.66,
+        "targetLufs": -30,
+        "derived": {
+          "lufs": -11.34,
+          "truePeak": -0.87,
+          "lra": 0.9
+        },
+        "after": {
+          "lufs": -30.01,
+          "truePeak": -19.53,
+          "lra": 0.8
+        }
+      }
+    },
+    {
+      "id": "jura-experimental-20261018-bass",
+      "name": "Авторский эксперимент / bass",
+      "kind": "arrangement",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 1,
+      "key": "A minor",
+      "authorship": "user",
+      "path": "assets/audio/ft/jura-experimental-v1/bass.wav",
+      "source": "Новая папка/beats 90 bpm/bass.mp3",
+      "sourceHash": "d33355968ef6a78e3f644ca35fa48e0ea0ce02526a2de24d62189c087c7afcc0",
+      "sha256": "d066c5ed89cb0f485e897747fd16871efabeb8ad86c3dd5ced898b202a903969",
+      "sampleRate": 44100,
+      "frames": 470400,
+      "evidence": {
+        "frames": 135476,
+        "seconds": 3.07202,
+        "peak": 0.42557,
+        "rms": 0.08847,
+        "rmsDb": -21.06431,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.03589,
+        "lowEnergyBelow200": 0.97117,
+        "centroidHz": 89.12556,
+        "spectralPeaks": [
+          {
+            "hz": 55.75023,
+            "note": "A1",
+            "share": 0.18237
+          },
+          {
+            "hz": 65.95579,
+            "note": "C2",
+            "share": 0.08429
+          },
+          {
+            "hz": 111.25124,
+            "note": "A2",
+            "share": 0.06458
+          },
+          {
+            "hz": 132.29942,
+            "note": "C3",
+            "share": 0.0579
+          },
+          {
+            "hz": 166.76956,
+            "note": "E3",
+            "share": 0.01983
+          },
+          {
+            "hz": 198.55651,
+            "note": "G3",
+            "share": 0.01375
+          },
+          {
+            "hz": 264.40858,
+            "note": "C4",
+            "share": 0.00552
+          },
+          {
+            "hz": 222.32932,
+            "note": "A3",
+            "share": 0.00331
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A",
+            "share": 0.57039
+          },
+          {
+            "note": "C",
+            "share": 0.33664
+          },
+          {
+            "note": "E",
+            "share": 0.0517
+          },
+          {
+            "note": "G",
+            "share": 0.03279
+          },
+          {
+            "note": "B",
+            "share": 0.00373
+          },
+          {
+            "note": "C#",
+            "share": 0.00209
+          },
+          {
+            "note": "F",
+            "share": 0.00132
+          },
+          {
+            "note": "F#",
+            "share": 0.00056
+          },
+          {
+            "note": "G#",
+            "share": 0.00044
+          },
+          {
+            "note": "A#",
+            "share": 0.00032
+          },
+          {
+            "note": "D#",
+            "share": 0.00003
+          },
+          {
+            "note": "D",
+            "share": 0.00002
+          }
+        ],
+        "activeStartSeconds": 0.03,
+        "activeEndSeconds": 2.54,
+        "onsetsSeconds": [
+          0.03,
+          1.03,
+          1.7,
+          2.04,
+          2.14,
+          2.23,
+          2.32
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.02909,
+          "bpm90": 0.03381,
+          "bpm92": 0.04876
+        },
+        "barRms": [
+          0.09495,
+          0.00164
+        ],
+        "tailRms": null
+      },
+      "trimFrames": 1186,
+      "tailPolicy": "Entire remaining decoded decay folded into measured musical cycle; 3ms seam fades; no transpose or time stretch",
+      "tonalEvidence": "A/C/E/G and D/B natural partials support common A-minor compatibility, inferred rather than authoritative key detection.",
+      "calibration": {
+        "buildGainDb": 0,
+        "gainDb": -8.86,
+        "targetLufs": -28.5,
+        "derived": {
+          "lufs": -19.64,
+          "truePeak": -7.42,
+          "lra": 1.4
+        },
+        "after": {
+          "lufs": -28.51,
+          "truePeak": -16.28,
+          "lra": 1.4
+        }
+      }
+    },
+    {
+      "id": "jura-experimental-20261018-bass-2",
+      "name": "Авторский эксперимент / bass-2",
+      "kind": "arrangement",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "key": "A minor",
+      "authorship": "user",
+      "path": "assets/audio/ft/jura-experimental-v1/bass-2.wav",
+      "source": "Новая папка/beats 90 bpm/bass 2.mp3",
+      "sourceHash": "c0bde6facdc5e347041f889e9b944f7b9f2a6ab0bd0142ec19ea94e78098398e",
+      "sha256": "a7a6a4447dd379f99073da6e46485caee7fc8c153670b5bcb4d79c69da3dd42b",
+      "sampleRate": 44100,
+      "frames": 470400,
+      "evidence": {
+        "frames": 261425,
+        "seconds": 5.928,
+        "peak": 0.47783,
+        "rms": 0.10469,
+        "rmsDb": -19.60175,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.048,
+        "lowEnergyBelow200": 0.9089,
+        "centroidHz": 112.0953,
+        "spectralPeaks": [
+          {
+            "hz": 111.06545,
+            "note": "A2",
+            "share": 0.16458
+          },
+          {
+            "hz": 55.76745,
+            "note": "A1",
+            "share": 0.13911
+          },
+          {
+            "hz": 83.35293,
+            "note": "E2",
+            "share": 0.04432
+          },
+          {
+            "hz": 166.54331,
+            "note": "E3",
+            "share": 0.02729
+          },
+          {
+            "hz": 197.86728,
+            "note": "G3",
+            "share": 0.01783
+          },
+          {
+            "hz": 222.18875,
+            "note": "A3",
+            "share": 0.01037
+          },
+          {
+            "hz": 42.23112,
+            "note": "E1",
+            "share": 0.0095
+          },
+          {
+            "hz": 250.17291,
+            "note": "B3",
+            "share": 0.00514
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A",
+            "share": 0.71558
+          },
+          {
+            "note": "E",
+            "share": 0.19491
+          },
+          {
+            "note": "G",
+            "share": 0.05111
+          },
+          {
+            "note": "B",
+            "share": 0.01899
+          },
+          {
+            "note": "C",
+            "share": 0.00803
+          },
+          {
+            "note": "G#",
+            "share": 0.00366
+          },
+          {
+            "note": "F#",
+            "share": 0.00265
+          },
+          {
+            "note": "C#",
+            "share": 0.00174
+          },
+          {
+            "note": "D",
+            "share": 0.00154
+          },
+          {
+            "note": "A#",
+            "share": 0.00069
+          },
+          {
+            "note": "D#",
+            "share": 0.00063
+          },
+          {
+            "note": "F",
+            "share": 0.00047
+          }
+        ],
+        "activeStartSeconds": 0.03,
+        "activeEndSeconds": 5.37,
+        "onsetsSeconds": [
+          0.03,
+          0.19,
+          0.28,
+          1.03,
+          1.21,
+          2.04,
+          2.69,
+          3.05,
+          3.16,
+          3.26,
+          3.34,
+          3.69,
+          3.78,
+          4.7,
+          5.04
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.04006,
+          "bpm90": 0.03533,
+          "bpm92": 0.04713
+        },
+        "barRms": [
+          0.10543,
+          0.11455
+        ],
+        "tailRms": 0.02392
+      },
+      "trimFrames": 1189,
+      "tailPolicy": "Entire remaining decoded decay folded into measured musical cycle; 3ms seam fades; no transpose or time stretch",
+      "tonalEvidence": "A/C/E/G and D/B natural partials support common A-minor compatibility, inferred rather than authoritative key detection.",
+      "calibration": {
+        "buildGainDb": 0,
+        "gainDb": -10.11,
+        "targetLufs": -28.5,
+        "derived": {
+          "lufs": -18.39,
+          "truePeak": -6.15,
+          "lra": 0.8
+        },
+        "after": {
+          "lufs": -28.5,
+          "truePeak": -16.26,
+          "lra": 0.9
+        }
+      }
+    },
+    {
+      "id": "jura-experimental-20261018-lead",
+      "name": "Авторский эксперимент / lead",
+      "kind": "theme",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 1,
+      "key": "A minor",
+      "authorship": "user",
+      "path": "assets/audio/ft/jura-experimental-v1/lead.wav",
+      "source": "Новая папка/beats 90 bpm/lead.mp3",
+      "sourceHash": "4810ae159e956c2da9658873db77d685b27519b891a9217b37c130b932878c0f",
+      "sha256": "ed73311482117d9f299aafc25254a813797e21f6b133bdfc07ea5952510f64ef",
+      "sampleRate": 44100,
+      "frames": 470400,
+      "evidence": {
+        "frames": 367265,
+        "seconds": 8.328,
+        "peak": 0.27731,
+        "rms": 0.05285,
+        "rmsDb": -25.53828,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.02818,
+        "lowEnergyBelow200": 0.00034,
+        "centroidHz": 321.18432,
+        "spectralPeaks": [
+          {
+            "hz": 293.28647,
+            "note": "D4",
+            "share": 0.16998
+          },
+          {
+            "hz": 329.29144,
+            "note": "E4",
+            "share": 0.13479
+          },
+          {
+            "hz": 261.41422,
+            "note": "C4",
+            "share": 0.11448
+          },
+          {
+            "hz": 219.8448,
+            "note": "A3",
+            "share": 0.07752
+          },
+          {
+            "hz": 659.39061,
+            "note": "E5",
+            "share": 0.0025
+          },
+          {
+            "hz": 523.13567,
+            "note": "C5",
+            "share": 0.00157
+          },
+          {
+            "hz": 440.02898,
+            "note": "A4",
+            "share": 0.00134
+          },
+          {
+            "hz": 587.15493,
+            "note": "D5",
+            "share": 0.00126
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "D",
+            "share": 0.33718
+          },
+          {
+            "note": "E",
+            "share": 0.271
+          },
+          {
+            "note": "C",
+            "share": 0.22883
+          },
+          {
+            "note": "A",
+            "share": 0.15728
+          },
+          {
+            "note": "G",
+            "share": 0.00171
+          },
+          {
+            "note": "B",
+            "share": 0.00138
+          },
+          {
+            "note": "F#",
+            "share": 0.00085
+          },
+          {
+            "note": "G#",
+            "share": 0.00065
+          },
+          {
+            "note": "A#",
+            "share": 0.00054
+          },
+          {
+            "note": "C#",
+            "share": 0.00036
+          },
+          {
+            "note": "D#",
+            "share": 0.00013
+          },
+          {
+            "note": "F",
+            "share": 0.00008
+          }
+        ],
+        "activeStartSeconds": 0.03,
+        "activeEndSeconds": 3.21,
+        "onsetsSeconds": [
+          0.04,
+          2.12
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.05727,
+          "bpm90": 0.04333,
+          "bpm92": 0.02022
+        },
+        "barRms": [
+          0.09229,
+          0.01442
+        ],
+        "tailRms": 0.00014
+      },
+      "trimFrames": 1187,
+      "tailPolicy": "Entire remaining decoded decay folded into measured musical cycle; 3ms seam fades; no transpose or time stretch",
+      "tonalEvidence": "A/C/E/G and D/B natural partials support common A-minor compatibility, inferred rather than authoritative key detection.",
+      "calibration": {
+        "buildGainDb": 0,
+        "gainDb": -8.61,
+        "targetLufs": -27,
+        "derived": {
+          "lufs": -18.39,
+          "truePeak": -10.81,
+          "lra": 0.3
+        },
+        "after": {
+          "lufs": -26.99,
+          "truePeak": -19.42,
+          "lra": 0.4
+        }
+      }
+    },
+    {
+      "id": "jura-experimental-20261018-lead-2",
+      "name": "Авторский эксперимент / lead-2",
+      "kind": "theme",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "key": "A minor",
+      "authorship": "user",
+      "path": "assets/audio/ft/jura-experimental-v1/lead-2.wav",
+      "source": "Новая папка/beats 90 bpm/lead 2.mp3",
+      "sourceHash": "8d37e96c081942a11a829295f3174aa978a615d6a115dde717fa2ed4a3251763",
+      "sha256": "817a96a1a97a61193eb55990512965d43bc93eb0d7ad7d7fc1e3681de31ca7bb",
+      "sampleRate": 44100,
+      "frames": 470400,
+      "evidence": {
+        "frames": 490040,
+        "seconds": 11.11202,
+        "peak": 0.29318,
+        "rms": 0.06622,
+        "rmsDb": -23.5802,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.03642,
+        "lowEnergyBelow200": 0.31679,
+        "centroidHz": 290.80584,
+        "spectralPeaks": [
+          {
+            "hz": 164.81475,
+            "note": "E3",
+            "share": 0.09364
+          },
+          {
+            "hz": 293.39654,
+            "note": "D4",
+            "share": 0.06936
+          },
+          {
+            "hz": 328.5703,
+            "note": "E4",
+            "share": 0.06616
+          },
+          {
+            "hz": 195.86971,
+            "note": "G3",
+            "share": 0.0625
+          },
+          {
+            "hz": 219.71601,
+            "note": "A3",
+            "share": 0.0481
+          },
+          {
+            "hz": 261.36941,
+            "note": "C4",
+            "share": 0.04026
+          },
+          {
+            "hz": 247.43201,
+            "note": "B3",
+            "share": 0.0353
+          },
+          {
+            "hz": 391.45873,
+            "note": "G4",
+            "share": 0.03168
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "E",
+            "share": 0.35119
+          },
+          {
+            "note": "G",
+            "share": 0.20875
+          },
+          {
+            "note": "D",
+            "share": 0.15936
+          },
+          {
+            "note": "A",
+            "share": 0.10773
+          },
+          {
+            "note": "C",
+            "share": 0.0903
+          },
+          {
+            "note": "B",
+            "share": 0.07923
+          },
+          {
+            "note": "A#",
+            "share": 0.00107
+          },
+          {
+            "note": "F#",
+            "share": 0.00089
+          },
+          {
+            "note": "G#",
+            "share": 0.00051
+          },
+          {
+            "note": "F",
+            "share": 0.00041
+          },
+          {
+            "note": "D#",
+            "share": 0.00029
+          },
+          {
+            "note": "C#",
+            "share": 0.00025
+          }
+        ],
+        "activeStartSeconds": 0.03,
+        "activeEndSeconds": 5.78,
+        "onsetsSeconds": [
+          0.04,
+          0.37,
+          1.38,
+          2.05,
+          2.37,
+          2.75,
+          4.7,
+          5.03
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.03568,
+          "bpm90": 0.04458,
+          "bpm92": 0.04739
+        },
+        "barRms": [
+          0.08974,
+          0.1002
+        ],
+        "tailRms": 0.00912
+      },
+      "trimFrames": 1188,
+      "tailPolicy": "Entire remaining decoded decay folded into measured musical cycle; 3ms seam fades; no transpose or time stretch",
+      "tonalEvidence": "A/C/E/G and D/B natural partials support common A-minor compatibility, inferred rather than authoritative key detection.",
+      "calibration": {
+        "buildGainDb": 0,
+        "gainDb": -8.87,
+        "targetLufs": -27,
+        "derived": {
+          "lufs": -18.13,
+          "truePeak": -10.66,
+          "lra": 0.9
+        },
+        "after": {
+          "lufs": -27,
+          "truePeak": -19.53,
+          "lra": 0.8
+        }
+      }
+    }
+  ]
+}

@@ -1,11 +1,11 @@
 import {BEAT_RULES} from './beat-catalog.js?rev=43';
-import {workBlockReason} from './beat-production.js?rev=43';
+import {workBlockReason} from './beat-production.js?rev=45';
 import {validGameMinute} from './game-minute.js?rev=43';
 import {beatResultSeed} from './beat-result.js?rev=43';
-import {normalizeRapAnalysis,studyInstallReason,studyHeroSnapshot,validStudyHeroSnapshot,finishStudyReport} from './rap-analysis.js?rev=43';
-import {completeJudgeEvidence} from './judge-dossier-analysis.js?rev=43';
+import {normalizeRapAnalysis,studyInstallReason,studyHeroSnapshot,validStudyHeroSnapshot,finishStudyReport} from './rap-analysis.js?rev=45';
+import {completeJudgeEvidence} from './judge-dossier-analysis.js?rev=45';
 import {publicCharacterProfile} from './npc-social-profiles.js?rev=43';
-import {caseStudySources} from './rap-research-sources.js?rev=43';
+import {caseStudySources} from './rap-research-sources.js?rev=45';
 import {validRapReport,reconcileResearchFindings} from './rap-report-schema.js?rev=43';
 export {reconcileResearchFindings};
 

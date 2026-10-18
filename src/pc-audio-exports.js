@@ -1,9 +1,9 @@
-import {normalizeBeat} from './beat-production.js?rev=43';
-import {resolveBeatPlayback} from './beat-playback.js?rev=43';
-import {captureTrackVersion,canonicalTrackSignature} from './track-version.js?rev=43';
+import {normalizeBeat} from './beat-production.js?rev=45';
+import {resolveBeatPlayback} from './beat-playback.js?rev=45';
+import {captureTrackVersion,canonicalTrackSignature} from './track-version.js?rev=45';
 import {softwareDiskBytes} from './pc-software.js?rev=43';
 import {drumById} from './beat-catalog.js?rev=43';
-import {beginnerById} from './beat-beginner-bank.js?rev=43';
+import {beginnerById} from './beat-beginner-bank.js?rev=45';
 import {vocalById} from './vocal-catalog.js?rev=43';
 
 export const AUDIO_EXPORT_FOLDERS=Object.freeze(['documents','music','exports','downloads','projects']);

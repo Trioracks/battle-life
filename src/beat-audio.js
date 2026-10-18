@@ -1,11 +1,12 @@
 import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=43';
-import {beginnerById} from './beat-beginner-bank.js?rev=43';
-import {resolveBeatPlayback} from './beat-playback.js?rev=43';
+import {beginnerById} from './beat-beginner-bank.js?rev=45';
+import {resolveBeatPlayback} from './beat-playback.js?rev=45';
 import {connectBeatMix} from './beat-mix.js?rev=43';
 import {connectBeatResult,connectBeatResultMaster} from './beat-result-dsp.js?rev=43';
 import {vocalById} from './vocal-catalog.js?rev=43';
+import {npcVocalById} from './npc-vocal-catalog.js?rev=45';
 import {descriptorOutputGain} from './audio-levels.js?rev=43';
-import {createBeatPcmProcessor} from './beat-pcm-background.js?rev=43';
+import {createBeatPcmProcessor} from './beat-pcm-background.js?rev=45';
 
 // Authored placeholder PCM, not a remix of third-party music. Sliders never enter here.
 export function primitiveSamples(kind,rate=44100){
@@ -48,13 +49,13 @@ export class BeatAudio{
   if(['primitive','melody','bass'].includes(id)){
    const samples=primitiveSamples(id==='primitive'?'drums':id);buffer=this.context.createBuffer(1,samples.length,44100);buffer.copyToChannel(samples,0);
   }else{
-   const asset=beginnerById(id)||drumById(id)||vocalById(id);if(!asset)throw Error('unknown asset');
+   const asset=beginnerById(id)||drumById(id)||vocalById(id)||npcVocalById(id);if(!asset)throw Error('unknown asset');
    const response=await this.fetchFn(asset.path);if(!this.current(token))return null;
    if(!response.ok)throw Error('missing asset');
    const bytes=await response.arrayBuffer();if(!this.current(token))return null;
    buffer=await this.context.decodeAudioData(bytes);if(!this.current(token))return null;
   }
-  if(buffer.duration<(beginnerById(id)||vocalById(id)?32/3:loopSeconds())-.02)throw Error('short loop');
+  if(npcVocalById(id)?buffer.duration<npcVocalById(id).seconds-.02:buffer.duration<(beginnerById(id)||vocalById(id)?32/3:loopSeconds())-.02)throw Error('short loop');
   if(!this.disposed){if(this.cache.size>=8)this.cache.delete(this.cache.keys().next().value);this.cache.set(id,buffer);}return buffer;
  }
  play({drumId='primitive',stage=1}={}){

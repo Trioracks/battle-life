@@ -1,8 +1,8 @@
 import {communityById} from './social-catalog.js?rev=43';
 import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow,isBattleWindowId} from './battle-windows.js?rev=43';
 import {validGameMinute} from './game-minute.js?rev=43';
-import {TRACK_DSP_VERSION} from './track-version.js?rev=43';
-import {normalizeAudioExports} from './pc-audio-exports.js?rev=43';
+import {TRACK_DSP_VERSION} from './track-version.js?rev=45';
+import {normalizeAudioExports} from './pc-audio-exports.js?rev=45';
 import {normalizeSocial} from './social-state.js?rev=43';
 export const UPLOAD_TOTAL_SECONDS=2;
 const clone=v=>JSON.parse(JSON.stringify(v));

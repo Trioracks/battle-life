@@ -1,6 +1,6 @@
-import {normalizeBeat} from './beat-production.js?rev=43';
-import {normalizeLyric} from './lyric-production.js?rev=43';
-import {resolveBeatPlayback} from './beat-playback.js?rev=43';
+import {normalizeBeat} from './beat-production.js?rev=45';
+import {normalizeLyric} from './lyric-production.js?rev=45';
+import {resolveBeatPlayback} from './beat-playback.js?rev=45';
 import {lyricOutcomes,beatOutcomes,vocalOutcomes,combineProductionOutcomes} from './production-outcomes.js?rev=43';
 export const TRACK_DSP_VERSION=1;
 const clone=value=>JSON.parse(JSON.stringify(value));

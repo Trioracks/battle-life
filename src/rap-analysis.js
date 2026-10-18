@@ -1,14 +1,14 @@
 import config from '../data/analysis/demo-v2-policy.json' with {type:'json'};
 import {BEAT_RULES} from './beat-catalog.js?rev=43';
-import {workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=43';
-import {effectiveWritingSkill} from './lyric-production.js?rev=43';
-import {effectiveVocalSkill} from './vocal-production.js?rev=43';
+import {workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=45';
+import {effectiveWritingSkill} from './lyric-production.js?rev=45';
+import {effectiveVocalSkill} from './vocal-production.js?rev=45';
 import {validGameMinute} from './game-minute.js?rev=43';
 import {beatResultSeed} from './beat-result.js?rev=43';
 import {battleRandom} from './battle-seeding.js?rev=43';
 import {publicTournamentTrackIds} from './battle-results-table.js?rev=43';
 import {publicCharacterProfile} from './npc-social-profiles.js?rev=43';
-import {completeJudgeEvidence} from './judge-dossier-analysis.js?rev=43';
+import {completeJudgeEvidence} from './judge-dossier-analysis.js?rev=45';
 import {validRapReport,reconcileResearchFindings} from './rap-report-schema.js?rev=43';
 export const STUDY_POLICY=Object.freeze({...config.study});
 export const ANALYSIS_AXES=['text','performance','music','sound'];

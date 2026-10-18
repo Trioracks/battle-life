@@ -1,6 +1,6 @@
 import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=43';
-import {AUDIO_EXPORT_FOLDERS,AUDIO_EXPORT_KINDS,createAudioExport} from './pc-audio-exports.js?rev=43';
-import {EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=43';
+import {AUDIO_EXPORT_FOLDERS,AUDIO_EXPORT_KINDS,createAudioExport} from './pc-audio-exports.js?rev=45';
+import {EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=45';
 import {gameDateTimeLabel} from './home-calendar.js?rev=43';
 
 export function mountAudioExport(root,{getState,projectId,getMetadata=()=>({}),onCommit,onClose=()=>{}}){
