@@ -11,6 +11,7 @@ export async function playTrackVersion(audio,version){
  const descriptor=version.recipe.descriptor;
  if(!Array.isArray(descriptor?.parts)||!descriptor.parts.length||!Number.isFinite(descriptor.durationSeconds)||descriptor.durationSeconds<=0)return fail('Аудиорецепт повреждён. Работа сохранена.');
  for(const part of descriptor.parts){
+  if(version.npc&&vocalById(part.id))return fail('Голос игрока недоступен для работ NPC.');
   if(drumById(part.id)?.retired)return fail(RETIRED_DRUM_MESSAGE);
   if(!['primitive','melody','bass'].includes(part.id)&&!beginnerById(part.id)&&!drumById(part.id)&&!vocalById(part.id)&&!(version.npc&&part.vocal&&npcVocalById(part.id)))return fail('Источник этой версии недоступен. Подмена звука не выполнялась.');
  }

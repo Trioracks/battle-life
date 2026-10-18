@@ -56,3 +56,34 @@ test('NPC playback rejects extra hero vocals or missing character-bound vocal re
  assert.equal(npcPlaybackDescriptor(hero).ok,false);
  const missing=structuredClone(v);missing.npc.requiredAssets=missing.npc.requiredAssets.filter(a=>a.kind!=='vocal');assert.equal(npcPlaybackDescriptor(missing).ok,false);
 });
+test('a changed used/future order permutation blocks direct selection and JSON/full save recovery',()=>{
+ const selection={characterId:'npc',seed:71,flow:20},first=voices.selectNpcVocal({},selection),second=voices.selectNpcVocal(first.state,selection),damaged=structuredClone(second.state);
+ assert.equal(first.asset.id,'npc-jura-09');assert.equal(second.asset.id,'npc-jura-46');
+ [damaged.npc.order[0],damaged.npc.order[2]]=[damaged.npc.order[2],damaged.npc.order[0]];
+ for(const raw of [damaged,JSON.parse(JSON.stringify(damaged))]){
+  const rejected=voices.selectNpcVocal(raw,selection);assert.equal(rejected.ok,false);assert.equal(rejected.asset,null);assert.equal(rejected.state.npc.blocked,true);
+  const normalized=normalizeNpcTracks({voices:raw});assert.equal(normalized.voices.npc.blocked,true);
+  const loaded=createVirtualPcState(JSON.parse(JSON.stringify({...createVirtualPcState(),npcTracks:{voices:raw}})));assert.equal(loaded.npcTracks.voices.npc.blocked,true);
+  assert.equal(createVirtualPcState(JSON.parse(JSON.stringify(loaded))).npcTracks.voices.npc.blocked,true);
+  const again=voices.selectNpcVocal(loaded.npcTracks.voices,selection);assert.equal(again.ok,false);assert.equal(again.asset,null);
+ }
+});
+test('later seeded cycle permutations block without losing normal deterministic cycles',()=>{
+ const selection={characterId:'npc',seed:71,flow:20};let state={};
+ for(let i=0;i<100;i++){const r=voices.selectNpcVocal(JSON.parse(JSON.stringify(state)),selection);assert.equal(r.ok,true);state=r.state;}
+ assert.equal(state.npc.cycle,2);assert.equal(state.npc.cursor,2);
+ [state.npc.order[0],state.npc.order[2]]=[state.npc.order[2],state.npc.order[0]];
+ assert.equal(voices.selectNpcVocal(state,selection).ok,false);
+});
+test('unflagged hero sources and mismatched required asset kinds never reach NPC audio',async()=>{
+ const r=ensureNpcRoundTrack(createVirtualPcState(),args()),v=r.state.trackVersions.byId[r.trackVersionId];
+ for(const modify of [
+  d=>{d.recipe.descriptor.parts[0].id='vocal-01';},
+  d=>{d.recipe.descriptor.parts[0].id='vocal-01';d.npc.requiredAssets[0].id='vocal-01';},
+  d=>{d.npc.requiredAssets[0].kind='vocal';},
+  d=>{d.recipe.descriptor.parts[0].id='npc-jura-01';d.npc.requiredAssets[0].id='npc-jura-01';},
+ ]){
+  const damaged=structuredClone(v);modify(damaged);assert.equal(npcPlaybackDescriptor(damaged).ok,false);
+  let played=0;const result=await playTrackVersion({stop(){},playDescriptor(){played++;return true;}},damaged);assert.equal(result.ok,false);assert.equal(played,0);
+ }
+});
