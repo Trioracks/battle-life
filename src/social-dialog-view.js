@@ -1,14 +1,14 @@
 import {pcElement as el} from './virtual-pc-dom.js?rev=43';
 import {communityById} from './social-catalog.js?rev=43';
 import {socialButton,socialPeerLink,socialHeading} from './social-dom.js?rev=43';
-import {sendSubmission,dialogIsTyping,markDialogRead} from './social-submission.js?rev=45';
+import {sendSubmission,dialogIsTyping,markDialogRead} from './social-submission.js?rev=47';
 import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=43';
 import {gameDateTimeLabel} from './home-calendar.js?rev=43';
-import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=45';
-import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=45';
+import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=47';
+import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=47';
 import {mountPersonalDialog,visibleDialogReader} from './social-messages-view.js?rev=43';
-import {uploadPresentation,cancelSubmissionUpload} from './social-upload.js?rev=45';
-import {startSubmissionMessage,advanceSubmissionMessage,cancelSubmissionMessage} from './social-composer.js?rev=45';
+import {uploadPresentation,cancelSubmissionUpload} from './social-upload.js?rev=47';
+import {startSubmissionMessage,advanceSubmissionMessage,cancelSubmissionMessage} from './social-composer.js?rev=47';
 import {createLyricWorkAudio} from './lyric-work-audio.js?rev=43';
 export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commit,audio,isVisible=()=>true,onRegistered=()=>{},onRead=id=>commit(markDialogRead(getState(),id))}){
  if(peer?.kind==='person')return mountPersonalDialog(d,{id,getState,getMetadata,navigate,commit,isVisible,onRead});

@@ -1,5 +1,5 @@
 import {ensureBattleWindow} from './battle-windows.js?rev=43';
-import {applyToBattle} from './virtual-pc-state.js?rev=45';
+import {applyToBattle} from './virtual-pc-state.js?rev=47';
 import {gameDateTimeLabel} from './home-calendar.js?rev=43';
 import {validGameMinute} from './game-minute.js?rev=43';
 export function metadataGameMinute(metadata={}){

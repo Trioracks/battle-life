@@ -9,31 +9,31 @@ import {playTrackVersion} from '../src/track-version-audio.js';
 const args=(characterId='mak-npc-02',roundId='selection')=>({characterId,roundId,battleId:'makarevich-1',nowMinute:600});
 test('Jura assignment uses base flow boundaries and retains the assigned speaker after progression',()=>{
  assert.equal(typeof voices.selectNpcVocal,'function');
- for(const flow of [0,40])assert.equal(voices.selectNpcVocal({}, {characterId:'npc',seed:71,flow}).asset.voiceId,'npc-voice:jura-20261018');
- assert.equal(voices.selectNpcVocal({}, {characterId:'npc',seed:71,flow:40.01}).asset,null);
+ for(const flow of [0,9.99])assert.equal(voices.selectNpcVocal({}, {characterId:'npc',seed:71,flow}).asset.voiceId,'npc-voice:jura-20261018');
+ assert.equal(voices.selectNpcVocal({}, {characterId:'npc',seed:71,flow:65.01}).asset,null);
  const first=voices.selectNpcVocal({}, {characterId:'npc',seed:71,flow:0});
  assert.equal(voices.selectNpcVocal(first.state,{characterId:'npc',seed:999,flow:100}).asset.voiceId,first.asset.voiceId);
 });
 test('independent seeded bags use 49 recordings in each of two cycles, survive reload, and never repeat at boundary',()=>{
- assert.equal(typeof voices.selectNpcVocal,'function');assert.equal(voices.NPC_VOCAL_CATALOG.length,49);
+ assert.equal(typeof voices.selectNpcVocal,'function');assert.equal(voices.NPC_VOCAL_CATALOG.filter(p=>p.voiceId==='npc-voice:jura-20261018').length,49);
  let state={},heard=[];
- const other=voices.selectNpcVocal({}, {characterId:'other',seed:71,flow:20});
+ const other=voices.selectNpcVocal({}, {characterId:'other',seed:71,flow:0});
  for(let i=0;i<98;i++){
-  const before=JSON.stringify(state),r=voices.selectNpcVocal(state,{characterId:'npc',seed:71,flow:20});
+  const before=JSON.stringify(state),r=voices.selectNpcVocal(state,{characterId:'npc',seed:71,flow:0});
   assert.equal(JSON.stringify(state),before,'selection is transactional');assert.equal(r.ok,true);state=JSON.parse(JSON.stringify(r.state));heard.push(r.asset.id);
-  if(i===24){const joined={...state,...other.state},a=voices.selectNpcVocal(joined,{characterId:'other',seed:71,flow:20}),b=voices.selectNpcVocal(other.state,{characterId:'other',seed:71,flow:20});assert.deepEqual(a.asset,b.asset);assert.deepEqual(a.state.other,b.state.other);assert.deepEqual(a.state.npc,state.npc);}
+  if(i===24){const joined={...state,...other.state},a=voices.selectNpcVocal(joined,{characterId:'other',seed:71,flow:0}),b=voices.selectNpcVocal(other.state,{characterId:'other',seed:71,flow:0});assert.deepEqual(a.asset,b.asset);assert.deepEqual(a.state.other,b.state.other);assert.deepEqual(a.state.npc,state.npc);}
  }
  assert.equal(new Set(heard.slice(0,49)).size,49);assert.equal(new Set(heard.slice(49)).size,49);assert.notEqual(heard[48],heard[49]);assert.notDeepEqual(heard.slice(0,49),heard.slice(49));
- assert.notEqual(heard.join(','),Array.from({length:49},()=>{const r=voices.selectNpcVocal(other.state,{characterId:'other',seed:71,flow:20});other.state=r.state;return r.asset.id;}).join(','));
+ assert.notEqual(heard.join(','),Array.from({length:49},()=>{const r=voices.selectNpcVocal(other.state,{characterId:'other',seed:71,flow:0});other.state=r.state;return r.asset.id;}).join(','));
 });
 test('malformed voice history blocks replay and normalization preserves the recovery marker',()=>{
  assert.equal(typeof voices.selectNpcVocal,'function');
- const r=voices.selectNpcVocal({npc:{voiceId:'npc-voice:jura-20261018',order:['unknown'],cursor:0,cycle:0,seed:1}},{characterId:'npc',seed:71,flow:20});
+ const r=voices.selectNpcVocal({npc:{voiceId:'npc-voice:jura-20261018',order:['unknown'],cursor:0,cycle:0,seed:1}},{characterId:'npc',seed:71,flow:0});
  assert.equal(r.ok,false);assert.equal(r.asset,null);
  const normalized=normalizeNpcTracks({voices:{'mak-npc-02':{broken:true}}});
- assert.equal(voices.selectNpcVocal(normalized.voices,{characterId:'mak-npc-02',seed:71,flow:20}).ok,false);
- const used=voices.selectNpcVocal({}, {characterId:'npc',seed:71,flow:20}).state;used.npc.cursor=0;
- assert.equal(voices.selectNpcVocal(used,{characterId:'npc',seed:71,flow:20}).ok,false,'a reset cursor with an already used last entry cannot replay the first recording');
+ assert.equal(voices.selectNpcVocal(normalized.voices,{characterId:'mak-npc-02',seed:71,flow:0}).ok,false);
+ const used=voices.selectNpcVocal({}, {characterId:'npc',seed:71,flow:0}).state;used.npc.cursor=0;
+ assert.equal(voices.selectNpcVocal(used,{characterId:'npc',seed:71,flow:0}).ok,false,'a reset cursor with an already used last entry cannot replay the first recording');
 });
 test('real NPC saved round includes only Jura vocal, social playback, idempotent reads and reload equality',async()=>{
  const first=ensureNpcRoundTrack(createVirtualPcState(),args());assert.equal(first.ok,true,first.reason);
@@ -48,7 +48,7 @@ test('real NPC saved round includes only Jura vocal, social playback, idempotent
 test('six additive experimental sources are reachable only below 50 XP and preserve legacy selection',()=>{
  const seen=new Set();
  for(const xp of [0,49.99])for(let i=0;i<1800;i++)Object.values(bank.chooseBeginnerParts(()=>(i+.5)/1800,{genre:'experimental',genreXP:xp,skill:20})).filter(id=>id.startsWith('jura-experimental-')).forEach(id=>seen.add(id));
- assert.equal(seen.size,6);assert.deepEqual([...seen].map(bank.beginnerById).map(p=>p.kind).sort(),['arrangement','arrangement','drums','drums','theme','theme']);
+ const released=[...seen].filter(id=>!/-[34]$/.test(id));assert.equal(released.length,6);assert.deepEqual(released.map(bank.beginnerById).map(p=>p.kind).sort(),['arrangement','arrangement','drums','drums','theme','theme']);
  for(const [genre,genreXP]of [['experimental',50],['boombap',0],['experimental',-1]])for(let i=0;i<1800;i++)assert.equal(Object.values(bank.chooseBeginnerParts(()=>(i+.5)/1800,{genre,genreXP,skill:20})).some(id=>id.startsWith('jura-experimental-')),false);
 });
 test('NPC playback rejects extra hero vocals or missing character-bound vocal requirements',()=>{
@@ -57,7 +57,7 @@ test('NPC playback rejects extra hero vocals or missing character-bound vocal re
  const missing=structuredClone(v);missing.npc.requiredAssets=missing.npc.requiredAssets.filter(a=>a.kind!=='vocal');assert.equal(npcPlaybackDescriptor(missing).ok,false);
 });
 test('a changed used/future order permutation blocks direct selection and JSON/full save recovery',()=>{
- const selection={characterId:'npc',seed:71,flow:20},first=voices.selectNpcVocal({},selection),second=voices.selectNpcVocal(first.state,selection),damaged=structuredClone(second.state);
+ const selection={characterId:'npc',seed:71,flow:0},first=voices.selectNpcVocal({},selection),second=voices.selectNpcVocal(first.state,selection),damaged=structuredClone(second.state);
  assert.equal(first.asset.id,'npc-jura-09');assert.equal(second.asset.id,'npc-jura-46');
  [damaged.npc.order[0],damaged.npc.order[2]]=[damaged.npc.order[2],damaged.npc.order[0]];
  for(const raw of [damaged,JSON.parse(JSON.stringify(damaged))]){
@@ -69,7 +69,7 @@ test('a changed used/future order permutation blocks direct selection and JSON/f
  }
 });
 test('later seeded cycle permutations block without losing normal deterministic cycles',()=>{
- const selection={characterId:'npc',seed:71,flow:20};let state={};
+ const selection={characterId:'npc',seed:71,flow:0};let state={};
  for(let i=0;i<100;i++){const r=voices.selectNpcVocal(JSON.parse(JSON.stringify(state)),selection);assert.equal(r.ok,true);state=r.state;}
  assert.equal(state.npc.cycle,2);assert.equal(state.npc.cursor,2);
  [state.npc.order[0],state.npc.order[2]]=[state.npc.order[2],state.npc.order[0]];

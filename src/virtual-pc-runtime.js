@@ -1,11 +1,11 @@
-import {createVirtualPcState} from './virtual-pc-state.js?rev=45';
+import {createVirtualPcState} from './virtual-pc-state.js?rev=47';
 import {softwareDiskBytes} from './pc-software.js?rev=43';
 import {normalizeSoftware} from './pc-software.js?rev=43';
 import {SOFTWARE} from './pc-software-catalog.js?rev=43';
 import {advanceTransfers,TRANSFER_RATES} from './pc-transfer-runtime.js?rev=43';
 import {gameMinuteStamp} from './game-minute.js?rev=43';
-import {advanceSocial} from './social-runtime.js?rev=45';
-import {advanceSubmissionUpload,normalizeOutgoingUpload} from './social-upload.js?rev=45';
+import {advanceSocial} from './social-runtime.js?rev=47';
+import {advanceSubmissionUpload,normalizeOutgoingUpload} from './social-upload.js?rev=47';
 // Only the buffered fraction of active time is ephemeral. State exposed to the
 // UI is always the last durable checkpoint, never an optimistic ready draft.
 export function createSubmissionTransferClock(){

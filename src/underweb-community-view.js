@@ -3,7 +3,7 @@ import {COMMUNITY_BOARDS,COMMUNITY_REPLY_LIMIT,normalizeCommunity,communityDay,t
 import {homeDateLabel} from './home-calendar.js?rev=43';
 import {createForumArchiveView} from './underweb-forum-archive-view.js?rev=43';
 import {publicRoundAnnouncements} from './round-topics.js?rev=43';
-import {metadataGameMinute} from './social-registration.js?rev=45';
+import {metadataGameMinute} from './social-registration.js?rev=47';
 import {createRoundAnnouncementView} from './round-announcement-view.js?rev=43';
 import {publicSeedingPosts} from './social-reactions.js?rev=43';
 import {createPostReactionsView} from './social-reactions-view.js?rev=43';

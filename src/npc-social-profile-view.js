@@ -1,6 +1,6 @@
 import {pcElement as el} from './virtual-pc-dom.js?rev=43';
 import {publicCharacterProfile} from './npc-social-profiles.js?rev=43';
-import {metadataGameMinute} from './social-registration.js?rev=45';
+import {metadataGameMinute} from './social-registration.js?rev=47';
 import {socialAvatar,socialButton,socialHeading,socialPhoto,socialPost} from './social-dom.js?rev=43';
 import {gameDateTimeLabel} from './home-calendar.js?rev=43';
 import {createPostReactionsView} from './social-reactions-view.js?rev=43';

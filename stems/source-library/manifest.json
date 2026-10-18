@@ -1,0 +1,686 @@
+{
+  "version": 1,
+  "intakeRoot": "Новая папка/beats 90 bpm",
+  "archiveRoot": "stems/source-library",
+  "originals": [
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC.wav",
+      "bytes": 1036182,
+      "sha256": "155299926db453b1403d5f6a22e3c8ae0b9e3d5ebef29214f46af6e711d1865e"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_10.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_10.wav",
+      "bytes": 1034850,
+      "sha256": "2610fbea3b8dfce87699a1034e2ad47ee2cfee49f4b3d2895aad119654a9eabc"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_11.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_11.wav",
+      "bytes": 1037514,
+      "sha256": "c038f76bfab8dea237bb1c45c8db266437f348e16d8af42b5adec7e1f3a64306"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_12.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_12.wav",
+      "bytes": 1020182,
+      "sha256": "3386dd9ea17061d82d1914eb0d8f847880b59d52539eaa38c6c63b2b12d633d7"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_13.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_13.wav",
+      "bytes": 1005514,
+      "sha256": "3d3eb1c26fc8d02b7248ac3cabe432d9d384b0300ca907b2abf390b8e70149d0"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_14.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_14.wav",
+      "bytes": 1030850,
+      "sha256": "fbbd16f006cf27a8fe1745640aaebdb69f403c3dc410c082163eb45c0da808f1"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_15.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_15.wav",
+      "bytes": 1034850,
+      "sha256": "9587dd680711630b3b34358f1ea2f5090d622056aec05eb7dda1c88bb6952eeb"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_16.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_16.wav",
+      "bytes": 910850,
+      "sha256": "af20ca9131fff426eb7824d5cdc06fb3de50ff2de912bcab92610ca538b0a032"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_17.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_17.wav",
+      "bytes": 992182,
+      "sha256": "8bc118fb50ad061bb4ca0ce975b56198f64eb572f1e1d496767b3767c990960f"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_18.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_18.wav",
+      "bytes": 1018850,
+      "sha256": "d391c24df7c7217b23c3528dda729cafe71c98ee8b2a7cce525c4db1747c711e"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_19.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_19.wav",
+      "bytes": 1036182,
+      "sha256": "7086ad94f32148bf753e84064bf8108663a0efb78c028c819d7a460a9006d59d"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_2.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_2.wav",
+      "bytes": 940182,
+      "sha256": "62040b9548569851eafb11967d9db2d11714c1fb5fcef952ccdd9565e4459751"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_20.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_20.wav",
+      "bytes": 932182,
+      "sha256": "dcb159534de55bee30a4ae2d1d7872496b6678186d99242f04244e005eaf4e27"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_21.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_21.wav",
+      "bytes": 984182,
+      "sha256": "e2ce766d6685136b9531cb5844880496b570657b904dc8a5ca60f586304601ec"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_22.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_22.wav",
+      "bytes": 1034850,
+      "sha256": "3edca9ab49dc41be68d437b33f3b2af2bfdf35db370a3f3afc78b85376b048cb"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_23.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_23.wav",
+      "bytes": 849514,
+      "sha256": "4d573cd48209fc760a021bd7575623b58472c17eba7ac71ef4e04f305529fb4f"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_24.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_24.wav",
+      "bytes": 940182,
+      "sha256": "66da6a25e33ae769e1f7e58ccde6b34f8ee033f4a322de02604e1d3faaa2baeb"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_25.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_25.wav",
+      "bytes": 946850,
+      "sha256": "7102fd7dd693ab6cca802148e76dfda48cc4a921bc5272a39ed0e9009ebc2481"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_26.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_26.wav",
+      "bytes": 1021514,
+      "sha256": "c45b7420e38354a13394a9fceb6068d2c60dc06fb451a77cf606f957a0159da7"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_27.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_27.wav",
+      "bytes": 861514,
+      "sha256": "fb2077b701303f2abf99b8499277a7612b952073405712fb361f799d3674f76d"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_28.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_28.wav",
+      "bytes": 960182,
+      "sha256": "ee5ddeb135f5d9aad4aef40d427ed8be5709964ade98c29cfdade7390748f2f2"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_29.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_29.wav",
+      "bytes": 961514,
+      "sha256": "46445e39c13b7b7d90df9a04f5eb9d06a8c6c5d88695c71b46c47a8ae3e9d4ed"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_3.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_3.wav",
+      "bytes": 1014850,
+      "sha256": "239718628529302dbd7d2fa665a8a935efae3ce81f8a3eba9b967abfd86b8786"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_30.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_30.wav",
+      "bytes": 1006850,
+      "sha256": "3e913c0595bb489d6a2c0eb72e05d8d2149aa4e480cf5059e6e1266e1c048ca0"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_31.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_31.wav",
+      "bytes": 974850,
+      "sha256": "8a110fee814febf887d944e84c96ea2d58691f19936379b2da5763ad8d8fc905"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_32.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_32.wav",
+      "bytes": 1032182,
+      "sha256": "d56e96e87838d9772e578ad79922e0fed92df1e41ba77c8bccc7024b08647d7e"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_33.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_33.wav",
+      "bytes": 926850,
+      "sha256": "05765f6d46c000cc2e2812a5d5498d79e4bd21a7ac394d1097b6ce3a6468c307"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_34.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_34.wav",
+      "bytes": 1022850,
+      "sha256": "186fb264fae81740c73e3720aa07c67ef8131ecbbe9ca05d6946b72b6874fdc3"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_35.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_35.wav",
+      "bytes": 934850,
+      "sha256": "264573522fda757f9f49dcf64255e3010188334cb5d5a3b0dec19449591a83a1"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_36.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_36.wav",
+      "bytes": 1028182,
+      "sha256": "01b869316f581e77e501e4092794c70d6a0a8f10f173c3d445cf782a118ce7c6"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_37.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_37.wav",
+      "bytes": 1040182,
+      "sha256": "25d4e71b96a73ea5b821fbe6d9cd289b3c991a6244f5007358c9317b7f44778f"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_38.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_38.wav",
+      "bytes": 981514,
+      "sha256": "6ad25ac9600331671908c0fc4544cf03e47ab1b6b15c80a716475045596dead0"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_39.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_39.wav",
+      "bytes": 1018850,
+      "sha256": "7b4c4557fcf3ce128f6dafb91d4e089b69cd84fe2e2b54d29cb1e0f42299047e"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_4.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_4.wav",
+      "bytes": 1030850,
+      "sha256": "bb644dc4a9c07e4fa03d9f86a070851d2d83692be6765ad8b0d42d210f5c873b"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_40.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_40.wav",
+      "bytes": 880182,
+      "sha256": "c0cb34f28dc34d7a5634c34518f89098ebb4d831a6ae51ecbd457c0c55125d9b"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_41.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_41.wav",
+      "bytes": 918850,
+      "sha256": "515b7e1af4617f06f93e6499ff2288b24f8c31cbcbdf2ce0a593ac675f47d2e6"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_42.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_42.wav",
+      "bytes": 1024182,
+      "sha256": "0d2ae015f764707c10bdc04b5ce0a4abd3eec6cfb7971463b9610d7ad3912edb"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_43.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_43.wav",
+      "bytes": 940182,
+      "sha256": "26ecad682faead5ac53fa84ea8b614de24fe1715f431adbf1f206dd770d7cf0e"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_44.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_44.wav",
+      "bytes": 1038850,
+      "sha256": "32feb9e18e91db5f9b8c89802bc0cd966b000ee8f1782d2662960aed8233712d"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_45.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_45.wav",
+      "bytes": 896182,
+      "sha256": "112ad7e038b778dd31bad5fe5536c35f24447aed4f389257be1216b40590b164"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_46.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_46.wav",
+      "bytes": 932182,
+      "sha256": "b6fbed606750e37808476db4aa3566b88b71273337c8f7398b756ba4a3719dbf"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_47.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_47.wav",
+      "bytes": 918850,
+      "sha256": "dab4e4711eb0ded9c3e985014429e4237eff1b2e380924e4cea9b26a084edd3e"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_48.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_48.wav",
+      "bytes": 982850,
+      "sha256": "14284773d198109c243a5622a02089a04622de0d9d42dc6be869b40dfc4311cd"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_49.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_49.wav",
+      "bytes": 928182,
+      "sha256": "4f38e605e1db4ebf1b16483c1fe3bc4e8534bb3021e961bb8d4a104853352a50"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_5.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_5.wav",
+      "bytes": 1045514,
+      "sha256": "c7b13cda302f77e4f4476486d7f3b656fb57772b61b51f34199ef87ca31452cf"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_50.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_50.wav",
+      "bytes": 1044182,
+      "sha256": "2f001f0fc4345c9ad9d6f395334cf1deafd7e293267a1bcb766dfa024bd7205a"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_51.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_51.wav",
+      "bytes": 985514,
+      "sha256": "34cca8cec8fc1281c9c5f086478cf90ed3814ad558b99da459e38baba55124d3"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_52.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_52.wav",
+      "bytes": 982850,
+      "sha256": "52a7885afbf086fc443aea4b5b8bed2a32387871c7f744d4c2ae184f1e518273"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_6.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_6.wav",
+      "bytes": 1034850,
+      "sha256": "362644f00aab28d37f0bafc699078c7b6d2e9acb291ea8fed7d89922fcd6c777"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_7.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_7.wav",
+      "bytes": 936182,
+      "sha256": "1f3607cc6d48c98c0a365402a32dcabf17856b7788e4057e88b68cb112af0911"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_8.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_8.wav",
+      "bytes": 1040182,
+      "sha256": "36026680aa631435dc6234be56ec87916a516e6356e44f51690ee5664d5ad7dc"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Artem Voice (10-65 skill)/Артём - REC_9.wav",
+      "newPath": "stems/source-library/voices/artem/Артём - REC_9.wav",
+      "bytes": 1013514,
+      "sha256": "2c3dd63e81d598857d29b883157d2eaee394aa6c13b4aed387cf66bdad5fabec"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC.wav",
+      "bytes": 1038850,
+      "sha256": "a48157e7be804cd7f074b928f40e0eef14964068e7d54ee7ca93d104d6c2acd7"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_10.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_10.wav",
+      "bytes": 1041514,
+      "sha256": "640f59254f6b1cecad4433d3dd55137bb3684f7dff4bb1736074df84e106e9ea"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_11.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_11.wav",
+      "bytes": 998850,
+      "sha256": "3f38714e88b4b71751c5d43eecc851c91f753455fe4dc25f6ddc8150d12f7bef"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_12.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_12.wav",
+      "bytes": 1006850,
+      "sha256": "d4b3a261a671517ac1bfe25fe3e0ccaa3f2fd62552be2f4f5da4c5714b1ae25d"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_13.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_13.wav",
+      "bytes": 985514,
+      "sha256": "8ec3976926510443353d65ab2cd62eca1b6d557bfc23f58cbcdbe964c98afdf4"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_14.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_14.wav",
+      "bytes": 1029514,
+      "sha256": "417909dc0d8b70d764fc058da1c3fcae9708811111d5b8560fdc67cb7db3aa36"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_15.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_15.wav",
+      "bytes": 1036182,
+      "sha256": "c994029cfc628fd150ac1f0ea63849e00afd8a3e6922c2010280c41b82c2b9fb"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_16.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_16.wav",
+      "bytes": 1036182,
+      "sha256": "37777bac25cbba1e8dfed2a719c93b72b177dc10eb330d62b87aa1b79e9e1a10"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_17.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_17.wav",
+      "bytes": 1012182,
+      "sha256": "c92f39c27c9e450413a3d4ef0f9ca35fa41ac4ad373fa4e40587dce1227537b0"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_18.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_18.wav",
+      "bytes": 1021514,
+      "sha256": "7c8bac03264c1b77fcf6fe18d8b04bf37dd6a1b02cf4d972b4c86be6a7e9e50a"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_19.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_19.wav",
+      "bytes": 977514,
+      "sha256": "d927858253102ad0938391ef77c4207e288b6ce9af844bffc026cff11f574016"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_2.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_2.wav",
+      "bytes": 1038850,
+      "sha256": "7d5d596e9073cac7489d5e69bcf520bd47684ccd5ffe7a2f52b22cd9ae4aa0e2"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_20.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_20.wav",
+      "bytes": 980182,
+      "sha256": "c8302c8e92882dd030ec998b2406f829edfd53f97186294bbaaf9a107c755797"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_21.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_21.wav",
+      "bytes": 1021514,
+      "sha256": "e191cd20d4b51030e8aa37c0ab7405191e5ecd0bddaa17778ec9c4503d9f7f4e"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_22.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_22.wav",
+      "bytes": 980182,
+      "sha256": "2e90a1a787d2e07da651851d6206d4dd6a4e004cb2fcbfa3798e17a5b59fd577"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_23.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_23.wav",
+      "bytes": 1021514,
+      "sha256": "d8388aa82b810635842f37cfe079230ee4a98dbbdcba31db7d95eaac63641396"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_24.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_24.wav",
+      "bytes": 1001514,
+      "sha256": "b2381293f49880fffc4d3240e583d189089b5c3b96293780c6a44a8b1add7415"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_25.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_25.wav",
+      "bytes": 1008182,
+      "sha256": "ae0e0ac2aeb3b0d1e7a2bc9d47edc59854c86b3a8013908ac93fa9cc0173409e"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_26.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_26.wav",
+      "bytes": 877514,
+      "sha256": "ee5dec4b1d2cb2f6173351e7e3347c7016a075d05114a71cd1dc1d311806b7f6"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_27.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_27.wav",
+      "bytes": 1020182,
+      "sha256": "0dc67421d272c89b950b2297b80a9109c1c1058d9ae5767a72426461a3eda032"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_28.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_28.wav",
+      "bytes": 997514,
+      "sha256": "d416d18b533b59bacb91c0f2526ac480d8aa75e328d0b624595c8fa3e7fcad41"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_29.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_29.wav",
+      "bytes": 1026850,
+      "sha256": "cb7b52d7a0fbc5267ada7ce742388f705d479c6d96e753f8bb39caee259b6e14"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_3.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_3.wav",
+      "bytes": 1040182,
+      "sha256": "5d3f89f99918823b85d2841e814a4588bd2cb816ced25a486d30acdaf0871487"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_30.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_30.wav",
+      "bytes": 1037514,
+      "sha256": "fb2a145789fc82d2cf3b628c62872f92d9e35c8c5df3a46038b7ddf67f9c87c3"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_31.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_31.wav",
+      "bytes": 1034850,
+      "sha256": "2688a0a4ef8bcd3997c2e52cf23b6c1d02f2d9ee178dd3766d40ce53ae44c920"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_32.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_32.wav",
+      "bytes": 1038850,
+      "sha256": "018a10cf01ffd027dcfa03588406a14bf439b6dc2a4467d24f4e60bc0d3bce90"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_33.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_33.wav",
+      "bytes": 1034850,
+      "sha256": "8b29bc1fb6033197a8c8b6d7954b8935cdc5a8bd1f2b8a66a4f0f89ebba8e473"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_34.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_34.wav",
+      "bytes": 1041514,
+      "sha256": "9d153e1f32421e475b2abb7fb0db69680ee7b0296b8fdc17d62b7efd9723c5d7"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_35.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_35.wav",
+      "bytes": 1037514,
+      "sha256": "2d42bdbe81ff8eeff51563ddf477b8858a333130d8dc2b4d570615535fc2bac1"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_36.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_36.wav",
+      "bytes": 1018850,
+      "sha256": "145041d100bbd2bff4cac5035de9ba3c46712f4a0ef5bbf380cb4950a9b31fd4"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_37.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_37.wav",
+      "bytes": 1029514,
+      "sha256": "3e05c594ff10ca745921582842c8b2518ccaf269f855629d1ed1514c3914dc83"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_38.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_38.wav",
+      "bytes": 1006850,
+      "sha256": "df1c6bd1198d11b314ebc1e79df073ce83bca0badf3e9d0e812950b879275ed4"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_39.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_39.wav",
+      "bytes": 961514,
+      "sha256": "f2020f7779aacdd5eb8f08a8567f7ba7b4f1df5708253004595fa5caf079c7a2"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_4.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_4.wav",
+      "bytes": 1038850,
+      "sha256": "93ff47e219061019a3e43551d420930ffb95d04182b209751d58041e583b887c"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_40.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_40.wav",
+      "bytes": 1008182,
+      "sha256": "fb12bcacb07b47d604602ae038344be8dfabfda4d33f5a933ae3fbbda8fd0137"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_41.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_41.wav",
+      "bytes": 1022850,
+      "sha256": "7495e95dbd9034ead996be3786b13ee935832359615427041c82382f7ac54d49"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_42.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_42.wav",
+      "bytes": 1013514,
+      "sha256": "fb23a992974c6041b82fa20e0a0d8843b32cca73fb3e1e4756233877c1a1eba9"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_43.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_43.wav",
+      "bytes": 1004182,
+      "sha256": "44859058876081dcdbfd30dec6affb640d775f703670ffc23ca6ca140a48caad"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_44.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_44.wav",
+      "bytes": 1005514,
+      "sha256": "f88282c91d35d5d2888b22f3ebffd72359f607ff471c29100ec36b1be4fe61a9"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_45.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_45.wav",
+      "bytes": 1038850,
+      "sha256": "2c25c0f868c0c520c15a0c1ee6e8929e091f0555d4c722cdd7f4c567b5b9e0a5"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_46.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_46.wav",
+      "bytes": 1036182,
+      "sha256": "4f638974dadaab77d6277b21911298951a650c88dec447149080de718d0dd4b4"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_47.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_47.wav",
+      "bytes": 1026850,
+      "sha256": "ed3903a606cff19d3f3fd68f390ecd37b3676821537173ffe8cce43d07161d05"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_48.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_48.wav",
+      "bytes": 1018850,
+      "sha256": "9ebc59492a4f45e7f4adab788109ed570cd04b119d94f23651ba26c62781d655"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_49.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_49.wav",
+      "bytes": 984182,
+      "sha256": "27da760d0b9dd3712f9a276333e9f2257a6575dffac11e93e6b6b3a631ebe1c2"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_5.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_5.wav",
+      "bytes": 1026850,
+      "sha256": "4780b0634c52a0ce7285c95353983ab2240e266fcc977762c50ca28993213b95"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_6.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_6.wav",
+      "bytes": 1033514,
+      "sha256": "29595f02f64205ffbdfa438de4fef4fd9cdd2d4f75c323162650c92c7fd68fc3"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_7.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_7.wav",
+      "bytes": 1045514,
+      "sha256": "901dffeb72d2f0a7bc83c511584432e00fb7fdc77c79bb74b9ade6dfd07c50e7"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_8.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_8.wav",
+      "bytes": 1034850,
+      "sha256": "36cdd709f4d2e8b8a900835a601f8e93469917852c170e4595b432b6a5186ef5"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/Ura Voice (0-40 skill)/юра - REC_9.wav",
+      "newPath": "stems/source-library/voices/jura/юра - REC_9.wav",
+      "bytes": 1032182,
+      "sha256": "1b3c5ee1c3db96cd530d12b49a8d8514299e7b1097895daa8d8c004ccf1a481d"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/bass 2.mp3",
+      "newPath": "stems/source-library/instruments/bass/bass 2.mp3",
+      "bytes": 142341,
+      "sha256": "c0bde6facdc5e347041f889e9b944f7b9f2a6ab0bd0142ec19ea94e78098398e"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/bass 3.mp3",
+      "newPath": "stems/source-library/instruments/bass/bass 3.mp3",
+      "bytes": 179205,
+      "sha256": "cab26cffa43bec8bb45a047a1c9b7af796c2d60fd6da361339b85db7e60d9e04"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/bass 4.mp3",
+      "newPath": "stems/source-library/instruments/bass/bass 4.mp3",
+      "bytes": 131973,
+      "sha256": "312a5fb347774254e0984acdb55ab17c782dbb28bbe25389863dbe2cb9bd13b4"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/bass.mp3",
+      "newPath": "stems/source-library/instruments/bass/bass.mp3",
+      "bytes": 73797,
+      "sha256": "d33355968ef6a78e3f644ca35fa48e0ea0ce02526a2de24d62189c087c7afcc0"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/drumm 2.mp3",
+      "newPath": "stems/source-library/instruments/drums/drumm 2.mp3",
+      "bytes": 129093,
+      "sha256": "8a7b93a94135a08c611f34b2d7d59f89838a1a6e4277e1cd9d2cc7354ab9d5c8"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/drumm 3.mp3",
+      "newPath": "stems/source-library/instruments/drums/drumm 3.mp3",
+      "bytes": 129093,
+      "sha256": "4e1fe3702546d83666a9b8cb59084b176d3958c401dccb8b13f4e5f8e6f74f6d"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/drumm 4.mp3",
+      "newPath": "stems/source-library/instruments/drums/drumm 4.mp3",
+      "bytes": 130245,
+      "sha256": "fc5db2222523b64506587b00bab5223d521c38a0743f431ba642f923238c32e9"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/drumm.mp3",
+      "newPath": "stems/source-library/instruments/drums/drumm.mp3",
+      "bytes": 65157,
+      "sha256": "f2ab9b394c2f9eafc3038b0d05cf5caed41bf000dd25e1a0722e8fba93f8e760"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/lead 2.mp3",
+      "newPath": "stems/source-library/instruments/lead/lead 2.mp3",
+      "bytes": 266757,
+      "sha256": "8d37e96c081942a11a829295f3174aa978a615d6a115dde717fa2ed4a3251763"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/lead 3.mp3",
+      "newPath": "stems/source-library/instruments/lead/lead 3.mp3",
+      "bytes": 139461,
+      "sha256": "42ea4598e2d067b306d4f1cca5cb636a610e8ba40eceae9aad2e6e60b265c033"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/lead 4.mp3",
+      "newPath": "stems/source-library/instruments/lead/lead 4.mp3",
+      "bytes": 181509,
+      "sha256": "2658e61c319a51b2b50421eaba46eb48d02440de1522fc71e2994ab56d351bc1"
+    },
+    {
+      "oldPath": "Новая папка/beats 90 bpm/lead.mp3",
+      "newPath": "stems/source-library/instruments/lead/lead.mp3",
+      "bytes": 199941,
+      "sha256": "4810ae159e956c2da9658873db77d685b27519b891a9217b37c130b932878c0f"
+    }
+  ],
+  "remainingIntakeFiles": []
+}

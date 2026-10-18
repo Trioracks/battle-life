@@ -1,6 +1,6 @@
 import {SAVE_KEY,STAT_KEYS,normalizeAppearance} from './avatar-v3-profile.js?rev=43';
 import {createWardrobe} from './home-wardrobe.js?rev=43';
-import {VIRTUAL_PC_STORAGE_KEY,createVirtualPcState} from './virtual-pc-state.js?rev=45';
+import {VIRTUAL_PC_STORAGE_KEY,createVirtualPcState} from './virtual-pc-state.js?rev=47';
 import {decodePcSave,encodePcSave} from './pc-save-codec.js?rev=43';
 
 export const NOVICE_JOURNAL_KEY='battle-life-novice-migration-v1';

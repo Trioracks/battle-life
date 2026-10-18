@@ -1,8 +1,10 @@
 // Only separately supplied and cleared NPC recordings belong here.
 // Never alias these voices to the player's vocal catalog.
-import voices from '../data/audio/npc-voices.json?rev=45' with {type:'json'};
-import jura from '../assets/audio/ft/npc-jura-v1/manifest.json?rev=45' with {type:'json'};
-export const NPC_VOICE_REGISTRY=Object.freeze({...voices,voices:voices.voices.map(v=>Object.freeze({...v,parts:v.catalog==='npc-jura-v1'?jura.parts:[]}))});
+import voices from '../data/audio/npc-voices.json?rev=47' with {type:'json'};
+import jura from '../assets/audio/ft/npc-jura-v1/manifest.json?rev=47' with {type:'json'};
+import artem from '../assets/audio/ft/npc-artem-v1/manifest.json?rev=47' with {type:'json'};
+const catalogs={'npc-jura-v1':jura,'npc-artem-v1':artem};
+export const NPC_VOICE_REGISTRY=Object.freeze({...voices,voices:voices.voices.map(v=>Object.freeze({...v,parts:catalogs[v.catalog]?.parts??[]}))});
 export const NPC_VOCAL_CATALOG=Object.freeze(NPC_VOICE_REGISTRY.voices.flatMap(v=>v.parts).map(p=>Object.freeze({...p})));
 export const npcVocalById=id=>NPC_VOCAL_CATALOG.find(asset=>asset.id===id);
 const object=v=>v!==null&&typeof v==='object'&&!Array.isArray(v),safeId=v=>typeof v==='string'&&/^[\w:-]{1,100}$/.test(v);
@@ -37,7 +39,9 @@ export function selectNpcVocal(raw,{characterId,seed,flow}={}){
  if(!safeId(characterId)||state.__invalid||state[characterId]?.blocked)return fail();
  let item=state[characterId];
  if(!item){
-  const speaker=NPC_VOICE_REGISTRY.voices.find(v=>Number.isFinite(flow)&&flow>=v.initialBaseFlowMin&&flow<=v.initialBaseFlowMax);
+  const eligible=NPC_VOICE_REGISTRY.voices.filter(v=>Number.isFinite(flow)&&flow>=v.initialBaseFlowMin&&flow<=v.initialBaseFlowMax);
+  // Speaker choice has its own seed. Existing Jura bag seeds and orders stay exact.
+  const speaker=eligible[seedFor(String(seed)+':'+characterId+':speaker')%eligible.length];
   if(!speaker)return {ok:true,state,asset:null,reason:''};
   const initial=seedFor(String(seed)+':'+characterId);item={voiceId:speaker.id,seed:initial,cycle:0,cursor:0,order:shuffled(speaker.id,initial,0),lastId:null};
  }

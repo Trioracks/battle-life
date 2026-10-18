@@ -1,6 +1,6 @@
-import {NPC_VOCAL_CATALOG} from './npc-vocal-catalog.js?rev=45';
+import {NPC_VOCAL_CATALOG} from './npc-vocal-catalog.js?rev=47';
 import {vocalById} from './vocal-catalog.js?rev=43';
-import {beginnerById} from './beat-beginner-bank.js?rev=45';
+import {beginnerById} from './beat-beginner-bank.js?rev=47';
 import {drumById} from './beat-catalog.js?rev=43';
 export function npcPlaybackDescriptor(version,vocalCatalog=NPC_VOCAL_CATALOG){
  if(!version?.npc||!Array.isArray(version.npc.requiredAssets)||version.npc.requiredAssets.some(a=>!a||typeof a.id!=='string')||!Array.isArray(version.recipe?.descriptor?.parts)||version.recipe.descriptor.parts.some(p=>!p||typeof p.id!=='string'))return {ok:false,reason:'Версия NPC недоступна.',missingAssets:[]};

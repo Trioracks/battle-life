@@ -17,7 +17,7 @@ const {chromium}=createRequire(import.meta.url)('D:/Project/Battle-web/node_modu
 await mkdir(output,{recursive:true});
 const examples=[];
 for(const [characterId,label] of [['mak-npc-08','rough-sound-8'],['mak-npc-12','higher-sound-34']]){
- const args={characterId,battleId:'makarevich-1',roundId:'selection',nowMinute:600},result=ensureNpcRoundTrack(createVirtualPcState(),args);assert.equal(result.ok,true,result.reason);
+ const args={characterId,battleId:'makarevich-1',roundId:'selection',nowMinute:600},input=verifyOnly?JSON.parse(await readFile(resolve(output,label+'-saved-state.json'),'utf8')):undefined,result=ensureNpcRoundTrack(createVirtualPcState(input),args);assert.equal(result.ok,true,result.reason);
  const saved=result.state.trackVersions.byId[result.trackVersionId],reloaded=createVirtualPcState(JSON.parse(JSON.stringify(result.state))),again=ensureNpcRoundTrack(reloaded,args);
  assert.deepEqual(again.state.trackVersions.byId[result.trackVersionId],saved);assert.deepEqual(again.state.npcTracks.voices,result.state.npcTracks.voices);
  if(verifyOnly){const prior=JSON.parse(await readFile(resolve(output,label+'-saved-state.json'),'utf8'));assert.deepEqual(saved,prior.trackVersions.byId[saved.id],'frozen recipe and assignment equality');}else await writeFile(resolve(output,label+'-saved-state.json'),JSON.stringify(result.state,null,2));examples.push({label,kind:'Generated local example using canonical NPC; not an actual campaign event',version:saved,reloadEqual:true});

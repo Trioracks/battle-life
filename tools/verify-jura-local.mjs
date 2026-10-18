@@ -16,7 +16,10 @@ for(const p of m.parts){const pcm=decodePcm16(await readFile(p.path)),stats=pcmS
  loops.push({id:p.id,...stats,barRms,cycleBars:p.cycleBars});
 }
 async function walk(dir,prefix=''){const found=[];for(const entry of await readdir(dir,{withFileTypes:true})){const relative=prefix+entry.name,path=dir+'/'+entry.name;if(entry.isDirectory())found.push(...await walk(path,relative+'/'));else{const bytes=await readFile(path);found.push([relative,bytes.length,hash(bytes)]);}}return found;}
-const intake=(await walk('Новая папка/beats 90 bpm')).sort((a,b)=>a[0]<b[0]?-1:a[0]>b[0]?1:0),intakeHash=hash(JSON.stringify(intake));
+const archive=await read('stems/source-library/manifest.json'),intake=[];
+for(const entry of archive.originals){const bytes=await readFile(entry.newPath);assert.equal(bytes.length,entry.bytes);assert.equal(hash(bytes),entry.sha256);if(m.originals.some(p=>p.path===entry.newPath))intake.push([entry.oldPath.slice(archive.intakeRoot.length+1),bytes.length,hash(bytes)]);}
+intake.sort((a,b)=>a[0]<b[0]?-1:a[0]>b[0]?1:0);const intakeHash=hash(JSON.stringify(intake));
+assert.equal((await walk('Новая папка/beats 90 bpm')).length,0,'all inventoried originals are archived');
 const trackedNames=execFileSync('git',['ls-tree','-r','--name-only','-z','b773a928a5de456b5edf3e0521d8c5223cc352ad','--','assets/audio','stems'],{windowsHide:true}).toString().split('\0').filter(Boolean).sort(),tracked=[];
 for(const path of trackedNames){const bytes=await readFile(path);tracked.push([path,bytes.length,hash(bytes)]);}
 const trackedHash=hash(tracked.map(x=>JSON.stringify(x)+'\n').join(''));

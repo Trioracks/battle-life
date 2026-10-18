@@ -1,13 +1,13 @@
 import {communityById} from './social-catalog.js?rev=43';
 import {normalizeSocial} from './social-state.js?rev=43';
 import {ensureBattleWindow} from './battle-windows.js?rev=43';
-import {ACK_TEMPLATES,acknowledgementFor} from './social-submission.js?rev=45';
+import {ACK_TEMPLATES,acknowledgementFor} from './social-submission.js?rev=47';
 import {validGameMinute} from './game-minute.js?rev=43';
 import {receivePhoneEvents} from './phone-notifications.js?rev=43';
 import {publishJudgeEvents} from './social-judging-events.js?rev=43';
 import {SOCIAL_IDENTITY} from './social-identity.js?rev=43';
 import {advancePersonalDialogs} from './social-personal.js?rev=43';
-import {advanceBattleLifecycle} from './battle-judging-clock.js?rev=45';
+import {advanceBattleLifecycle} from './battle-judging-clock.js?rev=47';
 import {ensureSocialReactionPlans} from './social-reactions.js?rev=43';
 import {ensureCommunityPublications,publishCommunityNotices} from './social-community-publications.js?rev=43';
 const clone=v=>JSON.parse(JSON.stringify(v));

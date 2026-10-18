@@ -1,4 +1,4 @@
-// Additive local preparation. Never changes, moves, or removes intake originals.
+// Reproducible local preparation from archived, byte-preserved originals.
 import {readFile,writeFile,mkdir,readdir} from 'node:fs/promises';
 import {resolve,dirname} from 'node:path';
 import {createHash} from 'node:crypto';
@@ -6,7 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {decodeAudio,measureLoudness,signalEvidence} from './audio/experimental-analysis.mjs';
 import {decodePcm16,encodePcm16,repeatDrumCycle,pcmStatistics} from './audio/source-loop.mjs';
 import {JURA_EXPERIMENTAL_BANK} from '../src/beat-jura-experimental-bank.js';
-const root=fileURLToPath(new URL('../',import.meta.url)),intake='Новая папка/beats 90 bpm',output='assets/audio/ft/jura-experimental-v1',voiceOutput='assets/audio/ft/npc-jura-v1';
+const root=fileURLToPath(new URL('../',import.meta.url)),intake='stems/source-library',output='assets/audio/ft/jura-experimental-v1',voiceOutput='assets/audio/ft/npc-jura-v1';
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const read=async p=>{try{return await readFile(resolve(root,p));}catch(e){if(e.code==='ENOENT')return null;throw e;}};
 const oldBytes=await read(output+'/manifest.json'),previous=oldBytes?JSON.parse(oldBytes):null;
@@ -18,8 +18,8 @@ async function owned(path,bytes,oldHash){
 const sourceHashes=[];
 async function source(path){const raw=await read(path);if(!raw)throw Error('Missing input '+path);sourceHashes.push({path,bytes:raw.length,sha256:hash(raw)});return raw;}
 const parts=[],gains={};
-for(const part of JURA_EXPERIMENTAL_BANK){
- const name=part.id.replace('jura-experimental-20261018-','').replace('-2',' 2'),sourcePath=intake+'/'+name+'.mp3',raw=await source(sourcePath),old=previous?.parts.find(p=>p.id===part.id);
+for(const part of JURA_EXPERIMENTAL_BANK.filter(p=>p.path.includes('/jura-experimental-v1/'))){
+ const name=part.id.replace('jura-experimental-20261018-','').replace('-2',' 2'),category={drums:'drums',theme:'lead',arrangement:'bass'}[part.kind],sourcePath=intake+'/instruments/'+category+'/'+name+'.mp3',raw=await source(sourcePath),old=previous?.parts.find(p=>p.id===part.id);
  if(old&&old.sourceHash!==hash(raw))throw Error('Changed original '+sourcePath);
  const decoded=decodeAudio(resolve(root,sourcePath)),evidence=signalEvidence(decoded);
  // These non-gapless MP3 exports share ~25ms encoder delay. Trim only the
@@ -37,7 +37,7 @@ for(const part of JURA_EXPERIMENTAL_BANK){
  const target={drums:-30,theme:-27,arrangement:-28.5}[part.kind],loudness=measureLoudness(resolve(root,path)),gainDb=Number(Math.min(target-loudness.lufs,-10-loudness.truePeak).toFixed(2));gains[part.id]=gainDb;
  parts.push({...part,path,source:sourcePath,sourceHash:hash(raw),sha256:hash(wav),sampleRate:loop.sampleRate,frames:loop.channels[0].length,evidence,trimFrames:trim,tailPolicy:'Entire remaining decoded decay folded into measured musical cycle; 3ms seam fades; no transpose or time stretch',tonalEvidence:part.kind==='drums'?'Percussion; kick resonances are not a key.':'A/C/E/G and D/B natural partials support common A-minor compatibility, inferred rather than authoritative key detection.',calibration:{buildGainDb,gainDb,targetLufs:target,derived:loudness,after:measureLoudness(resolve(root,path),gainDb)}});
 }
-const voiceDir=intake+'/Ura Voice (0-40 skill)',names=(await readdir(resolve(root,voiceDir))).filter(n=>n.endsWith('.wav')).sort((a,b)=>a.localeCompare(b,'ru',{numeric:true})),voiceParts=[];
+const voiceDir=intake+'/voices/jura',names=(await readdir(resolve(root,voiceDir))).filter(n=>n.endsWith('.wav')).sort((a,b)=>a.localeCompare(b,'ru',{numeric:true})),voiceParts=[];
 if(names.length!==49)throw Error('Expected the 49 supplied Jura recordings');
 for(const [i,name]of names.entries()){
  const sourcePath=voiceDir+'/'+name,raw=await source(sourcePath),pcm=decodePcm16(raw),n=String(i+1).padStart(2,'0'),id='npc-jura-'+n,path=voiceOutput+'/'+n+'.wav',old=previousVoices?.parts.find(p=>p.id===id);

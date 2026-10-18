@@ -1,5 +1,5 @@
 import {USER_EXPERIMENTAL_BANK,USER_EXPERIMENTAL_RECIPES} from './beat-user-experimental-bank.js?rev=43';
-import {JURA_EXPERIMENTAL_BANK,JURA_EXPERIMENTAL_RECIPES} from './beat-jura-experimental-bank.js?rev=45';
+import {JURA_EXPERIMENTAL_BANK,JURA_EXPERIMENTAL_RECIPES} from './beat-jura-experimental-bank.js?rev=47';
 export {USER_EXPERIMENTAL_BANK} from './beat-user-experimental-bank.js?rev=43';
 const legacyBank = ['drums','theme','arrangement'].flatMap(kind =>
   Array.from({length:16}, (_,index) => {

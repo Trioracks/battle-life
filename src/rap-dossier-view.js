@@ -1,10 +1,10 @@
 import {pcElement as el,pcFind} from './virtual-pc-dom.js?rev=43';
 import {socialButton} from './social-dom.js?rev=43';
-import {dossierCases,publicDossierCase,publicDossierTarget} from './rap-dossier-cases.js?rev=45';
-import {metadataGameMinute} from './social-registration.js?rev=45';
+import {dossierCases,publicDossierCase,publicDossierTarget} from './rap-dossier-cases.js?rev=47';
+import {metadataGameMinute} from './social-registration.js?rev=47';
 import {createPublicAnalysisReportView} from './rap-analysis-view.js?rev=43';
-import {startTrackStudy,pauseStudy,effectiveStudySkills} from './rap-analysis.js?rev=45';
-import {startCaseStudy,pauseCaseStudy} from './rap-research.js?rev=45';
+import {startTrackStudy,pauseStudy,effectiveStudySkills} from './rap-analysis.js?rev=47';
+import {startCaseStudy,pauseCaseStudy} from './rap-research.js?rev=47';
 import {mountDossierBoard,forecastText} from './rap-dossier-board-view.js?rev=43';
 import {gameDateTimeLabel} from './home-calendar.js?rev=43';
 const studyLabel=n=>n.kind==='track'?'Изучить трек · 45 мин':['battle','round'].includes(n.kind)?'Изучить '+(n.kind==='battle'?'баттл':'раунд')+' · 6 ч':'Изучить · 45 мин';

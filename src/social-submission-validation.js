@@ -2,9 +2,9 @@ import {communityById} from './social-catalog.js?rev=43';
 import {normalizeSocial} from './social-state.js?rev=43';
 import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=43';
 import {validGameMinute} from './game-minute.js?rev=43';
-import {TRACK_DSP_VERSION} from './track-version.js?rev=45';
-import {submissionCandidates} from './battle-submission.js?rev=45';
-import {normalizeOutgoingUpload} from './social-upload.js?rev=45';
+import {TRACK_DSP_VERSION} from './track-version.js?rev=47';
+import {submissionCandidates} from './battle-submission.js?rev=47';
+import {normalizeOutgoingUpload} from './social-upload.js?rev=47';
 export function submissionSendContext(state,{communityId,nowMinute}={}){
  const fail=reason=>({ok:false,state,reason}),c=communityById(communityId),window=currentBattleWindow(state,c?.battleId,nowMinute),upload=normalizeOutgoingUpload(state.outgoingUpload,state.trackVersions,state.audioExports);
  if(upload?.issue)return fail(upload.issue);

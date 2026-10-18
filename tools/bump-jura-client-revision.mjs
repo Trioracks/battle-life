@@ -1,7 +1,7 @@
 // Mechanical cache invalidation for the changed audio modules and their importers.
 import {readdir,readFile,writeFile} from 'node:fs/promises';
 import path from 'node:path';
-const revision='45',files=(await readdir('src')).filter(f=>f.endsWith('.js')).map(f=>'src/'+f),texts=new Map(await Promise.all(files.map(async f=>[f,await readFile(f,'utf8')])));
+const revision='47',files=(await readdir('src')).filter(f=>f.endsWith('.js')).map(f=>'src/'+f),texts=new Map(await Promise.all(files.map(async f=>[f,await readFile(f,'utf8')])));
 const pattern=/(?:from\s*|import\s*\(\s*|new URL\(\s*)['"](\.\.?\/[^'"]+\.js(?:\?[^'"]*)?)['"]/g;
 const imports=new Map([...texts].map(([f,t])=>[f,[...t.matchAll(pattern)].map(m=>({url:m[1],target:path.posix.normalize(path.posix.join(path.posix.dirname(f),m[1].split('?')[0]))}))]));
 const changed=new Set(['src/battle-npc.js','src/battle-npc-audio.js','src/beat-audio.js','src/beat-beginner-bank.js','src/npc-vocal-catalog.js','src/source-levels.js','src/track-version-audio.js','src/beat-jura-experimental-bank.js']);
