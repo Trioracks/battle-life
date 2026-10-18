@@ -1,6 +1,6 @@
-import {advanceSocial} from './social-runtime.js?rev=44';
-import {preparePcSaveArchives} from './virtual-pc-state.js?rev=44';
-import {SOCIAL_DOMAIN_KEYS} from './social-background.js?rev=44';
+import {advanceSocial} from './social-runtime.js?rev=45';
+import {preparePcSaveArchives} from './virtual-pc-state.js?rev=45';
+import {SOCIAL_DOMAIN_KEYS} from './social-background.js?rev=45';
 
 // Lives in a Worker. All history traversal, validation and large compression
 // stays here; the main thread receives only changed sections and prepared saves.

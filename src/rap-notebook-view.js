@@ -1,10 +1,10 @@
 // Notepad-style view of the persisted symbolic lyric projects.
-import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=44';
-import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill,canEditLyricContentMix,setLyricContentMix,lyricRefinementReason} from './lyric-production.js?rev=44';
-import {randomBeatName} from './beat-names.js?rev=44';
-import {mountProjectPicker} from './project-picker-view.js?rev=44';
-import {normalizeBeat} from './beat-production.js?rev=44';
-import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=44';
+import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=45';
+import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill,canEditLyricContentMix,setLyricContentMix,lyricRefinementReason} from './lyric-production.js?rev=45';
+import {randomBeatName} from './beat-names.js?rev=45';
+import {mountProjectPicker} from './project-picker-view.js?rev=45';
+import {normalizeBeat} from './beat-production.js?rev=45';
+import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=45';
 
 export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,onWork=()=>false}={}){
  const d=root.ownerDocument;let panel=null,modal=null,returnFocusLabel='',message='',signature=[],disposed=false,controls=[],needsLabel=null;

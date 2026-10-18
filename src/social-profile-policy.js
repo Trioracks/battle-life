@@ -1,7 +1,7 @@
-import {npcSocialProfile} from './npc-social-profiles.js?rev=44';
-import {profileAccess as legacyAccess} from './social-state.js?rev=44';
-import {validGameMinute} from './game-minute.js?rev=44';
-import {publicAnnouncedJudges} from './social-community-publications.js?rev=44';
+import {npcSocialProfile} from './npc-social-profiles.js?rev=45';
+import {profileAccess as legacyAccess} from './social-state.js?rev=45';
+import {validGameMinute} from './game-minute.js?rev=45';
+import {publicAnnouncedJudges} from './social-community-publications.js?rev=45';
 export function profileAccess(state,{viewerId='player',characterId,nowMinute}={}){
  if(characterId===viewerId||characterId==='me')return {canView:true,canAddFriend:false,reason:''};
  const profile=npcSocialProfile(state,characterId);

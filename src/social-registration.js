@@ -1,7 +1,7 @@
-import {ensureBattleWindow} from './battle-windows.js?rev=44';
-import {applyToBattle} from './virtual-pc-state.js?rev=44';
-import {gameDateTimeLabel} from './home-calendar.js?rev=44';
-import {validGameMinute} from './game-minute.js?rev=44';
+import {ensureBattleWindow} from './battle-windows.js?rev=45';
+import {applyToBattle} from './virtual-pc-state.js?rev=45';
+import {gameDateTimeLabel} from './home-calendar.js?rev=45';
+import {validGameMinute} from './game-minute.js?rev=45';
 export function metadataGameMinute(metadata={}){
  if(validGameMinute(metadata.gameMinutes))return metadata.gameMinutes;
  const match=/^(\d{1,2}):(\d{2})$/.exec(metadata.clockLabel??''),day=Number.isSafeInteger(metadata.gameDay)&&metadata.gameDay>0?metadata.gameDay:1;

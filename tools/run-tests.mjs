@@ -8,16 +8,16 @@ const projectRoot=fileURLToPath(new URL('../',import.meta.url));
 export function discoverTests({root=projectRoot,profile='public'}={}){
  if(!['public','local-assets'].includes(profile))throw new Error('Unknown test profile');
  const selected=[],excluded=[];
- function visit(relative){for(const entry of fs.readdirSync(path.join(root,relative),{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){const name=`${relative}/${entry.name}`;if(entry.isSymbolicLink())throw new Error(`Linked test input: ${name}`);if(entry.isDirectory())visit(name);else if(entry.isFile()&&entry.name.endsWith('.test.js')){
-  if(profile==='public'&&name.startsWith('test/local-assets/'))excluded.push({path:name,reason:'requires explicitly configured private physical assets'});
-  else if(profile==='local-assets'&&name==='test/local-assets/apartment-installer.test.js'&&process.platform!=='win32')excluded.push({path:name,reason:'Windows-only PowerShell installer dry-run; unavailable on this platform'});
+ function visit(relative){for(const entry of fs.readdirSync(path.join(root,relative),{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){const name=`${relative}/${entry.name}`;if(entry.isSymbolicLink())throw new Error(`Linked test input: ${name}`);if(entry.isDirectory())visit(name);else if(entry.isFile()&&/\.test\.(?:js|mjs)$/.test(entry.name)){
+  if(profile==='public'&&name.startsWith('test/local-assets/'))excluded.push({path:name,reason:/\/(?:beat-skill-ladder|flow-genre-curve|gans-mix-preview)\.test\.js$/.test(name)?'requires native FFmpeg/Rubber Band DSP tooling; some cases also use explicitly configured private source assets':/\/(?:artem-local|apartment-installer)\.test\.js$/.test(name)?'requires Windows PowerShell archival/installer tooling':'requires explicitly configured private physical assets'});
+  else if(profile==='local-assets'&&['test/local-assets/apartment-installer.test.js','test/local-assets/artem-local.test.js'].includes(name)&&process.platform!=='win32')excluded.push({path:name,reason:'Windows-only PowerShell installer or archival check; unavailable on this platform'});
   else selected.push(name);
  }}}
  visit('test');if(!selected.length)throw new Error('No selected tests: empty suite');return {selected,excluded};
 }
 export function validateRequiredAssets(root){
  const base=validateLocalAssetRoot(root),required=new Set(['assets/source/apartment-cutaway-v3.blend','assets/source/mannequin-v3.blend']);
- for(const bank of ['beginner-v1','beginner-v2','user-drums-v1','user-experimental-v1','vocals-v1','vocals-v2']){
+ for(const bank of ['beginner-v1','beginner-v2','user-drums-v1','user-experimental-v1','vocals-v1','vocals-v2','npc-jura-v1','npc-artem-v1','npc-gans-v1','npc-kapa-v1','jura-experimental-v1','jura-experimental-v2','experimental-gans-v1']){
   const manifest=JSON.parse(fs.readFileSync(path.join(projectRoot,`assets/audio/ft/${bank}/manifest.json`),'utf8'));
   for(const part of manifest.parts)for(const value of [part.path,part.source])if(value)required.add(value);
  }

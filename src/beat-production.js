@@ -1,11 +1,11 @@
-import {BEAT_RULES as R,BEAT_PRACTICE,BEAT_GENRES,drumById,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=44';
-import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=44';
-import {softwareDiskBytes} from './pc-software.js?rev=44';
-import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=44';
-import {createBeatResult} from './beat-result.js?rev=44';
-import {normalizeRecording,effectiveSoundSkill} from './vocal-result.js?rev=44';
-import {normalizeSongForm} from './beat-song-form.js?rev=44';
-import {genreById,normalizeGenreProgression,genreOptions,genreSnapshot,normalizeGenreSnapshot,addGenrePractice} from './genre-progression.js?rev=44';
+import {BEAT_RULES as R,BEAT_PRACTICE,BEAT_GENRES,drumById,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=45';
+import {beginnerById,chooseBeginnerParts} from './beat-beginner-bank.js?rev=45';
+import {softwareDiskBytes} from './pc-software.js?rev=45';
+import {createBeatMix,normalizeBeatMix} from './beat-mix.js?rev=45';
+import {createBeatResult} from './beat-result.js?rev=45';
+import {normalizeRecording,effectiveSoundSkill} from './vocal-result.js?rev=45';
+import {normalizeSongForm} from './beat-song-form.js?rev=45';
+import {genreById,normalizeGenreProgression,genreOptions,genreSnapshot,normalizeGenreSnapshot,addGenrePractice} from './genre-progression.js?rev=45';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
 const clamp=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,finite(v)));
 const text=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';
@@ -21,7 +21,11 @@ export function normalizeBeat(p){
  if(p.songFormVersion===1)beat.songFormVersion=1;
  const genreProfile=normalizeGenreSnapshot(p.genreProfile);if(genreProfile&&genreProfile.id===beat.genre)beat.genreProfile=genreProfile;
  const mix=normalizeBeatMix(p.mix);if(mix)beat.mix=mix;
- const recording=normalizeRecording(p.recording);if(recording&&beat.status==='ready')beat.recording=recording;
+ const recording=normalizeRecording(p.recording);
+ // A rejected stored take must recover as a blocked project, never an empty
+ // ready beat that can overwrite the original recording on the next save.
+ if(p.recording!=null&&(!recording||beat.status!=='ready'))return null;
+ if(recording)beat.recording=recording;
  if(p.version===3){
   beat.productionMode=p.productionMode==='beginner'?'beginner':'automatic';
   beat.audio={bankVersion:p.audio?.bankVersion===1?1:0,bars:p.audio?.bars===4?4:0,themeId:text(p.audio?.themeId,100),arrangementId:text(p.audio?.arrangementId,100)};

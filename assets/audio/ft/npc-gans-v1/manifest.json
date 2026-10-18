@@ -1,0 +1,1758 @@
+{
+  "version": 1,
+  "batch": "gans-kapa-20261018-v1",
+  "authorship": "User supplied full WAV takes; original archive preserved byte-for-byte. Usable WAV paths reference originals; only the selected demo take has a runtime copy.",
+  "voice": "gans",
+  "initialSkillRange": {
+    "min": 0,
+    "max": 50
+  },
+  "parts": [
+    {
+      "id": "npc-gans-01",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./assets/audio/ft/npc-gans-v1/01.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_2.wav",
+      "sourceHash": "f7b71f36b5494634e123a9f924d7e08b92f5cc6cf4ed0692a7436c36941379e5",
+      "sha256": "f7b71f36b5494634e123a9f924d7e08b92f5cc6cf4ed0692a7436c36941379e5",
+      "bytes": 993514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 248333,
+      "seconds": 5.173604166666666,
+      "bpm": 90,
+      "sourceGainDb": -1.92706,
+      "rms": 0.05617790131264863,
+      "peak": 0.690673828125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 3.06
+        },
+        {
+          "startSeconds": 3.19,
+          "endSeconds": 3.74
+        },
+        {
+          "startSeconds": 3.88,
+          "endSeconds": 4.46
+        },
+        {
+          "startSeconds": 4.58,
+          "endSeconds": 5.06
+        }
+      ],
+      "selectedForDemo": true,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-02",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_3.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_3.wav",
+      "sourceHash": "38e43e5d30e02230dcd9f1719a4f0534e8cd88dbf26c800fbc65bb1fce4edfbb",
+      "sha256": "38e43e5d30e02230dcd9f1719a4f0534e8cd88dbf26c800fbc65bb1fce4edfbb",
+      "bytes": 957514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 239333,
+      "seconds": 4.986104166666666,
+      "bpm": 90,
+      "sourceGainDb": -5.36817,
+      "rms": 0.08348746068530653,
+      "peak": 0.5361328125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 4.86
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-03",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_4.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_4.wav",
+      "sourceHash": "52852b671a092d639adfe7aac6926dbd137a4cecc35a26e8f93c872381a68d35",
+      "sha256": "52852b671a092d639adfe7aac6926dbd137a4cecc35a26e8f93c872381a68d35",
+      "bytes": 1030850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 257667,
+      "seconds": 5.3680625,
+      "bpm": 90,
+      "sourceGainDb": -4.33776,
+      "rms": 0.07414821934758017,
+      "peak": 0.58538818359375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.37,
+          "endSeconds": 5.22
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-04",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_5.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_5.wav",
+      "sourceHash": "cf4339fb82f2536f349198cd8b31da8ac8397536930a742a2d2ea5d3c5e6e2e1",
+      "sha256": "cf4339fb82f2536f349198cd8b31da8ac8397536930a742a2d2ea5d3c5e6e2e1",
+      "bytes": 868182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 217000,
+      "seconds": 4.520833333333333,
+      "bpm": 90,
+      "sourceGainDb": -5.54718,
+      "rms": 0.08522587072198758,
+      "peak": 0.536895751953125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 1.21
+        },
+        {
+          "startSeconds": 1.3,
+          "endSeconds": 4.38
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-05",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_6.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_6.wav",
+      "sourceHash": "c3ac61361cada369cfc75082dc4c8ed1327bb09ad54ff8afefa4cec1e3991fa1",
+      "sha256": "c3ac61361cada369cfc75082dc4c8ed1327bb09ad54ff8afefa4cec1e3991fa1",
+      "bytes": 1022850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 255667,
+      "seconds": 5.326395833333334,
+      "bpm": 90,
+      "sourceGainDb": -2.90337,
+      "rms": 0.06286097613955573,
+      "peak": 0.61260986328125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.01,
+          "endSeconds": 1.12
+        },
+        {
+          "startSeconds": 1.22,
+          "endSeconds": 2.42
+        },
+        {
+          "startSeconds": 2.73,
+          "endSeconds": 5.14
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-06",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_7.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_7.wav",
+      "sourceHash": "970b397a1acb711d33a11e2f996248c1c9e0e8c89f5c82700184533b41f0196f",
+      "sha256": "970b397a1acb711d33a11e2f996248c1c9e0e8c89f5c82700184533b41f0196f",
+      "bytes": 981514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 245333,
+      "seconds": 5.111104166666666,
+      "bpm": 90,
+      "sourceGainDb": -3.53472,
+      "rms": 0.06760024549983006,
+      "peak": 0.572998046875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 4.99
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-07",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_8.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_8.wav",
+      "sourceHash": "a0e2753999c3b09b31f19adbcb8f49d133bcb469b965b9c9e6750e0a49303d09",
+      "sha256": "a0e2753999c3b09b31f19adbcb8f49d133bcb469b965b9c9e6750e0a49303d09",
+      "bytes": 980182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 245000,
+      "seconds": 5.104166666666667,
+      "bpm": 90,
+      "sourceGainDb": -0.73842,
+      "rms": 0.048992939322928974,
+      "peak": 0.428375244140625,
+      "phraseSpans": [
+        {
+          "startSeconds": 1.31,
+          "endSeconds": 2.24
+        },
+        {
+          "startSeconds": 4,
+          "endSeconds": 4.97
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-08",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_9.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_9.wav",
+      "sourceHash": "2478b19bf9e18c1dd941c598f34b33c45fd8119f13afb6c2ca12a97228f355ec",
+      "sha256": "2478b19bf9e18c1dd941c598f34b33c45fd8119f13afb6c2ca12a97228f355ec",
+      "bytes": 977514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 244333,
+      "seconds": 5.090270833333333,
+      "bpm": 90,
+      "sourceGainDb": -0.87326,
+      "rms": 0.04975945614801914,
+      "peak": 0.499542236328125,
+      "phraseSpans": [
+        {
+          "startSeconds": 1.22,
+          "endSeconds": 2.3
+        },
+        {
+          "startSeconds": 3.81,
+          "endSeconds": 4.95
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-09",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_10.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_10.wav",
+      "sourceHash": "a0733e719814b409c2759cf42a99035031b7e281a09e7e2a98017c810a50e215",
+      "sha256": "a0733e719814b409c2759cf42a99035031b7e281a09e7e2a98017c810a50e215",
+      "bytes": 976182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 244000,
+      "seconds": 5.083333333333333,
+      "bpm": 90,
+      "sourceGainDb": -1.56822,
+      "rms": 0.05390433287680663,
+      "peak": 0.597076416015625,
+      "phraseSpans": [
+        {
+          "startSeconds": 1.27,
+          "endSeconds": 2.27
+        },
+        {
+          "startSeconds": 3.74,
+          "endSeconds": 4.94
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-10",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_11.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_11.wav",
+      "sourceHash": "07d872cca19ed417e94504d61b3be657bf96871fd68d4d0d4b3739f1b8fe5629",
+      "sha256": "07d872cca19ed417e94504d61b3be657bf96871fd68d4d0d4b3739f1b8fe5629",
+      "bytes": 994850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 248667,
+      "seconds": 5.1805625,
+      "bpm": 90,
+      "sourceGainDb": -0.73098,
+      "rms": 0.04895098599324647,
+      "peak": 0.63299560546875,
+      "phraseSpans": [
+        {
+          "startSeconds": 1.16,
+          "endSeconds": 2.27
+        },
+        {
+          "startSeconds": 3.86,
+          "endSeconds": 5.02
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-11",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_12.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_12.wav",
+      "sourceHash": "01283ca106de2ee0f67aed7607e6d79ff82ee06814fa9663bdfbbc2cb64a1b6d",
+      "sha256": "01283ca106de2ee0f67aed7607e6d79ff82ee06814fa9663bdfbbc2cb64a1b6d",
+      "bytes": 980182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 245000,
+      "seconds": 5.104166666666667,
+      "bpm": 90,
+      "sourceGainDb": -1.18363,
+      "rms": 0.05156965431726283,
+      "peak": 0.58026123046875,
+      "phraseSpans": [
+        {
+          "startSeconds": 1.2,
+          "endSeconds": 2.37
+        },
+        {
+          "startSeconds": 3.81,
+          "endSeconds": 4.94
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-12",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_13.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_13.wav",
+      "sourceHash": "c637b256df4c6383ad91c0252a4e4a9f33d5163d8f35d0fe1b1e3f63920d1a01",
+      "sha256": "c637b256df4c6383ad91c0252a4e4a9f33d5163d8f35d0fe1b1e3f63920d1a01",
+      "bytes": 994850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 248667,
+      "seconds": 5.1805625,
+      "bpm": 90,
+      "sourceGainDb": -0.25689,
+      "rms": 0.04635080005874487,
+      "peak": 0.55938720703125,
+      "phraseSpans": [
+        {
+          "startSeconds": 1.18,
+          "endSeconds": 2.32
+        },
+        {
+          "startSeconds": 3.8,
+          "endSeconds": 5.04
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-13",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_14.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_14.wav",
+      "sourceHash": "dded35d68b920090e36393b492d1b3c48352b49c11a16f957dc01863d5f2f106",
+      "sha256": "dded35d68b920090e36393b492d1b3c48352b49c11a16f957dc01863d5f2f106",
+      "bytes": 986850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 246667,
+      "seconds": 5.138895833333334,
+      "bpm": 90,
+      "sourceGainDb": 0,
+      "rms": 0.044632284538267064,
+      "peak": 0.591217041015625,
+      "phraseSpans": [
+        {
+          "startSeconds": 1.23,
+          "endSeconds": 2.46
+        },
+        {
+          "startSeconds": 3.78,
+          "endSeconds": 5.02
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-14",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_15.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_15.wav",
+      "sourceHash": "23f107445d78c9eff7159228a289dfc25d3d7a3cfb4f955f680417fe467aec6e",
+      "sha256": "23f107445d78c9eff7159228a289dfc25d3d7a3cfb4f955f680417fe467aec6e",
+      "bytes": 1001514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 250333,
+      "seconds": 5.215270833333333,
+      "bpm": 90,
+      "sourceGainDb": -2.93933,
+      "rms": 0.06312174794608252,
+      "peak": 0.577667236328125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.04
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-15",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_16.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_16.wav",
+      "sourceHash": "795bae32b794e93959122bf34f7d8cdf088752e6b1349d944eeac3fbbbfdf782",
+      "sha256": "795bae32b794e93959122bf34f7d8cdf088752e6b1349d944eeac3fbbbfdf782",
+      "bytes": 978850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 244667,
+      "seconds": 5.097229166666667,
+      "bpm": 90,
+      "sourceGainDb": -3.51453,
+      "rms": 0.06744329913925082,
+      "peak": 0.53106689453125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.33,
+          "endSeconds": 4.21
+        },
+        {
+          "startSeconds": 4.3,
+          "endSeconds": 4.97
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-16",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_17.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_17.wav",
+      "sourceHash": "cc0b91c71c8ba646261ca0aee7b47f164bbec5f7d046a2189efbdad02788a7ad",
+      "sha256": "cc0b91c71c8ba646261ca0aee7b47f164bbec5f7d046a2189efbdad02788a7ad",
+      "bytes": 930850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 232667,
+      "seconds": 4.847229166666667,
+      "bpm": 90,
+      "sourceGainDb": -2.5779,
+      "rms": 0.060549099284994086,
+      "peak": 0.470611572265625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.25,
+          "endSeconds": 0.89
+        },
+        {
+          "startSeconds": 0.99,
+          "endSeconds": 2.07
+        },
+        {
+          "startSeconds": 2.21,
+          "endSeconds": 4.73
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-17",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_18.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_18.wav",
+      "sourceHash": "5e37faf7cd1cea69c4484d36c7cd2cc22d5cb876ba7f2cee501fbcf3b4539225",
+      "sha256": "5e37faf7cd1cea69c4484d36c7cd2cc22d5cb876ba7f2cee501fbcf3b4539225",
+      "bytes": 982850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 245667,
+      "seconds": 5.1180625,
+      "bpm": 90,
+      "sourceGainDb": -4.48332,
+      "rms": 0.07540121299811647,
+      "peak": 0.5174560546875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 2.29
+        },
+        {
+          "startSeconds": 2.5,
+          "endSeconds": 4.25
+        },
+        {
+          "startSeconds": 4.35,
+          "endSeconds": 4.97
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-18",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_19.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_19.wav",
+      "sourceHash": "e13d768edbd35dc827ddb0ab3bd8cbf45fbf0d3caf278a0b586dea2220c75154",
+      "sha256": "e13d768edbd35dc827ddb0ab3bd8cbf45fbf0d3caf278a0b586dea2220c75154",
+      "bytes": 896182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 224000,
+      "seconds": 4.666666666666667,
+      "bpm": 90,
+      "sourceGainDb": -1.96266,
+      "rms": 0.056408612497730735,
+      "peak": 0.518218994140625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.01,
+          "endSeconds": 1.75
+        },
+        {
+          "startSeconds": 2.41,
+          "endSeconds": 4.48
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-19",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_20.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_20.wav",
+      "sourceHash": "8f438db6e4ff8a71f917dea1a90caf04fa653c019723b0e3b0bb37a54cb730fd",
+      "sha256": "8f438db6e4ff8a71f917dea1a90caf04fa653c019723b0e3b0bb37a54cb730fd",
+      "bytes": 888182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 222000,
+      "seconds": 4.625,
+      "bpm": 90,
+      "sourceGainDb": -1.40434,
+      "rms": 0.052896820584574344,
+      "peak": 0.401885986328125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 1.78
+        },
+        {
+          "startSeconds": 2.63,
+          "endSeconds": 4.43
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-20",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_21.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_21.wav",
+      "sourceHash": "ca799328b3959b28f9d0273cfffa4f82e2aab7a2fc5f843427b91f8b80f21a88",
+      "sha256": "ca799328b3959b28f9d0273cfffa4f82e2aab7a2fc5f843427b91f8b80f21a88",
+      "bytes": 882850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 220667,
+      "seconds": 4.597229166666667,
+      "bpm": 90,
+      "sourceGainDb": -2.63793,
+      "rms": 0.060969015057847874,
+      "peak": 0.501190185546875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 1.84
+        },
+        {
+          "startSeconds": 2.41,
+          "endSeconds": 4.43
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-21",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_22.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_22.wav",
+      "sourceHash": "a8ab4ce2feb1e630c97d5783282f7868303799180409fce57a51bb359fc2cac6",
+      "sha256": "a8ab4ce2feb1e630c97d5783282f7868303799180409fce57a51bb359fc2cac6",
+      "bytes": 897514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 224333,
+      "seconds": 4.673604166666666,
+      "bpm": 90,
+      "sourceGainDb": -2.76359,
+      "rms": 0.06185747724320927,
+      "peak": 0.465240478515625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 1.17
+        },
+        {
+          "startSeconds": 1.26,
+          "endSeconds": 1.76
+        },
+        {
+          "startSeconds": 2.64,
+          "endSeconds": 4.52
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-22",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_23.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_23.wav",
+      "sourceHash": "25225416850cd0d91a2f49683b940a5b6a7a99143bca1633f442a2dd7ff3f017",
+      "sha256": "25225416850cd0d91a2f49683b940a5b6a7a99143bca1633f442a2dd7ff3f017",
+      "bytes": 860182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 215000,
+      "seconds": 4.479166666666667,
+      "bpm": 90,
+      "sourceGainDb": -2.15224,
+      "rms": 0.05765333090864715,
+      "peak": 0.597412109375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 1.88
+        },
+        {
+          "startSeconds": 2.43,
+          "endSeconds": 3.67
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-23",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_24.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_24.wav",
+      "sourceHash": "b2ff71d815d021938ec2b9cb7933ef681582731a79bd636e7d3a907ac65fd91e",
+      "sha256": "b2ff71d815d021938ec2b9cb7933ef681582731a79bd636e7d3a907ac65fd91e",
+      "bytes": 893514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 223333,
+      "seconds": 4.652770833333333,
+      "bpm": 90,
+      "sourceGainDb": -2.34704,
+      "rms": 0.058960931705687544,
+      "peak": 0.64105224609375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 1.9
+        },
+        {
+          "startSeconds": 2.49,
+          "endSeconds": 4.48
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-24",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_25.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_25.wav",
+      "sourceHash": "16e2c1b26d0addcfec292754e2e6c15d46bc96af22eb13d4f096a9ae2df4165d",
+      "sha256": "16e2c1b26d0addcfec292754e2e6c15d46bc96af22eb13d4f096a9ae2df4165d",
+      "bytes": 989514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 247333,
+      "seconds": 5.152770833333333,
+      "bpm": 90,
+      "sourceGainDb": -4.16405,
+      "rms": 0.07268003228920908,
+      "peak": 0.740875244140625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.19
+        },
+        {
+          "startSeconds": 0.33,
+          "endSeconds": 0.98
+        },
+        {
+          "startSeconds": 1.34,
+          "endSeconds": 2.99
+        },
+        {
+          "startSeconds": 3.32,
+          "endSeconds": 4.98
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-25",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_26.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_26.wav",
+      "sourceHash": "2056cdadaf838251a6e45e4d08b848f13b32f6c9ba367ecc4d7ecd40fc2fcc4c",
+      "sha256": "2056cdadaf838251a6e45e4d08b848f13b32f6c9ba367ecc4d7ecd40fc2fcc4c",
+      "bytes": 1048182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 262000,
+      "seconds": 5.458333333333333,
+      "bpm": 90,
+      "sourceGainDb": -3.30739,
+      "rms": 0.06585397202831383,
+      "peak": 0.555419921875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.34
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-26",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_27.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_27.wav",
+      "sourceHash": "7c5c1bae08eb3bd6d8f45b9b920e3e4506621152aba422a114e1213e0025c18a",
+      "sha256": "7c5c1bae08eb3bd6d8f45b9b920e3e4506621152aba422a114e1213e0025c18a",
+      "bytes": 992182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 248000,
+      "seconds": 5.166666666666667,
+      "bpm": 90,
+      "sourceGainDb": -4.29024,
+      "rms": 0.07374361903662893,
+      "peak": 0.67864990234375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 1.09
+        },
+        {
+          "startSeconds": 1.31,
+          "endSeconds": 1.85
+        },
+        {
+          "startSeconds": 1.97,
+          "endSeconds": 5.01
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-27",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_28.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_28.wav",
+      "sourceHash": "26c76cfb38bf339e51752bdc84146ff7f7e1f5b09ac443d608a90ff0552e0d03",
+      "sha256": "26c76cfb38bf339e51752bdc84146ff7f7e1f5b09ac443d608a90ff0552e0d03",
+      "bytes": 984182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 246000,
+      "seconds": 5.125,
+      "bpm": 90,
+      "sourceGainDb": -5.38995,
+      "rms": 0.0836970177176843,
+      "peak": 0.580047607421875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.01,
+          "endSeconds": 0.93
+        },
+        {
+          "startSeconds": 1.04,
+          "endSeconds": 2.6
+        },
+        {
+          "startSeconds": 2.71,
+          "endSeconds": 3.94
+        },
+        {
+          "startSeconds": 4.03,
+          "endSeconds": 4.96
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-28",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_29.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_29.wav",
+      "sourceHash": "29434a29047b6fc059cf2640b7dfb5fa61d7c0a9d5593c93b1d3c315f7b276c9",
+      "sha256": "29434a29047b6fc059cf2640b7dfb5fa61d7c0a9d5593c93b1d3c315f7b276c9",
+      "bytes": 953514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 238333,
+      "seconds": 4.965270833333333,
+      "bpm": 90,
+      "sourceGainDb": -4.95045,
+      "rms": 0.07956733381129284,
+      "peak": 0.577911376953125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.32,
+          "endSeconds": 0.55
+        },
+        {
+          "startSeconds": 0.65,
+          "endSeconds": 4.82
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-29",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_30.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_30.wav",
+      "sourceHash": "1eb59f58e32e747f2b79b842b5b900d371e1a7f235e6c37f1fd38a45d98cabb5",
+      "sha256": "1eb59f58e32e747f2b79b842b5b900d371e1a7f235e6c37f1fd38a45d98cabb5",
+      "bytes": 1030850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 257667,
+      "seconds": 5.3680625,
+      "bpm": 90,
+      "sourceGainDb": -5.54295,
+      "rms": 0.08518442203459572,
+      "peak": 0.71942138671875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.23
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-30",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_31.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_31.wav",
+      "sourceHash": "da981d921f8aa13cb154ccb1ee9760f34fdbcf079e399f952e63268ec7c7b3af",
+      "sha256": "da981d921f8aa13cb154ccb1ee9760f34fdbcf079e399f952e63268ec7c7b3af",
+      "bytes": 834850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 208667,
+      "seconds": 4.347229166666667,
+      "bpm": 90,
+      "sourceGainDb": -5.9925,
+      "rms": 0.0897092908130825,
+      "peak": 0.8319091796875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.55
+        },
+        {
+          "startSeconds": 1.01,
+          "endSeconds": 2.48
+        },
+        {
+          "startSeconds": 2.64,
+          "endSeconds": 3.25
+        },
+        {
+          "startSeconds": 3.55,
+          "endSeconds": 4.2
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-31",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_32.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_32.wav",
+      "sourceHash": "5ee9620fa49c84fe42b1fa0b181c37a20ce340c9179b95aa8e3461d8bdec52e6",
+      "sha256": "5ee9620fa49c84fe42b1fa0b181c37a20ce340c9179b95aa8e3461d8bdec52e6",
+      "bytes": 821514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 205333,
+      "seconds": 4.277770833333333,
+      "bpm": 90,
+      "sourceGainDb": -2.80413,
+      "rms": 0.06214684403514101,
+      "peak": 0.481414794921875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.04,
+          "endSeconds": 0.6
+        },
+        {
+          "startSeconds": 0.69,
+          "endSeconds": 1.08
+        },
+        {
+          "startSeconds": 1.33,
+          "endSeconds": 1.92
+        },
+        {
+          "startSeconds": 2.19,
+          "endSeconds": 3.21
+        },
+        {
+          "startSeconds": 3.66,
+          "endSeconds": 4.14
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-32",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_33.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_33.wav",
+      "sourceHash": "ca3bcaeaff7fd71e576deb9c4af427ce6fdf9b667e5276049b73f5ed91e049de",
+      "sha256": "ca3bcaeaff7fd71e576deb9c4af427ce6fdf9b667e5276049b73f5ed91e049de",
+      "bytes": 992182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 248000,
+      "seconds": 5.166666666666667,
+      "bpm": 90,
+      "sourceGainDb": -5.85084,
+      "rms": 0.08825806688940092,
+      "peak": 0.676971435546875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 4.95
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-33",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_34.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_34.wav",
+      "sourceHash": "9aed27246f94c6473d320beceaa3c127870549c3397a97e487e1dba4d10a00d0",
+      "sha256": "9aed27246f94c6473d320beceaa3c127870549c3397a97e487e1dba4d10a00d0",
+      "bytes": 1053514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 263333,
+      "seconds": 5.486104166666666,
+      "bpm": 90,
+      "sourceGainDb": -5.45236,
+      "rms": 0.08430056602119858,
+      "peak": 0.52545166015625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 2.12
+        },
+        {
+          "startSeconds": 2.33,
+          "endSeconds": 3.23
+        },
+        {
+          "startSeconds": 3.32,
+          "endSeconds": 4.22
+        },
+        {
+          "startSeconds": 4.33,
+          "endSeconds": 5.34
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-34",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_35.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_35.wav",
+      "sourceHash": "1d630084b0dce15b5e6ffcbfe9c4afaa2b39670c683b657e5d595c64b79dce2a",
+      "sha256": "1d630084b0dce15b5e6ffcbfe9c4afaa2b39670c683b657e5d595c64b79dce2a",
+      "bytes": 1014850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 253667,
+      "seconds": 5.284729166666667,
+      "bpm": 90,
+      "sourceGainDb": -1.9527,
+      "rms": 0.056343993582180764,
+      "peak": 0.447265625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 1.02
+        },
+        {
+          "startSeconds": 1.34,
+          "endSeconds": 1.77
+        },
+        {
+          "startSeconds": 1.95,
+          "endSeconds": 2.31
+        },
+        {
+          "startSeconds": 2.54,
+          "endSeconds": 3.77
+        },
+        {
+          "startSeconds": 3.98,
+          "endSeconds": 5.12
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-35",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_36.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_36.wav",
+      "sourceHash": "eb1677e21b1c0979a9405fb91cc96915db55784131101e68d4aa7fdde084fb68",
+      "sha256": "eb1677e21b1c0979a9405fb91cc96915db55784131101e68d4aa7fdde084fb68",
+      "bytes": 852182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 213000,
+      "seconds": 4.4375,
+      "bpm": 90,
+      "sourceGainDb": -3.68226,
+      "rms": 0.06875834392931926,
+      "peak": 0.551300048828125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 1.52
+        },
+        {
+          "startSeconds": 1.67,
+          "endSeconds": 1.81
+        },
+        {
+          "startSeconds": 2.48,
+          "endSeconds": 4.21
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-36",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_37.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_37.wav",
+      "sourceHash": "1cf9767e617c734019b776c1579ec7dbe2bf998e92d4aa1656ff9d35d01a81e5",
+      "sha256": "1cf9767e617c734019b776c1579ec7dbe2bf998e92d4aa1656ff9d35d01a81e5",
+      "bytes": 949514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 237333,
+      "seconds": 4.9444375,
+      "bpm": 90,
+      "sourceGainDb": -5.53499,
+      "rms": 0.08510631419239352,
+      "peak": 0.4344482421875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 4.77
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-37",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_38.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_38.wav",
+      "sourceHash": "6ecf2ac519946d3740649a61c1bc06e168d1002b2d3e2826fd95f6aa95006d30",
+      "sha256": "6ecf2ac519946d3740649a61c1bc06e168d1002b2d3e2826fd95f6aa95006d30",
+      "bytes": 862850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 215667,
+      "seconds": 4.4930625,
+      "bpm": 90,
+      "sourceGainDb": -2.99414,
+      "rms": 0.06352133937069382,
+      "peak": 0.57537841796875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.83
+        },
+        {
+          "startSeconds": 1,
+          "endSeconds": 4.23
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-38",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_39.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_39.wav",
+      "sourceHash": "cc0c867b62746c82448de64a91fbee0585973184c26877ba7465a6e4b5d503d6",
+      "sha256": "cc0c867b62746c82448de64a91fbee0585973184c26877ba7465a6e4b5d503d6",
+      "bytes": 976182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 244000,
+      "seconds": 5.083333333333333,
+      "bpm": 90,
+      "sourceGainDb": -3.5744,
+      "rms": 0.06790979093379441,
+      "peak": 0.610809326171875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 1.05
+        },
+        {
+          "startSeconds": 1.31,
+          "endSeconds": 1.77
+        },
+        {
+          "startSeconds": 1.93,
+          "endSeconds": 3.75
+        },
+        {
+          "startSeconds": 3.97,
+          "endSeconds": 4.93
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-39",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_40.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_40.wav",
+      "sourceHash": "fd5c95f78a53157c21dcd7b6f56ed0c1e91875bc3a6820e3f9b3940c986240a5",
+      "sha256": "fd5c95f78a53157c21dcd7b6f56ed0c1e91875bc3a6820e3f9b3940c986240a5",
+      "bytes": 970850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 242667,
+      "seconds": 5.0555625,
+      "bpm": 90,
+      "sourceGainDb": -4.45638,
+      "rms": 0.07516771740621958,
+      "peak": 0.948699951171875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 2.56
+        },
+        {
+          "startSeconds": 2.81,
+          "endSeconds": 3.55
+        },
+        {
+          "startSeconds": 3.65,
+          "endSeconds": 4.9
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-40",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_41.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_41.wav",
+      "sourceHash": "0fdd628038d52e798e2c5d4ac1bad3ff6a2f72f3c697e73f8e5308df2a17745a",
+      "sha256": "0fdd628038d52e798e2c5d4ac1bad3ff6a2f72f3c697e73f8e5308df2a17745a",
+      "bytes": 986850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 246667,
+      "seconds": 5.138895833333334,
+      "bpm": 90,
+      "sourceGainDb": -4.19624,
+      "rms": 0.07294984127770852,
+      "peak": 0.5684814453125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 1.14
+        },
+        {
+          "startSeconds": 1.39,
+          "endSeconds": 4.95
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-41",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_42.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_42.wav",
+      "sourceHash": "c400c2607ca977375c208f6f7005616d86acfda1b3be2d20853e8dc381430ea9",
+      "sha256": "c400c2607ca977375c208f6f7005616d86acfda1b3be2d20853e8dc381430ea9",
+      "bytes": 980182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 245000,
+      "seconds": 5.104166666666667,
+      "bpm": 90,
+      "sourceGainDb": -3.89808,
+      "rms": 0.07048820053428832,
+      "peak": 0.43450927734375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 1
+        },
+        {
+          "startSeconds": 1.14,
+          "endSeconds": 2.43
+        },
+        {
+          "startSeconds": 2.64,
+          "endSeconds": 4.96
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-42",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_43.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_43.wav",
+      "sourceHash": "b365818737cc5db0ca34a9a1cadded0e64936a720cdf3550a4adb0473b08d7d5",
+      "sha256": "b365818737cc5db0ca34a9a1cadded0e64936a720cdf3550a4adb0473b08d7d5",
+      "bytes": 960182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 240000,
+      "seconds": 5,
+      "bpm": 90,
+      "sourceGainDb": -5.33185,
+      "rms": 0.08313902461226595,
+      "peak": 0.761932373046875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 4.86
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-43",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_44.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_44.wav",
+      "sourceHash": "dde810b5d2cc760f17b4c4aec6f7a9062e82d48ee0cbcac454069e6a629b809a",
+      "sha256": "dde810b5d2cc760f17b4c4aec6f7a9062e82d48ee0cbcac454069e6a629b809a",
+      "bytes": 977514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 244333,
+      "seconds": 5.090270833333333,
+      "bpm": 90,
+      "sourceGainDb": -1.86484,
+      "rms": 0.05577693751727009,
+      "peak": 0.620941162109375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.87
+        },
+        {
+          "startSeconds": 0.97,
+          "endSeconds": 2.97
+        },
+        {
+          "startSeconds": 3.15,
+          "endSeconds": 3.99
+        },
+        {
+          "startSeconds": 4.75,
+          "endSeconds": 4.96
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-44",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_45.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_45.wav",
+      "sourceHash": "f58135e2242ce66b5576d0e0b9a78e18d911a7830a9f9f824184487c5ca5c3f4",
+      "sha256": "f58135e2242ce66b5576d0e0b9a78e18d911a7830a9f9f824184487c5ca5c3f4",
+      "bytes": 985514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 246333,
+      "seconds": 5.1319375,
+      "bpm": 90,
+      "sourceGainDb": -5.28049,
+      "rms": 0.08264889807397312,
+      "peak": 0.73760986328125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.02,
+          "endSeconds": 2.95
+        },
+        {
+          "startSeconds": 3.07,
+          "endSeconds": 4.97
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-45",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_46.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_46.wav",
+      "sourceHash": "a1c475382bf39b8345f6ade71d6dfec480e59d41dd244ca93a37703b8e5bf8f9",
+      "sha256": "a1c475382bf39b8345f6ade71d6dfec480e59d41dd244ca93a37703b8e5bf8f9",
+      "bytes": 1002850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 250667,
+      "seconds": 5.222229166666667,
+      "bpm": 90,
+      "sourceGainDb": -4.02894,
+      "rms": 0.07155821529636006,
+      "peak": 0.5565185546875,
+      "phraseSpans": [
+        {
+          "startSeconds": 1.26,
+          "endSeconds": 5.1
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-46",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_47.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_47.wav",
+      "sourceHash": "701133ef8a18bb144829fe0b54ad3ab54f4d641d88bc0306e024a52edd99ba6e",
+      "sha256": "701133ef8a18bb144829fe0b54ad3ab54f4d641d88bc0306e024a52edd99ba6e",
+      "bytes": 1026850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 256667,
+      "seconds": 5.347229166666667,
+      "bpm": 90,
+      "sourceGainDb": -4.19873,
+      "rms": 0.07297076627424892,
+      "peak": 0.585235595703125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.97,
+          "endSeconds": 2.15
+        },
+        {
+          "startSeconds": 2.52,
+          "endSeconds": 5.23
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-47",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_48.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_48.wav",
+      "sourceHash": "bceeb3d24d2c7e25ca26ac5b7c4504e39dfec31b2be19d96d4c697d9fc7244d7",
+      "sha256": "bceeb3d24d2c7e25ca26ac5b7c4504e39dfec31b2be19d96d4c697d9fc7244d7",
+      "bytes": 944182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 236000,
+      "seconds": 4.916666666666667,
+      "bpm": 90,
+      "sourceGainDb": -4.29913,
+      "rms": 0.07381917504628281,
+      "peak": 0.7357177734375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.01,
+          "endSeconds": 0.66
+        },
+        {
+          "startSeconds": 0.93,
+          "endSeconds": 2.04
+        },
+        {
+          "startSeconds": 2.15,
+          "endSeconds": 4.79
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-48",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_49.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC_49.wav",
+      "sourceHash": "3e45d2e0ca483861ff5c6cfab0fd3c5a8ed63ef3ca91fc8d7df9a6579e070f0b",
+      "sha256": "3e45d2e0ca483861ff5c6cfab0fd3c5a8ed63ef3ca91fc8d7df9a6579e070f0b",
+      "bytes": 838850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 209667,
+      "seconds": 4.3680625,
+      "bpm": 90,
+      "sourceGainDb": -3.88814,
+      "rms": 0.07040762695457943,
+      "peak": 0.481781005859375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.01,
+          "endSeconds": 4.19
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    },
+    {
+      "id": "npc-gans-49",
+      "voiceId": "npc-voice:gans-20261018",
+      "verified": true,
+      "path": "./stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC.wav",
+      "source": "stems/source-library/voices/gans/gans-kapa-20261018-v1/Ганс - REC.wav",
+      "sourceHash": "3c22e70b5f8d38a29a487ee909f9b071aedf750504c4b50d4699e9d8369bdad9",
+      "sha256": "3c22e70b5f8d38a29a487ee909f9b071aedf750504c4b50d4699e9d8369bdad9",
+      "bytes": 961514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 240333,
+      "seconds": 5.0069375,
+      "bpm": 90,
+      "sourceGainDb": -3.04683,
+      "rms": 0.06390782432139627,
+      "peak": 0.553741455078125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.01,
+          "endSeconds": 1.37
+        },
+        {
+          "startSeconds": 1.53,
+          "endSeconds": 2.76
+        },
+        {
+          "startSeconds": 2.98,
+          "endSeconds": 4.35
+        },
+        {
+          "startSeconds": 4.45,
+          "endSeconds": 4.9
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 50
+      },
+      "skillRangeStatus": "metadata only; persistent NPC selection is not wired in this preview"
+    }
+  ]
+}

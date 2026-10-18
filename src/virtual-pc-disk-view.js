@@ -1,5 +1,5 @@
-import {PC_IDENTITY} from './pc-identity.js?rev=44';
-import {pcElement as el} from './virtual-pc-dom.js?rev=44';
+import {PC_IDENTITY} from './pc-identity.js?rev=45';
+import {pcElement as el} from './virtual-pc-dom.js?rev=45';
 
 export function formatDiskGb(mb) {
   return (Math.max(0,Number.isFinite(mb)?mb:0)/1000).toFixed(1).replace('.',',')+' ГБ';

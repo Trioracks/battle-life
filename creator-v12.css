@@ -21,7 +21,7 @@ body:has(.home-wardrobe:not([hidden])) :is(#game-header,#controls,#inspector,#ho
 #creator button{font:16px/1.25 Georgia,'Times New Roman',serif;border:1px solid #6b5c3d;box-shadow:inset 0 0 0 1px #181711,0 2px 3px #0007;background:linear-gradient(#25231c,#171712);color:#c9c2ad;padding:9px 12px;border-radius:0;min-height:37px;overflow-wrap:anywhere}
 #creator button:hover:not(:disabled){background:linear-gradient(#49402b,#30281a);border-color:#bca36d;color:#fff0c9}
 #creator button[aria-pressed=true],#creator button.active{color:#f1e2ba;background:linear-gradient(90deg,#5e3e23,#30291c);border-color:#be9b5a;box-shadow:inset 3px 0 #d8b571,inset 0 0 0 1px #342416}
-#creator :is(button,input):focus-visible{outline:2px solid #efd49a;outline-offset:3px}
+#creator :is(button,input,select):focus-visible{outline:2px solid #efd49a;outline-offset:3px}
 #creator button:disabled{opacity:.45}
 #creator button.primary{background:linear-gradient(#736039,#4d3a20);border-color:#b69b61;color:#f6e7c3}
 #creator .creator-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0;border:0;flex-shrink:0;background:#11110ee8}
@@ -34,6 +34,9 @@ body:has(.home-wardrobe:not([hidden])) :is(#game-header,#controls,#inspector,#ho
 #creator .name-field{font-size:15px;color:#b5a67f;text-transform:none}
 #creator .name-field input{font:18px/1.3 Georgia,serif;margin:6px 0 3px;padding:9px 8px;background:#0b0e0a;border:1px solid #766545;color:#eee2c6}
 #creator .name-field input::placeholder{color:#777565}
+#creator .voice-field{display:block;font-size:15px;color:#b5a67f;margin-top:12px}
+#creator .voice-field select{display:block;width:100%;font:16px/1.3 Georgia,serif;margin:6px 0;padding:9px 5px;background:#0b0e0a;border:1px solid #766545;color:#eee2c6}
+#creator .voice-note{font:12px/1.4 Georgia,serif;color:#aaa28a;margin:4px 0 12px}
 #creator .look-categories{display:flex;flex-direction:column;gap:3px;margin:13px 0 18px}
 #creator .look-categories button{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:37px;padding:8px 11px;font-size:17px;text-align:left}
 #creator .creator-icon{width:22px;height:22px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.4}

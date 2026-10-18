@@ -7,7 +7,7 @@ import { Group, Mesh } from '../vendor/three/three.module.js';
 import {
   APPEARANCE_OPTIONS, DEFAULT_APPEARANCE, STAT_KEYS, STAT_LABELS, SAVE_KEY,
   normalizeAppearance, applyAppearance, createProfile, saveProfile, loadProfile,
-} from '../src/avatar-v3-profile.js?rev=28';
+} from '../src/avatar-v3-profile.js?rev=45';
 
 const allocations = {
   intelligence: 2, writing: 2, musicality: 1, flow: 1, beatmaking: 1,
@@ -186,9 +186,9 @@ test('saving and loading uses the isolated v3 key and preserves the old campaign
   const result = saveProfile(storage, profile({ name: '  Миша  ' }));
   assert.equal(result.ok, true);
   assert.equal(SAVE_KEY, 'battle-life-apartment-v3');
-  assert.deepEqual(JSON.parse(storage.getItem('battle-life-apartment-v3')), profile());
+  assert.deepEqual(JSON.parse(storage.getItem('battle-life-apartment-v3')), profile({voiceId:'player-voice:original'}));
   assert.equal(storage.getItem('battle-life-campaign'), 'legacy campaign');
-  assert.deepEqual(loadProfile(storage), { ok: true, profile: profile() });
+  assert.deepEqual(loadProfile(storage), { ok: true, profile: profile({voiceId:'player-voice:original'}) });
 });
 
 test('saving revalidates profile skills and does not overwrite a good save with malformed input', () => {
@@ -232,7 +232,7 @@ test('loading revalidates stored names, versions, all skills, and total point bu
 test('loading normalizes legacy cosmetics and preserves unrelated snapshot properties', () => {
   const stored = profile({ name: '  Миша  ', appearance: { top: 'shirt', bottom: 'missing', cap: 'red' }, campaign: 'unrelated' });
   const result = loadProfile(memoryStorage({ 'battle-life-apartment-v3': JSON.stringify(stored) }));
-  assert.deepEqual(result, { ok: true, profile: profile({ appearance: { ...expectedDefault, top: 'shirt' },campaign:'unrelated' }) });
+  assert.deepEqual(result, { ok: true, profile: profile({ voiceId:'player-voice:original',appearance: { ...expectedDefault, top: 'shirt' },campaign:'unrelated' }) });
 });
 
 test('missing saves and inaccessible storage are safe explicit results', () => {

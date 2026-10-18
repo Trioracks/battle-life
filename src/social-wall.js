@@ -1,11 +1,11 @@
 import templates from '../data/social/post-templates.json' with {type:'json'};
 import resultTemplates from '../data/social/result-post-templates.json' with {type:'json'};
-import {resolveResultOutcome} from './result-outcome.js?rev=44';
-import {ensureSocialReactionPlans} from './social-reactions.js?rev=44';
-import {gameDateTimeLabel} from './home-calendar.js?rev=44';
-import {normalizeSocial} from './social-state.js?rev=44';
-import {judgeProfile} from './judge-profiles.js?rev=44';
-import {JUDGE_COMMENTS} from './judge-comments.js?rev=44';
+import {resolveResultOutcome} from './result-outcome.js?rev=45';
+import {ensureSocialReactionPlans} from './social-reactions.js?rev=45';
+import {gameDateTimeLabel} from './home-calendar.js?rev=45';
+import {normalizeSocial} from './social-state.js?rev=45';
+import {judgeProfile} from './judge-profiles.js?rev=45';
+import {JUDGE_COMMENTS} from './judge-comments.js?rev=45';
 export const POST_TEMPLATES=Object.freeze(templates);
 export const RESULT_POST_TEMPLATES=Object.freeze(resultTemplates);
 export const AUDIENCE_RULES=Object.freeze({likeProbability:.08,commentProbability:.01,maxSimulatedAudience:5000,maxVisibleComments:40});

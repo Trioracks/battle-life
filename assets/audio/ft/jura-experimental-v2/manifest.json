@@ -1,0 +1,1005 @@
+{
+  "version": 1,
+  "builder": "node tools/prepare-artem-local.mjs",
+  "parts": [
+    {
+      "id": "jura-experimental-20261018-drumm-3",
+      "name": "Авторский эксперимент / drumm-3",
+      "kind": "drums",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "key": null,
+      "authorship": "user",
+      "path": "assets/audio/ft/jura-experimental-v2/drumm-3.wav",
+      "source": "stems/source-library/instruments/drums/drumm 3.mp3",
+      "sourceHash": "4e1fe3702546d83666a9b8cb59084b176d3958c401dccb8b13f4e5f8e6f74f6d",
+      "sha256": "ed87813439d7d196846b2b0060a85d2d42229172b6843c7bbae81a213470f3d8",
+      "sampleRate": 44100,
+      "frames": 470400,
+      "evidence": {
+        "frames": 237081,
+        "seconds": 5.37599,
+        "peak": 0.90885,
+        "rms": 0.13443,
+        "rmsDb": -17.43037,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.00778,
+        "lowEnergyBelow200": 0.92586,
+        "centroidHz": 392.02696,
+        "spectralPeaks": [
+          {
+            "hz": 59.20147,
+            "note": "A#1",
+            "share": 0.07146
+          },
+          {
+            "hz": 95.64816,
+            "note": "G2",
+            "share": 0.01366
+          },
+          {
+            "hz": 129.44648,
+            "note": "C3",
+            "share": 0.01083
+          },
+          {
+            "hz": 154.32501,
+            "note": "D#3",
+            "share": 0.00886
+          },
+          {
+            "hz": 183.8088,
+            "note": "F#3",
+            "share": 0.00325
+          },
+          {
+            "hz": 200.78588,
+            "note": "G3",
+            "share": 0.00144
+          },
+          {
+            "hz": 226.3287,
+            "note": "A3",
+            "share": 0.00093
+          },
+          {
+            "hz": 409.57465,
+            "note": "G#4",
+            "share": 0.00027
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A#",
+            "share": 0.62697
+          },
+          {
+            "note": "G",
+            "share": 0.13406
+          },
+          {
+            "note": "C",
+            "share": 0.09579
+          },
+          {
+            "note": "D#",
+            "share": 0.07933
+          },
+          {
+            "note": "F#",
+            "share": 0.02987
+          },
+          {
+            "note": "A",
+            "share": 0.01053
+          },
+          {
+            "note": "G#",
+            "share": 0.007
+          },
+          {
+            "note": "E",
+            "share": 0.00482
+          },
+          {
+            "note": "B",
+            "share": 0.00458
+          },
+          {
+            "note": "C#",
+            "share": 0.00312
+          },
+          {
+            "note": "F",
+            "share": 0.00207
+          },
+          {
+            "note": "D",
+            "share": 0.00184
+          }
+        ],
+        "activeStartSeconds": 0.02,
+        "activeEndSeconds": 5.25,
+        "onsetsSeconds": [
+          0.04,
+          0.7,
+          1.37,
+          1.7,
+          2.03,
+          2.37,
+          2.7,
+          3.37,
+          4.04,
+          4.7,
+          5.03,
+          5.2
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.03822,
+          "bpm90": 0.03472,
+          "bpm92": 0.05033
+        },
+        "barRms": [
+          0.13392,
+          0.136
+        ],
+        "tailRms": 0.00006
+      },
+      "trimFrames": 1009,
+      "cycleEvidence": "Two 2.6666667s bars at 90 BPM: active phrase extends through second bar; extra container duration is decay. Full tail folded at 5.3333333s, not looped as a third bar.",
+      "tailPolicy": "Measured quiet MP3 prefix trimmed with 2ms pre-onset margin; full remaining decay folded into two bars; 3ms seam fade; four-bar derived playback, no transpose or time stretch.",
+      "tonalEvidence": "90 BPM onset grid; percussion has no assigned key.",
+      "calibration": {
+        "buildGainDb": -0.08496170839153311,
+        "gainDb": -13.97,
+        "targetLufs": -30,
+        "derived": {
+          "lufs": -16.03,
+          "truePeak": -0.9,
+          "lra": 1
+        },
+        "after": {
+          "lufs": -29.99,
+          "truePeak": -14.87,
+          "lra": 0.9
+        }
+      }
+    },
+    {
+      "id": "jura-experimental-20261018-drumm-4",
+      "name": "Авторский эксперимент / drumm-4",
+      "kind": "drums",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "key": null,
+      "authorship": "user",
+      "path": "assets/audio/ft/jura-experimental-v2/drumm-4.wav",
+      "source": "stems/source-library/instruments/drums/drumm 4.mp3",
+      "sourceHash": "fc5db2222523b64506587b00bab5223d521c38a0743f431ba642f923238c32e9",
+      "sha256": "eea9933a11d185c0602280237e6ceda28c7154f98fdc7d46b81c3e48e66c71b3",
+      "sampleRate": 44100,
+      "frames": 470400,
+      "evidence": {
+        "frames": 239199,
+        "seconds": 5.42401,
+        "peak": 0.939,
+        "rms": 0.14286,
+        "rmsDb": -16.90195,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.01536,
+        "lowEnergyBelow200": 0.91559,
+        "centroidHz": 447.78971,
+        "spectralPeaks": [
+          {
+            "hz": 59.33178,
+            "note": "A#1",
+            "share": 0.07672
+          },
+          {
+            "hz": 96.27572,
+            "note": "G2",
+            "share": 0.01445
+          },
+          {
+            "hz": 89.61533,
+            "note": "F2",
+            "share": 0.01353
+          },
+          {
+            "hz": 83.51843,
+            "note": "E2",
+            "share": 0.0133
+          },
+          {
+            "hz": 131.4573,
+            "note": "C3",
+            "share": 0.01148
+          },
+          {
+            "hz": 126.85181,
+            "note": "B2",
+            "share": 0.01113
+          },
+          {
+            "hz": 155.65525,
+            "note": "D#3",
+            "share": 0.00928
+          },
+          {
+            "hz": 160.90738,
+            "note": "E3",
+            "share": 0.00705
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A#",
+            "share": 0.43099
+          },
+          {
+            "note": "E",
+            "share": 0.14612
+          },
+          {
+            "note": "G",
+            "share": 0.0921
+          },
+          {
+            "note": "F",
+            "share": 0.07778
+          },
+          {
+            "note": "B",
+            "share": 0.06888
+          },
+          {
+            "note": "C",
+            "share": 0.06546
+          },
+          {
+            "note": "D#",
+            "share": 0.05231
+          },
+          {
+            "note": "F#",
+            "share": 0.03786
+          },
+          {
+            "note": "G#",
+            "share": 0.01562
+          },
+          {
+            "note": "A",
+            "share": 0.00586
+          },
+          {
+            "note": "C#",
+            "share": 0.00435
+          },
+          {
+            "note": "D",
+            "share": 0.00266
+          }
+        ],
+        "activeStartSeconds": 0.02,
+        "activeEndSeconds": 5.23,
+        "onsetsSeconds": [
+          0.04,
+          0.37,
+          0.7,
+          1.37,
+          1.53,
+          1.7,
+          1.86,
+          2.03,
+          2.37,
+          2.7,
+          2.86,
+          3.03,
+          3.19,
+          3.36,
+          4.04,
+          4.19,
+          4.36,
+          4.54,
+          4.7,
+          5.19
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.03777,
+          "bpm90": 0.0315,
+          "bpm92": 0.05513
+        },
+        "barRms": [
+          0.15037,
+          0.13748
+        ],
+        "tailRms": 0.00002
+      },
+      "trimFrames": 876,
+      "cycleEvidence": "Two 2.6666667s bars at 90 BPM: active phrase extends through second bar; extra container duration is decay. Full tail folded at 5.3333333s, not looped as a third bar.",
+      "tailPolicy": "Measured quiet MP3 prefix trimmed with 2ms pre-onset margin; full remaining decay folded into two bars; 3ms seam fade; four-bar derived playback, no transpose or time stretch.",
+      "tonalEvidence": "90 BPM onset grid; percussion has no assigned key.",
+      "calibration": {
+        "buildGainDb": -0.3684452130032393,
+        "gainDb": -14.17,
+        "targetLufs": -30,
+        "derived": {
+          "lufs": -15.83,
+          "truePeak": -0.82,
+          "lra": 1.4
+        },
+        "after": {
+          "lufs": -30,
+          "truePeak": -14.99,
+          "lra": 1.3
+        }
+      }
+    },
+    {
+      "id": "jura-experimental-20261018-bass-3",
+      "name": "Авторский эксперимент / bass-3",
+      "kind": "arrangement",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "key": "A minor",
+      "authorship": "user",
+      "path": "assets/audio/ft/jura-experimental-v2/bass-3.wav",
+      "source": "stems/source-library/instruments/bass/bass 3.mp3",
+      "sourceHash": "cab26cffa43bec8bb45a047a1c9b7af796c2d60fd6da361339b85db7e60d9e04",
+      "sha256": "36ee2fbe667bb14f551654a065c57670d78ca18b5f51b25fa2fca6dacd3b9fbb",
+      "sampleRate": 44100,
+      "frames": 470400,
+      "evidence": {
+        "frames": 329163,
+        "seconds": 7.46401,
+        "peak": 0.13565,
+        "rms": 0.01663,
+        "rmsDb": -35.58466,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.00642,
+        "lowEnergyBelow200": 0.46677,
+        "centroidHz": 411.37856,
+        "spectralPeaks": [
+          {
+            "hz": 164.4279,
+            "note": "E3",
+            "share": 0.14525
+          },
+          {
+            "hz": 329.29938,
+            "note": "E4",
+            "share": 0.08096
+          },
+          {
+            "hz": 219.64921,
+            "note": "A3",
+            "share": 0.03618
+          },
+          {
+            "hz": 82.20064,
+            "note": "E2",
+            "share": 0.02992
+          },
+          {
+            "hz": 109.7777,
+            "note": "A2",
+            "share": 0.02566
+          },
+          {
+            "hz": 246.74288,
+            "note": "B3",
+            "share": 0.02499
+          },
+          {
+            "hz": 260.87215,
+            "note": "C4",
+            "share": 0.02491
+          },
+          {
+            "hz": 130.79191,
+            "note": "C3",
+            "share": 0.02215
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "E",
+            "share": 0.52717
+          },
+          {
+            "note": "A",
+            "share": 0.1416
+          },
+          {
+            "note": "B",
+            "share": 0.10723
+          },
+          {
+            "note": "C",
+            "share": 0.10458
+          },
+          {
+            "note": "G#",
+            "share": 0.02181
+          },
+          {
+            "note": "D",
+            "share": 0.01942
+          },
+          {
+            "note": "G",
+            "share": 0.01869
+          },
+          {
+            "note": "C#",
+            "share": 0.01864
+          },
+          {
+            "note": "F#",
+            "share": 0.01399
+          },
+          {
+            "note": "D#",
+            "share": 0.01138
+          },
+          {
+            "note": "A#",
+            "share": 0.0079
+          },
+          {
+            "note": "F",
+            "share": 0.0076
+          }
+        ],
+        "activeStartSeconds": 0.03,
+        "activeEndSeconds": 5.63,
+        "onsetsSeconds": [
+          0.04,
+          0.2,
+          0.51,
+          1.03,
+          1.13,
+          1.24,
+          1.35,
+          1.45,
+          1.68,
+          1.79,
+          1.91,
+          2.08,
+          2.19,
+          2.32,
+          2.69,
+          2.83,
+          3.72,
+          3.83,
+          3.91,
+          4.03,
+          4.14,
+          4.3,
+          4.43,
+          4.57,
+          4.65,
+          4.77,
+          4.85,
+          5.02
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.04179,
+          "bpm90": 0.03738,
+          "bpm92": 0.04239
+        },
+        "barRms": [
+          0.01955,
+          0.01968
+        ],
+        "tailRms": 0.00225
+      },
+      "trimFrames": 1055,
+      "cycleEvidence": "Two 2.6666667s bars at 90 BPM: active phrase extends through second bar; extra container duration is decay. Full tail folded at 5.3333333s, not looped as a third bar.",
+      "tailPolicy": "Measured quiet MP3 prefix trimmed with 2ms pre-onset margin; full remaining decay folded into two bars; 3ms seam fade; four-bar derived playback, no transpose or time stretch.",
+      "tonalEvidence": "Spectral partials support A natural minor compatibility (A/B/C/D/E/F/G). Inference, not authoritative key detection; mixed only with the established A-minor bank.",
+      "calibration": {
+        "buildGainDb": 0,
+        "gainDb": 3.38,
+        "targetLufs": -28.5,
+        "derived": {
+          "lufs": -31.88,
+          "truePeak": -16.89,
+          "lra": 0.4
+        },
+        "after": {
+          "lufs": -28.5,
+          "truePeak": -13.51,
+          "lra": 0.4
+        }
+      }
+    },
+    {
+      "id": "jura-experimental-20261018-bass-4",
+      "name": "Авторский эксперимент / bass-4",
+      "kind": "arrangement",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "key": "A minor",
+      "authorship": "user",
+      "path": "assets/audio/ft/jura-experimental-v2/bass-4.wav",
+      "source": "stems/source-library/instruments/bass/bass 4.mp3",
+      "sourceHash": "312a5fb347774254e0984acdb55ab17c782dbb28bbe25389863dbe2cb9bd13b4",
+      "sha256": "dc566cf787bf56bfa3c973e5599697e300e2def61a52c739bb6c3f07a841b81c",
+      "sampleRate": 44100,
+      "frames": 470400,
+      "evidence": {
+        "frames": 242373,
+        "seconds": 5.49599,
+        "peak": 0.34848,
+        "rms": 0.05731,
+        "rmsDb": -24.83608,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.02689,
+        "lowEnergyBelow200": 0.84533,
+        "centroidHz": 139.53171,
+        "spectralPeaks": [
+          {
+            "hz": 54.96898,
+            "note": "A1",
+            "share": 0.17281
+          },
+          {
+            "hz": 109.98328,
+            "note": "A2",
+            "share": 0.09909
+          },
+          {
+            "hz": 82.46635,
+            "note": "E2",
+            "share": 0.09598
+          },
+          {
+            "hz": 164.89342,
+            "note": "E3",
+            "share": 0.02512
+          },
+          {
+            "hz": 219.78856,
+            "note": "A3",
+            "share": 0.01013
+          },
+          {
+            "hz": 329.81089,
+            "note": "E4",
+            "share": 0.00762
+          },
+          {
+            "hz": 384.99504,
+            "note": "G4",
+            "share": 0.00476
+          },
+          {
+            "hz": 274.89795,
+            "note": "C#4",
+            "share": 0.00439
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A",
+            "share": 0.62993
+          },
+          {
+            "note": "E",
+            "share": 0.28679
+          },
+          {
+            "note": "C#",
+            "share": 0.01895
+          },
+          {
+            "note": "G",
+            "share": 0.0181
+          },
+          {
+            "note": "F",
+            "share": 0.01601
+          },
+          {
+            "note": "C",
+            "share": 0.01252
+          },
+          {
+            "note": "B",
+            "share": 0.00754
+          },
+          {
+            "note": "D",
+            "share": 0.00321
+          },
+          {
+            "note": "D#",
+            "share": 0.00245
+          },
+          {
+            "note": "G#",
+            "share": 0.00185
+          },
+          {
+            "note": "A#",
+            "share": 0.00151
+          },
+          {
+            "note": "F#",
+            "share": 0.00115
+          }
+        ],
+        "activeStartSeconds": 0.03,
+        "activeEndSeconds": 5.21,
+        "onsetsSeconds": [
+          0.04,
+          0.49,
+          0.6,
+          0.69,
+          1.04,
+          2.03,
+          3.71,
+          3.83,
+          4.03
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.04056,
+          "bpm90": 0.03185,
+          "bpm92": 0.04802
+        },
+        "barRms": [
+          0.05919,
+          0.05703
+        ],
+        "tailRms": 0.01381
+      },
+      "trimFrames": 1189,
+      "cycleEvidence": "Two 2.6666667s bars at 90 BPM: active phrase extends through second bar; extra container duration is decay. Full tail folded at 5.3333333s, not looped as a third bar.",
+      "tailPolicy": "Measured quiet MP3 prefix trimmed with 2ms pre-onset margin; full remaining decay folded into two bars; 3ms seam fade; four-bar derived playback, no transpose or time stretch.",
+      "tonalEvidence": "Spectral partials support A natural minor compatibility (A/B/C/D/E/F/G). Inference, not authoritative key detection; mixed only with the established A-minor bank.",
+      "calibration": {
+        "buildGainDb": 0,
+        "gainDb": -4.8,
+        "targetLufs": -28.5,
+        "derived": {
+          "lufs": -23.7,
+          "truePeak": -8.96,
+          "lra": 3.9
+        },
+        "after": {
+          "lufs": -28.5,
+          "truePeak": -13.76,
+          "lra": 3.9
+        }
+      }
+    },
+    {
+      "id": "jura-experimental-20261018-lead-3",
+      "name": "Авторский эксперимент / lead-3",
+      "kind": "theme",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "key": "A minor",
+      "authorship": "user",
+      "path": "assets/audio/ft/jura-experimental-v2/lead-3.wav",
+      "source": "stems/source-library/instruments/lead/lead 3.mp3",
+      "sourceHash": "42ea4598e2d067b306d4f1cca5cb636a610e8ba40eceae9aad2e6e60b265c033",
+      "sha256": "7ae7e264144e3c640f01ce80b04579a8160fc93560b4b18f9a9008939c469b8b",
+      "sampleRate": 44100,
+      "frames": 470400,
+      "evidence": {
+        "frames": 256133,
+        "seconds": 5.808,
+        "peak": 0.41873,
+        "rms": 0.08746,
+        "rmsDb": -21.16411,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.04604,
+        "lowEnergyBelow200": 0.42764,
+        "centroidHz": 560.72018,
+        "spectralPeaks": [
+          {
+            "hz": 86.12592,
+            "note": "F2",
+            "share": 0.07601
+          },
+          {
+            "hz": 110.0772,
+            "note": "A2",
+            "share": 0.0549
+          },
+          {
+            "hz": 879.85267,
+            "note": "A5",
+            "share": 0.04248
+          },
+          {
+            "hz": 658.95693,
+            "note": "E5",
+            "share": 0.02813
+          },
+          {
+            "hz": 440.09319,
+            "note": "A4",
+            "share": 0.02448
+          },
+          {
+            "hz": 174.06848,
+            "note": "F3",
+            "share": 0.02348
+          },
+          {
+            "hz": 1319.73369,
+            "note": "E6",
+            "share": 0.02088
+          },
+          {
+            "hz": 1174.41379,
+            "note": "D6",
+            "share": 0.00856
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "A",
+            "share": 0.34501
+          },
+          {
+            "note": "F",
+            "share": 0.29106
+          },
+          {
+            "note": "E",
+            "share": 0.15144
+          },
+          {
+            "note": "D",
+            "share": 0.07839
+          },
+          {
+            "note": "C",
+            "share": 0.04246
+          },
+          {
+            "note": "B",
+            "share": 0.01782
+          },
+          {
+            "note": "G",
+            "share": 0.01608
+          },
+          {
+            "note": "A#",
+            "share": 0.01455
+          },
+          {
+            "note": "D#",
+            "share": 0.01428
+          },
+          {
+            "note": "C#",
+            "share": 0.01265
+          },
+          {
+            "note": "G#",
+            "share": 0.01027
+          },
+          {
+            "note": "F#",
+            "share": 0.00599
+          }
+        ],
+        "activeStartSeconds": 0.03,
+        "activeEndSeconds": 5.67,
+        "onsetsSeconds": [
+          0.04,
+          0.71,
+          1.3,
+          3.76,
+          3.86,
+          4.04,
+          4.37
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.045,
+          "bpm90": 0.0419,
+          "bpm92": 0.03335
+        },
+        "barRms": [
+          0.0871,
+          0.09459
+        ],
+        "tailRms": 0.02645
+      },
+      "trimFrames": 1189,
+      "cycleEvidence": "Two 2.6666667s bars at 90 BPM: active phrase extends through second bar; extra container duration is decay. Full tail folded at 5.3333333s, not looped as a third bar.",
+      "tailPolicy": "Measured quiet MP3 prefix trimmed with 2ms pre-onset margin; full remaining decay folded into two bars; 3ms seam fade; four-bar derived playback, no transpose or time stretch.",
+      "tonalEvidence": "Spectral partials support A natural minor compatibility (A/B/C/D/E/F/G). Inference, not authoritative key detection; mixed only with the established A-minor bank.",
+      "calibration": {
+        "buildGainDb": 0,
+        "gainDb": -8.68,
+        "targetLufs": -27,
+        "derived": {
+          "lufs": -18.32,
+          "truePeak": -7.54,
+          "lra": 1.9
+        },
+        "after": {
+          "lufs": -27,
+          "truePeak": -16.22,
+          "lra": 1.9
+        }
+      }
+    },
+    {
+      "id": "jura-experimental-20261018-lead-4",
+      "name": "Авторский эксперимент / lead-4",
+      "kind": "theme",
+      "bpm": 90,
+      "bars": 4,
+      "cycleBars": 2,
+      "key": "A minor",
+      "authorship": "user",
+      "path": "assets/audio/ft/jura-experimental-v2/lead-4.wav",
+      "source": "stems/source-library/instruments/lead/lead 4.mp3",
+      "sourceHash": "2658e61c319a51b2b50421eaba46eb48d02440de1522fc71e2994ab56d351bc1",
+      "sha256": "052ba0b155d7e8a64de54bab33a8c7cf865e9e7d46ddef43267d103e56fda8f8",
+      "sampleRate": 44100,
+      "frames": 470400,
+      "evidence": {
+        "frames": 333396,
+        "seconds": 7.56,
+        "peak": 0.30458,
+        "rms": 0.02335,
+        "rmsDb": -32.63282,
+        "clippedSamples": 0,
+        "stereoDifferenceRms": 0.0095,
+        "lowEnergyBelow200": 0.22097,
+        "centroidHz": 1212.73653,
+        "spectralPeaks": [
+          {
+            "hz": 164.46926,
+            "note": "E3",
+            "share": 0.06942
+          },
+          {
+            "hz": 329.09725,
+            "note": "E4",
+            "share": 0.04366
+          },
+          {
+            "hz": 658.21097,
+            "note": "E5",
+            "share": 0.02836
+          },
+          {
+            "hz": 1317.23904,
+            "note": "E6",
+            "share": 0.01783
+          },
+          {
+            "hz": 195.34583,
+            "note": "G3",
+            "share": 0.01776
+          },
+          {
+            "hz": 1972.73227,
+            "note": "B6",
+            "share": 0.01687
+          },
+          {
+            "hz": 82.18163,
+            "note": "E2",
+            "share": 0.01588
+          },
+          {
+            "hz": 1757.59504,
+            "note": "A6",
+            "share": 0.0138
+          }
+        ],
+        "pitchClassEnergy": [
+          {
+            "note": "E",
+            "share": 0.47729
+          },
+          {
+            "note": "B",
+            "share": 0.14506
+          },
+          {
+            "note": "G",
+            "share": 0.14278
+          },
+          {
+            "note": "A",
+            "share": 0.06755
+          },
+          {
+            "note": "D",
+            "share": 0.06086
+          },
+          {
+            "note": "C",
+            "share": 0.037
+          },
+          {
+            "note": "G#",
+            "share": 0.02151
+          },
+          {
+            "note": "F#",
+            "share": 0.01303
+          },
+          {
+            "note": "C#",
+            "share": 0.01249
+          },
+          {
+            "note": "D#",
+            "share": 0.00806
+          },
+          {
+            "note": "A#",
+            "share": 0.00786
+          },
+          {
+            "note": "F",
+            "share": 0.00649
+          }
+        ],
+        "activeStartSeconds": 0.03,
+        "activeEndSeconds": 5.65,
+        "onsetsSeconds": [
+          0.04,
+          0.2,
+          1.13,
+          2.04,
+          2.37,
+          2.72,
+          2.87,
+          3.72,
+          4.38,
+          4.7,
+          5.04
+        ],
+        "gridErrorSeconds": {
+          "bpm88": 0.03798,
+          "bpm90": 0.04091,
+          "bpm92": 0.04134
+        },
+        "barRms": [
+          0.02891,
+          0.02659
+        ],
+        "tailRms": 0.00204
+      },
+      "trimFrames": 1091,
+      "cycleEvidence": "Two 2.6666667s bars at 90 BPM: active phrase extends through second bar; extra container duration is decay. Full tail folded at 5.3333333s, not looped as a third bar.",
+      "tailPolicy": "Measured quiet MP3 prefix trimmed with 2ms pre-onset margin; full remaining decay folded into two bars; 3ms seam fade; four-bar derived playback, no transpose or time stretch.",
+      "tonalEvidence": "Spectral partials support A natural minor compatibility (A/B/C/D/E/F/G). Inference, not authoritative key detection; mixed only with the established A-minor bank.",
+      "calibration": {
+        "buildGainDb": 0,
+        "gainDb": 0.1,
+        "targetLufs": -27,
+        "derived": {
+          "lufs": -27.6,
+          "truePeak": -10.1,
+          "lra": 0.8
+        },
+        "after": {
+          "lufs": -27.5,
+          "truePeak": -10,
+          "lra": 0.8
+        }
+      }
+    }
+  ]
+}

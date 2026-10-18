@@ -1,0 +1,17 @@
+{
+  "provenance": "LOCAL PREVIEW: new defect model on the frozen engine-generated Artem seed-33 recipe. Not current production output.",
+  "baselineCommit": "47abf9e09a18d47400804efae48001c1aecc5f0c",
+  "reference": "artifacts/artem-local-demos/artem-beatmaking-48-seed-33.json",
+  "demoSeed": 33,
+  "beatSeed": 1837050013,
+  "vocalTakeSeed": 249582559,
+  "sampleRate": 44100,
+  "durationSeconds": 21.333333333333332,
+  "outputGain": 0.776895649542515,
+  "parts": [
+    {"id":"jura-experimental-20261018-drumm-4","role":"drums","engineStage":0,"path":"assets/audio/ft/jura-experimental-v2/drumm-4.wav","loopSeconds":10.666666666666666,"sourceGainDb":-14.17,"windows":[{"startBar":2,"bars":4,"sourceBar":0}]},
+    {"id":"jura-experimental-20261018-lead-4","role":"melody","engineStage":1,"path":"assets/audio/ft/jura-experimental-v2/lead-4.wav","loopSeconds":10.666666666666666,"sourceGainDb":0.1,"windows":[{"startBar":2,"bars":4,"sourceBar":0},{"startBar":6,"bars":2,"sourceBar":2}]},
+    {"id":"jura-experimental-20261018-bass-4","role":"bass","engineStage":2,"path":"assets/audio/ft/jura-experimental-v2/bass-4.wav","loopSeconds":10.666666666666666,"sourceGainDb":-4.8,"windows":[{"startBar":0,"bars":2,"sourceBar":0},{"startBar":2,"bars":4,"sourceBar":0}]},
+    {"id":"npc-artem-47","role":"vocal","path":"assets/audio/ft/npc-artem-v1/47.wav","loopSeconds":10.666666666666666,"sourceGainDb":-3.98,"windows":[{"startBar":2,"bars":4,"sourceBar":0}]}
+  ]
+}

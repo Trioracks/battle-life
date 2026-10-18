@@ -1,5 +1,6 @@
-import {USER_EXPERIMENTAL_BANK,USER_EXPERIMENTAL_RECIPES} from './beat-user-experimental-bank.js?rev=44';
-export {USER_EXPERIMENTAL_BANK} from './beat-user-experimental-bank.js?rev=44';
+import {USER_EXPERIMENTAL_BANK,USER_EXPERIMENTAL_RECIPES} from './beat-user-experimental-bank.js?rev=45';
+import {JURA_EXPERIMENTAL_BANK,JURA_EXPERIMENTAL_RECIPES} from './beat-jura-experimental-bank.js?rev=45';
+export {USER_EXPERIMENTAL_BANK} from './beat-user-experimental-bank.js?rev=45';
 const legacyBank = ['drums','theme','arrangement'].flatMap(kind =>
   Array.from({length:16}, (_,index) => {
     const number=String(index+1).padStart(2,'0');
@@ -36,14 +37,15 @@ export const USER_DRUM_BANK=Object.freeze(Array.from({length:10},(_,index)=>{
  const number=String(index+1).padStart(2,'0');
  return Object.freeze({id:'user-drums-20261012-'+number,kind:'drums',bpm:90,bars:4,key:null,authorship:'user',name:'Авторский ритм / '+number,path:'./assets/audio/ft/user-drums-v1/'+number+'.wav'});
 }));
-const catalogue=new Map([...BEGINNER_BANK,...USER_DRUM_BANK,...USER_EXPERIMENTAL_BANK].map(part=>[part.id,part]));
+const catalogue=new Map([...BEGINNER_BANK,...USER_DRUM_BANK,...USER_EXPERIMENTAL_BANK,...JURA_EXPERIMENTAL_BANK].map(part=>[part.id,part]));
 export const beginnerById=id=>catalogue.get(id);
 export function chooseBeginnerParts(random=Math.random,{skill,genre,genreXP}={}){
   const value=random();let unit=Number.isFinite(value)?Math.max(0,Math.min(.999999,value)):0;
   // Explicit genre context is required. Older callers preserve the exact old mapping.
   if(genre==='experimental'&&Number.isFinite(genreXP)&&genreXP>=0&&genreXP<50){
     if(unit<1/3)return {...USER_EXPERIMENTAL_RECIPES[Math.floor(unit*3*USER_EXPERIMENTAL_RECIPES.length)]};
-    unit=(unit-1/3)*1.5;
+    if(unit<1/2)return {...JURA_EXPERIMENTAL_RECIPES[Math.floor((unit-1/3)*6*JURA_EXPERIMENTAL_RECIPES.length)]};
+    unit=(unit-1/2)*2;
   }
   const index=Math.floor(unit*BEGINNER_RECIPES.length),{drumsId,themeId,arrangementId}=BEGINNER_RECIPES[index];
   const author=Number.isFinite(skill)&&skill<50&&index%3===0;

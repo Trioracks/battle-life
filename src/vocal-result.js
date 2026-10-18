@@ -1,5 +1,5 @@
-import {vocalById} from './vocal-catalog.js?rev=44';
-import {vocalOutcomes,normalizeProductionOutcome} from './production-outcomes.js?rev=44';
+import {vocalById,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=45';
+import {vocalOutcomes,normalizeProductionOutcome} from './production-outcomes.js?rev=45';
 export const clampV=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,Number.isFinite(v)?v:lo));
 const text=(v,n=100)=>typeof v==='string'?v.trim().slice(0,n):'';
 export const VOCAL_EQUIPMENT=Object.freeze({microphone:'desk-mic',interface:'onboard'});
@@ -28,11 +28,12 @@ function take(v,kind){
 }
 export function normalizeRecording(v){
  if(v?.version!==1||!vocalById(v.sourceId)||!text(v.text?.id)||!text(v.text?.name,64)||!Number.isInteger(v.revision)||v.revision<1)return null;
+ if(vocalById(v.sourceId).voiceId!==(v.voiceId===undefined?DEFAULT_VOICE_ID:v.voiceId))return null;
  const draft=take(v.draft,'draft');if(!draft)return null;
  const clean=take(v.clean,'clean'),post=p=>p&&Number.isFinite(p.skill)?{skill:clampV(p.skill),gain:2}:null;
  if(clean&&clean.resultVersion!==1)clean.quality=Math.max(clean.quality,Math.min(VOCAL_CEILING,draft.quality+3));
  const snapshot=v.text.snapshot?.kind==='lyrics'&&v.text.snapshot.id===v.text.id&&v.text.snapshot.revision===v.text.revision?JSON.parse(JSON.stringify(v.text.snapshot)):null;
- return {version:1,revision:v.revision,text:{id:text(v.text.id),name:text(v.text.name,64),revision:Math.max(1,Math.floor(clampV(v.text.revision,1,1e6))),...(snapshot?{snapshot}:{})},sourceId:v.sourceId,draft,clean,mix:post(v.mix),master:post(v.master)};
+ return {version:1,revision:v.revision,text:{id:text(v.text.id),name:text(v.text.name,64),revision:Math.max(1,Math.floor(clampV(v.text.revision,1,1e6))),...(snapshot?{snapshot}:{})},sourceId:v.sourceId,...(v.voiceId!==undefined?{voiceId:v.voiceId}:{}),draft,clean,mix:post(v.mix),master:post(v.master)};
 }
 export function recordingQuality(value){const r=normalizeRecording(value);if(!r)return 0;const t=r.clean??r.draft;return Math.min(t.ceiling,t.quality+(r.mix?2:0)+(r.master?2:0));}
 export function vocalPlaybackProfile(value){const r=normalizeRecording(value);if(!r)return null;return {...(r.clean??r.draft),quality:recordingQuality(r),postGain:(r.mix?2:0)+(r.master?2:0),vocalGainDb:r.master?.5:r.mix?-1:-2};}

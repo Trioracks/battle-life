@@ -46,6 +46,9 @@ test('public work never starts or retries audio across hidden frames and reports
 });
 test('public NPC full track and beat-only preview both remain disabled with no synthetic progress',async()=>{
  const {session,d,calls}=fixture(),npc=ensureNpcRoundTrack(createVirtualPcState(),{characterId:DEMO_PARTICIPANTS[0].characterId,battleId:'makarevich-1',roundId:'selection',nowMinute:600}),version=npc.state.trackVersions.byId[npc.trackVersionId],view=createSocialAudio(session.forOwner('social'));
+ const complete=view.row(d,{version}),fullPlay=allPc(complete).find(n=>n.dataset.socialAudio===version.id);assert.equal(fullPlay.disabled,true);fullPlay.click();await flush();assert.equal(calls.play,0);assert.equal(hasNotice(complete),true);assert.equal(allPc(complete).find(n=>n.getAttribute('role')==='progressbar').getAttribute('aria-valuenow'),'0');
+ // Historical frozen work without a cleared vocal remains a beat-only preview.
+ version.npc.audioStatus='awaiting-voice';version.npc.voiceId='npc-voice:'+version.npc.characterId;version.recipe.descriptor.parts=version.recipe.descriptor.parts.filter(p=>!p.vocal);version.npc.requiredAssets=version.npc.requiredAssets.map(a=>a.kind==='vocal'?{...a,id:'npc-take:'+version.npc.characterId+':selection',voiceId:version.npc.voiceId}:a);
  const row=view.row(d,{version}),preview=findButton(row,'Предпросмотр бита — без голоса');assert.ok(preview);assert.equal(preview.disabled,true);preview.click();await flush();assert.equal(calls.play,0);assert.equal(hasNotice(row),true);assert.equal(allPc(row).find(n=>n.getAttribute('role')==='progressbar').getAttribute('aria-valuenow'),'0');view.dispose();session.dispose();
 });
 test('production desktop defaults to public recorded capability while preserving its procedural cue engine',()=>{

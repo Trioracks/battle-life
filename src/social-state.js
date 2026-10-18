@@ -1,7 +1,7 @@
-import {SOCIAL_COMMUNITIES,SOCIAL_PROFILES,profileById} from './social-catalog.js?rev=44';
-import {normalizePlayerPortrait} from './social-portraits.js?rev=44';
-import {normalizeCommunityPublicationState,ensureCommunityPublications,baselineCommunityRead,communityUnreadCounts,publicCommunityPosts} from './social-community-publications.js?rev=44';
-import {validGameMinute} from './game-minute.js?rev=44';
+import {SOCIAL_COMMUNITIES,SOCIAL_PROFILES,profileById} from './social-catalog.js?rev=45';
+import {normalizePlayerPortrait} from './social-portraits.js?rev=45';
+import {normalizeCommunityPublicationState,ensureCommunityPublications,baselineCommunityRead,communityUnreadCounts,publicCommunityPosts} from './social-community-publications.js?rev=45';
+import {validGameMinute} from './game-minute.js?rev=45';
 import conversations from '../data/social/conversations.json' with {type:'json'};
 const copy=value=>JSON.parse(JSON.stringify(value));
 const record=v=>v&&typeof v==='object'&&!Array.isArray(v);

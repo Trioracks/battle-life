@@ -1,12 +1,12 @@
-import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=44';
-import {COMMUNITY_BOARDS,COMMUNITY_REPLY_LIMIT,normalizeCommunity,communityDay,topicsForDay,topicForDay,replyToTopic} from './underweb-community.js?rev=44';
-import {homeDateLabel} from './home-calendar.js?rev=44';
-import {createForumArchiveView} from './underweb-forum-archive-view.js?rev=44';
-import {publicRoundAnnouncements} from './round-topics.js?rev=44';
-import {metadataGameMinute} from './social-registration.js?rev=44';
-import {createRoundAnnouncementView} from './round-announcement-view.js?rev=44';
-import {publicSeedingPosts} from './social-reactions.js?rev=44';
-import {createPostReactionsView} from './social-reactions-view.js?rev=44';
+import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=45';
+import {COMMUNITY_BOARDS,COMMUNITY_REPLY_LIMIT,normalizeCommunity,communityDay,topicsForDay,topicForDay,replyToTopic} from './underweb-community.js?rev=45';
+import {homeDateLabel} from './home-calendar.js?rev=45';
+import {createForumArchiveView} from './underweb-forum-archive-view.js?rev=45';
+import {publicRoundAnnouncements} from './round-topics.js?rev=45';
+import {metadataGameMinute} from './social-registration.js?rev=45';
+import {createRoundAnnouncementView} from './round-announcement-view.js?rev=45';
+import {publicSeedingPosts} from './social-reactions.js?rev=45';
+import {createPostReactionsView} from './social-reactions-view.js?rev=45';
 const button=(d,text,fn,attributes={})=>pcButton(d,text,{className:'uw-control uw-forum-link',attributes},fn);
 export function createCommunityView(d,{route,getState,getMetadata,onChange,navigate}){
  const day=communityDay(getMetadata().gameDay),state=normalizeCommunity(getState().community);

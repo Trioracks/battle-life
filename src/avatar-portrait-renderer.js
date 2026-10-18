@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=44';
+import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=45';
 
 function cloneSkeleton(root){
  const copy=root.clone(true),mapping=new Map();

@@ -5,6 +5,8 @@ import path from 'node:path';
 import {tmpdir} from 'node:os';
 import http from 'node:http';
 import {startPreviewServer} from '../tools/serve-preview.mjs';
+import {vocalById} from '../src/vocal-catalog.js';
+import {JURA_EXPERIMENTAL_BANK} from '../src/beat-jura-experimental-bank.js';
 
 async function fixture(t){
  const parent=await fs.mkdtemp(path.join(tmpdir(),'preview-server-'));t.after(()=>fs.rm(parent,{recursive:true,force:true}));
@@ -42,6 +44,15 @@ test('public mode never inspects broken local settings or a supplied inaccessibl
  const server=await startPreviewServer({root,port:0,profile:'public-preview',assetRoot:path.join(root,'nonexistent-private-pack')});t.after(server.close);
  assert.equal((await request(server.origin,'/battle-life/')).status,200);
  await assert.rejects(startPreviewServer({root,port:0,profile:'local-full'}),SyntaxError);
+});
+
+test('new catalog audio routes require explicit local mode and never expose an entire source directory',async t=>{
+ const {root,assets,put}=await fixture(t),routes=['npc-jura-01','npc-artem-01','npc-gans-01','npc-kapa-01'].map(id=>vocalById(id).path.replace(/^\.\//,''));
+ routes.push(JURA_EXPERIMENTAL_BANK[0].path.replace(/^\.\//,''));
+ for(const route of routes)await put(assets,route,'local fixture');
+ const local=await startPreviewServer({root,port:0,profile:'local-full',assetRoot:assets}),publicServer=await startPreviewServer({root,port:0});t.after(local.close);t.after(publicServer.close);
+ for(const route of routes){assert.equal((await request(local.origin,'/battle-life/'+route)).status,200,route);assert.equal((await request(publicServer.origin,'/battle-life/'+route)).status,404,route);}
+ assert.equal((await request(local.origin,'/battle-life/stems/private.wav')).status,404);
 });
 test('server rejects symlink files, directories and root ancestors',async t=>{
  const {root,assets,put}=await fixture(t);await put(root,'src/secret.js','secret');

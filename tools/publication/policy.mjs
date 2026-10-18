@@ -25,7 +25,7 @@ export function publicationPathReason(relativePath, target) {
   if (target==='source' && /^docs\//.test(relativePath) && (ext==='.md' || relativePath==='docs/research/package-one-reference-sources.json' || relativePath==='docs/public-source-provenance.json')) return null;
   if (relativePath==='vendor/three/LICENSE') return null;
   if (/^assets\/(apartment|models|battle-covers|npc-photos|social|ui|fonts)\//.test(relativePath) && (binaries.has(ext) || ['.svg','.txt','.md'].includes(ext) || assetJson.has(relativePath))) return null;
-  if (relativePath==='assets/audio/pc/manifest.json' || (target==='source' && /^assets\/audio\/ft\/[^/]+\/manifest\.json$/.test(relativePath))) return null;
+  if (relativePath==='assets/audio/pc/manifest.json' || /^assets\/audio\/ft\/(?:npc-(?:jura|artem|gans|kapa)-v1|jura-experimental-v2)\/manifest\.json$/.test(relativePath) || (target==='source' && /^assets\/audio\/ft\/[^/]+\/manifest\.json$/.test(relativePath))) return null;
   return 'path or type is not on the publication allowlist';
 }
 

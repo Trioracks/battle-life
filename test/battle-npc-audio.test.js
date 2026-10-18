@@ -9,7 +9,9 @@ import {playTrackVersion} from '../src/track-version-audio.js';
 import {beginnerById} from '../src/beat-beginner-bank.js';
 import {createSocialAudio} from '../src/social-audio-view.js';
 import {pcDocument,findButton,allPc} from './helpers/virtual-pc-dom.js';
-function version(){const r=ensureNpcRoundTrack(createVirtualPcState(),{characterId:DEMO_PARTICIPANTS[0].characterId,battleId:'makarevich-1',roundId:'selection',nowMinute:600});return r.state.trackVersions.byId[r.trackVersionId];}
+// Model a historical frozen missing-voice version, rather than depending on
+// current speaker eligibility to accidentally produce a missing asset.
+function version(){const r=ensureNpcRoundTrack(createVirtualPcState(),{characterId:DEMO_PARTICIPANTS[0].characterId,battleId:'makarevich-1',roundId:'selection',nowMinute:600}),v=r.state.trackVersions.byId[r.trackVersionId];v.npc.audioStatus='awaiting-voice';v.npc.voiceId='npc-voice:'+v.npc.characterId;v.recipe.descriptor.parts=v.recipe.descriptor.parts.filter(p=>!p.vocal);v.npc.requiredAssets=v.npc.requiredAssets.map(a=>a.kind==='vocal'?{...a,id:'npc-take:'+v.npc.characterId+':selection',voiceId:v.npc.voiceId}:a);return v;}
 test('missing NPC voice stays explicit; cleared beat preview is separate from the full track',async()=>{
  const v=version(),before=JSON.stringify(v),r=npcPlaybackDescriptor(v,NPC_VOCAL_CATALOG);assert.equal(r.ok,false);assert.equal(r.missingAssets.length,1);assert.equal(r.missingAssets[0].kind,'vocal');assert.match(r.reason,/голос/i);
  assert.ok(r.previewDescriptor.parts.length>=3);assert.ok(r.previewDescriptor.parts.every(p=>beginnerById(p.id)));assert.equal(r.previewDescriptor.parts.some(p=>p.vocal),false);
