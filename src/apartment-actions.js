@@ -8,6 +8,10 @@ const actions = Object.freeze({
   door: { id: 'door', label: 'Выйти на карту', tooltip: 'Выйти на карту · 5 мин', targetX: 7.64, minutes: 5, animation: 'door', cue: 'door', requiresEnergy: 0 },
 });
 
+export function sleepOptionsForActionMenu(manual) {
+  return manual ? { mode: 'manual', minutesPerSecond: 450 } : undefined;
+}
+
 export function getApartmentAction(id) {
   return actions[id] ? { ...actions[id] } : null;
 }

@@ -1,4 +1,5 @@
 import {ApartmentMotion} from './apartment-v3-motion.js?rev=43';
+import {sleepOptionsForActionMenu} from './apartment-actions.js?rev=46';
 import {ApartmentTime,loadHomeTime,saveHomeTime as saveHomeTimeRaw} from './apartment-v3-time.js?rev=43';
 import {districts,getDistrictLocations} from './calikfornia.js?rev=43';
 import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction,consumeHomeFood} from './apartment-v3-runtime.js?rev=45';
@@ -270,7 +271,7 @@ try{
     const id=key==='bed-manual'?'bed':key,manual=key==='bed-manual';
     if(!config.actions[id])continue;
     const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.label=label;b.dataset.action=id;if(manual){b.dataset.sleepMode='manual';b.hidden=true;}
-    b.addEventListener('click',()=>{if(id==='bed'&&actionMenuContext!=='bed'){openActionMenu('bed');return;}$('#apartment-actions').hidden=true;act(id,manual?{mode:'manual',minutesPerSecond:45}:undefined);canvas.focus();});
+    b.addEventListener('click',()=>{if(id==='bed'&&actionMenuContext!=='bed'){openActionMenu('bed');return;}$('#apartment-actions').hidden=true;act(id,sleepOptionsForActionMenu(manual));canvas.focus();});
     if(config.actions[id]?.lightRoom)b.setAttribute('aria-label',label);
     $('#actions').append(b);
   }

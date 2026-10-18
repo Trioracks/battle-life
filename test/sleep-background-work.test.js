@@ -6,6 +6,7 @@ import * as runtime from '../src/apartment-v3-runtime.js';
 import {createVirtualPcState,loadVirtualPcState,saveVirtualPcState} from '../src/virtual-pc-state.js';
 import {advanceInstallation,openInstaller,advanceInstaller} from '../src/pc-software.js';
 import {getSoundCue,playSoundCue} from '../src/sound-cues.js';
+import * as apartmentActions from '../src/apartment-actions.js';
 
 const installationClock=await import('../src/pc-installation-clock.js').catch(()=>({}));
 const config=runtime.prepareApartmentConfig({bounds:[-2,2],spawn:[1,0,.8],speed:1,doorX:0,actions:{
@@ -59,6 +60,31 @@ test('manual bed request reaches the bed, holds through a week and wakes explici
   assert.equal(clock.isSleeping,true);assert.equal(motion.phase,'perform');assert.ok(clock.day>=8);
   assert.equal(motion.wakeUp(),true);runtime.advanceHomeFrame(motion,clock,1/60);
   assert.equal(clock.isSleeping,false);assert.equal(motion.phase,'return-out');
+});
+
+test('manual bed menu rate advances seven days in 22.4 seconds and leaves ordinary sleep unchanged',()=>{
+  assert.equal(typeof apartmentActions.sleepOptionsForActionMenu,'function');
+  const manual=apartmentActions.sleepOptionsForActionMenu(true);
+  assert.deepEqual(manual,{mode:'manual',minutesPerSecond:450});
+  assert.equal(apartmentActions.sleepOptionsForActionMenu(false),undefined);
+
+  const motion=new ApartmentMotion(config),clock=new ApartmentTime({day:1,minutes:600});
+  assert.equal(runtime.startHomeAction(motion,clock,'bed',manual).allowed,true);
+  for(let frame=0;frame<600&&!clock.isSleeping;frame++)runtime.advanceHomeFrame(motion,clock,1/60);
+  assert.equal(motion.sleeping,true);
+  for(let frame=0;frame<448;frame++)runtime.advanceHomeFrame(motion,clock,.05);
+  assert.equal(clock.day,8);
+  assert.equal(clock.isSleeping,true);
+  assert.equal(motion.wakeUp(),true);
+  runtime.advanceHomeFrame(motion,clock,1/60);
+  assert.equal(clock.isSleeping,false);
+
+  const ordinaryMotion=new ApartmentMotion(config),ordinaryClock=new ApartmentTime({day:1,minutes:600});
+  assert.equal(runtime.startHomeAction(ordinaryMotion,ordinaryClock,'bed').allowed,true);
+  for(let frame=0;frame<600&&!ordinaryMotion.sleeping;frame++)runtime.advanceHomeFrame(ordinaryMotion,ordinaryClock,1/60);
+  for(let frame=0;frame<160;frame++)runtime.advanceHomeFrame(ordinaryMotion,ordinaryClock,.05);
+  assert.equal(ordinaryClock.label,'16:00');
+  assert.equal(ordinaryClock.isSleeping,false);
 });
 
 test('food cue follows one durable consumption and never a refusal or failed save',()=>{
