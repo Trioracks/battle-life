@@ -44,3 +44,13 @@
 Не публикуются и остаются локально: `stems/janres/non/vocal/test.zip` (249 МБ), четыре MP3-примера в «Новая папка», ignored QA/сохранения, ранее установленные как local-only записи `assets/audio/goblin/` и `assets/audio/filya/`. Рабочие игровые банки, модели и фотографии включаются в выпуск.
 
 Локальные доказательства (ignored): `artifacts/patch-release/`, `artifacts/patch-dialogs-{desktop,narrow,community}.jpg`, `artifacts/patch-community-desktop.jpg`, `.superpowers/sdd/2026-10-23-social-patch-release/notebook-qa.html`. Fixtures используют отдельное состояние в памяти и не пишут пользовательскую карьеру.
+
+## Публикация через Git LFS
+
+Первый push коммита `0b6fd91` был отклонён GitHub из-за исторического blob `assets/source/apartment-cutaway-v3.blend` размером123.77MiB. Этот объект не входил в новый diff; аудит только новых файлов был недостаточен для публикации всей прежней истории.
+
+Публикационный кандидат подготовлен в отдельном `D:/Project/Battle/.worktrees/lfs-publish`. В LFS преобразован только этот путь (5 исторических объектов,308МБ); runtime-код и игровые ресурсы остались идентичны проверенному коммиту. Исходные локальные branch tips сохранены; полный патч доLFS закреплён в `codex/sloboda-workflow-pre-lfs-20261023` (`0b6fd91e7828b72492830a8a8f20c580fb00bce0`). Объекты LFS и временные данные находятся наD:.
+
+Рабочий Blender-файл восстановлен изLFS, SHA256 совпал с исходным: `029b2db6a1183e5e13bd4fd1a7e62a722b04998a5cbd201fe36ef44a91c5b418`. `git lfs fsck --objects 0b6fd91..HEAD` прошёл; в публикационной истории нет обычных Git blobs >=100МБ. Дополнительные проверки bundle/canonical revisions после преобразования: **7/7 passed**. Повтор полного1647suite не потребовался: сравнение Git-деревьев подтверждает неизменность кода, тестов и остальных ресурсов.
+
+Публикуется только `codex/sloboda-workflow-design`, без force push; существующие remote-ветки не переписываются. Финальное подтверждение remote SHA записывается в сообщении о выпуске.
