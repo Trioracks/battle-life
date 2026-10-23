@@ -3,6 +3,10 @@ import assert from 'node:assert/strict';
 import {SOCIAL_COMMUNITIES,SOCIAL_PROFILES,communityById,profileById} from '../src/social-catalog.js';
 import {backgroundAudioDescriptor} from '../src/social-audio-view.js';
 import {createVirtualPcState} from '../src/virtual-pc-state.js';
+import {advanceGoblin} from '../src/goblin-mentor.js';
+import {advanceFilya} from '../src/filya-calendar.js';
+import {createSocialProfileView} from '../src/social-profile-view.js';
+import {pcDocument,allPc} from './helpers/virtual-pc-dom.js';
 test('six distinct fictional archive recordings live only in Makarevich and create no submissions',()=>{
  const demos=SOCIAL_COMMUNITIES.flatMap(c=>c.audio.map(d=>({...d,communityId:c.id})));
  assert.equal(demos.length,6);assert.ok(demos.every(d=>d.communityId==='makarevich-1'&&d.archive));
@@ -23,9 +27,16 @@ test('twenty original communities cover everyday life, with stable dated history
  const c=communityById('makarevich-1');c.description='changed';assert.notEqual(communityById(c.id).description,'changed');
  assert.equal(communityById('missing'),null);
 });
-test('ordinary acquaintances and musicians have complete profiles without fabricated real identities',()=>{
+test('ordinary acquaintances have complete fictional profiles and musicians expose calendar-authored content',()=>{
  assert.ok(SOCIAL_PROFILES.length>=12);assert.ok(SOCIAL_PROFILES.filter(p=>!p.birthday).length>SOCIAL_PROFILES.length/2);
  assert.ok(SOCIAL_PROFILES.filter(p=>p.occupation!=='musician').length>=8);
- for(const p of SOCIAL_PROFILES){assert.ok(p.name&&p.avatar&&p.description&&p.languages.length&&p.photos.length&&p.wall.length);assert.equal(p.fictional,true);}
+ const calendarAuthors=new Set(['mak-npc-06','mc-filya']);
+ for(const p of SOCIAL_PROFILES){assert.ok(p.name&&p.avatar&&p.description&&p.languages.length);if(!calendarAuthors.has(p.id)){assert.ok(p.photos.length&&p.wall.length,p.id+' has its catalog wall and photos');assert.equal(p.fictional,true);}}
+ const state=advanceFilya(advanceGoblin(createVirtualPcState(),480).state,480,{random:()=>.42}).state,d=pcDocument();
+ for(const id of calendarAuthors){
+  const view=createSocialProfileView(d,{id,getState:()=>state,getMetadata:()=>({gameMinutes:480}),navigate(){},commit(){},audio:{stop(){}}}),nodes=allPc(view);
+  assert.ok(nodes.filter(n=>n.className?.split(' ').includes('sn-post')).length>=2,id+' has its actual published calendar posts');
+  assert.ok(nodes.some(n=>n.tagName==='IMG'&&n.getAttribute('alt')!=='Аватар: '+profileById(id).name),id+' has published life photos');
+ }
  assert.equal(profileById('missing'),null);
 });

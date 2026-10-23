@@ -1,54 +1,59 @@
-import {ApartmentMotion} from './apartment-v3-motion.js?rev=45';
-import {sleepOptionsForActionMenu} from './apartment-actions.js?rev=45';
-import {ApartmentTime,loadHomeTime,saveHomeTime as saveHomeTimeRaw} from './apartment-v3-time.js?rev=45';
-import {districts,getDistrictLocations} from './calikfornia.js?rev=45';
-import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction,consumeHomeFood} from './apartment-v3-runtime.js?rev=45';
-import {playSoundCue} from './sound-cues.js?rev=45';
-import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=45';
-import {DEFAULT_APPEARANCE,loadProfile,saveProfile} from './avatar-v3-profile.js?rev=45';
-import {mountVoiceSelector} from './character-voice-selector.js?rev=45';
-import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=45';
-import {createNewGameSession} from './apartment-v3-new-game.js?rev=45';
-import {advanceVirtualPcDurably,gameMinuteStamp,createSubmissionTransferClock} from './virtual-pc-runtime.js?rev=45';
-import {createVirtualPcState,preparePcRuntimeState,primePcSaveArchives,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=45';
-import {createSocialBackground} from './social-background.js?rev=45';
-import {mountVirtualPc} from './virtual-pc-ui.js?rev=45';
-import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=45';
-import {PcSounds} from './virtual-pc-sounds.js?rev=45';
-import {playIndoorFootstep} from './indoor-footsteps.js?rev=45';
-import {createFootstepCadence} from './footstep-cadence.js?rev=45';
-import {restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=45';
-import {advanceInstallation} from './pc-software.js?rev=45';
-import {installationElapsedSeconds} from './pc-installation-clock.js?rev=45';
-import {advanceBrowserDownloads} from './pc-browser-downloads.js?rev=45';
-import {createBeatWorkPanel} from './beat-work-view.js?rev=45';
-import {normalizeGenreProgression,genreById,genreCap} from './genre-progression.js?rev=45';
-import {createBeatWorkAudio} from './beat-work-audio.js?rev=45';
-import {createLyricWorkAudio} from './lyric-work-audio.js?rev=45';
-import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.js?rev=45';
-import {workCameraFrame} from './work-camera.js?rev=45';
-import {pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=45';
-import {pauseStudy} from './rap-analysis.js?rev=45';
-import {pauseCaseStudy} from './rap-research.js?rev=45';
-import {effectiveVocalSkill} from './vocal-production.js?rev=45';
-import {effectiveWritingSkill} from './lyric-production.js?rev=45';
-import {createCharacterSpeech,workNeedSpeech} from './character-speech.js?rev=45';
-import {mountHomeNeedsView,mountCharacterSpeech} from './home-needs-view.js?rev=45';
-import {migrateNoviceSave} from './home-profile-migration.js?rev=45';
-import {mountHomeWardrobeView} from './home-wardrobe-view.js?rev=45';
-import {mountPhoneHud} from './phone-hud.js?rev=45';
-import {nextSafeResultReaction,completeResultReaction} from './social-result-reaction.js?rev=45';
-import {captureDesktopReturn} from './desktop-return-state.js?rev=45';
-import {createPlayerPortraitController,portraitKey} from './social-portraits.js?rev=45';
+import {ApartmentMotion} from './apartment-v3-motion.js?rev=57';
+import {sleepOptionsForActionMenu} from './apartment-actions.js?rev=57';
+import {ApartmentTime,loadHomeTime,saveHomeTime as saveHomeTimeRaw} from './apartment-v3-time.js?rev=57';
+import {districts,getDistrictLocations} from './calikfornia.js?rev=57';
+import {advanceComputerHomeFrame,advanceHomeFrame,prepareApartmentConfig,startHomeAction,consumeHomeFood} from './apartment-v3-runtime.js?rev=57';
+import {playSoundCue} from './sound-cues.js?rev=57';
+import {CameraPointer,cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=57';
+import {createApartmentHover,canClickApartment} from './apartment-interaction.js?rev=57';
+import {DEFAULT_APPEARANCE,loadProfile,saveProfile} from './avatar-v3-profile.js?rev=57';
+import {mountVoiceSelector} from './character-voice-selector.js?rev=57';
+import {mountCreator,decorateCreatorButton} from './apartment-v3-creator.js?rev=57';
+import {createNewGameSession} from './apartment-v3-new-game.js?rev=57';
+import {advanceVirtualPcDurably,gameMinuteStamp,createSubmissionTransferClock} from './virtual-pc-runtime.js?rev=57';
+import {createVirtualPcState,preparePcRuntimeState,primePcSaveArchives,loadVirtualPcState,saveStudioProject,saveVirtualPcState,setPcPower} from './virtual-pc-state.js?rev=57';
+import {createSocialBackground} from './social-background.js?rev=57';
+import {mountVirtualPc} from './virtual-pc-ui.js?rev=57';
+import {PcLifecycle,pcNeedsSceneFrame,moveInRoom,beginPcCutscene,preparePcWorkPose} from './virtual-pc-lifecycle.js?rev=57';
+import {PcSounds} from './virtual-pc-sounds.js?rev=57';
+import {createPcSocialNotifications} from './pc-social-notifications.js?rev=57';
+import {playIndoorFootstep} from './indoor-footsteps.js?rev=57';
+import {createFootstepCadence} from './footstep-cadence.js?rev=57';
+import {restoreMusicNeeds,workBlockReason,effectiveBeatSkill} from './beat-production.js?rev=57';
+import {advanceInstallation} from './pc-software.js?rev=57';
+import {installationElapsedSeconds} from './pc-installation-clock.js?rev=57';
+import {advanceBrowserDownloads} from './pc-browser-downloads.js?rev=57';
+import {createBeatWorkPanel} from './beat-work-view.js?rev=57';
+import {normalizeGenreProgression,genreById,genreCap} from './genre-progression.js?rev=57';
+import {createBeatWorkAudio} from './beat-work-audio.js?rev=57';
+import {createLyricWorkAudio} from './lyric-work-audio.js?rev=57';
+import {creativeWorkDescriptor,advanceCreativeWork} from './home-creative-work.js?rev=57';
+import {workCameraFrame} from './work-camera.js?rev=57';
+import {pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=57';
+import {pauseStudy} from './rap-analysis.js?rev=57';
+import {pauseCaseStudy} from './rap-research.js?rev=57';
+import {effectiveVocalSkill} from './vocal-production.js?rev=57';
+import {effectiveWritingSkill} from './lyric-production.js?rev=57';
+import {createCharacterSpeech,workNeedSpeech} from './character-speech.js?rev=57';
+import {mountHomeNeedsView,mountCharacterSpeech} from './home-needs-view.js?rev=57';
+import {migrateNoviceSave} from './home-profile-migration.js?rev=57';
+import {mountHomeWardrobeView} from './home-wardrobe-view.js?rev=57';
+import {mountPhoneHud} from './phone-hud.js?rev=57';
+import {nextSafeResultReaction,completeResultReaction} from './social-result-reaction.js?rev=57';
+import {captureDesktopReturn} from './desktop-return-state.js?rev=57';
+import {createPlayerPortraitController,portraitKey} from './social-portraits.js?rev=57';
+import {createPlayerAlbumController} from './player-life-photos.js?rev=57';
+import {saveTestSkill} from './test-skills.js?rev=57';
+import {mountTestSkills} from './test-skills-view.js?rev=57';
 
-import {mountReleaseInfo} from './release-info-view.js?rev=45';
+import {mountReleaseInfo} from './release-info-view.js?rev=57';
 
 const $=s=>document.querySelector(s),canvas=$('#apartment'),status=$('#activity'),loading=$('#loading');
 mountReleaseInfo($('#release-info'));
 let audio=null,paused=false,skeleton=false,hold=false,stepVariation=0;
 const cue=id=>{try{audio??=new AudioContext();if(audio.state==='suspended')audio.resume().catch(()=>{});if(id==='footstep')playIndoorFootstep(audio,stepVariation++);else playSoundCue(id,audio);}catch{/* Sound is optional. */}};
 try{
-  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=45');
+  const {createApartmentScene}=await import('./apartment-v3-scene.js?rev=57');
   const response=await fetch('./assets/apartment/v3/scene.json',{cache:'no-cache'});if(!response.ok)throw Error('Scene manifest '+response.status);
   const config=prepareApartmentConfig(await response.json()),view=await createApartmentScene(canvas,config);
   const footsteps=createFootstepCadence(config.stride);
@@ -66,7 +71,7 @@ try{
     });cameraLabel();await switching;cameraLabel();
   });
   canvas.addEventListener('contextmenu',e=>{if(mode==='game'&&view.modes.mode==='3D')e.preventDefault();});
-  canvas.addEventListener('pointerdown',e=>{if(lookInput.start(e,mode==='game'&&view.modes.mode==='3D')){canvas.setPointerCapture(e.pointerId);e.preventDefault();}});
+  canvas.addEventListener('pointerdown',e=>{if(lookInput.start(e,mode==='game'&&!homeModalOpen()&&$('#apartment-actions').hidden&&view.modes.mode==='3D')){hover.clear();canvas.setPointerCapture(e.pointerId);e.preventDefault();}});
   function stopLook(){lookInput.stop();}
   canvas.addEventListener('pointerup',stopLook);canvas.addEventListener('pointercancel',stopLook);canvas.addEventListener('lostpointercapture',stopLook);
   let storage;try{storage=window.localStorage;}catch{/* Browsers can deny local storage. */}
@@ -96,7 +101,23 @@ try{
     onApply:next=>{if(!migrationReady)return {ok:false,error:migration.error||'Автосохранение отключено до восстановления.'};const saved=saveProfile(storage,next);if(saved.ok){profile=saved.profile;void requestPlayerPortrait();}return saved;},
     onClose:()=>{if(motion.actionId==='wardrobe'&&motion.phase==='perform')motion.leaveAction();last=performance.now();},
   });
-  const homeModalOpen=()=>fridgeView.isOpen||wardrobeView.isOpen;
+  const testSkillsButton=document.createElement('button');testSkillsButton.id='test-skills';testSkillsButton.type='button';testSkillsButton.textContent='+';testSkillsButton.setAttribute('aria-label','Тестовые навыки');testSkillsButton.title='Тестовые навыки';$('#game-header .top-right').prepend(testSkillsButton);
+  const testSkillsRoot=document.createElement('section');document.body.append(testSkillsRoot);
+  const testSkillsView=mountTestSkills(testSkillsRoot,{
+    getProfile:()=>profile,getState:()=>pcState,returnFocus:$('#test-skills'),onClose:()=>{last=performance.now();},
+    onRaise:request=>{
+      if(!migrationReady)return {ok:false,reason:migration.error||'Автосохранение отключено до восстановления.'};
+      const result=saveTestSkill(profile,pcState,request,{saveProfile:next=>saveProfile(storage,next),persistPc});
+      if(result.ok){
+        profile=result.profile;
+        if(result.store==='pc')virtualPc.syncState(pcState);
+        virtualPc.syncHost({playerName:profile.name,clockLabel:homeTime.label,gameDay:homeTime.day,gameMinutes:gameMinuteStamp(homeTime),skills:profile.skills,...portraitMetadata()});
+      }
+      return result;
+    },
+  });
+  $('#test-skills').addEventListener('click',()=>{if(mode==='game'&&profile&&!fridgeView.isOpen&&!wardrobeView.isOpen){lookInput.stop();$('#apartment-actions').hidden=true;testSkillsView.open();}});
+  const homeModalOpen=()=>fridgeView.isOpen||wardrobeView.isOpen||testSkillsView.isOpen;
   function persistPc(next,{atomic=false,archives=[]}={}){
     const previous=pcState;
     primePcSaveArchives(storage,archives);
@@ -109,6 +130,7 @@ try{
     return saved;
   }
   const pcSounds=new PcSounds();let pcPrepareError=false;
+  const pcNotices=createPcSocialNotifications({contextFactory:()=>{audio??=new AudioContext();return audio;}});
   fetch('./assets/audio/pc/manifest.json?rev=21').then(r=>r.ok?r.json():{}).then(clips=>{pcSounds.clips=clips;}).catch(()=>{});
   function returnFromComputer(){
     pcRoot.hidden=true;
@@ -138,7 +160,9 @@ try{
   backgroundRetry.addEventListener('click',()=>socialBackground.retry());
   const portraitController=createPlayerPortraitController({getState:()=>pcState,getAppearance:()=>profile?.appearance,render:look=>view.capturePlayerPortrait(look),save:next=>{const saved=persistPc(next,{atomic:true});if(saved)virtualPc.syncState(pcState);return saved;}});
   const requestPlayerPortrait=()=>portraitController.request();
-  const portraitMetadata=()=>({portraitKey:profile?portraitKey(profile.appearance):null,requestPlayerPortrait});
+  const albumController=createPlayerAlbumController({getState:()=>pcState,getAppearance:()=>profile?.appearance,render:(look,stage)=>view.capturePlayerLifePhoto(look,stage),save:next=>{const saved=persistPc(next,{atomic:true});if(saved)virtualPc.syncState(pcState);return saved;}});
+  const requestPlayerPhotos=()=>albumController.request();
+  const portraitMetadata=()=>({portraitKey:profile?portraitKey(profile.appearance):null,requestPlayerPortrait,requestPlayerPhotos});
   const phoneRoot=document.createElement('aside');phoneRoot.hidden=true;document.body.append(phoneRoot);
   const phoneView=mountPhoneHud(phoneRoot,{
     getState:()=>pcState.phone,
@@ -175,6 +199,8 @@ try{
   let message='',messageUntil=0,last=performance.now(),lastDoor=false,frameRate=60;
   function setMode(next){
     lookInput.stop();
+    hover.clear();
+    testSkillsView.close();
     if(next!=='game'){fridgeView.close();wardrobeView.close();}
     mode=next;document.body.dataset.mode=next;
     phoneView.update();$('#apartment-actions').hidden=true;
@@ -189,8 +215,9 @@ try{
     if(next!=='creator'&&next!=='peephole'){view.setRoomLights(homeTime.lights);view.render(motion,0,{paused:true,instant:true});}
     last=performance.now();
   }
-  function resumeAnimation(){paused=false;$('#pause').textContent='Пауза';}
+  function resumeAnimation(){paused=false;$('#pause').textContent='Пауза';void pcNotices.unlock();}
   function enterApartment(nextProfile){
+    testSkillsView.close();
     pcLifecycle.reset();
     speech.clear();
     view.modes.reset();cameraLabel();
@@ -203,7 +230,7 @@ try{
     creator.selectSection(section);const clothing=section==='clothing';
     $('#next-step').hidden=clothing;$('#start-game').hidden=!clothing;
     for(const name of ['appearance','clothing'])$('#'+name+'-tab').setAttribute('aria-pressed',String(name===section));
-    $('#creator-footer-note').textContent=clothing?'Ткань, силуэт, цвет. Всё выбранное станет твоим.':'Лицо, волосы и характер. Все навыки начнут с 10.';
+    $('#creator-footer-note').textContent=clothing?'Ткань, силуэт, цвет. Всё выбранное станет твоим.':'Лицо, волосы и характер. Все навыки начнут с 0.';
   }
   function updateStats(){
     $('#start-game').disabled=!$('#character-name').value.trim();
@@ -217,6 +244,7 @@ try{
     creatorSession=createNewGameSession(profile,storage,{enter(next,home){
       socialBackground.reset();
       homeTime=home.homeTime;pcState=home.pcState;migrationReady=home.migrationReady;virtualPc.reset(pcState);
+      pcNotices.reset(pcState);
       pcStorageWarning=home.pcSaved?'':'Сохранение виртуального ПК недоступно.';
       virtualPc.setPersistenceWarning(pcStorageWarning);enterApartment(next);
       if(!home.homeSaved||!home.pcSaved){message='Новая игра начата, но браузер не подтвердил сохранение.';messageUntil=performance.now()+8000;}
@@ -270,6 +298,7 @@ try{
   let actionMenuContext=null;
   function openActionMenu(context=null){
     if(homeModalOpen()||motion.busy||pcLifecycle.pending||pcLifecycle.snapshot.phase!=='room')return;
+    hover.clear();
     actionMenuContext=context;
     for(const b of $('#actions').children){b.hidden=context==='bed'?b.dataset.action!=='bed':b.dataset.sleepMode==='manual';if(b.dataset.action==='bed'&&b.dataset.sleepMode!=='manual')b.textContent=context==='bed'?'Лечь спать':b.dataset.label;}
     $('#apartment-actions').setAttribute('aria-label',context==='bed'?'Кровать: варианты сна':'Действия в квартире');$('#apartment-actions').hidden=false;
@@ -283,10 +312,17 @@ try{
     if(config.actions[id]?.lightRoom)b.setAttribute('aria-label',label);
     $('#actions').append(b);
   }
-  canvas.addEventListener('pointerdown',e=>{if(homeModalOpen()||!lookInput.canPick(e)||cameraFade||mode!=='game')return;const hit=view.pick(e);resumeAnimation();if(hit.id==='bed')openActionMenu('bed');else if(hit.id)act(hit.id);else if(hit.hero)motion.faceCamera();else if(Number.isFinite(hit.x))moveInRoom(motion,pcLifecycle,hit.x);});
-  canvas.addEventListener('pointermove',e=>{if(mode!=='game'){canvas.style.cursor='default';return;}const delta=lookInput.move(e);if(delta){view.modes.look(...delta);canvas.style.cursor='grabbing';$('#hover-label').textContent='';return;}const hit=view.pick(e);canvas.style.cursor=hit.id||hit.hero?'pointer':'crosshair';
-    const action=config.actions[hit.id];$('#hover-label').textContent=action?.lightRoom?(homeTime.lights[action.lightRoom]?'Выключить':'Включить')+' свет '+(action.lightRoom==='living'?'в комнате':'на кухне'):action?.label??(hit.hero?'Повернуться к камере':'');});
-  canvas.addEventListener('pointerleave',()=>$('#hover-label').textContent='');
+  const hover=createApartmentHover({pick:view.pick,select:view.setHoveredAction,present:hit=>{
+    canvas.style.cursor=hit.id||hit.hero?'pointer':mode==='game'?'crosshair':'default';
+    const action=config.actions[hit.id];$('#hover-label').textContent=action?.lightRoom?(homeTime.lights[action.lightRoom]?'Выключить':'Включить')+' свет '+(action.lightRoom==='living'?'в комнате':'на кухне'):action?.label??(hit.hero?'Повернуться к камере':'');
+  }});
+  const clickAllowed=()=>canClickApartment({mode,cameraFade,hidden:document.hidden,modalOpen:homeModalOpen(),actionMenuOpen:!$('#apartment-actions').hidden,pcPhase:pcLifecycle.snapshot.phase,pcEntering:pcLifecycle.entering});
+  const hoverAllowed=()=>clickAllowed()&&!lookInput.active&&!motion.busy&&pcLifecycle.snapshot.phase==='room';
+  canvas.addEventListener('pointerdown',e=>{if(!clickAllowed()||!lookInput.canPick(e))return;const hit=view.pick(e);resumeAnimation();if(hit.id==='bed')openActionMenu('bed');else if(hit.id)act(hit.id);else if(hit.hero)motion.faceCamera();else if(Number.isFinite(hit.x))moveInRoom(motion,pcLifecycle,hit.x);});
+  canvas.addEventListener('pointermove',e=>{const delta=lookInput.move(e);if(delta){view.modes.look(...delta);hover.clear();canvas.style.cursor='grabbing';return;}hover.move(e);hover.update(hoverAllowed());});
+  for(const event of ['pointerleave','pointercancel','lostpointercapture'])canvas.addEventListener(event,hover.clear);
+  window.addEventListener('blur',hover.clear);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)hover.clear();});
   canvas.addEventListener('keydown',e=>{if(mode==='game'&&!homeModalOpen()&&pcLifecycle.snapshot.phase==='room'&&['Enter',' '].includes(e.key)){e.preventDefault();openActionMenu();}});
   $('#close-apartment-actions').addEventListener('click',()=>{$('#apartment-actions').hidden=true;canvas.focus();});
   $('#rig-toggle').addEventListener('click',()=>{if(!debug)return;$('#inspector').hidden=!$('#inspector').hidden;$('#rig-toggle').setAttribute('aria-expanded',String(!$('#inspector').hidden));});
@@ -295,6 +331,7 @@ try{
   $('#step').addEventListener('click',()=>{paused=true;$('#pause').textContent='Продолжить';update(1/30,performance.now(),true);});$('#face').addEventListener('click',()=>motion.faceCamera());
   document.addEventListener('keydown',e=>{if(e.defaultPrevented||e.key!=='Escape')return;if(!$('#apartment-actions').hidden){$('#apartment-actions').hidden=true;canvas.focus();e.preventDefault();}else if(mode==='peephole')stopPeeking();else if(mode==='door')setMode('game');else if(mode==='pc')virtualPc.closeWindow();else if(mode==='game')setMode('menu');});
   function update(dt,now,step=false){
+    if(!hoverAllowed())hover.clear();
     const installationMinuteBefore=gameMinuteStamp(homeTime),installationRunning=pcState.software.installer?.step==='install';
     function tickInstallation(){
       if(!installationRunning||pcState.software.installer?.step!=='install')return;
@@ -413,8 +450,11 @@ try{
     const door=motion.doorOpen>.3;if(door&&!lastDoor)cue('door');lastDoor=door;
     view.setRoomLights(homeTime.lights);view.setTime(homeTime.minutes,lightPreview==='game'?homeTime.minutes:Number(lightPreview));
     motion.workPerformance=creativeWorkDescriptor(pcState,profile?.skills).performance;
+    hover.update(hoverAllowed(),now);
     if(pcNeedsSceneFrame(pcLifecycle.snapshot,mode))view.render(motion,(paused&&!step)||homeModalOpen()||document.hidden?0:dt,{skeleton,paused:(paused&&!step)||homeModalOpen()||document.hidden});cameraLabel();$('#fade').style.opacity=motion.fade;
-    virtualPc.beatAudio.setRoomFrame(view.getComputerAudioFrame({desktop:mode==='pc'&&pcLifecycle.snapshot.phase==='desktop'}));
+    const pcAudioFrame=view.getComputerAudioFrame({desktop:mode==='pc'&&pcLifecycle.snapshot.phase==='desktop'});
+    virtualPc.beatAudio.setRoomFrame(pcAudioFrame);
+    pcNotices.update(pcState,{frame:pcAudioFrame,enabled:playing&&!paused&&!document.hidden&&['game','pc'].includes(mode)});
     const firstPerson=view.modes.mode==='3D',roomReady=pcLifecycle.snapshot.phase==='room'&&motion.actionId!=='computer'&&motion.fade<.01;
     const reacting=mode==='pc'&&pcLifecycle.snapshot.phase==='reaction-speaking';
     const headAnchor=speech.snapshot.fullText&&(!firstPerson||reacting)?view.getHeadScreenPosition():{visible:true};
@@ -424,6 +464,7 @@ try{
     virtualPc.tickOutgoingMessage(dt,{paused:paused||document.hidden||mode!=='pc'});
     $('#home-time').textContent=`${homeTime.dateLabel} · ${homeTime.label} · ${homeTime.period} · Дом`;
     phoneView.update();
+    if(testSkillsView.isOpen)testSkillsView.update();
     if(now-lastTimeSave>(homeTime.isSleeping?500:15000)){saveHomeTime(storage,homeTime);persistPc(pcState);lastTimeSave=now;}
     $('#room').textContent=motion.position[0]<0?'КУХНЯ':'ЖИЛАЯ КОМНАТА';
     if(debug)$('#state').textContent=`${motion.phase} · ${motion.clip} · x ${motion.position[0].toFixed(2)} · камера ${motion.cameraX.toFixed(2)} · ${Math.round(motion.yaw*180/Math.PI)}° · дверь ${Math.round(motion.doorOpen*100)}% · ${Math.round(frameRate)} FPS`;
@@ -448,8 +489,8 @@ try{
   }
   loading.hidden=true;setMode('menu');view.render(motion,0);
   function frame(now){const raw=(now-last)/1000,dt=Math.min(raw,.25);if(raw>0)frameRate=frameRate*.9+Math.min(240,1/raw)*.1;last=now;update(dt,now);requestAnimationFrame(frame);}requestAnimationFrame(frame);
-  document.addEventListener('visibilitychange',()=>{last=performance.now();if(document.hidden){advanceOutgoingTransfer(0,'hidden');virtualPc.tickOutgoingMessage(0,{paused:true});syncWorkAudio(true);virtualPc.audioSession.stopAll();saveHomeTime(storage,homeTime);persistPc(pcState);}});
+  document.addEventListener('visibilitychange',()=>{last=performance.now();if(document.hidden){pcNotices.stop();advanceOutgoingTransfer(0,'hidden');virtualPc.tickOutgoingMessage(0,{paused:true});syncWorkAudio(true);virtualPc.audioSession.stopAll();saveHomeTime(storage,homeTime);persistPc(pcState);}});
   window.addEventListener('pagehide',event=>{advanceOutgoingTransfer(0,'pagehide');virtualPc.tickOutgoingMessage(0,{paused:true});if(!event.persisted){socialBackground.dispose();backgroundWarning.remove();phoneView.dispose();}});
-  window.addEventListener('pagehide',event=>{saveHomeTime(storage,homeTime);persistPc(pcState);syncWorkAudio(true);virtualPc.audioSession.stopAll();if(event.persisted){pcSounds.stop();return;}wardrobeView.dispose();fridgeView.dispose();speechView.dispose();workAudio.dispose();lyricWorkAudio.dispose();workPanel.dispose();pcLifecycle.reset();pcSounds.dispose();virtualPc.dispose();view.dispose();});
+  window.addEventListener('pagehide',event=>{saveHomeTime(storage,homeTime);persistPc(pcState);syncWorkAudio(true);virtualPc.audioSession.stopAll();if(event.persisted){pcSounds.stop();return;}testSkillsView.dispose();wardrobeView.dispose();fridgeView.dispose();speechView.dispose();workAudio.dispose();lyricWorkAudio.dispose();workPanel.dispose();pcLifecycle.reset();pcSounds.dispose();pcNotices.dispose();virtualPc.dispose();view.dispose();});
   window.addEventListener('pageshow',event=>{if(event.persisted)last=performance.now();});
 }catch(error){console.error(error);loading.querySelector('h2').textContent='Не удалось загрузить сцену';loading.querySelector('p').textContent=error.message;loading.classList.add('error');}

@@ -8,8 +8,19 @@ import {BeatAudio} from '../src/beat-audio.js';
 import {beginnerById} from '../src/beat-beginner-bank.js';
 import {normalizeBeat} from '../src/beat-production.js';
 import {SOURCE_GAINS_DB} from '../src/source-levels-v1.js';
+import {chooseBeginnerParts} from '../src/beat-beginner-bank.js';
 const song=await import('../src/beat-song-form.js').catch(error=>{if(error.code==='ERR_MODULE_NOT_FOUND')return {};throw error;});
 const beat=(id='song',seed=15)=>({version:3,id,bpm:90,stages:[{},{},{}],drumId:'beginner-drums-01',audio:{bankVersion:1,bars:4,themeId:'beginner-theme-01',arrangementId:'beginner-arrangement-01'},recording:{version:1,revision:1,text:{id:'t',name:'Text',revision:1},sourceId:'vocal-01',draft:createVocalTake({seed}),clean:null,mix:{skill:10},master:null}});
+
+test('abstract intro and outro keep sources and windows inside the chosen paired recipe',()=>{
+ const parts=chooseBeginnerParts(()=>0,{genre:'abstract',genreXP:0});assert.ok(parts.abstractRecipe);
+ const b={...beat(),genre:'abstract',drumId:parts.drumsId,audio:{bankVersion:1,bars:4,themeId:parts.themeId,arrangementId:parts.arrangementId,abstractRecipe:parts.abstractRecipe}},ids=[parts.drumsId,parts.themeId,parts.arrangementId];
+ for(let seed=0;seed<100;seed++){
+  const form=song.chooseSongForm(b,{seed});assert.equal(form.introSourceId,ids[form.introStage]);assert.equal(form.outroSourceId,ids[form.outroStage]);
+  assert.deepEqual(form.introWindow,{startBar:0,bars:2,sourceBar:0});assert.deepEqual(form.outroWindow,{startBar:6,bars:2,sourceBar:2});
+  const broken={...form,introSourceId:'beginner-'+['drums','theme','arrangement'][form.introStage]+'-02'};assert.equal(song.normalizeSongForm(broken,b),null);
+ }
+});
 
 test('saved alternate drums use a compatible source, its calibrated gain and its own window',()=>{
  assert.equal(typeof song.chooseSongForm,'function');

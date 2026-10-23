@@ -27,8 +27,9 @@ test('manual duplicate beat names offer a new variant and the searchable picker 
  assert.equal(s.state.projects.length,1);assert.ok(allPc(s.root).some(n=>n.textContent?.includes('Ночной двор (2)')));findButton(s.root,'Отмена').click();findButton(s.root,'Открыть проект').click();
  const search=allPc(s.root).find(n=>n.getAttribute('aria-label')==='Поиск проектов');search.value='двор';search.focus();fire(search,'input');s.state={...s.state,projects:[...s.state.projects]};assert.equal(s.d.activeElement,search);assert.equal(search.value,'двор');s.view.dispose();
 });
-test('analytics show the saved layer result and sound skill after the character trains',()=>{
+test('legacy analytics show the saved layer result and sound skill after the character trains',()=>{
  let state=createBeat(createVirtualPcState(),{id:'audio',name:'Sound'},{sound:12}).state;
+ delete state.projects[0].practicePolicy;
  state=startBeatStage(state,'audio',[5,5,5],{beatmaking:10,sound:12}).state;state=advanceBeatWork(state,600).state;
  const s=setup(state,{skills:{beatmaking:10,sound:99},gameDay:1});s.view.openProject(state.projects[0]);
  const mix=role(s.root,'mix-character');assert.ok(mix);

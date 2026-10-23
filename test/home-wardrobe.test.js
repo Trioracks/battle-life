@@ -8,9 +8,9 @@ import fs from 'node:fs';
 import * as THREE from '../vendor/three/three.module.js';
 const wardrobe=await import('../src/home-wardrobe.js?rev=28').catch(()=>({}));
 const views=await import('../src/home-wardrobe-view.js?rev=28').catch(()=>({}));
-test('new heroes start at ten without allocations and ignore old bonuses',()=>{
+test('new heroes start at zero without allocations and ignore old bonuses',()=>{
  const p=createProfile({name:'Новичок',allocations:{intelligence:999}});
- assert.deepEqual(Object.values(p.skills),[10,10,10,10,10,10,10,10,10]);assert.equal(p.version,4);assert.equal(p.noviceSchema,1);
+ assert.deepEqual(Object.values(p.skills),Array(9).fill(0));assert.equal(p.version,4);assert.equal(p.noviceSchema,1);assert.equal(p.skillSchema,2);
  const records=new Map(),storage={setItem:(k,v)=>records.set(k,v),getItem:k=>records.get(k)??null};
  p.skills.beatmaking=14;assert.equal(saveProfile(storage,p).ok,true);assert.equal(loadProfile(storage).profile.skills.beatmaking,14);
 });

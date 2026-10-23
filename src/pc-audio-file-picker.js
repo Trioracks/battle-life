@@ -1,7 +1,7 @@
-import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=45';
-import {AUDIO_EXPORT_FOLDERS,AUDIO_EXPORT_KINDS,normalizeAudioExports} from './pc-audio-exports.js?rev=45';
-import {EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=45';
-import {gameDateTimeLabel} from './home-calendar.js?rev=45';
+import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=57';
+import {AUDIO_EXPORT_FOLDERS,AUDIO_EXPORT_KINDS,normalizeAudioExports} from './pc-audio-exports.js?rev=57';
+import {EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=57';
+import {gameDateTimeLabel} from './home-calendar.js?rev=57';
 
 export function mountAudioFilePicker(root,{getState,onSelect,onClose=()=>{},describe=()=>''}){
  const d=root.ownerDocument,box=el(d,'section',{className:'pc-audio-picker',attributes:{role:'dialog','aria-modal':'true','aria-label':'Прикрепить трек'}}),folder=el(d,'select',{attributes:{'aria-label':'Папка аудиофайла'}}),list=el(d,'div',{className:'pc-audio-picker-files'}),details=el(d,'p',{className:'pc-audio-picker-details'}),status=el(d,'p',{attributes:{role:'status'}}),actions=el(d,'div',{className:'pc-dialog-actions'});

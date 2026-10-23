@@ -14,6 +14,6 @@ test('site and community share registration and deadline; failed persistence can
  const d=pcDocument(),root=d.createElement('div');let state=createVirtualPcState(),allow=false;
  const view=mountUnderweb(root,{getState:()=>state,getMetadata:()=>({gameMinutes:600,gameDay:1,playerName:'Герой'}),onChange:next=>{if(!allow)return false;state=next;return true;}});
  view.navigate('underweb://battles/makarevich-1');findButton(root,'Подать заявку').click();findButton(root,'Подтвердить заявку').click();assert.equal(state.battleApplications.length,0);assert.equal(allPc(root).some(n=>n.textContent?.startsWith('Ваша заявка принята')),false);
- allow=true;view.navigate('underweb://social/community/makarevich-1');findButton(root,'Зарегистрироваться').click();assert.equal(state.battleApplications.length,1);assert.ok(allPc(root).some(n=>n.textContent==='Ваша заявка принята, Герой. Ожидаем вашего трека'));
- view.navigate('underweb://battles/makarevich-1');assert.ok(findButton(root,'Открыть сообщения сообщества'));assert.ok(allPc(root).some(n=>n.textContent==='Приём заявок и треков до 08.09.2012 10:00'));assert.equal(state.social.subscriptions.length,0);view.dispose();
+ allow=true;view.navigate('underweb://social/community/makarevich-1');findButton(root,'Подписаться').click();findButton(root,'Зарегистрироваться').click();assert.equal(state.battleApplications.length,1);assert.ok(allPc(root).some(n=>n.textContent==='Ваша заявка принята, Герой. Ожидаем вашего трека'));
+ view.navigate('underweb://battles/makarevich-1');assert.ok(findButton(root,'Открыть сообщения сообщества'));assert.ok(allPc(root).some(n=>n.textContent==='Приём заявок и треков до 08.09.2012 10:00'));assert.equal(state.social.subscriptions.length,1);view.dispose();
 });

@@ -1,5 +1,6 @@
-import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=45';
-import {socialPhotoSource} from './social-portraits.js?rev=45';
+import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=57';
+import {socialPhotoSource} from './social-portraits.js?rev=57';
+import {socialImageUrl,recoverableSocialImage} from './social-image.js?rev=57';
 export const socialButton=(d,text,fn,extra={})=>pcButton(d,text,{className:'sn-button',...extra},fn);
 export function socialLink(d,text,url,navigate){const link=el(d,'a',{className:'sn-link',text,dataset:{focusId:text},attributes:{href:url}});link.addEventListener('click',e=>{e.preventDefault();navigate(url);});return link;}
 export function socialPeerLink(d,peer,name,navigate,avatar){
@@ -20,27 +21,43 @@ export function showRegistrationNotice(host,name,onContinue){
 export function socialAvatar(d,avatar={},name='',large=false){
  const node=el(d,'div',{className:'sn-avatar'+(large?' sn-avatar-large':''),text:avatar.mark??'Р',attributes:{role:'img','aria-label':'Аватар: '+name}});
  node.style.setProperty('--avatar-color',avatar.color??'#617d94');const src=socialPhotoSource(avatar.src)??(/^\.\/assets\/battle-covers\/mak-cover-\d\d\.png$/.test(avatar.src??'')?avatar.src:null);
- if(src){const img=el(d,'img',{attributes:{src,alt:'Аватар: '+name}});node.textContent='';node.append(img);img.addEventListener('error',()=>{node.replaceChildren();node.textContent=avatar.mark??'Фото';});}return node;
+ if(src){const img=el(d,'img',{attributes:{src:socialImageUrl(src),alt:'Аватар: '+name,decoding:'async',loading:'lazy'}});node.textContent='';node.append(img);recoverableSocialImage(d,img,node,'Аватар: '+name);}return node;
 }
 export function socialHeading(d,title,count){
  const h=el(d,'h2',{className:'sn-heading',text:title});if(count!==undefined)h.append(el(d,'span',{text:String(count)}));return h;
 }
+export function socialComment(d,{body='',author,date='',likes,administrator=false}={},navigate){
+ const name=author?.name??'Читатель',row=el(d,'article',{className:'sn-comment-row',attributes:{'aria-label':'Комментарий: '+name}});
+ const avatar=socialAvatar(d,author?.avatar??{mark:name[0]},name),content=el(d,'div',{className:'sn-comment-content'});
+ if(author?.id&&navigate){
+  const link=socialButton(d,'',()=>navigate('underweb://social/profile/'+author.id),{className:'sn-comment-avatar-link',attributes:{'aria-label':'Открыть страницу: '+name}});
+  link.append(avatar);row.append(link);
+  content.append(socialButton(d,name,()=>navigate('underweb://social/profile/'+author.id),{className:'sn-link sn-comment-author'}));
+ }else{row.append(avatar);content.append(el(d,'strong',{className:'sn-comment-author',text:name}));}
+ content.append(el(d,'p',{text:body}));
+ const meta=el(d,'div',{className:'sn-comment-meta'});
+ if(date)meta.append(el(d,'time',{text:date}));
+ if(administrator)meta.append(el(d,'span',{text:'организатор'}));
+ if(Number.isFinite(likes))meta.append(el(d,'span',{className:'sn-comment-likes',text:'♥ '+likes,attributes:{'aria-label':'Нравится: '+likes}}));
+ content.append(meta);row.append(content);return row;
+}
 export function socialPhoto(d,photo){
  const fig=el(d,'figure',{className:'sn-photo'}),src=socialPhotoSource(photo.src);
- if(src){const img=el(d,'img',{attributes:{src,alt:photo.title,loading:'lazy'}});img.addEventListener('error',()=>{img.remove();fig.prepend?.(el(d,'span',{text:'Фото недоступно'}));});fig.append(img);}
+ if(src){const img=el(d,'img',{attributes:{src:socialImageUrl(src),alt:photo.title,loading:'lazy'}});fig.append(img);recoverableSocialImage(d,img,fig,photo.title);}
  else fig.append(el(d,'span',{className:'sn-photo-pending',text:'Фото ещё не готово'}));
  fig.append(el(d,'figcaption',{text:photo.title}),el(d,'small',{text:photo.date}));return fig;
 }
-export function socialPost(d,post,{author='',navigate,profileById,reactions=null}={}){
+export function socialPost(d,post,{author='',authorProfile,navigate,profileById,reactions=null,photoNode=null}={}){
  const article=el(d,'article',{className:'sn-post'});
  article.append(el(d,'strong',{text:author}),el(d,'small',{text:post.date??''}),el(d,'p',{text:post.body}));
+ if(photoNode)article.append(photoNode);
+ if(post.graffiti)article.append(socialGraffiti(d,post.graffiti));
  if(reactions)article.append(reactions);else{
  const likes=el(d,'div',{className:'sn-post-reactions'});likes.append(socialThumbCount(d,'like',post.likes??0),socialThumbCount(d,'dislike',post.dislikes??0),el(d,'span',{text:'Комментарии: '+(post.comments?.length??0)}));article.append(likes);
- for(const c of post.comments??[]){const row=el(d,'div',{className:'sn-comment'}),person=profileById?.(c.authorId);
-  if(person&&navigate)row.append(socialButton(d,person.name,()=>navigate('underweb://social/profile/'+person.id),{className:'sn-link'}));
-  row.append(el(d,'span',{text:c.body}));article.append(row);
- }
- }if(post.graffiti)article.append(socialGraffiti(d,post.graffiti));return article;
+ const thread=el(d,'section',{className:'sn-comments',attributes:{'aria-label':'Комментарии'}});
+ for(const c of post.comments??[])thread.append(socialComment(d,{...c,author:profileById?.(c.authorId)??(c.authorName===author?authorProfile:null)??{name:c.authorName??'Читатель'},date:c.date??post.date??''},navigate));
+ if(thread.children.length)article.append(thread);
+ }return article;
 }
 export function socialGraffiti(d,graffiti){
  const make=(tag,attrs={})=>{const node=d.createElementNS?d.createElementNS('http://www.w3.org/2000/svg',tag):d.createElement(tag);for(const [k,v]of Object.entries(attrs))node.setAttribute(k,v);return node;};

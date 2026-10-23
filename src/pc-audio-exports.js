@@ -1,10 +1,11 @@
-import {normalizeBeat} from './beat-production.js?rev=45';
-import {resolveBeatPlayback} from './beat-playback.js?rev=45';
-import {captureTrackVersion,canonicalTrackSignature} from './track-version.js?rev=45';
-import {softwareDiskBytes} from './pc-software.js?rev=45';
-import {drumById} from './beat-catalog.js?rev=45';
-import {beginnerById} from './beat-beginner-bank.js?rev=45';
-import {vocalById,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=45';
+import {normalizeBeat} from './beat-production.js?rev=57';
+import {resolveBeatPlayback} from './beat-playback.js?rev=57';
+import {captureTrackVersion,canonicalTrackSignature} from './track-version.js?rev=57';
+import {softwareDiskBytes} from './pc-software.js?rev=57';
+import {drumById} from './beat-catalog.js?rev=57';
+import {beginnerById} from './beat-beginner-bank.js?rev=57';
+import {vocalById,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=57';
+import {validBeatExecutionDescriptor} from './beat-execution-snapshot.js?rev=57';
 
 export const AUDIO_EXPORT_FOLDERS=Object.freeze(['documents','music','exports','downloads','projects']);
 export const AUDIO_EXPORT_KINDS=Object.freeze({beat:'Бит',vocal:'Вокал',track:'Полный трек'});
@@ -22,7 +23,7 @@ export function audioExportFilename(value){
 export function audioExportBytes(durationSeconds){return 44+Math.ceil(durationSeconds*44100)*4;}
 const supportedSource=value=>!drumById(value)?.retired&&(['primitive','melody','bass'].includes(value)||Boolean(beginnerById(value)||drumById(value)||vocalById(value)));
 function validDescriptor(d){
- return object(d)&&finiteJson(d)&&typeof d.key==='string'&&typeof d.owner==='string'&&Number.isFinite(d.durationSeconds)&&d.durationSeconds>0&&Number.isSafeInteger(audioExportBytes(d.durationSeconds))&&Array.isArray(d.parts)&&d.parts.length>0&&d.parts.every(p=>
+ return object(d)&&finiteJson(d)&&validBeatExecutionDescriptor(d)&&typeof d.key==='string'&&typeof d.owner==='string'&&Number.isFinite(d.durationSeconds)&&d.durationSeconds>0&&Number.isSafeInteger(audioExportBytes(d.durationSeconds))&&Array.isArray(d.parts)&&d.parts.length>0&&d.parts.every(p=>
   object(p)&&id(p.id)&&supportedSource(p.id)&&Number.isFinite(p.loopSeconds)&&p.loopSeconds>0&&(p.vocal===undefined||object(p.vocal))&&(!vocalById(p.id)||object(p.vocal)&&vocalById(p.id).voiceId===(p.voiceId===undefined?DEFAULT_VOICE_ID:p.voiceId))&&
   (p.windows===undefined||Array.isArray(p.windows)&&p.windows.length>0&&p.windows.every(w=>object(w)&&Number.isFinite(w.startBar)&&w.startBar>=0&&Number.isFinite(w.bars)&&w.bars>0&&Number.isFinite(w.sourceBar)&&w.sourceBar>=0)));
 }

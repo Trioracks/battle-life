@@ -1,12 +1,12 @@
 // The background domain may write only these sections. UI actions replace them
 // immutably; reference guards prevent a late worker from undoing a newer action.
 export const SOCIAL_DOMAIN_KEYS=Object.freeze(['social','phone','socialRuntime','communityAudio','battleSubmissions','battleWindows','tournaments','trackVersions','judging','judgingSchedule','npcTracks','battleHistory','roundThemes','roundThemeRecovery','socialReactions']);
-const READ_KEYS=[...SOCIAL_DOMAIN_KEYS,'battleApplications'];
+const READ_KEYS=[...SOCIAL_DOMAIN_KEYS,'battleApplications','software'];
 const captured=state=>Object.fromEntries(READ_KEYS.map(key=>[key,state[key]]));
 const unchanged=(state,base)=>READ_KEYS.every(key=>state[key]===base[key]);
 
-export function createSocialBackground({createWorker=()=>new Worker(new URL('./social-worker.js?rev=45',import.meta.url),{type:'module'}),getState,persist,onState,onError=()=>{}}){
- let worker=null,pending=null,mirror={},lastInput=null,lastMinute=null,lastDispatch=-Infinity,sequence=0,epoch=0,failed='',disposed=false,jobsStarted=0,commits=0;
+export function createSocialBackground({createWorker=()=>new Worker(new URL('./social-worker.js?rev=57',import.meta.url),{type:'module'}),getState,persist,onState,onError=()=>{}}){
+ let worker=null,pending=null,mirror={},lastInput=null,lastMinute=null,lastDispatch=-Infinity,sequence=0,epoch=0,failed='',warning='',disposed=false,jobsStarted=0,commits=0;
  function stop(){if(worker)worker.terminate();worker=null;pending=null;mirror={};epoch++;}
  function fail(reason){stop();failed=reason||'Не удалось обработать события баттла.';onError(failed);}
  function receive(data,generation){
@@ -28,6 +28,7 @@ export function createSocialBackground({createWorker=()=>new Worker(new URL('./s
    if(saved===false||saved?.ok===false){fail('События баттла не сохранены. Проверь свободное место и повтори попытку.');return;}
   }
   onState(next,archives);commits++;lastMinute=job.minute;lastInput=captured(getState());mirror={...job.input,...patch};
+  if(warning!==(data.warning??'')){warning=data.warning??'';onError(warning);}
  }
  return {
   tick(nowMinute,options={},realMs=performance.now()){
@@ -42,8 +43,8 @@ export function createSocialBackground({createWorker=()=>new Worker(new URL('./s
     pending={id:++sequence,input,minute};lastDispatch=realMs;jobsStarted++;worker.postMessage({id:pending.id,patch,nowMinute:minute,options:structuredClone(options)});
    }catch(error){fail(error.message);}
   },
-  retry(){if(disposed)return;failed='';lastInput=null;lastDispatch=-Infinity;onError('');},
-  reset(){stop();failed='';lastInput=null;lastMinute=null;lastDispatch=-Infinity;onError('');},
+  retry(){if(disposed)return;failed='';warning='';lastInput=null;lastDispatch=-Infinity;onError('');},
+  reset(){stop();failed='';warning='';lastInput=null;lastMinute=null;lastDispatch=-Infinity;onError('');},
   dispose(){disposed=true;stop();},
   get snapshot(){return {busy:Boolean(pending),failed:Boolean(failed),error:failed,jobsStarted,commits};},
  };

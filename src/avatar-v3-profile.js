@@ -1,9 +1,9 @@
-import { STAT_KEYS, validateAllocations } from './creator.js?rev=45';
-import {normalizeVoiceId} from './vocal-catalog.js?rev=45';
-import {createWardrobe,validWardrobe,canWear} from './home-wardrobe.js?rev=45';
-import {closedFootwearId,migrateClosedFootwear,reserveFootwearBackup} from './avatar-footwear-migration.js?rev=45';
+import { STAT_KEYS, validateAllocations } from './creator.js?rev=57';
+import {normalizeVoiceId} from './vocal-catalog.js?rev=57';
+import {createWardrobe,validWardrobe,canWear} from './home-wardrobe.js?rev=57';
+import {closedFootwearId,migrateClosedFootwear,reserveFootwearBackup} from './avatar-footwear-migration.js?rev=57';
 
-export { STAT_KEYS, statLabels as STAT_LABELS } from './creator.js?rev=45';
+export { STAT_KEYS, statLabels as STAT_LABELS } from './creator.js?rev=57';
 
 function category(label, options) {
   return Object.freeze({
@@ -82,22 +82,25 @@ export function createProfile(input = {}) {
   return {
     version: 4,
     noviceSchema: 1,
+    skillSchema: 2,
     name: name.trim(),
     voiceId:normalizeVoiceId(input.voiceId),
-    skills: Object.fromEntries(STAT_KEYS.map((key) => [key, 10])),
+    skills: Object.fromEntries(STAT_KEYS.map((key) => [key, 0])),
     appearance: look,
     wardrobe: createWardrobe(look),
   };
 }
 
-function validateProfile(input) {
+export function validateProfile(input) {
   if (!isRecord(input) || ![3,4].includes(input.version) || !isRecord(input.skills) || typeof input.name!=='string' || !input.name.trim()) {
     throw new Error('Сохранение героя имеет неверный формат.');
   }
+  if(input.skillSchema!==undefined&&(input.skillSchema!==2||input.version!==4))throw Error('Неизвестная схема характеристик героя.');
+  const zeroStart=input.skillSchema===2;
   const allocations = Object.fromEntries(STAT_KEYS.map((key) => {
     const value = input.skills[key];
-    if (!Object.hasOwn(input.skills, key) || !Number.isFinite(value) || value < 10 || value > (input.version===3?50:100) || (input.version===3&&(!Number.isInteger(value)||value%10!==0))) {
-      throw new Error('Характеристики сохранённого героя должны быть от 10 до 50 с шагом 10.');
+    if (!Object.hasOwn(input.skills, key) || !Number.isFinite(value) || value < (zeroStart?0:10) || value > (input.version===3?50:100) || (input.version===3&&(!Number.isInteger(value)||value%10!==0))) {
+      throw new Error(zeroStart?'Все характеристики сохранённого героя должны быть от 0 до 100.':'Характеристики сохранённого героя должны быть от 10 до 50 с шагом 10.');
     }
     return [key, (value - 10) / 10];
   }));

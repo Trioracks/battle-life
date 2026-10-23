@@ -6,8 +6,8 @@ export const MAX_SITE_BYTES = 350 * 1024 * 1024;
 const textTypes = new Set(['.html','.css','.js','.mjs','.cjs','.json','.md','.txt','.svg','.py','.ps1','.cmd','.yml','.yaml']);
 const runtimeText = new Set(['.html','.css','.js','.mjs','.json','.txt','.svg']);
 const binaries = new Set(['.png','.jpg','.jpeg','.glb','.ttf']);
-const assetJson = new Set(['assets/apartment/v3/scene.json','assets/apartment/v3/rig.json','assets/models/apartment-first-location.manifest.json','assets/models/avatar.manifest.json','assets/npc-photos/manifest.json','assets/social/photos/manifest.json']);
-const rootRuntime = new Set(['index.html','legacy.html','style.css','apartment-v3.css','creator-v12.css','desktop-apps.css','phone-hud.css','rap-dossier.css','rap-notebook.css','social-network.css','underweb-world.css','virtual-pc.css','version.json','release.json','.nojekyll']);
+const assetJson = new Set(['assets/apartment/v3/scene.json','assets/apartment/v3/rig.json','assets/models/apartment-first-location.manifest.json','assets/models/avatar.manifest.json','assets/npc-photos/manifest.json','assets/npc-photos/life/manifest.json','assets/social/photos/manifest.json']);
+const rootRuntime = new Set(['index.html','legacy.html','style.css','apartment-v3.css','creator-v12.css','desktop-apps.css','phone-hud.css','rap-dossier.css','rap-notebook.css','social-network.css','social-dialogs.css','social-community.css','rap-notebook-shell.css','test-skills.css','underweb-world.css','virtual-pc.css','version.json','release.json','.nojekyll']);
 const rootSource = new Set([...rootRuntime,'README.md','AGENTS.md','LICENSE','LICENSE.md','NOTICE','NOTICE.md','package.json','package-lock.json','.gitignore','.local-audio.example.json','Запустить игру.cmd']);
 
 export function publicationPathReason(relativePath, target) {
@@ -25,7 +25,7 @@ export function publicationPathReason(relativePath, target) {
   if (target==='source' && /^docs\//.test(relativePath) && (ext==='.md' || relativePath==='docs/research/package-one-reference-sources.json' || relativePath==='docs/public-source-provenance.json')) return null;
   if (relativePath==='vendor/three/LICENSE') return null;
   if (/^assets\/(apartment|models|battle-covers|npc-photos|social|ui|fonts)\//.test(relativePath) && (binaries.has(ext) || ['.svg','.txt','.md'].includes(ext) || assetJson.has(relativePath))) return null;
-  if (relativePath==='assets/audio/pc/manifest.json' || /^assets\/audio\/ft\/(?:npc-(?:jura|artem|gans|kapa)-v1|jura-experimental-v2)\/manifest\.json$/.test(relativePath) || (target==='source' && /^assets\/audio\/ft\/[^/]+\/manifest\.json$/.test(relativePath))) return null;
+  if (relativePath==='assets/audio/pc/manifest.json' || /^assets\/audio\/ft\/(?:npc-(?:jura|artem|gans|kapa)-v1|jura-experimental-v2|abstract-v1|experimental-leads-v1|npc-daniel-v1|npc-kapa-v2)\/manifest\.json$/.test(relativePath) || (target==='source' && /^assets\/audio\/ft\/[^/]+\/manifest\.json$/.test(relativePath))) return null;
   return 'path or type is not on the publication allowlist';
 }
 

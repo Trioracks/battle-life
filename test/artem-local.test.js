@@ -11,15 +11,15 @@ import {createVirtualPcState} from '../src/virtual-pc-state.js';
 import {npcPlaybackDescriptor} from '../src/battle-npc-audio.js';
 import {playTrackVersion} from '../src/track-version-audio.js';
 const jura='npc-voice:jura-20261018',artem='npc-voice:artem-20261018';
-test('all four non-player voices are reachable on both sides of former Flow boundaries',()=>{
+test('all five non-player voices are reachable on both sides of former Flow boundaries',()=>{
  for(const flow of [0,9.99,10,40,40.01,65,65.01,100]){
-  const want=[jura,artem,'npc-voice:kapa-20261018','npc-voice:gans-20261018'];
+  const want=[jura,artem,'npc-voice:kapa-20261018','npc-voice:gans-20261018','npc-voice:daniel-20261020'];
   const got=new Set();for(let seed=0;seed<100;seed++){const r=voices.selectNpcVocal({},{characterId:'npc',seed,flow});if(r.asset)got.add(r.asset.voiceId);}
   assert.deepEqual([...got].sort(),want.sort(),String(flow));
  }
 });
 test('each voice bag exhausts two independent cycles and keeps persisted assignments across progression',()=>{
- for(const [voiceId,seed,flow,count]of [[jura,71,0,49],[artem,1,53,52]]){
+ for(const [voiceId,seed,flow,count]of [[jura,71,0,49],[artem,2,53,52]]){
   let state={},heard=[];const options={characterId:'npc',seed,flow};
   assert.equal(voices.selectNpcVocal({},options).asset.voiceId,voiceId);
   const other=voices.selectNpcVocal({},{...options,characterId:'other'});

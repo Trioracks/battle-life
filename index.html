@@ -3,14 +3,18 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Battle Life — первый вечер</title>
-  <link rel="stylesheet" href="./apartment-v3.css?rev=45">
-  <link rel="stylesheet" href="./creator-v12.css?rev=45">
-  <link rel="stylesheet" href="./virtual-pc.css?rev=45">
-  <link rel="stylesheet" href="./desktop-apps.css?rev=45">
-  <link rel="stylesheet" href="./rap-notebook.css?rev=45">
-  <link rel="stylesheet" href="./rap-dossier.css?rev=45">
-  <link rel="stylesheet" href="./social-network.css?rev=45">
-  <link rel="stylesheet" href="./phone-hud.css?rev=45">
+  <link rel="stylesheet" href="./apartment-v3.css?rev=57">
+  <link rel="stylesheet" href="./creator-v12.css?rev=57">
+  <link rel="stylesheet" href="./virtual-pc.css?rev=57">
+  <link rel="stylesheet" href="./desktop-apps.css?rev=57">
+  <link rel="stylesheet" href="./rap-notebook.css?rev=57">
+  <link rel="stylesheet" href="./rap-notebook-shell.css?rev=57">
+  <link rel="stylesheet" href="./rap-dossier.css?rev=57">
+  <link rel="stylesheet" href="./social-network.css?rev=57">
+  <link rel="stylesheet" href="./social-dialogs.css?rev=57">
+  <link rel="stylesheet" href="./social-community.css?rev=57">
+  <link rel="stylesheet" href="./phone-hud.css?rev=57">
+  <link rel="stylesheet" href="./test-skills.css?rev=57">
   <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
 </head>
 <body>
@@ -35,7 +39,7 @@
           <p id="voice-note" class="voice-note">Голос выбирается на всю историю.</p>
           <p id="voice-error" class="field-error" role="alert"></p>
           <div id="creator-categories"></div>
-          <p class="novice-note">Все девять навыков начинают с 10. Дальше их развивает практика.</p>
+          <p class="novice-note">Все девять навыков начинают с 0. Дальше их развивает практика.</p>
         </aside>
         <div class="creator-parchment">
           <section id="appearance-panel"><p class="section-hint">Облик, в котором начнётся твоя история.</p><div id="appearance-fields"></div></section>
@@ -52,6 +56,6 @@
   <section id="peephole" class="screen" hidden aria-labelledby="peek-title"><div class="peek-heading"><p class="eyebrow">ЗА ДВЕРЬЮ</p><h2 id="peek-title">Лестничная площадка</h2></div><div id="peek-stage" aria-label="Вид через дверной глазок"></div><div class="peek-footer"><p>Дверь закрыта. В подъезде никого.</p><button id="peek-close">Отойти от глазка</button></div></section>
   <section id="virtual-pc" hidden aria-label="Виртуальный домашний компьютер"></section>
   <section id="loading"><p class="brand">BATTLE LIFE / ПЕРВЫЙ ВЕЧЕР</p><h2>Включаем свет в квартире</h2><div class="loader-line"></div><p>Загружаются квартира, персонаж и его гардероб.</p></section>
-<script type="module" src="./src/apartment-app.js?rev=45"></script>
+<script type="module" src="./src/apartment-app.js?rev=57"></script>
 </body>
 </html>

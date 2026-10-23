@@ -1,13 +1,13 @@
-import {vocalById,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=45';
-import {vocalOutcomes,normalizeProductionOutcome} from './production-outcomes.js?rev=45';
+import {vocalById,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=57';
+import {vocalOutcomes,normalizeProductionOutcome} from './production-outcomes.js?rev=57';
 export const clampV=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,Number.isFinite(v)?v:lo));
 const text=(v,n=100)=>typeof v==='string'?v.trim().slice(0,n):'';
 export const VOCAL_EQUIPMENT=Object.freeze({microphone:'desk-mic',interface:'onboard'});
 export const VOCAL_CEILING=44;
-export const effectiveSoundSkill=(state,skills={})=>clampV((Number.isFinite(skills.sound)?skills.sound:10)+clampV(state.recording?.practice?.sound));
+export const effectiveSoundSkill=(state,skills={})=>clampV((Number.isFinite(skills.sound)?skills.sound:0)+clampV(state.recording?.practice?.sound));
 export function createVocalTake({kind='draft',seed=1,skills={},sliders=[5,5,5]}={}){
  if(!['draft','clean'].includes(kind)||!Array.isArray(sliders)||sliders.length!==3||!sliders.every(Number.isFinite))return null;
- const values=sliders.map(v=>clampV(v,0,10)),snapshot=Object.fromEntries(['flow','sound','musicality','confidence'].map(k=>[k,clampV(skills[k]??10)]));
+ const values=sliders.map(v=>clampV(v,0,10)),snapshot=Object.fromEntries(['flow','sound','musicality','confidence'].map(k=>[k,clampV(skills[k]??0)]));
  const fit=1-values.reduce((sum,v)=>sum+Math.abs(v-8),0)/30;
  const ability=snapshot.flow*.6+snapshot.sound*.15+snapshot.musicality*.15+snapshot.confidence*.1;
  const quality=Math.min(VOCAL_CEILING,Math.max(4,ability*(.55+.45*fit)+10*fit+(kind==='clean'?7:0)));
@@ -24,7 +24,8 @@ function take(v,kind){
  if(v.resultVersion!==undefined)return null;
  // Legacy reader keeps the old audible calculation but does not retroactively
  // invent an artistic performance outcome that was never produced.
- const legacy=createVocalTake(v);if(!legacy)return null;delete legacy.resultVersion;delete legacy.productionOutcome;return legacy;
+ const skills=Object.fromEntries(['flow','sound','musicality','confidence'].map(k=>[k,v.skills[k]??10]));
+ const legacy=createVocalTake({...v,skills});if(!legacy)return null;delete legacy.resultVersion;delete legacy.productionOutcome;return legacy;
 }
 export function normalizeRecording(v){
  if(v?.version!==1||!vocalById(v.sourceId)||!text(v.text?.id)||!text(v.text?.name,64)||!Number.isInteger(v.revision)||v.revision<1)return null;

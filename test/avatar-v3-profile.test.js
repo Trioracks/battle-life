@@ -7,7 +7,7 @@ import { Group, Mesh } from '../vendor/three/three.module.js';
 import {
   APPEARANCE_OPTIONS, DEFAULT_APPEARANCE, STAT_KEYS, STAT_LABELS, SAVE_KEY,
   normalizeAppearance, applyAppearance, createProfile, saveProfile, loadProfile,
-} from '../src/avatar-v3-profile.js?rev=45';
+} from '../src/avatar-v3-profile.js?rev=28';
 
 const allocations = {
   intelligence: 2, writing: 2, musicality: 1, flow: 1, beatmaking: 1,
@@ -160,7 +160,7 @@ test('appearance switching preserves structural nodes and hides unsupported vari
 
 test('profile creation trims names and derives the nine skills without converting v3 appearance to legacy look', () => {
   const result = createProfile({ name: '  Миша  ', allocations, appearance: { face: 'long', top: 'shirt', bottom: 'jeans' } });
-  assert.equal(result.name,'Миша');assert.equal(result.version,4);assert.deepEqual(Object.values(result.skills),[10,10,10,10,10,10,10,10,10]);assert.deepEqual(result.appearance,{...expectedDefault,face:'long',top:'shirt'});assert.deepEqual(result.wardrobe.top,[{id:'shirt',color:'blue'}]);
+  assert.equal(result.name,'Миша');assert.equal(result.version,4);assert.equal(result.skillSchema,2);assert.deepEqual(Object.values(result.skills),Array(9).fill(0));assert.deepEqual(result.appearance,{...expectedDefault,face:'long',top:'shirt'});assert.deepEqual(result.wardrobe.top,[{id:'shirt',color:'blue'}]);
   assert.equal(Object.hasOwn(result, 'look'), false);
   assert.deepEqual(STAT_KEYS, Object.keys(expectedSkills));
   assert.equal(STAT_LABELS.writing, 'Письмо');
@@ -174,10 +174,10 @@ test('profile creation rejects blank and non-string names', () => {
 
 test('obsolete allocations of every shape cannot change the novice baseline', () => {
   for (const resilience of [-1, 0.5, '0', null, NaN, Infinity, false]) {
-    assert.deepEqual(Object.values(createProfile({ name: 'Миша', allocations: { ...allocations, resilience } }).skills),[10,10,10,10,10,10,10,10,10]);
+    assert.deepEqual(Object.values(createProfile({ name: 'Миша', allocations: { ...allocations, resilience } }).skills),Array(9).fill(0));
   }
   for (const invalid of [null, undefined, [], 'points']) {
-    assert.deepEqual(Object.values(createProfile({ name: 'Миша', allocations: invalid }).skills),[10,10,10,10,10,10,10,10,10]);
+    assert.deepEqual(Object.values(createProfile({ name: 'Миша', allocations: invalid }).skills),Array(9).fill(0));
   }
 });
 

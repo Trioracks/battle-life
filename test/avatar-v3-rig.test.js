@@ -370,8 +370,8 @@ test('exported sleep lies on the side with the face toward the wall and head on 
   assert.ok(Math.max(...clothed.map(v=>v.y))<=1.20,`tucked arms must fit under a soft bed cover: ${Math.max(...clothed.map(v=>v.y))}`);
 });
 
-// Catches separately capped waist/leg tubes and a raised detached neck ring.
-test('shorts form a single continuous waist and crotch, and raised sweater neck has no cap',()=>{
+// Catches separately capped waist/leg tubes.
+test('shorts form a single continuous waist and crotch',()=>{
   const {g,values}=model();
   const shorts=g.nodes.find(n=>n.name==='look-bottom-shorts'),mesh=g.meshes[shorts.mesh];
   const adjacency=new Map(),key=v=>v.map(x=>Math.round(x*10000)).join(',');
@@ -385,13 +385,58 @@ test('shorts form a single continuous waist and crotch, and raised sweater neck 
   let components=0;const unseen=new Set(adjacency.keys());
   while(unseen.size){components++;const queue=[unseen.values().next().value];unseen.delete(queue[0]);while(queue.length)for(const next of adjacency.get(queue.pop()))if(unseen.delete(next))queue.push(next);}
   assert.equal(components,1,'waist and both legs need a shared continuous crotch surface');
-  const sweater=g.nodes.find(n=>n.name==='look-top-sweater');
-  for(const p of g.meshes[sweater.mesh].primitives){
-    const positions=values(p.attributes.POSITION),indices=values(p.indices).flat();
-    assert.ok(Math.max(...positions.map(v=>v[1]))>1.50&&Math.max(...positions.map(v=>v[1]))<1.53,'thick sweater must cover neck below the chin');
-    for(let i=0;i<indices.length;i+=3){
-      const triangle=indices.slice(i,i+3).map(j=>positions[j]);
-      assert.ok(!triangle.every(v=>v[1]>1.44)||Math.max(...triangle.map(v=>v[1]))-Math.min(...triangle.map(v=>v[1]))>.002,'neck opening cannot be a capped disc');
+});
+
+test('sweater crew neck and turtleneck are sewn into their shoulders with distinct open necklines',()=>{
+  const {g,values}=model(),key=v=>v.map(x=>Math.round(x*100000)).join(',');
+  for(const look of ['sweater','turtleneck']){
+    const node=g.nodes.find(n=>n.name==='look-top-'+look),graph=new Map(),positions=[];
+    for(const p of g.meshes[node.mesh].primitives){
+      const vv=values(p.attributes.POSITION),ii=values(p.indices).flat();positions.push(...vv);
+      for(let i=0;i<ii.length;i+=3){
+        const triangle=ii.slice(i,i+3).map(j=>key(vv[j]));
+        for(const a of triangle){if(!graph.has(a))graph.set(a,new Set());for(const b of triangle)graph.get(a).add(b);}
+        const ray=new Ray(new Vector3(0,1.56,0),new Vector3(0,-1,0));
+        assert.equal(ray.intersectTriangle(...ii.slice(i,i+3).map(j=>new Vector3().fromArray(vv[j])),false,new Vector3()),null,look+' neckline must remain open');
+      }
+    }
+    const unseen=new Set(graph.keys());let components=0;
+    while(unseen.size){components++;const queue=[unseen.values().next().value];unseen.delete(queue[0]);while(queue.length)for(const n of graph.get(queue.pop()))if(unseen.delete(n))queue.push(n);}
+    assert.equal(components,1,look+' collar and shoulders must share a continuous fabric surface');
+    const top=Math.max(...positions.map(v=>v[1]));
+    assert.ok(look==='sweater'?top<1.48:top>1.50&&top<1.53,look+' must have its own neckline height');
+  }
+});
+
+test('knit shoulders cover skin between the sleeves and neckline while breathing and walking',()=>{
+  const {g,values}=model(),body=g.nodes.find(n=>n.name==='neutral-skinned-body');
+  const samples=[];let base=0;
+  for(const p of g.meshes[body.mesh].primitives){
+    const vv=values(p.attributes.POSITION),ii=values(p.indices).flat();
+    for(let i=0;i<ii.length;i+=3)for(let a=0;a<=4;a++)for(let b=0;b<=4-a;b++){
+      const weights=[a/4,b/4,1-(a+b)/4],indices=ii.slice(i,i+3);
+      const v=[0,1,2].map(axis=>indices.reduce((sum,j,k)=>sum+vv[j][axis]*weights[k],0));
+      if(v[1]>1.415&&v[1]<1.449&&Math.hypot(v[0],v[2])>.07&&Math.abs(v[0])<.18)samples.push({indices:indices.map(j=>base+j),weights});
+    }
+    base+=vv.length;
+  }
+  assert.ok(samples.length>100,'check actual shoulder skin triangle interiors, not just the sparse neck vertices');
+  for(const clip of ['idle','walk']){
+    const avatar=animatedModel(clip);
+    for(const time of [0,.25,.5,.75]){
+      avatar.frame(time);const skin=avatar.vertices(body.name);
+      for(const look of ['sweater','turtleneck']){
+        const node=g.nodes.find(n=>n.name==='look-top-'+look),fabric=avatar.vertices(node.name),triangles=[];let offset=0;
+        for(const p of g.meshes[node.mesh].primitives){
+          const indices=values(p.indices).flat();for(let i=0;i<indices.length;i+=3)triangles.push(indices.slice(i,i+3).map(j=>fabric[offset+j]));
+          offset+=values(p.attributes.POSITION).length;
+        }
+        for(const {indices,weights} of samples){
+          const point=indices.reduce((v,j,k)=>v.addScaledVector(skin[j],weights[k]),new Vector3());
+          const ray=new Ray(point,new Vector3(point.x,.08,point.z).normalize());
+          assert.ok(triangles.some(t=>ray.intersectTriangle(...t,false,new Vector3())),`${look} exposes shoulder skin at ${clip} ${time}: ${point.toArray()}`);
+        }
+      }
     }
   }
 });

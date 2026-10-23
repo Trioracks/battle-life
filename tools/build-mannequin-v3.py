@@ -298,6 +298,14 @@ def torso_garment(prefix,material,loose,kind):
           (1.421,.206,.118,{'chest':1}),
           (1.452,.071,.065,{'chest':.8,'neck':.2})]
     if kind=='tank':rows[-1]=(1.391,.103,.085,{'chest':1})
+    # Knit shoulders must sit above the skin's sloping clavicle surface. Sew
+    # the neckline into these same loops so it cannot pull away like a choker.
+    if kind=='sweater':
+        rows[-1]=(1.463,.076,.070,{'chest':.3,'neck':.7})
+        rows.append((1.473,.073,.067,{'chest':.2,'neck':.8}))
+    elif kind=='turtleneck':
+        rows[-1]=(1.465,.070,.066,{'chest':.3,'neck':.7})
+        rows.extend([(1.486,.066,.062,{'neck':1}),(1.515,.063,.059,{'neck':1})])
     def vertex(v,w):vertices.append(v);weights.append(w);return len(vertices)-1
     for level,(z,rx,ry,w) in enumerate(rows):
         loop=[]
@@ -305,7 +313,8 @@ def torso_garment(prefix,material,loose,kind):
             a=2*math.pi*j/n;sn=math.sin(a);cs=math.cos(a)
             x=(rx+(loose if level<5 else 0))*math.copysign(abs(cs)**.72,cs)
             y=(ry+(loose if level<5 else 0))*math.copysign(abs(sn)**.72,sn)
-            zz=z-(.018*max(0,-sn) if level==5 else 0)
+            neck_drop=.010 if kind=='sweater' else .004 if kind=='turtleneck' else .018
+            zz=z-(neck_drop*max(0,-sn) if level>=5 else 0)
             garment_weights=w.copy()
             if level in [2,3,4] and j in [15,0,1,7,8,9]:
                 arm='upper_arm.'+('L' if x>0 else 'R')

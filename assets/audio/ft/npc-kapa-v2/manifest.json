@@ -1,0 +1,1949 @@
+{
+  "version": 1,
+  "batch": "abstract-20261020-v1",
+  "catalogVersion": 2,
+  "voice": "kapa",
+  "voiceId": "npc-voice:kapa-20261018",
+  "parts": [
+    {
+      "id": "npc-kapa-v2-01",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_2.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_2.wav",
+      "sourceHash": "229a2f81a4a2ad6e34d4c7875c2f0cbb20dc35e22a9e3dc6ad52c9626b88cf09",
+      "sha256": "229a2f81a4a2ad6e34d4c7875c2f0cbb20dc35e22a9e3dc6ad52c9626b88cf09",
+      "bytes": 1069514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 267333,
+      "seconds": 5.5694375,
+      "bpm": 90,
+      "sourceGainDb": -6.76506,
+      "rms": 0.09805403436778432,
+      "peak": 0.749542236328125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.46,
+          "endSeconds": 3.39
+        },
+        {
+          "startSeconds": 3.89,
+          "endSeconds": 4.9
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-02",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_3.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_3.wav",
+      "sourceHash": "f7eb5b5926e8157e7e60bf66f87f105d1baf9930c1d6946006cab204e838be47",
+      "sha256": "f7eb5b5926e8157e7e60bf66f87f105d1baf9930c1d6946006cab204e838be47",
+      "bytes": 1066850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 266667,
+      "seconds": 5.5555625,
+      "bpm": 90,
+      "sourceGainDb": -5.91266,
+      "rms": 0.08888849033870497,
+      "peak": 0.674560546875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.56,
+          "endSeconds": 4.56
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-03",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_4.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_4.wav",
+      "sourceHash": "17faa99c81832f79f1a1c794a17ea092546d905a6b451b7419f2d30f9e67044c",
+      "sha256": "17faa99c81832f79f1a1c794a17ea092546d905a6b451b7419f2d30f9e67044c",
+      "bytes": 1090850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 272667,
+      "seconds": 5.6805625,
+      "bpm": 90,
+      "sourceGainDb": -7.89065,
+      "rms": 0.11162071103052666,
+      "peak": 0.88555908203125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.84,
+          "endSeconds": 2.21
+        },
+        {
+          "startSeconds": 2.3,
+          "endSeconds": 2.8
+        },
+        {
+          "startSeconds": 3.49,
+          "endSeconds": 4.84
+        },
+        {
+          "startSeconds": 4.96,
+          "endSeconds": 5.33
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-04",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_5.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_5.wav",
+      "sourceHash": "68f35bcbed34c4f6f1def7c5f6d073e274b789dec454b4036e84b2e127d638c6",
+      "sha256": "68f35bcbed34c4f6f1def7c5f6d073e274b789dec454b4036e84b2e127d638c6",
+      "bytes": 1077514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 269333,
+      "seconds": 5.611104166666666,
+      "bpm": 90,
+      "sourceGainDb": -8.34042,
+      "rms": 0.11755300896974584,
+      "peak": 0.84625244140625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.82,
+          "endSeconds": 2.24
+        },
+        {
+          "startSeconds": 2.34,
+          "endSeconds": 3.34
+        },
+        {
+          "startSeconds": 3.47,
+          "endSeconds": 5.18
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-05",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_6.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_6.wav",
+      "sourceHash": "5737bee344287d86334e379e8495a2fa68656178487370da0e0c0a733b6c6159",
+      "sha256": "5737bee344287d86334e379e8495a2fa68656178487370da0e0c0a733b6c6159",
+      "bytes": 1062850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 265667,
+      "seconds": 5.534729166666667,
+      "bpm": 90,
+      "sourceGainDb": -7.57369,
+      "rms": 0.10762104275034552,
+      "peak": 0.859283447265625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.58,
+          "endSeconds": 5.06
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-06",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_7.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_7.wav",
+      "sourceHash": "45561e2d0060be32490d9bb956e2ca7859c7eb86ad4b05de68c9d7e92e08ed7b",
+      "sha256": "45561e2d0060be32490d9bb956e2ca7859c7eb86ad4b05de68c9d7e92e08ed7b",
+      "bytes": 1064182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 266000,
+      "seconds": 5.541666666666667,
+      "bpm": 90,
+      "sourceGainDb": -6.0563,
+      "rms": 0.09037064169674067,
+      "peak": 0.600830078125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.82,
+          "endSeconds": 4.34
+        },
+        {
+          "startSeconds": 4.47,
+          "endSeconds": 4.84
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-07",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_8.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_8.wav",
+      "sourceHash": "fb2293b7c01907d449ca08e16586a0eb31cf45aca19125377dc8b1c43b441482",
+      "sha256": "fb2293b7c01907d449ca08e16586a0eb31cf45aca19125377dc8b1c43b441482",
+      "bytes": 1066850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 266667,
+      "seconds": 5.5555625,
+      "bpm": 90,
+      "sourceGainDb": -6.87628,
+      "rms": 0.09931771611626668,
+      "peak": 0.72015380859375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.57,
+          "endSeconds": 2.32
+        },
+        {
+          "startSeconds": 2.41,
+          "endSeconds": 2.94
+        },
+        {
+          "startSeconds": 3.2,
+          "endSeconds": 5.11
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-08",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": false,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_9.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_9.wav",
+      "sourceHash": "185a304c2fadcb168711e4a3286fba201e78c359d5a676eb67962a6b49a2c60e",
+      "sha256": "185a304c2fadcb168711e4a3286fba201e78c359d5a676eb67962a6b49a2c60e",
+      "bytes": 1025514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 256333,
+      "seconds": 5.340270833333333,
+      "bpm": 90,
+      "sourceGainDb": 0,
+      "rms": 0,
+      "peak": 0,
+      "phraseSpans": [],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": "Measured silent PCM (RMS < 0.0001); original retained."
+    },
+    {
+      "id": "npc-kapa-v2-09",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_10.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_10.wav",
+      "sourceHash": "cbac24d5de3e3ec8e2d35f2d7e59cf6bab4b8cee1242184b6095f9e9bc956fcb",
+      "sha256": "cbac24d5de3e3ec8e2d35f2d7e59cf6bab4b8cee1242184b6095f9e9bc956fcb",
+      "bytes": 1062850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 265667,
+      "seconds": 5.534729166666667,
+      "bpm": 90,
+      "sourceGainDb": -9.14919,
+      "rms": 0.12902452294173158,
+      "peak": 0.814483642578125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.58,
+          "endSeconds": 1.13
+        },
+        {
+          "startSeconds": 1.54,
+          "endSeconds": 3.1
+        },
+        {
+          "startSeconds": 3.62,
+          "endSeconds": 5.04
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-10",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_11.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_11.wav",
+      "sourceHash": "348ea2abfca71306dda0e5b711f0812d6e6719a8628d53c1e812c34f745398fa",
+      "sha256": "348ea2abfca71306dda0e5b711f0812d6e6719a8628d53c1e812c34f745398fa",
+      "bytes": 941514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 235333,
+      "seconds": 4.902770833333333,
+      "bpm": 90,
+      "sourceGainDb": -6.20143,
+      "rms": 0.09189335025949993,
+      "peak": 0.77032470703125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.59,
+          "endSeconds": 1.1
+        },
+        {
+          "startSeconds": 1.21,
+          "endSeconds": 2.2
+        },
+        {
+          "startSeconds": 3.21,
+          "endSeconds": 4.03
+        },
+        {
+          "startSeconds": 4.14,
+          "endSeconds": 4.55
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-11",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_12.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_12.wav",
+      "sourceHash": "2a5e74ae5df9f4a6f17987f7fa921e95fa7d8ca267ab8988a8422878bc5cafe0",
+      "sha256": "2a5e74ae5df9f4a6f17987f7fa921e95fa7d8ca267ab8988a8422878bc5cafe0",
+      "bytes": 1088182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 272000,
+      "seconds": 5.666666666666667,
+      "bpm": 90,
+      "sourceGainDb": -7.5026,
+      "rms": 0.10674372076118117,
+      "peak": 0.79010009765625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.63,
+          "endSeconds": 0.8
+        },
+        {
+          "startSeconds": 0.95,
+          "endSeconds": 2.6
+        },
+        {
+          "startSeconds": 3.56,
+          "endSeconds": 4.48
+        },
+        {
+          "startSeconds": 4.6,
+          "endSeconds": 5.31
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-12",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_13.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_13.wav",
+      "sourceHash": "0fda458ca0709514866fa67a7b48a782bb3e23f1f0e28870770e58d21fd0532d",
+      "sha256": "0fda458ca0709514866fa67a7b48a782bb3e23f1f0e28870770e58d21fd0532d",
+      "bytes": 1089514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 272333,
+      "seconds": 5.673604166666666,
+      "bpm": 90,
+      "sourceGainDb": -6.82444,
+      "rms": 0.09872665207794508,
+      "peak": 0.80767822265625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.65,
+          "endSeconds": 0.99
+        },
+        {
+          "startSeconds": 1.11,
+          "endSeconds": 2.37
+        },
+        {
+          "startSeconds": 2.46,
+          "endSeconds": 2.69
+        },
+        {
+          "startSeconds": 2.78,
+          "endSeconds": 3.38
+        },
+        {
+          "startSeconds": 3.64,
+          "endSeconds": 4.6
+        },
+        {
+          "startSeconds": 4.72,
+          "endSeconds": 5.33
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-13",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_14.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_14.wav",
+      "sourceHash": "c958336f8f53ae6f1c4952cd6234a87d957f431856469b1d20d360273d58a772",
+      "sha256": "c958336f8f53ae6f1c4952cd6234a87d957f431856469b1d20d360273d58a772",
+      "bytes": 1064182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 266000,
+      "seconds": 5.541666666666667,
+      "bpm": 90,
+      "sourceGainDb": -5.67939,
+      "rms": 0.08653303938173418,
+      "peak": 0.629638671875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.56,
+          "endSeconds": 1.24
+        },
+        {
+          "startSeconds": 1.33,
+          "endSeconds": 1.97
+        },
+        {
+          "startSeconds": 2.06,
+          "endSeconds": 2.67
+        },
+        {
+          "startSeconds": 2.79,
+          "endSeconds": 3.12
+        },
+        {
+          "startSeconds": 3.61,
+          "endSeconds": 4.64
+        },
+        {
+          "startSeconds": 4.76,
+          "endSeconds": 5.08
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-14",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_15.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_15.wav",
+      "sourceHash": "66509d7ef0ba3ba378c6ba8d936d8d4c1bd227eb2624bcfc44e38721a7696421",
+      "sha256": "66509d7ef0ba3ba378c6ba8d936d8d4c1bd227eb2624bcfc44e38721a7696421",
+      "bytes": 1074850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 268667,
+      "seconds": 5.597229166666667,
+      "bpm": 90,
+      "sourceGainDb": -6.76984,
+      "rms": 0.09810800287983172,
+      "peak": 0.80694580078125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.53,
+          "endSeconds": 2.67
+        },
+        {
+          "startSeconds": 2.76,
+          "endSeconds": 3.16
+        },
+        {
+          "startSeconds": 3.61,
+          "endSeconds": 5.05
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-15",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_16.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_16.wav",
+      "sourceHash": "5fa7a0a7208900e8f6970f844156523dd50de9851880eb508c8802a94bd253d2",
+      "sha256": "5fa7a0a7208900e8f6970f844156523dd50de9851880eb508c8802a94bd253d2",
+      "bytes": 953514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 238333,
+      "seconds": 4.965270833333333,
+      "bpm": 90,
+      "sourceGainDb": -7.97506,
+      "rms": 0.1127107385970517,
+      "peak": 0.6866455078125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.61,
+          "endSeconds": 2.17
+        },
+        {
+          "startSeconds": 2.27,
+          "endSeconds": 4.56
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-16",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_17.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_17.wav",
+      "sourceHash": "5f036081d9d5532142a9056bbc01b51bf76ee7ebfaa775158bf00c5cd0e5048d",
+      "sha256": "5f036081d9d5532142a9056bbc01b51bf76ee7ebfaa775158bf00c5cd0e5048d",
+      "bytes": 1084182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271000,
+      "seconds": 5.645833333333333,
+      "bpm": 90,
+      "sourceGainDb": -6.33908,
+      "rms": 0.09336116581761458,
+      "peak": 0.799346923828125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.65,
+          "endSeconds": 3.25
+        },
+        {
+          "startSeconds": 3.68,
+          "endSeconds": 5.25
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-17",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_18.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_18.wav",
+      "sourceHash": "9804e53bcc322ce3415eb21ca3ae43629f5dca9dcbb97423559ffb1bccb5ca57",
+      "sha256": "9804e53bcc322ce3415eb21ca3ae43629f5dca9dcbb97423559ffb1bccb5ca57",
+      "bytes": 1060182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 265000,
+      "seconds": 5.520833333333333,
+      "bpm": 90,
+      "sourceGainDb": -5.75152,
+      "rms": 0.08725465333770516,
+      "peak": 0.711181640625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.49,
+          "endSeconds": 3.04
+        },
+        {
+          "startSeconds": 3.61,
+          "endSeconds": 5.04
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-18",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_19.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_19.wav",
+      "sourceHash": "0b8a1c2ac732bfd5a74599a620ce3b18e3ec5e74c8fb7573bae44263f83f9817",
+      "sha256": "0b8a1c2ac732bfd5a74599a620ce3b18e3ec5e74c8fb7573bae44263f83f9817",
+      "bytes": 1094850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 273667,
+      "seconds": 5.701395833333334,
+      "bpm": 90,
+      "sourceGainDb": -5.31185,
+      "rms": 0.08294784381011569,
+      "peak": 0.860504150390625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.58,
+          "endSeconds": 1.35
+        },
+        {
+          "startSeconds": 1.64,
+          "endSeconds": 3.41
+        },
+        {
+          "startSeconds": 3.92,
+          "endSeconds": 5.34
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-19",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_20.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_20.wav",
+      "sourceHash": "76ae35ab17f8a442958f85632474e3030f01210fc02f2feeb4478b4d7bbe7d52",
+      "sha256": "76ae35ab17f8a442958f85632474e3030f01210fc02f2feeb4478b4d7bbe7d52",
+      "bytes": 1032182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 258000,
+      "seconds": 5.375,
+      "bpm": 90,
+      "sourceGainDb": -8.72987,
+      "rms": 0.12294359308629484,
+      "peak": 0.975494384765625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.57
+        },
+        {
+          "startSeconds": 0.86,
+          "endSeconds": 1.68
+        },
+        {
+          "startSeconds": 1.89,
+          "endSeconds": 2.35
+        },
+        {
+          "startSeconds": 2.6,
+          "endSeconds": 3.31
+        },
+        {
+          "startSeconds": 3.53,
+          "endSeconds": 4.95
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-20",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_21.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_21.wav",
+      "sourceHash": "8f55f9c1d82440fc82f64aab5a0013b8dcf910964ad27c801dbb290e99dd1a97",
+      "sha256": "8f55f9c1d82440fc82f64aab5a0013b8dcf910964ad27c801dbb290e99dd1a97",
+      "bytes": 1089514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 272333,
+      "seconds": 5.673604166666666,
+      "bpm": 90,
+      "sourceGainDb": -6.78735,
+      "rms": 0.09830601084021688,
+      "peak": 0.76495361328125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.03,
+          "endSeconds": 0.54
+        },
+        {
+          "startSeconds": 0.63,
+          "endSeconds": 5.32
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-21",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_22.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_22.wav",
+      "sourceHash": "52c8d9cc35fc29db05e59d062f5c6a38db13992b8400b66a5fe7a49cc4fb109e",
+      "sha256": "52c8d9cc35fc29db05e59d062f5c6a38db13992b8400b66a5fe7a49cc4fb109e",
+      "bytes": 937514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 234333,
+      "seconds": 4.8819375,
+      "bpm": 90,
+      "sourceGainDb": -8.09042,
+      "rms": 0.1142177286613342,
+      "peak": 0.81170654296875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.78,
+          "endSeconds": 4.51
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-22",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_23.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_23.wav",
+      "sourceHash": "81a9ce9749bad5f43109e64376ded07cf442b73dd2b7b5f5dcb19515e3444d0e",
+      "sha256": "81a9ce9749bad5f43109e64376ded07cf442b73dd2b7b5f5dcb19515e3444d0e",
+      "bytes": 1046850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 261667,
+      "seconds": 5.451395833333334,
+      "bpm": 90,
+      "sourceGainDb": -5.42044,
+      "rms": 0.08399135852933008,
+      "peak": 0.6605224609375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.55,
+          "endSeconds": 3.9
+        },
+        {
+          "startSeconds": 4,
+          "endSeconds": 4.48
+        },
+        {
+          "startSeconds": 4.57,
+          "endSeconds": 5.01
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-23",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_24.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_24.wav",
+      "sourceHash": "1c6d0673fc971fddc5a7aaa21e22dcd0fd35119ba00d6e11145a9e9ed4ba6cc7",
+      "sha256": "1c6d0673fc971fddc5a7aaa21e22dcd0fd35119ba00d6e11145a9e9ed4ba6cc7",
+      "bytes": 1076182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 269000,
+      "seconds": 5.604166666666667,
+      "bpm": 90,
+      "sourceGainDb": -8.0435,
+      "rms": 0.11360240400707959,
+      "peak": 0.764434814453125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.54,
+          "endSeconds": 5.21
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-24",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_25.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_25.wav",
+      "sourceHash": "296157aab1d9794f5a0e5580fcf90aedee3f94ac00d96d56b07e88c7c97c1e56",
+      "sha256": "296157aab1d9794f5a0e5580fcf90aedee3f94ac00d96d56b07e88c7c97c1e56",
+      "bytes": 1089514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 272333,
+      "seconds": 5.673604166666666,
+      "bpm": 90,
+      "sourceGainDb": -7.47717,
+      "rms": 0.10643173783992266,
+      "peak": 0.836517333984375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.65,
+          "endSeconds": 5.33
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-25",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_26.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_26.wav",
+      "sourceHash": "c8e31a005cb3f7ef662b6838ef36153234e1bb570973c21a2811cb4b33b0e963",
+      "sha256": "c8e31a005cb3f7ef662b6838ef36153234e1bb570973c21a2811cb4b33b0e963",
+      "bytes": 1085514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271333,
+      "seconds": 5.652770833333333,
+      "bpm": 90,
+      "sourceGainDb": -7.01106,
+      "rms": 0.10087079658616317,
+      "peak": 0.729949951171875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.61,
+          "endSeconds": 2.85
+        },
+        {
+          "startSeconds": 3.31,
+          "endSeconds": 5.31
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-26",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_27.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_27.wav",
+      "sourceHash": "390de8564028dc2664e642f1cc11671f60dcc0dfb0d47249ad2d922f5305ddad",
+      "sha256": "390de8564028dc2664e642f1cc11671f60dcc0dfb0d47249ad2d922f5305ddad",
+      "bytes": 1074850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 268667,
+      "seconds": 5.597229166666667,
+      "bpm": 90,
+      "sourceGainDb": -7.11232,
+      "rms": 0.10205370147364273,
+      "peak": 0.9493408203125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.65,
+          "endSeconds": 2.38
+        },
+        {
+          "startSeconds": 3.23,
+          "endSeconds": 5.06
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-27",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_28.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_28.wav",
+      "sourceHash": "ac4e4da8683746470ea93698c1889a21d216151284fdfb4023286589e7185899",
+      "sha256": "ac4e4da8683746470ea93698c1889a21d216151284fdfb4023286589e7185899",
+      "bytes": 1058850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 264667,
+      "seconds": 5.513895833333334,
+      "bpm": 90,
+      "sourceGainDb": -7.59105,
+      "rms": 0.10783629401074372,
+      "peak": 0.856109619140625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.51,
+          "endSeconds": 2.5
+        },
+        {
+          "startSeconds": 3.22,
+          "endSeconds": 5.07
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-28",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_29.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_29.wav",
+      "sourceHash": "174d1c26d305ee38fdbfdb06777602f046d5b805512e561bb185f0cf05ee8f5e",
+      "sha256": "174d1c26d305ee38fdbfdb06777602f046d5b805512e561bb185f0cf05ee8f5e",
+      "bytes": 1038850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 259667,
+      "seconds": 5.409729166666667,
+      "bpm": 90,
+      "sourceGainDb": -7.46406,
+      "rms": 0.10627122036560907,
+      "peak": 0.89093017578125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.65,
+          "endSeconds": 1.73
+        },
+        {
+          "startSeconds": 3.33,
+          "endSeconds": 4.52
+        },
+        {
+          "startSeconds": 4.62,
+          "endSeconds": 5.06
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-29",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_30.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_30.wav",
+      "sourceHash": "68b149708e17e7e20831bea949262152cde436da9f17b56d9011a8b28fcc5fc0",
+      "sha256": "68b149708e17e7e20831bea949262152cde436da9f17b56d9011a8b28fcc5fc0",
+      "bytes": 1042850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 260667,
+      "seconds": 5.4305625,
+      "bpm": 90,
+      "sourceGainDb": -6.79623,
+      "rms": 0.09840652695852063,
+      "peak": 0.610931396484375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.55,
+          "endSeconds": 2.74
+        },
+        {
+          "startSeconds": 3.26,
+          "endSeconds": 4.07
+        },
+        {
+          "startSeconds": 4.39,
+          "endSeconds": 4.61
+        },
+        {
+          "startSeconds": 4.72,
+          "endSeconds": 4.99
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-30",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_31.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_31.wav",
+      "sourceHash": "5252e30afa0e3152c47e23ef1b89a9f02d73a52cf3aecee2bfea64f317370070",
+      "sha256": "5252e30afa0e3152c47e23ef1b89a9f02d73a52cf3aecee2bfea64f317370070",
+      "bytes": 1044182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 261000,
+      "seconds": 5.4375,
+      "bpm": 90,
+      "sourceGainDb": -8.61237,
+      "rms": 0.12129162576346825,
+      "peak": 0.744232177734375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.57,
+          "endSeconds": 3.12
+        },
+        {
+          "startSeconds": 3.22,
+          "endSeconds": 4.09
+        },
+        {
+          "startSeconds": 4.18,
+          "endSeconds": 5.03
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-31",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_32.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_32.wav",
+      "sourceHash": "444ac1fd3bb59e60ac9aacd8b88514317dbb5f1f1bae5ff5724f5051bd75c020",
+      "sha256": "444ac1fd3bb59e60ac9aacd8b88514317dbb5f1f1bae5ff5724f5051bd75c020",
+      "bytes": 1034850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 258667,
+      "seconds": 5.388895833333334,
+      "bpm": 90,
+      "sourceGainDb": -6.60447,
+      "rms": 0.09625780671718596,
+      "peak": 0.722625732421875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.56,
+          "endSeconds": 3.36
+        },
+        {
+          "startSeconds": 3.87,
+          "endSeconds": 5.03
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-32",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_33.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_33.wav",
+      "sourceHash": "e3bc267692408fd94ea555d02605dc1df4c6ccea601273e6cc82789e7841b583",
+      "sha256": "e3bc267692408fd94ea555d02605dc1df4c6ccea601273e6cc82789e7841b583",
+      "bytes": 1036182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 259000,
+      "seconds": 5.395833333333333,
+      "bpm": 90,
+      "sourceGainDb": -4.77705,
+      "rms": 0.07799466154787676,
+      "peak": 0.617431640625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.58,
+          "endSeconds": 1.7
+        },
+        {
+          "startSeconds": 1.87,
+          "endSeconds": 3.28
+        },
+        {
+          "startSeconds": 4.02,
+          "endSeconds": 5.06
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-33",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_34.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_34.wav",
+      "sourceHash": "77e75fa45f0b0bed565f8606b838e63bd958324912d60b1bc30fd3fa97fa2598",
+      "sha256": "77e75fa45f0b0bed565f8606b838e63bd958324912d60b1bc30fd3fa97fa2598",
+      "bytes": 902850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 225667,
+      "seconds": 4.701395833333334,
+      "bpm": 90,
+      "sourceGainDb": -5.56712,
+      "rms": 0.08542176108394102,
+      "peak": 0.6202392578125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.62,
+          "endSeconds": 1.73
+        },
+        {
+          "startSeconds": 1.85,
+          "endSeconds": 3.02
+        },
+        {
+          "startSeconds": 3.26,
+          "endSeconds": 4.32
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-34",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_35.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_35.wav",
+      "sourceHash": "9d967c1f9d03b0398cb32f15a05f0794a1828d918ef4aa6fc1e58e1a5a46c52c",
+      "sha256": "9d967c1f9d03b0398cb32f15a05f0794a1828d918ef4aa6fc1e58e1a5a46c52c",
+      "bytes": 1018850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 254667,
+      "seconds": 5.3055625,
+      "bpm": 90,
+      "sourceGainDb": -7.84375,
+      "rms": 0.11101966940729303,
+      "peak": 0.728607177734375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.49,
+          "endSeconds": 1.94
+        },
+        {
+          "startSeconds": 2.05,
+          "endSeconds": 2.24
+        },
+        {
+          "startSeconds": 2.33,
+          "endSeconds": 3.09
+        },
+        {
+          "startSeconds": 3.69,
+          "endSeconds": 4.97
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-35",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_36.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_36.wav",
+      "sourceHash": "27c6976249518ce33febf24e592efe4109f2c2126b37739d5e114b922104e0cf",
+      "sha256": "27c6976249518ce33febf24e592efe4109f2c2126b37739d5e114b922104e0cf",
+      "bytes": 1085514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271333,
+      "seconds": 5.652770833333333,
+      "bpm": 90,
+      "sourceGainDb": -8.5157,
+      "rms": 0.1199492181390574,
+      "peak": 0.807159423828125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.6,
+          "endSeconds": 3.39
+        },
+        {
+          "startSeconds": 3.96,
+          "endSeconds": 5.27
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-36",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_37.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_37.wav",
+      "sourceHash": "93387b518686dec2e0e0058728b596c684fb6f8ac92198f5749ed0a5b22d4bf7",
+      "sha256": "93387b518686dec2e0e0058728b596c684fb6f8ac92198f5749ed0a5b22d4bf7",
+      "bytes": 1058850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 264667,
+      "seconds": 5.513895833333334,
+      "bpm": 90,
+      "sourceGainDb": -5.70253,
+      "rms": 0.08676384403425154,
+      "peak": 0.76220703125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.59,
+          "endSeconds": 3.24
+        },
+        {
+          "startSeconds": 3.91,
+          "endSeconds": 5.12
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-37",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_38.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_38.wav",
+      "sourceHash": "24707deb4615fdd97ce11213273e2cdd0cbba7cb1eb67719c794093fd2e867e3",
+      "sha256": "24707deb4615fdd97ce11213273e2cdd0cbba7cb1eb67719c794093fd2e867e3",
+      "bytes": 1073514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 268333,
+      "seconds": 5.590270833333333,
+      "bpm": 90,
+      "sourceGainDb": -6.60757,
+      "rms": 0.09629223077046528,
+      "peak": 0.726287841796875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.53,
+          "endSeconds": 3.1
+        },
+        {
+          "startSeconds": 3.63,
+          "endSeconds": 5.19
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-38",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_39.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_39.wav",
+      "sourceHash": "193116f8c305386acf5767ceb6f5e1dba9ea4f88a5968e200a3b5ef4061971fe",
+      "sha256": "193116f8c305386acf5767ceb6f5e1dba9ea4f88a5968e200a3b5ef4061971fe",
+      "bytes": 1056182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 264000,
+      "seconds": 5.5,
+      "bpm": 90,
+      "sourceGainDb": -8.11668,
+      "rms": 0.1145635381134743,
+      "peak": 0.81573486328125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.45,
+          "endSeconds": 3.37
+        },
+        {
+          "startSeconds": 3.53,
+          "endSeconds": 5.16
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-39",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_40.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_40.wav",
+      "sourceHash": "f7341d552322ed136d07ab98da327ec417527d781c7bff35189818e2221a35b7",
+      "sha256": "f7341d552322ed136d07ab98da327ec417527d781c7bff35189818e2221a35b7",
+      "bytes": 1066850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 266667,
+      "seconds": 5.5555625,
+      "bpm": 90,
+      "sourceGainDb": -8.32124,
+      "rms": 0.11729369482644048,
+      "peak": 0.92803955078125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.52,
+          "endSeconds": 4.12
+        },
+        {
+          "startSeconds": 4.21,
+          "endSeconds": 5.15
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-40",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_41.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_41.wav",
+      "sourceHash": "97b406028aff7bbe82d4e6cf642e4d47ddc7ccabeb0659dbc133aef16a0ad315",
+      "sha256": "97b406028aff7bbe82d4e6cf642e4d47ddc7ccabeb0659dbc133aef16a0ad315",
+      "bytes": 1088182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 272000,
+      "seconds": 5.666666666666667,
+      "bpm": 90,
+      "sourceGainDb": -7.75061,
+      "rms": 0.10983562054553593,
+      "peak": 0.81378173828125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.96,
+          "endSeconds": 5.29
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-41",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_42.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_42.wav",
+      "sourceHash": "9284eb6cdff71724b14e924f14c68d0f5d2447e2e45d76619e3f2e78c9c6e5bd",
+      "sha256": "9284eb6cdff71724b14e924f14c68d0f5d2447e2e45d76619e3f2e78c9c6e5bd",
+      "bytes": 1089514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 272333,
+      "seconds": 5.673604166666666,
+      "bpm": 90,
+      "sourceGainDb": -6.62966,
+      "rms": 0.09653742745684267,
+      "peak": 0.715362548828125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.66,
+          "endSeconds": 3.79
+        },
+        {
+          "startSeconds": 4.25,
+          "endSeconds": 5.32
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-42",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_43.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_43.wav",
+      "sourceHash": "0b5af5645837b9433cf0f9292ac0f224a1e975da5fb1aad53f347e406ba8fab1",
+      "sha256": "0b5af5645837b9433cf0f9292ac0f224a1e975da5fb1aad53f347e406ba8fab1",
+      "bytes": 1073514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 268333,
+      "seconds": 5.590270833333333,
+      "bpm": 90,
+      "sourceGainDb": -7.41594,
+      "rms": 0.10568404216140555,
+      "peak": 0.758575439453125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.5,
+          "endSeconds": 3.13
+        },
+        {
+          "startSeconds": 3.58,
+          "endSeconds": 4.68
+        },
+        {
+          "startSeconds": 4.77,
+          "endSeconds": 5.02
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-43",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_44.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_44.wav",
+      "sourceHash": "87fedc5d2a753fc461ec05f7567b8cae3a3b3e79aaf914de90f85575b2f9941b",
+      "sha256": "87fedc5d2a753fc461ec05f7567b8cae3a3b3e79aaf914de90f85575b2f9941b",
+      "bytes": 1064182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 266000,
+      "seconds": 5.541666666666667,
+      "bpm": 90,
+      "sourceGainDb": -7.66428,
+      "rms": 0.10874933871970927,
+      "peak": 0.83331298828125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.58,
+          "endSeconds": 3.26
+        },
+        {
+          "startSeconds": 3.55,
+          "endSeconds": 5.2
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-44",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_45.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_45.wav",
+      "sourceHash": "c9173c7a98589bedb7267e988639517a528279cafb1f56f5899f5eaeab1b2bf2",
+      "sha256": "c9173c7a98589bedb7267e988639517a528279cafb1f56f5899f5eaeab1b2bf2",
+      "bytes": 977514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 244333,
+      "seconds": 5.090270833333333,
+      "bpm": 90,
+      "sourceGainDb": -7.21064,
+      "rms": 0.10321537499492145,
+      "peak": 0.874237060546875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.64,
+          "endSeconds": 3.26
+        },
+        {
+          "startSeconds": 3.35,
+          "endSeconds": 4.66
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-45",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_46.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_46.wav",
+      "sourceHash": "23e94e9c8eccfdaee64260228b033d61afea466fb6199696fca735433324ad1e",
+      "sha256": "23e94e9c8eccfdaee64260228b033d61afea466fb6199696fca735433324ad1e",
+      "bytes": 1076182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 269000,
+      "seconds": 5.604166666666667,
+      "bpm": 90,
+      "sourceGainDb": -7.09847,
+      "rms": 0.10189108368919009,
+      "peak": 0.859222412109375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.58,
+          "endSeconds": 4.54
+        },
+        {
+          "startSeconds": 4.69,
+          "endSeconds": 5.24
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-46",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_47.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_47.wav",
+      "sourceHash": "262119af1604029a445aa1a13c33f6f2b90f0f64d19c77aa2d1ec756c4accfd5",
+      "sha256": "262119af1604029a445aa1a13c33f6f2b90f0f64d19c77aa2d1ec756c4accfd5",
+      "bytes": 1054850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 263667,
+      "seconds": 5.4930625,
+      "bpm": 90,
+      "sourceGainDb": -7.09875,
+      "rms": 0.10189429804747009,
+      "peak": 0.7550048828125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.48,
+          "endSeconds": 5.14
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-47",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_48.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_48.wav",
+      "sourceHash": "6ff79504e878efbb6b0ca7a083299f6236c9e267662323fcd7a70f8007b71d07",
+      "sha256": "6ff79504e878efbb6b0ca7a083299f6236c9e267662323fcd7a70f8007b71d07",
+      "bytes": 960182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 240000,
+      "seconds": 5,
+      "bpm": 90,
+      "sourceGainDb": -6.67593,
+      "rms": 0.09705302795994328,
+      "peak": 0.787384033203125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.64,
+          "endSeconds": 1.84
+        },
+        {
+          "startSeconds": 3,
+          "endSeconds": 4.62
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-48",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_49.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC_49.wav",
+      "sourceHash": "c98fac46d5cd7776ce1ae5d983ce27d1575b36bb21cd1a103ee90d09edff9e71",
+      "sha256": "c98fac46d5cd7776ce1ae5d983ce27d1575b36bb21cd1a103ee90d09edff9e71",
+      "bytes": 1070850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 267667,
+      "seconds": 5.576395833333334,
+      "bpm": 90,
+      "sourceGainDb": -7.84345,
+      "rms": 0.11101581464414889,
+      "peak": 0.81488037109375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.94,
+          "endSeconds": 3.39
+        },
+        {
+          "startSeconds": 3.7,
+          "endSeconds": 4.25
+        },
+        {
+          "startSeconds": 4.34,
+          "endSeconds": 4.51
+        },
+        {
+          "startSeconds": 4.63,
+          "endSeconds": 5.21
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-49",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - REC.wav",
+      "sourceHash": "b6dd18bddcb3653bbae7cf73b40b121e121f589b088812beea5c0e9e1ed3fd8e",
+      "sha256": "b6dd18bddcb3653bbae7cf73b40b121e121f589b088812beea5c0e9e1ed3fd8e",
+      "bytes": 1074850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 268667,
+      "seconds": 5.597229166666667,
+      "bpm": 90,
+      "sourceGainDb": -7.60691,
+      "rms": 0.10803334807464682,
+      "peak": 0.71728515625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.47,
+          "endSeconds": 2.76
+        },
+        {
+          "startSeconds": 3.16,
+          "endSeconds": 5.2
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-kapa-v2-50",
+      "voiceId": "npc-voice:kapa-20261018",
+      "catalogVersion": 2,
+      "usable": false,
+      "verified": true,
+      "path": "./stems/source-library/voices/kapa/abstract-20261020-v1/Капа - Track 1.wav",
+      "source": "stems/source-library/voices/kapa/abstract-20261020-v1/Капа - Track 1.wav",
+      "sourceHash": "185a304c2fadcb168711e4a3286fba201e78c359d5a676eb67962a6b49a2c60e",
+      "sha256": "185a304c2fadcb168711e4a3286fba201e78c359d5a676eb67962a6b49a2c60e",
+      "bytes": 1025514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 256333,
+      "seconds": 5.340270833333333,
+      "bpm": 90,
+      "sourceGainDb": 0,
+      "rms": 0,
+      "peak": 0,
+      "phraseSpans": [],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": "Measured silent PCM (RMS < 0.0001); original retained."
+    }
+  ]
+}

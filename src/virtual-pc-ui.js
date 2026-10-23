@@ -1,38 +1,39 @@
-import {PC_IDENTITY} from './pc-identity.js?rev=45';
-import { FtStudioAudio } from './ft-studio-audio.js?rev=45';
-import {mountPcShell} from './virtual-pc-shell.js?rev=45';
-import {mountExplorer} from './virtual-pc-explorer-view.js?rev=45';
-import {mountPcMenu} from './virtual-pc-menus.js?rev=45';
-import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=45';
-import {explorerProperties} from './virtual-pc-explorer.js?rev=45';
-import {createWindowState,reduceWindows} from './virtual-pc-window-state.js?rev=45';
-import {layoutDesktopIcons,setDesktopIconPosition,resetDesktopIconPositions} from './virtual-pc-state.js?rev=45';
-import {createPcIcon} from './virtual-pc-icons.js?rev=45';
-import { normalizeStudioProject } from './ft-studio-project.js?rev=45';
-import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js?rev=45';
-import { createVirtualPcState, diskUsage, saveStudioProject } from './virtual-pc-state.js?rev=45';
-import {diskAmount} from './virtual-pc-disk-view.js?rev=45';
-import {pcPresentation} from './virtual-pc-presentation.js?rev=45';
-import {createStudioWorkspace,presentRecordingWorkspace} from './ft-studio-view.js?rev=45';
-import {mountUnderweb} from './underweb-view.js?rev=45';
-import {applyToBattle} from './virtual-pc-state.js?rev=45';
-import {mountBeatStudio} from './beat-studio-view.js?rev=45';
-import {createGameAudio} from './game-audio.js?rev=45';
-import {createPcAudioSession} from './pc-audio-session.js?rev=45';
-import {createPcRoomOutput} from './pc-room-audio.js?rev=45';
-import {normalizeBeat} from './beat-production.js?rev=45';
-import {createBeatMarket} from './beat-market-view.js?rev=45';
-import * as software from './pc-software.js?rev=45';
-import {mountTorrent,mountInstaller,softwareMessage} from './pc-software-view.js?rev=45';
-import {startBrowserDownload,advanceBrowserDownloads,clearCompletedBrowserDownloadHistory} from './pc-browser-downloads.js?rev=45';
-import {SOFTWARE} from './pc-software-catalog.js?rev=45';
-import {mountRapNotebook} from './rap-notebook-view.js?rev=45';
-import {mountRapDossier} from './rap-dossier-view.js?rev=45';
-import {normalizeLyric} from './lyric-production.js?rev=45';
-import {pauseCreativeChain} from './creative-workflow.js?rev=45';
-import {pauseStudy} from './rap-analysis.js?rev=45';
-import {pauseCaseStudy} from './rap-research.js?rev=45';
-import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=45';
+import {PC_IDENTITY} from './pc-identity.js?rev=57';
+import {importGoblinFile} from './goblin-exchange.js?rev=57';
+import { FtStudioAudio } from './ft-studio-audio.js?rev=57';
+import {mountPcShell} from './virtual-pc-shell.js?rev=57';
+import {mountExplorer} from './virtual-pc-explorer-view.js?rev=57';
+import {mountPcMenu} from './virtual-pc-menus.js?rev=57';
+import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=57';
+import {explorerProperties} from './virtual-pc-explorer.js?rev=57';
+import {createWindowState,reduceWindows} from './virtual-pc-window-state.js?rev=57';
+import {layoutDesktopIcons,setDesktopIconPosition,resetDesktopIconPositions} from './virtual-pc-state.js?rev=57';
+import {createPcIcon} from './virtual-pc-icons.js?rev=57';
+import { normalizeStudioProject } from './ft-studio-project.js?rev=57';
+import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js?rev=57';
+import { createVirtualPcState, diskUsage, saveStudioProject } from './virtual-pc-state.js?rev=57';
+import {diskAmount} from './virtual-pc-disk-view.js?rev=57';
+import {pcPresentation} from './virtual-pc-presentation.js?rev=57';
+import {createStudioWorkspace,presentRecordingWorkspace} from './ft-studio-view.js?rev=57';
+import {mountUnderweb} from './underweb-view.js?rev=57';
+import {applyToBattle} from './virtual-pc-state.js?rev=57';
+import {mountBeatStudio} from './beat-studio-view.js?rev=57';
+import {createGameAudio} from './game-audio.js?rev=57';
+import {createPcAudioSession} from './pc-audio-session.js?rev=57';
+import {createPcRoomOutput} from './pc-room-audio.js?rev=57';
+import {normalizeBeat} from './beat-production.js?rev=57';
+import {createBeatMarket} from './beat-market-view.js?rev=57';
+import * as software from './pc-software.js?rev=57';
+import {mountTorrent,mountInstaller,softwareMessage} from './pc-software-view.js?rev=57';
+import {startBrowserDownload,advanceBrowserDownloads,clearCompletedBrowserDownloadHistory} from './pc-browser-downloads.js?rev=57';
+import {SOFTWARE} from './pc-software-catalog.js?rev=57';
+import {mountRapNotebook} from './rap-notebook-view.js?rev=57';
+import {mountRapDossier} from './rap-dossier-view.js?rev=57';
+import {normalizeLyric} from './lyric-production.js?rev=57';
+import {pauseCreativeChain} from './creative-workflow.js?rev=57';
+import {pauseStudy} from './rap-analysis.js?rev=57';
+import {pauseCaseStudy} from './rap-research.js?rev=57';
+import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=57';
 
 const NOOP = () => {};
 const sameInputs=(a,b)=>a?.length===b.length&&b.every((value,i)=>value===a[i]);
@@ -373,7 +374,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.notebookView.update();return;
     }
     if(appId==='underweb'){
-      if(!pc.underwebView)pc.underwebView=mountUnderweb(target,{onWork:()=>callbacks.onWork?.()??false,onStudyTarget:target=>{pc.open('rap-dossier');pc.dossierView?.focusTarget(target);},getState:()=>pc.state,getMetadata:()=>pc.metadata,isVisible:()=>pc.phase==='desktop'&&!pc.locked&&!root.hidden&&!document.hidden&&(!root.dataset.pcTransition||root.dataset.pcTransition==='desktop')&&pc.windows.activeId==='underweb'&&pc.windows.windows.some(w=>w.id==='underweb'&&w.mode!=='minimized'),onApply:(id,name)=>pc.persist(applyToBattle(pc.state,id,name)),onSubmitTrack:id=>pc.showSubmission(id),onResultViewed:callbacks.onResultViewed,onSoftware:pc.softwareAction,getSoftwareMessage:()=>pc.message,onChange:next=>{const saved=pc.persist(next,{atomic:true});pc.renderDesktop(false);return saved;},audio:pc.audioSession.forOwner('underweb')});
+      if(!pc.underwebView)pc.underwebView=mountUnderweb(target,{onWork:()=>callbacks.onWork?.()??false,onStudyTarget:target=>{pc.open('rap-dossier');pc.dossierView?.focusTarget(target);},getState:()=>pc.state,getMetadata:()=>({...pc.metadata,openMentorFile:pc.openMentorFile}),isVisible:()=>pc.phase==='desktop'&&!pc.locked&&!root.hidden&&!document.hidden&&(!root.dataset.pcTransition||root.dataset.pcTransition==='desktop')&&pc.windows.activeId==='underweb'&&pc.windows.windows.some(w=>w.id==='underweb'&&w.mode!=='minimized'),onApply:(id,name)=>pc.persist(applyToBattle(pc.state,id,name)),onSubmitTrack:id=>pc.showSubmission(id),onResultViewed:callbacks.onResultViewed,onSoftware:pc.softwareAction,getSoftwareMessage:()=>pc.message,onChange:next=>{const saved=pc.persist(next,{atomic:true});pc.renderDesktop(false);return saved;},audio:pc.audioSession.forOwner('underweb')});
       pc.underwebView.update();return;
     }
     if(appId==='ft-studio'){
@@ -381,7 +382,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.studioView.update();return;
     }
     if(appId==='computer'){
-      if(!pc.explorer)pc.explorer=mountExplorer(target,{audio:pc.audioSession.forOwner('computer'),onSoftware:pc.softwareAction,onOpenArtifact:entry=>{pc.softwareAction(entry.action,entry.appId);return pc.message;},onOpenApp:id=>pc.open(id),onOpenProject:p=>pc.openProject(p),onProperties:p=>pc.showProperties(p),onClose:()=>pc.closeWindow('computer'),onMenu:p=>pc.menu?.open(p),onNavigate:location=>{
+      if(!pc.explorer)pc.explorer=mountExplorer(target,{audio:pc.audioSession.forOwner('computer'),onSoftware:pc.softwareAction,onOpenArtifact:entry=>{if(entry.action==='mentor-file')return pc.openMentorFile(entry.fileId);pc.softwareAction(entry.action,entry.appId);return pc.message;},onOpenApp:id=>pc.open(id),onOpenProject:p=>pc.openProject(p),onProperties:p=>pc.showProperties(p),onClose:()=>pc.closeWindow('computer'),onMenu:p=>pc.menu?.open(p),onNavigate:location=>{
         pc.windows={...pc.windows,windows:pc.windows.windows.map(w=>w.id==='computer'?{...w,title:location.label,iconId:location.iconId}:w)};pc.renderDesktop(false);
       }});
       pc.explorer.update(pc.state);return;
@@ -477,6 +478,13 @@ export function mountVirtualPc(root, callbacks = {}) {
     if(!pc.studioView)pc.pendingStudioProject=normalized;
     pc.callbacks.onOpenProject(normalized);pc.open('ft-studio');pc.refreshApp('ft-studio',{replaceContent:true});
     if(pc.studioView){pc.pendingStudioProject=null;pc.studioView.openProject(normalized);}
+  };
+  pc.openMentorFile = fileId => {
+    const r=importGoblinFile(pc.state,fileId,pc.metadata.gameMinutes??pc.state.lastGameMinute??0);
+    if(!r.ok)return r.reason;
+    if(!pc.persist(r.state,{atomic:true}))return 'Не удалось сохранить полученный проект.';
+    pc.openProject(pc.state.projects.find(p=>p.id===r.projectId));
+    return r.reason;
   };
 
 

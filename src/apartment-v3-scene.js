@@ -1,23 +1,25 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {ApartmentAnimation} from './apartment-v3-animation.js?rev=45';
-import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=45';
-import {headCameraPose} from './apartment-head-pose.js?rev=45';
-import {segmentIntersectsBox} from './pc-room-audio.js?rev=45';
-import {workCameraPose} from './work-camera.js?rev=45';
-import {renderAvatarPortrait} from './avatar-portrait-renderer.js?rev=45';
-import {homeLight} from './apartment-v3-time.js?rev=45';
-import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=45';
-import {createLandingReveal} from './apartment-v3-landing.js?rev=45';
-import {CameraModes,cameraPose,pickVisible,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=45';
-import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=45';
-import {createSmoke} from './apartment-v3-smoke.js?rev=45';
-import {createRetroPass} from './apartment-v3-retro.js?rev=45';
-import {createComputerView} from './apartment-v3-computer.js?rev=45';
-import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=45';
-import {pcPresentation} from './virtual-pc-presentation.js?rev=45';
-import {createWardrobeFurniture} from './home-wardrobe.js?rev=45';
-import {applySwitchStyle} from './apartment-switch-style.js?rev=45';
+import {ApartmentAnimation} from './apartment-v3-animation.js?rev=57';
+import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=57';
+import {headCameraPose} from './apartment-head-pose.js?rev=57';
+import {segmentIntersectsBox} from './pc-room-audio.js?rev=57';
+import {workCameraPose} from './work-camera.js?rev=57';
+import {renderAvatarPortrait} from './avatar-portrait-renderer.js?rev=57';
+import {homeLight} from './apartment-v3-time.js?rev=57';
+import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=57';
+import {createLandingReveal} from './apartment-v3-landing.js?rev=57';
+import {CameraModes,cameraPose,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=57';
+import {createInteractionTargets,pickInteraction} from './apartment-interaction.js?rev=57';
+import {createHoverOutline} from './apartment-hover-outline.js?rev=57';
+import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=57';
+import {createSmoke} from './apartment-v3-smoke.js?rev=57';
+import {createRetroPass} from './apartment-v3-retro.js?rev=57';
+import {createComputerView} from './apartment-v3-computer.js?rev=57';
+import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=57';
+import {pcPresentation} from './virtual-pc-presentation.js?rev=57';
+import {createWardrobeFurniture} from './home-wardrobe.js?rev=57';
+import {applySwitchStyle} from './apartment-switch-style.js?rev=57';
 
 export async function createApartmentScene(canvas,config){
   const BASE=config.assetBase??'./assets/apartment/v3/';
@@ -35,7 +37,7 @@ export async function createApartmentScene(canvas,config){
   camera.position.copy(basePosition);camera.lookAt(baseTarget);
   const loader=new GLTFLoader();
   const [environment,model,staticModel]=await Promise.all([
-    loader.loadAsync(BASE+config.geometry+'?rev=40'),loader.loadAsync(BASE+config.rig+'?rev=40'),loader.loadAsync(BASE+config.staticGeometry+'?rev=21')
+    loader.loadAsync(BASE+config.geometry+'?rev=40'),loader.loadAsync(BASE+config.rig+'?rev=56'),loader.loadAsync(BASE+config.staticGeometry+'?rev=21')
   ]);
   const staticScene=staticModel.scene;
   staticScene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
@@ -162,34 +164,23 @@ export async function createApartmentScene(canvas,config){
   g.addColorStop(0,'rgba(0,0,0,.44)');g.addColorStop(.5,'rgba(0,0,0,.23)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,128,128);
   const shadow=new THREE.Mesh(new THREE.PlaneGeometry(.85,.65),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(shadowCanvas),transparent:true,depthWrite:false,toneMapped:false}));
   shadow.rotation.x=-Math.PI/2;shadow.renderOrder=-10;scene.add(shadow);
-  const targets=[];
-  for(const [id,a] of Object.entries(config.actions)){
-    if(!a.hit)continue;
-    const mesh=new THREE.Mesh(new THREE.BoxGeometry(...a.hit[1]),new THREE.MeshBasicMaterial({visible:false}));
-    mesh.position.fromArray(a.hit[0]);mesh.userData.action=id;scene.add(mesh);targets.push(mesh);
-  }
+  const targets=createInteractionTargets(THREE,{staticScene,liveScene:environment.scene,config,actor});
+  const hoverOutline=createHoverOutline(THREE,renderer,targets);
+  const setHoveredAction=id=>hoverOutline.select(id);
   const ring=new THREE.Mesh(new THREE.RingGeometry(.065,.082,32),new THREE.MeshBasicMaterial({color:0xddc59c,side:THREE.DoubleSide,transparent:true,opacity:.8}));
   ring.rotation.x=-Math.PI/2;ring.visible=false;scene.add(ring);
   const ray=new THREE.Raycaster(),pointer=new THREE.Vector2(),floor=new THREE.Plane(new THREE.Vector3(0,1,0),0),point=new THREE.Vector3();
   function pick(event){
     scene.updateMatrixWorld(true);
     const r=canvas.getBoundingClientRect();pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,modes.mode==='3D'?firstCamera:camera);
-    if(modes.mode==='3D'){
-      const visible=o=>{for(let p=o;p;p=p.parent)if(!p.visible)return false;return true;};
-      const blockers=ray.intersectObjects([staticScene,environment.scene].filter(Boolean),true).filter(h=>visible(h.object));
-      const hits=ray.intersectObjects(targets).map(h=>({distance:h.distance,id:h.object.userData.action}));
-      const surface=blockers[0],normal=surface?.face?.normal.clone().transformDirection(surface.object.matrixWorld);
-      const f=surface&&surface.point.y<.12&&normal?.y>.7?{distance:surface.distance,x:surface.point.x}:null;
-      return pickVisible(hits,blockers,f);
-    }
-    const blocker=ray.intersectObjects([staticScene,environment.scene],true).find(hit=>{for(let o=hit.object;o;o=o.parent)if(!o.visible)return false;return true;}),distance=blocker?.distance??Infinity;
-    const hit=ray.intersectObjects(targets)[0];if(hit&&hit.distance<=distance+.025)return {id:hit.object.userData.action};
-    const hero=ray.intersectObject(actor,true).find(hit=>{for(let o=hit.object;o;o=o.parent)if(!o.visible)return false;return true;});if(hero&&hero.distance<=distance+.025)return {hero:true};
+    const {id,hero,surface:blocker}=pickInteraction(ray,targets,[staticScene,environment.scene,actor]);
+    if(id)return {id};if(hero)return {hero};
+    const distance=blocker?.distance??Infinity;
     // The furnished floor has thickness above the old mathematical y=0 plane.
     // Walk on its visible upper surface just as the first-person camera does.
     const normal=blocker?.face?.normal.clone().transformDirection(blocker.object.matrixWorld);
     if(blocker&&blocker.point.y<.12&&normal?.y>.7)return {x:blocker.point.x};
-    if(ray.ray.intersectPlane(floor,point)&&ray.ray.origin.distanceTo(point)<=distance+.025)return {x:point.x};return {};
+    if(modes.mode!=='3D'&&ray.ray.intersectPlane(floor,point)&&ray.ray.origin.distanceTo(point)<=distance+.025)return {x:point.x};return {};
   }
   function resize(){const r=canvas.getBoundingClientRect(),aspect=r.width/r.height;
     camera.aspect=aspect;camera.updateProjectionMatrix();firstCamera.aspect=aspect;firstCamera.updateProjectionMatrix();workViewCamera.aspect=aspect;workViewCamera.updateProjectionMatrix();computer?.resize(r.width,r.height);transitionFrame.setSize(Math.max(1,r.width),Math.max(1,r.height));retro.resize(r.width,r.height);}
@@ -250,6 +241,7 @@ export async function createApartmentScene(canvas,config){
       actor.visible=workViewCamera.position.distanceTo(new THREE.Vector3(...headPose.position))>.38;
     }
     retro.render(scene,activeCamera);
+    if(!computerActive&&!workCamera)hoverOutline.render(scene,activeCamera);
   }
   const previewCamera=new THREE.OrthographicCamera(-1,1,1.1,-1.1,.1,20);
   previewCamera.position.set(0,1.08,5);previewCamera.lookAt(0,.94,0);
@@ -298,5 +290,6 @@ export async function createApartmentScene(canvas,config){
     return {x:rect.left+(point.x+1)*rect.width/2,y:rect.top+(1-point.y)*rect.height/2,visible:actor.visible&&!computerActive&&modes.mode!=='3D'};
   }
   const capturePlayerPortrait=appearance=>renderAvatarPortrait({appearance,sceneAssets:{model,environment:environment.scene,staticScene,config}});
-  return {modes,loadMode,prepareComputerView,beginComputerView,getHeadCameraPose,getComputerAudioFrame,setWorkCamera,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,capturePlayerPortrait,pick,setTime,setRoomLights,setAppearance,getHeadScreenPosition,clips:[...animation.actions.keys()],dispose(){disposed=true;switchStyle.dispose();computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,staticScene])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
+  const capturePlayerLifePhoto=(appearance,stage)=>renderAvatarPortrait({appearance,variant:'life:'+stage,size:512,sceneAssets:{model}});
+  return {modes,loadMode,prepareComputerView,beginComputerView,getHeadCameraPose,getComputerAudioFrame,setWorkCamera,setComputerPresentation,endComputerView,render,renderPreview,renderPeephole,capturePlayerPortrait,capturePlayerLifePhoto,pick,setHoveredAction,setTime,setRoomLights,setAppearance,getHeadScreenPosition,clips:[...animation.actions.keys()],dispose(){disposed=true;hoverOutline.dispose();targets.dispose();switchStyle.dispose();computer?.dispose();transitionBackdrop.dispose();transitionFrame.dispose();transitionQuad.geometry.dispose();observer.disconnect();smoke.dispose();for(const root of [courtyard,staticScene])root.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==depthMaterial)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});depthMaterial.dispose();retro.dispose();renderer.dispose();}};
 }

@@ -1,11 +1,11 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=45';
-import {socialButton} from './social-dom.js?rev=45';
-import {playTrackVersion} from './track-version-audio.js?rev=45';
-import {backgroundAudioDescriptor as archiveDescriptor} from './social-background-audio.js?rev=45';
-import {npcPlaybackDescriptor} from './battle-npc-audio.js?rev=45';
-import {profileAccess} from './social-profile-policy.js?rev=45';
-import {battleCharacter} from './battle-demo-config.js?rev=45';
-import {metadataGameMinute} from './social-registration.js?rev=45';
+import {pcElement as el} from './virtual-pc-dom.js?rev=57';
+import {socialButton} from './social-dom.js?rev=57';
+import {playTrackVersion} from './track-version-audio.js?rev=57';
+import {backgroundAudioDescriptor as archiveDescriptor} from './social-background-audio.js?rev=57';
+import {npcPlaybackDescriptor} from './battle-npc-audio.js?rev=57';
+import {profileAccess} from './social-profile-policy.js?rev=57';
+import {battleCharacter} from './battle-demo-config.js?rev=57';
+import {metadataGameMinute} from './social-registration.js?rev=57';
 // Retain the catalog-item entry point for existing callers; recipes use IDs.
 export const backgroundAudioDescriptor=item=>archiveDescriptor(typeof item==='string'?item:item?.id);
 const clock=seconds=>{const n=Math.max(0,Math.floor(seconds+1e-6));return Math.floor(n/60)+':'+String(n%60).padStart(2,'0');};
@@ -15,7 +15,7 @@ export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze
  const releaseRow=(row,entry)=>{entry.active=false;for(const [node,handler]of entry.listeners)node.removeEventListener('click',handler);entry.listeners.length=0;rows.delete(row);};
  // Called before an owner replaces its content. Newly constructed rows outside
  // that subtree keep their registration even before their first attachment.
- const releaseRows=root=>{for(const [row,entry]of rows)if(root.contains(row))releaseRow(row,entry);};
+ const releaseRows=root=>{for(const [row,entry]of rows)if(root.contains(row))releaseRow(row,entry);for(const media of root.querySelectorAll?.('audio[data-goblin-audio]')??[]){media.pause();media.removeAttribute('src');media.load?.();}};
  const update=next=>{if(disposed)return;snapshot=next;for(const entry of rows.values())entry.render();};
  const refresh=()=>update(audio?.getSnapshot?.()??snapshot);
  const unsubscribe=audio?.subscribe?.(update);
@@ -24,10 +24,11 @@ export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze
  // option belongs to this playback request, never to a saved recipe or export.
  const player={playDescriptor:descriptor=>audio?.playDescriptor?.(descriptor,{loop:false}),stop:()=>audio?.stop?.(),get error(){return audio?.error??'';}};
  return {
+  capabilities:audio?.capabilities,
   row(d,{version,item}){
    const entry={active:true,listeners:[],render:null};
    const button=(d,text,handler,options)=>{const node=socialButton(d,text,handler,options);entry.listeners.push([node,handler]);return node;};
-   const descriptor=version?null:item?backgroundAudioDescriptor(item):null,key=version?'version:'+version.id:descriptor?.key;
+   const descriptor=version?null:item?.descriptor?{...item.descriptor,key:'file:'+item.id,owner:'social'}:item?backgroundAudioDescriptor(item):null,key=version?'version:'+version.id:descriptor?.key;
    const title=version?.name??(item?[(item.archive?item.author:null),item.title].filter(Boolean).join(' — '):'Сохранённая работа недоступна');
    const duration=version?.recipe?.descriptor?.durationSeconds??descriptor?.durationSeconds??32/3;
    const row=el(d,'div',{className:'sn-audio'}),status=el(d,'small',{attributes:{'aria-live':'polite'}});
@@ -35,6 +36,7 @@ export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze
    progress.append(fill);let failure='',unavailable='',previewKey=null,previewDescriptor=null;
    const matches=()=>snapshot.owner==='social'&&Boolean(key)&&(snapshot.key===key||snapshot.key===previewKey);
    const start=async(preview=null)=>{
+    for(const media of d.querySelectorAll?.('audio[data-goblin-audio]')??[])media.pause();
     if(disposed||!entry.active||audio?.capabilities?.recordedPlayback===false)return;const token=++generation;failure='';
     if(!audio?.getSnapshot)update({status:'loading',key:preview?.key??key,owner:'social',positionSeconds:0});
     try{

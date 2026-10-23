@@ -16,12 +16,17 @@ test('permanent choices reject locked, unknown, duplicate and fourth styles; onl
  assert.equal(chooseGenre(g,'boombap',100).ok,false);assert.equal(chooseGenre(g,'drill',100).ok,false);
  assert.equal(chooseSpecialization(g,'drill',100).ok,false);assert.equal(chooseSpecialization(g,'boombap',99.99).ok,false);
  g=chooseSpecialization(g,'boombap',100).value;assert.equal(chooseSpecialization(g,'experimental',100).ok,false);
- g=addGenrePractice(addGenrePractice(g,'boombap',120),'experimental',120);assert.equal(g.xp.boombap,100);assert.equal(g.xp.experimental,75);assert.equal(genreCap(g,'boombap'),100);
+ g=addGenrePractice(addGenrePractice(g,'boombap',120),'experimental',120);assert.equal(g.xp.boombap,100);assert.equal(g.xp.experimental,100);assert.equal(genreCap(g,'boombap'),100);
  assert.equal(addGenrePractice(g,'drill',10).xp.drill,0);
 });
-test('malformed normalization enforces selected unique IDs and only primary reaches100',()=>{
+test('malformed normalization enforces selected unique IDs and caps open genres at100',()=>{
  const g=normalizeGenreProgression({version:1,chosen:['bad','boombap','boombap','trap','lofi','drill'],primary:'drill',xp:{boombap:101,experimental:90,drill:100}});
- assert.deepEqual(g.chosen,['boombap','trap','lofi']);assert.equal(g.primary,null);assert.equal(g.xp.boombap,75);assert.equal(g.xp.experimental,75);assert.equal(g.xp.drill,0);
+ assert.deepEqual(g.chosen,['boombap','trap','lofi']);assert.equal(g.primary,null);assert.equal(g.xp.boombap,100);assert.equal(g.xp.experimental,90);assert.equal(g.xp.drill,0);
+});
+test('old chosen genres survive cap removal',()=>{
+ const old={version:1,chosen:['boombap','trap','lofi'],primary:'trap',xp:{experimental:75,boombap:75,trap:100,lofi:42}};
+ const g=normalizeGenreProgression(old);assert.deepEqual(g.chosen,old.chosen);assert.equal(g.primary,'trap');for(const [id,xp] of Object.entries(old.xp))assert.equal(g.xp[id],xp);assert.equal(chooseGenre(g,'abstract',100).ok,false);
+ for(const id of ['experimental','boombap','trap','lofi'])assert.equal(addGenrePractice(g,id,120).xp[id],100);
 });
 test('new projects default experimental, validate style access and preserve snapshots',()=>{
  let s=fresh();assert.equal(createBeat(s,{id:'locked',name:'No',genre:'boombap'},{beatmaking:100}).ok,false);
@@ -34,13 +39,13 @@ test('new projects default experimental, validate style access and preserve snap
 });
 test('partial work credits general and only current genre once across resume',()=>{
  let s=createBeat(fresh(),{id:'b',name:'B'}).state;s=startBeatStage(s,'b',[5,5,5]).state;
- s=advanceBeatWork(s,s.music.job.total/2).state;assert.ok(Math.abs(s.music.genres.xp.experimental-1/6)<1e-10);
+ s=advanceBeatWork(s,s.music.job.total/2).state;assert.ok(Math.abs(s.music.genres.xp.experimental-1)<1e-10);
  s=createVirtualPcState(JSON.parse(JSON.stringify(s)));s=startBeatStage(s,'b',[0,0,0]).state;
- s=advanceBeatWork(s,600).state;assert.ok(Math.abs(s.music.genres.xp.experimental-1/3)<1e-10);assert.ok(Math.abs(s.music.practice-1/3)<1e-10);
+ s=advanceBeatWork(s,600).state;assert.ok(Math.abs(s.music.genres.xp.experimental-2)<1e-10);assert.ok(Math.abs(s.music.practice-1)<1e-10);
  assert.equal(s.music.genres.xp.boombap,0);assert.deepEqual(advanceBeatWork(s,600).state,s);
 });
 test('legacy partial job receives genre credit only for remaining work; archive audio unchanged',()=>{
- let s=createBeat(fresh(),{id:'b',name:'B'}).state;s.projects[0].genre='practice';delete s.projects[0].genreProfile;
+ let s=createBeat(fresh(),{id:'b',name:'B'}).state;delete s.projects[0].practicePolicy;s.projects[0].genre='practice';delete s.projects[0].genreProfile;
  s=startBeatStage(s,'b',[5,5,5]).state;s=advanceBeatWork(s,s.music.job.total/2).state;
  delete s.music.genres;delete s.music.job.genreCredit;delete s.music.job.genreProfile;
  const archived=structuredClone(s.projects);s=createVirtualPcState(s);assert.equal(s.music.genres.xp.experimental,0);

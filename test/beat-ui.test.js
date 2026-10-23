@@ -54,7 +54,8 @@ test('ready and unfinished retired projects display an unavailable source withou
 test('finished beat keeps base quality hidden and presents a subjective impression',()=>{
  const s=setup();let state=createBeat(s.pc.state,{id:'done',name:'Готовый'},{}).state;
  for(let i=0;i<3;i++){state=restoreMusicNeeds(restoreMusicNeeds(state,'meal'),'sleep',360);state=startBeatStage(state,'done',[5,5,5],{}).state;state=advanceBeatWork(state,600).state;}
- s.pc.syncState(state);s.pc.openProject(state.projects[0]);s.launch();assert.equal(allPc(s.root).some(n=>/\d+ \/ 100/.test(n.textContent)),false);
+ s.pc.syncState(state);s.pc.openProject(state.projects[0]);s.launch();assert.equal(allPc(s.root).some(n=>n.dataset.ftRole!=='genre-summary'&&/\d+ \/ 100/.test(n.textContent)),false);
+ assert.ok(allPc(s.root).some(n=>n.dataset.ftRole==='genre-summary'&&/\d+ \/ 100/.test(n.textContent)));
  assert.ok(allPc(s.root).some(n=>n.textContent==='Впечатление героя'));
 });
 test('reset stops shop audio even when FT has not been opened',()=>{

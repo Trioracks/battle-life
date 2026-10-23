@@ -18,10 +18,13 @@ test('Iskra search leads to one news feature, then the first social shortcut',()
 test('battle group pins only its current announcement and puts authored wall before archive',()=>{
  const d=pcDocument(),root=d.createElement('main');let state=ensureBattleWindow(createVirtualPcState(),{battleId:'makarevich-1',nowMinute:600}).state;
  const browser=mountUnderweb(root,{getState:()=>state,getMetadata:()=>({gameDay:1,gameMinutes:601,playerName:'Герой'}),onChange:s=>{state=s;return true;}});browser.navigate('underweb://social/community/makarevich-1');
- const nodes=allPc(root),pinned=nodes.filter(n=>n.dataset?.pinnedAnnouncement==='true'),wall=nodes.find(n=>n.getAttribute('aria-label')==='Стена группы'),archive=nodes.find(n=>n.getAttribute('aria-label')==='Аудиоархив группы');
+ const nodes=allPc(root),pinned=nodes.filter(n=>n.dataset?.pinnedAnnouncement==='true'),wall=nodes.find(n=>n.getAttribute('aria-label')==='Стена группы'),archive=nodes.find(n=>n.getAttribute('aria-label')==='Аудиотека группы');
  assert.equal(pinned.length,1);assert.match(allPc(pinned[0]).map(n=>n.textContent??'').join(' '),/до/);assert.ok(wall);assert.ok(archive);assert.ok(nodes.indexOf(pinned[0])<nodes.indexOf(wall));assert.ok(nodes.indexOf(wall)<nodes.indexOf(archive));
- assert.ok(nodes.some(n=>n.tagName==='IMG'&&n.getAttribute('src')==='./assets/battle-covers/mak-cover-01.png'));assert.equal(findButton(root,'Изучить площадку'),undefined);
- const links=nodes.filter(n=>n.tagName==='A');assert.ok(links.some(n=>n.textContent==='Правила баттла'));assert.ok(links.some(n=>n.textContent==='Таблица судейства'));assert.ok(findButton(root,'Мои группы'));browser.dispose();
+ assert.ok(nodes.some(n=>n.tagName==='IMG'&&new URL(n.getAttribute('src'),'http://fixture/').pathname.endsWith('/assets/battle-covers/mak-cover-01.png')));assert.equal(findButton(root,'Изучить площадку'),undefined);
+ const links=nodes.filter(n=>n.tagName==='A');assert.ok(links.some(n=>n.textContent==='Правила баттла'));
+ const information=nodes.find(n=>n.dataset?.communityPanel==='information'),tables=nodes.find(n=>n.dataset?.communityPanel==='tables');assert.equal(information.hidden,false);assert.equal(tables.hidden,true);
+ findButton(root,'Таблицы раунда').click();assert.equal(information.hidden,true);assert.equal(tables.hidden,false);assert.ok(allPc(tables).some(n=>n.tagName==='A'&&n.getAttribute('href')==='underweb://social/results/makarevich-1/selection'));
+ findButton(root,'Актуальная информация').click();assert.equal(information.hidden,false);assert.equal(tables.hidden,true);assert.ok(findButton(root,'Мои группы'));browser.dispose();
 });
 
 test('thumb votes show counts, describe their action and persist a switch',()=>{

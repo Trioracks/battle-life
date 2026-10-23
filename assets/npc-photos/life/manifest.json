@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "photos": [
+    {
+      "id": "mak-npc-01:school",
+      "characterId": "mak-npc-01",
+      "appearanceId": "portrait-v1:{\"hair\":\"buzz\",\"face\":\"square\",\"beard\":\"none\",\"mustache\":\"pencil\",\"top\":\"sweater\",\"bottom\":\"skinny\",\"footwear\":\"highcanvas\",\"topColor\":\"grey\",\"bottomColor\":\"yellow\",\"footwearColor\":\"beige\"}",
+      "path": "assets/npc-photos/life/mak-npc-01-school.jpg",
+      "sha256": "b91434efc0457cb1716a1833a3fe5ed7ca3b1f2af706d3982c3224dc3b04b8ba"
+    },
+    {
+      "id": "mak-npc-01:college",
+      "characterId": "mak-npc-01",
+      "appearanceId": "portrait-v1:{\"hair\":\"buzz\",\"face\":\"square\",\"beard\":\"none\",\"mustache\":\"pencil\",\"top\":\"sweater\",\"bottom\":\"skinny\",\"footwear\":\"highcanvas\",\"topColor\":\"grey\",\"bottomColor\":\"yellow\",\"footwearColor\":\"beige\"}",
+      "path": "assets/npc-photos/life/mak-npc-01-college.jpg",
+      "sha256": "558ece976722ee6415127694411bf901b5790a7677eeea144639ad446f4d184d"
+    },
+    {
+      "id": "mak-npc-01:army",
+      "characterId": "mak-npc-01",
+      "appearanceId": "portrait-v1:{\"hair\":\"buzz\",\"face\":\"square\",\"beard\":\"none\",\"mustache\":\"pencil\",\"top\":\"sweater\",\"bottom\":\"skinny\",\"footwear\":\"highcanvas\",\"topColor\":\"grey\",\"bottomColor\":\"yellow\",\"footwearColor\":\"beige\"}",
+      "path": "assets/npc-photos/life/mak-npc-01-army.jpg",
+      "sha256": "867158a4f4f3ff35e0fd2ed6f3b62f38ceb79f7f67861451fec230de2b80799b"
+    },
+    {
+      "id": "mak-npc-01:work",
+      "characterId": "mak-npc-01",
+      "appearanceId": "portrait-v1:{\"hair\":\"buzz\",\"face\":\"square\",\"beard\":\"none\",\"mustache\":\"pencil\",\"top\":\"sweater\",\"bottom\":\"skinny\",\"footwear\":\"highcanvas\",\"topColor\":\"grey\",\"bottomColor\":\"yellow\",\"footwearColor\":\"beige\"}",
+      "path": "assets/npc-photos/life/mak-npc-01-work.jpg",
+      "sha256": "1563549b1f403605ba5ba32c565f62304a12afec530c9f1e8fa8ae9433534fb1"
+    },
+    {
+      "id": "mak-npc-02:school",
+      "characterId": "mak-npc-02",
+      "appearanceId": "portrait-v1:{\"hair\":\"parted\",\"face\":\"square\",\"beard\":\"full\",\"mustache\":\"handlebar\",\"top\":\"sweater\",\"bottom\":\"skinny\",\"footwear\":\"sneakers\",\"topColor\":\"yellow\",\"bottomColor\":\"grey\",\"footwearColor\":\"olive\"}",
+      "path": "assets/npc-photos/life/mak-npc-02-school.jpg",
+      "sha256": "e1b246a822ed87a9ab50e726b26d571165b80911e9b9fa30bde47553a09c68dd"
+    },
+    {
+      "id": "mak-npc-02:university",
+      "characterId": "mak-npc-02",
+      "appearanceId": "portrait-v1:{\"hair\":\"parted\",\"face\":\"square\",\"beard\":\"full\",\"mustache\":\"handlebar\",\"top\":\"sweater\",\"bottom\":\"skinny\",\"footwear\":\"sneakers\",\"topColor\":\"yellow\",\"bottomColor\":\"grey\",\"footwearColor\":\"olive\"}",
+      "path": "assets/npc-photos/life/mak-npc-02-university.jpg",
+      "sha256": "b544f2682119c517301159839170032f71e6c38c000d573128d32871882f5c23"
+    },
+    {
+      "id": "mak-npc-02:rehearsal",
+      "characterId": "mak-npc-02",
+      "appearanceId": "portrait-v1:{\"hair\":\"parted\",\"face\":\"square\",\"beard\":\"full\",\"mustache\":\"handlebar\",\"top\":\"sweater\",\"bottom\":\"skinny\",\"footwear\":\"sneakers\",\"topColor\":\"yellow\",\"bottomColor\":\"grey\",\"footwearColor\":\"olive\"}",
+      "path": "assets/npc-photos/life/mak-npc-02-rehearsal.jpg",
+      "sha256": "b70fb289106cb6b86819cbd9a1d4d94dc538607ff8772f851785454ed44c4173"
+    },
+    {
+      "id": "mak-npc-02:workshop",
+      "characterId": "mak-npc-02",
+      "appearanceId": "portrait-v1:{\"hair\":\"parted\",\"face\":\"square\",\"beard\":\"full\",\"mustache\":\"handlebar\",\"top\":\"sweater\",\"bottom\":\"skinny\",\"footwear\":\"sneakers\",\"topColor\":\"yellow\",\"bottomColor\":\"grey\",\"footwearColor\":\"olive\"}",
+      "path": "assets/npc-photos/life/mak-npc-02-workshop.jpg",
+      "sha256": "b1ca3cf4771502c01f14447eb82fc6924a7d6a2281f7ebe00a7bef885a0aa2e5"
+    },
+    {
+      "id": "mak-npc-07:school",
+      "characterId": "mak-npc-07",
+      "appearanceId": "portrait-v1:{\"hair\":\"parted\",\"face\":\"square\",\"beard\":\"stubble\",\"mustache\":\"none\",\"top\":\"shirt\",\"bottom\":\"breeches\",\"footwear\":\"boots\",\"topColor\":\"grey\",\"bottomColor\":\"blue\",\"footwearColor\":\"green\"}",
+      "path": "assets/npc-photos/life/mak-npc-07-school.jpg",
+      "sha256": "b6f460910edf6b705806a33ee0738a18adf81e8bd058efb7332f1cb226def666"
+    },
+    {
+      "id": "mak-npc-07:college",
+      "characterId": "mak-npc-07",
+      "appearanceId": "portrait-v1:{\"hair\":\"parted\",\"face\":\"square\",\"beard\":\"stubble\",\"mustache\":\"none\",\"top\":\"shirt\",\"bottom\":\"breeches\",\"footwear\":\"boots\",\"topColor\":\"grey\",\"bottomColor\":\"blue\",\"footwearColor\":\"green\"}",
+      "path": "assets/npc-photos/life/mak-npc-07-college.jpg",
+      "sha256": "78331c408ae2db42d07b038019822a883f7623667534caa5301dd538efb9894e"
+    },
+    {
+      "id": "mak-npc-07:army",
+      "characterId": "mak-npc-07",
+      "appearanceId": "portrait-v1:{\"hair\":\"parted\",\"face\":\"square\",\"beard\":\"stubble\",\"mustache\":\"none\",\"top\":\"shirt\",\"bottom\":\"breeches\",\"footwear\":\"boots\",\"topColor\":\"grey\",\"bottomColor\":\"blue\",\"footwearColor\":\"green\"}",
+      "path": "assets/npc-photos/life/mak-npc-07-army.jpg",
+      "sha256": "867158a4f4f3ff35e0fd2ed6f3b62f38ceb79f7f67861451fec230de2b80799b"
+    },
+    {
+      "id": "mak-npc-07:work",
+      "characterId": "mak-npc-07",
+      "appearanceId": "portrait-v1:{\"hair\":\"parted\",\"face\":\"square\",\"beard\":\"stubble\",\"mustache\":\"none\",\"top\":\"shirt\",\"bottom\":\"breeches\",\"footwear\":\"boots\",\"topColor\":\"grey\",\"bottomColor\":\"blue\",\"footwearColor\":\"green\"}",
+      "path": "assets/npc-photos/life/mak-npc-07-work.jpg",
+      "sha256": "19858e2e3030d7d94ca0d7199c882c3d8267230b3a5979e3f3a13fb621d3a953"
+    },
+    {
+      "id": "mak-npc-08:school",
+      "characterId": "mak-npc-08",
+      "appearanceId": "portrait-v1:{\"hair\":\"crop\",\"face\":\"square\",\"beard\":\"short\",\"mustache\":\"horseshoe\",\"top\":\"tee\",\"bottom\":\"sports\",\"footwear\":\"sneakers\",\"topColor\":\"white\",\"bottomColor\":\"black\",\"footwearColor\":\"yellow\"}",
+      "path": "assets/npc-photos/life/mak-npc-08-school.jpg",
+      "sha256": "6096bef28446a028d08d769a5245d744c16bc6b95e23bb381a30a042541e3e29"
+    },
+    {
+      "id": "mak-npc-08:university",
+      "characterId": "mak-npc-08",
+      "appearanceId": "portrait-v1:{\"hair\":\"crop\",\"face\":\"square\",\"beard\":\"short\",\"mustache\":\"horseshoe\",\"top\":\"tee\",\"bottom\":\"sports\",\"footwear\":\"sneakers\",\"topColor\":\"white\",\"bottomColor\":\"black\",\"footwearColor\":\"yellow\"}",
+      "path": "assets/npc-photos/life/mak-npc-08-university.jpg",
+      "sha256": "e1407745b4476dad6d22df75266a25593f8b845141c696d897423511b2b13dec"
+    },
+    {
+      "id": "mak-npc-08:rehearsal",
+      "characterId": "mak-npc-08",
+      "appearanceId": "portrait-v1:{\"hair\":\"crop\",\"face\":\"square\",\"beard\":\"short\",\"mustache\":\"horseshoe\",\"top\":\"tee\",\"bottom\":\"sports\",\"footwear\":\"sneakers\",\"topColor\":\"white\",\"bottomColor\":\"black\",\"footwearColor\":\"yellow\"}",
+      "path": "assets/npc-photos/life/mak-npc-08-rehearsal.jpg",
+      "sha256": "b43d49abd47778d0b4603f704474d9a669b0cf49c5e2a0e7d02a5ed1a8b2c682"
+    },
+    {
+      "id": "mak-npc-08:workshop",
+      "characterId": "mak-npc-08",
+      "appearanceId": "portrait-v1:{\"hair\":\"crop\",\"face\":\"square\",\"beard\":\"short\",\"mustache\":\"horseshoe\",\"top\":\"tee\",\"bottom\":\"sports\",\"footwear\":\"sneakers\",\"topColor\":\"white\",\"bottomColor\":\"black\",\"footwearColor\":\"yellow\"}",
+      "path": "assets/npc-photos/life/mak-npc-08-workshop.jpg",
+      "sha256": "c7659b3a2877b65076069611345acab6ffb6d88f69c6d88e3babdfb01ab65bd2"
+    },
+    {
+      "id": "mak-npc-23:school",
+      "characterId": "mak-npc-23",
+      "appearanceId": "portrait-v1:{\"hair\":\"longshag\",\"face\":\"oval\",\"beard\":\"none\",\"mustache\":\"horseshoe\",\"top\":\"shirt\",\"bottom\":\"skinny\",\"footwear\":\"highcanvas\",\"topColor\":\"beige\",\"bottomColor\":\"red\",\"footwearColor\":\"brown\"}",
+      "path": "assets/npc-photos/life/mak-npc-23-school.jpg",
+      "sha256": "b8d91242e2a6b8752ce8546a9d7037e46ca95e122301a32b222aa756fba84f07"
+    },
+    {
+      "id": "mak-npc-23:college",
+      "characterId": "mak-npc-23",
+      "appearanceId": "portrait-v1:{\"hair\":\"longshag\",\"face\":\"oval\",\"beard\":\"none\",\"mustache\":\"horseshoe\",\"top\":\"shirt\",\"bottom\":\"skinny\",\"footwear\":\"highcanvas\",\"topColor\":\"beige\",\"bottomColor\":\"red\",\"footwearColor\":\"brown\"}",
+      "path": "assets/npc-photos/life/mak-npc-23-college.jpg",
+      "sha256": "b3be25c42a76d85ea4f3aa987476c9b6e830863b5a5b10cd7d4bf36b5cbc9913"
+    },
+    {
+      "id": "mak-npc-23:army",
+      "characterId": "mak-npc-23",
+      "appearanceId": "portrait-v1:{\"hair\":\"longshag\",\"face\":\"oval\",\"beard\":\"none\",\"mustache\":\"horseshoe\",\"top\":\"shirt\",\"bottom\":\"skinny\",\"footwear\":\"highcanvas\",\"topColor\":\"beige\",\"bottomColor\":\"red\",\"footwearColor\":\"brown\"}",
+      "path": "assets/npc-photos/life/mak-npc-23-army.jpg",
+      "sha256": "3f6327292d49f782c13b62cd0aca7de81665531f6819f4f3da4cfb3814448ce7"
+    },
+    {
+      "id": "mak-npc-23:work",
+      "characterId": "mak-npc-23",
+      "appearanceId": "portrait-v1:{\"hair\":\"longshag\",\"face\":\"oval\",\"beard\":\"none\",\"mustache\":\"horseshoe\",\"top\":\"shirt\",\"bottom\":\"skinny\",\"footwear\":\"highcanvas\",\"topColor\":\"beige\",\"bottomColor\":\"red\",\"footwearColor\":\"brown\"}",
+      "path": "assets/npc-photos/life/mak-npc-23-work.jpg",
+      "sha256": "3bf66414f68958f641b6603799ebf9ff77a651c849c4373427732e34cf27642a"
+    },
+    {
+      "id": "mak-npc-24:school",
+      "characterId": "mak-npc-24",
+      "appearanceId": "portrait-v1:{\"hair\":\"buzz\",\"face\":\"square\",\"beard\":\"full\",\"mustache\":\"classic\",\"top\":\"hoodie\",\"bottom\":\"jeans\",\"footwear\":\"boots\",\"topColor\":\"beige\",\"bottomColor\":\"black\",\"footwearColor\":\"grey\"}",
+      "path": "assets/npc-photos/life/mak-npc-24-school.jpg",
+      "sha256": "77c22469a525d883afbbb6026be258ba3fd49c552a20e121edb3a17514cf2ffe"
+    },
+    {
+      "id": "mak-npc-24:college",
+      "characterId": "mak-npc-24",
+      "appearanceId": "portrait-v1:{\"hair\":\"buzz\",\"face\":\"square\",\"beard\":\"full\",\"mustache\":\"classic\",\"top\":\"hoodie\",\"bottom\":\"jeans\",\"footwear\":\"boots\",\"topColor\":\"beige\",\"bottomColor\":\"black\",\"footwearColor\":\"grey\"}",
+      "path": "assets/npc-photos/life/mak-npc-24-college.jpg",
+      "sha256": "dc35d57e02798f5b49af6f96c111ee2fa29415108b7c5a01f3a3e27ccbee9cc0"
+    },
+    {
+      "id": "mak-npc-24:army",
+      "characterId": "mak-npc-24",
+      "appearanceId": "portrait-v1:{\"hair\":\"buzz\",\"face\":\"square\",\"beard\":\"full\",\"mustache\":\"classic\",\"top\":\"hoodie\",\"bottom\":\"jeans\",\"footwear\":\"boots\",\"topColor\":\"beige\",\"bottomColor\":\"black\",\"footwearColor\":\"grey\"}",
+      "path": "assets/npc-photos/life/mak-npc-24-army.jpg",
+      "sha256": "867158a4f4f3ff35e0fd2ed6f3b62f38ceb79f7f67861451fec230de2b80799b"
+    },
+    {
+      "id": "mak-npc-24:work",
+      "characterId": "mak-npc-24",
+      "appearanceId": "portrait-v1:{\"hair\":\"buzz\",\"face\":\"square\",\"beard\":\"full\",\"mustache\":\"classic\",\"top\":\"hoodie\",\"bottom\":\"jeans\",\"footwear\":\"boots\",\"topColor\":\"beige\",\"bottomColor\":\"black\",\"footwearColor\":\"grey\"}",
+      "path": "assets/npc-photos/life/mak-npc-24-work.jpg",
+      "sha256": "a9c7e16361048bfc1bd79dd8aa8a6c097a83e5387a5db9c6720eb081ea2b5393"
+    }
+  ]
+}

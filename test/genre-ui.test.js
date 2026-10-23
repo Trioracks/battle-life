@@ -19,7 +19,7 @@ test('novice sees fixed experimental and no locked selector; sliders appear at e
   byLabel(s.root,'Название бита').value='B';findButton(s.root,'Начать проект').click();
   assert.equal(s.state.projects[0].genre,'experimental');assert.equal(allPc(s.root).filter(n=>n.type==='range').length,skill<25?0:9);
   assert.ok(findButton(s.root,'Работать над битом'));
-  assert.ok(allPc(s.root).some(n=>n.dataset.ftRole==='genre-summary'&&n.textContent.includes('0.00 / 75')));s.studio.dispose();
+  assert.ok(allPc(s.root).some(n=>n.dataset.ftRole==='genre-summary'&&n.textContent.includes('0.00 / 100')));s.studio.dispose();
  }
 });
 test('genre permanent choice has cancel and explicit confirmation and becomes new-project option',()=>{
@@ -33,9 +33,16 @@ test('genre permanent choice has cancel and explicit confirmation and becomes ne
 });
 test('primary specialization is explicit and cannot be selected twice',()=>{
  const s=setup(100);findButton(s.root,'Закрыть').click();findButton(s.root,'Жанры').click();
- findButton(s.root,'Специализация: Экспериментальный').click();assert.ok(allPc(s.root).some(n=>n.textContent?.includes('до 100')));
+ findButton(s.root,'Специализация: Экспериментальный').click();assert.ok(allPc(s.root).some(n=>n.textContent?.includes('Все открытые жанры')));
  findButton(s.root,'Подтвердить выбор').click();assert.equal(s.state.music.genres.primary,'experimental');
  findButton(s.root,'Жанры').click();assert.equal(findButton(s.root,'Специализация: Экспериментальный'),undefined);s.studio.dispose();
+});
+test('abstract is first candidate and creates a project with zero genre XP',()=>{
+ const s=setup(25);findButton(s.root,'Закрыть').click();findButton(s.root,'Жанры').click();
+ assert.equal(allPc(s.root).filter(n=>n.tagName==='BUTTON'&&n.textContent.startsWith('Выбрать: '))[0]?.textContent,'Выбрать: Абстрактный хип-хоп');
+ findButton(s.root,'Выбрать: Абстрактный хип-хоп').click();findButton(s.root,'Подтвердить выбор').click();
+ findButton(s.root,'Новый проект').click();const select=byLabel(s.root,'Жанр проекта');select.value='abstract';fire(select,'change');byLabel(s.root,'Название бита').value='Abstract';findButton(s.root,'Начать проект').click();
+ assert.equal(s.state.projects[0].genre,'abstract');assert.equal(s.state.projects[0].genreProfile.xp,0);assert.ok(s.state.projects[0].audio.abstractRecipe);s.studio.dispose();
 });
 test('work HUD shows separate genre progress only during beat work',()=>{
  const panel=createBeatWorkPanel(pcDocument()),model={beat:{kind:'beat',genre:'experimental'},job:{stage:0,total:60,elapsed:30,skill:10,genreSkill:0},skill:10+1/6,genreProgress:{name:'Экспериментальный',xp:1/6,cap:75}};

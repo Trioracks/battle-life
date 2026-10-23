@@ -1,13 +1,21 @@
-import {SAVE_KEY,STAT_KEYS,normalizeAppearance} from './avatar-v3-profile.js?rev=45';
-import {createWardrobe} from './home-wardrobe.js?rev=45';
-import {VIRTUAL_PC_STORAGE_KEY,createVirtualPcState} from './virtual-pc-state.js?rev=45';
-import {decodePcSave,encodePcSave} from './pc-save-codec.js?rev=45';
-import {normalizeVoiceId} from './vocal-catalog.js?rev=45';
+import {SAVE_KEY,STAT_KEYS,normalizeAppearance,validateProfile} from './avatar-v3-profile.js?rev=57';
+import {createWardrobe} from './home-wardrobe.js?rev=57';
+import {VIRTUAL_PC_STORAGE_KEY,createVirtualPcState} from './virtual-pc-state.js?rev=57';
+import {decodePcSave,encodePcSave} from './pc-save-codec.js?rev=57';
+import {normalizeVoiceId} from './vocal-catalog.js?rev=57';
 
 export const NOVICE_JOURNAL_KEY='battle-life-novice-migration-v1';
 export const PROFILE_BACKUP_KEY=SAVE_KEY+'-before-novice-v1';
 export const PC_BACKUP_KEY=VIRTUAL_PC_STORAGE_KEY+'-before-novice-v1';
 const record=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+function preservedTargets(profile,pc,token){
+ if(!record(profile)||![3,4].includes(profile.version)||typeof profile.name!=='string'||!profile.name.trim()||!record(profile.skills)||!STAT_KEYS.every(key=>Object.hasOwn(profile.skills,key)&&Number.isFinite(profile.skills[key])&&profile.skills[key]>=(profile.skillSchema===2?0:10)&&profile.skills[key]<=(profile.version===3?50:100)))throw Error('Неверный формат героя');
+ if(pc!==null&&(!record(pc)||pc.version!==1))throw Error('Неверный формат ПК');
+ const voiceId=normalizeVoiceId(profile.voiceId),sourcePc=pc??createVirtualPcState();
+ if(pc&&normalizeVoiceId(pc.voiceId)!==voiceId)throw Error('Голос героя не совпадает с состоянием ПК');
+ const appearance=normalizeAppearance(profile.appearance);
+ return {profile:{...profile,voiceId,version:4,noviceSchema:1,noviceMigration:token,skills:{...profile.skills},appearance,wardrobe:profile.wardrobe??createWardrobe(appearance)},pc:{...sourcePc,voiceId,noviceSchema:1,noviceMigration:token}};
+}
 export function abandonNoviceMigration(storage){
  storage.setItem(NOVICE_JOURNAL_KEY,JSON.stringify({status:'superseded'}));
 }
@@ -28,6 +36,14 @@ export function migrateNoviceSave(storage){
    let profile;try{profile=profileRaw===null?null:JSON.parse(profileRaw);}catch{/* Valid prepared targets can repair corrupt source JSON. */}
    // A different confirmed hero always wins over an old recovery journal.
    if(profileRaw!==journal.sourceProfile&&profile?.noviceSchema===1&&profile.noviceMigration!==journal.token){abandonNoviceMigration(storage);return {ok:true};}
+   // Before zero-start support, prepared upgrades contained destructive reset
+   // targets. Recover earned values from the original sources, never those targets.
+   if(journal.kind===undefined){
+    const backup=storage.getItem(PC_BACKUP_KEY);
+    if(typeof journal.sourceProfile!=='string'||backup===null)throw Error('Нет исходных данных для восстановления карьеры');
+    const targets=preservedTargets(JSON.parse(journal.sourceProfile),decodePcSave(backup),journal.token);
+    journal={...journal,kind:'schema-upgrade',...targets};storage.setItem(NOVICE_JOURNAL_KEY,JSON.stringify(journal));
+   }else if(!['new-game','schema-upgrade'].includes(journal.kind))throw Error('Неизвестный вид перехода');
   }else{
    const profile=profileRaw===null?null:JSON.parse(profileRaw),pc=pcRaw===null?null:decodePcSave(pcRaw);
    if(profile!==null&&!record(profile)||pc!==null&&!record(pc))throw Error('Неверный формат сохранения');
@@ -35,16 +51,16 @@ export function migrateNoviceSave(storage){
    const voiceId=normalizeVoiceId(profile.voiceId);
    if(pc&&normalizeVoiceId(pc.voiceId)!==voiceId)throw Error('Голос героя не совпадает с состоянием ПК');
    if(profile.noviceSchema===1)return {ok:true};
-   if(profile.version!==3||typeof profile.name!=='string'||!profile.name.trim()||!record(profile.skills))throw Error('Неверный формат героя');
    const token=globalThis.crypto?.randomUUID?.()??'novice-'+Date.now()+'-'+Math.random();
-   const appearance=normalizeAppearance(profile.appearance),sourcePc=pc??createVirtualPcState();
-   const targetProfile={...profile,voiceId,version:4,noviceSchema:1,noviceMigration:token,skills:Object.fromEntries(STAT_KEYS.map(key=>[key,10])),appearance,wardrobe:createWardrobe(appearance)};
-   const targetPc={...sourcePc,voiceId,noviceSchema:1,noviceMigration:token,music:{...sourcePc.music,practice:0,genrePractice:Object.fromEntries(Object.keys(sourcePc.music?.genrePractice??{}).map(key=>[key,0]))}};
+   const targets=preservedTargets(profile,pc,token);
    // Both raw sources and the recoverable target exist before either overwrite.
    for(const [key,raw]of [[PROFILE_BACKUP_KEY,profileRaw],[PC_BACKUP_KEY,pcRaw]])if(storage.getItem(key)===null)storage.setItem(key,raw??'null');
-   journal={status:'prepared',token,sourceProfile:profileRaw,profile:targetProfile,pc:targetPc};storage.setItem(NOVICE_JOURNAL_KEY,JSON.stringify(journal));
+   journal={status:'prepared',kind:'schema-upgrade',token,sourceProfile:profileRaw,...targets};storage.setItem(NOVICE_JOURNAL_KEY,JSON.stringify(journal));
   }
   if(journal.status!=='prepared')return {ok:true};
+  // Recovery must enforce the same profile contract as ordinary save/load
+  // before either source can be replaced, regardless of the journal kind.
+  validateProfile(journal.profile);
   storage.setItem(SAVE_KEY,JSON.stringify(journal.profile));storage.setItem(VIRTUAL_PC_STORAGE_KEY,encodePcSave(journal.pc));
   if(journal.kind==='new-game')storage.setItem('battle-life-apartment-v3-time',JSON.stringify(journal.homeTime));
   storage.setItem(NOVICE_JOURNAL_KEY,JSON.stringify({status:'completed',token:journal.token}));return {ok:true};

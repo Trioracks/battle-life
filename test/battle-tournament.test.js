@@ -6,6 +6,7 @@ import {createVirtualPcState,applyToBattle} from '../src/virtual-pc-state.js';
 import {exportedSubmissionFixture,completeSubmissionUpload,completeSubmissionMessage} from './helpers/submission-fixtures.js';
 import {attachSubmissionTrack,sendSubmission} from '../src/social-submission.js';
 import {createSocialCommunityView} from '../src/social-community-view.js';
+import {subscribeCommunity} from '../src/social-state.js';
 import {pcDocument,findButton,allPc} from './helpers/virtual-pc-dom.js';
 const battleId='makarevich-1';
 function fresh(){let s=applyToBattle(createVirtualPcState(),battleId,'Игрок');s=ensureBattleWindow(s,{battleId,nowMinute:600}).state;return ensureTournament(s,{battleId,nowMinute:600,heroSkills:{writing:40,musicality:40,flow:40,beatmaking:40,sound:40}}).state;}
@@ -41,7 +42,8 @@ test('legacy published player grades survive adoption; damaged tournament is rec
  assert.equal(ensureTournament({...s,tournaments:bad},{battleId,nowMinute:600}).ok,false);
 });
 test('hero can upload/type/send a second round after reload; previous upload cannot cross a RoundKey',()=>{
- let s=ensureBattleWindow(exportedSubmissionFixture(),{battleId,nowMinute:600}).state;
+ const subscribed=subscribeCommunity(exportedSubmissionFixture(),battleId,true,{nowMinute:600});assert.equal(subscribed.ok,true,subscribed.reason);
+ let s=ensureBattleWindow(subscribed.state,{battleId,nowMinute:600}).state;
  s=completeSubmissionUpload(attachSubmissionTrack(s,{communityId:battleId,fileId:'submission-file',nowMinute:601}).state);s=completeSubmissionMessage(s);
  let sent=sendSubmission(s,{communityId:battleId,nowMinute:601});assert.equal(sent.ok,true,sent.reason);s=ensureTournament(sent.state,{battleId,nowMinute:601}).state;s=advanceTournament(s,10680).state;
  const gradesById=Object.fromEntries(Object.keys(tournament(s).rounds.selection.submissions).map(id=>[id,Array(5).fill(id==='player'?10:5)]));

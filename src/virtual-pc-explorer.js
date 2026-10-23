@@ -1,10 +1,10 @@
-import {PC_IDENTITY} from './pc-identity.js?rev=45';
-import {diskUsage} from './virtual-pc-state.js?rev=45';
-import {formatDiskGb,diskAmount} from './virtual-pc-disk-view.js?rev=45';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=45';
-import {SOFTWARE} from './pc-software-catalog.js?rev=45';
-import {AUDIO_EXPORT_KINDS} from './pc-audio-exports.js?rev=45';
-import {gameDateTimeLabel} from './home-calendar.js?rev=45';
+import {PC_IDENTITY} from './pc-identity.js?rev=57';
+import {diskUsage} from './virtual-pc-state.js?rev=57';
+import {formatDiskGb,diskAmount} from './virtual-pc-disk-view.js?rev=57';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=57';
+import {SOFTWARE} from './pc-software-catalog.js?rev=57';
+import {AUDIO_EXPORT_KINDS} from './pc-audio-exports.js?rev=57';
+import {gameDateTimeLabel} from './home-calendar.js?rev=57';
 export const EXPLORER_PATHS=Object.freeze({
   computer:{label:'Мой компьютер',address:'Мой компьютер',parent:null,iconId:'computer'},
   disk:{label:'Локальный диск (C:)',address:'C:\\',parent:'computer',iconId:'disk'},
@@ -70,6 +70,7 @@ export function explorerEntries(pcState,path) {
   const paths=explorerPaths(pcState),entries=Object.entries(paths).filter(([,p])=>p.parent===path).map(([id,p])=>({id,kind:id==='disk'?'disk':'folder',name:p.label,iconId:p.iconId,targetPath:id}));
   if(path==='projects')entries.push(...pcState.projects.map(p=>({id:'project:'+p.id,kind:'project',name:typeof p.name==='string'?p.name:p.id,iconId:'project',projectId:p.id,sizeMb:2})));
   for(const file of pcState.audioExports?.files??[])if(file.folderId===path)entries.push({id:'audio:'+file.id,kind:'audio',name:file.filename,iconId:'microphone',fileId:file.id,sizeMb:file.bytes/1000000,createdAtMinute:file.createdAtMinute,trackVersionId:file.trackVersionId});
+  for(const file of pcState.social?.goblin?.files??[])if(file.folderId===path&&file.createdAtMinute<=(pcState.socialRuntime?.lastMinute??pcState.lastGameMinute??0))entries.push({id:'mentor:'+file.id,kind:'artifact',name:file.filename,iconId:file.kind==='lyrics'?'notebook':'project',action:'mentor-file',fileId:file.id,sizeMb:(file.bytes??0)/1000000});
   const s=pcState.software;
   if(path==='downloads'&&s){
    for(const item of pcState.browserDownloads?.items??[])if(item.kind==='metadata'&&!s[SOFTWARE[item.appId].metadataKey])entries.push({id:item.appId+'-metadata',kind:'artifact',name:SOFTWARE[item.appId].torrent+'.part',iconId:'torent',sizeMb:Math.floor(12000*item.elapsedSeconds)/1000000});

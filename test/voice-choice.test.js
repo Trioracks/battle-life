@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
 import * as catalog from '../src/vocal-catalog.js';
 import {createProfile,loadProfile,saveProfile,SAVE_KEY} from '../src/avatar-v3-profile.js';
 import {createNewGameSession} from '../src/apartment-v3-new-game.js';
@@ -20,14 +21,15 @@ import {BeatAudio} from '../src/beat-audio.js';
 import {pcDocument} from './helpers/virtual-pc-dom.js';
 import {validateCreatorDraft} from '../src/apartment-v3-creator-session.js';
 
-const ids=['player-voice:original','npc-voice:kapa-20261018','npc-voice:gans-20261018','npc-voice:artem-20261018','npc-voice:jura-20261018'];
+const ids=['player-voice:original','npc-voice:kapa-20261018','npc-voice:gans-20261018','npc-voice:artem-20261018','npc-voice:jura-20261018','npc-voice:daniel-20261020'];
 const storage=()=>{const map=new Map();return {getItem:k=>map.get(k)??null,setItem:(k,v)=>map.set(k,v)};};
 
 // Break caught: selector loses choice/default/reset or invalid choice is reported as a name error.
-test('creator selector exposes five labelled choices, defaults and resets without fetching or playing audio',async()=>{
+test('six silent voice choices exclude the hero from new opponents',async t=>{
+ t.mock.method(globalThis,'fetch',()=>assert.fail('voice choice must not load audio'));
  const ui=await import('../src/character-voice-selector.js').catch(()=>({}));assert.equal(typeof ui.mountVoiceSelector,'function');
  const select=pcDocument().createElement('select'),view=ui.mountVoiceSelector(select);
- assert.deepEqual(select.children.map(n=>n.textContent),['Геннадий Зелёнкин','Глеб Курилков','Ганс Аристократов','Филипп Филов','Юрий Комбучев']);
+ assert.deepEqual(select.children.map(n=>n.textContent),['Геннадий Зелёнкин','Глеб Курилков','Ганс Аристократов','Филипп Филов','Юрий Комбучев','Даниил']);
  assert.equal(view.value,ids[0]);for(const voiceId of ids){select.value=voiceId;assert.equal(view.value,voiceId);}
  view.reset();assert.equal(view.value,ids[0]);assert.ok(validateCreatorDraft({name:'Герой',voiceId:'corrupt'}).errors.voiceId);
 });
@@ -92,8 +94,8 @@ function finish(s,kind='draft',beatId='b'){
 }
 
 // Break caught: choice lost at profile/PC migration or silently repaired invalid identity.
-test('five character identities persist through creator, new game, profile edits and save codec; cancel preserves save',()=>{
- assert.deepEqual(catalog.VOICE_PACKS?.map(p=>p.label),['Геннадий Зелёнкин','Глеб Курилков','Ганс Аристократов','Филипп Филов','Юрий Комбучев']);
+test('six character identities persist through creator, new game, profile edits and save codec; cancel preserves save',()=>{
+ assert.deepEqual(catalog.VOICE_PACKS?.map(p=>p.label),['Геннадий Зелёнкин','Глеб Курилков','Ганс Аристократов','Филипп Филов','Юрий Комбучев','Даниил']);
  for(const voiceId of ids){
   const saved=storage();let home;
   const result=createNewGameSession(null,saved,{enter:(p,h)=>home=h,restore(){}}).submit({name:'Герой',voiceId});
@@ -132,7 +134,7 @@ test('each chosen pack records, plays and exports its take with gain metadata an
 });
 
 // Break caught: Flow gates speaker identity or player pack leaks into a new NPC assignment.
-test('all other four NPC packs are reachable for each player choice without Flow gates and stay assigned',()=>{
+test('all other five NPC packs are reachable for each player choice without Flow gates and stay assigned',()=>{
  for(const playerVoiceId of ids)for(const flow of [0,100]){
   const seen=new Set();for(let seed=0;seed<120;seed++){
    const r=selectNpcVocal({},{characterId:'npc',seed,flow,playerVoiceId});assert.equal(r.ok,true);assert.ok(r.asset);assert.notEqual(r.asset.voiceId,playerVoiceId);seen.add(r.asset.voiceId);
@@ -155,7 +157,7 @@ test('all player and NPC bags exhaust without repeats and corruption blocks repl
    s=advanceVocalWork(r.state,1000).state;heard.push(candidate);s=createVirtualPcState(JSON.parse(JSON.stringify(s)));s.music.needs={satiety:100,energy:100};
   }
   assert.equal(new Set(heard.slice(0,-1)).size,pack.parts.length);if(pack.parts.length>1)assert.notEqual(heard.at(-1),heard.at(-2));
-  if(voiceId===ids[1])assert.deepEqual(heard,['npc-kapa-49','npc-kapa-49']);
+  if(voiceId===ids[1])assert.ok(heard.every(id=>id.startsWith('npc-kapa-v2-')));
   const broken=structuredClone(s);broken.playerVocalBag={blocked:true};assert.equal(startVocalWork(broken,{beatId:'missing',textId:'t'}).ok,false);
   let state={},npc=[];const playerVoiceId=ids.find(id=>id!==voiceId);
   for(let seed=0;seed<120;seed++){const r=selectNpcVocal({},{characterId:'npc',seed,playerVoiceId});if(r.asset.voiceId===voiceId){state=r.state;npc.push(r.asset.id);break;}}

@@ -1,16 +1,18 @@
-import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=45';
-import {beginnerById} from './beat-beginner-bank.js?rev=45';
-import {normalizeBeatMix} from './beat-mix.js?rev=45';
-import {normalizeRecording,vocalPlaybackProfile} from './vocal-result.js?rev=45';
-import {createBeatSongForm,songPartWindows,normalizeSongForm} from './beat-song-form.js?rev=45';
-import {normalizeGenreSnapshot} from './genre-progression.js?rev=45';
-import {SOURCE_GAINS_DB} from './source-levels.js?rev=45';
-import {vocalById} from './vocal-catalog.js?rev=45';
+import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=57';
+import {beginnerById} from './beat-beginner-bank.js?rev=57';
+import {normalizeBeatMix} from './beat-mix.js?rev=57';
+import {normalizeRecording,vocalPlaybackProfile} from './vocal-result.js?rev=57';
+import {createBeatSongForm,songPartWindows,normalizeSongForm} from './beat-song-form.js?rev=57';
+import {normalizeGenreSnapshot} from './genre-progression.js?rev=57';
+import {SOURCE_GAINS_DB} from './source-levels.js?rev=57';
+import {vocalById} from './vocal-catalog.js?rev=57';
+import {validBeatExecutionMix} from './beat-execution-snapshot.js?rev=57';
 
 // A project has one musical clock, even when a legacy drum loop is shorter.
 export function resolveBeatPlayback(beat,{workStage=null,recordingPreview=null}={}){
  const fail=reason=>({ok:false,reason});
  if(!beat||![2,3].includes(beat.version)||!Array.isArray(beat.stages))return fail('Этот проект пока нельзя прослушать.');
+ if(!validBeatExecutionMix(beat.mix))return fail('Повреждён снимок исполнения. Проект сохранён.');
  if(workStage!==null&&(!Number.isInteger(workStage)||workStage<0||workStage>2))return fail('Неизвестный этап работы.');
  const modern=beat.version===3;
  if(beat.songForm!==undefined&&!normalizeSongForm(beat.songForm,beat))return fail('Не найдена сохранённая форма трека. Проект сохранён.');

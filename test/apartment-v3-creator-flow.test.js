@@ -9,7 +9,7 @@ test('invalid name cannot save or enter; old allocation input no longer grants b
   const result=session.submit({...draft(),...change});assert.equal(result.ok,false);assert.ok(Object.keys(result.errors).length);
  }
  assert.equal(writes,0);assert.equal(entries,0);
- const result=session.submit({...draft(),allocations:{intelligence:999}});assert.equal(result.ok,true);assert.equal(result.profile.name,'Тест');assert.equal(result.profile.version,4);assert.equal(entries,1);assert.deepEqual(Object.values(result.profile.skills),[10,10,10,10,10,10,10,10,10]);
+ const result=session.submit({...draft(),allocations:{intelligence:999}});assert.equal(result.ok,true);assert.equal(result.profile.name,'Тест');assert.equal(result.profile.version,4);assert.equal(entries,1);assert.deepEqual(Object.values(result.profile.skills),Array(9).fill(0));
 });
 test('repeated confirmation enters once, with the chosen wardrobe',async()=>{
  const {createCreatorSession}=await import('../src/apartment-v3-creator-session.js?rev=28');let writes=0;const entries=[];
