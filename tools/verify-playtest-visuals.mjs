@@ -5,6 +5,7 @@ import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {validateQaOptions,responseViolation} from './verify-public-preview.mjs';
 import {startPreviewServer} from './serve-preview.mjs';
+import {verifyNoBankJudging} from './verify-playtest-no-bank.mjs';
 import {verifyCameraHandoffs} from './verify-playtest-camera.mjs';
 export async function verifyPlaytestVisuals(options={}){
  const qa=await validateQaOptions(options),server=await startPreviewServer({root:qa.root,port:0}),{chromium}=await import('playwright'),browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']}),context=await browser.newContext(),page=await context.newPage(),errors=[],violations=[];
@@ -34,8 +35,9 @@ export async function verifyPlaytestVisuals(options={}){
    const file='production-'+width+'.png';await page.screenshot({path:path.join(outputDir,file)});shots.push(file);
   }
   if(options.camera)await verifyCameraHandoffs(page,{artifactUrl,outputDir:path.join(outputDir,'camera')});
+  if(options.noBank)await verifyNoBankJudging(page,{artifactUrl,outputDir:path.join(outputDir,'no-bank')});
   assert.deepEqual(errors,[],'page errors');assert.deepEqual(violations,[],'network violations');
   const report={revision:qa.expectedRevision,shots,errors,violations};await fs.writeFile(path.join(outputDir,'visual-report.json'),JSON.stringify(report,null,2));return report;
  }finally{await context.close();await browser.close();await server.close();}
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){const args=process.argv.slice(2),options={};for(let i=0;i<args.length;i++){const key=args[i];if(key==='--camera')options.camera=true;else if(key==='--root')options.root=args[++i];else if(key==='--output-dir')options.outputDir=args[++i];else if(key==='--expected-revision')options.expectedRevision=args[++i];else throw Error('Unknown option '+key);}console.log(JSON.stringify(await verifyPlaytestVisuals(options)));}
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){const args=process.argv.slice(2),options={};for(let i=0;i<args.length;i++){const key=args[i];if(key==='--camera')options.camera=true;else if(key==='--no-bank')options.noBank=true;else if(key==='--root')options.root=args[++i];else if(key==='--output-dir')options.outputDir=args[++i];else if(key==='--expected-revision')options.expectedRevision=args[++i];else throw Error('Unknown option '+key);}console.log(JSON.stringify(await verifyPlaytestVisuals(options)));}
