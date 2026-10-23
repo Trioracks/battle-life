@@ -1,11 +1,11 @@
-import {normalizeVoiceId,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=57';
-import {normalizePlayerVocalBag,selectPlayerVocal} from './npc-vocal-catalog.js?rev=57';
-import {clampV,createVocalTake,normalizeRecording,recordingQuality,VOCAL_EQUIPMENT,effectiveSoundSkill} from './vocal-result.js?rev=57';
-import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=57';
-import {latestReadyLyric} from './lyric-production.js?rev=57';
-import {BEAT_RULES as R,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=57';
-import {vocalOutcomes} from './production-outcomes.js?rev=57';
-import {chooseSongForm} from './beat-song-form.js?rev=57';
+import {normalizeVoiceId,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=58';
+import {normalizePlayerVocalBag,selectPlayerVocal} from './npc-vocal-catalog.js?rev=58';
+import {clampV,createVocalTake,normalizeRecording,recordingQuality,VOCAL_EQUIPMENT,effectiveSoundSkill} from './vocal-result.js?rev=58';
+import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=58';
+import {latestReadyLyric} from './lyric-production.js?rev=58';
+import {BEAT_RULES as R,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=58';
+import {vocalOutcomes} from './production-outcomes.js?rev=58';
+import {chooseSongForm} from './beat-song-form.js?rev=58';
 export {recordingQuality};
 export const VOCAL_STAGES=Object.freeze({draft:{name:'Черновая запись',minutes:60,skill:'flow'},clean:{name:'Чистовая запись',minutes:60,skill:'flow'},mix:{name:'Сведение',minutes:45,skill:'sound'},master:{name:'Мастеринг',minutes:30,skill:'sound'}});
 export function canVocalStage(recording,kind){

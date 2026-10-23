@@ -1,4 +1,4 @@
-import {APPEARANCE_OPTIONS,DEFAULT_APPEARANCE,CLOTHING_COLORS,normalizeAppearance} from './avatar-v3-profile.js?rev=57';
+import {APPEARANCE_OPTIONS,DEFAULT_APPEARANCE,CLOTHING_COLORS,normalizeAppearance} from './avatar-v3-profile.js?rev=58';
 
 const categories=['face','hair','beard','mustache','top','bottom','footwear'];
 const sections={appearance:['face','hair','beard','mustache'],clothing:['top','bottom','footwear']};

@@ -1,5 +1,5 @@
 // Saved skill controls whether effects are intentional. Quality controls mistakes.
-import {normalizeGenreSnapshot} from './genre-progression.js?rev=57';
+import {normalizeGenreSnapshot} from './genre-progression.js?rev=58';
 export function creativeProfileAmount(value,legacySkill,postGain=0){
  const profile=normalizeGenreSnapshot(value);
  if(!profile)return creativeEffectAmount(legacySkill);

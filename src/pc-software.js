@@ -1,4 +1,4 @@
-import {SOFTWARE,METADATA_BYTES,DISK_BYTES,SYSTEM_BYTES} from './pc-software-catalog.js?rev=57';
+import {SOFTWARE,METADATA_BYTES,DISK_BYTES,SYSTEM_BYTES} from './pc-software-catalog.js?rev=58';
 const bytes=(n,max)=>Number.isFinite(n)?Math.max(0,Math.min(max,n)):0;
 export function normalizeInstallPath(value){
  if(typeof value!=='string')return null;

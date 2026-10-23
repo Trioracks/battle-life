@@ -1,6 +1,6 @@
-import {BEGINNER_RECIPES} from './beat-beginner-bank.js?rev=57';
-import {SOURCE_GAINS_DB} from './source-levels.js?rev=57';
-import {songPartWindows} from './beat-song-form.js?rev=57';
+import {BEGINNER_RECIPES} from './beat-beginner-bank.js?rev=58';
+import {SOURCE_GAINS_DB} from './source-levels.js?rev=58';
+import {songPartWindows} from './beat-song-form.js?rev=58';
 
 // Fictional archive instrumentals, authored from the cleared in-game bank.
 // Each author has a different melody family and a compatible three-layer trio.

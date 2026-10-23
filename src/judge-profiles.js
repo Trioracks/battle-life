@@ -1,6 +1,6 @@
 import data from '../data/judges/profiles.json' with { type:'json' };
 import contentPolicy from '../data/judges/content-policy-v2.json' with { type:'json' };
-import {judgeReferenceKnowledge} from './cultural-references.js?rev=57';
+import {judgeReferenceKnowledge} from './cultural-references.js?rev=58';
 
 function freeze(value) {
   if (value && typeof value === 'object') {

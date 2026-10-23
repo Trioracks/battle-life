@@ -1,5 +1,5 @@
-import {BEGINNER_BANK,USER_DRUM_BANK,beginnerById} from './beat-beginner-bank.js?rev=57';
-import {SOURCE_GAINS_DB} from './source-levels.js?rev=57';
+import {BEGINNER_BANK,USER_DRUM_BANK,beginnerById} from './beat-beginner-bank.js?rev=58';
+import {SOURCE_GAINS_DB} from './source-levels.js?rev=58';
 const BAR_SECONDS=8/3;
 const kinds=['drums','theme','arrangement'];
 const sourceIds=beat=>[beat.drumId,beat.audio?.themeId,beat.audio?.arrangementId];

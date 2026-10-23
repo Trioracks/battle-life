@@ -133,3 +133,7 @@
 .sn-network .sn-photo-close{background:var(--sn-orange);color:#171a13;border:0}.sn-network .sn-photo-user-comment{background:transparent}
 @media(max-width:1100px){.sn-network .sn-layout{grid-template-columns:190px minmax(0,1fr)}.sn-network .sn-nav-link{padding-left:14px;font-size:15px!important}.sn-network .sn-profile{grid-template-columns:170px minmax(0,1fr)}.sn-network .sn-avatar-large{height:195px}.sn-network .sn-fields{grid-template-columns:125px 1fr}.sn-network .sn-top{padding-left:18px}}
 @media(max-width:760px){.sn-network .sn-layout{grid-template-columns:135px minmax(0,1fr);gap:8px}.sn-network .sn-nav-link{font-size:12px!important;padding:8px}.sn-network .sn-profile{display:block}.sn-network .sn-profile-aside{width:145px;float:left;margin:0 12px 10px 0}.sn-network .sn-brand{font-size:25px}.sn-network .sn-top .sn-brandmark{width:38px;height:38px;font-size:28px}.sn-network .sn-top>span{display:none}.sn-network .sn-photo-strip{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}}
+#virtual-pc .uw-browser .sn-network .sn-photo-strip{grid-template-columns:repeat(3,minmax(0,220px));justify-content:start}
+#virtual-pc .uw-browser .sn-network .sn-photo-strip .sn-photo{max-width:none}
+#virtual-pc .uw-browser .sn-network .sn-profile-description,#virtual-pc .uw-browser .sn-network .sn-post>p{font-size:16px;line-height:1.5;color:#deddd3}
+#virtual-pc .uw-browser .sn-network .sn-comment-content p{font-size:15px;line-height:1.5}

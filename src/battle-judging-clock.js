@@ -1,12 +1,12 @@
-import {beatResultSeed} from './beat-result.js?rev=57';
-import {battleRandom} from './battle-seeding.js?rev=57';
-import {validGameMinute} from './game-minute.js?rev=57';
-import {ensureTournament,advanceTournament,completeTournamentRound} from './battle-tournament.js?rev=57';
-import {judgeProfile} from './judge-profiles.js?rev=57';
-import {battleFormat} from './battle-format.js?rev=57';
-import {generateJudgeReview} from './judge-comments.js?rev=57';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=57';
-import {selectRoundLtr} from './battle-round-awards.js?rev=57';
+import {beatResultSeed} from './beat-result.js?rev=58';
+import {battleRandom} from './battle-seeding.js?rev=58';
+import {validGameMinute} from './game-minute.js?rev=58';
+import {ensureTournament,advanceTournament,completeTournamentRound} from './battle-tournament.js?rev=58';
+import {judgeProfile} from './judge-profiles.js?rev=58';
+import {battleFormat} from './battle-format.js?rev=58';
+import {generateJudgeReview} from './judge-comments.js?rev=58';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=58';
+import {selectRoundLtr} from './battle-round-awards.js?rev=58';
 const clone=v=>structuredClone(v),battleId='makarevich-1',order=(a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id);
 export function advanceJudgeClock(raw,{deadline,judgeIds,seed,nowMinute,roll,publishedAtByJudge={},notBefore=0}={}){
  const clock=raw?clone(raw):{policyVersion:2,checkedHour:6,completed:{}},ready=[];

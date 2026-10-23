@@ -1,12 +1,12 @@
 // Shared real-time work integration for the apartment camera.
-import {advanceBeatWork,effectiveBeatSkill} from './beat-production.js?rev=57';
-import {advanceLyricWork,effectiveWritingSkill} from './lyric-production.js?rev=57';
-import {BEAT_RULES} from './beat-catalog.js?rev=57';
-import {advanceVocalWork,effectiveVocalSkill} from './vocal-production.js?rev=57';
-import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=57';
-import {advanceStudy} from './rap-analysis.js?rev=57';
-import {advanceCaseStudy,STUDY_MINUTES_PER_SECOND} from './rap-research.js?rev=57';
-import {gameMinuteStamp} from './game-minute.js?rev=57';
+import {advanceBeatWork,effectiveBeatSkill} from './beat-production.js?rev=58';
+import {advanceLyricWork,effectiveWritingSkill} from './lyric-production.js?rev=58';
+import {BEAT_RULES} from './beat-catalog.js?rev=58';
+import {advanceVocalWork,effectiveVocalSkill} from './vocal-production.js?rev=58';
+import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=58';
+import {advanceStudy} from './rap-analysis.js?rev=58';
+import {advanceCaseStudy,STUDY_MINUTES_PER_SECOND} from './rap-research.js?rev=58';
+import {gameMinuteStamp} from './game-minute.js?rev=58';
 export function creativeWorkDescriptor(state,skills={}){
  if(state.rapResearch?.job?.status==='active'){const job=state.rapResearch.job;return {researching:true,studying:true,writing:false,recording:false,job,project:{id:job.id,kind:'study',name:{battle:'Изучение баттла',round:'Изучение раунда',judge:'Изучение судьи',opponent:'Изучение соперника'}[job.kind]},performance:'typing',chainProgress:null,skill:job.heroSnapshot.intelligence};}
  if(state.rapAnalysis?.job?.status==='active'){const job=state.rapAnalysis.job;return {studying:true,writing:false,recording:false,job,project:{id:job.id,kind:'study',name:job.trackName},performance:'typing',chainProgress:null,skill:job.heroSnapshot.intelligence};}

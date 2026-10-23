@@ -35,5 +35,5 @@ test('pending render cannot replace a newer appearance or discard concurrent gam
 test('a clothing geometry revision refreshes an old valid portrait exactly once',async()=>{
  const oldKey='portrait-v1:'+JSON.stringify(DEFAULT_APPEARANCE);let state={social:{playerPortrait:{key:oldKey,url:jpeg()}}},renders=0;
  const controller=portraits.createPlayerPortraitController({getState:()=>state,getAppearance:()=>DEFAULT_APPEARANCE,render:async()=>{renders++;return {url:jpeg()};},save:next=>{state=next;return true;}});
- assert.equal((await controller.request()).ok,true);assert.notEqual(state.social.playerPortrait.key,oldKey);assert.equal(state.social.playerPortrait.key,portraits.portraitKey(DEFAULT_APPEARANCE));await controller.request();assert.equal(renders,1);
+ assert.equal((await controller.request()).ok,true);assert.notEqual(state.social.playerPortrait.key,oldKey);assert.equal(state.social.playerPortrait.key,portraits.generatedPortraitKey(DEFAULT_APPEARANCE));await controller.request();assert.equal(renders,1);
 });

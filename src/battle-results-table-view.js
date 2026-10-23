@@ -1,7 +1,7 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=57';
-import {socialButton,socialHeading} from './social-dom.js?rev=57';
-import {gameDateTimeLabel} from './home-calendar.js?rev=57';
-import {requestResultReaction} from './social-result-reaction.js?rev=57';
+import {pcElement as el} from './virtual-pc-dom.js?rev=58';
+import {socialButton,socialHeading} from './social-dom.js?rev=58';
+import {gameDateTimeLabel} from './home-calendar.js?rev=58';
+import {requestResultReaction} from './social-result-reaction.js?rev=58';
 let commentSequence=0;
 const statuses={processing:'Обрабатываем сдачу',accepting:'Приём работ',judging:'Ожидает итога',no_show:'Не сдал',bye:'Проход пустой ветки',empty:'Пустое место',hidden:'░░░░',qualified:'Прошёл',eliminated:'Выбыл',won:'Победа',technical_win:'Технический проход'};
 export function createBattleResultsTableView(d,{table,navigate,onAnalyze,audio,getState,commit,onResultViewed=()=>{},uiState={},isVisible=()=>true}={}){

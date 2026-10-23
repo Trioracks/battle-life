@@ -1,5 +1,5 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=57';
-import {socialButton} from './social-dom.js?rev=57';
+import {pcElement as el} from './virtual-pc-dom.js?rev=58';
+import {socialButton} from './social-dom.js?rev=58';
 export function mountReplyPanel(root,{getContext,onChoose=()=>{},onAttach=()=>{},onSend=()=>{}}={}){
  const d=root.ownerDocument,panel=el(d,'section',{className:'sn-dialog-options sn-reply-panel',attributes:{'aria-label':'Выбор ответа'}}),hint=el(d,'p',{className:'sn-reply-hint',attributes:{role:'status'}}),list=el(d,'div',{className:'sn-reply-choices'});let signature='',disposed=false,selected=null;
  panel.append(el(d,'strong',{text:'Выберите ответ'}),hint,list);panel.hidden=true;root.append(panel);

@@ -1,14 +1,14 @@
-import {PC_IDENTITY} from './pc-identity.js?rev=57';
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=57';
-import {createPcIcon} from './virtual-pc-icons.js?rev=57';
-import {createExplorerState,reconcileExplorerState,navigateExplorer,explorerEntries,explorerProperties,explorerPaths} from './virtual-pc-explorer.js?rev=57';
-import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=57';
-import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=57';
-import {normalizeStudioProject} from './ft-studio-project.js?rev=57';
-import {normalizeBeat} from './beat-production.js?rev=57';
-import {normalizeLyric} from './lyric-production.js?rev=57';
-import {mountAudioFilePlayer} from './pc-audio-export-view.js?rev=57';
-import {pcFileById,createPcFolder} from './pc-filesystem.js?rev=57';
+import {PC_IDENTITY} from './pc-identity.js?rev=58';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=58';
+import {createPcIcon} from './virtual-pc-icons.js?rev=58';
+import {createExplorerState,reconcileExplorerState,navigateExplorer,explorerEntries,explorerProperties,explorerPaths} from './virtual-pc-explorer.js?rev=58';
+import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=58';
+import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=58';
+import {normalizeStudioProject} from './ft-studio-project.js?rev=58';
+import {normalizeBeat} from './beat-production.js?rev=58';
+import {normalizeLyric} from './lyric-production.js?rev=58';
+import {mountAudioFilePlayer} from './pc-audio-export-view.js?rev=58';
+import {pcFileById,createPcFolder} from './pc-filesystem.js?rev=58';
 
 export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenProject,onProperties,onClose,onMenu,onNavigate,onChange,audio}) {
   const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',diskLabel=null,disposed=false;

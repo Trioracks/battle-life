@@ -1,9 +1,9 @@
-import {publicRoundTable} from './battle-results-table.js?rev=57';
-import {publicCharacterProfile} from './npc-social-profiles.js?rev=57';
-import {publicAnnouncedJudges,publicCommunityPosts} from './social-community-publications.js?rev=57';
-import {SOCIAL_COMMUNITIES} from './social-catalog.js?rev=57';
-import {publishedStudyReviews} from './rap-analysis.js?rev=57';
-import {validGameMinute} from './game-minute.js?rev=57';
+import {publicRoundTable} from './battle-results-table.js?rev=58';
+import {publicCharacterProfile} from './npc-social-profiles.js?rev=58';
+import {publicAnnouncedJudges,publicCommunityPosts} from './social-community-publications.js?rev=58';
+import {SOCIAL_COMMUNITIES} from './social-catalog.js?rev=58';
+import {publishedStudyReviews} from './rap-analysis.js?rev=58';
+import {validGameMinute} from './game-minute.js?rev=58';
 const sorted=values=>[...new Set(values)].sort();
 
 // Resolve public projections only at command/completion boundaries, never per frame.

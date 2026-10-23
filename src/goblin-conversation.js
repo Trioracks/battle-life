@@ -1,8 +1,8 @@
-import {GOBLIN_ID,GOBLIN_NAME,normalizeGoblin} from './goblin-catalog.js?rev=57';
-import {receivePhoneEvents} from './phone-notifications.js?rev=57';
-import {validGameMinute} from './game-minute.js?rev=57';
-import {battleStage,battleStageText} from './battle-stage.js?rev=57';
-import {SOFTWARE} from './pc-software-catalog.js?rev=57';
+import {GOBLIN_ID,GOBLIN_NAME,normalizeGoblin} from './goblin-catalog.js?rev=58';
+import {receivePhoneEvents} from './phone-notifications.js?rev=58';
+import {validGameMinute} from './game-minute.js?rev=58';
+import {battleStage,battleStageText} from './battle-stage.js?rev=58';
+import {SOFTWARE} from './pc-software-catalog.js?rev=58';
 const battleLink={label:'Макаревич Battle',url:'underweb://social/community/makarevich-1'};
 const hash=value=>{let h=2166136261;for(const c of String(value))h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0;};
 export function goblinReplyContext(state,nowMinute=state.socialRuntime?.lastMinute??state.lastGameMinute??0){

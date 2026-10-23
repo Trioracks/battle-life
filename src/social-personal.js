@@ -1,8 +1,8 @@
-import {normalizeSocial} from './social-state.js?rev=57';
-import {profileById,communityById} from './social-catalog.js?rev=57';
-import {receivePhoneEvents} from './phone-notifications.js?rev=57';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=57';
-import {validGameMinute} from './game-minute.js?rev=57';
+import {normalizeSocial} from './social-state.js?rev=58';
+import {profileById,communityById} from './social-catalog.js?rev=58';
+import {receivePhoneEvents} from './phone-notifications.js?rev=58';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=58';
+import {validGameMinute} from './game-minute.js?rev=58';
 const SCHEDULE=Object.freeze([
  {id:'personal:vitya:day1',dueAt:600,text:'Здорово, мужик. Есть деньги взаймы? Опять до зарплаты не дотянул.'},
  {id:'personal:vitya:day3',dueAt:3480,text:'Ты тут? Мужик, есть деньги взаймы? Хоть немного. Напиши, как увидишь.'},

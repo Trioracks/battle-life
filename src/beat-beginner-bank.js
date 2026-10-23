@@ -1,8 +1,8 @@
-import {USER_EXPERIMENTAL_BANK,USER_EXPERIMENTAL_RECIPES} from './beat-user-experimental-bank.js?rev=57';
-import {JURA_EXPERIMENTAL_BANK,JURA_EXPERIMENTAL_RECIPES} from './beat-jura-experimental-bank.js?rev=57';
-import {ABSTRACT_BANK,chooseAbstractRecipe} from './beat-abstract-bank.js?rev=57';
-import {EXPERIMENTAL_LEAD_BANK,EXPERIMENTAL_LEAD_RECIPES} from './beat-experimental-leads-bank.js?rev=57';
-export {USER_EXPERIMENTAL_BANK} from './beat-user-experimental-bank.js?rev=57';
+import {USER_EXPERIMENTAL_BANK,USER_EXPERIMENTAL_RECIPES} from './beat-user-experimental-bank.js?rev=58';
+import {JURA_EXPERIMENTAL_BANK,JURA_EXPERIMENTAL_RECIPES} from './beat-jura-experimental-bank.js?rev=58';
+import {ABSTRACT_BANK,chooseAbstractRecipe} from './beat-abstract-bank.js?rev=58';
+import {EXPERIMENTAL_LEAD_BANK,EXPERIMENTAL_LEAD_RECIPES} from './beat-experimental-leads-bank.js?rev=58';
+export {USER_EXPERIMENTAL_BANK} from './beat-user-experimental-bank.js?rev=58';
 const legacyBank = ['drums','theme','arrangement'].flatMap(kind =>
   Array.from({length:16}, (_,index) => {
     const number=String(index+1).padStart(2,'0');

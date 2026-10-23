@@ -243,13 +243,13 @@ export async function verifyPublicPreview(options={}){
    const currentRequests=[];context.on('request',request=>currentRequests.push(request.url()));
    await page.goto(cacheProbe.url,{timeout:60000});await page.locator('#loading').waitFor({state:'hidden'});await page.locator('#continue-game').click();await phase(page,'room');
    await page.waitForFunction(()=>document.body.dataset.mode==='game');
-   const until=Date.now()+30000;while(!currentRequests.some(url=>url.includes('social-worker.js?rev=57'))&&Date.now()<until)await page.waitForTimeout(100);
+   const until=Date.now()+30000;while(!currentRequests.some(url=>url.includes('social-worker.js?rev=58'))&&Date.now()<until)await page.waitForTimeout(100);
    const resources=currentRequests.filter(url=>/\.(?:js|css)(?:\?|$)/.test(url)&&!url.includes('/vendor/'));
-   assert.ok(resources.some(url=>url.includes('apartment-app.js?rev=57')));assert.ok(resources.some(url=>url.includes('.css?rev=57')));assert.ok(resources.some(url=>url.includes('social-worker.js?rev=57')));assert.ok(resources.every(url=>new URL(url).searchParams.get('rev')==='57'));
+   assert.ok(resources.some(url=>url.includes('apartment-app.js?rev=58')));assert.ok(resources.some(url=>url.includes('.css?rev=58')));assert.ok(resources.some(url=>url.includes('social-worker.js?rev=58')));assert.ok(resources.every(url=>new URL(url).searchParams.get('rev')==='58'));
    assert.equal(await page.evaluate(()=>typeof window.__cacheProbe),'undefined');assert.equal(await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--preview-cache-probe').trim()),'');
    await screenshot(page,'stale-http-cache-to-current-1280');
    report.cacheEvidence={syntheticPriorRevision:43,priorHits:{...cacheProbe.priorHits},cachedResponses:hits.map(({text,...hit})=>hit),currentResources:resources,scope:'Controlled synthetic old JS/CSS/Worker cached with immutable max-age, then unchanged current artifact on the same owned origin. Not an old gameplay migration test.'};
-   check('stale HTTP-cached JS/CSS/Worker cohort cannot replace canonical 57 entry',{cacheHits:3,syntheticPriorRevision:43});await close(context,page,'stale-http-cache');await cacheProbe.close();cacheProbe=null;
+   check('stale HTTP-cached JS/CSS/Worker cohort cannot replace canonical 58 entry',{cacheHits:3,syntheticPriorRevision:43});await close(context,page,'stale-http-cache');await cacheProbe.close();cacheProbe=null;
   }
   for(const viewport of report.viewports){
    const suffix=String(viewport.width);
@@ -284,7 +284,7 @@ export async function verifyPublicPreview(options={}){
    for(const kind of ['lyrics','beat']){
     const {context,page}=await fresh(viewport,publicPreviewFixture(kind));await enter(page);await app(page,kind==='lyrics'?'Рэпблокнот':'FT Studio');
     if(kind==='beat'){
-     await frame(page,'ft-studio').getByRole('dialog').getByRole('button',{name:'Открыть проект',exact:true}).click();await frame(page,'ft-studio').locator('[data-project-id="preview-beat"]').click();
+     await frame(page,'ft-studio').getByRole('dialog').getByRole('button',{name:'Открыть проект',exact:true}).click();await frame(page,'ft-studio').getByRole('button',{name:'Выбрать: Preview beat.flp',exact:true}).dblclick();
     }
     await frame(page,kind==='lyrics'?'rap-notebook':'ft-studio').getByRole('button',{name:kind==='lyrics'?'Начать писать':'Работать над битом',exact:true}).click();
     await phase(page,'working');await screenshot(page,kind+'-work-'+suffix);
@@ -296,14 +296,14 @@ export async function verifyPublicPreview(options={}){
    }
    {
     const {context,page}=await fresh(viewport,publicPreviewFixture('vocal'));await enter(page);await app(page,'FT Studio');
-    await frame(page,'ft-studio').getByRole('dialog').getByRole('button',{name:'Открыть проект',exact:true}).click();await frame(page,'ft-studio').locator('[data-project-id="beat"]').click();
+    await frame(page,'ft-studio').getByRole('dialog').getByRole('button',{name:'Открыть проект',exact:true}).click();await frame(page,'ft-studio').getByRole('button',{name:'Выбрать: Работа.flp',exact:true}).dblclick();
     await frame(page,'ft-studio').getByRole('button',{name:'Добавить вокал',exact:true}).click();await frame(page,'ft-studio').getByRole('dialog').locator('[data-project-id="lyrics"]').click();
     await phase(page,'working');assert.ok((await page.locator('.beat-work-audio').innerText()).includes(notice));await screenshot(page,'vocal-work-'+suffix);await phase(page,'desktop');assert.ok((await state(page)).projects.find(p=>p.id==='beat').recording.draft);
     await frame(page,'ft-studio').getByRole('button',{name:'Свести',exact:true}).click();await phase(page,'working');await phase(page,'desktop');assert.ok((await state(page)).projects.find(p=>p.id==='beat').recording.mix);
     await frame(page,'ft-studio').getByRole('button',{name:'Экспорт',exact:true}).click();
-    const exported=frame(page,'ft-studio').getByRole('dialog',{name:'Экспорт аудиофайла'});await exported.getByLabel('Вид аудиофайла',{exact:true}).selectOption('track');await exported.getByLabel('Имя аудиофайла',{exact:true}).fill('Preview.wav');await exported.getByRole('button',{name:'Сохранить аудиофайл',exact:true}).click();await exported.waitFor({state:'detached'});
+    const exported=frame(page,'ft-studio').getByRole('dialog',{name:'Экспорт аудиофайла'});await exported.getByLabel('Вид аудиофайла',{exact:true}).selectOption('track');await exported.getByRole('button',{name:'Экспортировать',exact:true}).click();const savePicker=frame(page,'ft-studio').getByRole('dialog',{name:'Сохранить как',exact:true});await savePicker.getByLabel('Имя файла',{exact:true}).fill('Preview.wav');await savePicker.getByRole('button',{name:'Сохранить',exact:true}).click();await waitState(page,saved=>saved.audioExports.files.some(f=>f.filename==='Preview.wav'));await exported.waitFor({state:'detached'});
     const before=await state(page),file=before.audioExports.files.find(file=>file.filename==='Preview.wav');assert.ok(file?.descriptor);const frozen=JSON.stringify(file),frozenVersion=JSON.stringify(before.trackVersions.byId[file.trackVersionId]);
-    await navigate(page,'underweb://social/community/makarevich-1');await page.getByRole('button',{name:'Подписаться',exact:true}).click();await screenshot(page,'social-group-'+suffix);await page.getByRole('button',{name:'Сдать трек',exact:true}).click();await page.getByRole('button',{name:'Прикрепить',exact:true}).click();await page.getByRole('button',{name:'Выбрать: Preview.wav',exact:true}).click();await page.getByRole('button',{name:'Прикрепить выбранный трек',exact:true}).click();
+    await navigate(page,'underweb://social/community/makarevich-1');await page.getByRole('button',{name:'Подписаться',exact:true}).click();await screenshot(page,'social-group-'+suffix);await page.getByRole('button',{name:'Сдать трек',exact:true}).click();await page.getByRole('button',{name:'Прикрепить',exact:true}).click();await page.getByRole('button',{name:'Выбрать: Preview.wav',exact:true}).click();await page.getByRole('dialog',{name:'Выбор файла',exact:true}).getByRole('button',{name:'Прикрепить',exact:true}).click();
     await waitState(page,saved=>saved.outgoingUpload?.status==='ready');await page.getByRole('button',{name:'Ответить',exact:true}).click();await page.getByRole('button',{name:'Отправить работу на баттл',exact:true}).click();await page.getByRole('button',{name:'Отправить',exact:true}).click();
     await waitState(page,saved=>saved.battleSubmissions.length===1,30000);await screenshot(page,'submission-dialog-'+suffix);
     await navigate(page,'underweb://social/audio');
@@ -313,7 +313,7 @@ export async function verifyPublicPreview(options={}){
     assert.equal(await page.getByRole('button',{name:'▶ Слушать файл',exact:true}).isDisabled(),true);await screenshot(page,'export-player-disabled-'+suffix);
     await navigate(page,'underweb://social/dialog/anya');await screenshot(page,'social-navigation-'+suffix);
     await navigate(page,'underweb://social/audio');
-    await page.getByRole('button',{name:'Изучить трек · 45 мин',exact:true}).first().click();await frame(page,'rap-dossier').getByRole('button',{name:'Изучить трек · 45 мин',exact:true}).click();await phase(page,'working');await screenshot(page,'dossier-study-work-'+suffix);await phase(page,'desktop');
+    await app(page,'Рэп-досье');await frame(page,'rap-dossier').getByLabel('Выбрать дело',{exact:true}).selectOption('recordings');await frame(page,'rap-dossier').locator('[data-dossier-node^="track:"]').first().click();await frame(page,'rap-dossier').getByRole('button',{name:'Изучить трек · 45 мин',exact:true}).click();await phase(page,'working');await screenshot(page,'dossier-study-work-'+suffix);await phase(page,'desktop');
     assert.ok(Object.keys((await state(page)).rapAnalysis.reports).length>0);await app(page,'Рэп-досье');await screenshot(page,'dossier-report-'+suffix);
     assert.equal(JSON.stringify((await state(page)).audioExports.files.find(item=>item.id===file.id)),frozen);
     await reload(page);await page.locator('#continue-game').click();await phase(page,'room');
@@ -322,11 +322,11 @@ export async function verifyPublicPreview(options={}){
    }
   }
   const active=[...observed].filter(url=>/\.(?:js|css)(?:\?|$)/.test(url)&&!url.includes('/vendor/'));
-  assert.ok(active.some(url=>url.includes('apartment-app.js?rev=57')));assert.ok(active.some(url=>url.includes('.css?rev=57')));assert.ok(active.every(url=>new URL(url).searchParams.get('rev')==='57'),'all active first-party JS/CSS use canonical revision 57');
+  assert.ok(active.some(url=>url.includes('apartment-app.js?rev=58')));assert.ok(active.some(url=>url.includes('.css?rev=58')));assert.ok(active.every(url=>new URL(url).searchParams.get('rev')==='58'),'all active first-party JS/CSS use canonical revision 58');
   const workers=report.requests.filter(url=>new URL(url).origin===new URL(report.url).origin&&/\/[^/]*worker\.js(?:\?|$)/.test(url));
-  assert.ok(workers.every(url=>new URL(url).searchParams.get('rev')==='57'),'all real Worker entries use canonical revision 57');
-  if(!options.smoke)assert.ok(workers.some(url=>url.includes('social-worker.js?rev=57')),'real canonical social Worker requested');
-  check('prior module URL followed by canonical revision 57 entry, CSS and Worker',{priorRevision:43,canonicalRevision:57,workerRequired:!options.smoke,cacheScope:'isolated module URL warmup; local HTTP responses are no-store'});
+  assert.ok(workers.every(url=>new URL(url).searchParams.get('rev')==='58'),'all real Worker entries use canonical revision 58');
+  if(!options.smoke)assert.ok(workers.some(url=>url.includes('social-worker.js?rev=58')),'real canonical social Worker requested');
+  check('prior module URL followed by canonical revision 58 entry, CSS and Worker',{priorRevision:43,canonicalRevision:58,workerRequired:!options.smoke,cacheScope:'isolated module URL warmup; local HTTP responses are no-store'});
   report.completedGlbSignals=[];report.readyDocuments=[...readyDocuments];
   const rawFailures=report.unexpectedResponses;report.unexpectedResponses=[];
   for(const failure of rawFailures){

@@ -1,7 +1,7 @@
-import {mentorDownloadBytes,completeMentorDownload} from './pc-mentor-downloads.js?rev=57';
-import {GOBLIN_ID} from './goblin-catalog.js?rev=57';
-import {SOFTWARE,METADATA_BYTES} from './pc-software-catalog.js?rev=57';
-import {normalizeSoftware,withSoftware,softwareDiskBytes} from './pc-software.js?rev=57';
+import {mentorDownloadBytes,completeMentorDownload} from './pc-mentor-downloads.js?rev=58';
+import {GOBLIN_ID} from './goblin-catalog.js?rev=58';
+import {SOFTWARE,METADATA_BYTES} from './pc-software-catalog.js?rev=58';
+import {normalizeSoftware,withSoftware,softwareDiskBytes} from './pc-software.js?rev=58';
 const seconds=n=>Number.isFinite(n)?Math.max(0,Math.min(1,n)):0;
 export function normalizeBrowserDownloads(value){
  const seen=new Set(),items=[],hiddenHistoryIds=[],recovery=(Array.isArray(value?.recovery)?value.recovery:[]).map(item=>structuredClone(item));

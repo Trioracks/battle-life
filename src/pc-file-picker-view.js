@@ -1,6 +1,6 @@
-import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=57';
-import {explorerPaths,navigateExplorer,createExplorerState} from './virtual-pc-explorer.js?rev=57';
-import {pcFileEntries,pcDocumentFilename,createPcFolder} from './pc-filesystem.js?rev=57';
+import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=58';
+import {explorerPaths,navigateExplorer,createExplorerState} from './virtual-pc-explorer.js?rev=58';
+import {pcFileEntries,pcDocumentFilename,createPcFolder} from './pc-filesystem.js?rev=58';
 export function mountPcFilePicker(root,{getState,mode='open',types,initialFolderId='documents',suggestedName='',filter=()=>true,emptyText='Подходящих файлов нет.',onSelect,onCancel=()=>{},onChange}={}){
  const d=root.ownerDocument,save=['save','export'].includes(mode),label=save?'Сохранить':mode==='attach'?'Прикрепить':'Открыть';
  const box=el(d,'section',{className:'pc-file-picker',attributes:{role:'dialog','aria-modal':'true','aria-label':save?'Сохранить как':'Выбор файла'}}),folder=el(d,'select',{attributes:{'aria-label':'Папка файла'}}),address=el(d,'input',{attributes:{'aria-label':'Адрес папки файла'}}),list=el(d,'div',{className:'pc-picker-files'}),name=el(d,'input',{value:suggestedName,attributes:{'aria-label':'Имя файла',maxlength:'120'}}),notice=el(d,'p',{attributes:{role:'status'}});

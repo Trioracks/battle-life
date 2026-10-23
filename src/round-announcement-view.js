@@ -1,8 +1,8 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=57';
-import {socialButton,socialLink} from './social-dom.js?rev=57';
-import {battleCover} from './battle-content-assets.js?rev=57';
-import {socialImageUrl,recoverableSocialImage} from './social-image.js?rev=57';
-import {battleStageText} from './battle-stage.js?rev=57';
+import {pcElement as el} from './virtual-pc-dom.js?rev=58';
+import {socialButton,socialLink} from './social-dom.js?rev=58';
+import {battleCover} from './battle-content-assets.js?rev=58';
+import {socialImageUrl,recoverableSocialImage} from './social-image.js?rev=58';
+import {battleStageText} from './battle-stage.js?rev=58';
 export function createRoundAnnouncementView(d,post,{navigate,onWrite,stage}={}){
  const root=el(d,'article',{className:'sn-post sn-round-announcement',dataset:{themeId:post.theme.id}});
  if(stage)root.append(el(d,'p',{className:'sn-battle-stage',text:battleStageText(stage)}));

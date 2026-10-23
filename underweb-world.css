@@ -209,3 +209,6 @@
 #virtual-pc .pc-window .uw-browser .uw-home .uw-news-panel>header .uw-news-link{font-size:15px}
 #virtual-pc .pc-window .uw-browser .uw-home .uw-site-tile{font-family:'Segoe UI',Arial,sans-serif}
 @media(max-width:1250px){#virtual-pc .pc-window .uw-browser .uw-bookmarks button{font-size:14px!important}#virtual-pc .pc-window .uw-browser .uw-home .uw-news-headline{font-size:23px!important}}
+#virtual-pc .uw-home .uw-news-illustration{float:right;width:31%;max-width:312px;aspect-ratio:1.56;object-fit:cover;margin:0 0 10px 24px;border:1px solid #6e637d;filter:saturate(.7)}
+#virtual-pc .uw-home .uw-news-panel article::after{content:'';display:block;clear:both}
+@container(max-width:850px){#virtual-pc .uw-home .uw-news-illustration{width:35%;margin-left:15px}}

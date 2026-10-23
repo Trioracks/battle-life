@@ -1,10 +1,10 @@
-import {discussionForPost} from './social-discussion.js?rev=57';
-import {mountSocialFeed} from './social-feed-page.js?rev=57';
-import {pcElement as el} from './virtual-pc-dom.js?rev=57';
-import {socialAvatar,socialButton,socialHeading,socialPhoto,socialComment} from './social-dom.js?rev=57';
-import {profileById} from './social-catalog.js?rev=57';
-import {gameDateTimeLabel} from './home-calendar.js?rev=57';
-import {profilePhoto} from './social-photo-view.js?rev=57';
+import {discussionForPost} from './social-discussion.js?rev=58';
+import {mountSocialFeed} from './social-feed-page.js?rev=58';
+import {pcElement as el} from './virtual-pc-dom.js?rev=58';
+import {socialAvatar,socialButton,socialHeading,socialPhoto,socialComment} from './social-dom.js?rev=58';
+import {profileById} from './social-catalog.js?rev=58';
+import {gameDateTimeLabel} from './home-calendar.js?rev=58';
+import {profilePhoto} from './social-photo-view.js?rev=58';
 export function createMusicianProfileView(d,{profile,posts,photos,stateKey,subtitle,historyLabel,view='page',getState,getMetadata,navigate,commit,audio,onAnalyze,onPhotoClose,uiState={}}){
  const state=getState(),tracks=posts.filter(p=>p.release||p.trackVersionId);
  const root=el(d,'section',{className:'sn-profile sn-goblin-profile'}),aside=el(d,'aside',{className:'sn-profile-aside'}),main=el(d,'div',{className:'sn-profile-main'});

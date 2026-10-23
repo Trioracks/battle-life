@@ -1,3 +1,4 @@
+import {savePcDocument} from '../../src/pc-filesystem.js';
 import {createProfile} from '../../src/avatar-v3-profile.js';
 import {createVirtualPcState} from '../../src/virtual-pc-state.js';
 import {createBeat} from '../../src/beat-production.js';
@@ -17,6 +18,7 @@ export function publicPreviewFixture(kind){
   if(!result.ok)throw Error(result.reason);state=result.state;
  }
  if(!['installer','beat','lyrics','vocal'].includes(kind))throw Error('Unknown preview fixture');
+ if(kind==='beat'||kind==='vocal'){const r=savePcDocument(state,{projectId:kind==='beat'?'preview-beat':'beat',folderId:'projects',filename:kind==='beat'?'Preview beat.flp':'Работа.flp',nowMinute:600});if(!r.ok)throw Error(r.reason);state=r.state;}
  state.lastGameMinute=600;
  return {'battle-life-apartment-v3':JSON.stringify(profile),'battle-life-virtual-pc-v1':JSON.stringify(state),'battle-life-apartment-v3-time':JSON.stringify({day:1,minutes:600,initialRest:false})};
 }

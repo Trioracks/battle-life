@@ -1,4 +1,4 @@
-import { advanceCampaign } from './game-state.js?rev=57';
+import { advanceCampaign } from './game-state.js?rev=58';
 
 function nextInventory(campaign, change) {
   return { ...campaign.inventory, ...change };

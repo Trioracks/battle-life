@@ -1,8 +1,8 @@
-import {normalizeLyric} from './lyric-production.js?rev=57';
-import {normalizeBeat} from './beat-production.js?rev=57';
-import {normalizeStudioProject} from './ft-studio-project.js?rev=57';
-import {softwareDiskBytes} from './pc-software.js?rev=57';
-import {validGameMinute} from './game-minute.js?rev=57';
+import {normalizeLyric} from './lyric-production.js?rev=58';
+import {normalizeBeat} from './beat-production.js?rev=58';
+import {normalizeStudioProject} from './ft-studio-project.js?rev=58';
+import {softwareDiskBytes} from './pc-software.js?rev=58';
+import {validGameMinute} from './game-minute.js?rev=58';
 
 export const PC_USER_FOLDERS=Object.freeze(['disk','documents','projects','music','exports','downloads']);
 const base=new Set(PC_USER_FOLDERS),reserved=new Set([...PC_USER_FOLDERS,'computer','windows']),types=new Set(['txt','flp','wav','mp3']),clone=structuredClone;

@@ -1,11 +1,11 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=57';
-import {socialButton} from './social-dom.js?rev=57';
-import {playTrackVersion} from './track-version-audio.js?rev=57';
-import {backgroundAudioDescriptor as archiveDescriptor} from './social-background-audio.js?rev=57';
-import {npcPlaybackDescriptor} from './battle-npc-audio.js?rev=57';
-import {profileAccess} from './social-profile-policy.js?rev=57';
-import {battleCharacter} from './battle-demo-config.js?rev=57';
-import {metadataGameMinute} from './social-registration.js?rev=57';
+import {pcElement as el} from './virtual-pc-dom.js?rev=58';
+import {socialButton} from './social-dom.js?rev=58';
+import {playTrackVersion} from './track-version-audio.js?rev=58';
+import {backgroundAudioDescriptor as archiveDescriptor} from './social-background-audio.js?rev=58';
+import {npcPlaybackDescriptor} from './battle-npc-audio.js?rev=58';
+import {profileAccess} from './social-profile-policy.js?rev=58';
+import {battleCharacter} from './battle-demo-config.js?rev=58';
+import {metadataGameMinute} from './social-registration.js?rev=58';
 // Retain the catalog-item entry point for existing callers; recipes use IDs.
 export const backgroundAudioDescriptor=item=>archiveDescriptor(typeof item==='string'?item:item?.id);
 const clock=seconds=>{const n=Math.max(0,Math.floor(seconds+1e-6));return Math.floor(n/60)+':'+String(n%60).padStart(2,'0');};

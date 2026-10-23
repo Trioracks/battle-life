@@ -1,5 +1,5 @@
-import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=57';
-import {documentIsDirty,discardPcDocument} from './pc-document-session.js?rev=57';
+import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=58';
+import {documentIsDirty,discardPcDocument} from './pc-document-session.js?rev=58';
 export function createDocumentGuard(root,{appId,getState,onCommit,onSave}={}){
  const d=root.ownerDocument;let node=null,pending=null,resolvePending=null,after=null,prior=[],returnFocus=null;
  function clear(){node?.remove();node=null;for(const [child,inert]of prior)child.inert=inert;prior=[];}

@@ -1,8 +1,8 @@
-import {pcFileEntries} from './pc-filesystem.js?rev=57';
-import {normalizeLyric} from './lyric-production.js?rev=57';
-import {normalizeBeat} from './beat-production.js?rev=57';
-import {normalizeTrackVersions} from './track-version.js?rev=57';
-import {normalizeAudioExports} from './pc-audio-exports.js?rev=57';
+import {pcFileEntries} from './pc-filesystem.js?rev=58';
+import {normalizeLyric} from './lyric-production.js?rev=58';
+import {normalizeBeat} from './beat-production.js?rev=58';
+import {normalizeTrackVersions} from './track-version.js?rev=58';
+import {normalizeAudioExports} from './pc-audio-exports.js?rev=58';
 export const mentorDownloadBytes=file=>file?.exported?.file?.bytes??file?.bytes??0;
 export function completeMentorDownload(state,item){
  const g=state.social?.goblin,file=g?.files.find(f=>f.id===item.attachmentId),fail=reason=>({ok:false,state,reason});if(!file)return fail('attachment-unavailable');
