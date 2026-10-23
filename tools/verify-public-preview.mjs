@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -50,13 +51,18 @@ export function validateLiveRelease(release,expected){
  for(const key of ['version','profile','revision','sourceCommit'])assert.equal(release[key],expected[key],'live release '+key);
  assert.ok(Number.isFinite(Date.parse(release.builtAt)),'live release timestamp');
 }
-export function isCompletedGlbSignal(failure,consumption,expectedBytes,sceneReady){
+export function isCompletedGlbSignal(failure,consumption,expectedBytes,sceneReady,expectedSha256){
  if(failure.why!=='net::ERR_ABORTED'||!sceneReady||!Number.isSafeInteger(expectedBytes)||expectedBytes<=0)return false;
  if(!new URL(failure.url).pathname.endsWith('.glb')||consumption?.url!==failure.url||consumption.status!==200||consumption.eof!==true)return false;
  if(!Number.isFinite(failure.documentTimeOrigin)||consumption.documentTimeOrigin!==failure.documentTimeOrigin)return false;
  if(consumption.bytes!==expectedBytes||consumption.declaredBytes!==0&&consumption.declaredBytes!==expectedBytes||Math.abs(consumption.startedAt-failure.startedAt)>250)return false;
  if(!/\/vendor\/three\/three\.module\.js:/.test(consumption.initiator??''))return false;
- return failure.resourceTiming?.some(t=>t.decodedBodySize===expectedBytes&&t.encodedBodySize>0&&t.transferSize>=t.encodedBodySize)===true;
+ const timed=failure.resourceTiming?.some(t=>t.decodedBodySize===expectedBytes&&t.encodedBodySize>0&&t.transferSize>=t.encodedBodySize)===true;
+ // Chromium can emit a cancellation after the FileLoader consumed EOF without
+ // retaining ResourceTiming. Accept that case only with an independent digest
+ // of the exact bytes consumed by that same reader and the audited file.
+ const hashed=!failure.resourceTiming?.length&&typeof expectedSha256==='string'&&/^[a-f0-9]{64}$/.test(expectedSha256)&&consumption.sha256===expectedSha256;
+ return timed||hashed;
 }
 // QA-only controlled old cohort. No route or synthetic bytes are built/published.
 export async function startCacheProbeServer({artifactUrl}){
@@ -130,8 +136,19 @@ function observeAssetReads(){
   if(!response.url||!new URL(response.url).pathname.endsWith('.glb')||!response.body)return response;
   const url=response.url,status=response.status,declaredBytes=Number(response.headers.get('content-length')),body=response.body,getReader=body.getReader.bind(body);
   body.getReader=function(...options){
-   const reader=getReader(...options),read=reader.read.bind(reader),initiator=new Error().stack;let bytes=0;
-   reader.read=async function(...readOptions){const chunk=await read(...readOptions);if(chunk.done)void window.__previewAssetEvent({url,status,startedAt,finishedAt:Date.now(),documentTimeOrigin:performance.timeOrigin,declaredBytes,bytes,eof:true,initiator});else bytes+=chunk.value.byteLength;return chunk;};
+   const reader=getReader(...options),read=reader.read.bind(reader),initiator=new Error().stack;let bytes=0,chunks=[];
+   reader.read=async function(...readOptions){
+    const chunk=await read(...readOptions);
+    if(chunk.done){
+     const event={url,status,startedAt,finishedAt:Date.now(),documentTimeOrigin:performance.timeOrigin,declaredBytes,bytes,eof:true,initiator},parts=chunks;chunks=[];
+     void (async()=>{
+      const input=new Uint8Array(bytes);let offset=0;for(const part of parts){input.set(part,offset);offset+=part.byteLength;}
+      const digest=await crypto.subtle.digest('SHA-256',input),sha256=Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('');
+      await window.__previewAssetEvent({...event,sha256});
+     })().catch(()=>{});
+    }else{bytes+=chunk.value.byteLength;chunks.push(chunk.value);}
+    return chunk;
+   };
    return reader;
   };
   return response;
@@ -316,7 +333,9 @@ export async function verifyPublicPreview(options={}){
    if(failure.why==='net::ERR_ABORTED'){
     const url=new URL(failure.url),relative=url.pathname.startsWith(config.prefix)?url.pathname.slice(config.prefix.length):'',filename=path.resolve(config.root,relative);
     if(relative.startsWith('assets/')&&relative.endsWith('.glb')&&inside(config.root,filename)){
-     const expectedBytes=await fs.stat(filename).then(info=>info.size,()=>0),consumption=report.assetConsumptions.find(entry=>isCompletedGlbSignal(failure,entry,expectedBytes,readyDocuments.has(entry.documentTimeOrigin)));
+     const expectedBytes=await fs.stat(filename).then(info=>info.size,()=>0);
+     const expectedSha256=!failure.resourceTiming?.length&&expectedBytes>0?createHash('sha256').update(await fs.readFile(filename)).digest('hex'):undefined;
+     const consumption=report.assetConsumptions.find(entry=>isCompletedGlbSignal(failure,entry,expectedBytes,readyDocuments.has(entry.documentTimeOrigin),expectedSha256));
      if(consumption){matched=true;report.completedGlbSignals.push({...failure,expectedBytes,consumption,sceneReady:true});}
     }
    }
