@@ -1,7 +1,7 @@
 import {communityById} from './social-catalog.js?rev=57';
 import {normalizeSocial} from './social-state.js?rev=57';
 import {ensureBattleWindow,migrateBattleDeadlines} from './battle-windows.js?rev=57';
-import {ACK_TEMPLATES,acknowledgementFor} from './social-submission.js?rev=57';
+import {acknowledgementBodyFor,acknowledgementFor} from './social-submission.js?rev=57';
 import {validGameMinute} from './game-minute.js?rev=57';
 import {receivePhoneEvents} from './phone-notifications.js?rev=57';
 import {publishJudgeEvents} from './social-judging-events.js?rev=57';
@@ -49,7 +49,7 @@ export function advanceSocial(input,nowMinute,options={}){
   if(s.version!==2||s.status==='recovery')continue;
   const c=communityById(s.communityId),window=state.battleWindows?.find(w=>w.id===s.windowId&&!w.issue);if(!c||!window)continue;
   const common={source:SOCIAL_IDENTITY.name,sender:c.name,entityId:s.id,trackVersionId:s.trackVersionId,communityId:c.id};
-  if(s.status==='pending'&&s.ackAt<=nowMinute)due.push({...common,id:s.id+':ack',type:'submission-ack',dueAt:s.ackAt,text:ACK_TEMPLATES.find(t=>t.id===s.ackTemplateId)?.body??'Работа получена. Подтверждение сохранено.'});
+  if(s.status==='pending'&&s.ackAt<=nowMinute)due.push({...common,id:s.id+':ack',type:'submission-ack',dueAt:s.ackAt,text:acknowledgementBodyFor(state,s)});
   if(window.closesAt<=nowMinute)due.push({...common,id:s.id+':published',type:'submission-published',dueAt:window.closesAt,text:'Приём закрыт. Работа добавлена в аудиозаписи сообщества.'});
  }
  const events=due.filter(e=>!processed.has(e.id)).sort((a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id));

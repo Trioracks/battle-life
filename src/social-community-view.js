@@ -1,3 +1,4 @@
+import {mountSocialFeed} from './social-feed-page.js?rev=57';
 import {pcElement as el} from './virtual-pc-dom.js?rev=57';
 import {communityById,profileById} from './social-catalog.js?rev=57';
 import {normalizeSocial,subscribeCommunity} from './social-state.js?rev=57';
@@ -43,7 +44,7 @@ export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),na
  const information=el(d,'section',{className:'sn-community-information',dataset:{communityPanel:'information'},attributes:{role:'tabpanel',id:'community-'+id+'-information','aria-labelledby':'community-'+id+'-information-tab'}});
  const tables=el(d,'section',{className:'sn-community-tables',dataset:{communityPanel:'tables'},attributes:{role:'tabpanel',id:'community-'+id+'-tables','aria-labelledby':'community-'+id+'-tables-tab'}});
  const tabs=el(d,'nav',{className:'sn-community-tabs',attributes:{role:'tablist','aria-label':'Материалы сообщества'}}),tabButtons=[];
- if(uiState.communityId!==id){uiState.communityId=id;uiState.tab='information';}
+ if(uiState.communityId!==id){uiState.communityId=id;uiState.tab='information';uiState.visibleCount=3;}
  if(!c.battleId||!['information','tables'].includes(uiState.tab))uiState.tab='information';
  const selectTab=tab=>{
   uiState.tab=tab;information.hidden=tab!=='information';tables.hidden=tab!=='tables';
@@ -92,8 +93,7 @@ export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),na
  const wall=el(d,'section',{className:'sn-community-wall',attributes:{'aria-label':'Стена группы'}});wall.append(socialHeading(d,'Стена группы'));
  const wallPosts=publicCommunityPosts(state,{communityId:id,nowMinute}).sort((a,b)=>b.at-a.at||(a.kind==='static'&&b.kind==='static'?c.history.findIndex(p=>p.id===b.id)-c.history.findIndex(p=>p.id===a.id):b.id.localeCompare(a.id)));
  const judges=new Map(publicAnnouncedJudges(state,{battleId:c.battleId,nowMinute}).map(j=>[j.id,j]));
- for(const post of wallPosts){
-  if(post.id===current?.id)continue;
+ mountSocialFeed(wall,{posts:wallPosts,uiState,pinnedId:current?.id,renderPost:post=>{
   const staticPost=c.history.find(p=>p.id===post.id),node=socialPost(d,{...staticPost,...post,date:staticPost?.date??gameDateTimeLabel(post.at)},{author:post.authorName,navigate,profileById,reactions:state.socialReactions?.plans?.[post.id]?reactions(post.id):null});
   node.dataset.communityPost=post.id;
   if(post.kind==='round-theme')node.append(socialLink(d,'Таблица раунда','underweb://social/results/'+c.battleId+'/'+post.roundId,navigate));
@@ -101,8 +101,8 @@ export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),na
    const judge=judges.get(post.judgeId),index=judge?post.body.indexOf(judge.name):-1;
    if(index>=0){const body=node.children[2];body.textContent='';body.append(el(d,'span',{text:post.body.slice(0,index)}),socialLink(d,judge.name,judge.profileUrl,navigate),el(d,'span',{text:post.body.slice(index+judge.name.length)}));}
   }
-  wall.append(administratorPost(node));
- }
+  return administratorPost(node);
+ }});
  information.append(wall);columns.append(main,side);root.append(columns);
 
  const archive=el(d,'section',{className:'sn-community-archive',attributes:{'aria-label':'Аудиотека группы'}});

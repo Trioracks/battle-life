@@ -46,7 +46,7 @@ export function advanceSubmissionUpload(state,{activeSeconds=0,powered=false,pau
  const nextElapsed=u.elapsedSeconds+activeSeconds,elapsedSeconds=nextElapsed>=UPLOAD_TOTAL_SECONDS-1e-9?UPLOAD_TOTAL_SECONDS:nextElapsed,completed=elapsedSeconds===UPLOAD_TOTAL_SECONDS;
  const outgoingUpload={...u,...progress(u.totalBytes,elapsedSeconds),elapsedSeconds,status:completed?'ready':'uploading'};
  let social=state.social;
- if(completed){social=normalizeSocial(social);social.personalAudioIds=[...new Set([...social.personalAudioIds,u.versionId])];social.dialogs[u.communityId]={messages:[],unread:false,...social.dialogs[u.communityId],peer:{kind:'community',id:u.communityId},draftVersionId:u.versionId};}
+ if(completed){social=normalizeSocial(social);social.personalAudioIds=[...new Set([...social.personalAudioIds,u.versionId])];if(u.fileId)social.personalAudioFiles={...social.personalAudioFiles,[u.versionId]:u.fileId};social.dialogs[u.communityId]={messages:[],unread:false,...social.dialogs[u.communityId],peer:{kind:'community',id:u.communityId},draftVersionId:u.versionId};}
  return {state:{...state,social,outgoingUpload},changed:true,completed};
 }
 export function cancelSubmissionUpload(state){const recovery=state.outgoingUpload?.issue?[...(state.outgoingUploadRecovery??[]),clone(state.outgoingUpload)]:state.outgoingUploadRecovery??[];return {ok:true,state:{...state,outgoingUpload:null,outgoingUploadRecovery:recovery},reason:''};}

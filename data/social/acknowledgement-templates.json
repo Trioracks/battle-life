@@ -1,0 +1,444 @@
+[
+  {
+    "id": "ack-friendly-01",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Здорово! Спасибо за трек, приняли. Приём закончится {deadline}, оценки — не позднее {judgingDeadline}. {notificationHint}"
+  },
+  {
+    "id": "ack-friendly-02",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Привет, чувак! Работа у нас. Дождись закрытия приёма {deadline}; после него судьи всё послушают. {notificationHint}"
+  },
+  {
+    "id": "ack-friendly-03",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Спасибо, что сдал! Отметили твою работу. Итоги ждём не позднее {judgingDeadline}. Удачи тебе в раунде)"
+  },
+  {
+    "id": "ack-friendly-04",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Здорово! Трек получили. До {deadline} ещё принимаем остальные работы, потом начнём судить. {notificationHint}"
+  },
+  {
+    "id": "ack-friendly-05",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Привет! Всё дошло, спасибо. Тебе больше ничего досылать не надо. За оценками возвращайся не позднее {judgingDeadline}."
+  },
+  {
+    "id": "ack-friendly-06",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Приняли, чувак. Теперь можно немного выдохнуть) Судьи приступят после {deadline}. {notificationHint}"
+  },
+  {
+    "id": "ack-friendly-07",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Спасибо за участие! Трек записали в список. Оценки появятся к {judgingDeadline}, заглядывай в таблицу раунда."
+  },
+  {
+    "id": "ack-friendly-08",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Здорово, работа принята. Послушаем вместе со всеми после закрытия приёма {deadline}. Хорошего тебе раунда!"
+  },
+  {
+    "id": "ack-friendly-09",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Привет! Спасибо, что успел сдать. Пока ждём остальных до {deadline}, потом передадим работы судьям."
+  },
+  {
+    "id": "ack-friendly-10",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Есть твой трек, спасибо! Судейство закончится не позднее {judgingDeadline}. {notificationHint}"
+  },
+  {
+    "id": "ack-friendly-11",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection"
+    ],
+    "body": "Здорово! В отбор приняли. Приём закроется {deadline}, после этого будем слушать. Удачи, чувак!"
+  },
+  {
+    "id": "ack-friendly-12",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection"
+    ],
+    "body": "Привет! Спасибо за работу на отбор. Оценки ищи в таблице не позднее {judgingDeadline}. {notificationHint}"
+  },
+  {
+    "id": "ack-friendly-13",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection"
+    ],
+    "body": "Трек на отбор получили, спасибо) Дождёмся дедлайна {deadline}, затем дело за судьями."
+  },
+  {
+    "id": "ack-friendly-14",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection"
+    ],
+    "body": "Приняли в отбор. Спасибо, что с нами! Возвращайся за результатами не позднее {judgingDeadline}."
+  },
+  {
+    "id": "ack-friendly-15",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection"
+    ],
+    "body": "Здорово, участник отбора! Работу получили. Пока можешь отдохнуть, после {deadline} начнётся прослушивание."
+  },
+  {
+    "id": "ack-friendly-16",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Привет! Твой трек у нас. Срок общий для всех: приём до {deadline}, оценки не позднее {judgingDeadline}."
+  },
+  {
+    "id": "ack-friendly-17",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Спасибо, приняли твою версию. Не переживай насчёт ответа — это подтверждение получения. Оценки будут позже, до {judgingDeadline}."
+  },
+  {
+    "id": "ack-friendly-18",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Здорово! Сдал, всё хорошо. Дальше ждём закрытия приёма {deadline} и решения судей. {notificationHint}"
+  },
+  {
+    "id": "ack-friendly-19",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Привет! Работа в списке. Если интересно, как идёт раунд, смотри информацию сверху в группе. Оценки — до {judgingDeadline}."
+  },
+  {
+    "id": "ack-friendly-20",
+    "tone": "friendly",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Приняли, спасибо! За результатами приходи в таблицу раунда к {judgingDeadline}. {notificationHint}"
+  },
+  {
+    "id": "ack-neutral-01",
+    "tone": "neutral",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Здравствуйте. Работа получена, спасибо за участие. Приём заканчивается {deadline}. Результаты ожидаются не позднее {judgingDeadline}."
+  },
+  {
+    "id": "ack-neutral-02",
+    "tone": "neutral",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Трек приняли. После закрытия приёма {deadline} его оценят судьи. {notificationHint}"
+  },
+  {
+    "id": "ack-neutral-03",
+    "tone": "neutral",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Спасибо за работу. Она включена в список участников этого раунда. Итоги будут в таблице не позднее {judgingDeadline}."
+  },
+  {
+    "id": "ack-neutral-04",
+    "tone": "neutral",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Работу получили. Дождитесь общего дедлайна {deadline}; после него начнётся судейство."
+  },
+  {
+    "id": "ack-neutral-05",
+    "tone": "neutral",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Заявку с треком приняли, спасибо. Подтверждение получения и оценки — разные этапы. Оценки опубликуем не позднее {judgingDeadline}."
+  },
+  {
+    "id": "ack-neutral-06",
+    "tone": "neutral",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Получили вашу работу. Повторная отправка не требуется. Следите за таблицей раунда после {deadline}."
+  },
+  {
+    "id": "ack-neutral-07",
+    "tone": "neutral",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Трек принят к участию. Судейство завершится не позднее {judgingDeadline}. {notificationHint}"
+  },
+  {
+    "id": "ack-neutral-08",
+    "tone": "neutral",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Спасибо, работа зарегистрирована в этом раунде. Общий приём продлится до {deadline}, затем начнутся оценки."
+  },
+  {
+    "id": "ack-neutral-09",
+    "tone": "neutral",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Подтверждаем получение трека. Результаты и комментарии судей появятся в таблице к {judgingDeadline}."
+  },
+  {
+    "id": "ack-neutral-10",
+    "tone": "neutral",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Работа принята. Все треки передадим на судейство после {deadline}. Спасибо за участие."
+  },
+  {
+    "id": "ack-neutral-11",
+    "tone": "neutral",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Спасибо за своевременную сдачу. Оценки публикуются в таблице раунда, крайний срок — {judgingDeadline}."
+  },
+  {
+    "id": "ack-neutral-12",
+    "tone": "neutral",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Трек получен и добавлен к работам раунда. {notificationHint} Результаты — не позднее {judgingDeadline}."
+  },
+  {
+    "id": "ack-neutral-13",
+    "tone": "neutral",
+    "roundKinds": [
+      "knockout"
+    ],
+    "body": "Работу приняли. Твой соперник — {opponent}. Итоги пары будут в таблице не позднее {judgingDeadline}."
+  },
+  {
+    "id": "ack-neutral-14",
+    "tone": "neutral",
+    "roundKinds": [
+      "knockout"
+    ],
+    "body": "Спасибо, трек на раунд получен. Соперник: {opponent}. Дождитесь закрытия приёма {deadline}."
+  },
+  {
+    "id": "ack-neutral-15",
+    "tone": "neutral",
+    "roundKinds": [
+      "knockout"
+    ],
+    "body": "Работа принята к сравнению в паре. Твой соперник — {opponent}. За оценками возвращайся к {judgingDeadline}."
+  },
+  {
+    "id": "ack-dry-01",
+    "tone": "dry",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Получено. Работа принята. Приём до {deadline}, оценки не позднее {judgingDeadline}."
+  },
+  {
+    "id": "ack-dry-02",
+    "tone": "dry",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Трек принят. Судейство начнётся после {deadline}. Результаты смотрите в таблице раунда."
+  },
+  {
+    "id": "ack-dry-03",
+    "tone": "dry",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Работа зарегистрирована. Повторная сдача не нужна. Срок публикации оценок — не позднее {judgingDeadline}."
+  },
+  {
+    "id": "ack-dry-04",
+    "tone": "dry",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Приняли. Общий дедлайн: {deadline}. Оценки будут опубликованы отдельно."
+  },
+  {
+    "id": "ack-dry-05",
+    "tone": "dry",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Трек получили. Ожидайте решения судей не позднее {judgingDeadline}. {notificationHint}"
+  },
+  {
+    "id": "ack-dry-06",
+    "tone": "dry",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Работа в списке. Приём продолжается до {deadline}. Подтверждение получения не содержит оценки."
+  },
+  {
+    "id": "ack-dry-07",
+    "tone": "dry",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Сдачу подтвердили. Результаты раунда появятся в таблице до {judgingDeadline}."
+  },
+  {
+    "id": "ack-dry-08",
+    "tone": "dry",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Получили вашу версию трека. Она будет оценена после закрытия приёма {deadline}."
+  },
+  {
+    "id": "ack-dry-09",
+    "tone": "dry",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Работа принята к судейству. Срок окончания — не позднее {judgingDeadline}."
+  },
+  {
+    "id": "ack-dry-10",
+    "tone": "dry",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Трек зарегистрирован. Следующее обновление — результаты раунда, не позднее {judgingDeadline}."
+  },
+  {
+    "id": "ack-strict-01",
+    "tone": "strict",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Работу приняли. Повторно ничего не присылай: на раунд сдаётся одна версия. Оценки будут до {judgingDeadline}."
+  },
+  {
+    "id": "ack-strict-02",
+    "tone": "strict",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Получили трек. Сейчас идёт приём до {deadline}; ускорить судейство сообщениями не получится. Итоги — в таблице."
+  },
+  {
+    "id": "ack-strict-03",
+    "tone": "strict",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Принято. Жди общего решения судей не позднее {judgingDeadline}. Замену работы этот раунд не предусматривает."
+  },
+  {
+    "id": "ack-strict-04",
+    "tone": "strict",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Трек у организаторов. До {deadline} принимаем остальные заявки. После — судейство по общим правилам."
+  },
+  {
+    "id": "ack-strict-05",
+    "tone": "strict",
+    "roundKinds": [
+      "selection",
+      "knockout"
+    ],
+    "body": "Работу зарегистрировали. Возвращайся за оценками к {judgingDeadline}; подтверждение получения уже есть."
+  }
+]

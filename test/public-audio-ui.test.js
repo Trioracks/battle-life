@@ -27,9 +27,9 @@ test('studio disables recorded transport while project creation and ready export
  const view=mountBeatStudio(root,{getState:()=>state,getMetadata:()=>({skills:{}}),onChange:s=>state=s,audio:session.forOwner('studio'),initialProject:state.projects.find(p=>p.id==='beat')});
  assert.equal(allPc(root).find(n=>n.dataset.ftAction==='play').disabled,true);assert.equal(hasNotice(root),true);assert.equal(findButton(root,'Экспорт').disabled,false);assert.notEqual(findButton(root,'Новый проект').disabled,true);assert.equal(calls.play,0);view.dispose();session.dispose();
 });
-test('idle social row stays stopped with study available',async()=>{
+test('idle social row stays stopped without a Study control',async()=>{
  const {session,d,calls}=fixture(),view=createSocialAudio(session.forOwner('social'),{onAnalyze(){}}),version={id:'saved',name:'Запись',schemaVersion:1,recipe:{dspVersion:1,descriptor:{durationSeconds:20,parts:[]}}};
- const row=view.row(d,{version}),play=allPc(row).find(n=>n.dataset.socialAudio);assert.equal(play.disabled,true);assert.equal(hasNotice(row),true);assert.notEqual(findButton(row,'Изучить трек · 45 мин').disabled,true);play.click();await flush();assert.equal(calls.play,0);assert.equal(allPc(row).find(n=>n.getAttribute('role')==='progressbar').getAttribute('aria-valuenow'),'0');view.dispose();session.dispose();
+ const row=view.row(d,{version}),play=allPc(row).find(n=>n.dataset.socialAudio);assert.equal(play.disabled,true);assert.equal(hasNotice(row),true);assert.equal(findButton(row,'Изучить трек · 45 мин'),undefined);play.click();await flush();assert.equal(calls.play,0);assert.equal(allPc(row).find(n=>n.getAttribute('role')==='progressbar').getAttribute('aria-valuenow'),'0');view.dispose();session.dispose();
 });
 test('market and RIPLINE show public notice and disable only recorded listening',()=>{
  for(const ripline of [false,true]){const {audio,d,session}=fixture(),root=createBeatMarket(d,{getState:()=>submissionFixture(),onChange(){},audio,navigate(){},ripline});assert.equal(hasNotice(root),true);assert.equal(allPc(root).filter(n=>n.tagName==='BUTTON'&&n.textContent==='▶ Слушать').length,0,'the released catalog is intentionally empty');assert.notEqual(findButton(root,ripline?'Установить RIPLINE':'Открыть RIPLINE').disabled,true);session.dispose();}

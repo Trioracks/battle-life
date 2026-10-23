@@ -1,3 +1,4 @@
+import {normalizeDiscussions} from './social-discussion.js?rev=57';
 import {SOCIAL_COMMUNITIES,SOCIAL_PROFILES,profileById} from './social-catalog.js?rev=57';
 import {normalizePlayerPortrait} from './social-portraits.js?rev=57';
 import {normalizeCommunityPublicationState,ensureCommunityPublications,baselineCommunityRead,communityUnreadCounts,publicCommunityPosts} from './social-community-publications.js?rev=57';
@@ -20,7 +21,7 @@ export function normalizeSocial(raw){
  for(const [id,messages]of Object.entries(conversations))if(!dialogs[id])dialogs[id]={peer:{kind:'person',id},messages:messages.map(m=>({...m,kind:'personal',at:null,archived:true})),unread:false};
  if(dialogs[GOBLIN_ID])dialogs[GOBLIN_ID].messages=(dialogs[GOBLIN_ID].messages??[]).map(refreshGoblinMessage);
  return {schemaVersion:2,goblin:normalizeGoblin(s.goblin),filya:normalizeFilya(s.filya),...normalizeCommunityPublicationState(s),subscriptions:ids(s.subscriptions,id=>communities.has(id)),friends:ids([...(s.friends??known),GOBLIN_ID],id=>accessibleProfiles.includes(id)&&!blockedProfileIds.includes(id)),blockedProfileIds,
-  accessibleProfiles,personalAudioIds:ids(s.personalAudioIds),dialogs,photoFeedback:normalizePhotoFeedback(s.photoFeedback),
+  accessibleProfiles,personalAudioFiles:Object.fromEntries(Object.entries(record(s.personalAudioFiles)?s.personalAudioFiles:{}).filter(([id,file])=>typeof file==='string'&&file.length<=160)),personalAudioIds:ids(s.personalAudioIds),dialogs,discussions:normalizeDiscussions(s.discussions),photoFeedback:normalizePhotoFeedback(s.photoFeedback),
   playerPortrait:normalizePlayerPortrait(s.playerPortrait),playerAlbum:normalizePlayerAlbum(s.playerAlbum),posts:records(s.posts),reactions:records(s.reactions),audienceCount:Number.isFinite(s.audienceCount)?Math.max(0,Math.min(1e7,Math.floor(s.audienceCount))):12};
 }
 export function listCommunities(state,{query='',nowMinute=state.socialRuntime?.lastMinute??0}={}){

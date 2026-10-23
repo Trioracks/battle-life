@@ -25,11 +25,11 @@ export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze
  const player={playDescriptor:descriptor=>audio?.playDescriptor?.(descriptor,{loop:false}),stop:()=>audio?.stop?.(),get error(){return audio?.error??'';}};
  return {
   capabilities:audio?.capabilities,
-  row(d,{version,item}){
+  row(d,{version,item,displayName}){
    const entry={active:true,listeners:[],render:null};
    const button=(d,text,handler,options)=>{const node=socialButton(d,text,handler,options);entry.listeners.push([node,handler]);return node;};
    const descriptor=version?null:item?.descriptor?{...item.descriptor,key:'file:'+item.id,owner:'social'}:item?backgroundAudioDescriptor(item):null,key=version?'version:'+version.id:descriptor?.key;
-   const title=version?.name??(item?[(item.archive?item.author:null),item.title].filter(Boolean).join(' — '):'Сохранённая работа недоступна');
+   const title=displayName??version?.name??(item?[(item.archive?item.author:null),item.title].filter(Boolean).join(' — '):'Сохранённая работа недоступна');
    const duration=version?.recipe?.descriptor?.durationSeconds??descriptor?.durationSeconds??32/3;
    const row=el(d,'div',{className:'sn-audio'}),status=el(d,'small',{attributes:{'aria-live':'polite'}});
    const progress=el(d,'div',{className:'sn-audio-progress',attributes:{role:'progressbar','aria-label':'Воспроизведение: '+title,'aria-valuemin':'0','aria-valuemax':'100','aria-valuenow':'0'}}),fill=el(d,'span',{className:'sn-audio-progress-fill'}),time=el(d,'span',{className:'sn-audio-time'});
@@ -71,7 +71,6 @@ export function createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze
     const npc=npcPlaybackDescriptor(version);if(!npc.ok)unavailable=npc.reason;
     if(npc.previewDescriptor){previewDescriptor={...npc.previewDescriptor,owner:'social'};previewKey=previewDescriptor.key;const preview=button(d,'Предпросмотр бита — без голоса',()=>void start(previewDescriptor),{className:'sn-button sn-audio-extra',attributes:{'aria-label':'Предпросмотр бита — без голоса'}});preview.disabled=audio?.capabilities?.recordedPlayback===false;row.append(preview);}
    }
-   if(version&&onAnalyze){row.append(button(d,'Изучить трек · 45 мин',()=>onAnalyze({trackVersionId:version.id,reviewIds:[]}),{className:'sn-button sn-audio-extra'}));if(getState&&!getState().software?.dossier?.installed)row.append(el(d,'small',{className:'sn-audio-extra',text:'Для изучения скачай и установи Рэп-досье. Все разборы открываются в приложении.'}));}
    render();return row;
   },stop,releaseRows,dispose(){if(disposed)return;disposed=true;generation++;unsubscribe?.();for(const [row,entry]of rows)releaseRow(row,entry);}
  };

@@ -79,7 +79,7 @@ export function mountGoblinDialog(d,{getState,getMetadata,navigate,commit,audio,
     for(const link of msg.links??[])body.append(socialLink(d,link.label,link.url,navigate));
     const file=g?.files?.find(f=>f.id===msg.fileId),exported=msg.exportId&&state.audioExports?.files.find(f=>f.id===msg.exportId);
     if(file){
-     const card=el(d,'div',{className:'sn-mentor-file'});card.append(el(d,'strong',{text:'📎 '+file.filename}));
+     const card=el(d,'div',{className:'sn-mentor-file'});card.append(el(d,'strong',{text:'📎 '+(file.exported?.file.filename??file.filename)}));
      if(file.kind==='lyrics')card.append(el(d,'p',{className:'sn-note',text:file.project.sections?.slice(0,1).flatMap(s=>s.lines?.slice(0,2).map(l=>l.words.map(w=>w.text).join(' '))).join('\n')??'Сохранённый текст'}));
      if(!outgoing){const downloaded=g.downloaded?.[file.id],loading=state.browserDownloads?.items.find(i=>i.attachmentId===file.id),download=socialButton(d,downloaded?'Открыть файл':loading&&!loading.error?'Скачивается…':'Скачать '+(file.exported?.file.filename??file.filename),()=>{
       if(downloaded){error=getMetadata().openDownloadedFile?.(downloaded)??'';update(false);}else run(startMentorDownload(getState(),{attachmentId:file.id,nowMinute:now()}));
@@ -87,7 +87,7 @@ export function mountGoblinDialog(d,{getState,getMetadata,navigate,commit,audio,
      body.append(card);
     }else if(msg.attachmentSnapshot){body.append(el(d,'p',{className:'sn-mentor-file',text:'📎 '+msg.attachmentSnapshot.filename}));
     }else if(exported&&audio?.row){
-     if(exported.trackVersionId)body.append(audio.row(d,{version:state.trackVersions?.byId?.[exported.trackVersionId]}));
+     if(exported.trackVersionId)body.append(audio.row(d,{version:state.trackVersions?.byId?.[exported.trackVersionId],displayName:exported.filename.replace(/\.(wav|mp3)$/i,'')}));
      else body.append(audio.row(d,{item:{id:exported.id,title:exported.filename,descriptor:exported.descriptor}}));
     }
     history.append(row);

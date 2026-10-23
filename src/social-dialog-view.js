@@ -67,7 +67,7 @@ export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commi
     const outgoing=msg.sender==='player',senderPeer=outgoing?{kind:'person',id:'me'}:communityPeer,name=outgoing?getMetadata().playerName??'Игрок':c.name;
     body.append(socialPeerLink(d,senderPeer,name,navigate),el(d,'small',{text:gameDateTimeLabel(msg.at)}),el(d,'p',{text:msg.body}));
     if(msg.textAttachment)body.append(el(d,'p',{className:'sn-mentor-file',text:'📎 '+msg.textAttachment.filename}));
-    if(msg.trackVersionId)body.append(audio.row(d,{version:state.trackVersions?.byId?.[msg.trackVersionId]}));row.append(socialPeerLink(d,senderPeer,name,navigate,outgoing?{mark:'Я',src:state.social?.playerPortrait?.url,color:'#688277'}:c.avatar),body);history.append(row);
+    if(msg.trackVersionId)body.append(audio.row(d,{version:state.trackVersions?.byId?.[msg.trackVersionId],displayName:state.audioExports?.files.find(f=>f.id===(msg.audioFileId??state.social?.personalAudioFiles?.[msg.trackVersionId]))?.filename.replace(/\.(wav|mp3)$/i,'')}));row.append(socialPeerLink(d,senderPeer,name,navigate,outgoing?{mark:'Я',src:state.social?.playerPortrait?.url,color:'#688277'}:c.avatar),body);history.append(row);
    }
    if(!(dialog.messages?.length))history.append(el(d,'p',{className:'sn-empty',text:'Прикрепи готовый трек и отправь его организаторам. Свободных сообщений здесь нет.'}));});
   }

@@ -20,7 +20,7 @@ test('registration, playable vocal and open interval gate send, off-topic audio 
  let s=attachSubmissionTrack(ready({registered:false}),options).state;assert.equal(sendSubmission(s,options).ok,false);
  assert.equal(attachSubmissionTrack(ready({battleId:null}),options).ok,false);s=completeSubmissionMessage(completeSubmissionUpload(attachSubmissionTrack(ready(),options).state));assert.ok(sendSubmission(s,options).ok);
  for(const nowMinute of [599,600+7*1440,NaN,Infinity])assert.equal(sendSubmission(s,{...options,nowMinute}).ok,false);
- assert.equal(ACK_TEMPLATES.length,10);assert.equal(new Set(ACK_TEMPLATES.map(t=>t.body)).size,10);
+ assert.equal(ACK_TEMPLATES.length,50);assert.equal(new Set(ACK_TEMPLATES.map(t=>t.body)).size,50);
 });
 test('window is saved once, odd panel and fixed schedules survive reopening',()=>{
  const s=ready(),window=structuredClone(s.battleWindows[0]);assert.equal(window.closesAt,10080);assert.equal(window.closesAt-window.opensAt,9480);assert.equal(window.judgeIds.length%2,1);
