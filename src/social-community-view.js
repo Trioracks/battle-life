@@ -12,6 +12,7 @@ import {createRoundAnnouncementView} from './round-announcement-view.js?rev=57';
 import {publicCommunityPosts,publicAnnouncedJudges} from './social-community-publications.js?rev=57';
 import {gameDateTimeLabel} from './home-calendar.js?rev=57';
 import {createPostReactionsView} from './social-reactions-view.js?rev=57';
+import {battleStage,battleStageText} from './battle-stage.js?rev=57';
 
 export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),navigate,commit,audio,expandedResults=new Set(),onResultViewed,onRegistered=()=>{},uiState={}}){
  const c=communityById(id),root=el(d,'section',{className:'sn-community'});if(!c)return root;
@@ -57,7 +58,7 @@ export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),na
  }
  main.append(tabs,information,tables);selectTab(uiState.tab);
  const details=el(d,'div',{className:'sn-community-details'});details.append(el(d,'p',{text:c.description}));
- if(c.battleId)details.append(el(d,'p',{className:'sn-community-deadline',text:window||state.battleApplications?.some(a=>a.battleId===c.battleId)?deadline.text:'Зарегистрируйся, чтобы открыть приём работ на семь игровых дней.'}));
+ if(c.battleId){const stage=battleStage(state,{battleId:c.battleId,nowMinute});details.append(el(d,'p',{className:'sn-community-deadline',text:window?battleStageText(stage):'Зарегистрируйся, чтобы открыть приём работ на семь игровых дней.'}));if(window)details.append(socialLink(d,'Таблица '+(stage.roundId==='selection'?'отбора':'раунда'),stage.tableUrl,navigate));}
  information.append(details);
 
  const members=el(d,'section',{className:'sn-community-card sn-community-members'});members.append(socialHeading(d,'Участники',c.memberCount+Number(subscribed)));
@@ -84,7 +85,7 @@ export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),na
   node.replaceChildren(avatar,content);node.className+=' sn-community-admin-post';return node;
  };
  if(c.battleId){
-  const pinned=current?createRoundAnnouncementView(d,current,{navigate}):el(d,'article',{className:'sn-post sn-round-announcement'});pinned.className+=' sn-pinned-announcement';pinned.dataset.pinnedAnnouncement='true';pinned.setAttribute('aria-label','Закреплённый анонс');
+  const pinned=current?createRoundAnnouncementView(d,current,{navigate,stage:battleStage(state,{battleId:c.battleId,nowMinute})}):el(d,'article',{className:'sn-post sn-round-announcement'});pinned.className+=' sn-pinned-announcement';pinned.dataset.pinnedAnnouncement='true';pinned.setAttribute('aria-label','Закреплённый анонс');
   if(current)pinned.append(reactions(current.id,true));else pinned.append(el(d,'h3',{text:'Текущий раунд'}),el(d,'p',{text:window?deadline.text:'Информация о раунде появится здесь после объявления.'}));
   information.append(administratorPost(pinned,{label:true}));
  }

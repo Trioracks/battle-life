@@ -23,7 +23,7 @@ test('registration, playable vocal and open interval gate send, off-topic track 
  assert.equal(ACK_TEMPLATES.length,10);assert.equal(new Set(ACK_TEMPLATES.map(t=>t.body)).size,10);
 });
 test('window is saved once, odd panel and fixed schedules survive reopening',()=>{
- const s=ready(),window=structuredClone(s.battleWindows[0]);assert.equal(window.closesAt-window.opensAt,7*1440);assert.equal(window.judgeIds.length%2,1);
+ const s=ready(),window=structuredClone(s.battleWindows[0]);assert.equal(window.closesAt,10080);assert.equal(window.closesAt-window.opensAt,9480);assert.equal(window.judgeIds.length%2,1);
  assert.deepEqual(ensureBattleWindow(s,{battleId:'makarevich-1',nowMinute:99999}).state.battleWindows,[window]);
  assert.equal(ensureBattleWindow(s,{battleId:'missing',nowMinute:600}).ok,false);
 });

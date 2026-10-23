@@ -19,7 +19,7 @@ test('later-round acknowledgements never claim this work was sent to selection',
 test('real strong production earns a final win with normal judges, frozen saves and six distinct round works',()=>{
  const {state:s,trace}=runDemo({reload:true}),t=tournament(s);assert.equal(t.status,'complete');assert.equal(t.winnerId,'player');assert.equal(t.qualifiedIds.length,32);assert.equal(t.participantIds.length,33);assert.equal(trace.length,6);assert.equal(s.battleSubmissions.length,6);assert.equal(new Set(s.battleSubmissions.map(r=>r.trackVersionId)).size,6);
  for(const r of Object.values(t.rounds)){assert.equal(r.status,'complete');assert.equal(r.completedAt,Math.max(...Object.values(r.judgeBatches).map(b=>b.publishedAt)));assert.ok(r.completedAt<=r.closesAt+2400);assert.equal(r.judgeIds.length%2,1);}
- for(let i=1;i<trace.length;i++)assert.equal(t.rounds[trace[i].roundId].opensAt,trace[i-1].completedAt+1440);
+ for(let i=1;i<trace.length;i++){const opens=t.rounds[trace[i].roundId].opensAt;assert.equal(opens%1440,0);assert.ok(opens>=trace[i-1].completedAt+1440&&opens<trace[i-1].completedAt+2880);};
  const archived=JSON.stringify({versions:s.trackVersions,judging:s.judging,themes:s.roundThemes,history:s.battleHistory}),again=advanceSocial(createVirtualPcState(decodePcSave(encodePcSave(s))),100000).state;
  assert.equal(JSON.stringify({versions:again.trackVersions,judging:again.judging,themes:again.roundThemes,history:again.battleHistory}),archived);
  assert.ok(s.phone.queue.some(n=>n.type==='round-result'));assert.equal(advanceSocial(again,100000).events.length,0);

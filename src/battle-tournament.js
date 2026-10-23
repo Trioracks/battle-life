@@ -10,6 +10,7 @@ import {effectiveVocalSkill} from './vocal-production.js?rev=57';
 import {validGameMinute} from './game-minute.js?rev=57';
 import {ensureRoundTheme} from './round-topics.js?rev=57';
 import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=57';
+import {battleDeadlineAtMidnight} from './battle-windows.js?rev=57';
 export const TOURNAMENT_ROUNDS=Object.freeze(['selection','round-2','round-3','round-4','round-5','final']);
 const clone=v=>structuredClone(v),record=v=>v!==null&&typeof v==='object'&&!Array.isArray(v),battleId=DEMO_BATTLE.battleId;
 function validRoundInternals(r){
@@ -60,7 +61,7 @@ function closeRound(state,t,round){
 function announceNext(state,t,heroSkills){
  const index=TOURNAMENT_ROUNDS.indexOf(t.currentRoundId)+1,roundId=TOURNAMENT_ROUNDS[index],opensAt=t.nextRoundAt;
  if(!roundId||!validGameMinute(opensAt))return null;
- const judgeIds=[...DEMO_BATTLE.panels[roundId].judgeIds],window={id:battleId+':'+roundId+':1',battleId,roundId,opensAt,closesAt:opensAt+7*1440,judgeIds,judgingPolicyVersion:2,policyVersion:2,judgingOffsets:judgeIds.map((_,i)=>(i+1)*60)};
+ const judgeIds=[...DEMO_BATTLE.panels[roundId].judgeIds],window={id:battleId+':'+roundId+':1',battleId,roundId,opensAt,closesAt:battleDeadlineAtMidnight(opensAt),deadlinePolicyVersion:2,judgeIds,judgingPolicyVersion:2,policyVersion:2,judgingOffsets:judgeIds.map((_,i)=>(i+1)*60)};
  const round=newRound(window),hero=heroTournamentSkills(state,heroSkills);round.heroSkillSnapshot=hero;
  round.pairs=t.bracket.rounds[index-1].map(n=>({nodeId:n.id,participantIds:[...n.participantIds]}));
  for(const pair of round.pairs)for(const [slot,id]of pair.participantIds.entries()){
@@ -124,7 +125,7 @@ export function completeTournamentRound(input,{battleId:id=battleId,roundId,comp
   }
  }
  round.status='complete';round.completedAt=completedAt;
- if(roundId==='final'){t.status='complete';t.winnerId=round.pairs[0]?.winnerId??null;t.nextRoundAt=null;}else t.nextRoundAt=completedAt+1440;
+ if(roundId==='final'){t.status='complete';t.winnerId=round.pairs[0]?.winnerId??null;t.nextRoundAt=null;}else t.nextRoundAt=round.deadlinePolicyVersion===2?Math.ceil((completedAt+1440)/1440)*1440:completedAt+1440;
  const event=eventFor(round,'round-result',completedAt,{text:roundId==='final'?'Турнир завершён.':'Итог раунда опубликован. Следующий анонс через сутки.'});const events=[];addEvent(t,event,events);
  return {ok:true,state:recordBattleHistory({...input,tournaments},history),events,reason:''};
 }

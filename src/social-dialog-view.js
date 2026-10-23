@@ -12,6 +12,7 @@ import {startSubmissionMessage,advanceSubmissionMessage,cancelSubmissionMessage}
 import {createLyricWorkAudio} from './lyric-work-audio.js?rev=57';
 import {mountGoblinDialog} from './goblin-dialog-view.js?rev=57';
 import {createDialogLayout,dialogMessageField} from './social-dialog-layout.js?rev=57';
+import {battleStage,battleStageText} from './battle-stage.js?rev=57';
 export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commit,audio,isVisible=()=>true,onRegistered=()=>{},onRead=id=>commit(markDialogRead(getState(),id))}){
  if(id==='mak-npc-06')return mountGoblinDialog(d,{getState,getMetadata,navigate,commit,audio,isVisible,onRead});
  if(peer?.kind==='person')return mountPersonalDialog(d,{id,getState,getMetadata,navigate,commit,isVisible,onRead});
@@ -31,7 +32,8 @@ export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commi
  const read=socialButton(d,'Отметить прочитанным',()=>commit(markDialogRead(getState(),id)),{className:'sn-link'});
  const register=socialButton(d,'Зарегистрироваться',()=>{const result=registerBattle(getState(),{battleId:c.battleId,playerName:getMetadata().playerName,nowMinute:metadataGameMinute(getMetadata())});if(commit(result))onRegistered(c.battleId);});
  const communityPeer={kind:'community',id},heading=socialHeading(d,'Сообщения · ');heading.append(socialPeerLink(d,communityPeer,c.name,navigate));
- layout.head.append(heading,socialButton(d,'← Сообщество',()=>navigate('underweb://social/community/'+id),{className:'sn-link'}));actions.append(send,answer,register,attach,cancelMessage,read);layout.footer.append(draft,uploadBox,composerBox,actions,replyOptions,typing,notice,pickerHost);
+ const stageHeader=el(d,'p',{className:'sn-battle-stage'}),stageLink=socialButton(d,'Таблица раунда',()=>navigate(battleStage(getState(),{battleId:c.battleId,nowMinute:metadataGameMinute(getMetadata())}).tableUrl),{className:'sn-link'});
+ layout.head.append(heading,socialButton(d,'← Сообщество',()=>navigate('underweb://social/community/'+id),{className:'sn-link'}),stageHeader,stageLink);actions.append(send,answer,register,attach,cancelMessage,read);layout.footer.append(draft,uploadBox,composerBox,actions,replyOptions,typing,notice,pickerHost);
  const message=()=>{const m=getState().outgoingMessage;return m&&(m.issue||m.communityId===id)?m:null;};
  function flushProgress(){
   if(blocked)return false;
@@ -69,6 +71,7 @@ export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commi
   if(lastDraft!==(dialog.draftVersionId??'')){lastDraft=dialog.draftVersionId??'';audio.releaseRows?.(draft);draft.replaceChildren();if(lastDraft)draft.append(el(d,'strong',{text:'Вложение · ещё не отправлено'}),audio.row(d,{version:state.trackVersions?.byId?.[lastDraft]}));}
   typing.textContent=dialogIsTyping(state,id,now)?c.name+' печатает…':'';
   const registered=state.battleApplications?.some(a=>a.battleId===c.battleId),deadline=battleDeadlineLabel(window,now);register.hidden=Boolean(registered);register.disabled=Boolean(window)&&!deadline.open;
+  stageHeader.textContent=battleStageText(battleStage(state,{battleId:c.battleId,nowMinute:now}));
   const upload=uploadPresentation(state),ownUpload=upload&&(upload.status==='error'||upload.communityId===id),waiting=ownUpload&&upload.status!=='ready';
   uploadBox.hidden=!ownUpload;uploadBar.hidden=upload?.status==='error';uploadCancel.textContent=upload?.status==='ready'?'Сменить вложение':'Отменить загрузку';draft.hidden=Boolean(waiting);
   if(ownUpload){uploadBar.value=upload.percent;uploadLabel.textContent=upload.status==='error'?upload.reason:upload.status==='ready'?'Вложение загружено · '+(upload.totalBytes/1000000).toFixed(2)+' МБ':(upload.uploadedBytes/1000000).toFixed(2)+' / '+(upload.totalBytes/1000000).toFixed(2)+' МБ · '+upload.percent+'% · '+(upload.bytesPerSecond/1000).toFixed(1)+' КБ/с · осталось '+upload.remainingSeconds+' сек.';}

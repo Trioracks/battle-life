@@ -1,6 +1,6 @@
 import {communityById} from './social-catalog.js?rev=57';
 import {normalizeSocial} from './social-state.js?rev=57';
-import {ensureBattleWindow} from './battle-windows.js?rev=57';
+import {ensureBattleWindow,migrateBattleDeadlines} from './battle-windows.js?rev=57';
 import {ACK_TEMPLATES,acknowledgementFor} from './social-submission.js?rev=57';
 import {validGameMinute} from './game-minute.js?rev=57';
 import {receivePhoneEvents} from './phone-notifications.js?rev=57';
@@ -37,7 +37,7 @@ export function migrateLegacySocial(input,nowMinute){
 }
 export function activateSocial(state,nowMinute,battleId='makarevich-1'){
  const migrated=migrateLegacySocial(state,nowMinute);if(!migrated.ok)return migrated;
- return ensureBattleWindow(migrated.state,{battleId,nowMinute,judgingPolicyVersion:2});
+ return ensureBattleWindow(migrateBattleDeadlines(migrated.state,nowMinute).state,{battleId,nowMinute,judgingPolicyVersion:2});
 }
 export function advanceSocial(input,nowMinute,options={}){
  const runtime=normalizeSocialRuntime(input.socialRuntime);
