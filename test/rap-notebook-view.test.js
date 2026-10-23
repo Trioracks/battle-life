@@ -32,7 +32,7 @@ test('host redraw preserves an unfinished text title and failed work transition 
 });
 
 test('text dialogs focus and trap controls, keep background inert, and restore focus on Escape',()=>{
- const seed=createLyric(createVirtualPcState(),{id:'draft',name:'Черновик'}).state,f=fixture(seed),d=f.root.ownerDocument;
+ let seed=createLyric(createVirtualPcState(),{id:'draft',name:'Черновик'}).state;seed=savePcDocument(seed,{projectId:'draft',folderId:'documents',filename:'Черновик.txt',nowMinute:1}).state;const f=fixture(seed),d=f.root.ownerDocument;
  findButton(f.root,'Новый текст').focus();fire(findButton(f.root,'Новый текст'),'click');
  const cover=allPc(f.root).find(n=>n.className==='rn-cover'),items=pcFocusable(cover);
  assert.equal(d.activeElement,items[0]);assert.ok(!pcFocusable(f.root).includes(findButton(f.root,'Начать писать')));
@@ -104,7 +104,7 @@ test('opening, refinement and beat adaptation still run the real persisted proje
  for(let i=0;i<3;i++){s.music.needs={satiety:100,energy:100};s=advanceBeatWork(startBeatStage(s,'beat',undefined,undefined,()=>.4).state,1000).state;}
  s.music.needs={satiety:100,energy:100};s=createLyric(s,{id:'other',name:'Другой текст'}).state;
  s=savePcDocument(s,{projectId:'ready',folderId:'downloads',filename:'Готовый текст.txt',nowMinute:1}).state;
- const f=fixture(s);fire(findButton(f.root,'Открыть текст'),'click');
+ const f=fixture(s);fire(findButton(f.root,'Открыть текст'),'click');findButton(allPc(f.root).find(n=>n.getAttribute?.('aria-label')==='Сохранить изменения?'),'Не сохранять').click();
  const picker=allPc(f.root).find(n=>n.className==='pc-file-picker');findButton(picker,'Выбрать: Готовый текст.txt').click();findButton(picker,'Открыть').click();assert.equal(f.state.writing.activeTextId,'ready');
  fire(findButton(f.root,'Доработать'),'click');assert.equal(f.state.writing.job.kind,'refine');assert.equal(f.works,1);
  f.state=advanceLyricWork(f.state,1000).state;f.state.music.needs={satiety:100,energy:100};f.mounted.update();

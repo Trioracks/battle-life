@@ -9,10 +9,13 @@ import {savePcDocument,openPcDocument,pcFileById} from './pc-filesystem.js?rev=5
 import {documentSession,documentIsDirty} from './pc-document-session.js?rev=57';
 import {mountPcFilePicker} from './pc-file-picker-view.js?rev=57';
 import {explorerPaths} from './virtual-pc-explorer.js?rev=57';
+import {createDocumentGuard} from './pc-document-guard.js?rev=57';
 import {battleDocumentName} from './battle-document-name.js?rev=57';
 
 export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,onCommit=onChange,onWork=()=>false}={}){
  const d=root.ownerDocument;let panel=null,modal=null,filePicker=null,returnFocusLabel='',message='',saveMessage='Черновик не сохранён в файл',saveFailed=false,signature=[],disposed=false,controls=[],needsLabel=null;
+ let saveContinuation=null;const guard=createDocumentGuard(root,{appId:'rap-notebook',getState,onCommit,onSave:save});
+ function replaceDocument(mode){guard.request({onClose:()=>openPanel(mode)});}
  function openPanel(mode){returnFocusLabel=d.activeElement?.textContent??'';panel=mode;message='';render();}
  const active=()=>normalizeLyric(getState().projects.find(p=>p.id===getState().writing.activeTextId));
  const fingerprint=()=>{const s=getState(),selected=s.projects.find(p=>p.id===s.writing.activeTextId);return [s.writing.activeTextId,s.projects,selected?.stages,selected?.stages?.length,s.battleApplications,s.writing.job?.projectId,s.writing.job?.kind,s.writing.job?.stage,Math.floor(s.writing.job?.elapsed??0),Boolean(s.music.job),Boolean(s.recording?.job),s.writing.practice,s.creativeWork?.items,effectiveWritingSkill(s,getMetadata().skills)];};
@@ -22,7 +25,7 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
  function persist(next){saveFailed=onChange(next)===false;saveMessage=saveFailed?'Ошибка сохранения':'Изменения в черновике';return !saveFailed;}
  const boundFile=()=>{const s=documentSession(getState(),'rap-notebook');return s.projectId===active()?.id?pcFileById(getState(),s.fileId):null;};
  function commitFile(result){if(!result.ok)return result;saveFailed=onCommit(result.state)===false;if(saveFailed){saveMessage='Ошибка сохранения';return {ok:false,reason:'Не удалось сохранить файл. Повтори попытку.'};}saveMessage='Файл сохранён';message='Текст сохранён.';return {ok:true};}
- function save(){const p=active();if(!p)return;if(!boundFile()){openPanel('save');return;}const r=commitFile(savePcDocument(getState(),{projectId:p.id,fileId:boundFile().id,nowMinute:getMetadata().gameMinutes??getState().lastGameMinute??0}));message=r.ok?'Текст сохранён.':r.reason;render();}
+ function save(continuation=null){const p=active();if(!p){continuation?.onCancel?.();return;}if(!boundFile()){saveContinuation=continuation;openPanel('save');return;}const r=commitFile(savePcDocument(getState(),{projectId:p.id,fileId:boundFile().id,nowMinute:getMetadata().gameMinutes??getState().lastGameMinute??0}));message=r.ok?'Текст сохранён.':r.reason;render();if(r.ok)continuation?.onSaved?.();else continuation?.onCancel?.();}
  function start(kind='stage',extra={}){
   const before=getState(),p=active();if(!p)return;
   const stageSliders=[];for(const c of controls)stageSliders[c.stage]=c.inputs.map(input=>Number(input.value));
@@ -51,9 +54,9 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
   form.append(select,name,random,el(d,'p',{text:'Выбор темы не подаёт заявку на баттл. Сначала набросок, затем рифмы и образы.'}),error,button(d,'Создать текст',{},submit),button(d,'Отмена',{},()=>{panel=null;render();}));form.addEventListener('submit',e=>{e.preventDefault();submit();});box.append(form);return cover;
  }
  function fileDialog(mode){const {cover,box}=dialog(mode==='open'?'Открыть текст':'Сохранить как');
-  filePicker=mountPcFilePicker(box,{getState,mode,types:['txt'],initialFolderId:mode==='open'?'downloads':boundFile()?.folderId??'documents',suggestedName:boundFile()?.filename??(active()?.name??'Текст')+'.txt',onChange:next=>onCommit(next),onCancel:()=>{panel=null;render();},onSelect:value=>{
+  filePicker=mountPcFilePicker(box,{getState,mode,types:['txt'],initialFolderId:mode==='open'?'downloads':boundFile()?.folderId??'documents',suggestedName:boundFile()?.filename??(active()?.name??'Текст')+'.txt',onChange:next=>onCommit(next),onCancel:()=>{const continuation=saveContinuation;saveContinuation=null;panel=null;render();continuation?.onCancel?.();},onSelect:value=>{
    const result=mode==='open'?openPcDocument(getState(),{fileId:value,appId:'rap-notebook'}):savePcDocument(getState(),{projectId:active()?.id,folderId:value.folderId,filename:value.filename,fileId:value.overwriteFileId,overwrite:Boolean(value.overwriteFileId),nowMinute:getMetadata().gameMinutes??getState().lastGameMinute??0});
-   const saved=commitFile(result);if(saved.ok){panel=null;render();}return saved;
+   const saved=commitFile(result);if(saved.ok){const continuation=saveContinuation;saveContinuation=null;panel=null;render();continuation?.onSaved?.();}return saved;
   }});return cover;
  }
  function listDialog(mode){
@@ -74,7 +77,7 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
   brand.append(el(d,'span',{className:'rn-brand-icon',text:'▤',attributes:{'aria-hidden':'true'}}),el(d,'strong',{text:'РэпБлокнот'}));
   const saveButton=button(d,'Сохранить',{className:'rn-save-button',attributes:{'aria-label':'Сохранить'}},save);saveButton.disabled=!p;
   const saveAs=button(d,'Сохранить как',{attributes:{'aria-label':'Сохранить текст как'}},()=>openPanel('save'));saveAs.disabled=!p;
-  toolbar.append(button(d,'Новый',{className:'rn-new-button',attributes:{'aria-label':'Новый текст'}},()=>openPanel('new')),button(d,'Открыть',{className:'rn-open-button',attributes:{'aria-label':'Открыть текст'}},()=>openPanel('open')),saveButton,saveAs);header.append(brand,toolbar);
+  toolbar.append(button(d,'Новый',{className:'rn-new-button',attributes:{'aria-label':'Новый текст'}},()=>replaceDocument('new')),button(d,'Открыть',{className:'rn-open-button',attributes:{'aria-label':'Открыть текст'}},()=>replaceDocument('open')),saveButton,saveAs);header.append(brand,toolbar);
   const tab=el(d,'div',{className:'rn-tab'}),body=el(d,'div',{className:'rn-body'}),editor=el(d,'div',{className:'rn-editor'}),sheet=el(d,'article',{className:'rn-sheet',dataset:{lyricRole:'document'},attributes:{'aria-label':'Документ текста'}}),side=el(d,'aside',{className:'rn-work',attributes:{'aria-label':'О тексте'}});
   const file=boundFile(),dirty=documentIsDirty(s,'rap-notebook');tab.append(el(d,'span',{className:'rn-file-label',text:p?(file?.filename??p.name+'.txt')+(dirty?' *':''):'Нет открытого текста'}),el(d,'span',{className:'rn-save-state'+(saveFailed?' rn-save-error':''),text:p?saveFailed?saveMessage:dirty?'Черновик не сохранён в файл':'Файл сохранён':'Создай или открой текст'}));
   controls=[];
@@ -143,9 +146,9 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
     if(event.key==='Tab'){const items=pcFocusable(modal),i=items.indexOf(d.activeElement);event.preventDefault();event.stopPropagation();items[(i+(event.shiftKey?-1:1)+items.length)%items.length]?.focus();}
    });
   }
-  root.replaceChildren(wrap);signature=fingerprint();
+  root.replaceChildren(wrap);guard.update();signature=fingerprint();
   if(modal)pcFocusable(modal)[0]?.focus();
   else if(hadModal){const items=pcFocusable(wrap);(items.find(n=>n.textContent===returnFocusLabel)??items[0])?.focus();}
  }
- render();return {update(){if(disposed)return;if(!panel&&!sameInputs(signature,fingerprint()))render();else{filePicker?.update();updateNeeds();}},openProject(p){if(normalizeLyric(p))choose(p.id);},focus(){if(modal)pcFocusable(modal)[0]?.focus();},dispose(){disposed=true;filePicker?.dispose();modal=null;root.replaceChildren();}};
+ render();return {requestClose:options=>guard.request(options),save,update(){if(disposed)return;if(!panel&&!sameInputs(signature,fingerprint()))render();else{filePicker?.update();updateNeeds();}},openProject(p){if(normalizeLyric(p))choose(p.id);},focus(){if(modal)pcFocusable(modal)[0]?.focus();},dispose(){guard.dispose();disposed=true;filePicker?.dispose();modal=null;root.replaceChildren();}};
 }

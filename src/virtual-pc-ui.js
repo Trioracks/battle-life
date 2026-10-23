@@ -3,7 +3,7 @@ import {importGoblinFile} from './goblin-exchange.js?rev=57';
 import { FtStudioAudio } from './ft-studio-audio.js?rev=57';
 import {mountPcShell} from './virtual-pc-shell.js?rev=57';
 import {mountExplorer} from './virtual-pc-explorer-view.js?rev=57';
-import {openPcDocument} from './pc-filesystem.js?rev=57';
+import {pcFileById,openPcDocument} from './pc-filesystem.js?rev=57';
 import {mountPcMenu} from './virtual-pc-menus.js?rev=57';
 import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=57';
 import {explorerProperties} from './virtual-pc-explorer.js?rev=57';
@@ -383,7 +383,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.studioView.update();return;
     }
     if(appId==='computer'){
-      if(!pc.explorer)pc.explorer=mountExplorer(target,{audio:pc.audioSession.forOwner('computer'),onSoftware:pc.softwareAction,onChange:next=>pc.persist(next,{atomic:true}),onOpenArtifact:entry=>{if(entry.action==='document-file'){const r=openPcDocument(pc.state,{fileId:entry.fileId});if(!r.ok)return r.reason;if(!pc.persist(r.state,{atomic:true}))return 'Не удалось открыть файл.';pc.openProject(pc.state.projects.find(p=>p.id===r.projectId));return '';}if(entry.action==='mentor-file')return pc.openMentorFile(entry.fileId);pc.softwareAction(entry.action,entry.appId);return pc.message;},onOpenApp:id=>pc.open(id),onOpenProject:p=>pc.openProject(p),onProperties:p=>pc.showProperties(p),onClose:()=>pc.closeWindow('computer'),onMenu:p=>pc.menu?.open(p),onNavigate:location=>{
+      if(!pc.explorer)pc.explorer=mountExplorer(target,{audio:pc.audioSession.forOwner('computer'),onSoftware:pc.softwareAction,onChange:next=>pc.persist(next,{atomic:true}),onOpenArtifact:entry=>{if(entry.action==='document-file')return pc.openDocumentFile(entry.fileId);if(entry.action==='mentor-file')return pc.openMentorFile(entry.fileId);pc.softwareAction(entry.action,entry.appId);return pc.message;},onOpenApp:id=>pc.open(id),onOpenProject:p=>pc.openProject(p),onProperties:p=>pc.showProperties(p),onClose:()=>pc.closeWindow('computer'),onMenu:p=>pc.menu?.open(p),onNavigate:location=>{
         pc.windows={...pc.windows,windows:pc.windows.windows.map(w=>w.id==='computer'?{...w,title:location.label,iconId:location.iconId}:w)};pc.renderDesktop(false);
       }});
       pc.explorer.update(pc.state);return;
@@ -480,6 +480,11 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.callbacks.onOpenProject(normalized);pc.open('ft-studio');pc.refreshApp('ft-studio',{replaceContent:true});
     if(pc.studioView){pc.pendingStudioProject=null;pc.studioView.openProject(normalized);}
   };
+  pc.openDocumentFile = fileId => {
+    const file=pcFileById(pc.state,fileId),view=file?.type==='txt'?pc.notebookView:pc.studioView;
+    const open=()=>{const r=openPcDocument(pc.state,{fileId});if(!r.ok)return r.reason;if(!pc.persist(r.state,{atomic:true}))return 'Не удалось открыть файл.';pc.openProject(pc.state.projects.find(p=>p.id===r.projectId));return '';};
+    if(view?.requestClose){view.requestClose({onClose:open});return '';}return open();
+  };
   pc.openMentorFile = fileId => {
     const r=importGoblinFile(pc.state,fileId,pc.metadata.gameMinutes??pc.state.lastGameMinute??0);
     if(!r.ok)return r.reason;
@@ -573,6 +578,8 @@ export function mountVirtualPc(root, callbacks = {}) {
     if(pc.locked||pc.confirmClose||!id)return;
     if((id==='ft-studio'&&pc.state.music.job)||(id==='rap-notebook'&&pc.state.writing.job))pc.persist(pauseCreativeChain(pc.state));
     if(id==='rap-dossier')pc.persist(pauseCaseStudy(pauseStudy(pc.state)));
+    const view=id==='ft-studio'?pc.studioView:id==='rap-notebook'?pc.notebookView:null;
+    if(view?.requestClose){view.requestClose({onClose:()=>pc.closeNow(id)});return;}
     pc.closeNow(id);
   };
 
@@ -590,7 +597,9 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.persist(pauseCaseStudy(pauseStudy(pauseCreativeChain(pc.state))));
     pc.cancelStudioLaunch();
     pc.cancelInstallerLaunch();
-    pc.audio.stop();pc.audioSession.stopAll();pc.callbacks.onShutdown();
+    const finish=()=>{pc.audio.stop();pc.audioSession.stopAll();pc.callbacks.onShutdown();};
+    const notebook=()=>pc.notebookView?.requestClose?pc.notebookView.requestClose({onClose:finish}):finish();
+    if(pc.studioView?.requestClose)pc.studioView.requestClose({onClose:notebook});else notebook();
   };
 
   pc.completeShutdown=()=>{pc.cancelStudioLaunch();pc.audioSession.stopAll();pc.clearViews();pc.windows=reduceWindows(pc.windows,{type:'clear'});pc.renderDesktop(false);};

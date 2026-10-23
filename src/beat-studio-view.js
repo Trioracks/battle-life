@@ -11,6 +11,11 @@ import {startVocalWork} from './vocal-production.js?rev=57';
 import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=57';
 import {appendRecordingControls} from './recording-studio-view.js?rev=57';
 import {normalizeGenreProgression,genreOptions,genreById,genreCap,chooseGenre,chooseSpecialization} from './genre-progression.js?rev=57';
+import {mountPcFilePicker} from './pc-file-picker-view.js?rev=57';
+import {pcFileById,savePcDocument,openPcDocument} from './pc-filesystem.js?rev=57';
+import {documentSession,documentIsDirty} from './pc-document-session.js?rev=57';
+import {createDocumentGuard} from './pc-document-guard.js?rev=57';
+import {importAudioBacking} from './pc-audio-import.js?rev=57';
 import {mountAudioExport} from './pc-audio-export-view.js?rev=57';
 
 export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onChange,onWork,audio,legacyName,initialProject}){
@@ -20,12 +25,14 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onC
  body.append(panel);body.className+=' ft-producing';
  const actions=find('project-actions'),workflow=find('workflow');
  const exportButton=button(d,'Экспорт',{},()=>openDialog('export'));
- actions.append(button(d,'Новый проект',{},()=>openDialog('new')),button(d,'Открыть проект',{},()=>openDialog('projects')),exportButton);
+ actions.append(button(d,'Новый проект',{},()=>replaceProject('new')),button(d,'Открыть проект',{},()=>replaceProject('projects')),button(d,'Сохранить',{},()=>saveDocument()),button(d,'Сохранить как',{},()=>openFilePicker('save')),button(d,'Импорт аудио',{},()=>replaceProject('import')),exportButton);
  const genreButton=button(d,'Жанры',{},()=>openDialog('genres'));
  const footer=pcFind(workspace,n=>n.className==='ft-bottom');footer.replaceChildren(el(d,'span',{text:'●  FIELD TONE / HOME STUDIO'}),el(d,'span',{text:'Три этапа. Твой первый звук.'}),el(d,'span',{text:'44.1 kHz / 16 bit'}));
  const summary=el(d,'p',{className:'ft-needs'}),session=pcFind(workspace,n=>n.className==='ft-session').children[1],tempo=pcFind(workspace,n=>n.className==='ft-tempo').children[0];
  const readout=pcFind(workspace,n=>n.className==='ft-readout').children[1],transport=find('transport'),playhead=find('playhead'),status=find('transport-status');
  const controls=Object.fromEntries(['play','pause','stop'].map(key=>[key,pcFind(transport,n=>n.dataset?.ftAction===key)]));
+ let filePicker=null,saveContinuation=null;
+ const guard=createDocumentGuard(workspace,{appId:'ft-studio',getState,onCommit,onSave:saveDocument});
  let signature=[],message='',disposed=false,dialog=null,exportView=null,returnFocus=null,frame=null,sessionSelected=false,visible=true;
  const win=d.defaultView??globalThis,requestFrame=win.requestAnimationFrame?.bind(win),cancelFrame=win.cancelAnimationFrame?.bind(win);
  let beatSource,beatCache;
@@ -42,10 +49,26 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onC
  }
  function change(next){onChange(next);render();}
  function closeDialog({restore=true}={}){
-  exportView?.dispose();exportView=null;
+  exportView?.dispose();exportView=null;filePicker?.dispose();filePicker=null;
   dialog?.remove();dialog=null;
   for(const child of workspace.children)child.inert=false;
   if(restore){(returnFocus?.isConnected?returnFocus:pcFocusable(actions)[0])?.focus();returnFocus=null;}
+ }
+ function commitDocument(result){if(!result.ok)return result;if(onCommit(result.state)===false)return {ok:false,reason:'Не удалось сохранить файл. Повтори попытку.'};message='Проект сохранён.';return {ok:true};}
+ function boundFile(){const binding=documentSession(getState(),'ft-studio');return binding.projectId===currentBeat()?.id?pcFileById(getState(),binding.fileId):null;}
+ function saveDocument(continuation=null){
+  if(!currentBeat()){continuation?.onCancel?.();return;}
+  if(!boundFile()){saveContinuation=continuation;openFilePicker('save');return;}
+  const r=commitDocument(savePcDocument(getState(),{projectId:currentBeat().id,fileId:boundFile().id,nowMinute:getMetadata().gameMinutes??getState().lastGameMinute??0}));message=r.reason??'Проект сохранён.';render();if(r.ok)continuation?.onSaved?.();else continuation?.onCancel?.();
+ }
+ function replaceProject(mode){if(!currentBeat()){mode==='new'?openDialog('new'):openFilePicker(mode);return;}guard.request({onClose:()=>mode==='new'?openDialog('new'):openFilePicker(mode)});}
+ function openFilePicker(mode){
+  returnFocus??=d.activeElement;closeDialog({restore:false});dialog=el(d,'div',{className:'ft-dialog-backdrop'});workspace.append(dialog);
+  const cancel=()=>{const continuation=saveContinuation;saveContinuation=null;closeDialog();continuation?.onCancel?.();};
+  filePicker=mountPcFilePicker(dialog,{getState,mode:mode==='save'?'save':'open',types:mode==='import'?['wav','mp3']:[ 'flp' ],initialFolderId:mode==='import'?'downloads':boundFile()?.folderId??'projects',suggestedName:boundFile()?.filename??(currentBeat()?.name??'Проект')+'.flp',onChange:onCommit,onCancel:cancel,onSelect:value=>{
+   const r=mode==='save'?savePcDocument(getState(),{projectId:currentBeat()?.id,folderId:value.folderId,filename:value.filename,fileId:value.overwriteFileId,overwrite:Boolean(value.overwriteFileId),nowMinute:getMetadata().gameMinutes??0}):mode==='import'?importAudioBacking(getState(),{fileId:value,projectId:'backing-'+(globalThis.crypto?.randomUUID?.()??Date.now()),name:(pcFileById(getState(),value)?.filename??'Фонограмма').replace(/\.(wav|mp3)$/i,''),nowMinute:getMetadata().gameMinutes??0}):openPcDocument(getState(),{fileId:value,appId:'ft-studio'});
+   const saved=commitDocument(r);if(!saved.ok)return saved;sessionSelected=true;if(mode!=='save'){const opened=getState().projects.find(p=>p.id===r.projectId);legacyName=opened?.kind==='beat'?undefined:opened?.name;}const continuation=saveContinuation;saveContinuation=null;closeDialog();render();continuation?.onSaved?.();return {ok:true};
+  }});
  }
  function openDialog(mode='home',choice=null){
   returnFocus??=d.activeElement;closeDialog({restore:false});
@@ -89,7 +112,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onC
     if(distinct!==name.value.trim()){notice.textContent='Такой бит уже есть. Попробуй «'+distinct+'».';return;}
     const r=createBeat(getState(),{id:globalThis.crypto?.randomUUID?.()??'beat-'+Date.now(),name:name.value,genre,gameDay:getMetadata().gameDay},getMetadata().skills);
     if(!r.ok){notice.textContent=r.reason;return;}
-    sessionSelected=true;legacyName=undefined;message='';audio.stop();closeDialog({restore:false});change(r.state);pcFocusable(actions)[0]?.focus();
+    sessionSelected=true;legacyName=undefined;message='';audio.stop();closeDialog({restore:false});change({...r.state,documentSessions:{version:1,...r.state.documentSessions,byApp:{...r.state.documentSessions?.byApp,'ft-studio':{projectId:r.state.music.activeBeatId,fileId:null}}}});pcFocusable(actions)[0]?.focus();
    };
    const naming=el(d,'div',{className:'ft-project-name'});
    naming.append(name,button(d,'⚄ Случайное название',{attributes:{'aria-label':'Случайное название'}},()=>{name.value=randomBeatName(getMetadata().gameDay,name.value,Math.random,getState().projects.map(p=>p.name));name.focus();}));
@@ -100,9 +123,9 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onC
    if(!projects.length)card.append(el(d,'p',{className:'ft-production-note',text:'Пока нет сохранённых проектов.'}));
    const list=el(d,'div',{className:'ft-dialog-projects'});
    mountProjectPicker(list,{items:projects,onSelect:selectProject,onCancel:()=>closeDialog()});
-   card.append(list,button(d,'Новый проект',{},()=>openDialog('new')));
+   card.append(list,button(d,'Новый проект',{},()=>replaceProject('new')));
   }else{
-   card.append(el(d,'p',{className:'ft-production-note',text:'Чистый лист или работа, к которой хочется вернуться.'}),button(d,'Новый проект',{className:'ft-menu-choice'},()=>openDialog('new')),button(d,'Открыть проект',{className:'ft-menu-choice'},()=>openDialog('projects')));
+   card.append(el(d,'p',{className:'ft-production-note',text:'Чистый лист или работа, к которой хочется вернуться.'}),button(d,'Новый проект',{className:'ft-menu-choice'},()=>openDialog('new')),button(d,'Открыть проект',{className:'ft-menu-choice'},()=>replaceProject('projects')));
   }
   if(!['projects','vocals','export'].includes(mode))card.append(button(d,mode==='home'?'Закрыть':'Отмена',{},()=>closeDialog()));
   dialog.append(card);workspace.append(dialog);
@@ -121,14 +144,15 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onC
  }
  function render(){
   if(disposed)return;const s=getState(),beat=currentBeat();signature=stateSignature();panel.replaceChildren();workflow.replaceChildren();
-  exportButton.disabled=!beat||beat.status!=='ready'||Boolean(beat.audioIssue);exportView?.update();
+  for(const child of actions.children)if(['Сохранить','Сохранить как'].includes(child.textContent))child.disabled=!beat;
+  exportButton.disabled=!beat||beat.status!=='ready'||Boolean(beat.audioIssue);exportView?.update();filePicker?.update();guard.update();
   if(effectiveBeatSkill(s,getMetadata().skills)>=25){if(!genreButton.parentNode)actions.append(genreButton);}else genreButton.remove();
   panel.append(el(d,'small',{className:'ft-eyebrow',text:'АНАЛИЗ ПРОЕКТА'}),summary);
   const genres=normalizeGenreProgression(s.music.genres),genreId=beat?.genreProfile?.id??'experimental',options=genreOptions(genres,effectiveBeatSkill(s,getMetadata().skills));
   panel.append(el(d,'p',{className:'ft-production-note',dataset:{ftRole:'genre-summary'},text:(beat&&!beat.genreProfile?'Архивная экспериментальная работа · ':genreById(genreId).name+' · ')+genres.xp[genreId].toFixed(2)+' / '+genreCap(genres,genreId)}));
   if(options.remaining)panel.append(button(d,'Доступен новый жанр · '+options.remaining,{},()=>openDialog('genres')));
   if(options.canSpecialize)panel.append(button(d,'Выбрать главную специализацию',{},()=>openDialog('genres')));
-  session.textContent=beat?.name??legacyName??'Сеанс без названия';tempo.textContent=beat?String(beat.bpm):'—';
+  session.textContent=beat?(boundFile()?.filename??beat.name+'.flp')+(documentIsDirty(s,'ft-studio')?' *':''):legacyName??'Сеанс без названия';tempo.textContent=beat?String(beat.bpm):'—';
   renderStudioTracks(workspace,beat);
   if(beat){
    const stage=beat.stages.length,job=s.music.job?.beatId===beat.id?s.music.job:s.creativeWork?.items.find(i=>i.projectId===beat.id)?.pausedJob;
@@ -205,9 +229,11 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onC
  frame=requestFrame?.(tick)??null;
  return {
   openProject:selectProject,
+  requestClose:options=>currentBeat()?guard.request(options):(options?.onClose?.(),Promise.resolve('saved')),
+  save:saveDocument,
   focus(){if(dialog)pcFocusable(dialog)[0]?.focus();},
   setVisible(next){visible=next;if(!visible&&frame!==null){cancelFrame?.(frame);frame=null;}else if(visible&&!disposed&&frame===null){updateTransport();frame=requestFrame?.(tick)??null;}},
   update(){if(disposed||!visible)return;if(!sameInputs(stateSignature(),signature))render();else updateSummary();},
-  dispose(){disposed=true;if(frame!==null)cancelFrame?.(frame);closeDialog({restore:false});audio.stop();root.replaceChildren();}
+  dispose(){guard.dispose();disposed=true;if(frame!==null)cancelFrame?.(frame);closeDialog({restore:false});audio.stop();root.replaceChildren();}
  };
 }

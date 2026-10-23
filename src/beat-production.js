@@ -9,6 +9,7 @@ import {normalizeSongForm} from './beat-song-form.js?rev=57';
 import {genreById,normalizeGenreProgression,genreOptions,genreSnapshot,normalizeGenreSnapshot,addGenrePractice} from './genre-progression.js?rev=57';
 import {beatPracticeBudget} from './beat-practice-curve.js?rev=57';
 import {createBeatExecutionSnapshot,validBeatExecutionMix} from './beat-execution-snapshot.js?rev=57';
+import {normalizeAudioBacking} from './pc-audio-backing.js?rev=57';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
 const clamp=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,finite(v)));
 const text=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';
@@ -35,6 +36,7 @@ export function normalizeBeat(p){
  // ready beat that can overwrite the original recording on the next save.
  if(p.recording!=null&&(!recording||beat.status!=='ready'))return null;
  if(recording)beat.recording=recording;
+ if(p.audioBacking!==undefined){const backing=normalizeAudioBacking(p.audioBacking);if(!backing||beat.status!=='ready')return null;beat.audioBacking=backing;}
  if(p.version===3){
   beat.productionMode=p.productionMode==='beginner'?'beginner':'automatic';
   beat.audio={bankVersion:p.audio?.bankVersion===1?1:0,bars:p.audio?.bars===4?4:0,themeId:text(p.audio?.themeId,100),arrangementId:text(p.audio?.arrangementId,100)};

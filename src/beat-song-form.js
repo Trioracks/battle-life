@@ -12,6 +12,7 @@ function choice(key){
 // Saved project identity and the first take define the form. A clean take or
 // mastering changes the sound, but never the musical arrangement choices.
 export function createBeatSongForm(beat){
+ if(beat?.audioBacking)return null;
  const recording=beat?.recording;
  if(beat?.stages?.length!==3||!recording?.draft)return null;
  if(beat.songForm)return normalizeSongForm(beat.songForm,beat);

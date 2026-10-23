@@ -7,13 +7,19 @@ export function normalizeDocumentSessions(raw,{fileSystem,projects=[]}={}){
   else out.recovery.push({app,recoveryData:structuredClone(s),reason:'Сеанс документа недоступен.'});
  }return out;
 }
-export function documentSession(state,appId){return state.documentSessions?.byApp?.[appId]??{projectId:appId==='rap-notebook'?state.writing?.activeTextId:state.music?.activeBeatId,fileId:null};}
+export function documentSession(state,appId){const projectId=appId==='rap-notebook'?state.writing?.activeTextId:state.music?.activeBeatId,s=state.documentSessions?.byApp?.[appId];return s?.projectId===projectId?s:{projectId,fileId:state.fileSystem?.files.find(f=>f.projectId===projectId&&f.source==='legacy-project')?.id??null};}
 export function documentIsDirty(state,appId){
  const s=documentSession(state,appId),p=state.projects?.find(p=>p.id===s.projectId);if(!p)return false;
  const file=s.fileId?pcFileById(state,s.fileId):null;return !file||JSON.stringify(p)!==JSON.stringify(file.snapshot);
 }
 export function discardPcDocument(state,appId){
  const s=documentSession(state,appId);
+ // Work already credited remains in skills. Its pending output must not restore
+ // a discarded document, including after a game autosave and reload.
+ state={...state,creativeWork:{...state.creativeWork,items:(state.creativeWork?.items??[]).filter(i=>i.projectId!==s.projectId),activeId:state.creativeWork?.activeId===s.projectId?null:state.creativeWork?.activeId}};
+ if(state.writing?.job?.projectId===s.projectId)state.writing={...state.writing,job:null};
+ if(state.music?.job?.beatId===s.projectId)state.music={...state.music,job:null};
+ if(state.recording?.job?.beatId===s.projectId)state.recording={...state.recording,job:null};
  if(s.fileId)return openPcDocument(state,{fileId:s.fileId,appId});
  const next={...state,projects:(state.projects??[]).filter(p=>p.id!==s.projectId),documentSessions:{version:1,...state.documentSessions,byApp:{...state.documentSessions?.byApp}}};delete next.documentSessions.byApp[appId];
  if(appId==='rap-notebook')next.writing={...state.writing,activeTextId:null};else next.music={...state.music,activeBeatId:null};

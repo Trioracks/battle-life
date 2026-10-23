@@ -89,7 +89,7 @@ export function openPcDocument(state,{fileId,appId}={}){
  if(state.music?.job||state.writing?.job||state.recording?.job)return fail('Сначала прерви текущую работу.');
  const projectId=file.projectId??snapshot.id,p={...clone(snapshot),id:projectId};
  const projects=state.projects?.some(p=>p.id===projectId)?state.projects.map(old=>old.id===projectId?p:old):[...(state.projects??[]),p];
- const next={...state,projects,documentSessions:{version:1,...state.documentSessions,byApp:{...state.documentSessions?.byApp,[appId]:{projectId,fileId}}}};
+ const next={...state,projects,creativeWork:{...state.creativeWork,items:(state.creativeWork?.items??[]).filter(i=>i.projectId!==projectId),activeId:state.creativeWork?.activeId===projectId?null:state.creativeWork?.activeId},documentSessions:{version:1,...state.documentSessions,byApp:{...state.documentSessions?.byApp,[appId]:{projectId,fileId}}}};
  if(file.type==='txt')next.writing={...state.writing,activeTextId:projectId};else next.music={...state.music,activeBeatId:projectId};
  return {ok:true,state:next,projectId,reason:''};
 }

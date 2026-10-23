@@ -13,6 +13,7 @@ test('battle selection locks the topic name and ignores edited input at submissi
  const f=setup(25);findButton(f.root,'Новый текст').click();const select=field(f.root,'Для чего пишем текст');select.value='makarevich-1';fire(select,'change');const name=field(f.root,'Название текста');
  assert.equal(name.readOnly,true);assert.equal(name.value,'Не переключай');assert.equal(findButton(f.root,'Случайное название').disabled,true);
  name.value='Обман';findButton(f.root,'Создать текст').click();assert.equal(f.state.projects[0].name,'Не переключай');
+ findButton(f.root,'Сохранить').click();findButton(field(f.root,'Сохранить как'),'Сохранить').click();
  findButton(f.root,'Новый текст').click();const next=field(f.root,'Для чего пишем текст');next.value='makarevich-1';fire(next,'change');findButton(f.root,'Создать текст').click();assert.equal(f.state.projects[1].name,'Не переключай (1)');f.view.dispose();
 });
 test('the first Save selects a virtual TXT path and subsequent Save updates that same file',()=>{
