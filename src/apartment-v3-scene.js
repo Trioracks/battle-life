@@ -9,7 +9,7 @@ import {renderAvatarPortrait} from './avatar-portrait-renderer.js?rev=57';
 import {homeLight} from './apartment-v3-time.js?rev=57';
 import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=57';
 import {createLandingReveal} from './apartment-v3-landing.js?rev=57';
-import {CameraModes,cameraPose,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=57';
+import {CameraModes,cameraPose,computerCameraSource,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=57';
 import {createInteractionTargets,pickInteraction} from './apartment-interaction.js?rev=57';
 import {createHoverOutline} from './apartment-hover-outline.js?rev=57';
 import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=57';
@@ -108,10 +108,10 @@ export async function createApartmentScene(canvas,config){
     const anchor=head??actor;
     return headCameraPose({position:anchor.getWorldPosition(new THREE.Vector3()).toArray(),quaternion:anchor.getWorldQuaternion(new THREE.Quaternion()).toArray(),eyeOffset:head?[0,.09,.1]:[0,eyeHeight,.1]});
   }
-  function beginComputerView(){
+  function beginComputerView({fromHead=false}={}){
     if(!staticScene||!computer||disposed)throw Error('Computer view is not prepared');
     const pose=getHeadCameraPose();headViewCamera.position.fromArray(pose.position);headViewCamera.quaternion.fromArray(pose.quaternion);headViewCamera.aspect=camera.aspect;headViewCamera.updateProjectionMatrix();headViewCamera.updateMatrixWorld(true);
-    computer.begin(headViewCamera);computerActive=true;
+    computer.begin(computerCameraSource({mode:modes.mode,overview:camera,firstPerson:firstCamera,head:headViewCamera,fromHead}));computerActive=true;
   }
   function setComputerPresentation(snapshot,pcState,playerName){computerSnapshot=snapshot;computer?.update(snapshot,pcPresentation(snapshot,pcState.power,playerName));}
   function endComputerView(){computerActive=false;computer?.end();transitionQuad.visible=false;}
