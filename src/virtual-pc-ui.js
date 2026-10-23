@@ -371,7 +371,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.dossierView.update();return;
     }
     if(appId==='rap-notebook'){
-      if(!pc.notebookView)pc.notebookView=mountRapNotebook(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onChange:next=>pc.persist(next),onWork:()=>callbacks.onWork?.()??false});
+      if(!pc.notebookView)pc.notebookView=mountRapNotebook(target,{getState:()=>pc.state,getMetadata:()=>pc.metadata,onChange:next=>pc.persist(next),onCommit:next=>pc.persist(next,{atomic:true}),onWork:()=>callbacks.onWork?.()??false});
       pc.notebookView.update();return;
     }
     if(appId==='underweb'){

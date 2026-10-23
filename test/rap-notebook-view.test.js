@@ -6,6 +6,7 @@ import {createLyric,startLyricWork,advanceLyricWork} from '../src/lyric-producti
 import {createBeat,startBeatStage,advanceBeatWork} from '../src/beat-production.js';
 import * as view from '../src/rap-notebook-view.js';
 import {pcFocusable} from '../src/virtual-pc-dom.js';
+import {savePcDocument} from '../src/pc-filesystem.js';
 function fixture(seed){const d=pcDocument(),root=d.createElement('main');let s=createVirtualPcState(seed),works=0;const mounted=view.mountRapNotebook(root,{getState:()=>s,getMetadata:()=>({gameDay:1,skills:{writing:10}}),onChange:n=>s=createVirtualPcState(n),onWork:()=>{works++;return true;}});return {root,mounted,get state(){return s;},set state(n){s=n;},get works(){return works;}};}
 function readyState(){let s=createLyric(createVirtualPcState(),{id:'ready',name:'Готовый текст'}).state;for(let i=0;i<3;i++){s.music.needs={satiety:100,energy:100};s=advanceLyricWork(startLyricWork(s,{projectId:'ready'},{writing:10},()=>.4).state,1000).state;}s.music.needs={satiety:100,energy:100};return s;}
 test('new text hides registered option until a battle application exists',()=>{
@@ -19,8 +20,7 @@ test('beginner creates text without sliders and starts actual writing work',()=>
  const f=fixture({music:{needs:{satiety:100,energy:100}}});fire(findButton(f.root,'Новый текст'),'click');
  const title=allPc(f.root).find(n=>n.getAttribute('aria-label')==='Название текста');title.value='Первые строки';fire(findButton(f.root,'Создать текст'),'click');
  assert.equal(f.state.projects[0].name,'Первые строки');assert.ok(!allPc(f.root).some(n=>n.type==='range'));
- const start=findButton(f.root,'Начать писать');assert.ok(allPc(f.root).find(n=>n.dataset.lyricRole==='document').contains(start));
- fire(start,'click');assert.equal(f.works,1);assert.equal(f.state.writing.job.kind,'stage');
+ assert.equal(findButton(f.root,'Начать писать'),undefined);assert.equal(f.works,1);assert.equal(f.state.writing.job.kind,'stage');
  f.state=advanceLyricWork(f.state,1000).state;f.mounted.update();
  assert.ok(allPc(f.root).some(n=>n.className==='rn-word rn-error'));assert.ok(allPc(f.root).some(n=>n.dataset.lyricRole==='document'));
 });
@@ -54,40 +54,33 @@ test('novice draft renders flowing prose without notes or verse headings',()=>{
 
 test('empty notebook keeps New and Open available and cannot save an absent document',()=>{
  const f=fixture(),toolbar=allPc(f.root).find(n=>n.className==='rn-toolbar');
- assert.deepEqual(allPc(toolbar).filter(n=>n.tagName==='BUTTON').map(n=>n.textContent),['Новый','Открыть','Сохранить']);
+ assert.deepEqual(allPc(toolbar).filter(n=>n.tagName==='BUTTON').map(n=>n.textContent),['Новый','Открыть','Сохранить','Сохранить как']);
  assert.equal(findButton(f.root,'Сохранить').disabled,true);
 });
 
-test('Save persists the current document and reports a rejected save without changing its content',()=>{
- const d=pcDocument(),root=d.createElement('main'),s=createLyric(createVirtualPcState(),{id:'save',name:'Сохрани мысль'}).state;
- let accepted=false,calls=0,persisted=null;
- const mounted=view.mountRapNotebook(root,{getState:()=>s,onChange:next=>{calls++;persisted=next;return accepted;}});
- fire(findButton(root,'Сохранить'),'click');
- assert.equal(calls,1);assert.equal(persisted,s);assert.ok(allPc(root).some(n=>n.textContent==='Не удалось сохранить текст.'));
- assert.ok(allPc(root).some(n=>n.className==='rn-save-state rn-save-error'));
- accepted=true;fire(findButton(root,'Сохранить'),'click');
- assert.equal(calls,2);assert.equal(persisted.projects[0].name,'Сохрани мысль');
- assert.ok(allPc(root).some(n=>n.textContent==='Все изменения сохранены'));
- mounted.dispose();
+test('Save reports a rejected file commit and retries the same selected destination',()=>{
+ const d=pcDocument(),root=d.createElement('main');let s=createLyric(createVirtualPcState(),{id:'save',name:'Сохрани мысль'}).state,accepted=false,calls=0;
+ const mounted=view.mountRapNotebook(root,{getState:()=>s,onChange:next=>{calls++;if(!accepted)return false;s=next;return true;}});
+ findButton(root,'Сохранить').click();let picker=allPc(root).find(n=>n.className==='pc-file-picker');findButton(picker,'Сохранить').click();
+ assert.equal(calls,1);assert.equal(s.fileSystem.files.length,0);assert.ok(allPc(picker).some(n=>/Не удалось сохранить файл/.test(n.textContent)));
+ accepted=true;findButton(picker,'Сохранить').click();assert.equal(calls,2);assert.equal(s.fileSystem.files[0].snapshot.name,'Сохрани мысль');
+ assert.ok(allPc(root).some(n=>n.textContent==='Файл сохранён'));mounted.dispose();
 });
 
-test('automatic project saves refresh the file strip after a manual save succeeded',()=>{
- const d=pcDocument(),root=d.createElement('main');let s=createLyric(createVirtualPcState(),{id:'auto',name:'Автосохранение'}).state,accepted=true;
- const mounted=view.mountRapNotebook(root,{getState:()=>s,onChange:next=>{s=next;return accepted;}});
- fire(findButton(root,'Сохранить'),'click');accepted=false;mounted.openProject(s.projects[0]);
- assert.ok(allPc(root).some(n=>n.className==='rn-save-state rn-save-error'));
- accepted=true;mounted.openProject(s.projects[0]);
- assert.ok(allPc(root).some(n=>n.textContent==='Все изменения сохранены'));mounted.dispose();
+test('automatic game saves leave a modified TXT dirty and preserve its previous file snapshot',()=>{
+ const d=pcDocument(),root=d.createElement('main');let s=createLyric(createVirtualPcState(),{id:'auto',name:'Автосохранение'}).state;
+ s=savePcDocument(s,{projectId:'auto',folderId:'documents',filename:'Текст.txt',nowMinute:0}).state;
+ const mounted=view.mountRapNotebook(root,{getState:()=>s,onChange:next=>{s=next;return true;}});
+ s={...s,projects:s.projects.map(p=>({...p,name:'Несохранённое изменение'}))};mounted.openProject(s.projects[0]);
+ assert.ok(allPc(root).some(n=>n.textContent==='Черновик не сохранён в файл'));assert.equal(s.fileSystem.files[0].snapshot.name,'Автосохранение');mounted.dispose();
 });
 
-test('ready document keeps refinement, adaptation, additions and export reachable below its text',()=>{
+test('ready document keeps compact refinement actions and saves a TXT through the file picker',()=>{
  const f=fixture(readyState()),actions=allPc(f.root).find(n=>n.className==='rn-actions');
- assert.ok(actions?.contains(findButton(f.root,'Доработать')));
- assert.ok(actions.contains(findButton(f.root,'Адаптировать под бит')));
- assert.ok(findButton(f.root,'Добавить'));assert.ok(findButton(f.root,'Экспорт текста'));
- fire(findButton(f.root,'Экспорт текста'),'click');
- assert.equal(f.state.social.goblin.files.at(-1)?.kind,'lyrics');
- assert.equal(f.state.social.goblin.files.at(-1)?.project.id,'ready');
+ assert.ok(actions?.contains(findButton(f.root,'Доработать')));assert.ok(actions.contains(findButton(f.root,'Адаптировать под бит')));
+ assert.ok(findButton(f.root,'Добавить'));assert.equal(findButton(f.root,'Экспорт текста'),undefined);
+ findButton(f.root,'Сохранить').click();findButton(allPc(f.root).find(n=>n.className==='pc-file-picker'),'Сохранить').click();
+ assert.equal(f.state.fileSystem.files.at(-1).type,'txt');assert.equal(f.state.fileSystem.files.at(-1).snapshot.id,'ready');
 });
 
 test('ready actions update their busy state when another studio job starts or stops',()=>{
@@ -110,8 +103,9 @@ test('opening, refinement and beat adaptation still run the real persisted proje
  let s=readyState();s=createBeat(s,{id:'beat',name:'Ритм'},undefined,()=>.4).state;
  for(let i=0;i<3;i++){s.music.needs={satiety:100,energy:100};s=advanceBeatWork(startBeatStage(s,'beat',undefined,undefined,()=>.4).state,1000).state;}
  s.music.needs={satiety:100,energy:100};s=createLyric(s,{id:'other',name:'Другой текст'}).state;
+ s=savePcDocument(s,{projectId:'ready',folderId:'downloads',filename:'Готовый текст.txt',nowMinute:1}).state;
  const f=fixture(s);fire(findButton(f.root,'Открыть текст'),'click');
- fire(allPc(f.root).find(n=>n.dataset.projectId==='ready'),'click');assert.equal(f.state.writing.activeTextId,'ready');
+ const picker=allPc(f.root).find(n=>n.className==='pc-file-picker');findButton(picker,'Выбрать: Готовый текст.txt').click();findButton(picker,'Открыть').click();assert.equal(f.state.writing.activeTextId,'ready');
  fire(findButton(f.root,'Доработать'),'click');assert.equal(f.state.writing.job.kind,'refine');assert.equal(f.works,1);
  f.state=advanceLyricWork(f.state,1000).state;f.state.music.needs={satiety:100,energy:100};f.mounted.update();
  fire(findButton(f.root,'Адаптировать под бит'),'click');fire(allPc(f.root).find(n=>n.dataset.projectId==='beat'),'click');
