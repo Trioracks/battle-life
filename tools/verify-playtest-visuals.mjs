@@ -8,6 +8,7 @@ import {startPreviewServer} from './serve-preview.mjs';
 import {verifyShoulderCoverage} from './verify-shoulder-coverage.mjs';
 import {verifyNoBankJudging} from './verify-playtest-no-bank.mjs';
 import {verifyCameraHandoffs} from './verify-playtest-camera.mjs';
+import {verifyFilePicker} from './verify-playtest-file-picker.mjs';
 export async function verifyPlaytestVisuals(options={}){
  const qa=await validateQaOptions(options),server=await startPreviewServer({root:qa.root,port:0}),{chromium}=await import('playwright'),browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']}),context=await browser.newContext(),page=await context.newPage(),errors=[],violations=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(!r.url().includes('__qa')){const reason=responseViolation({url:r.url(),status:r.status(),contentType:r.headers()['content-type']??''});if(reason)violations.push({url:r.url(),reason});}});
@@ -36,6 +37,7 @@ export async function verifyPlaytestVisuals(options={}){
    const file='production-'+width+'.png';await page.screenshot({path:path.join(outputDir,file)});shots.push(file);
   }
   if(options.camera)await verifyCameraHandoffs(page,{artifactUrl,outputDir:path.join(outputDir,'camera')});
+  if(options.filePicker)await verifyFilePicker(page,{artifactUrl,outputDir:path.join(outputDir,'file-picker')});
   if(options.shoulders)await verifyShoulderCoverage(page,{artifactUrl,outputDir:path.join(outputDir,'shoulders')});
   if(options.noBank)await verifyNoBankJudging(page,{artifactUrl,outputDir:path.join(outputDir,'no-bank')});
   assert.deepEqual(errors,[],'page errors');assert.deepEqual(violations,[],'network violations');
