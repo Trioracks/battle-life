@@ -102,7 +102,7 @@ async function waitState(page,predicate,timeout=60000){
 }
 const phase=(page,value)=>page.waitForFunction(value=>document.querySelector('#virtual-pc')?.dataset.pcTransition===value,value);
 async function recordReady(page){const timeOrigin=await page.evaluate(()=>document.querySelector('#loading')?.hidden===true?performance.timeOrigin:null);if(timeOrigin!==null)page._qaReadyDocuments?.add(timeOrigin);}
-async function reload(page){page._qaPhase='reload-drain';await page.waitForLoadState('networkidle',{timeout:30000});page._qaPhase='reload-navigation';await page.reload();page._qaPhase='reload-ready-wait';await page.locator('#loading').waitFor({state:'hidden'});page._qaPhase='reload-ready';await recordReady(page);}
+async function reload(page){page._qaPhase='reload-drain';await page.waitForLoadState('networkidle',{timeout:30000});await page.evaluate(()=>window.__previewFlushAssets?.());page._qaPhase='reload-navigation';await page.reload();page._qaPhase='reload-ready-wait';await page.locator('#loading').waitFor({state:'hidden'});page._qaPhase='reload-ready';await recordReady(page);}
 async function action(page,id){
  await page.waitForFunction(()=>document.body.dataset.mode==='game'&&!document.querySelector('#actions [data-action=computer]').disabled);
  await page.locator('#apartment').focus();await page.locator('#apartment').press('Enter');
@@ -130,7 +130,8 @@ function observeAudio(){
 // Observe EOF on the same reader consumed by Three's FileLoader. No clone,
 // replacement body, generated geometry, extra asset request or state hook.
 function observeAssetReads(){
- const originalFetch=window.fetch;
+ const originalFetch=window.fetch,pending=new Set();
+ window.__previewFlushAssets=async()=>{while(pending.size)await Promise.allSettled([...pending]);};
  window.fetch=async function(...args){
   const startedAt=Date.now(),response=await originalFetch.apply(this,args);
   if(!response.url||!new URL(response.url).pathname.endsWith('.glb')||!response.body)return response;
@@ -141,11 +142,11 @@ function observeAssetReads(){
     const chunk=await read(...readOptions);
     if(chunk.done){
      const event={url,status,startedAt,finishedAt:Date.now(),documentTimeOrigin:performance.timeOrigin,declaredBytes,bytes,eof:true,initiator},parts=chunks;chunks=[];
-     void (async()=>{
-      const input=new Uint8Array(bytes);let offset=0;for(const part of parts){input.set(part,offset);offset+=part.byteLength;}
+     const task=(async()=>{
+      const input=new Uint8Array(bytes);let offset=0;for(const part of parts){input.set(part,offset);offset+=part.byteLength;}parts.length=0;
       const digest=await crypto.subtle.digest('SHA-256',input),sha256=Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('');
       await window.__previewAssetEvent({...event,sha256});
-     })().catch(()=>{});
+     })();pending.add(task);void task.finally(()=>pending.delete(task)).catch(()=>{});
     }else{bytes+=chunk.value.byteLength;chunks.push(chunk.value);}
     return chunk;
    };
@@ -211,7 +212,7 @@ export async function verifyPublicPreview(options={}){
   assert.equal(counts.bufferStarts,0,label+' starts no recorded PCM');assert.equal(counts.mediaStarts,0,label+' starts no media');assert.equal(counts.decodes,0,label+' decodes no recorded audio');
   for(const url of await page.evaluate(()=>performance.getEntriesByType('resource').map(entry=>entry.name)))observed.add(url);
  }
- async function close(context,page,label){page._qaPhase='close-drain:'+label;await page.waitForLoadState('networkidle',{timeout:30000});await observe(page,label);closingContexts.add(context);page._qaPhase='context-close:'+label;await context.close();contexts.delete(context);}
+ async function close(context,page,label){page._qaPhase='close-drain:'+label;await page.waitForLoadState('networkidle',{timeout:30000});await observe(page,label);await page.evaluate(()=>window.__previewFlushAssets?.());closingContexts.add(context);page._qaPhase='context-close:'+label;await context.close();contexts.delete(context);}
  try{
   if(!config.live){server=await startPreviewServer({root:config.root,port:0,prefix:config.prefix});assert.notEqual(new URL(server.url).port,'4173');report.url=server.url;}
   else report.url=config.url;
