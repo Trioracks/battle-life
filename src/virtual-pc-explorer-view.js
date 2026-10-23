@@ -8,8 +8,9 @@ import {normalizeStudioProject} from './ft-studio-project.js?rev=57';
 import {normalizeBeat} from './beat-production.js?rev=57';
 import {normalizeLyric} from './lyric-production.js?rev=57';
 import {mountAudioFilePlayer} from './pc-audio-export-view.js?rev=57';
+import {pcFileById,createPcFolder} from './pc-filesystem.js?rev=57';
 
-export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenProject,onProperties,onClose,onMenu,onNavigate,audio}) {
+export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenProject,onProperties,onClose,onMenu,onNavigate,onChange,audio}) {
   const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',diskLabel=null,disposed=false;
   const wrap=el(d,'div',{className:'pc-explorer'}),menubar=el(d,'div',{className:'pc-menubar'});
   const tools=el(d,'div',{className:'pc-explorer-tools'}),form=el(d,'form',{className:'pc-address'});
@@ -28,6 +29,7 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
   function openEntry(entry) {
     if(!entry)return;
     if(entry.targetPath){navigate(entry.targetPath);return;}
+    if(entry.kind==='document'){if(onOpenArtifact){const message=onOpenArtifact(entry);status.textContent=typeof message==='string'?message:'';}else{const file=pcFileById(state,entry.fileId);if(file?.snapshot)onOpenProject?.(structuredClone(file.snapshot));}return;}
     if(entry.kind==='audio'){const file=state.audioExports?.files.find(f=>f.id===entry.fileId);if(file)player.open(file);return;}
     if(entry.kind==='artifact'){
       if(entry.action){const message=onOpenArtifact?.(entry);nav={...nav,error:typeof message==='string'?message:''};status.textContent=nav.error||'Объектов: '+entries().length;status.dataset.error=String(!!nav.error);}
@@ -46,8 +48,13 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
     {id:'tree',label:'Панель папок',onSelect:()=>change({type:'toggle-tree'})},
   ];
   function menu(anchor,items,e) {const r=anchor.getBoundingClientRect();onMenu?.({anchor,items,x:e?.clientX??r.left,y:e?.clientY??r.bottom});}
+  function newFolder(){
+    const box=el(d,'section',{className:'pc-folder-dialog',attributes:{role:'dialog','aria-label':'Новая папка','aria-modal':'true'}}),input=el(d,'input',{value:'Новая папка',attributes:{'aria-label':'Имя новой папки'}}),message=el(d,'p',{attributes:{role:'status'}}),close=()=>{box.remove();address.focus();};
+    box.append(el(d,'h2',{text:'Новая папка'}),input,message,button(d,'Создать папку',{},()=>{const r=createPcFolder(state,{id:'folder:'+(globalThis.crypto?.randomUUID?.()??Date.now()),parentId:nav.path,name:input.value,nowMinute:state.lastGameMinute??0});if(!r.ok){message.textContent=r.reason;return;}if(!onChange||onChange(r.state)===false){message.textContent='Не удалось сохранить папку.';return;}state=r.state;close();render(false);}),button(d,'Отмена',{},close));
+    box.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close();}});wrap.append(box);input.focus();
+  }
   for(const [label,items]of [
-    ['Файл',()=>[{id:'open',label:'Открыть',disabled:!selected(),onSelect:()=>openEntry(selected())},{id:'properties',label:'Свойства',disabled:!selected(),onSelect:()=>properties()},{id:'close',label:'Закрыть',onSelect:onClose}]],
+    ['Файл',()=>[{id:'open',label:'Открыть',disabled:!selected(),onSelect:()=>openEntry(selected())},{id:'new-folder',label:'Создать папку',disabled:!onChange||['computer','windows'].includes(nav.path),onSelect:newFolder},{id:'properties',label:'Свойства',disabled:!selected(),onSelect:()=>properties()},{id:'close',label:'Закрыть',onSelect:onClose}]],
     ['Вид',viewItems],
     ['Переход',()=>[{id:'back',label:'Назад',disabled:nav.index===0,onSelect:()=>change({type:'back'})},{id:'forward',label:'Вперёд',disabled:nav.index===nav.history.length-1,onSelect:()=>change({type:'forward'})},{id:'up',label:'Вверх',disabled:nav.path==='computer',onSelect:()=>change({type:'up'})}]],
   ]) {const b=button(d,label,{className:'pc-menu-trigger'},()=>menu(b,items()));menubar.append(b);}
@@ -74,7 +81,7 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
     if(nav.view==='details')files.append(el(d,'div',{className:'pc-details-head',text:'Имя                                      Тип                 Размер'}));
     if(nav.path==='windows')files.append(el(d,'p',{className:'pc-system-note',text:PC_IDENTITY.name+' — системные файлы. Доступны только для просмотра.'}));
     for(const entry of entries()){
-      const label=entry.kind==='project'?'Открыть проект '+entry.name:entry.kind==='disk'?'Открыть диск C:':entry.kind==='folder'?'Открыть папку '+entry.name:'Открыть '+entry.name;
+      const label=['project','document'].includes(entry.kind)?'Открыть проект '+entry.name:entry.kind==='disk'?'Открыть диск C:':entry.kind==='folder'?'Открыть папку '+entry.name:'Открыть '+entry.name;
       const b=button(d,'',{className:'pc-file',dataset:{entryId:entry.id},attributes:{'aria-label':label,'aria-pressed':String(nav.selection===entry.id)}},()=>{
         nav={...nav,selection:entry.id,error:''};
         for(const item of files.children)if(item.dataset.entryId)item.setAttribute('aria-pressed',String(item.dataset.entryId===entry.id));
@@ -97,7 +104,7 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
   form.addEventListener('submit',submit);
   const backgroundMenu=e=>{
     if(e.target!==files)return;e.preventDefault();nav={...nav,selection:null};
-    menu(files,[{id:'view',label:'Вид',items:viewItems()},{id:'refresh',label:'Обновить',onSelect:()=>render(false)}],e);
+    menu(files,[{id:'new-folder',label:'Создать папку',disabled:!onChange||['computer','windows'].includes(nav.path),onSelect:newFolder},{id:'view',label:'Вид',items:viewItems()},{id:'refresh',label:'Обновить',onSelect:()=>render(false)}],e);
   };
   files.addEventListener('contextmenu',backgroundMenu);
   render(true);

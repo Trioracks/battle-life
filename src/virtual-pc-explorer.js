@@ -5,6 +5,7 @@ import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=57';
 import {SOFTWARE} from './pc-software-catalog.js?rev=57';
 import {AUDIO_EXPORT_KINDS} from './pc-audio-exports.js?rev=57';
 import {gameDateTimeLabel} from './home-calendar.js?rev=57';
+import {pcFileEntries} from './pc-filesystem.js?rev=57';
 export const EXPLORER_PATHS=Object.freeze({
   computer:{label:'Мой компьютер',address:'Мой компьютер',parent:null,iconId:'computer'},
   disk:{label:'Локальный диск (C:)',address:'C:\\',parent:'computer',iconId:'disk'},
@@ -17,6 +18,7 @@ export const EXPLORER_PATHS=Object.freeze({
 });
 export function explorerPaths(state={}){
  const paths={...EXPLORER_PATHS};
+ for(let pass=0;pass<12;pass++)for(const f of state.fileSystem?.folders??[]){if(!Object.hasOwn(paths,f.id)&&Object.hasOwn(paths,f.parentId))paths[f.id]={label:f.name,address:paths[f.parentId].address.replace(/\\$/,'')+'\\'+f.name,parent:f.parentId,iconId:'folder'};}
  for(const [id,app]of Object.entries(state.software??{})){
   if(!SOFTWARE[id]||!app.installed)continue;
   const parts=app.path.slice(3).split('\\');let parent='disk',address='C:';
@@ -68,7 +70,10 @@ export function navigateExplorer(s,a,pcState={}) {
 }
 export function explorerEntries(pcState,path) {
   const paths=explorerPaths(pcState),entries=Object.entries(paths).filter(([,p])=>p.parent===path).map(([id,p])=>({id,kind:id==='disk'?'disk':'folder',name:p.label,iconId:p.iconId,targetPath:id}));
-  if(path==='projects')entries.push(...pcState.projects.map(p=>({id:'project:'+p.id,kind:'project',name:typeof p.name==='string'?p.name:p.id,iconId:'project',projectId:p.id,sizeMb:2})));
+  const documents=pcFileEntries(pcState,{folderId:path,types:['txt','flp']});
+  const savedProjects=new Set((pcState.fileSystem?.files??[]).filter(f=>['txt','flp'].includes(f.type)).map(f=>f.projectId));
+  if(path==='projects')entries.push(...pcState.projects.filter(p=>!savedProjects.has(p.id)).map(p=>({id:'project:'+p.id,kind:'project',name:typeof p.name==='string'?p.name:p.id,iconId:'project',projectId:p.id,sizeMb:2})));
+  for(const f of documents)entries.push({id:'document:'+f.id,kind:'document',name:f.filename,iconId:f.type==='txt'?'notebook':'project',fileId:f.id,projectId:f.projectId,sizeMb:f.bytes/1000000,action:'document-file'});
   for(const file of pcState.audioExports?.files??[])if(file.folderId===path)entries.push({id:'audio:'+file.id,kind:'audio',name:file.filename,iconId:'microphone',fileId:file.id,sizeMb:file.bytes/1000000,createdAtMinute:file.createdAtMinute,trackVersionId:file.trackVersionId});
   for(const file of pcState.social?.goblin?.files??[])if(file.folderId===path&&file.createdAtMinute<=(pcState.socialRuntime?.lastMinute??pcState.lastGameMinute??0))entries.push({id:'mentor:'+file.id,kind:'artifact',name:file.filename,iconId:file.kind==='lyrics'?'notebook':'project',action:'mentor-file',fileId:file.id,sizeMb:(file.bytes??0)/1000000});
   const s=pcState.software;

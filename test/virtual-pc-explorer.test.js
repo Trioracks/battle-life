@@ -54,11 +54,11 @@ function setup(seed={}) {
 test('projects refresh after save without losing selection or address input',()=>{
   const p=createStudioProject({id:'p',name:'Бит',battleId:'concrete-echo'}).project;
   const {root,view}=setup({projects:[p]});view.navigate('projects');
-  findButton(root,'Открыть проект Бит').click();
+  findButton(root,'Открыть проект Бит.flp').click();
   const address=allPc(root).find(n=>n.getAttribute('aria-label')==='Адрес папки');address.value='Ввод';
   view.update(createVirtualPcState({projects:[p,{...p,id:'p2',name:'Второй'}]}));
-  assert.equal(address.value,'Ввод');assert.equal(findButton(root,'Открыть проект Бит').getAttribute('aria-pressed'),'true');
-  assert.ok(findButton(root,'Открыть проект Второй'));
+  assert.equal(address.value,'Ввод');assert.equal(findButton(root,'Открыть проект Бит.flp').getAttribute('aria-pressed'),'true');
+  assert.ok(findButton(root,'Открыть проект Второй.flp'));
 });
 test('malformed project shows local error and text names cannot inject markup',()=>{
   const {root,view,opened}=setup({projects:[{id:'bad',name:'<img src=x>'}]});view.navigate('projects');

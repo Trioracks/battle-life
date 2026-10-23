@@ -33,6 +33,8 @@ import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=57';
 import {normalizeHousehold} from './home-food.js?rev=57';
 import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=57';
 import {normalizeBrowserDownloads} from './pc-browser-downloads.js?rev=57';
+import {normalizePcFileSystem} from './pc-filesystem.js?rev=57';
+import {normalizeDocumentSessions} from './pc-document-session.js?rev=57';
 export const VIRTUAL_PC_STORAGE_KEY = 'battle-life-virtual-pc-v1';
 export const VIRTUAL_DISK_MB = 16000;
 export const SYSTEM_RESERVED_MB = 14000;
@@ -134,6 +136,8 @@ function normalizeSnapshot(value,archiveCache=null) {
     if(captured.ok){trackVersions=captured.state.trackVersions;submission.trackVersionId=captured.versionId;submission.timePrecision='day-only';}
   }
   const audioExports=archive('audioExports',raw=>normalizeAudioExports(raw,trackVersions));
+  const fileSystem=normalizePcFileSystem(source.fileSystem,{projects,audioExports,mentorFiles:source.social?.goblin?.files});
+  const documentSessions=normalizeDocumentSessions(source.documentSessions,{fileSystem,projects});
   const judging=archive('judging',normalizeJudging);
   const rapAnalysis=normalizeRapAnalysis(source.rapAnalysis),rapResearch=reconcileResearchFindings(normalizeRapResearch(source.rapResearch),rapAnalysis);
   // Keep suspended work, including conflicting older saves, without completing it.
@@ -148,7 +152,7 @@ function normalizeSnapshot(value,archiveCache=null) {
     wallpaper: wallpaperIds.has(source.wallpaper) ? source.wallpaper : 'courtyard',
     desktopIcons: normalizeIcons(source.desktopIcons),
     download: normalizeDownload(source.download),
-    projects,
+    projects,fileSystem,documentSessions,
     music,writing,recording,
     ...(retiredSourceWork.length?{retiredSourceWork}:{}),
     creativeWork:normalizeCreativeWork(source.creativeWork,projects),

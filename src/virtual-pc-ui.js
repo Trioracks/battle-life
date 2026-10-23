@@ -3,6 +3,7 @@ import {importGoblinFile} from './goblin-exchange.js?rev=57';
 import { FtStudioAudio } from './ft-studio-audio.js?rev=57';
 import {mountPcShell} from './virtual-pc-shell.js?rev=57';
 import {mountExplorer} from './virtual-pc-explorer-view.js?rev=57';
+import {openPcDocument} from './pc-filesystem.js?rev=57';
 import {mountPcMenu} from './virtual-pc-menus.js?rev=57';
 import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=57';
 import {explorerProperties} from './virtual-pc-explorer.js?rev=57';
@@ -382,7 +383,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.studioView.update();return;
     }
     if(appId==='computer'){
-      if(!pc.explorer)pc.explorer=mountExplorer(target,{audio:pc.audioSession.forOwner('computer'),onSoftware:pc.softwareAction,onOpenArtifact:entry=>{if(entry.action==='mentor-file')return pc.openMentorFile(entry.fileId);pc.softwareAction(entry.action,entry.appId);return pc.message;},onOpenApp:id=>pc.open(id),onOpenProject:p=>pc.openProject(p),onProperties:p=>pc.showProperties(p),onClose:()=>pc.closeWindow('computer'),onMenu:p=>pc.menu?.open(p),onNavigate:location=>{
+      if(!pc.explorer)pc.explorer=mountExplorer(target,{audio:pc.audioSession.forOwner('computer'),onSoftware:pc.softwareAction,onChange:next=>pc.persist(next,{atomic:true}),onOpenArtifact:entry=>{if(entry.action==='document-file'){const r=openPcDocument(pc.state,{fileId:entry.fileId});if(!r.ok)return r.reason;if(!pc.persist(r.state,{atomic:true}))return 'Не удалось открыть файл.';pc.openProject(pc.state.projects.find(p=>p.id===r.projectId));return '';}if(entry.action==='mentor-file')return pc.openMentorFile(entry.fileId);pc.softwareAction(entry.action,entry.appId);return pc.message;},onOpenApp:id=>pc.open(id),onOpenProject:p=>pc.openProject(p),onProperties:p=>pc.showProperties(p),onClose:()=>pc.closeWindow('computer'),onMenu:p=>pc.menu?.open(p),onNavigate:location=>{
         pc.windows={...pc.windows,windows:pc.windows.windows.map(w=>w.id==='computer'?{...w,title:location.label,iconId:location.iconId}:w)};pc.renderDesktop(false);
       }});
       pc.explorer.update(pc.state);return;

@@ -28,7 +28,11 @@ export function withSoftware(state,software){
 export function softwareDiskBytes(state){
  const s=normalizeSoftware(state.software,state.download);
  const partialMetadata=(state.browserDownloads?.items??[]).reduce((n,item)=>n+(item.kind==='metadata'&&SOFTWARE[item.appId]?.metadataKey&&!s[SOFTWARE[item.appId].metadataKey]?Math.floor(METADATA_BYTES*Math.max(0,Math.min(1,item.elapsedSeconds||0))):0),0);
- const downloaded=partialMetadata+Object.keys(SOFTWARE).reduce((n,id)=>n+s[id].receivedBytes+(SOFTWARE[id].metadataKey&&s[SOFTWARE[id].metadataKey]?METADATA_BYTES:0),0),installed=Object.keys(SOFTWARE).reduce((n,id)=>n+(s[id].installed?SOFTWARE[id].installedBytes:0),0),projects=(state.projects?.length??0)*2000000;
+ const documents=(state.fileSystem?.files??[]).filter(f=>['document','legacy-project'].includes(f.source)),savedIds=new Set(documents.map(f=>f.projectId));
+ // A saved snapshot replaces its working/legacy reservation; archive aliases
+ // never charge a second copy. Unknown legacy projects still reserve their space.
+ const projectBytes=documents.reduce((n,f)=>n+(Number.isSafeInteger(f.bytes)&&f.bytes>0?f.bytes:0),0)+(state.projects??[]).filter(p=>!savedIds.has(p.id)).length*2000000;
+ const downloaded=partialMetadata+Object.keys(SOFTWARE).reduce((n,id)=>n+s[id].receivedBytes+(SOFTWARE[id].metadataKey&&s[SOFTWARE[id].metadataKey]?METADATA_BYTES:0),0),installed=Object.keys(SOFTWARE).reduce((n,id)=>n+(s[id].installed?SOFTWARE[id].installedBytes:0),0),projects=state.fileSystem?.version===1?projectBytes:(state.projects?.length??0)*2000000;
  const audioExports=(state.audioExports?.files??[]).reduce((n,f)=>n+(Number.isSafeInteger(f.bytes)&&f.bytes>0?f.bytes:0),0)+(state.social?.goblin?.files??[]).reduce((n,f)=>n+(Number.isSafeInteger(f.bytes)&&f.bytes>0?f.bytes:0),0);
  return {downloaded,installed,projects,audioExports,used:SYSTEM_BYTES+downloaded+installed+projects+audioExports,free:Math.max(0,DISK_BYTES-SYSTEM_BYTES-downloaded-installed-projects-audioExports)};
 }

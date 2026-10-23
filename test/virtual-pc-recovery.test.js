@@ -130,15 +130,15 @@ test('projects are opened by navigating through the virtual disk and folder', ()
   const saved = project('on-disk');
   const { controller, root } = setup({ projects: [saved] });
   controller.open('computer');
-  assert.ok(!find(root, 'Открыть проект on-disk'));
+  assert.ok(!find(root, 'Открыть проект on-disk.flp'));
   assert.ok(find(root, 'Открыть диск C:'));
   fire(find(root, 'Открыть диск C:'),'dblclick');
   fire(find(root, 'Открыть папку Система'),'dblclick');
-  assert.ok(!find(root, 'Открыть проект on-disk'));
+  assert.ok(!find(root, 'Открыть проект on-disk.flp'));
   find(root, 'Назад').click();
   fire(find(root, 'Открыть папку Мои документы'),'dblclick');
   fire(find(root, 'Открыть папку Мои проекты'),'dblclick');
-  fire(find(root, 'Открыть проект on-disk'),'dblclick');
+  fire(find(root, 'Открыть проект on-disk.flp'),'dblclick');
   assert.equal(controller.project.id, 'on-disk');
 });
 
