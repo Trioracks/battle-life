@@ -5,6 +5,8 @@ import {mountBeatStudio} from '../src/beat-studio-view.js?rev=28';
 import {mountVirtualPc} from '../src/virtual-pc-ui.js?rev=28';
 import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=28';
 import {createBeat,startBeatStage,advanceBeatWork,restoreMusicNeeds} from '../src/beat-production.js?rev=28';
+import {createStudioProject} from '../src/ft-studio-project.js';
+import {savePcDocument} from '../src/pc-filesystem.js';
 import {createLyric} from '../src/lyric-production.js?rev=28';
 import {pcDocument,allPc,findButton,fire} from './helpers/virtual-pc-dom.js';
 const role=(root,key)=>allPc(root).find(n=>n.dataset.ftRole===key);
@@ -16,16 +18,16 @@ function setup(state=createVirtualPcState(),metadata={skills:{beatmaking:10},gam
 }
 
 test('FT project picker excludes notebook documents while keeping legacy music projects',()=>{
- let state=createLyric(createVirtualPcState({projects:[{id:'legacy',name:'Старый бит'}]}),{id:'text',name:'Не музыка'}).state;
+ let state=createLyric(createVirtualPcState({projects:[createStudioProject({id:'legacy',name:'Старый бит',battleId:'concrete-echo'}).project]}),{id:'text',name:'Не музыка'}).state;
  const s=setup(state);findButton(s.root,'Открыть проект').click();
- const rows=allPc(role(s.root,'dialog')).filter(n=>n.dataset.projectId),labels=rows.map(n=>n.textContent);
- assert.equal(rows.length,1);assert.match(labels[0],/Старый бит.*архив/);assert.ok(labels.every(x=>!x.includes('Не музыка')));rows[0].click();assert.ok(allPc(s.root).some(n=>n.textContent==='Старый бит'));s.view.dispose();
+ const picker=allPc(s.root).find(n=>n.className==='pc-file-picker'),rows=allPc(picker).filter(n=>n.dataset.fileId),labels=rows.map(n=>n.textContent);
+ assert.equal(rows.length,1);assert.match(labels[0],/Старый бит.flp/);assert.ok(labels.every(x=>!x.includes('Не музыка')));rows[0].click();findButton(picker,'Открыть').click();assert.ok(allPc(s.root).some(n=>n.textContent==='Старый бит'));s.view.dispose();
 });
 test('manual duplicate beat names offer a new variant and the searchable picker keeps input across state updates',()=>{
- const seed=createBeat(createVirtualPcState(),{id:'b',name:'01.09.2012 — Ночной двор'},{}).state,s=setup(seed);
+ let seed=createBeat(createVirtualPcState(),{id:'b',name:'01.09.2012 — Ночной двор'},{}).state;seed=savePcDocument(seed,{projectId:'b',folderId:'projects',filename:'Ночной двор.flp',nowMinute:1}).state;const s=setup(seed);
  findButton(s.root,'Новый проект').click();const title=allPc(s.root).find(n=>n.getAttribute('aria-label')==='Название бита');title.value='02.09.2012 — Ночной двор';findButton(s.root,'Начать проект').click();
  assert.equal(s.state.projects.length,1);assert.ok(allPc(s.root).some(n=>n.textContent?.includes('Ночной двор (2)')));findButton(s.root,'Отмена').click();findButton(s.root,'Открыть проект').click();
- const search=allPc(s.root).find(n=>n.getAttribute('aria-label')==='Поиск проектов');search.value='двор';search.focus();fire(search,'input');s.state={...s.state,projects:[...s.state.projects]};assert.equal(s.d.activeElement,search);assert.equal(search.value,'двор');s.view.dispose();
+ const search=allPc(s.root).find(n=>n.getAttribute('aria-label')==='Поиск файлов');search.value='двор';search.focus();fire(search,'input');s.state={...s.state,projects:[...s.state.projects]};assert.equal(s.d.activeElement,search);assert.equal(search.value,'двор');s.view.dispose();
 });
 test('legacy analytics show the saved layer result and sound skill after the character trains',()=>{
  let state=createBeat(createVirtualPcState(),{id:'audio',name:'Sound'},{sound:12}).state;
@@ -51,10 +53,10 @@ test('unrelated preview or project playback does not own this FT transport',()=>
  findButton(s.root,'Play').click();assert.equal(played,'a');s.view.dispose();
 });
 
-test('random title uses current game date, rerolls two words, remains editable and is saved once',()=>{
+test('random title uses current game date, rerolls one to three words, remains editable and is saved once',()=>{
  const metadata={skills:{beatmaking:10},gameDay:1},s=setup(undefined,metadata);findButton(s.root,'Новый проект').click();
  const name=allPc(s.root).find(n=>n.getAttribute('aria-label')==='Название бита'),random=findButton(s.root,'Случайное название');
- assert.ok(random);random.click();const first=name.value;assert.match(first,/^01\.09\.2012 — [А-Яа-яё]+ [А-Яа-яё]+$/u);
+ assert.ok(random);random.click();const first=name.value;assert.match(first,/^01\.09\.2012 — [А-Яа-яё,]+(?: [А-Яа-яё]+){0,2}$/u);
  random.click();assert.notEqual(name.value,first);metadata.gameDay=31;random.click();assert.match(name.value,/^01\.10\.2012 — /);
  name.value+=' демо';const final=name.value;findButton(s.root,'Начать проект').click();assert.equal(s.state.projects[0].name,final);
  metadata.gameDay=32;s.view.update();s.view.openProject(s.state.projects[0]);assert.equal(s.state.projects[0].name,final);s.view.dispose();
@@ -110,12 +112,12 @@ test('project menu reads fresh state, Escape closes dialog and traps Tab',()=>{
  const buttons=allPc(dialog).filter(n=>n.tagName==='BUTTON');buttons.at(-1).focus();fire(dialog,'keydown',{key:'Tab'});assert.equal(s.d.activeElement,buttons[0]);
  s.state={...s.state,music:{...s.state.music,cash:1234,needs:{satiety:91,energy:82}}};findButton(s.root,'Открыть проект').click();
  assert.equal(s.state.music.cash,1234);assert.equal(s.state.music.needs.energy,82);
- fire(role(s.root,'dialog'),'keydown',{key:'Escape'});assert.equal(role(s.root,'dialog'),undefined);s.view.dispose();
+ fire(allPc(s.root).find(n=>n.className==='pc-file-picker'),'keydown',{key:'Escape'});assert.equal(allPc(s.root).some(n=>n.className==='pc-file-picker'),false);s.view.dispose();
 });
 test('Explorer selection survives delayed launch and a later normal launch still shows menu',()=>{
  const d=pcDocument(),root=d.createElement('section');let launch;
  const pc=mountVirtualPc(root,{audio:{stop(){},dispose(){}},beatAudio:{stop(){},dispose(){},getSnapshot:()=>({status:'stopped'})},setTimeoutFn:fn=>(launch=fn,1),clearTimeoutFn(){}});
  const state=createBeat(createVirtualPcState({power:'on',download:{status:'installed'}}),{id:'a',name:'Saved'},{}).state;pc.showDesktop(state);
  pc.openProject(state.projects[0]);launch();assert.equal(role(root,'dialog'),undefined);assert.ok(findButton(root,'Работать над битом'));
- pc.closeWindow('ft-studio');pc.open('ft-studio');launch();assert.ok(role(root,'dialog'));pc.dispose();
+ pc.closeWindow('ft-studio');findButton(allPc(root).find(n=>n.getAttribute?.('aria-label')==='Сохранить изменения?'),'Не сохранять').click();pc.open('ft-studio');launch();assert.ok(role(root,'dialog'));pc.dispose();
 });

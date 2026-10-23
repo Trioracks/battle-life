@@ -117,7 +117,9 @@ rings('skin-torso',[
 ellipsoid('skin-neck',(0,0,1.49),(.052,.050,.081),skin,'neck')
 for side,s in [('L',1),('R',-1)]:
     upper='upper_arm.'+side;lower='forearm.'+side;hand='hand.'+side;thigh='thigh.'+side;shin='shin.'+side
-    rings('skin-arm-'+side,[((s*.190,0,1.400),.045,.051,{'chest':.5,upper:.5}),((s*.232,0,1.366),.056,.057,{upper:1}),((s*.241,0,1.25),.045,.044,{upper:1}),((s*.245,0,1.15),.037,.036,{upper:.8,lower:.2}),((s*.246,0,1.11),.035,.036,{upper:.2,lower:.8}),((s*.248,-.003,1.03),.042,.037,{lower:1}),((s*.25,-.01,.90),.027,.025,{lower:.8,hand:.2})],skin)
+    # Closed tops always cover the deltoid. Keep only the exposed lower arm
+    # in the shared body; the sleeveless look owns its original bare shoulder.
+    rings('skin-arm-'+side,[((s*.241,0,1.25),.045,.044,{upper:1}),((s*.245,0,1.15),.037,.036,{upper:.8,lower:.2}),((s*.246,0,1.11),.035,.036,{upper:.2,lower:.8}),((s*.248,-.003,1.03),.042,.037,{lower:1}),((s*.25,-.01,.90),.027,.025,{lower:.8,hand:.2})],skin)
     ellipsoid('skin-hand-'+side,(s*.25,-.015,.851),(.035,.027,.059),skin,hand)
     # All selectable bottoms cover the upper thighs. Omit that hidden skin so
     # moving fabric cannot reveal redundant hip triangles through the waist.
@@ -296,7 +298,7 @@ def torso_garment(prefix,material,loose,kind):
           (1.245,.194,.128,{'spine':.3,'chest':.7}),
           (1.320,.205,.131,{'chest':1}),
           (1.421,.206,.118,{'chest':1}),
-          (1.452,.071,.065,{'chest':.8,'neck':.2})]
+          (1.463,.076,.070,{'chest':.3,'neck':.7})]
     if kind=='tank':rows[-1]=(1.391,.103,.085,{'chest':1})
     # Knit shoulders must sit above the skin's sloping clavicle surface. Sew
     # the neckline into these same loops so it cannot pull away like a choker.
@@ -311,14 +313,17 @@ def torso_garment(prefix,material,loose,kind):
         loop=[]
         for j in range(n):
             a=2*math.pi*j/n;sn=math.sin(a);cs=math.cos(a)
-            x=(rx+(loose if level<5 else 0))*math.copysign(abs(cs)**.72,cs)
-            y=(ry+(loose if level<5 else 0))*math.copysign(abs(sn)**.72,sn)
-            neck_drop=.010 if kind=='sweater' else .004 if kind=='turtleneck' else .018
+            # Ease the moving armhole by at least 12 mm: a fitted tee/shirt
+            # otherwise cuts through the skin when the upper arm bends forward.
+            fit_loose=max(loose,.012) if level in [2,3,4] else loose
+            x=(rx+(fit_loose if level<5 else 0))*math.copysign(abs(cs)**.72,cs)
+            y=(ry+(fit_loose if level<5 else 0))*math.copysign(abs(sn)**.72,sn)
+            neck_drop=.018 if kind=='tank' else .004 if kind=='turtleneck' else .010
             zz=z-(neck_drop*max(0,-sn) if level>=5 else 0)
             garment_weights=w.copy()
             if level in [2,3,4] and j in [15,0,1,7,8,9]:
                 arm='upper_arm.'+('L' if x>0 else 'R')
-                blend=.12 if level==2 else .36 if level==3 else .25
+                blend=.12 if level==2 else .55 if level==3 else .50
                 garment_weights={bone:amount*(1-blend) for bone,amount in w.items()};garment_weights[arm]=blend
             loop.append(vertex((x,y,zz),garment_weights))
         levels.append(loop)
@@ -332,7 +337,8 @@ def torso_garment(prefix,material,loose,kind):
         # Start at the shoulder, round the back, through armpit, up the front.
         step=1 if s>0 else -1
         previous=[levels[4][c],levels[4][(c+step)%16],levels[3][(c+step)%16],levels[2][(c+step)%16],levels[2][c],levels[2][(c-step)%16],levels[3][(c-step)%16],levels[4][(c-step)%16]]
-        sleeve=[(.253,1.344,.072+loose,.072+loose,{up:1}),(.252,1.254,.066+loose,.065+loose,{up:1})]
+        shoulder_ease=max(loose,.012)
+        sleeve=[(.253,1.344,.072+shoulder_ease,.072+shoulder_ease,{up:1}),(.252,1.254,.066+shoulder_ease,.065+shoulder_ease,{up:1})]
         if kind!='tee':
             sleeve.extend([(.247,1.165,.058+loose,.056+loose,{up:.9,lo:.1}),(.247,1.115,.055+loose,.054+loose,{up:.2,lo:.8}),(.249,1.025,.057+loose,.052+loose,{lo:1}),(.25,.933,.040+loose*.5,.039+loose*.5,{lo:1}),(.25,.918,.039+loose*.5,.037+loose*.5,{lo:1})])
         else:sleeve.append((.252,1.244,.067+loose,.066+loose,{up:1}))

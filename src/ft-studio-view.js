@@ -1,7 +1,7 @@
-import {pcElement as el,pcButton as button,pcFind} from './virtual-pc-dom.js?rev=57';
-import {createBeatSongForm,songPartWindows} from './beat-song-form.js?rev=57';
-import {createPcIcon} from './virtual-pc-icons.js?rev=57';
-import {beginnerById} from './beat-beginner-bank.js?rev=57';
+import {pcElement as el,pcButton as button,pcFind} from './virtual-pc-dom.js?rev=58';
+import {createBeatSongForm,songPartWindows} from './beat-song-form.js?rev=58';
+import {createPcIcon} from './virtual-pc-icons.js?rev=58';
+import {beginnerById} from './beat-beginner-bank.js?rev=58';
 
 export const FT_TRACKS=Object.freeze([
  ...['Drum Kit','Bass','Percussion'].map(name=>({name,stage:0,color:'rhythm'})),
@@ -61,7 +61,7 @@ export function renderStudioTracks(root,beat,{timelineBars=16}={}){
    marker.style.gridColumn=(startBar+1)+' / span '+bars;sections.append(marker);
   }
  }
- const tracks=stage?FT_TRACKS.slice(0,stage*3):[{name:'Дорожка 01',stage:0,color:'empty'}];
+ const tracks=beat?.audioBacking?[{name:beat.audioBacking.filename,stage:0,color:'theme'}]:stage?FT_TRACKS.slice(0,stage*3):[{name:'Дорожка 01',stage:0,color:'empty'}];
  if(stage===3&&beat.recording?.draft){
   tracks.push({name:'Draft Vocal',stage:3,color:'vocal',muted:Boolean(beat.recording.clean)});
   if(beat.recording.clean)tracks.push({name:'Clean Vocal',stage:4,color:'vocal-clean'});
@@ -75,7 +75,7 @@ export function renderStudioTracks(root,beat,{timelineBars=16}={}){
   const lane=el(d,'div',{className:'ft-lane-grid',dataset:{ftRole:'lane'},attributes:{'aria-hidden':'true'}});
   lane.style.backgroundSize=(16/timelineBars*100)+'% 100%';
   if(stage){
-   const windows=form?songPartWindows(form,Math.min(3,track.stage)):[{startBar:0,bars:beat.version===3?4:2}];
+   const windows=form?songPartWindows(form,Math.min(3,track.stage)):[{startBar:0,bars:beat.audioBacking?beat.audioBacking.descriptor.durationSeconds/(8/3):beat.version===3?4:2}];
    if(form)lane.style.position='relative';
    for(const window of windows){
     const sourceId=form?.version&&track.stage<3?(window.startBar===0?form.introSourceId:window.startBar===6?form.outroSourceId:[beat.drumId,beat.audio?.themeId,beat.audio?.arrangementId][track.stage]):null;

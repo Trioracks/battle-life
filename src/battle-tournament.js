@@ -1,15 +1,16 @@
-import {DEMO_BATTLE,DEMO_PARTICIPANTS} from './battle-demo-config.js?rev=57';
-import {ensureNpcRoundTrack,npcMeanSkill} from './battle-npc.js?rev=57';
-import {rankTournamentSelection,seedBracket} from './battle-seeding.js?rev=57';
-import {decideNoShow,resolveTechnicalPair} from './battle-no-show.js?rev=57';
-import {recordBattleHistory} from './battle-history.js?rev=57';
-import {beatResultSeed} from './beat-result.js?rev=57';
-import {effectiveWritingSkill} from './lyric-production.js?rev=57';
-import {effectiveBeatSkill} from './beat-production.js?rev=57';
-import {effectiveVocalSkill} from './vocal-production.js?rev=57';
-import {validGameMinute} from './game-minute.js?rev=57';
-import {ensureRoundTheme} from './round-topics.js?rev=57';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=57';
+import {DEMO_BATTLE,DEMO_PARTICIPANTS} from './battle-demo-config.js?rev=58';
+import {ensureNpcRoundTrack,npcMeanSkill} from './battle-npc.js?rev=58';
+import {rankTournamentSelection,seedBracket} from './battle-seeding.js?rev=58';
+import {decideNoShow,resolveTechnicalPair} from './battle-no-show.js?rev=58';
+import {recordBattleHistory} from './battle-history.js?rev=58';
+import {beatResultSeed} from './beat-result.js?rev=58';
+import {effectiveWritingSkill} from './lyric-production.js?rev=58';
+import {effectiveBeatSkill} from './beat-production.js?rev=58';
+import {effectiveVocalSkill} from './vocal-production.js?rev=58';
+import {validGameMinute} from './game-minute.js?rev=58';
+import {ensureRoundTheme} from './round-topics.js?rev=58';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=58';
+import {battleDeadlineAtMidnight} from './battle-windows.js?rev=58';
 export const TOURNAMENT_ROUNDS=Object.freeze(['selection','round-2','round-3','round-4','round-5','final']);
 const clone=v=>structuredClone(v),record=v=>v!==null&&typeof v==='object'&&!Array.isArray(v),battleId=DEMO_BATTLE.battleId;
 function validRoundInternals(r){
@@ -60,7 +61,7 @@ function closeRound(state,t,round){
 function announceNext(state,t,heroSkills){
  const index=TOURNAMENT_ROUNDS.indexOf(t.currentRoundId)+1,roundId=TOURNAMENT_ROUNDS[index],opensAt=t.nextRoundAt;
  if(!roundId||!validGameMinute(opensAt))return null;
- const judgeIds=[...DEMO_BATTLE.panels[roundId].judgeIds],window={id:battleId+':'+roundId+':1',battleId,roundId,opensAt,closesAt:opensAt+7*1440,judgeIds,judgingPolicyVersion:2,policyVersion:2,judgingOffsets:judgeIds.map((_,i)=>(i+1)*60)};
+ const judgeIds=[...DEMO_BATTLE.panels[roundId].judgeIds],window={id:battleId+':'+roundId+':1',battleId,roundId,opensAt,closesAt:battleDeadlineAtMidnight(opensAt),deadlinePolicyVersion:2,judgeIds,judgingPolicyVersion:2,policyVersion:2,judgingOffsets:judgeIds.map((_,i)=>(i+1)*60)};
  const round=newRound(window),hero=heroTournamentSkills(state,heroSkills);round.heroSkillSnapshot=hero;
  round.pairs=t.bracket.rounds[index-1].map(n=>({nodeId:n.id,participantIds:[...n.participantIds]}));
  for(const pair of round.pairs)for(const [slot,id]of pair.participantIds.entries()){
@@ -124,7 +125,7 @@ export function completeTournamentRound(input,{battleId:id=battleId,roundId,comp
   }
  }
  round.status='complete';round.completedAt=completedAt;
- if(roundId==='final'){t.status='complete';t.winnerId=round.pairs[0]?.winnerId??null;t.nextRoundAt=null;}else t.nextRoundAt=completedAt+1440;
+ if(roundId==='final'){t.status='complete';t.winnerId=round.pairs[0]?.winnerId??null;t.nextRoundAt=null;}else t.nextRoundAt=round.deadlinePolicyVersion===2?Math.ceil((completedAt+1440)/1440)*1440:completedAt+1440;
  const event=eventFor(round,'round-result',completedAt,{text:roundId==='final'?'Турнир завершён.':'Итог раунда опубликован. Следующий анонс через сутки.'});const events=[];addEvent(t,event,events);
  return {ok:true,state:recordBattleHistory({...input,tournaments},history),events,reason:''};
 }

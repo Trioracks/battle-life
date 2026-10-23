@@ -1,4 +1,4 @@
-import {BUILD_INFO} from './build-info.js?rev=57';
+import {BUILD_INFO} from './build-info.js?rev=58';
 export function mountReleaseInfo(root,{buildInfo=BUILD_INFO}={}){
  const doc=root.ownerDocument,section=doc.createElement('div');section.className='release-info';section.setAttribute('tabindex','0');section.setAttribute('aria-label','Версия и ограничения веб-превью');
  const label=doc.createElement('p');label.textContent=`${buildInfo.version} · ${buildInfo.revision.slice(0,7)}`;section.append(label);

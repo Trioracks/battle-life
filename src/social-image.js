@@ -1,4 +1,4 @@
-import {pcButton} from './virtual-pc-dom.js?rev=57';
+import {pcButton} from './virtual-pc-dom.js?rev=58';
 // Resolve against the package, never an in-game address or an embedding page.
 export const socialImageUrl=src=>src?.startsWith('./assets/')?new URL('../'+src.slice(2),import.meta.url).href+'?rev=56':src;
 export function recoverableSocialImage(d,img,parent,label){

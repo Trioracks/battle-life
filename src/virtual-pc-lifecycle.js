@@ -1,4 +1,4 @@
-import {PcTransition} from './virtual-pc-transition.js?rev=57';
+import {PcTransition} from './virtual-pc-transition.js?rev=58';
 export const pcNeedsSceneFrame=(snapshot,mode)=>mode!=='pc'||snapshot.overlay<1;
 export function beginPcCutscene(motion){
  if(motion.busy||!motion.config.actions.computer)return false;
@@ -22,7 +22,7 @@ export class PcLifecycle{
  get snapshot(){const snapshot=this.transition.snapshot;return this.pending?{...snapshot,phase:'preparing',locked:true}:snapshot;}
  prepare(){
   if(this.pending||this.snapshot.phase!=='room')return false;
-  this.savedLook={mode:this.view.modes.mode,yaw:this.view.modes.yaw,pitch:this.view.modes.pitch};
+  this.savedLook={mode:this.view.modes.sleepCamera??this.view.modes.mode,yaw:this.view.modes.yaw,pitch:this.view.modes.pitch};
   try{this.pending=Promise.resolve(this.view.prepareComputerView()).then(()=>({ok:true}),error=>({ok:false,error}));}catch(error){this.pending=Promise.resolve({ok:false,error});}
   return true;
  }
@@ -46,9 +46,9 @@ export class PcLifecycle{
   else if(['bios','startup','shutdown'].includes(event.type))Promise.resolve(this.sounds?.play(event.type)).catch(()=>{});
   else if(event.type==='desktop-ready')this.onDesktop();
   else if(event.type==='work-scene'){this.view.endComputerView();this.view.modes.mode='2D';this.view.modes.revision++;}
-  else if(event.type==='work-camera')this.view.beginComputerView();
+  else if(event.type==='work-camera')this.view.beginComputerView({fromHead:true});
   else if(event.type==='reaction-scene'){this.view.endComputerView();this.view.modes.mode='2D';this.view.modes.revision++;}
-  else if(event.type==='reaction-camera'){if(this.reactionLook)Object.assign(this.view.modes,this.reactionLook);this.view.modes.revision++;this.reactionLook=null;this.view.beginComputerView();}
+  else if(event.type==='reaction-camera'){if(this.reactionLook)Object.assign(this.view.modes,this.reactionLook);this.view.modes.revision++;this.reactionLook=null;this.view.beginComputerView({fromHead:true});}
   else if(event.type==='room-ready'){this.view.endComputerView();this.onRoom();}
  }}
  restore(phase){if(phase!=='return-in'||!this.savedLook)return;Object.assign(this.view.modes,this.savedLook);this.view.modes.revision++;this.savedLook=null;}

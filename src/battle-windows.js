@@ -1,8 +1,22 @@
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=57';
-import {battleRoster,BATTLE_ROUND_IDS} from './battle-roster.js?rev=57';
-import {validGameMinute} from './game-minute.js?rev=57';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=58';
+import {battleRoster,BATTLE_ROUND_IDS} from './battle-roster.js?rev=58';
+import {validGameMinute} from './game-minute.js?rev=58';
 const clone=v=>JSON.parse(JSON.stringify(v)),ids=new Set(BATTLE_BRIEFS.map(b=>b.id));
 export const isBattleWindowId=(id,battleId)=>BATTLE_ROUND_IDS.some(round=>id===battleId+':'+round+':1');
+export const battleDeadlineAtMidnight=(opensAt,days=7)=>Math.floor(opensAt/1440)*1440+days*1440;
+export function migrateBattleDeadlines(state,nowMinute){
+ if(!validGameMinute(nowMinute))return {state,changed:false};
+ let changed=false;const tournaments=structuredClone(state.tournaments??{byId:{}}),roundThemes={...state.roundThemes};
+ const battleWindows=(state.battleWindows??[]).map(w=>{
+  const round=tournaments.byId?.[w.battleId]?.rounds?.[w.roundId],target=battleDeadlineAtMidnight(w.opensAt);
+  if(w.issue||w.deadlinePolicyVersion===2||!validGameMinute(w.opensAt)||!validGameMinute(w.closesAt)||target<=nowMinute||target>=w.closesAt||round&&round.status!=='accepting'||(state.battleSubmissions??[]).some(s=>s.windowId===w.id&&(!validGameMinute(s.sentAt)||s.sentAt>=target)))return w;
+  changed=true;const next={...w,closesAt:target,deadlinePolicyVersion:2,deadlineMigration:{previousClosesAt:w.closesAt,migratedAt:nowMinute}};
+  if(round)Object.assign(round,{closesAt:target,deadlinePolicyVersion:2,deadlineMigration:next.deadlineMigration});
+  const key=w.battleId+':'+w.roundId;if(roundThemes[key])roundThemes[key]={...roundThemes[key],closesAt:target};
+  return next;
+ });
+ return changed?{state:{...state,battleWindows,tournaments,roundThemes},changed:true}:{state,changed:false};
+}
 export function currentBattleWindow(state,battleId,nowMinute=Infinity){
  return (state.battleWindows??[]).filter(w=>w.battleId===battleId&&!w.issue&&w.opensAt<=nowMinute).sort((a,b)=>b.opensAt-a.opensAt)[0]??(state.battleWindows??[]).find(w=>w.battleId===battleId);
 }
@@ -27,7 +41,7 @@ export function ensureBattleWindow(state,{battleId,nowMinute,judgingPolicyVersio
   if(battleId==='makarevich-1'&&judgingPolicyVersion===2&&existing.judgingPolicyVersion!==2){const migrated={...existing,judgingPolicyVersion:2,judgingMigration:{fromPolicy:1,activatedAt:nowMinute,legacyOffsets:[...existing.judgingOffsets]}};return {ok:true,state:{...state,battleWindows:battleWindows.map(w=>w.id===existing.id?migrated:w)},reason:'',windowId:existing.id};}
   return {ok:true,state,reason:'',windowId:existing.id};
  }
- const judgeIds=battleRoster('selection').judgeIds,window={id:battleId+':selection:1',battleId,roundId:'selection',opensAt:nowMinute,closesAt:nowMinute+7*1440,judgeIds,judgingOffsets:judgeIds.map((_,i)=>Math.floor((i+1)*4320/judgeIds.length))};
+ const judgeIds=battleRoster('selection').judgeIds,window={id:battleId+':selection:1',battleId,roundId:'selection',opensAt:nowMinute,closesAt:battleDeadlineAtMidnight(nowMinute),deadlinePolicyVersion:2,judgeIds,judgingOffsets:judgeIds.map((_,i)=>Math.floor((i+1)*4320/judgeIds.length))};
  if(judgingPolicyVersion===2)window.judgingPolicyVersion=2;
  return {ok:true,state:{...state,battleWindows:[...battleWindows,window]},reason:'',windowId:window.id};
 }

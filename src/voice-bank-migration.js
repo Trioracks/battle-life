@@ -1,4 +1,4 @@
-import {voiceCatalog} from './vocal-catalog.js?rev=57';
+import {voiceCatalog} from './vocal-catalog.js?rev=58';
 export const voiceBagSeed=value=>{let h=2166136261;for(const c of String(value))h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0;};
 const equal=(a,b)=>a.length===b.length&&a.every((id,i)=>id===b[i]);
 export function shuffledVoiceOrder(catalog,seed,cycle,previous){

@@ -1,12 +1,12 @@
-import {BEAT_RULES} from './beat-catalog.js?rev=57';
-import {workBlockReason} from './beat-production.js?rev=57';
-import {validGameMinute} from './game-minute.js?rev=57';
-import {beatResultSeed} from './beat-result.js?rev=57';
-import {normalizeRapAnalysis,studyInstallReason,studyHeroSnapshot,validStudyHeroSnapshot,finishStudyReport} from './rap-analysis.js?rev=57';
-import {completeJudgeEvidence} from './judge-dossier-analysis.js?rev=57';
-import {publicCharacterProfile} from './npc-social-profiles.js?rev=57';
-import {caseStudySources} from './rap-research-sources.js?rev=57';
-import {validRapReport,reconcileResearchFindings} from './rap-report-schema.js?rev=57';
+import {BEAT_RULES} from './beat-catalog.js?rev=58';
+import {workBlockReason} from './beat-production.js?rev=58';
+import {validGameMinute} from './game-minute.js?rev=58';
+import {beatResultSeed} from './beat-result.js?rev=58';
+import {normalizeRapAnalysis,studyInstallReason,studyHeroSnapshot,validStudyHeroSnapshot,finishStudyReport} from './rap-analysis.js?rev=58';
+import {completeJudgeEvidence} from './judge-dossier-analysis.js?rev=58';
+import {publicCharacterProfile} from './npc-social-profiles.js?rev=58';
+import {caseStudySources} from './rap-research-sources.js?rev=58';
+import {validRapReport,reconcileResearchFindings} from './rap-report-schema.js?rev=58';
 export {reconcileResearchFindings};
 
 export const CASE_STUDY_MINUTES=Object.freeze({battle:360,round:360,judge:45,opponent:45});

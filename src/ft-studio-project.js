@@ -1,4 +1,4 @@
-import { BATTLE_BRIEFS } from './virtual-pc-catalog.js?rev=57';
+import { BATTLE_BRIEFS } from './virtual-pc-catalog.js?rev=58';
 
 export const STUDIO_TRACK_IDS = Object.freeze(['kick', 'snare', 'hat', 'bass']);
 export const STUDIO_STEP_COUNT = 16;

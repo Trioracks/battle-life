@@ -1,6 +1,6 @@
-import {GOBLIN_ID,GOBLIN_PROFILE,GOBLIN_RELEASES,GOBLIN_PHOTOS,goblinArt} from './goblin-catalog.js?rev=57';
-import {publicBattleHistory} from './battle-history.js?rev=57';
-import {createMusicianProfileView} from './musician-profile-view.js?rev=57';
+import {GOBLIN_ID,GOBLIN_PROFILE,GOBLIN_RELEASES,GOBLIN_PHOTOS,goblinArt} from './goblin-catalog.js?rev=58';
+import {publicBattleHistory} from './battle-history.js?rev=58';
+import {createMusicianProfileView} from './musician-profile-view.js?rev=58';
 const diaries=[
  ['Соседи попросили потише. Записал тишину. Теперь жалуются на бас в тишине.','МЦ Филя: вырежи у тишины низ.'],
  ['Продал педаль, купил продукты. Теперь дисторшн только у чайника...','МЦ Филя: хлеб через овердрайв не пропускай.'],
@@ -22,8 +22,10 @@ export function goblinPublicPosts(state,now){
  const seen=new Set();
  for(const e of publicBattleHistory(state,{participantId:GOBLIN_ID,nowMinute:now})){
   const v=state.trackVersions?.byId?.[e.trackVersionId];
-  if(e.status!=='submitted'||!v||seen.has(v.id))continue;seen.add(v.id);
-  authored.push({id:'goblin:battle:'+v.id,at:e.occurredAt,trackVersionId:v.id,body:'Сдал «'+v.name+'» на баттл. Тема: '+(v.recipe?.lyrics?.name??v.name)+'. В голове был эпос, на выходе — сосед с перфоратором xD Зацените, пока я не передумал.',comment:'МЦ Филя: перфоратор в тональности, уже прогресс.',art:themeArt(v.name)});
+  if(e.status!=='submitted'||!v||seen.has(v.id))continue;
+  const round=state.tournaments?.byId?.[e.battleId]?.rounds?.[e.roundId],result=(state.socialRuntime?.events??[]).find(event=>event.type==='round-result'&&event.battleId===e.battleId&&event.roundId===e.roundId&&event.dueAt<=now),at=result?.dueAt??(round?.status==='complete'?round.completedAt:null);
+  if(!Number.isFinite(at)||at>now)continue;seen.add(v.id);
+  authored.push({id:'goblin:battle:'+v.id,at,trackVersionId:v.id,body:'Судьи уже выставили оценки, теперь могу показать. Сдал «'+v.name+'» на баттл. Тема: '+(v.recipe?.lyrics?.name??v.name)+'. В голове был эпос, на выходе — сосед с перфоратором xD Зацените, пока я не передумал.',comment:'МЦ Филя: перфоратор в тональности, уже прогресс.',art:themeArt(v.name)});
  }
  return authored.sort((a,b)=>b.at-a.at);
 }

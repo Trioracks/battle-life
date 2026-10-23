@@ -1,3 +1,5 @@
+import {startMentorDownload,advanceBrowserDownloads} from '../src/pc-browser-downloads.js';
+import {savePcDocument,openPcDocument} from '../src/pc-filesystem.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {abstractRecordingFixture} from './helpers/abstract-recording-fixture.js';
@@ -18,19 +20,20 @@ function send(state,fileId,at=6641){
  s=completeSubmissionMessage(completeSubmissionUpload(s),{nowMinute:at});
  return next(sendSubmission(s,{communityId:battle,nowMinute:at}));
 }
+function downloadOpen(state,attachmentId,now){const started=startMentorDownload(state,{attachmentId,nowMinute:now});assert.equal(started.ok,true,started.reason);let s=advanceBrowserDownloads(started.state,{activeSeconds:1}).state;const fileId=s.social.goblin.downloaded[attachmentId];assert.ok(fileId);if(s.fileSystem.files.some(f=>f.id===fileId)){const opened=openPcDocument(s,{fileId});assert.equal(opened.ok,true,opened.reason);s=opened.state;}return {ok:true,state:s};}
 test('mentor text, beat, player vocal and returned mix reach acknowledgement and real judging after reload',()=>{
  let s=next(activateSocial(abstractRecordingFixture({experimentalLead:true}),1502));
  for(const app of ['client','ft','notebook'])s.software[app].installed=true;
  s=advanceGoblin(s,1502).state;s.social.goblin.stage='text';
  s=next(exportLyricFile(s,'lyrics',1600));s=next(sendGoblinFile(s,s.social.goblin.files[0].id,1600));
- s=advanceGoblin(restore(s),1620).state;s=next(importGoblinFile(s,'goblin-return-text',1620));
+ s=advanceGoblin(restore(s),1620).state;s=next(downloadOpen(s,'goblin-return-text',1620));
  s=next(createAudioExport(s,{id:'test-beat',projectId:'beat',kind:'beat',folderId:'exports',filename:'beat',nowMinute:1630}));
- s=next(sendGoblinFile(s,'test-beat',1630));s=advanceGoblin(restore(s),1650).state;s=next(importGoblinFile(s,'goblin-return-beat',1650));
- const beatId=s.social.goblin.received['goblin-return-beat'],textId=s.social.goblin.received['goblin-return-text'];
+ s=next(sendGoblinFile(s,'test-beat',1630));s=advanceGoblin(restore(s),1650).state;const flp=savePcDocument(s,{projectId:'beat',folderId:'projects',filename:'Мой проект.flp',nowMinute:1650});s=next(sendGoblinFile(flp.state,flp.fileId,1650));s=advanceGoblin(s,1670).state;s=next(downloadOpen(s,'goblin-return-project',1670));
+ const beatId=s.music.activeBeatId,textId=s.writing.activeTextId;
  s.music.needs={satiety:100,energy:100};s=next(startVocalWork(s,{beatId,textId},GOBLIN_SKILLS,()=>.2));s=advanceVocalWork(s,1000).state;
  s=next(createAudioExport(s,{id:'test-track',projectId:beatId,kind:'track',folderId:'exports',filename:'voice',nowMinute:6000}));
- s=next(sendGoblinFile(s,'test-track',6000));s=advanceGoblin(restore(s),6020).state;s=next(importGoblinFile(s,'goblin-return-track',6020));
- const file=s.audioExports.files.find(f=>f.id==='received-goblin-return-track');
+ s=next(sendGoblinFile(s,'test-track',6000));s=advanceGoblin(restore(s),6020).state;s=next(downloadOpen(s,'goblin-return-track',6020));
+ const file=s.audioExports.files.find(f=>f.id==='download:goblin-return-track');
  s=restore(send(restore(s),file.id));const row=s.battleSubmissions[0];
  s=advanceSocial(s,row.ackAt).state;assert.equal(s.battleSubmissions[0].status,'accepted');
  assert.equal(s.social.dialogs[battle].messages.filter(m=>m.kind==='ack').length,1);

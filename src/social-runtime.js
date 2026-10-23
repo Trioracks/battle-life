@@ -1,17 +1,17 @@
-import {communityById} from './social-catalog.js?rev=57';
-import {normalizeSocial} from './social-state.js?rev=57';
-import {ensureBattleWindow} from './battle-windows.js?rev=57';
-import {ACK_TEMPLATES,acknowledgementFor} from './social-submission.js?rev=57';
-import {validGameMinute} from './game-minute.js?rev=57';
-import {receivePhoneEvents} from './phone-notifications.js?rev=57';
-import {publishJudgeEvents} from './social-judging-events.js?rev=57';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=57';
-import {advancePersonalDialogs} from './social-personal.js?rev=57';
-import {advanceBattleLifecycle} from './battle-judging-clock.js?rev=57';
-import {ensureSocialReactionPlans} from './social-reactions.js?rev=57';
-import {ensureCommunityPublications,publishCommunityNotices} from './social-community-publications.js?rev=57';
-import {advanceGoblin} from './goblin-mentor.js?rev=57';
-import {advanceFilya} from './filya-calendar.js?rev=57';
+import {communityById} from './social-catalog.js?rev=58';
+import {normalizeSocial} from './social-state.js?rev=58';
+import {ensureBattleWindow,migrateBattleDeadlines} from './battle-windows.js?rev=58';
+import {acknowledgementBodyFor,acknowledgementFor} from './social-submission.js?rev=58';
+import {validGameMinute} from './game-minute.js?rev=58';
+import {receivePhoneEvents} from './phone-notifications.js?rev=58';
+import {publishJudgeEvents} from './social-judging-events.js?rev=58';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=58';
+import {advancePersonalDialogs} from './social-personal.js?rev=58';
+import {advanceBattleLifecycle} from './battle-judging-clock.js?rev=58';
+import {ensureSocialReactionPlans} from './social-reactions.js?rev=58';
+import {ensureCommunityPublications,publishCommunityNotices} from './social-community-publications.js?rev=58';
+import {advanceGoblin} from './goblin-mentor.js?rev=58';
+import {advanceFilya} from './filya-calendar.js?rev=58';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export function normalizeSocialRuntime(raw){
  const seen=new Set(),events=(Array.isArray(raw?.events)?raw.events:[]).filter(e=>e&&typeof e.id==='string'&&typeof e.type==='string'&&validGameMinute(e.dueAt)&&!seen.has(e.id)&&seen.add(e.id)).map(clone);
@@ -37,7 +37,7 @@ export function migrateLegacySocial(input,nowMinute){
 }
 export function activateSocial(state,nowMinute,battleId='makarevich-1'){
  const migrated=migrateLegacySocial(state,nowMinute);if(!migrated.ok)return migrated;
- return ensureBattleWindow(migrated.state,{battleId,nowMinute,judgingPolicyVersion:2});
+ return ensureBattleWindow(migrateBattleDeadlines(migrated.state,nowMinute).state,{battleId,nowMinute,judgingPolicyVersion:2});
 }
 export function advanceSocial(input,nowMinute,options={}){
  const runtime=normalizeSocialRuntime(input.socialRuntime);
@@ -49,7 +49,7 @@ export function advanceSocial(input,nowMinute,options={}){
   if(s.version!==2||s.status==='recovery')continue;
   const c=communityById(s.communityId),window=state.battleWindows?.find(w=>w.id===s.windowId&&!w.issue);if(!c||!window)continue;
   const common={source:SOCIAL_IDENTITY.name,sender:c.name,entityId:s.id,trackVersionId:s.trackVersionId,communityId:c.id};
-  if(s.status==='pending'&&s.ackAt<=nowMinute)due.push({...common,id:s.id+':ack',type:'submission-ack',dueAt:s.ackAt,text:ACK_TEMPLATES.find(t=>t.id===s.ackTemplateId)?.body??'Работа получена. Подтверждение сохранено.'});
+  if(s.status==='pending'&&s.ackAt<=nowMinute)due.push({...common,id:s.id+':ack',type:'submission-ack',dueAt:s.ackAt,text:acknowledgementBodyFor(state,s)});
   if(window.closesAt<=nowMinute)due.push({...common,id:s.id+':published',type:'submission-published',dueAt:window.closesAt,text:'Приём закрыт. Работа добавлена в аудиозаписи сообщества.'});
  }
  const events=due.filter(e=>!processed.has(e.id)).sort((a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id));

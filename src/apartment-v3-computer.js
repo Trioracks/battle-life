@@ -1,4 +1,4 @@
-import {PC_IDENTITY} from './pc-identity.js?rev=57';
+import {drawPcMonitor} from './pc-monitor-canvas.js?rev=58';
 // Owns only its camera, canvas texture and cloned materials; authored meshes stay owned by the scene.
 export function createComputerView({THREE,screen,indicator,viewport}){
  if(!screen?.geometry||!indicator)throw Error('Missing live CRT surfaces');
@@ -29,15 +29,7 @@ export function createComputerView({THREE,screen,indicator,viewport}){
   const key=JSON.stringify({...p,progress:Math.floor((p.progress??0)*30)/30});if(key===lastKey)return;lastKey=key;
   screen.material.color.setScalar(p.brightness===0?.018:Math.max(0,p.brightness));indicator.material.color.set(p.brightness>0?0x75bf43:0x171a10);
   if(!context)return;
-  const c=context;c.fillStyle=p.screen==='off'?'#101818':p.screen==='bios'||p.screen==='loading'?'#050709':'#394e58';c.fillRect(0,0,768,520);
-  if(p.screen==='desktop'){
-   c.fillStyle='#70a490';c.fillRect(0,0,768,490);c.fillStyle='#354b57';c.fillRect(0,490,768,30);c.fillStyle='#c89544';c.fillRect(0,490,95,30);
-   c.font='17px Tahoma';c.fillStyle='white';c.fillText(PC_IDENTITY.menuLabel,20,512);
-   for(const [i,label] of ['Мой компьютер','Underweb','FT Studio'].entries()){c.fillStyle='#d7e6ec';c.fillRect(30,28+i*98,30,27);c.fillStyle='white';c.fillText(label,12,78+i*98);}
-  }else if(p.screen!=='off'){
-   c.textAlign='center';c.fillStyle='white';c.font=(p.screen==='bios'?'24px monospace':'bold 48px Tahoma');c.fillText(p.title,384,230);c.font='21px Tahoma';c.fillText(p.subtitle,384,278);
-   if(p.screen==='loading'){c.strokeStyle='#5a6680';c.strokeRect(274,326,220,18);c.fillStyle='#d5a555';c.fillRect(277+((p.progress??0)*165),329,48,12);}c.textAlign='left';
-  }
+  drawPcMonitor(context,p);
   texture.needsUpdate=true;
  }
  return {camera,get active(){return active;},begin(source){

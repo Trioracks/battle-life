@@ -1,10 +1,11 @@
-import {communityById} from './social-catalog.js?rev=57';
-import {normalizeSocial} from './social-state.js?rev=57';
-import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=57';
-import {validGameMinute} from './game-minute.js?rev=57';
-import {TRACK_DSP_VERSION} from './track-version.js?rev=57';
-import {submissionCandidates} from './battle-submission.js?rev=57';
-import {normalizeOutgoingUpload} from './social-upload.js?rev=57';
+import {audioFileMatchesBattle} from './battle-file-match.js?rev=58';
+import {communityById} from './social-catalog.js?rev=58';
+import {normalizeSocial} from './social-state.js?rev=58';
+import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=58';
+import {validGameMinute} from './game-minute.js?rev=58';
+import {TRACK_DSP_VERSION} from './track-version.js?rev=58';
+import {submissionCandidates} from './battle-submission.js?rev=58';
+import {normalizeOutgoingUpload} from './social-upload.js?rev=58';
 export function submissionSendContext(state,{communityId,nowMinute}={}){
  const fail=reason=>({ok:false,state,reason}),c=communityById(communityId),window=currentBattleWindow(state,c?.battleId,nowMinute),upload=normalizeOutgoingUpload(state.outgoingUpload,state.trackVersions,state.audioExports);
  if(upload?.issue)return fail(upload.issue);
@@ -18,6 +19,7 @@ export function submissionSendContext(state,{communityId,nowMinute}={}){
  const social=normalizeSocial(state.social),dialog=social.dialogs[communityId],version=state.trackVersions?.byId?.[dialog?.draftVersionId];
  if(upload?.communityId===communityId&&upload.versionId!==dialog?.draftVersionId)return fail('Загруженная версия не совпадает с вложением. Выбери файл заново.');
  if(!version||version.recipe?.dspVersion!==TRACK_DSP_VERSION)return fail('Прикрепи доступную сохранённую версию трека.');
+ const file=state.audioExports?.files.find(f=>f.id===upload?.fileId);if(file&&!audioFileMatchesBattle(state,file,{battleId:c.battleId,roundId:window.roundId,themeId:state.roundThemes?.[c.battleId+':'+window.roundId]?.id}))return fail('Выбери трек для этого баттла и текущего раунда.');
  const beat=version.recipe.beat,lyrics=version.recipe.lyrics,check=submissionCandidates({projects:[beat,...(lyrics?[lyrics]:[])]},c.battleId)[0];
  if(!check||check.issue)return fail(check?.issue??'Сохранённая работа недоступна.');
  return {ok:true,c,window,upload,social,dialog,version,lyrics};

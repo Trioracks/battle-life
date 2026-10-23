@@ -1,6 +1,7 @@
-import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=57';
-import {socialPhotoSource} from './social-portraits.js?rev=57';
-import {socialImageUrl,recoverableSocialImage} from './social-image.js?rev=57';
+import {gameDateTimeLabel} from './home-calendar.js?rev=58';
+import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=58';
+import {socialPhotoSource} from './social-portraits.js?rev=58';
+import {socialImageUrl,recoverableSocialImage} from './social-image.js?rev=58';
 export const socialButton=(d,text,fn,extra={})=>pcButton(d,text,{className:'sn-button',...extra},fn);
 export function socialLink(d,text,url,navigate){const link=el(d,'a',{className:'sn-link',text,dataset:{focusId:text},attributes:{href:url}});link.addEventListener('click',e=>{e.preventDefault();navigate(url);});return link;}
 export function socialPeerLink(d,peer,name,navigate,avatar){
@@ -47,15 +48,17 @@ export function socialPhoto(d,photo){
  else fig.append(el(d,'span',{className:'sn-photo-pending',text:'Фото ещё не готово'}));
  fig.append(el(d,'figcaption',{text:photo.title}),el(d,'small',{text:photo.date}));return fig;
 }
-export function socialPost(d,post,{author='',authorProfile,navigate,profileById,reactions=null,photoNode=null}={}){
+export function socialPost(d,post,{author='',authorProfile,navigate,profileById,reactions=null,photoNode=null,discussion=null}={}){
+ if(discussion)post={...post,comments:discussion.comments};
  const article=el(d,'article',{className:'sn-post'});
  article.append(el(d,'strong',{text:author}),el(d,'small',{text:post.date??''}),el(d,'p',{text:post.body}));
  if(photoNode)article.append(photoNode);
  if(post.graffiti)article.append(socialGraffiti(d,post.graffiti));
  if(reactions)article.append(reactions);else{
  const likes=el(d,'div',{className:'sn-post-reactions'});likes.append(socialThumbCount(d,'like',post.likes??0),socialThumbCount(d,'dislike',post.dislikes??0),el(d,'span',{text:'Комментарии: '+(post.comments?.length??0)}));article.append(likes);
- const thread=el(d,'section',{className:'sn-comments',attributes:{'aria-label':'Комментарии'}});
- for(const c of post.comments??[])thread.append(socialComment(d,{...c,author:profileById?.(c.authorId)??(c.authorName===author?authorProfile:null)??{name:c.authorName??'Читатель'},date:c.date??post.date??''},navigate));
+ }
+ if(!reactions||discussion){const thread=el(d,'section',{className:'sn-comments',attributes:{'aria-label':'Комментарии'}});
+ for(const c of post.comments??[])thread.append(socialComment(d,{...c,author:profileById?.(c.authorId)??(c.authorName===author?authorProfile:null)??{name:c.authorName??'Читатель'},date:c.date??(Number.isFinite(c.at)?gameDateTimeLabel(c.at):post.date??'')},navigate));
  if(thread.children.length)article.append(thread);
  }return article;
 }

@@ -9,7 +9,7 @@ import {activateSocial,advanceSocial} from '../src/social-runtime.js';
 import {sentFixture} from './social-judging-events.test.js';
 import {scheduleSubmissionJudging,publishJudgeEvents} from '../src/social-judging-events.js';
 const battleId='makarevich-1';
-function fixture(){let s=ensureBattleWindow(createVirtualPcState(),{battleId,nowMinute:600,judgingPolicyVersion:2}).state;return ensureTournament(s,{battleId,nowMinute:600}).state;}
+function fixture(){let s=ensureBattleWindow(createVirtualPcState(),{battleId,nowMinute:600,judgingPolicyVersion:2}).state;s.battleWindows[0].closesAt=10680;s.battleWindows[0].deadlinePolicyVersion=1;return ensureTournament(s,{battleId,nowMinute:600}).state;}
 test('clock has6quiet hours,7h3%,8h6%,distinct streams and40hguarantee; reload cannot reroll',()=>{
  const options={deadline:600,judgeIds:['a','b','c'],seed:19,roll:()=>.99999};
  const quiet=advanceJudgeClock(null,{...options,nowMinute:960});assert.deepEqual(quiet.ready,[]);

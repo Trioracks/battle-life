@@ -1,20 +1,20 @@
-import {pcElement as el,pcFind} from './virtual-pc-dom.js?rev=57';
-import {SOCIAL_SECTIONS} from './social-catalog.js?rev=57';
-import {listCommunities} from './social-state.js?rev=57';
-import {socialAvatar,socialButton,socialHeading,showRegistrationNotice} from './social-dom.js?rev=57';
-import {createSocialAudio} from './social-audio-view.js?rev=57';
-import {createSocialProfileView} from './social-profile-view.js?rev=57';
-import {createSocialCommunityView} from './social-community-view.js?rev=57';
-import {mountSocialDialog} from './social-dialog-view.js?rev=57';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=57';
-import {mountSocialMessages} from './social-messages-view.js?rev=57';
-import {unreadDialogCount} from './social-personal.js?rev=57';
-import {markDialogRead} from './social-submission.js?rev=57';
-import {battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=57';
-import {publicRoundTable} from './battle-results-table.js?rev=57';
-import {createBattleResultsTableView} from './battle-results-table-view.js?rev=57';
-import {reactionVisibilitySignature} from './social-reactions-view.js?rev=57';
-import {communityUnreadCounts,publicCommunityPosts,markCommunitySeen} from './social-community-publications.js?rev=57';
+import {pcElement as el,pcFind} from './virtual-pc-dom.js?rev=58';
+import {SOCIAL_SECTIONS} from './social-catalog.js?rev=58';
+import {listCommunities} from './social-state.js?rev=58';
+import {socialAvatar,socialButton,socialHeading,showRegistrationNotice} from './social-dom.js?rev=58';
+import {createSocialAudio} from './social-audio-view.js?rev=58';
+import {createSocialProfileView} from './social-profile-view.js?rev=58';
+import {createSocialCommunityView} from './social-community-view.js?rev=58';
+import {mountSocialDialog} from './social-dialog-view.js?rev=58';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=58';
+import {mountSocialMessages} from './social-messages-view.js?rev=58';
+import {unreadDialogCount} from './social-personal.js?rev=58';
+import {markDialogRead} from './social-submission.js?rev=58';
+import {battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=58';
+import {publicRoundTable} from './battle-results-table.js?rev=58';
+import {createBattleResultsTableView} from './battle-results-table-view.js?rev=58';
+import {reactionVisibilitySignature} from './social-reactions-view.js?rev=58';
+import {communityUnreadCounts,publicCommunityPosts,markCommunitySeen} from './social-community-publications.js?rev=58';
 export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,navigate,audio,onStudyTarget=()=>{},onResultViewed=()=>{},isVisible=()=>true}){
  const d=root.ownerDocument,shell=el(d,'section',{className:'sn-network',attributes:{'aria-label':SOCIAL_IDENTITY.name}}),head=el(d,'header',{className:'sn-top'});
  const brand=el(d,'strong',{className:'sn-brand'});brand.append(el(d,'span',{className:'sn-brandmark',text:SOCIAL_IDENTITY.mark}),el(d,'b',{text:SOCIAL_IDENTITY.name}));
@@ -22,7 +22,7 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
  const grid=el(d,'div',{className:'sn-layout'}),nav=el(d,'nav',{className:'sn-nav',attributes:{'aria-label':'Разделы: '+SOCIAL_IDENTITY.name}}),content=el(d,'div',{className:'sn-content'}),message=el(d,'p',{className:'sn-message',attributes:{'aria-live':'polite'}});
  for(const [id,title]of SOCIAL_SECTIONS)nav.append(socialButton(d,title,()=>navigate('underweb://social/'+id),{className:'sn-nav-link',dataset:{socialSection:id},attributes:route.section===id?{'aria-current':'page'}:{}}));
  grid.append(nav,content);shell.append(head,grid,message,el(d,'footer',{className:'sn-footer',text:SOCIAL_IDENTITY.name+' · '+SOCIAL_IDENTITY.year+' · Вымышленная локальная сеть'}));root.replaceChildren(shell);
- const playback=createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze:startAnalysis}),expandedResults=new Set(),tableUiState={},communityUiState={};let last='',query='',disposed=false,dialogView=null,messagesView=null,tableView=null,tableWasVisible=isVisible(),lastUnread=-1,closeRegistration=null;
+ const playback=createSocialAudio(audio,{getState,getMetadata,navigate,onAnalyze:startAnalysis}),expandedResults=new Set(),tableUiState={},communityUiState={},profileUiState={};let last='',query='',disposed=false,dialogView=null,messagesView=null,tableView=null,tableWasVisible=isVisible(),lastUnread=-1,closeRegistration=null;
  function startAnalysis(options){if(disposed)return;if(!getState().software?.dossier?.installed){message.textContent='Для изучения нужен Рэп-досье. Скачай и установи приложение; результаты останутся в нём.';navigate('underweb://dump/dossier');return;}onStudyTarget(options);}
  let publicationCache=null,lastGroups=-1,readAttempt='',deferredRender=false;
  function publications(){const state=getState(),minute=Math.floor(metadataGameMinute(getMetadata())),refs=[state.social,state.tournaments,state.roundThemes,state.socialReactions];if(publicationCache?.minute===minute&&refs.every((v,i)=>v===publicationCache.refs[i]))return publicationCache;
@@ -35,7 +35,7 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
   // The native full-length songs must not be rebuilt on unrelated deadline
   // ticks or incoming tutorial messages. Only visible profile data can change it.
   const s=getState(),now=metadataGameMinute(getMetadata());
-  if(route.section==='profile'&&route.profileId==='mak-npc-06')return JSON.stringify([s.social?.goblin?.posts,s.social?.goblin?.likes,(s.battleHistory?.entries??[]).filter(e=>e.participantId==='mak-npc-06'&&e.occurredAt<=now),Object.keys(s.trackVersions?.byId??{})]);
+  if(route.section==='profile'&&route.profileId==='mak-npc-06')return JSON.stringify([s.social?.goblin?.posts,s.social?.goblin?.likes,(s.socialRuntime?.events??[]).filter(e=>e.type==='round-result'&&e.dueAt<=now),(s.battleHistory?.entries??[]).filter(e=>e.participantId==='mak-npc-06'&&e.occurredAt<=now),Object.keys(s.trackVersions?.byId??{})]);
   if(route.section==='profile'&&route.profileId==='mc-filya')return JSON.stringify([s.social?.filya?.posts,s.social?.filya?.likes]);
   return JSON.stringify([publications().ids,publications().counts,reactionVisibilitySignature(s,now),Object.keys(s.rapAnalysis?.reports??{}),s.social,Object.keys(s.trackVersions?.byId??{}),s.communityAudio,s.battleSubmissions,s.battleApplications,s.socialRuntime?.events,s.battleKnowledge,getMetadata().playerName,getMetadata().portraitKey,(s.battleWindows??[]).map(w=>battleDeadlineLabel(w,now))]);
  };
@@ -63,7 +63,7 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
   if(dialogView){dialogView.update();last=signature();return;}
   if(messagesView){messagesView.update();last=signature();return;}
   const identity=n=>n?.dataset?.focusId||n?.getAttribute?.('aria-label'),focus=content.contains(d.activeElement)?d.activeElement:null,label=identity(focus),start=focus?.selectionStart,end=focus?.selectionEnd;
-  const options={onAnalyze:startAnalysis,getState,getMetadata,navigate,commit,audio:playback,isVisible,onRegistered:id=>{closeRegistration?.();closeRegistration=showRegistrationNotice(shell,getState().battleApplications.find(a=>a.battleId===id).nickname,()=>navigate('underweb://social/dialog/'+id));},onRead:id=>commit(markDialogRead(getState(),id)),onResultViewed:id=>{pcFind(content,n=>n.dataset?.resultSummary===id)?.focus?.({preventScroll:true});onResultViewed(id);},expandedResults};
+  const options={uiState:profileUiState,onPhotoClose:()=>{deferredRender=true;render();},onAnalyze:startAnalysis,getState,getMetadata,navigate,commit,audio:playback,isVisible,onRegistered:id=>{closeRegistration?.();closeRegistration=showRegistrationNotice(shell,getState().battleApplications.find(a=>a.battleId===id).nickname,()=>navigate('underweb://social/dialog/'+id));},onRead:id=>commit(markDialogRead(getState(),id)),onResultViewed:id=>{pcFind(content,n=>n.dataset?.resultSummary===id)?.focus?.({preventScroll:true});onResultViewed(id);},expandedResults};
   let node;
   if(route.section==='groups')node=groups();
   else if(route.section==='results'){tableView?.dispose();node=tableView=createBattleResultsTableView(d,{...options,uiState:tableUiState,table:publicRoundTable(getState(),{battleId:route.battleId,roundId:route.roundId,nowMinute:metadataGameMinute(getMetadata())})});}

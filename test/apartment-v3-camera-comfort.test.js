@@ -93,9 +93,9 @@ for(const initial of ['2D','3D'])for(const wake of ['clock','early'])test(`${ini
  f.motion.move(f.motion.position[0]-.1);f.until(()=>f.motion.phase==='idle');assert.equal(f.camera.mode,'2D','the consumed sleep mode cannot leak into later actions');
 });
 
-test('a queued action after waking restores 3D when standing before its own camera swap',()=>{
+test('a queued computer action keeps the overview until its own camera handoff',()=>{
  const f=fixture('3D');f.motion.interact('bed');f.until(()=>f.motion.sleeping&&f.motion.phase==='perform');
- f.motion.interact('computer');f.until(()=>f.motion.phase==='walk');assert.equal(f.camera.mode,'3D');
+ f.motion.interact('computer');f.until(()=>f.motion.phase==='walk');assert.equal(f.camera.mode,'2D');
  f.until(()=>f.motion.phase==='perform');assert.equal(f.camera.mode,'2D');
 });
 

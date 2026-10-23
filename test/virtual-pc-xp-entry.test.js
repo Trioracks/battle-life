@@ -28,12 +28,12 @@ test('computer date tracks the shared game day and leaves clock text readable',(
 });
 test('host controller owns the eleven second cold boot with no DOM timer',()=>{
   const timers=[];const {c,root}=setup({setTimeoutFn:(fn,delay)=>{timers.push({fn,delay});return timers.length;},clearTimeoutFn:()=>{}});
-  c.boot(createVirtualPcState());const t=new PcTransition();t.enter();t.tick(3.6);c.presentTransition(t.snapshot);assert.ok(allPc(root).some(n=>n.textContent==='Слобода OS'));
+  c.boot(createVirtualPcState());const t=new PcTransition();t.enter();t.tick(3.6);c.presentTransition(t.snapshot);assert.ok(allPc(root).some(n=>n.getAttribute?.('aria-label')==='Слобода OS'));
   assert.equal(timers.length,0);t.tick(7.4);c.presentTransition(t.snapshot);assert.equal(root.dataset.pcTransition,'desktop');assert.ok(findButton(root,'Слобода'));
 });
 test('entry loads versioned Sloboda stylesheet and module, and host feeds game metadata',async()=>{
   const html=await readFile(new URL('../index.html',import.meta.url),'utf8'),app=await readFile(new URL('../src/apartment-app.js?rev=32',import.meta.url),'utf8');
-  assert.match(html,/apartment-app\.js\?rev=57/);assert.match(html,/virtual-pc\.css\?rev=57/);
-  assert.match(html,/desktop-apps\.css\?rev=57/);
-  assert.match(app,/virtual-pc-ui\.js\?rev=57/);assert.match(app,/syncHost\(\{playerName:profile\?\.name/);
+  assert.match(html,/apartment-app\.js\?rev=58/);assert.match(html,/virtual-pc\.css\?rev=58/);
+  assert.match(html,/desktop-apps\.css\?rev=58/);
+  assert.match(app,/virtual-pc-ui\.js\?rev=58/);assert.match(app,/syncHost\(\{playerName:profile\?\.name/);
 });

@@ -7,6 +7,7 @@ import {attachSubmissionTrack,sendSubmission} from '../src/social-submission.js'
 import {exportedSubmissionFixture,completeSubmissionUpload,completeSubmissionMessage} from './helpers/submission-fixtures.js';
 export function sentFixture(){
  let s=ensureBattleWindow(exportedSubmissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state;
+ s.battleWindows[0].closesAt=10680;s.battleWindows[0].deadlinePolicyVersion=1;
  s=attachSubmissionTrack(s,{communityId:'makarevich-1',fileId:'submission-file',nowMinute:601}).state;
  return sendSubmission(completeSubmissionMessage(completeSubmissionUpload(s)),{communityId:'makarevich-1',nowMinute:602}).state;
 }

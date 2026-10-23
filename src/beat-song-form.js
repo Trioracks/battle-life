@@ -1,5 +1,5 @@
-import {BEGINNER_BANK,USER_DRUM_BANK,beginnerById} from './beat-beginner-bank.js?rev=57';
-import {SOURCE_GAINS_DB} from './source-levels.js?rev=57';
+import {BEGINNER_BANK,USER_DRUM_BANK,beginnerById} from './beat-beginner-bank.js?rev=58';
+import {SOURCE_GAINS_DB} from './source-levels.js?rev=58';
 const BAR_SECONDS=8/3;
 const kinds=['drums','theme','arrangement'];
 const sourceIds=beat=>[beat.drumId,beat.audio?.themeId,beat.audio?.arrangementId];
@@ -12,6 +12,7 @@ function choice(key){
 // Saved project identity and the first take define the form. A clean take or
 // mastering changes the sound, but never the musical arrangement choices.
 export function createBeatSongForm(beat){
+ if(beat?.audioBacking)return null;
  const recording=beat?.recording;
  if(beat?.stages?.length!==3||!recording?.draft)return null;
  if(beat.songForm)return normalizeSongForm(beat.songForm,beat);

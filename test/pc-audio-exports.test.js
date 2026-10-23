@@ -9,6 +9,7 @@ import {createSocialBackground} from '../src/social-background.js';
 import {createSocialWorkerRuntime} from '../src/social-worker-runtime.js';
 import {mountVirtualPc} from '../src/virtual-pc-ui.js';
 import {pcDocument,allPc,findButton} from './helpers/virtual-pc-dom.js';
+import {advanceExportJobDurably,advanceExportJob} from '../src/pc-export-job.js';
 const api=await import('../src/pc-audio-exports.js').catch(()=>({}));
 const views=await import('../src/pc-audio-export-view.js').catch(()=>({}));
 const options={id:'export-1',projectId:'beat',kind:'track',folderId:'exports',filename:'Работа.wav',nowMinute:600};
@@ -123,18 +124,19 @@ test('failed export persistence leaves saved bytes, files and versions unchanged
  const write=storage.setItem.bind(storage);storage.setItem=(k,v)=>{if(reject)throw Error('quota');write(k,v);};
  const pc=mountVirtualPc(root,{onPersist:(next,options)=>saveVirtualPcState(storage,next)});
  pc.showDesktop(initial);pc.openNow('ft-studio');pc.studioView.openProject(initial.projects.find(p=>p.id==='beat'));
- findButton(root,'Экспорт').click();findButton(root,'Сохранить аудиофайл').click();
+ findButton(root,'Экспорт').click();findButton(root,'Экспортировать').click();findButton(allPc(root).find(n=>n.getAttribute?.('aria-label')==='Сохранить как'),'Сохранить').click();
  assert.deepEqual([...storage.data],previousSavedBytes);assert.equal(pc.state.audioExports.files.length,0);assert.equal(Object.keys(pc.state.trackVersions.byId).length,0);
  assert.ok(allPc(root).some(n=>/Не удалось сохранить/.test(n.textContent??'')));
- reject=false;findButton(root,'Сохранить аудиофайл').click();assert.equal(pc.state.audioExports.files.length,1);assert.equal(loadVirtualPcState(storage).state.audioExports.files.length,1);pc.dispose();
+ reject=false;findButton(allPc(root).find(n=>n.getAttribute?.('aria-label')==='Сохранить как'),'Сохранить').click();assert.equal(pc.state.audioExports.files.length,0);assert.ok(pc.state.exportJob);
+ const result=advanceExportJobDurably(pc.state,{activeSeconds:5,visible:true,powered:true},next=>pc.persist(next,{atomic:true}));assert.ok(result.completedFileId);assert.equal(pc.state.audioExports.files.length,1);assert.equal(loadVirtualPcState(storage).state.audioExports.files.length,1);pc.dispose();
 });
 
 test('export form retains focused name and folder while host state updates',()=>{
  assert.equal(typeof views.mountAudioExport,'function');const document=pcDocument(),root=document.createElement('div');let state=submissionFixture({vocal:false});
  const view=views.mountAudioExport(root,{getState:()=>state,projectId:'beat',getMetadata:()=>({gameDay:1,gameMinutes:600}),onCommit:next=>{state=next;return true;},onClose(){}});
- const name=allPc(root).find(n=>n.getAttribute('aria-label')==='Имя аудиофайла'),folder=allPc(root).find(n=>n.getAttribute('aria-label')==='Папка экспорта');name.value='Личное имя';folder.value='music';name.focus();
+ findButton(root,'Экспортировать').click();const name=allPc(root).find(n=>n.getAttribute('aria-label')==='Имя файла'),folder=allPc(root).find(n=>n.getAttribute('aria-label')==='Папка файла');name.value='Личное имя';folder.value='music';folder.dispatchEvent(new Event('change'));name.focus();
  state={...state,lastGameMinute:601};view.update();assert.equal(document.activeElement,name);assert.equal(name.value,'Личное имя');assert.equal(folder.value,'music');
- findButton(root,'Сохранить аудиофайл').click();assert.equal(state.audioExports.files[0].filename,'Личное имя.wav');assert.equal(state.audioExports.files[0].folderId,'music');view.dispose();
+ findButton(root,'Сохранить').click();assert.equal(state.audioExports.files.length,0);state=advanceExportJob(state,{activeSeconds:5,visible:true,powered:true}).state;view.update();assert.equal(state.audioExports.files[0].filename,'Личное имя.wav');assert.equal(state.audioExports.files[0].folderId,'music');view.dispose();
 });
 
 test('late Worker merges retain new exports, presentation and current unrelated state',()=>{
@@ -147,7 +149,7 @@ test('late Worker merges retain new exports, presentation and current unrelated 
 test('export timestamps consume the host absolute minute without adding the day twice',()=>{
  const document=pcDocument(),root=document.createElement('div');let state=submissionFixture({vocal:false});
  const view=views.mountAudioExport(root,{getState:()=>state,projectId:'beat',getMetadata:()=>({gameDay:2,gameMinutes:1500}),onCommit:next=>{state=next;return true;}});
- findButton(root,'Сохранить аудиофайл').click();assert.equal(state.audioExports.files[0].createdAtMinute,1500);view.dispose();
+ findButton(root,'Экспортировать').click();findButton(root,'Сохранить').click();state=advanceExportJob(state,{activeSeconds:5,visible:true,powered:true}).state;assert.equal(state.audioExports.files[0].createdAtMinute,1500);view.dispose();
 });
 
 test('an unreadable file collection is retained in recovery instead of silently discarded',()=>{

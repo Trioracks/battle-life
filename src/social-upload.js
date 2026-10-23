@@ -1,9 +1,10 @@
-import {communityById} from './social-catalog.js?rev=57';
-import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow,isBattleWindowId} from './battle-windows.js?rev=57';
-import {validGameMinute} from './game-minute.js?rev=57';
-import {TRACK_DSP_VERSION} from './track-version.js?rev=57';
-import {normalizeAudioExports} from './pc-audio-exports.js?rev=57';
-import {normalizeSocial} from './social-state.js?rev=57';
+import {audioFileMatchesBattle} from './battle-file-match.js?rev=58';
+import {communityById} from './social-catalog.js?rev=58';
+import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow,isBattleWindowId} from './battle-windows.js?rev=58';
+import {validGameMinute} from './game-minute.js?rev=58';
+import {TRACK_DSP_VERSION} from './track-version.js?rev=58';
+import {normalizeAudioExports} from './pc-audio-exports.js?rev=58';
+import {normalizeSocial} from './social-state.js?rev=58';
 export const UPLOAD_TOTAL_SECONDS=2;
 const clone=v=>JSON.parse(JSON.stringify(v));
 const fileBytes=version=>{const seconds=version?.recipe?.descriptor?.durationSeconds;return Number.isFinite(seconds)&&seconds>0&&seconds<=3600?Math.ceil(seconds*192000/8):null;};
@@ -32,8 +33,9 @@ export function startSubmissionUpload(state,{communityId,fileId,nowMinute}={}){
  if(attemptForWindow(state,window))return fail('Работа уже отправлена. Повторная сдача и замена недоступны.');
  if(nowMinute<window.opensAt||nowMinute>=window.closesAt)return fail('Приём заявок и треков закрыт.');
  if(!state.battleApplications?.some(a=>a.battleId===c.battleId))return fail('Сначала зарегистрируйся на этот баттл.');
- const file=normalizeAudioExports(state.audioExports,state.trackVersions).files.find(f=>f.id===fileId&&f.kind==='track');
- if(!file)return fail('Выбери экспортированный полный трек WAV. Бит, вокал и проект не подходят.');
+ const file=normalizeAudioExports(state.audioExports,state.trackVersions,{fileSystem:state.fileSystem}).files.find(f=>f.id===fileId&&f.kind==='track');
+ if(!file)return fail('Выбери экспортированный полный трек WAV или MP3. Бит, вокал и проект не подходят.');
+ if(!audioFileMatchesBattle(state,file,{battleId:c.battleId,roundId:window.roundId,themeId:state.roundThemes?.[c.battleId+':'+window.roundId]?.id}))return fail('Трек создан для другого баттла или раунда. Выбери работу для текущей темы.');
  const versionId=file.trackVersionId,totalBytes=file.bytes;
  const social=normalizeSocial(state.social);social.dialogs[communityId]={messages:[],unread:false,...social.dialogs[communityId],peer:{kind:'community',id:communityId}};
  return {ok:true,state:{...state,social,outgoingUpload:{version:2,communityId,windowId:window.id,fileId,versionId,totalBytes,uploadedBytes:0,fractionalBytes:0,elapsedSeconds:0,totalSeconds:UPLOAD_TOTAL_SECONDS,status:'uploading'}},versionId,reason:''};
@@ -44,7 +46,7 @@ export function advanceSubmissionUpload(state,{activeSeconds=0,powered=false,pau
  const nextElapsed=u.elapsedSeconds+activeSeconds,elapsedSeconds=nextElapsed>=UPLOAD_TOTAL_SECONDS-1e-9?UPLOAD_TOTAL_SECONDS:nextElapsed,completed=elapsedSeconds===UPLOAD_TOTAL_SECONDS;
  const outgoingUpload={...u,...progress(u.totalBytes,elapsedSeconds),elapsedSeconds,status:completed?'ready':'uploading'};
  let social=state.social;
- if(completed){social=normalizeSocial(social);social.personalAudioIds=[...new Set([...social.personalAudioIds,u.versionId])];social.dialogs[u.communityId]={messages:[],unread:false,...social.dialogs[u.communityId],peer:{kind:'community',id:u.communityId},draftVersionId:u.versionId};}
+ if(completed){social=normalizeSocial(social);social.personalAudioIds=[...new Set([...social.personalAudioIds,u.versionId])];if(u.fileId)social.personalAudioFiles={...social.personalAudioFiles,[u.versionId]:u.fileId};social.dialogs[u.communityId]={messages:[],unread:false,...social.dialogs[u.communityId],peer:{kind:'community',id:u.communityId},draftVersionId:u.versionId};}
  return {state:{...state,social,outgoingUpload},changed:true,completed};
 }
 export function cancelSubmissionUpload(state){const recovery=state.outgoingUpload?.issue?[...(state.outgoingUploadRecovery??[]),clone(state.outgoingUpload)]:state.outgoingUploadRecovery??[];return {ok:true,state:{...state,outgoingUpload:null,outgoingUploadRecovery:recovery},reason:''};}

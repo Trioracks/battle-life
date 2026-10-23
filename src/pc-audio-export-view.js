@@ -1,33 +1,38 @@
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=57';
-import {AUDIO_EXPORT_FOLDERS,AUDIO_EXPORT_KINDS,createAudioExport} from './pc-audio-exports.js?rev=57';
-import {EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=57';
-import {gameDateTimeLabel} from './home-calendar.js?rev=57';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=58';
+import {AUDIO_EXPORT_KINDS} from './pc-audio-exports.js?rev=58';
+import {mountPcFilePicker} from './pc-file-picker-view.js?rev=58';
+import {startExportJob,cancelExportJob} from './pc-export-job.js?rev=58';
+import {EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=58';
+import {gameDateTimeLabel} from './home-calendar.js?rev=58';
 
 export function mountAudioExport(root,{getState,projectId,getMetadata=()=>({}),onCommit,onClose=()=>{}}){
- const d=root.ownerDocument,form=el(d,'form'),kind=el(d,'select',{attributes:{'aria-label':'Вид аудиофайла'}}),folder=el(d,'select',{attributes:{'aria-label':'Папка экспорта'}}),name=el(d,'input',{attributes:{'aria-label':'Имя аудиофайла',maxlength:'120'}}),notice=el(d,'p',{className:'ft-warning',attributes:{role:'status'}}),availability=el(d,'p',{className:'ft-production-note'});
- let disposed=false,source=null;
- for(const [value,text]of Object.entries(AUDIO_EXPORT_KINDS))kind.append(el(d,'option',{value,text}));
- for(const value of AUDIO_EXPORT_FOLDERS)folder.append(el(d,'option',{value,text:EXPLORER_PATHS[value].address}));
- const beat=getState().projects.find(p=>p.id===projectId),hasVocal=Boolean(beat?.recording?.draft);
- kind.value=hasVocal?'track':'beat';folder.value='exports';name.value=(beat?.name??'Трек').replace(/[<>:"/\\|?*\x00-\x1f]/g,'_')+'.wav';
- function update(){
-  if(disposed)return;const beat=getState().projects.find(p=>p.id===projectId);if(beat===source)return;source=beat;
-  for(const option of kind.children)option.disabled=option.value!=='beat'&&!beat?.recording?.draft;
-  availability.textContent=beat?.recording?.draft?'WAV · 44,1 кГц · 16 бит · стерео. Файл сохранит текущую версию проекта.':'Вокал и полный трек доступны после записи вокала. Можно экспортировать готовый бит.';
- }
- function save(){
-  if(disposed)return;
-  const meta=getMetadata(),nowMinute=Number.isFinite(meta.gameMinutes)?meta.gameMinutes:getState().lastGameMinute??0;
-  const result=createAudioExport(getState(),{id:globalThis.crypto?.randomUUID?.()??'audio-'+Date.now(),projectId,kind:kind.value,folderId:folder.value,filename:name.value,nowMinute});
-  if(!result.ok){notice.textContent=result.reason;return;}
-  let durable;try{const committed=onCommit(result.state);durable=committed!==false&&committed?.ok!==false;}catch{durable=false;}
-  if(!durable){notice.textContent='Не удалось сохранить аудиофайл. Файл не создан. Повтори попытку.';return;}
-  onClose(result.fileId);
+ const d=root.ownerDocument,form=el(d,'form'),kind=el(d,'select',{attributes:{'aria-label':'Вид аудиофайла'}}),format=el(d,'select',{attributes:{'aria-label':'Формат аудиофайла'}}),notice=el(d,'p',{className:'ft-warning',attributes:{role:'status'}}),facts=el(d,'p',{className:'ft-production-note'}),progress=el(d,'section',{className:'ft-export-progress',attributes:{'aria-label':'Экспорт аудио'}}),bar=el(d,'progress'),percent=el(d,'strong'),filename=el(d,'p');
+ let disposed=false,picker=null,pickerRoot=null,ownJob=getState().exportJob?.id??null,fileId=getState().exportJob?.file.id??null,closed=false;
+ for(const [value,text]of Object.entries(AUDIO_EXPORT_KINDS))kind.append(el(d,'option',{value,text}));for(const value of ['wav','mp3'])format.append(el(d,'option',{value,text:value.toUpperCase()}));
+ kind.value=getState().projects.find(p=>p.id===projectId)?.recording?.draft?'track':'beat';format.value='wav';bar.max=5;
+ function commit(next){try{const r=onCommit(next);return r!==false&&r?.ok!==false;}catch{return false;}}
+ function closePicker(){picker?.dispose();picker=null;pickerRoot?.remove();pickerRoot=null;}
+ function choose(){
+  if(disposed||getState().exportJob)return;closePicker();pickerRoot=el(d,'div',{className:'ft-export-picker'});root.append(pickerRoot);
+  const beat=getState().projects.find(p=>p.id===projectId);
+  picker=mountPcFilePicker(pickerRoot,{getState,mode:'export',types:[format.value],initialFolderId:'exports',suggestedName:(beat?.name??'Трек').replace(/[<>:"/\\|?*]/g,'_')+'.'+format.value,onChange:onCommit,onCancel:closePicker,onSelect:value=>{
+   const r=startExportJob(getState(),{jobId:globalThis.crypto?.randomUUID?.()??'render-'+Date.now(),projectId,kind:kind.value,format:format.value,folderId:value.folderId,filename:value.filename,nowMinute:getMetadata().gameMinutes??getState().lastGameMinute??0});
+   if(!r.ok)return r;if(!commit(r.state))return {ok:false,reason:'Не удалось сохранить задание экспорта. Повтори попытку.'};ownJob=r.state.exportJob.id;fileId=r.state.exportJob.file.id;closePicker();update();return {ok:true};
+  }});
  }
  const field=(text,input)=>{const label=el(d,'label',{className:'pc-field',text});label.append(input);return label;};
- form.append(field('Экспортировать',kind),field('Папка виртуального диска',folder),field('Имя файла',name),availability,el(d,'p',{className:'ft-production-note',text:'Изменения проекта не изменят этот файл. Файлы доступны в «Моём компьютере».'}),button(d,'Сохранить аудиофайл',{className:'ft-primary'},save),notice,button(d,'Отмена',{},()=>onClose()));
- const submit=e=>{e.preventDefault();save();};form.addEventListener('submit',submit);root.append(form);update();
- return {update,dispose(){disposed=true;form.removeEventListener('submit',submit);form.remove();}};
+ const exportButton=button(d,'Экспортировать',{className:'ft-primary'},choose);form.append(field('Экспортировать',kind),field('Формат',format),facts,exportButton,notice,button(d,'Отмена',{},()=>onClose()));
+ progress.append(el(d,'h3',{text:'Рендеринг аудио'}),filename,bar,percent,button(d,'Отменить экспорт',{},()=>{if(commit(cancelExportJob(getState()).state))onClose();}));root.append(form,progress);
+ function update(){
+  if(disposed)return;picker?.update();const s=getState(),job=s.exportJob,beat=s.projects.find(p=>p.id===projectId),ours=job&&job.id===ownJob;form.hidden=Boolean(ours);progress.hidden=!ours;
+  for(const option of kind.children)option.disabled=option.value!=='beat'&&!beat?.recording?.draft;
+  facts.textContent=format.value==='mp3'?'MP3 · 128 кбит/с · 44,1 кГц · стерео · исходник 16 бит':'WAV · 44,1 кГц · 16 бит · стерео';
+  exportButton.disabled=Boolean(job);notice.textContent=job&&!ours?'Другой экспорт ещё не завершён.':'';
+  if(ours){bar.value=job.elapsedSeconds;percent.textContent=Math.floor(job.elapsedSeconds/5*100)+'%';filename.textContent=job.file.filename+' · '+job.file.bytes+' байт';if(job.error)percent.textContent=job.error;}
+  else if(fileId&&s.audioExports.files.some(f=>f.id===fileId)&&!closed){closed=true;onClose(fileId);}
+ }
+ const submit=e=>{e.preventDefault();choose();};form.addEventListener('submit',submit);format.addEventListener('change',update);update();
+ return {update,dispose(){disposed=true;closePicker();form.removeEventListener('submit',submit);format.removeEventListener('change',update);form.remove();progress.remove();}};
 }
 
 export function mountAudioFilePlayer(root,{audio}){

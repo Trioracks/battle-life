@@ -37,7 +37,7 @@ test('shutdown clears windows but leave preserves them and never discards the ol
 });
 test('closing another app leaves Studio intact and needs no music-save dialog',()=>{
   const s=setup(),c=s.controller;s.launch();c.open('underweb');c.closeWindow();
-  assert.equal(c.windows.activeId,'ft-studio');assert.equal(findButton(s.root,'Сохранить'),undefined);
+  assert.equal(c.windows.activeId,'ft-studio');assert.equal(findButton(s.root,'Сохранить').disabled,true);
 });
 test('Explorer title and icon follow the current folder',()=>{
   const {controller:c,root}=setup();c.open('computer');c.openFolder('projects');

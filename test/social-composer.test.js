@@ -5,6 +5,7 @@ import {exportedSubmissionFixture,completeSubmissionUpload} from './helpers/subm
 import {ensureBattleWindow} from '../src/battle-windows.js';
 import {attachSubmissionTrack,sendSubmission} from '../src/social-submission.js';
 import {createVirtualPcState,loadVirtualPcState,saveVirtualPcState,VIRTUAL_PC_STORAGE_KEY} from '../src/virtual-pc-state.js';
+import {savePcDocument} from '../src/pc-filesystem.js';
 const options={communityId:'makarevich-1',fileId:'submission-file',nowMinute:601};
 const ready=()=>completeSubmissionUpload(attachSubmissionTrack(ensureBattleWindow(exportedSubmissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state,options).state);
 const tick=(s,t,extra={})=>composer.advanceSubmissionMessage(s,{activeSeconds:t,visible:true,powered:true,paused:false,...extra});
@@ -20,10 +21,14 @@ test('damaged frozen lyric text isolates composer recovery without emptying the 
   const cancelled=composer.cancelSubmissionMessage(again).state;assert.equal(composer.startSubmissionMessage(cancelled,options).ok,false);assert.equal(cancelled.battleSubmissions.length,0);
  }
 });
-test('message uses the frozen symbolic words, original prose/verse gaps, headings and notes without regenerating',()=>{
+test('legacy messages keep frozen symbolic words, prose gaps, headings and notes without regenerating',()=>{
  const s=ready(),version=s.trackVersions.byId[s.social.dialogs['makarevich-1'].draftVersionId];
  version.recipe.lyrics.sections=[{title:'Черновик',presentation:'prose',lines:[{words:[{text:'αβ.'},{text:'██'}]},{words:[{text:'γδ'}]},{gapBefore:true,words:[{text:'абв'}]}]},{title:'Куплет 2',presentation:'lines',lines:[{words:[{text:'▀▀'},{text:'▓▓.'}],note:'Старая заметка'},{gapBefore:true,indent:1,words:[{text:'<script>'}]}]}];
- const body=composer.submissionMessageBody(version);assert.ok(body.startsWith('Привет!'));assert.ok(body.includes(version.name));assert.ok(body.includes('Черновик\nαβ. ██ γδ\n\nабв'));assert.ok(body.includes('Куплет 2\n▀▀ ▓▓. // Старая заметка\n\n  <script>'));
+ const body=composer.legacySubmissionMessageBody(version);assert.ok(body.startsWith('Привет!'));assert.ok(body.includes(version.name));assert.ok(body.includes('Черновик\nαβ. ██ γδ\n\nабв'));assert.ok(body.includes('Куплет 2\n▀▀ ▓▓. // Старая заметка\n\n  <script>'));
+});
+test('new submission bodies are short and freeze a matching saved TXT as an attachment',()=>{
+ let s=ready();s=savePcDocument(s,{projectId:'lyrics',folderId:'documents',filename:'Мой текст.txt',nowMinute:601}).state;const r=composer.startSubmissionMessage(s,options);assert.equal(r.ok,true,r.reason);const m=r.state.outgoingMessage;assert.ok(m.body.length<200);assert.ok(m.textAttachment);assert.equal(m.textAttachment.filename,'Мой текст.txt');
+ const frozen=structuredClone(m.textAttachment);r.state.fileSystem.files[0].filename='Позднее.txt';assert.deepEqual(r.state.outgoingMessage.textAttachment,frozen);
 });
 test('six visible active seconds gate final send; duplicate start, hide, pause, power and reload preserve one bound composition',()=>{
  let s=ready();assert.equal(sendSubmission(s,options).ok,false);s=composer.startSubmissionMessage(s,options).state;const body=s.outgoingMessage.body;

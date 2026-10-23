@@ -1,4 +1,4 @@
-import {homeLight,clockHandAngles} from './apartment-v3-time.js?rev=57';
+import {homeLight,clockHandAngles} from './apartment-v3-time.js?rev=58';
 
 export function sceneTimeState(gameMinutes,lightingMinutes=gameMinutes){
   return {light:homeLight(lightingMinutes),hands:clockHandAngles(gameMinutes)};

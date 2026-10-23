@@ -184,9 +184,9 @@ test('switch tap touches the rocker with the actual right hand then withdraws wi
   assert.ok(Math.abs(Math.max(...animation.samplers.flatMap(s=>values(s.input).flat()))-.7)<.001,'tap clip lasts .7 seconds');
 });
 
-test('sewn sleeve crowns cover the upper arm skin in the idle pose',()=>{
+test('sewn sleeve crowns enclose the sleeveless shoulder envelope in the idle pose',()=>{
   const {g,values}=model(),avatar=animatedModel('idle');avatar.frame(0);
-  const skin=avatar.vertices('neutral-skinned-body').filter(v=>Math.abs(v.x)>.205&&v.y>1.355&&v.y<1.405);
+  const tank=g.nodes.find(n=>n.name==='look-top-tank'),all=avatar.vertices('look-top-tank');let offset=0;const bare=[];for(const p of g.meshes[tank.mesh].primitives){const count=values(p.attributes.POSITION).length;if(g.materials[p.material].name==='warm-skin')bare.push(...all.slice(offset,offset+count));offset+=count;}const skin=bare.filter(v=>Math.abs(v.x)>.205&&v.y>1.355&&v.y<1.405);
   assert.ok(skin.length>10);
   for(const look of ['tee','shirt','sweater','hoodie']){
     const name='look-top-'+look,node=g.nodes.find(n=>n.name===name),fabric=avatar.vertices(name),triangles=[];let base=0;

@@ -37,11 +37,11 @@ test('Goblin answer selection types a durable draft and requires a separate send
  findButton(f.view.root,'Отправить').click();assert.equal(f.state.social.goblin.stage,'invite-wait');assert.equal(f.state.social.dialogs[GOBLIN_ID].messages.length,before+1);assert.equal(f.state.social.dialogs[GOBLIN_ID].replyDraft,null);f.view.dispose();
 });
 
-test('Goblin mood wait reports real queued game time and reveals the real invite choices',()=>{
+test('Goblin mood allows immediate questions and fallback still reveals the invitation',()=>{
  let state=advanceGoblin(advanceGoblin(createVirtualPcState({power:'on'}),0).state,20).state;
  state=advanceGoblin(replyToGoblin(state,'good',20).state,30).state;const f=goblin(state,30);
- assert.ok(allPc(f.view.root).some(n=>n.textContent?.includes('через 10 игровых минут')));
- assert.equal(findButton(f.view.root,'Ответить').disabled,true);
+ assert.equal(allPc(f.view.root).some(n=>n.textContent?.includes('через 10 игровых минут')),false);
+ assert.equal(findButton(f.view.root,'Ответить').disabled,false);findButton(f.view.root,'Ответить').click();assert.ok(findButton(f.view.root,'О, чё за музыка?'));
  f.state=advanceGoblin(f.state,60).state;f.setMinute(60);f.view.update();findButton(f.view.root,'Ответить').click();assert.ok(findButton(f.view.root,'О, круто! А чё дальше?'));f.view.dispose();
 });
 
@@ -60,7 +60,7 @@ test('Goblin retries unread persistence after reopening instead of treating a fa
 
 test('Goblin attachment chooser prepares the actual exported text and sends only on request',()=>{
  let state=advanceGoblin(exportedSubmissionFixture(),0).state;state.social.goblin.stage='text';const exported=exportLyricFile(state,'lyrics',20);assert.equal(exported.ok,true);state=exported.state;
- const f=goblin(state),before=f.state.social.dialogs[GOBLIN_ID].messages.length;findButton(f.view.root,'Прикрепить').click();findButton(f.view.root,'Выбрать вложение').click();
+ const f=goblin(state),before=f.state.social.dialogs[GOBLIN_ID].messages.length;findButton(f.view.root,'Прикрепить').click();const picker=allPc(f.view.root).find(n=>n.className==='pc-file-picker');findButton(picker,'Выбрать: '+f.state.fileSystem.files.find(file=>file.id===exported.fileId).filename).click();findButton(picker,'Прикрепить').click();
  assert.equal(f.state.social.goblin.sent.text,undefined);assert.equal(f.state.social.dialogs[GOBLIN_ID].messages.length,before);f.tick(3);assert.equal(field(f.view.root).value,'Чувак, вот мой текст. Глянешь?');assert.equal(f.state.social.goblin.stage,'text');
  findButton(f.view.root,'Отправить').click();assert.equal(f.state.social.goblin.stage,'waiting-text');assert.equal(f.state.social.goblin.sent.text,exported.fileId);assert.equal(f.state.social.dialogs[GOBLIN_ID].messages.length,before+1);assert.equal(f.state.social.goblin.pending.find(m=>m.id==='return:text').at,40);f.view.dispose();
 });

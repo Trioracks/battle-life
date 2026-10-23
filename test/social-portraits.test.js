@@ -32,3 +32,8 @@ test('pending render cannot replace a newer appearance or discard concurrent gam
  const controller=portraits.createPlayerPortraitController({getAppearance:()=>appearance,getState:()=>state,render:()=>new Promise(r=>resolve=r),save:next=>{state=next;return true;}});
  const pending=controller.request();state.other='new message';appearance={...appearance,hair:'bald'};resolve({url:jpeg()});assert.equal((await pending).stale,true);assert.equal(state.social.playerPortrait,undefined);assert.equal(state.other,'new message');
 });
+test('a clothing geometry revision refreshes an old valid portrait exactly once',async()=>{
+ const oldKey='portrait-v1:'+JSON.stringify(DEFAULT_APPEARANCE);let state={social:{playerPortrait:{key:oldKey,url:jpeg()}}},renders=0;
+ const controller=portraits.createPlayerPortraitController({getState:()=>state,getAppearance:()=>DEFAULT_APPEARANCE,render:async()=>{renders++;return {url:jpeg()};},save:next=>{state=next;return true;}});
+ assert.equal((await controller.request()).ok,true);assert.notEqual(state.social.playerPortrait.key,oldKey);assert.equal(state.social.playerPortrait.key,portraits.generatedPortraitKey(DEFAULT_APPEARANCE));await controller.request();assert.equal(renders,1);
+});

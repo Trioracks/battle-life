@@ -1,5 +1,5 @@
-import {createProfile,saveProfile,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=57';
-import {normalizeVoiceId} from './vocal-catalog.js?rev=57';
+import {createProfile,saveProfile,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=58';
+import {normalizeVoiceId} from './vocal-catalog.js?rev=58';
 
 export function validateCreatorDraft(draft){
  try{normalizeVoiceId(draft?.voiceId);}catch(error){return {ok:false,errors:{voiceId:error.message}};}

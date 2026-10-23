@@ -1,22 +1,31 @@
 // Notepad-style view of the persisted symbolic lyric projects.
-import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=57';
-import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill,canEditLyricContentMix,setLyricContentMix,lyricRefinementReason} from './lyric-production.js?rev=57';
-import {randomBeatName} from './beat-names.js?rev=57';
-import {mountProjectPicker} from './project-picker-view.js?rev=57';
-import {normalizeBeat} from './beat-production.js?rev=57';
-import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=57';
-import {exportLyricFile} from './goblin-exchange.js?rev=57';
+import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=58';
+import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill,canEditLyricContentMix,setLyricContentMix,lyricRefinementReason} from './lyric-production.js?rev=58';
+import {randomBeatName} from './beat-names.js?rev=58';
+import {mountProjectPicker} from './project-picker-view.js?rev=58';
+import {normalizeBeat} from './beat-production.js?rev=58';
+import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=58';
+import {savePcDocument,openPcDocument,pcFileById} from './pc-filesystem.js?rev=58';
+import {documentSession,documentIsDirty} from './pc-document-session.js?rev=58';
+import {mountPcFilePicker} from './pc-file-picker-view.js?rev=58';
+import {explorerPaths} from './virtual-pc-explorer.js?rev=58';
+import {createDocumentGuard} from './pc-document-guard.js?rev=58';
+import {battleDocumentName} from './battle-document-name.js?rev=58';
 
-export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,onWork=()=>false}={}){
- const d=root.ownerDocument;let panel=null,modal=null,returnFocusLabel='',message='',saveMessage='Сохраняется автоматически',saveFailed=false,signature=[],disposed=false,controls=[],needsLabel=null;
+export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,onCommit=onChange,onWork=()=>false}={}){
+ const d=root.ownerDocument;let panel=null,modal=null,filePicker=null,returnFocusLabel='',message='',saveMessage='Черновик не сохранён в файл',saveFailed=false,signature=[],disposed=false,controls=[],needsLabel=null;
+ let saveContinuation=null;const guard=createDocumentGuard(root,{appId:'rap-notebook',getState,onCommit,onSave:save});
+ function replaceDocument(mode){guard.request({onClose:()=>openPanel(mode)});}
  function openPanel(mode){returnFocusLabel=d.activeElement?.textContent??'';panel=mode;message='';render();}
  const active=()=>normalizeLyric(getState().projects.find(p=>p.id===getState().writing.activeTextId));
  const fingerprint=()=>{const s=getState(),selected=s.projects.find(p=>p.id===s.writing.activeTextId);return [s.writing.activeTextId,s.projects,selected?.stages,selected?.stages?.length,s.battleApplications,s.writing.job?.projectId,s.writing.job?.kind,s.writing.job?.stage,Math.floor(s.writing.job?.elapsed??0),Boolean(s.music.job),Boolean(s.recording?.job),s.writing.practice,s.creativeWork?.items,effectiveWritingSkill(s,getMetadata().skills)];};
  const sameInputs=(a,b)=>a.length===b.length&&a.every((value,i)=>value===b[i]);
  function updateNeeds(){const needs=getState().music.needs;if(needsLabel)needsLabel.textContent='Сытость '+Math.round(needs.satiety)+' · энергия '+Math.round(needs.energy);}
  function choose(id){const s=pauseCreativeChain(getState());persist({...s,writing:{...s.writing,activeTextId:id}});panel=null;message='';render();}
- function persist(next){saveFailed=onChange(next)===false;saveMessage=saveFailed?'Ошибка сохранения':'Все изменения сохранены';return !saveFailed;}
- function save(){const saved=persist(getState());message=saved?'Текст сохранён.':'Не удалось сохранить текст.';render();}
+ function persist(next){saveFailed=onChange(next)===false;saveMessage=saveFailed?'Ошибка сохранения':'Изменения в черновике';return !saveFailed;}
+ const boundFile=()=>{const s=documentSession(getState(),'rap-notebook');return s.projectId===active()?.id?pcFileById(getState(),s.fileId):null;};
+ function commitFile(result){if(!result.ok)return result;saveFailed=onCommit(result.state)===false;if(saveFailed){saveMessage='Ошибка сохранения';return {ok:false,reason:'Не удалось сохранить файл. Повтори попытку.'};}saveMessage='Файл сохранён';message='Текст сохранён.';return {ok:true};}
+ function save(continuation=null){const p=active();if(!p){continuation?.onCancel?.();return;}if(!boundFile()){saveContinuation=continuation;openPanel('save');return;}const r=commitFile(savePcDocument(getState(),{projectId:p.id,fileId:boundFile().id,nowMinute:getMetadata().gameMinutes??getState().lastGameMinute??0}));message=r.ok?'Текст сохранён.':r.reason;render();if(r.ok)continuation?.onSaved?.();else continuation?.onCancel?.();}
  function start(kind='stage',extra={}){
   const before=getState(),p=active();if(!p)return;
   const stageSliders=[];for(const c of controls)stageSliders[c.stage]=c.inputs.map(input=>Number(input.value));
@@ -33,10 +42,22 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
    for(const b of options[group])opt.append(el(d,'option',{text:b.title+' — '+b.theme,value:b.id}));select.append(opt);
   }
   const name=el(d,'input',{attributes:{'aria-label':'Название текста',placeholder:'Название трека',maxlength:'64'}});
-  select.addEventListener('change',()=>{const b=[...options.registered,...options.other].find(b=>b.id===select.value);if(!name.value)name.value=b?.theme??'';});
-  function submit(){const r=createLyric(getState(),{id:'text-'+(globalThis.crypto?.randomUUID?.()??Date.now().toString(36)),name:name.value,battleId:select.value==='free'||!select.value?null:select.value,gameDay:getMetadata().gameDay},getMetadata().skills);if(!r.ok){error.textContent=r.reason;return;}persist(r.state);panel=null;message='';render();}
+  const topicName=()=>{const current=lyricBattleOptions(getState()),b=[...current.registered,...current.other].find(b=>b.id===select.value);return b?battleDocumentName(b.theme,getState().projects.filter(p=>p.kind==='lyrics').map(p=>p.name)):null;};
+  const random=button(d,'Случайное название',{},()=>{if(name.readOnly)return;name.value=randomBeatName(getMetadata().gameDay,name.value,Math.random,getState().projects.map(p=>p.name));name.focus();});
+  select.addEventListener('change',()=>{const title=topicName();name.readOnly=Boolean(title);random.disabled=Boolean(title);if(title){name.value=title;name.setAttribute('readonly','');}else{name.value='';name.removeAttribute('readonly');}});
+  function submit(){const before=getState(),r=createLyric(before,{id:'text-'+(globalThis.crypto?.randomUUID?.()??Date.now().toString(36)),name:topicName()??name.value,battleId:select.value==='free'||!select.value?null:select.value,gameDay:getMetadata().gameDay},getMetadata().skills);if(!r.ok){error.textContent=r.reason;return;}
+   const id=r.state.writing.activeTextId;let next={...r.state,documentSessions:{version:1,...r.state.documentSessions,byApp:{...r.state.documentSessions?.byApp,'rap-notebook':{projectId:id,fileId:null}}}};
+   const quick=effectiveWritingSkill(next,getMetadata().skills)<25;if(quick){const started=startCreativeChain(next,{kind:'lyrics',projectId:id,stageSliders:[],gameDay:getMetadata().gameDay},getMetadata().skills);if(!started.ok){error.textContent=started.reason;return;}next=started.state;}
+   if(!persist(next)){error.textContent='Не удалось сохранить начало работы.';return;}panel=null;message='';if(quick&&onWork()===false){persist({...r.state,documentSessions:next.documentSessions});message='Текст создан. Сядь за компьютер, чтобы начать писать.';}render();
+  }
   const error=el(d,'p',{className:'rn-message',attributes:{role:'status'}});
-  form.append(select,name,button(d,'Случайное название',{},()=>{name.value=randomBeatName(getMetadata().gameDay,name.value,Math.random,getState().projects.map(p=>p.name));name.focus();}),el(d,'p',{text:'Выбор темы не подаёт заявку на баттл. Сначала набросок, затем рифмы и образы.'}),error,button(d,'Создать текст',{},submit),button(d,'Отмена',{},()=>{panel=null;render();}));form.addEventListener('submit',e=>{e.preventDefault();submit();});box.append(form);return cover;
+  form.append(select,name,random,el(d,'p',{text:'Выбор темы не подаёт заявку на баттл. Сначала набросок, затем рифмы и образы.'}),error,button(d,'Создать текст',{},submit),button(d,'Отмена',{},()=>{panel=null;render();}));form.addEventListener('submit',e=>{e.preventDefault();submit();});box.append(form);return cover;
+ }
+ function fileDialog(mode){const {cover,box}=dialog(mode==='open'?'Открыть текст':'Сохранить как');
+  filePicker=mountPcFilePicker(box,{getState,mode,types:['txt'],initialFolderId:mode==='open'?'downloads':boundFile()?.folderId??'documents',suggestedName:boundFile()?.filename??(active()?.name??'Текст')+'.txt',onChange:next=>onCommit(next),onCancel:()=>{const continuation=saveContinuation;saveContinuation=null;panel=null;render();continuation?.onCancel?.();},onSelect:value=>{
+   const result=mode==='open'?openPcDocument(getState(),{fileId:value,appId:'rap-notebook'}):savePcDocument(getState(),{projectId:active()?.id,folderId:value.folderId,filename:value.filename,fileId:value.overwriteFileId,overwrite:Boolean(value.overwriteFileId),nowMinute:getMetadata().gameMinutes??getState().lastGameMinute??0});
+   const saved=commitFile(result);if(saved.ok){const continuation=saveContinuation;saveContinuation=null;panel=null;render();continuation?.onSaved?.();}return saved;
+  }});return cover;
  }
  function listDialog(mode){
   const {cover,box}=dialog(mode==='open'?'Открыть текст':mode==='adapt'?'Адаптировать под бит':'Добавить в текст');
@@ -51,13 +72,14 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
   if(mode==='add')box.append(button(d,'Отмена',{},()=>{panel=null;render();}));return cover;
  }
  function render(){
-  if(disposed)return;const p=active(),s=getState(),skill=effectiveWritingSkill(s,getMetadata().skills),job=s.writing.job??s.creativeWork?.items.find(i=>i.projectId===p?.id)?.pausedJob;
+  if(disposed)return;filePicker?.dispose();filePicker=null;const p=active(),s=getState(),skill=effectiveWritingSkill(s,getMetadata().skills),job=s.writing.job??s.creativeWork?.items.find(i=>i.projectId===p?.id)?.pausedJob;
   const wrap=el(d,'section',{className:'rap-notebook',attributes:{'aria-label':'Рэпблокнот'}}),header=el(d,'header',{className:'rn-app-header'}),brand=el(d,'div',{className:'rn-brand'}),toolbar=el(d,'nav',{className:'rn-toolbar',attributes:{'aria-label':'Файл текста'}});
   brand.append(el(d,'span',{className:'rn-brand-icon',text:'▤',attributes:{'aria-hidden':'true'}}),el(d,'strong',{text:'РэпБлокнот'}));
   const saveButton=button(d,'Сохранить',{className:'rn-save-button',attributes:{'aria-label':'Сохранить'}},save);saveButton.disabled=!p;
-  toolbar.append(button(d,'Новый',{className:'rn-new-button',attributes:{'aria-label':'Новый текст'}},()=>openPanel('new')),button(d,'Открыть',{className:'rn-open-button',attributes:{'aria-label':'Открыть текст'}},()=>openPanel('open')),saveButton);header.append(brand,toolbar);
+  const saveAs=button(d,'Сохранить как',{attributes:{'aria-label':'Сохранить текст как'}},()=>openPanel('save'));saveAs.disabled=!p;
+  toolbar.append(button(d,'Новый',{className:'rn-new-button',attributes:{'aria-label':'Новый текст'}},()=>replaceDocument('new')),button(d,'Открыть',{className:'rn-open-button',attributes:{'aria-label':'Открыть текст'}},()=>replaceDocument('open')),saveButton,saveAs);header.append(brand,toolbar);
   const tab=el(d,'div',{className:'rn-tab'}),body=el(d,'div',{className:'rn-body'}),editor=el(d,'div',{className:'rn-editor'}),sheet=el(d,'article',{className:'rn-sheet',dataset:{lyricRole:'document'},attributes:{'aria-label':'Документ текста'}}),side=el(d,'aside',{className:'rn-work',attributes:{'aria-label':'О тексте'}});
-  tab.append(el(d,'span',{className:'rn-file-label',text:p?p.name+'.rap.txt':'Нет открытого текста'}),el(d,'span',{className:'rn-save-state'+(saveFailed?' rn-save-error':''),text:p?saveMessage:'Создай или открой текст'}));
+  const file=boundFile(),dirty=documentIsDirty(s,'rap-notebook');tab.append(el(d,'span',{className:'rn-file-label',text:p?(file?.filename??p.name+'.txt')+(dirty?' *':''):'Нет открытого текста'}),el(d,'span',{className:'rn-save-state'+(saveFailed?' rn-save-error':''),text:p?saveFailed?saveMessage:dirty?'Черновик не сохранён в файл':'Файл сохранён':'Создай или открой текст'}));
   controls=[];
   if(p){
    const meta=el(d,'header',{className:'rn-meta'});meta.append(el(d,'small',{className:'rn-eyebrow',text:'ТЕКСТ · ВЕРСИЯ '+String(p.revision).padStart(2,'0')}),el(d,'h1',{text:p.name}),el(d,'p',{text:p.battleName+(p.battleId?'  /  '+(p.round==='Отбор'?'Отборочный раунд':p.round):'  /  Свободная тема')}));sheet.append(meta);
@@ -106,27 +128,27 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
    }else {
     const actions=el(d,'section',{className:'rn-actions',attributes:{'aria-label':'Доработка текста'}}),refinement=el(d,'div',{className:'rn-action-group'}),adaptation=el(d,'div',{className:'rn-action-group'}),reason=lyricRefinementReason(s,p,getMetadata().skills),busy=Boolean(job||s.music.job||s.recording?.job),refine=button(d,'Доработать текст',{className:'rn-primary rn-refine-button',attributes:{'aria-label':'Доработать'}},()=>start('refine')),adapt=button(d,'Адаптировать под бит',{className:'rn-adapt-button',attributes:{'aria-label':'Адаптировать под бит'}},()=>openPanel('adapt'));
     refine.disabled=Boolean(reason||busy);adapt.disabled=busy||p.adaptationCount>=3;if(reason)refine.setAttribute('title',reason);
-    refinement.append(el(d,'small',{text:'60 мин · до +2 к качеству'}),refine,el(d,'small',{text:'Использовано '+p.refinementCount+' из 3 доработок'}));if(reason)refinement.append(el(d,'small',{className:'rn-action-reason',text:reason}));adaptation.append(el(d,'small',{text:'Ритм и подача'}),adapt,el(d,'small',{text:'Использовано '+p.adaptationCount+' из 3 адаптаций'}));actions.append(refinement,adaptation);editor.append(sheet,actions);
+    refinement.append(el(d,'small',{text:'60 мин · до +2 к качеству'}),refine,el(d,'small',{text:'Использовано '+p.refinementCount+' из 3 доработок'}));if(reason)refinement.append(el(d,'small',{className:'rn-action-reason',text:reason}));adaptation.append(el(d,'small',{text:'Ритм и подача'}),adapt,el(d,'small',{text:'Использовано '+p.adaptationCount+' из 3 адаптаций'}));actions.append(refinement,adaptation);side.append(actions);
     const extras=el(d,'div',{className:'rn-extra-actions'}),add=button(d,'Добавить',{className:'rn-add-button'},()=>openPanel('add'));add.disabled=busy;
-    extras.append(add,button(d,'Экспорт текста',{className:'rn-export-button',attributes:{'aria-label':'Экспорт текста'}},()=>{const r=exportLyricFile(getState(),p.id,getMetadata().gameMinutes??getState().lastGameMinute??0);if(r.ok&&persist(r.state)===false)message='Не удалось сохранить экспорт.';else message=r.reason;render();}));
+    extras.append(add);
     if(job?.projectId===p.id)extras.append(button(d,'Продолжить работу',{},()=>start(job.kind,{beatId:job.beatId})));side.append(extras);
    }
   }else {sheet.append(el(d,'div',{className:'rn-welcome',text:'Рэпблокнот'}),el(d,'p',{className:'rn-empty',text:'Тема. Первая мысль. Первая строка. Создай текст для баттла или сохрани собственную идею.'}));side.append(el(d,'h2',{text:'Твой черновик'}),el(d,'p',{text:'Здесь герой пишет сам. Ты выбираешь направление работы; символы показывают ритм и стройность текста.'}));}
   const condition=el(d,'details',{className:'rn-condition'});needsLabel=el(d,'p');updateNeeds();condition.append(el(d,'summary',{text:'Письмо '+skill.toFixed(2)+' / 100'}),needsLabel);side.append(condition);
   if(!editor.contains(sheet))editor.append(sheet);body.append(editor,side);
-  const status=el(d,'footer',{className:'rn-status',attributes:{role:'status'}});status.append(el(d,'span',{className:'rn-status-path',text:'Мои документы / Тексты'}),el(d,'span',{className:'rn-status-message',text:message||(job?'Работа сохранена · можно продолжить':p?.status==='ready'?'Готов к доработке':p?'Символический текст · UTF-8':'Создай свой первый текст')}));wrap.append(header,tab,body,status);
+  const status=el(d,'footer',{className:'rn-status',attributes:{role:'status'}});status.append(el(d,'span',{className:'rn-status-path',text:file?(explorerPaths(s)[file.folderId]?.address??file.folderId)+'\\'+file.filename:'Не сохранён в файл'}),el(d,'span',{className:'rn-status-message',text:message||(job?'Работа идёт · можно прервать':p?.status==='ready'?'Готов к доработке':p?'Символический текст · UTF-8':'Создай свой первый текст')}));wrap.append(header,tab,body,status);
   const hadModal=Boolean(modal);modal=null;
   if(panel){
    for(const child of wrap.children)child.inert=true;toolbar.inert=true;
-   modal=panel==='new'?newDialog():listDialog(panel);wrap.append(modal);
+   modal=panel==='new'?newDialog():['open','save'].includes(panel)?fileDialog(panel):listDialog(panel);wrap.append(modal);
    modal.addEventListener('keydown',event=>{
     if(event.key==='Escape'){event.preventDefault();event.stopPropagation();panel=null;render();return;}
     if(event.key==='Tab'){const items=pcFocusable(modal),i=items.indexOf(d.activeElement);event.preventDefault();event.stopPropagation();items[(i+(event.shiftKey?-1:1)+items.length)%items.length]?.focus();}
    });
   }
-  root.replaceChildren(wrap);signature=fingerprint();
+  root.replaceChildren(wrap);guard.update();signature=fingerprint();
   if(modal)pcFocusable(modal)[0]?.focus();
   else if(hadModal){const items=pcFocusable(wrap);(items.find(n=>n.textContent===returnFocusLabel)??items[0])?.focus();}
  }
- render();return {update(){if(disposed)return;if(!panel&&!sameInputs(signature,fingerprint()))render();else updateNeeds();},openProject(p){if(normalizeLyric(p))choose(p.id);},focus(){if(modal)pcFocusable(modal)[0]?.focus();},dispose(){disposed=true;modal=null;root.replaceChildren();}};
+ render();return {requestClose:options=>guard.request(options),save,update(){if(disposed)return;if(!panel&&!sameInputs(signature,fingerprint()))render();else{filePicker?.update();updateNeeds();}},openProject(p){if(normalizeLyric(p))choose(p.id);},focus(){if(modal)pcFocusable(modal)[0]?.focus();},dispose(){guard.dispose();disposed=true;filePicker?.dispose();modal=null;root.replaceChildren();}};
 }

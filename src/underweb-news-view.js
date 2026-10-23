@@ -1,4 +1,4 @@
-import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=57';
+import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=58';
 const date=value=>typeof value==='string'?value.split('-').reverse().join('.'):'';
 const link=(d,text,fn,className='')=>pcButton(d,text,{className:'uw-control uw-news-link '+className},fn);
 const articleUrl=issue=>'underweb://iskra/news/'+issue.id;
@@ -7,7 +7,7 @@ export function createNewsPanel(d,{issue,navigate}){
  const section=el(d,'section',{className:'uw-news-panel',attributes:{'aria-label':'Новости Искры'}}),head=el(d,'header');
  head.append(el(d,'h2',{text:'В мире сегодня'}),link(d,'Архив выпусков →',()=>navigate('underweb://iskra/archive')));section.append(head);
  if(!issue){section.append(el(d,'p',{text:'На эту дату нет опубликованных выпусков.'}));return section;}
- const content=el(d,'article');content.append(el(d,'small',{className:'uw-news-category',text:issue.category}),link(d,issue.title,()=>navigate(articleUrl(issue)),'uw-news-headline'),metadata(d,issue),el(d,'p',{className:'uw-news-snippet',text:(issue.body[0]??'').length>210?(issue.body[0].slice(0,207)+'…'):(issue.body[0]??'')}));section.append(content);return section;
+ const content=el(d,'article');if(issue.id==='news-2012-09-01')content.append(el(d,'img',{className:'uw-news-illustration',attributes:{src:'./assets/ui/underweb/news-bonfire.png',alt:'Рыцарь у костра среди руин',width:'312',height:'200',decoding:'async'}}));content.append(el(d,'small',{className:'uw-news-category',text:issue.category}),link(d,issue.title,()=>navigate(articleUrl(issue)),'uw-news-headline'),metadata(d,issue),el(d,'p',{className:'uw-news-snippet',text:(issue.body[0]??'').length>210?(issue.body[0].slice(0,207)+'…'):(issue.body[0]??'')}));section.append(content);return section;
 }
 export function createNewsPage(d,{route,navigate}){
  const page=el(d,'section',{className:'uw-news-page'}),head=el(d,'header',{className:'uw-news-masthead'});head.append(link(d,'✳ Искра',()=>navigate('underweb://iskra')),el(d,'span',{text:'НОВОСТИ / АРХИВ ЭПОХИ'}));page.append(head);

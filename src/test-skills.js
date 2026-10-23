@@ -1,5 +1,5 @@
-import {STAT_KEYS,statLabels} from './creator.js?rev=57';
-import {normalizeGenreProgression,genreById} from './genre-progression.js?rev=57';
+import {STAT_KEYS,statLabels} from './creator.js?rev=58';
+import {normalizeGenreProgression,genreById} from './genre-progression.js?rev=58';
 
 const clamp=value=>Math.max(0,Math.min(100,Number.isFinite(value)?value:0));
 const busy=pc=>Boolean(pc?.music?.job||pc?.writing?.job||pc?.recording?.job||pc?.rapAnalysis?.job?.status==='active'||pc?.rapResearch?.job?.status==='active');

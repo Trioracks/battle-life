@@ -1,21 +1,22 @@
-import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=57';
-import {resolveUnderweb,BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=57';
-import {createBeatMarket} from './beat-market-view.js?rev=57';
-import {softwareForum,softwareMessage} from './pc-software-view.js?rev=57';
-import {downloadPresentation} from './virtual-pc-runtime.js?rev=57';
-import {mountBrowserDownloads} from './pc-browser-downloads-view.js?rev=57';
-import {createCommunityView} from './underweb-community-view.js?rev=57';
-import {communityDay} from './underweb-community.js?rev=57';
-import {homeDateLabel} from './home-calendar.js?rev=57';
-import {newsForDay} from './underweb-news.js?rev=57';
-import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=57';
-import {mountSocial} from './social-view.js?rev=57';
-import {activateSocial} from './social-runtime.js?rev=57';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=57';
-import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=57';
-import {ensureBattleWindow,currentBattleWindow,attemptForWindow} from './battle-windows.js?rev=57';
-import {showRegistrationNotice} from './social-dom.js?rev=57';
-import {publicRoundTable,ROUND_LABELS} from './battle-results-table.js?rev=57';
+import {underwebIcon} from './underweb-icons.js?rev=58';
+import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=58';
+import {resolveUnderweb,BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=58';
+import {createBeatMarket} from './beat-market-view.js?rev=58';
+import {softwareForum,softwareMessage} from './pc-software-view.js?rev=58';
+import {downloadPresentation} from './virtual-pc-runtime.js?rev=58';
+import {mountBrowserDownloads} from './pc-browser-downloads-view.js?rev=58';
+import {createCommunityView} from './underweb-community-view.js?rev=58';
+import {communityDay} from './underweb-community.js?rev=58';
+import {homeDateLabel} from './home-calendar.js?rev=58';
+import {newsForDay} from './underweb-news.js?rev=58';
+import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=58';
+import {mountSocial} from './social-view.js?rev=58';
+import {activateSocial} from './social-runtime.js?rev=58';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=58';
+import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=58';
+import {ensureBattleWindow,currentBattleWindow,attemptForWindow} from './battle-windows.js?rev=58';
+import {showRegistrationNotice} from './social-dom.js?rev=58';
+import {publicRoundTable,ROUND_LABELS} from './battle-results-table.js?rev=58';
 const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-control '+(options.className??'')},fn);
 
 export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,onWork=()=>false,onStudyTarget=()=>{},onSubmitTrack=()=>{},onResultViewed=()=>{},getSoftwareMessage=()=>'',isVisible=()=>true}){
@@ -30,13 +31,16 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  const downloadsRoot=el(d,'section'),downloadsAnchor=button(d,'↓',{className:'uw-download-toggle',attributes:{'aria-label':'Загрузки',title:'Загрузки'}},()=>downloadsView.toggle());
  const downloadsView=mountBrowserDownloads(downloadsRoot,{anchor:downloadsAnchor,getState,onAction:onSoftware,getMessage:getSoftwareMessage}),downloadsControl=el(d,'div',{className:'uw-download-control'});
  downloadsControl.append(downloadsAnchor,downloadsRoot);
- toolbar.append(back,forward,home,el(d,'span',{className:'uw-address-label',text:'Адрес'}),address,button(d,'Перейти',{},()=>navigate(address.value)),downloadsControl);
+ for(const [control,id] of [[back,'back'],[forward,'forward'],[home,'home'],[downloadsAnchor,'download']]){control.textContent='';control.append(underwebIcon(d,id));control.className+=' uw-icon-control';}
+ const reload=button(d,'',{className:'uw-icon-control',attributes:{'aria-label':'Обновить страницу Underweb',title:'Обновить'}},()=>render({resetScroll:false,preserveInputs:true}));reload.append(underwebIcon(d,'reload'));
+ toolbar.append(back,forward,reload,home,address,button(d,'Перейти',{},()=>navigate(address.value)),downloadsControl);
  toolbar.addEventListener('submit',e=>{e.preventDefault();navigate(address.value);});
  const bookmarks=el(d,'nav',{className:'uw-bookmarks',attributes:{'aria-label':'Избранное Underweb'}});
  bookmarks.append(el(d,'strong',{text:'UNDERWEB'}),button(d,'Искра',{},()=>navigate('underweb://iskra')),button(d,SOCIAL_IDENTITY.name,{},()=>navigate('underweb://social/me')),button(d,'Баттлы',{},()=>navigate('underweb://battles')),button(d,'FT Studio',{},()=>navigate('underweb://software/ft-studio')));
  bookmarks.append(button(d,'Базар',{},()=>navigate('underweb://samples')),button(d,'RIPLINE',{},()=>navigate('underweb://ripline')));
  bookmarks.append(button(d,'Файловая помойка',{},()=>navigate('underweb://dump')));
  bookmarks.append(button(d,'Форум',{},()=>navigate('underweb://forum')));
+ for(const [i,control] of [...bookmarks.children].slice(1).entries()){control.prepend?.(underwebIcon(d,['spark','people','battle','studio','disc','bars','folder','forum'][i]));}
  const page=el(d,'div',{className:'uw-page'}),status=el(d,'footer',{className:'uw-status',text:'Готово · Локальная сеть'});
  browser.append(toolbar,bookmarks,page,status);root.replaceChildren(browser);
  function searchForm(query=''){
@@ -44,20 +48,17 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   form.append(input,button(d,'Найти',{},()=>navigate(input.value)));
   form.addEventListener('submit',e=>{e.preventDefault();navigate(input.value);});return form;
  }
- function logo(compact=false){const n=el(d,'div',{className:compact?'uw-iskra compact':'uw-iskra'});n.append(el(d,'i',{text:'✳',attributes:{'aria-hidden':'true'}}),el(d,'strong',{text:'Искра'}));return n;}
+ function logo(compact=false){const n=el(d,'div',{className:compact?'uw-iskra compact':'uw-iskra'});n.append(underwebIcon(d,'spark'),el(d,'strong',{text:'Искра'}));return n;}
  function homePage(){
-  const home=el(d,'div',{className:'uw-home'});home.append(el(d,'div',{className:'uw-site-top',text:'Твоя точка входа в Underweb'}),logo(),el(d,'p',{className:'uw-tagline',text:'Найди своё в сети.'}),searchForm());
+  const home=el(d,'div',{className:'uw-home'}),masthead=el(d,'header',{className:'uw-home-masthead'}),brand=el(d,'div',{className:'uw-home-brand'});brand.append(logo(),el(d,'p',{className:'uw-tagline',text:'Найди своё в сети.'}));masthead.append(brand,searchForm());home.append(masthead);
+  const columns=el(d,'div',{className:'uw-home-columns'}),main=el(d,'div',{className:'uw-home-main'}),side=el(d,'aside',{className:'uw-my-battles',attributes:{'aria-label':'Мои баттлы'}});main.append(createNewsPanel(d,{issue:newsForDay(getMetadata().gameDay),navigate}));
+  const registered=BATTLE_BRIEFS.filter(b=>isApplied(b.id)),sideHead=el(d,'h2',{text:'Мои баттлы'});sideHead.append(el(d,'span',{className:'uw-battle-count',text:String(registered.length)}));side.append(sideHead);
+  for(const b of registered){const saved=attemptForWindow(getState(),currentBattleWindow(getState(),b.id,metadataGameMinute(getMetadata()))??{});side.append(button(d,b.title,{className:'uw-battle-title'},()=>navigate('underweb://battles/'+b.id)),el(d,'p',{className:'uw-battle-registered',text:'Зарегистрирован'}),el(d,'p',{text:saved?.issue?'Проверь сохранённую работу':saved?'Работа отправлена':'Можно сдать трек'}),button(d,'Перейти к баттлу',{className:'uw-primary'},()=>navigate('underweb://social/community/'+b.id)));}
+  if(!registered.length)side.append(el(d,'p',{text:'Пока нет заявок.'}),button(d,'Найти баттл',{className:'uw-primary'},()=>navigate('underweb://battles')));columns.append(main,side);home.append(columns,el(d,'h2',{className:'uw-directory-title',text:'Сайты Underweb'}));
   const directory=el(d,'nav',{className:'uw-home-directory',attributes:{'aria-label':'Ярлыки сайтов'}});
-  for(const [mark,title,text,url,label]of [['в',SOCIAL_IDENTITY.name,'Друзья и сообщения','underweb://social/me',SOCIAL_IDENTITY.name+' — найди друзей и одноклассников'],['◈','Баттлы рядом','Раунды и новые имена','underweb://battles'],['↓','Файловая помойка','Программы для компьютера','underweb://dump'],['♬','Базар','Биты и сэмплы','underweb://samples'],['≡','Подземка','Форум после раунда','underweb://forum'],['♫','FT Studio','Музыкальная мастерская','underweb://software/ft-studio']]){
-   const card=button(d,'',{className:'uw-site-tile',attributes:{'aria-label':label??title}},()=>navigate(url));card.append(el(d,'span',{className:'uw-tile-mark',text:mark,attributes:{'aria-hidden':'true'}}),el(d,'strong',{text:title}),el(d,'small',{text}));directory.append(card);
-  }
-  const columns=el(d,'div',{className:'uw-home-columns'}),main=el(d,'div',{className:'uw-home-main'}),side=el(d,'aside',{className:'uw-my-battles',attributes:{'aria-label':'Мои баттлы'}});
-  main.append(createNewsPanel(d,{issue:newsForDay(getMetadata().gameDay),navigate}),directory);
-  side.append(el(d,'h2',{text:'Мои баттлы'}));
-  const registered=BATTLE_BRIEFS.filter(b=>isApplied(b.id));
-  for(const b of registered){const saved=attemptForWindow(getState(),currentBattleWindow(getState(),b.id,metadataGameMinute(getMetadata()))??{});side.append(button(d,b.title,{},()=>navigate('underweb://battles/'+b.id)),el(d,'small',{text:saved?.issue?'Проверь сохранённую работу':saved?'Ожидает проверки':'Зарегистрирован · можно сдать трек'}));}
-  if(!registered.length)side.append(el(d,'p',{text:'Пока нет заявок.'}),button(d,'Найти баттл',{},()=>navigate('underweb://battles')));
-  columns.append(main,side);home.append(columns,el(d,'footer',{className:'uw-site-footer',text:'Искра · Поиск по игровым сайтам'}));return home;
+  for(const [groupTitle,items] of [['Общение и события',[['people','В кругу','Друзья и сообщения','underweb://social/me','В кругу — найди друзей и одноклассников'],['battle','Баттлы рядом','Раунды и новые имена','underweb://battles'],['forum','Подземка','Форум после раунда','underweb://forum']]],['Музыка и программы',[['studio','FT Studio','Музыкальная мастерская','underweb://software/ft-studio'],['disc','Базар','Биты и сэмплы','underweb://samples'],['folder','Файловая помойка','Программы для компьютера','underweb://dump']]]]){
+   const group=el(d,'section',{className:'uw-directory-group'});group.append(el(d,'h3',{text:groupTitle}));for(const [mark,title,text,url,label] of items){const card=button(d,'',{className:'uw-site-tile',attributes:{'aria-label':label??title}},()=>navigate(url));card.append(underwebIcon(d,mark),el(d,'strong',{text:title}),el(d,'small',{text}),el(d,'span',{className:'uw-tile-arrow',text:'→',attributes:{'aria-hidden':'true'}}));group.append(card);}directory.append(group);
+  }home.append(directory,el(d,'footer',{className:'uw-site-footer',text:'Искра · Поиск по игровым сайтам'}));return home;
  }
  function resultsPage(){
   const result=el(d,'div',{className:'uw-results'}),head=el(d,'header',{className:'uw-results-head'});head.append(logo(true),searchForm(route.query));result.append(head);
@@ -168,5 +169,5 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   else if(route.type==='dump'){const node=pcFind(page,n=>n.dataset?.pcRole==='forum-transfer');if(node){const p=downloadPresentation(getState(),'client');node.textContent=`Загрузка: ${p.receivedMb.toFixed(2)} / ${p.totalMb} МБ · ${p.speedKbPerSecond} КБ/с${p.error?' · '+softwareMessage(p.error):''}`;}}
  },dispose(){closeRegistration?.();socialView?.dispose();downloadsView.dispose();root.replaceChildren();}};
 }
-import {currentRoundTopic} from './round-topics.js?rev=57';
-import {reactionVisibilitySignature} from './social-reactions-view.js?rev=57';
+import {currentRoundTopic} from './round-topics.js?rev=58';
+import {reactionVisibilitySignature} from './social-reactions-view.js?rev=58';

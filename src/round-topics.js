@@ -1,8 +1,9 @@
 import catalog from '../data/battles/round-topics-v1.json' with {type:'json'};
-import {beatResultSeed} from './beat-result.js?rev=57';
-import {judgeProfile} from './judge-profiles.js?rev=57';
-import {validGameMinute} from './game-minute.js?rev=57';
-import {gameDateTimeLabel} from './home-calendar.js?rev=57';
+import {beatResultSeed} from './beat-result.js?rev=58';
+import {judgeProfile} from './judge-profiles.js?rev=58';
+import {validGameMinute} from './game-minute.js?rev=58';
+import {gameDateTimeLabel} from './home-calendar.js?rev=58';
+import {battleDeadlineAtMidnight} from './battle-windows.js?rev=58';
 export const ROUND_TOPIC_CATALOG=Object.freeze(catalog);
 export function normalizeRoundThemeState(source){
  const roundThemes=normalizeRoundThemes(source.roundThemes),roundThemeRecovery=Array.isArray(source.roundThemeRecovery)?structuredClone(source.roundThemeRecovery):[];
@@ -18,7 +19,7 @@ export function ensureRoundTheme(state,{battleId,roundId,judgeIds,opensAt,legacy
  if(!validGameMinute(opensAt))return {state,theme:null};const authors=(judgeIds??[]).filter(id=>judgeProfile(id));if(!authors.length)return {state,theme:null};
  const seed=beatResultSeed(id+':'+opensAt+':'+(state.tournaments?.byId?.[battleId]?.seed??0)),used=new Set(Object.values(state.roundThemes??{}).filter(t=>t.battleId===battleId).map(t=>t.title)),available=roundTopicCandidates().filter(t=>!used.has(t.title));if(!available.length)return {state,theme:null};
  const choice=available[seed%available.length],covers=catalog.coverBriefs.filter(c=>c.nounIds.some(n=>choice.wordIds.includes(n))),cover=covers[(seed>>>8)%covers.length];
- const theme={id,battleId,roundId,title:legacyTitle??choice.title,wordIds:legacyTitle?[]:choice.wordIds,template:legacyTitle?'legacy-advertised':choice.template,coverId:legacyTitle?null:cover.id,authorJudgeId:authors[(seed>>>16)%authors.length],catalogVersion:legacyTitle?0:1,opensAt,closesAt:opensAt+7*1440,hype:({'round-2':70,'round-3':75,'round-4':80,'round-5':85,final:85})[roundId]??20};
+ const theme={id,battleId,roundId,title:legacyTitle??choice.title,wordIds:legacyTitle?[]:choice.wordIds,template:legacyTitle?'legacy-advertised':choice.template,coverId:legacyTitle?null:cover.id,authorJudgeId:authors[(seed>>>16)%authors.length],catalogVersion:legacyTitle?0:1,opensAt,closesAt:state.battleWindows?.find(w=>w.battleId===battleId&&w.roundId===roundId)?.closesAt??battleDeadlineAtMidnight(opensAt),hype:({'round-2':70,'round-3':75,'round-4':80,'round-5':85,final:85})[roundId]??20};
  return {state:{...state,roundThemes:{...state.roundThemes,[id]:theme}},theme};
 }
 export function currentRoundTopic(state,battleId,nowMinute=Infinity){const t=state.tournaments?.byId?.[battleId],rounds=Object.values(t?.rounds??{}).filter(r=>r.opensAt<=nowMinute).sort((a,b)=>a.opensAt-b.opensAt),round=rounds.at(-1);return round?state.roundThemes?.[key(battleId,round.roundId)]??null:null;}

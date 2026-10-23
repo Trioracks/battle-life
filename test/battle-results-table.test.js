@@ -32,8 +32,8 @@ test('double no-show shows both known names in red, no zero grades, same history
  const table=publicRoundTable(s,{...options,roundId:'round-2',nowMinute:24500});assert.equal(table.rows.length,2);for(const row of table.rows){assert.equal(row.status,'no_show');assert.equal(row.tone,'danger');assert.equal(row.total,null);assert.ok(row.name);assert.ok(row.scores.every(s=>s.value===null));}
  assert.deepEqual(publicRoundTable(JSON.parse(JSON.stringify(s)),{...options,roundId:'round-2',nowMinute:24500}),table);
 });
-test('table view passes specific published sources to analysis and browser route returns to community',()=>{
- const d=pcDocument(),table=publicRoundTable(tableFixture(),options),requests=[],root=createBattleResultsTableView(d,{table,navigate:()=>{},onAnalyze:r=>requests.push(r)});findButton(root,'Изучить: Герой').click();assert.deepEqual(requests[0].reviewIds,table.rows[0].reviews.map(r=>r.id));assert.equal(requests[0].trackVersionId,'track:player');
+test('table view exposes public results without Study controls and returns to community',()=>{
+ const d=pcDocument(),table=publicRoundTable(tableFixture(),options),requests=[],root=createBattleResultsTableView(d,{table,navigate:()=>{},onAnalyze:r=>requests.push(r)});assert.equal(findButton(root,'Изучить: Герой'),undefined);assert.equal(requests.length,0);
  const text=allPc(root).map(n=>n.textContent).join(' ');assert.ok(!text.includes('8.59'));assert.ok(text.includes('LTR'));
  const address='underweb://social/results/makarevich-1/selection';assert.equal(resolveSocialRoute(address).section,'results');assert.equal(resolveSocialRoute(address+'/extra'),null);
  const host=d.createElement('div');let state=tableFixture();const browser=mountUnderweb(host,{getState:()=>state,getMetadata:()=>({gameMinutes:12000,gameDay:9}),onChange:s=>{state=s;return true;}});browser.navigate(address);assert.ok(findButton(host,'← Группа'));findButton(host,'← Группа').click();assert.equal(browser.snapshot.route.section,'community');browser.dispose();
@@ -46,7 +46,7 @@ test('community hero panel uses binary votes rather than out-of-ten grades in a 
 test('table pages preserve every score and local player position across remounts',()=>{
  const d=pcDocument(),table=publicRoundTable(tableFixture(),options),uiState={page:0,rowsPerPage:2};table.rows=[...table.rows.slice(1),table.rows[0]];const original=structuredClone(table);
  let root=createBattleResultsTableView(d,{table,navigate(){},uiState});const rows=()=>allPc(root).filter(n=>n.className?.startsWith('bt-row '));assert.equal(rows().length,2);assert.equal(allPc(rows()[0]).filter(n=>n.tagName==='TD').length,table.judges.length+3);
- findButton(root,'К моему месту').click();assert.equal(uiState.page,1);assert.ok(allPc(rows()[0]).some(n=>n.textContent==='Герой'));assert.deepEqual(allPc(rows()[0]).filter(n=>n.dataset?.judgeScore).map(n=>n.textContent),['8','8','8']);
+ findButton(root,'К моему месту').click();assert.equal(uiState.page,1);assert.ok(allPc(rows()[0]).some(n=>n.textContent==='Герой'));assert.deepEqual(allPc(rows()[0]).filter(n=>n.dataset?.judgeScore).map(n=>n.children[0]?.textContent??n.textContent),['8','8','8']);
  root.dispose?.();root=createBattleResultsTableView(d,{table,navigate(){},uiState});assert.equal(uiState.page,1);assert.equal(rows().length,1);findButton(root,'Предыдущая страница').click();assert.equal(uiState.page,0);assert.equal(rows().length,2);assert.deepEqual(table,original);root.dispose?.();
 });
 test('background social changes preserve focus on the player-place control',()=>{

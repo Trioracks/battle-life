@@ -1,17 +1,19 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=57';
-import {communityById,profileById} from './social-catalog.js?rev=57';
-import {normalizeSocial,subscribeCommunity} from './social-state.js?rev=57';
-import {socialAvatar,socialButton,socialHeading,socialPost,socialLink} from './social-dom.js?rev=57';
-import {socialImageUrl,recoverableSocialImage} from './social-image.js?rev=57';
-import {createSocialResultView} from './social-result-view.js?rev=57';
-import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=57';
-import {currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=57';
-import {publicTournamentTrackIds,publicRoundTable} from './battle-results-table.js?rev=57';
-import {publicRoundAnnouncements} from './round-topics.js?rev=57';
-import {createRoundAnnouncementView} from './round-announcement-view.js?rev=57';
-import {publicCommunityPosts,publicAnnouncedJudges} from './social-community-publications.js?rev=57';
-import {gameDateTimeLabel} from './home-calendar.js?rev=57';
-import {createPostReactionsView} from './social-reactions-view.js?rev=57';
+import {mountSocialFeed} from './social-feed-page.js?rev=58';
+import {pcElement as el} from './virtual-pc-dom.js?rev=58';
+import {communityById,profileById} from './social-catalog.js?rev=58';
+import {normalizeSocial,subscribeCommunity} from './social-state.js?rev=58';
+import {socialAvatar,socialButton,socialHeading,socialPost,socialLink} from './social-dom.js?rev=58';
+import {socialImageUrl,recoverableSocialImage} from './social-image.js?rev=58';
+import {createSocialResultView} from './social-result-view.js?rev=58';
+import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=58';
+import {currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=58';
+import {publicTournamentTrackIds,publicRoundTable} from './battle-results-table.js?rev=58';
+import {publicRoundAnnouncements} from './round-topics.js?rev=58';
+import {createRoundAnnouncementView} from './round-announcement-view.js?rev=58';
+import {publicCommunityPosts,publicAnnouncedJudges} from './social-community-publications.js?rev=58';
+import {gameDateTimeLabel} from './home-calendar.js?rev=58';
+import {createPostReactionsView} from './social-reactions-view.js?rev=58';
+import {battleStage,battleStageText} from './battle-stage.js?rev=58';
 
 export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),navigate,commit,audio,expandedResults=new Set(),onResultViewed,onRegistered=()=>{},uiState={}}){
  const c=communityById(id),root=el(d,'section',{className:'sn-community'});if(!c)return root;
@@ -42,7 +44,7 @@ export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),na
  const information=el(d,'section',{className:'sn-community-information',dataset:{communityPanel:'information'},attributes:{role:'tabpanel',id:'community-'+id+'-information','aria-labelledby':'community-'+id+'-information-tab'}});
  const tables=el(d,'section',{className:'sn-community-tables',dataset:{communityPanel:'tables'},attributes:{role:'tabpanel',id:'community-'+id+'-tables','aria-labelledby':'community-'+id+'-tables-tab'}});
  const tabs=el(d,'nav',{className:'sn-community-tabs',attributes:{role:'tablist','aria-label':'Материалы сообщества'}}),tabButtons=[];
- if(uiState.communityId!==id){uiState.communityId=id;uiState.tab='information';}
+ if(uiState.communityId!==id){uiState.communityId=id;uiState.tab='information';uiState.visibleCount=3;}
  if(!c.battleId||!['information','tables'].includes(uiState.tab))uiState.tab='information';
  const selectTab=tab=>{
   uiState.tab=tab;information.hidden=tab!=='information';tables.hidden=tab!=='tables';
@@ -57,7 +59,7 @@ export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),na
  }
  main.append(tabs,information,tables);selectTab(uiState.tab);
  const details=el(d,'div',{className:'sn-community-details'});details.append(el(d,'p',{text:c.description}));
- if(c.battleId)details.append(el(d,'p',{className:'sn-community-deadline',text:window||state.battleApplications?.some(a=>a.battleId===c.battleId)?deadline.text:'Зарегистрируйся, чтобы открыть приём работ на семь игровых дней.'}));
+ if(c.battleId){const stage=battleStage(state,{battleId:c.battleId,nowMinute});details.append(el(d,'p',{className:'sn-community-deadline',text:window?battleStageText(stage):'Зарегистрируйся, чтобы открыть приём работ на семь игровых дней.'}));if(window)details.append(socialLink(d,'Таблица '+(stage.roundId==='selection'?'отбора':'раунда'),stage.tableUrl,navigate));}
  information.append(details);
 
  const members=el(d,'section',{className:'sn-community-card sn-community-members'});members.append(socialHeading(d,'Участники',c.memberCount+Number(subscribed)));
@@ -84,15 +86,14 @@ export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),na
   node.replaceChildren(avatar,content);node.className+=' sn-community-admin-post';return node;
  };
  if(c.battleId){
-  const pinned=current?createRoundAnnouncementView(d,current,{navigate}):el(d,'article',{className:'sn-post sn-round-announcement'});pinned.className+=' sn-pinned-announcement';pinned.dataset.pinnedAnnouncement='true';pinned.setAttribute('aria-label','Закреплённый анонс');
+  const pinned=current?createRoundAnnouncementView(d,current,{navigate,stage:battleStage(state,{battleId:c.battleId,nowMinute})}):el(d,'article',{className:'sn-post sn-round-announcement'});pinned.className+=' sn-pinned-announcement';pinned.dataset.pinnedAnnouncement='true';pinned.setAttribute('aria-label','Закреплённый анонс');
   if(current)pinned.append(reactions(current.id,true));else pinned.append(el(d,'h3',{text:'Текущий раунд'}),el(d,'p',{text:window?deadline.text:'Информация о раунде появится здесь после объявления.'}));
   information.append(administratorPost(pinned,{label:true}));
  }
  const wall=el(d,'section',{className:'sn-community-wall',attributes:{'aria-label':'Стена группы'}});wall.append(socialHeading(d,'Стена группы'));
  const wallPosts=publicCommunityPosts(state,{communityId:id,nowMinute}).sort((a,b)=>b.at-a.at||(a.kind==='static'&&b.kind==='static'?c.history.findIndex(p=>p.id===b.id)-c.history.findIndex(p=>p.id===a.id):b.id.localeCompare(a.id)));
  const judges=new Map(publicAnnouncedJudges(state,{battleId:c.battleId,nowMinute}).map(j=>[j.id,j]));
- for(const post of wallPosts){
-  if(post.id===current?.id)continue;
+ mountSocialFeed(wall,{posts:wallPosts,uiState,pinnedId:current?.id,renderPost:post=>{
   const staticPost=c.history.find(p=>p.id===post.id),node=socialPost(d,{...staticPost,...post,date:staticPost?.date??gameDateTimeLabel(post.at)},{author:post.authorName,navigate,profileById,reactions:state.socialReactions?.plans?.[post.id]?reactions(post.id):null});
   node.dataset.communityPost=post.id;
   if(post.kind==='round-theme')node.append(socialLink(d,'Таблица раунда','underweb://social/results/'+c.battleId+'/'+post.roundId,navigate));
@@ -100,8 +101,8 @@ export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),na
    const judge=judges.get(post.judgeId),index=judge?post.body.indexOf(judge.name):-1;
    if(index>=0){const body=node.children[2];body.textContent='';body.append(el(d,'span',{text:post.body.slice(0,index)}),socialLink(d,judge.name,judge.profileUrl,navigate),el(d,'span',{text:post.body.slice(index+judge.name.length)}));}
   }
-  wall.append(administratorPost(node));
- }
+  return administratorPost(node);
+ }});
  information.append(wall);columns.append(main,side);root.append(columns);
 
  const archive=el(d,'section',{className:'sn-community-archive',attributes:{'aria-label':'Аудиотека группы'}});

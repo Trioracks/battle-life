@@ -1,12 +1,13 @@
-import {SOCIAL_COMMUNITIES,SOCIAL_PROFILES,profileById} from './social-catalog.js?rev=57';
-import {normalizePlayerPortrait} from './social-portraits.js?rev=57';
-import {normalizeCommunityPublicationState,ensureCommunityPublications,baselineCommunityRead,communityUnreadCounts,publicCommunityPosts} from './social-community-publications.js?rev=57';
-import {validGameMinute} from './game-minute.js?rev=57';
+import {normalizeDiscussions} from './social-discussion.js?rev=58';
+import {SOCIAL_COMMUNITIES,SOCIAL_PROFILES,profileById} from './social-catalog.js?rev=58';
+import {normalizePlayerPortrait} from './social-portraits.js?rev=58';
+import {normalizeCommunityPublicationState,ensureCommunityPublications,baselineCommunityRead,communityUnreadCounts,publicCommunityPosts} from './social-community-publications.js?rev=58';
+import {validGameMinute} from './game-minute.js?rev=58';
 import conversations from '../data/social/conversations.json' with {type:'json'};
-import {GOBLIN_ID,normalizeGoblin,refreshGoblinMessage} from './goblin-catalog.js?rev=57';
-import {normalizeFilya} from './filya-catalog.js?rev=57';
-import {normalizePhotoFeedback} from './social-photo-feedback.js?rev=57';
-import {normalizePlayerAlbum} from './player-life-photos.js?rev=57';
+import {GOBLIN_ID,normalizeGoblin,refreshGoblinMessage} from './goblin-catalog.js?rev=58';
+import {normalizeFilya} from './filya-catalog.js?rev=58';
+import {normalizePhotoFeedback} from './social-photo-feedback.js?rev=58';
+import {normalizePlayerAlbum} from './player-life-photos.js?rev=58';
 const copy=value=>JSON.parse(JSON.stringify(value));
 const record=v=>v&&typeof v==='object'&&!Array.isArray(v);
 const ids=(v,allow=()=>true)=>[...new Set((Array.isArray(v)?v:[]).filter(id=>typeof id==='string'&&id.length>0&&id.length<180&&allow(id)))];
@@ -20,7 +21,7 @@ export function normalizeSocial(raw){
  for(const [id,messages]of Object.entries(conversations))if(!dialogs[id])dialogs[id]={peer:{kind:'person',id},messages:messages.map(m=>({...m,kind:'personal',at:null,archived:true})),unread:false};
  if(dialogs[GOBLIN_ID])dialogs[GOBLIN_ID].messages=(dialogs[GOBLIN_ID].messages??[]).map(refreshGoblinMessage);
  return {schemaVersion:2,goblin:normalizeGoblin(s.goblin),filya:normalizeFilya(s.filya),...normalizeCommunityPublicationState(s),subscriptions:ids(s.subscriptions,id=>communities.has(id)),friends:ids([...(s.friends??known),GOBLIN_ID],id=>accessibleProfiles.includes(id)&&!blockedProfileIds.includes(id)),blockedProfileIds,
-  accessibleProfiles,personalAudioIds:ids(s.personalAudioIds),dialogs,photoFeedback:normalizePhotoFeedback(s.photoFeedback),
+  accessibleProfiles,personalAudioFiles:Object.fromEntries(Object.entries(record(s.personalAudioFiles)?s.personalAudioFiles:{}).filter(([id,file])=>typeof file==='string'&&file.length<=160)),personalAudioIds:ids(s.personalAudioIds),dialogs,discussions:normalizeDiscussions(s.discussions),photoFeedback:normalizePhotoFeedback(s.photoFeedback),
   playerPortrait:normalizePlayerPortrait(s.playerPortrait),playerAlbum:normalizePlayerAlbum(s.playerAlbum),posts:records(s.posts),reactions:records(s.reactions),audienceCount:Number.isFinite(s.audienceCount)?Math.max(0,Math.min(1e7,Math.floor(s.audienceCount))):12};
 }
 export function listCommunities(state,{query='',nowMinute=state.socialRuntime?.lastMinute??0}={}){
