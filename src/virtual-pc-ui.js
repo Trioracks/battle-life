@@ -4,6 +4,7 @@ import { FtStudioAudio } from './ft-studio-audio.js?rev=58';
 import {mountPcShell} from './virtual-pc-shell.js?rev=58';
 import {mountExplorer} from './virtual-pc-explorer-view.js?rev=58';
 import {pcFileById,openPcDocument} from './pc-filesystem.js?rev=58';
+import {documentIsDirty} from './pc-document-session.js?rev=58';
 import {mountPcMenu} from './virtual-pc-menus.js?rev=58';
 import {mountSystemWindow} from './virtual-pc-system-windows.js?rev=58';
 import {explorerProperties} from './virtual-pc-explorer.js?rev=58';
@@ -474,7 +475,13 @@ export function mountVirtualPc(root, callbacks = {}) {
 
 
 
-  pc.openProject = project => {
+  const requestDocumentClose = (appId,onClose) => {
+    if(!documentIsDirty(pc.state,appId)){onClose();return;}
+    pc.openNow(appId);
+    const view=appId==='rap-notebook'?pc.notebookView:pc.studioView;
+    view?.requestClose({onClose});
+  };
+  const openProjectNow = project => {
     if(pc.state.creativeWork?.activeId&&pc.state.creativeWork.activeId!==project.id)pc.persist(pauseCreativeChain(pc.state));
     const lyric=normalizeLyric(project);
     if(lyric){if(!pc.state.software.notebook.installed){pc.open('underweb');pc.navigateUnderweb('underweb://dump/notebook');return;}pc.persist({...pc.state,writing:{...pc.state.writing,activeTextId:lyric.id}});pc.open('rap-notebook');pc.notebookView?.openProject(lyric);return;}
@@ -487,18 +494,26 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.callbacks.onOpenProject(normalized);pc.open('ft-studio');pc.refreshApp('ft-studio',{replaceContent:true});
     if(pc.studioView){pc.pendingStudioProject=null;pc.studioView.openProject(normalized);}
   };
+  pc.openProject = project => {
+    const appId=project?.kind==='lyrics'?'rap-notebook':'ft-studio',activeId=appId==='rap-notebook'?pc.state.writing.activeTextId:pc.state.music.activeBeatId;
+    if(activeId===project?.id||!desktopApps(pc.state).some(app=>app.id===appId))return openProjectNow(project);
+    return requestDocumentClose(appId,()=>openProjectNow(project));
+  };
   pc.openDocumentFile = fileId => {
-    const file=pcFileById(pc.state,fileId),view=file?.type==='txt'?pc.notebookView:pc.studioView;
-    const open=()=>{const r=openPcDocument(pc.state,{fileId});if(!r.ok)return r.reason;if(!pc.persist(r.state,{atomic:true}))return 'Не удалось открыть файл.';pc.openProject(pc.state.projects.find(p=>p.id===r.projectId));return '';};
-    if(view?.requestClose){view.requestClose({onClose:open});return '';}return open();
+    const file=pcFileById(pc.state,fileId);
+    const open=()=>{const r=openPcDocument(pc.state,{fileId});if(!r.ok)return r.reason;if(!pc.persist(r.state,{atomic:true}))return 'Не удалось открыть файл.';openProjectNow(pc.state.projects.find(p=>p.id===r.projectId));return '';};
+    let reason='';requestDocumentClose(file?.type==='txt'?'rap-notebook':'ft-studio',()=>{reason=open();});return reason;
   };
   pc.openDownloadedFile = fileId => {const file=pcFileById(pc.state,fileId);if(!file)return 'Файл недоступен.';if(file.snapshot)return pc.openDocumentFile(fileId);pc.open('computer');pc.openFolder(file.folderId);pc.explorer?.openFile(fileId);return '';};
   pc.openMentorFile = fileId => {
+    const open=()=>{
     const r=importGoblinFile(pc.state,fileId,pc.metadata.gameMinutes??pc.state.lastGameMinute??0);
     if(!r.ok)return r.reason;
     if(!pc.persist(r.state,{atomic:true}))return 'Не удалось сохранить полученный проект.';
-    pc.openProject(pc.state.projects.find(p=>p.id===r.projectId));
+    openProjectNow(pc.state.projects.find(p=>p.id===r.projectId));
     return r.reason;
+    };
+    let reason='';const file=pc.state.social?.goblin?.files.find(f=>f.id===fileId);requestDocumentClose(file?.project?.kind==='lyrics'?'rap-notebook':'ft-studio',()=>{reason=open();});return reason;
   };
 
 
@@ -606,8 +621,8 @@ export function mountVirtualPc(root, callbacks = {}) {
     pc.cancelStudioLaunch();
     pc.cancelInstallerLaunch();
     const finish=()=>{pc.audio.stop();pc.audioSession.stopAll();pc.callbacks.onShutdown();};
-    const notebook=()=>pc.notebookView?.requestClose?pc.notebookView.requestClose({onClose:finish}):finish();
-    if(pc.studioView?.requestClose)pc.studioView.requestClose({onClose:notebook});else notebook();
+    const notebook=()=>requestDocumentClose('rap-notebook',finish);
+    requestDocumentClose('ft-studio',notebook);
   };
 
   pc.completeShutdown=()=>{pc.cancelStudioLaunch();pc.audioSession.stopAll();pc.clearViews();pc.windows=reduceWindows(pc.windows,{type:'clear'});pc.renderDesktop(false);};

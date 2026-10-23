@@ -75,9 +75,12 @@ export function goblinFollowupPlan(state,now){
  const g=state.social?.goblin;if(g?.startedAt==null||['new','greeting-wait','hello','invite-wait','invite','subscribe','client','software','paused'].includes(g.stage))return {messages:[],seen:g?.followupSeen??[],lastSmallTalkAt:g?.lastSmallTalkAt??null,changed:false};
  const seen=new Set(g.followupSeen??[]),messages=[],applications=new Set(state.battleApplications?.map(a=>a.battleId)),candidate=[];
  for(const s of state.battleSubmissions??[])if(!s.issue&&s.id&&Number.isFinite(s.sentAt)&&s.sentAt<=now)candidate.push({id:'submitted:'+s.id,at:s.sentAt,body:'Ну что, сдал? Вижу, работа ушла. Выдыхай пока) Когда судьи закончат, посмотрим оценки и подумаем, что подтянуть.',links:[battleLink]});
- for(const e of state.socialRuntime?.events??[])if(applications.has(e.battleId)&&e.dueAt<=now&&e.type==='round-result')candidate.push({id:e.id,at:e.dueAt,body:'О, оценки уже выложили. Смотрел свои? Открой таблицу раунда, там у судей ещё комментарии бывают.',links:[{label:'Таблица раунда',url:'underweb://social/results/'+e.battleId+'/'+e.roundId}]});
+ for(const e of state.socialRuntime?.events??[])if(applications.has(e.battleId)&&e.dueAt<=now&&e.type==='round-result')candidate.push({id:e.id,at:e.dueAt,mandatory:true,body:'О, оценки уже выложили. Смотрел свои? Открой таблицу раунда, там у судей ещё комментарии бывают.',links:[{label:'Таблица раунда',url:'underweb://social/results/'+e.battleId+'/'+e.roundId}]});
  for(const w of state.battleWindows??[])if(applications.has(w.battleId)&&now>=w.closesAt-4320&&now<w.closesAt-2880)candidate.push({id:'deadline:'+w.id,at:w.closesAt-4320,body:'Чувак, через три дня приём закроется. Как твой трек? Если уже сдал — хорошо, если ещё пишешь, оставь время на экспорт и отправку.',links:[battleLink]});
- let changed=false;for(const e of candidate.filter(e=>!seen.has(e.id)).sort((a,b)=>b.at-a.at)){seen.add(e.id);changed=true;if(!messages.length&&now-e.at<2880)messages.push({id:'follow:'+e.id,at:now+10,body:e.body,links:e.links,followupId:e.id});}
+ let changed=false;for(const e of candidate.filter(e=>!seen.has(e.id)).sort((a,b)=>Number(Boolean(b.mandatory))-Number(Boolean(a.mandatory))||b.at-a.at)){
+  if(e.mandatory&&(messages.length||g.pending.some(m=>m.at>now&&m.followupId&&!m.followupId.startsWith('chat:'))))continue;
+  seen.add(e.id);changed=true;if(!messages.length&&(e.mandatory||now-e.at<2880))messages.push({id:'follow:'+e.id,at:now+10,body:e.body,links:e.links,followupId:e.id});
+ }
  let lastSmallTalkAt=g.lastSmallTalkAt??now;if(g.lastSmallTalkAt==null)changed=true;
  if(now-lastSmallTalkAt>=2880&&g.stage==='finished'){lastSmallTalkAt=now;changed=true;if(!messages.length&&!g.pending.some(m=>m.followupId?.startsWith('chat:')))messages.push({id:'follow:chat:'+now,at:now+20,body:'Здорово) Как сам? Что-нибудь новое пишешь или пока отдыхаешь от музыки?',followupId:'chat:'+now});}
  return {messages,seen:[...seen],lastSmallTalkAt,changed};

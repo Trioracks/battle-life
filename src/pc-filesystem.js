@@ -19,10 +19,10 @@ export function pcDocumentFilename(value,type){
 const documentProject=(p,type)=>type==='txt'?normalizeLyric(p):type==='flp'?(normalizeBeat(p)??normalizeStudioProject(p)):null;
 const projectType=p=>p?.kind==='lyrics'?'txt':'flp';
 export function pcFolderExists(state,id){return base.has(id)||(state.fileSystem?.folders??[]).some(f=>f.id===id);}
-function uniqueName(filename,folderId,files){
- const exists=name=>files.some(f=>f.folderId===folderId&&key(f.filename)===key(name));if(!exists(filename))return filename;
+function uniqueName(filename,folderId,files,folders=[]){
+ const exists=name=>files.some(f=>f.folderId===folderId&&key(f.filename)===key(name))||folders.some(f=>f.parentId===folderId&&key(f.name)===key(name));if(!exists(filename))return filename;
  const dot=filename.lastIndexOf('.'),stem=filename.slice(0,dot),ext=filename.slice(dot);
- for(let n=1;n<=files.length+1;n++){const name=stem.slice(0,100)+' ('+n+')'+ext;if(!exists(name))return name;}
+ for(let n=1;n<=files.length+folders.length+1;n++){const name=stem.slice(0,100)+' ('+n+')'+ext;if(!exists(name))return name;}
 }
 export function normalizePcFileSystem(raw,{projects=[],audioExports,mentorFiles=[]}={}){
  const out={version:1,folders:[],files:[],recovery:Array.isArray(raw?.recovery)?clone(raw.recovery):[]};
@@ -51,7 +51,7 @@ export function normalizePcFileSystem(raw,{projects=[],audioExports,mentorFiles=
  for(const f of mentorFiles){
   if(f?.requiresDownload||out.files.some(existing=>existing.id===f?.id||existing.mentorFileId===f?.id))continue;
   const type=projectType(f?.project),snapshot=documentProject(f?.project,type);if(!snapshot||!validPcId(f?.id)||!ids.has(f.folderId??'downloads'))continue;
-  const folderId=f.folderId??'downloads',filename=uniqueName(pcDocumentFilename(f.filename,type)??(pcEntryName(f.project.name)??'Вложение')+'.'+type,folderId,out.files);
+  const folderId=f.folderId??'downloads',filename=uniqueName(pcDocumentFilename(f.filename,type)??(pcEntryName(f.project.name)??'Вложение')+'.'+type,folderId,out.files,out.folders);
   out.files.push({id:'legacy-mentor:'+f.id,type,filename,folderId,projectId:f.project.id,snapshot:clone(snapshot),source:'mentor',mentorFileId:f.id,bytes:f.bytes??2000000,createdAtMinute:f.createdAtMinute??0,modifiedAtMinute:f.createdAtMinute??0});
  }
  return out;
@@ -62,6 +62,7 @@ export function pcFileEntries(state,{folderId,types:allowed,filter=()=>true}={})
  return files.filter(f=>(folderId===undefined||f.folderId===folderId)&&(!allowed||allowed.includes(f.type))&&filter(f));
 }
 export const pcFileById=(state,id)=>pcFileEntries(state,{}).find(f=>f.id===id)??null;
+export const pcFolderNameTaken=(state,folderId,name)=>(state.fileSystem?.folders??[]).some(f=>f.parentId===folderId&&key(f.name)===key(name));
 export function createPcFolder(state,{id,parentId,name,nowMinute}={}){
  const fail=reason=>({ok:false,state,folderId:null,reason}),safe=pcEntryName(name);
  if(!validPcId(id)||reserved.has(id)||state.fileSystem?.folders?.some(f=>f.id===id)||!safe||!validGameMinute(nowMinute))return fail('Укажи корректное имя новой папки.');
@@ -78,6 +79,7 @@ export function savePcDocument(state,{projectId,fileId,folderId,filename,nowMinu
  folderId??=old?.folderId;filename??=old?.filename;
  filename=pcDocumentFilename(filename,type);
  if(!pcFolderExists(state,folderId)||!filename)return fail('Выбери папку и безопасное имя файла '+type.toUpperCase()+'.');
+ if(pcFolderNameTaken(state,folderId,filename))return fail('Такое имя уже занято папкой. Выбери другое имя файла.');
  const collision=pcFileEntries(state,{folderId}).find(f=>key(f.filename)===key(filename)&&f.id!==fileId);
  if(collision&&!overwrite)return fail('Такой файл уже существует. Подтверди замену или выбери другое имя.');
  if(collision&&collision.type!==type)return fail('Нельзя заменить файл другого типа.');

@@ -1,4 +1,4 @@
-import {pcFileEntries} from './pc-filesystem.js?rev=58';
+import {pcFileEntries,pcFolderNameTaken} from './pc-filesystem.js?rev=58';
 import {normalizeLyric} from './lyric-production.js?rev=58';
 import {normalizeBeat} from './beat-production.js?rev=58';
 import {normalizeTrackVersions} from './track-version.js?rev=58';
@@ -9,7 +9,7 @@ export function completeMentorDownload(state,item){
  if(g.downloaded?.[file.id])return {ok:true,state,fileId:g.downloaded[file.id]};
  const id='download:'+file.id,folderId='downloads',files=pcFileEntries(state,{folderId}),safe=file.exported?.file.filename??file.filename;
  const dot=safe.lastIndexOf('.'),stem=safe.slice(0,dot),ext=safe.slice(dot);let filename=safe;
- for(let n=1;files.some(f=>f.filename.toLocaleLowerCase('ru')===filename.toLocaleLowerCase('ru'));n++)filename=stem.slice(0,100)+' ('+n+')'+ext;
+ for(let n=1;pcFolderNameTaken(state,folderId,filename)||files.some(f=>f.filename.normalize('NFC').toLocaleLowerCase('ru')===filename.normalize('NFC').toLocaleLowerCase('ru'));n++)filename=stem.slice(0,100)+' ('+n+')'+ext;
  let next=state;
  if(file.exported){
   const version=normalizeTrackVersions({byId:{[file.exported.version?.id]:file.exported.version}}).byId[file.exported.version?.id];if(!version)return fail('attachment-unavailable');

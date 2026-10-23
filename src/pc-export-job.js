@@ -1,6 +1,7 @@
 import {createAudioExport,normalizeAudioExports} from './pc-audio-exports.js?rev=58';
 import {softwareDiskBytes} from './pc-software.js?rev=58';
 import {canonicalTrackSignature,normalizeTrackVersions} from './track-version.js?rev=58';
+import {pcFileEntries,pcFolderNameTaken} from './pc-filesystem.js?rev=58';
 export function normalizeExportJob(raw,{trackVersions,audioExports,fileSystem}={}){
  if(raw==null)return null;
  if(raw.version!==1||typeof raw.id!=='string'||!raw.id||raw.id.length>100||!Number.isFinite(raw.elapsedSeconds)||raw.elapsedSeconds<0||raw.elapsedSeconds>5||raw.totalSeconds!==5)return null;
@@ -25,7 +26,7 @@ export function advanceExportJob(state,{activeSeconds,visible,powered,paused}={}
  const job=state.exportJob,elapsedSeconds=Math.min(5,job.elapsedSeconds+activeSeconds);
  if(elapsedSeconds<5-1e-8)return result({...state,exportJob:{...job,elapsedSeconds}});
  const archive=state.audioExports??{version:1,files:[],recovery:[]},file=job.file;
- const collision=archive.files.some(f=>f.id===file.id||f.folderId===file.folderId&&f.filename.toLocaleLowerCase('ru')===file.filename.toLocaleLowerCase('ru'));
+ const collision=pcFolderNameTaken(state,file.folderId,file.filename)||pcFileEntries(state,{folderId:file.folderId}).some(f=>f.id===file.id||f.filename.normalize('NFC').toLocaleLowerCase('ru')===file.filename.normalize('NFC').toLocaleLowerCase('ru'));
  const versions={version:1,...state.trackVersions,byId:{...state.trackVersions?.byId}},old=job.trackVersion?versions.byId[job.trackVersion.id]:null;
  const badVersion=old&&canonicalTrackSignature(old)!==canonicalTrackSignature(job.trackVersion);
  if(collision||badVersion||softwareDiskBytes({...state,exportJob:null}).free<file.bytes)return result({...state,exportJob:{...job,elapsedSeconds:5,error:collision?'Имя файла занято. Отмени экспорт и выбери другое.':badVersion?'Версия трека изменилась. Повтори экспорт.':'Недостаточно места на диске.'}});

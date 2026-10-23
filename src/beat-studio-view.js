@@ -229,7 +229,10 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onC
  frame=requestFrame?.(tick)??null;
  return {
   openProject:selectProject,
-  requestClose:options=>currentBeat()?guard.request(options):(options?.onClose?.(),Promise.resolve('saved')),
+  requestClose(options){
+   if(!currentBeat()&&documentIsDirty(getState(),'ft-studio')){const p=getState().projects.find(p=>p.id===getState().music.activeBeatId);if(normalizeBeat(p))selectProject(p);}
+   return currentBeat()?guard.request(options):(options?.onClose?.(),Promise.resolve('saved'));
+  },
   save:saveDocument,
   focus(){if(dialog)pcFocusable(dialog)[0]?.focus();},
   setVisible(next){visible=next;if(!visible&&frame!==null){cancelFrame?.(frame);frame=null;}else if(visible&&!disposed&&frame===null){updateTransport();frame=requestFrame?.(tick)??null;}},

@@ -73,8 +73,9 @@ test('Explorer opening selects a saved beat even while the new-beat form is open
  const s=setup(),state=createBeat(s.pc.state,{id:'existing',name:'Существующий'},{}).state;s.pc.syncState(state);s.pc.open('ft-studio');s.launch();findButton(s.root,'Новый проект').click();assert.ok(field(s.root,'Название бита'));
  s.pc.openProject(state.projects[0]);assert.equal(Boolean(field(s.root,'Название бита')),false);assert.ok(findButton(s.root,'Работать над битом'));
 });
-test('opening a legacy project replaces the active v2 view without rewriting its data',()=>{
+test('opening a legacy project saves the dirty beat first and preserves the legacy data',()=>{
  const s=setup(),legacy=createStudioProject({id:'legacy',name:'Архивный проект',battleId:'concrete-echo'}).project;let state=createBeat(s.pc.state,{id:'new',name:'Новый проект'},{}).state;state.projects.push(legacy);s.pc.syncState(state);s.pc.open('ft-studio');s.launch();s.pc.openProject(legacy);
+ assert.ok(field(s.root,'Сохранить изменения?'));findButton(field(s.root,'Сохранить изменения?'),'Сохранить').click();findButton(field(s.root,'Сохранить как'),'Сохранить').click();
  assert.equal(s.pc.state.music.activeBeatId,null);assert.equal(Boolean(findButton(s.root,'Работать над битом')),false);
  assert.ok(allPc(s.root).some(n=>n.textContent==='Архивный проект'));assert.ok(allPc(s.root).some(n=>n.textContent?.includes('Открыт прежний проект: Архивный проект')));
  assert.deepEqual(s.pc.state.projects,state.projects);

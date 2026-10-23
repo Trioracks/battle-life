@@ -1,4 +1,4 @@
-import {pcFolderExists,pcFileEntries} from './pc-filesystem.js?rev=58';
+import {pcFolderExists,pcFileEntries,pcFolderNameTaken} from './pc-filesystem.js?rev=58';
 import {normalizeBeat} from './beat-production.js?rev=58';
 import {resolveBeatPlayback} from './beat-playback.js?rev=58';
 import {captureTrackVersion,canonicalTrackSignature} from './track-version.js?rev=58';
@@ -60,6 +60,7 @@ export function createAudioExport(state,{id:fileId,projectId,kind,format='wav',f
  if(!id(fileId)||!Object.hasOwn(AUDIO_EXPORT_KINDS,kind))return fail('Укажи вид аудиофайла и его идентификатор.');
  if(!pcFolderExists(state,folderId))return fail('Выбери доступную папку виртуального диска.');
  const name=audioExportFilename(filename,format);if(!name)return fail('Укажи безопасное имя файла WAV или MP3 без пути и служебных символов.');
+ if(pcFolderNameTaken(state,folderId,name))return fail('Такое имя уже занято папкой. Выбери другое имя файла.');
  if(!Number.isFinite(nowMinute)||nowMinute<0)return fail('Не удалось определить игровое время.');
  const archive=state.audioExports??{version:1,files:[],recovery:[]};
  if(pcFileEntries(state,{folderId}).some(f=>nameKey(f.filename)===nameKey(name))||archive.files.some(f=>f.id===fileId||f.folderId===folderId&&nameKey(f.filename)===nameKey(name))||folderId==='projects'&&state.projects?.some(p=>typeof p.name==='string'&&nameKey(p.name)===nameKey(name)))return fail('Такое имя или идентификатор уже существует. Выбери другое имя.');
