@@ -4,7 +4,7 @@ import * as mix from '../src/beat-mix.js?rev=28';
 import {createVirtualPcState} from '../src/virtual-pc-state.js?rev=28';
 import {createBeat,startBeatStage,advanceBeatWork} from '../src/beat-production.js?rev=28';
 import {resolveBeatPlayback} from '../src/beat-playback.js?rev=28';
-const make=(skills={beatmaking:10,sound:10})=>createBeat(createVirtualPcState(),{id:'result',name:'Результат'},skills,()=>.2).state;
+const make=(skills={beatmaking:10,sound:10})=>{const state=createVirtualPcState();state.music.genres.xp.experimental=100;return createBeat(state,{id:'result',name:'Результат'},skills,()=>.2).state;};
 
 test('new profiles save both skills, bounded novice decisions, and first work layer before completion',()=>{
  const initial=make();assert.equal(initial.projects[0].mix.version,2);
@@ -27,7 +27,7 @@ test('excellent decisions cannot hide a novice sound skill behind expert beatmak
  assert.ok(quality({beatmaking:100,sound:10})<80);
  assert.ok(quality({beatmaking:10,sound:100})<80);
  assert.ok(quality({beatmaking:100,sound:70})>quality({beatmaking:100,sound:10}));
- assert.equal(quality({beatmaking:100,sound:100}),110);
+ assert.equal(quality({beatmaking:100,sound:100}),100);
 });
 
 test('started layer result survives work, reload, and growth, with fit and quality in completed stage',()=>{

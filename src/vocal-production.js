@@ -1,11 +1,11 @@
-import {normalizeVoiceId,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=45';
-import {normalizePlayerVocalBag,selectPlayerVocal} from './npc-vocal-catalog.js?rev=45';
-import {clampV,createVocalTake,normalizeRecording,recordingQuality,VOCAL_EQUIPMENT,effectiveSoundSkill} from './vocal-result.js?rev=45';
-import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=45';
-import {latestReadyLyric} from './lyric-production.js?rev=45';
-import {BEAT_RULES as R,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=45';
-import {vocalOutcomes} from './production-outcomes.js?rev=45';
-import {chooseSongForm} from './beat-song-form.js?rev=45';
+import {normalizeVoiceId,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=57';
+import {normalizePlayerVocalBag,selectPlayerVocal} from './npc-vocal-catalog.js?rev=57';
+import {clampV,createVocalTake,normalizeRecording,recordingQuality,VOCAL_EQUIPMENT,effectiveSoundSkill} from './vocal-result.js?rev=57';
+import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=57';
+import {latestReadyLyric} from './lyric-production.js?rev=57';
+import {BEAT_RULES as R,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=57';
+import {vocalOutcomes} from './production-outcomes.js?rev=57';
+import {chooseSongForm} from './beat-song-form.js?rev=57';
 export {recordingQuality};
 export const VOCAL_STAGES=Object.freeze({draft:{name:'Черновая запись',minutes:60,skill:'flow'},clean:{name:'Чистовая запись',minutes:60,skill:'flow'},mix:{name:'Сведение',minutes:45,skill:'sound'},master:{name:'Мастеринг',minutes:30,skill:'sound'}});
 export function canVocalStage(recording,kind){
@@ -23,11 +23,13 @@ function validTransition(before,after,kind){
 export function normalizeRecordingState(value,projects=[],voiceContext=null){
  const s=value??{},j=s.job,beat=projects.find(p=>p.id===j?.beatId&&p.kind==='beat'&&p.status==='ready'),before=normalizeRecording(beat?.recording),output=normalizeRecording(j?.output);
  const vocalBag=j?.kind==='draft'&&output?.voiceId!==undefined?normalizePlayerVocalBag(j.vocalBag,output.voiceId):null;
- const nextBag=voiceContext&&vocalBag&&!vocalBag.blocked?selectPlayerVocal(voiceContext.playerVocalBag,{voiceId:voiceContext.voiceId,seed:vocalBag.seed}):null;
+ // Pending drafts replay their original queue version until committed.
+ const nextBag=voiceContext&&vocalBag&&!vocalBag.blocked?selectPlayerVocal(voiceContext.playerVocalBag,{voiceId:voiceContext.voiceId,seed:vocalBag.seed,catalogVersion:vocalBag.catalogVersion??1}):null;
+ if(nextBag?.bag&&vocalBag.catalogVersion===undefined)delete nextBag.bag.catalogVersion;
  const valid=beat&&VOCAL_STAGES[j.kind]&&j.baseRevision===(before?.revision??0)&&Number.isFinite(j.total)&&j.total>0&&j.total<=600&&Number.isFinite(j.elapsed)&&j.elapsed>=0&&j.elapsed<j.total&&validTransition(before,output,j.kind)&&(!(j.kind==='draft'&&output.voiceId!==undefined)||vocalBag&&!vocalBag.blocked&&vocalBag.lastId===output.sourceId&&(!voiceContext||nextBag?.ok&&JSON.stringify(nextBag.bag)===JSON.stringify(vocalBag)));
  return {equipment:{...VOCAL_EQUIPMENT},practice:{flow:clampV(s.practice?.flow),sound:clampV(s.practice?.sound)},job:valid?{beatId:beat.id,kind:j.kind,baseRevision:j.baseRevision,output,...(vocalBag?{vocalBag}:{}),total:j.total,elapsed:j.elapsed,skill:clampV(j.skill),practiceCredit:clampV(j.practiceCredit,0,j.elapsed/j.total/3)}:null};
 }
-export const effectiveVocalSkill=(s,skills={},kind='draft')=>{const k=VOCAL_STAGES[kind]?.skill??'flow';return k==='sound'?effectiveSoundSkill(s,skills):clampV((skills[k]??10)+(s.recording?.practice?.[k]??0));};
+export const effectiveVocalSkill=(s,skills={},kind='draft')=>{const k=VOCAL_STAGES[kind]?.skill??'flow';return k==='sound'?effectiveSoundSkill(s,skills):clampV((skills[k]??0)+(s.recording?.practice?.[k]??0));};
 const normalized=input=>{const projects=(input.projects??[]).map(p=>p.kind==='beat'&&!p.recoveryIssue?normalizeBeat(p)??{id:p.id,kind:p.kind,name:p.name,recoveryIssue:'Не удалось прочитать проект. Исходные данные сохранены.',recoveryData:structuredClone(p)}:p).filter(Boolean);return {...input,projects,music:normalizeMusic(input.music,projects),recording:normalizeRecordingState(input.recording,projects,{voiceId:input.voiceId===undefined?DEFAULT_VOICE_ID:input.voiceId,playerVocalBag:input.playerVocalBag})};};
 export function startVocalWork(input,{beatId,textId,kind='draft',sliders}={},skills={},random=Math.random){
  if(input.rapAnalysis?.job?.status==='active'||input.rapResearch?.job?.status==='active')return {ok:false,state:input,reason:'Сначала приостанови изучение.'};

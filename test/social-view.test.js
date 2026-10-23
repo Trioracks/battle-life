@@ -14,8 +14,14 @@ function setup(path='me',options={}){
  const view=mountSocial(root,{route,getState:()=>state,getMetadata:()=>({gameDay:1,playerName:'Герой',...options.metadata}),onChange:next=>{if(options.fail)return false;state=next;return true;},navigate:url=>{navigated=url;},audio:options.audio});
  return {d,root,view,get state(){return state;},get navigated(){return navigated;}};
 }
-test('group navigation offers registration without changing saved battle knowledge',()=>{
- const s=setup('community/makarevich-1'),before=structuredClone(s.state.battleKnowledge);assert.equal(findButton(s.root,'Изучить площадку'),undefined);assert.ok(findButton(s.root,'Зарегистрироваться'));assert.deepEqual(s.state.battleKnowledge,before);assert.ok(!allPc(s.root).some(n=>/formatAdherence|strictnessOffset|maxPenalty/.test(n.textContent??'')));s.view.dispose();
+test('community rerender safely traverses SVG className objects in reaction controls',()=>{
+ const s=setup('community/makarevich-1'),content=allPc(s.root).find(n=>n.className==='sn-content');
+ const svg=s.d.createElement('svg');svg.className={baseVal:'sn-thumb'};content.append(svg);
+ s.state.social={...s.state.social,subscriptions:['makarevich-1']};
+ assert.doesNotThrow(()=>s.view.update());assert.ok(findButton(s.root,'Вы подписаны'));s.view.dispose();
+});
+test('group navigation offers registration after subscribing without changing saved battle knowledge',()=>{
+ const s=setup('community/makarevich-1'),before=structuredClone(s.state.battleKnowledge);assert.equal(findButton(s.root,'Изучить площадку'),undefined);assert.equal(findButton(s.root,'Зарегистрироваться'),undefined);findButton(s.root,'Подписаться').click();assert.ok(findButton(s.root,'Зарегистрироваться'));assert.deepEqual(s.state.battleKnowledge,before);assert.ok(!allPc(s.root).some(n=>/formatAdherence|strictnessOffset|maxPenalty/.test(n.textContent??'')));s.view.dispose();
 });
 test('group shows its saved deadline without a study action',()=>{
  const state=ensureBattleWindow(createVirtualPcState(),{battleId:'makarevich-1',nowMinute:600}).state;

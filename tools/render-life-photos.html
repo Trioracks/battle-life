@@ -1,0 +1,21 @@
+<!doctype html><html lang="ru"><meta charset="utf-8"><title>Рендер жизненных фотографий NPC</title>
+<script type="importmap">{"imports":{"three":"../vendor/three/three.module.js","three/addons/":"../vendor/three/addons/"}}</script>
+<style>body{font:14px Arial;background:#ddd}#photos{display:flex;flex-wrap:wrap;gap:12px}figure{margin:0;width:256px}img{width:256px;height:256px}</style>
+<h1>Жизненные фотографии из игровых моделей</h1><p>Сохранения игры не используются.</p><button id="render">Сгенерировать фотографии</button><button id="save" disabled>Сохранить 24 фотографии в проект</button><p id="status" role="status"></p><div id="photos"></div>
+<script type="module">
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {renderAvatarPortrait} from '../src/avatar-portrait-renderer.js?rev=56';
+import {normalizeNpcSocialProfiles} from '../src/npc-social-profiles.js?rev=56';
+import {npcLifeStory} from '../src/social-life-stories.js?rev=56';
+const status=document.querySelector('#status'),container=document.querySelector('#photos');
+document.querySelector('#render').onclick=async()=>{
+ document.querySelector('#render').disabled=true;container.replaceChildren();
+ try{const model=await new GLTFLoader().loadAsync('../assets/apartment/v3/mannequin.glb?rev=56');let count=0;
+ for(const profile of Object.values(normalizeNpcSocialProfiles().byId)){const life=npcLifeStory(profile);if(!life)continue;
+ for(const photo of life.photos){const shot=await renderAvatarPortrait({appearance:profile.appearance,variant:'life:'+photo.stage,size:512,sceneAssets:{model}}),figure=document.createElement('figure'),img=document.createElement('img'),link=document.createElement('a');
+ img.src=shot.url;img.alt=profile.name+' — '+photo.title;link.href=shot.url;link.download=photo.src.split('/').at(-1);link.textContent=link.download;figure.append(img,link);container.append(figure);status.textContent='Готово: '+(++count);await new Promise(requestAnimationFrame);}}
+ status.textContent+=' фотографий. Рендер завершён.';document.querySelector('#save').disabled=false;
+ }catch(error){status.textContent=error.message;}finally{document.querySelector('#render').disabled=false;}
+};
+document.querySelector('#save').onclick=async()=>{try{const rows=[...container.querySelectorAll('a[download]')].map(link=>({name:link.download,data:link.href}));const response=await fetch('http://127.0.0.1:4174/export',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(rows)}),result=await response.json();if(!response.ok)throw Error(result.error);status.textContent='Сохранено в проект: '+result.saved+' фотографий и манифест внешности.';}catch(error){status.textContent='Не сохранено: '+error.message;}};
+</script></html>

@@ -1,7 +1,7 @@
-import {pcElement as el,pcButton as button,pcFind} from './virtual-pc-dom.js?rev=45';
-import {createBeatSongForm,songPartWindows} from './beat-song-form.js?rev=45';
-import {createPcIcon} from './virtual-pc-icons.js?rev=45';
-import {beginnerById} from './beat-beginner-bank.js?rev=45';
+import {pcElement as el,pcButton as button,pcFind} from './virtual-pc-dom.js?rev=57';
+import {createBeatSongForm,songPartWindows} from './beat-song-form.js?rev=57';
+import {createPcIcon} from './virtual-pc-icons.js?rev=57';
+import {beginnerById} from './beat-beginner-bank.js?rev=57';
 
 export const FT_TRACKS=Object.freeze([
  ...['Drum Kit','Bass','Percussion'].map(name=>({name,stage:0,color:'rhythm'})),

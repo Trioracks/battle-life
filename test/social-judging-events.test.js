@@ -22,5 +22,5 @@ test('PC off / large clock jump publishes each grade, one panel and batched phon
  const done=advanceSocial(s,now),judges=done.events.filter(e=>e.type==='judge-review'),panels=done.events.filter(e=>e.type==='judge-panel-complete');
  assert.equal(judges.length,5);assert.equal(panels.length,1);assert.equal(done.state.phone.queue.filter(e=>e.type==='judge-review-batch').length,1);assert.equal(done.state.phone.queue.filter(e=>e.type==='judge-panel-complete').length,1);
  const result=publicBattleResults(done.state,row.id);assert.equal(result.complete,true);assert.equal(result.qualification,null);
- const again=advanceSocial(JSON.parse(JSON.stringify(done.state)),now+20);assert.deepEqual(again.state.judging,done.state.judging);assert.equal(again.events.length,0);assert.deepEqual(again.state.social.posts,[]);
+ const again=advanceSocial(JSON.parse(JSON.stringify(done.state)),now+20);assert.deepEqual(again.state.judging,done.state.judging);assert.equal(again.events.filter(e=>['judge-review','judge-panel-complete'].includes(e.type)).length,0);assert.deepEqual(again.state.social.posts,[]);
 });

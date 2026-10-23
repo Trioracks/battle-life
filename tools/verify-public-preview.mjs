@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -50,13 +51,18 @@ export function validateLiveRelease(release,expected){
  for(const key of ['version','profile','revision','sourceCommit'])assert.equal(release[key],expected[key],'live release '+key);
  assert.ok(Number.isFinite(Date.parse(release.builtAt)),'live release timestamp');
 }
-export function isCompletedGlbSignal(failure,consumption,expectedBytes,sceneReady){
+export function isCompletedGlbSignal(failure,consumption,expectedBytes,sceneReady,expectedSha256){
  if(failure.why!=='net::ERR_ABORTED'||!sceneReady||!Number.isSafeInteger(expectedBytes)||expectedBytes<=0)return false;
  if(!new URL(failure.url).pathname.endsWith('.glb')||consumption?.url!==failure.url||consumption.status!==200||consumption.eof!==true)return false;
  if(!Number.isFinite(failure.documentTimeOrigin)||consumption.documentTimeOrigin!==failure.documentTimeOrigin)return false;
  if(consumption.bytes!==expectedBytes||consumption.declaredBytes!==0&&consumption.declaredBytes!==expectedBytes||Math.abs(consumption.startedAt-failure.startedAt)>250)return false;
  if(!/\/vendor\/three\/three\.module\.js:/.test(consumption.initiator??''))return false;
- return failure.resourceTiming?.some(t=>t.decodedBodySize===expectedBytes&&t.encodedBodySize>0&&t.transferSize>=t.encodedBodySize)===true;
+ const timed=failure.resourceTiming?.some(t=>t.decodedBodySize===expectedBytes&&t.encodedBodySize>0&&t.transferSize>=t.encodedBodySize)===true;
+ // Chromium can emit a cancellation after the FileLoader consumed EOF without
+ // retaining ResourceTiming. Accept that case only with an independent digest
+ // of the exact bytes consumed by that same reader and the audited file.
+ const hashed=!failure.resourceTiming?.length&&typeof expectedSha256==='string'&&/^[a-f0-9]{64}$/.test(expectedSha256)&&consumption.sha256===expectedSha256;
+ return timed||hashed;
 }
 // QA-only controlled old cohort. No route or synthetic bytes are built/published.
 export async function startCacheProbeServer({artifactUrl}){
@@ -96,7 +102,7 @@ async function waitState(page,predicate,timeout=60000){
 }
 const phase=(page,value)=>page.waitForFunction(value=>document.querySelector('#virtual-pc')?.dataset.pcTransition===value,value);
 async function recordReady(page){const timeOrigin=await page.evaluate(()=>document.querySelector('#loading')?.hidden===true?performance.timeOrigin:null);if(timeOrigin!==null)page._qaReadyDocuments?.add(timeOrigin);}
-async function reload(page){page._qaPhase='reload-drain';await page.waitForLoadState('networkidle',{timeout:30000});page._qaPhase='reload-navigation';await page.reload();page._qaPhase='reload-ready-wait';await page.locator('#loading').waitFor({state:'hidden'});page._qaPhase='reload-ready';await recordReady(page);}
+async function reload(page){page._qaPhase='reload-drain';await page.waitForLoadState('networkidle',{timeout:30000});await page.evaluate(()=>window.__previewFlushAssets?.());page._qaPhase='reload-navigation';await page.reload();page._qaPhase='reload-ready-wait';await page.locator('#loading').waitFor({state:'hidden'});page._qaPhase='reload-ready';await recordReady(page);}
 async function action(page,id){
  await page.waitForFunction(()=>document.body.dataset.mode==='game'&&!document.querySelector('#actions [data-action=computer]').disabled);
  await page.locator('#apartment').focus();await page.locator('#apartment').press('Enter');
@@ -124,14 +130,26 @@ function observeAudio(){
 // Observe EOF on the same reader consumed by Three's FileLoader. No clone,
 // replacement body, generated geometry, extra asset request or state hook.
 function observeAssetReads(){
- const originalFetch=window.fetch;
+ const originalFetch=window.fetch,pending=new Set();
+ window.__previewFlushAssets=async()=>{while(pending.size)await Promise.allSettled([...pending]);};
  window.fetch=async function(...args){
   const startedAt=Date.now(),response=await originalFetch.apply(this,args);
   if(!response.url||!new URL(response.url).pathname.endsWith('.glb')||!response.body)return response;
   const url=response.url,status=response.status,declaredBytes=Number(response.headers.get('content-length')),body=response.body,getReader=body.getReader.bind(body);
   body.getReader=function(...options){
-   const reader=getReader(...options),read=reader.read.bind(reader),initiator=new Error().stack;let bytes=0;
-   reader.read=async function(...readOptions){const chunk=await read(...readOptions);if(chunk.done)void window.__previewAssetEvent({url,status,startedAt,finishedAt:Date.now(),documentTimeOrigin:performance.timeOrigin,declaredBytes,bytes,eof:true,initiator});else bytes+=chunk.value.byteLength;return chunk;};
+   const reader=getReader(...options),read=reader.read.bind(reader),initiator=new Error().stack;let bytes=0,chunks=[];
+   reader.read=async function(...readOptions){
+    const chunk=await read(...readOptions);
+    if(chunk.done){
+     const event={url,status,startedAt,finishedAt:Date.now(),documentTimeOrigin:performance.timeOrigin,declaredBytes,bytes,eof:true,initiator},parts=chunks;chunks=[];
+     const task=(async()=>{
+      const input=new Uint8Array(bytes);let offset=0;for(const part of parts){input.set(part,offset);offset+=part.byteLength;}parts.length=0;
+      const digest=await crypto.subtle.digest('SHA-256',input),sha256=Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('');
+      await window.__previewAssetEvent({...event,sha256});
+     })();pending.add(task);void task.finally(()=>pending.delete(task)).catch(()=>{});
+    }else{bytes+=chunk.value.byteLength;chunks.push(chunk.value);}
+    return chunk;
+   };
    return reader;
   };
   return response;
@@ -194,7 +212,7 @@ export async function verifyPublicPreview(options={}){
   assert.equal(counts.bufferStarts,0,label+' starts no recorded PCM');assert.equal(counts.mediaStarts,0,label+' starts no media');assert.equal(counts.decodes,0,label+' decodes no recorded audio');
   for(const url of await page.evaluate(()=>performance.getEntriesByType('resource').map(entry=>entry.name)))observed.add(url);
  }
- async function close(context,page,label){page._qaPhase='close-drain:'+label;await page.waitForLoadState('networkidle',{timeout:30000});await observe(page,label);closingContexts.add(context);page._qaPhase='context-close:'+label;await context.close();contexts.delete(context);}
+ async function close(context,page,label){page._qaPhase='close-drain:'+label;await page.waitForLoadState('networkidle',{timeout:30000});await observe(page,label);await page.evaluate(()=>window.__previewFlushAssets?.());closingContexts.add(context);page._qaPhase='context-close:'+label;await context.close();contexts.delete(context);}
  try{
   if(!config.live){server=await startPreviewServer({root:config.root,port:0,prefix:config.prefix});assert.notEqual(new URL(server.url).port,'4173');report.url=server.url;}
   else report.url=config.url;
@@ -225,13 +243,13 @@ export async function verifyPublicPreview(options={}){
    const currentRequests=[];context.on('request',request=>currentRequests.push(request.url()));
    await page.goto(cacheProbe.url,{timeout:60000});await page.locator('#loading').waitFor({state:'hidden'});await page.locator('#continue-game').click();await phase(page,'room');
    await page.waitForFunction(()=>document.body.dataset.mode==='game');
-   const until=Date.now()+30000;while(!currentRequests.some(url=>url.includes('social-worker.js?rev=45'))&&Date.now()<until)await page.waitForTimeout(100);
+   const until=Date.now()+30000;while(!currentRequests.some(url=>url.includes('social-worker.js?rev=57'))&&Date.now()<until)await page.waitForTimeout(100);
    const resources=currentRequests.filter(url=>/\.(?:js|css)(?:\?|$)/.test(url)&&!url.includes('/vendor/'));
-   assert.ok(resources.some(url=>url.includes('apartment-app.js?rev=45')));assert.ok(resources.some(url=>url.includes('.css?rev=45')));assert.ok(resources.some(url=>url.includes('social-worker.js?rev=45')));assert.ok(resources.every(url=>new URL(url).searchParams.get('rev')==='45'));
+   assert.ok(resources.some(url=>url.includes('apartment-app.js?rev=57')));assert.ok(resources.some(url=>url.includes('.css?rev=57')));assert.ok(resources.some(url=>url.includes('social-worker.js?rev=57')));assert.ok(resources.every(url=>new URL(url).searchParams.get('rev')==='57'));
    assert.equal(await page.evaluate(()=>typeof window.__cacheProbe),'undefined');assert.equal(await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--preview-cache-probe').trim()),'');
    await screenshot(page,'stale-http-cache-to-current-1280');
    report.cacheEvidence={syntheticPriorRevision:43,priorHits:{...cacheProbe.priorHits},cachedResponses:hits.map(({text,...hit})=>hit),currentResources:resources,scope:'Controlled synthetic old JS/CSS/Worker cached with immutable max-age, then unchanged current artifact on the same owned origin. Not an old gameplay migration test.'};
-   check('stale HTTP-cached JS/CSS/Worker cohort cannot replace canonical 45 entry',{cacheHits:3,syntheticPriorRevision:43});await close(context,page,'stale-http-cache');await cacheProbe.close();cacheProbe=null;
+   check('stale HTTP-cached JS/CSS/Worker cohort cannot replace canonical 57 entry',{cacheHits:3,syntheticPriorRevision:43});await close(context,page,'stale-http-cache');await cacheProbe.close();cacheProbe=null;
   }
   for(const viewport of report.viewports){
    const suffix=String(viewport.width);
@@ -285,8 +303,8 @@ export async function verifyPublicPreview(options={}){
     await frame(page,'ft-studio').getByRole('button',{name:'Экспорт',exact:true}).click();
     const exported=frame(page,'ft-studio').getByRole('dialog',{name:'Экспорт аудиофайла'});await exported.getByLabel('Вид аудиофайла',{exact:true}).selectOption('track');await exported.getByLabel('Имя аудиофайла',{exact:true}).fill('Preview.wav');await exported.getByRole('button',{name:'Сохранить аудиофайл',exact:true}).click();await exported.waitFor({state:'detached'});
     const before=await state(page),file=before.audioExports.files.find(file=>file.filename==='Preview.wav');assert.ok(file?.descriptor);const frozen=JSON.stringify(file),frozenVersion=JSON.stringify(before.trackVersions.byId[file.trackVersionId]);
-    await navigate(page,'underweb://social/community/makarevich-1');await screenshot(page,'social-group-'+suffix);await page.getByRole('button',{name:'Сдать трек',exact:true}).click();await page.getByRole('button',{name:'Прикрепить',exact:true}).click();await page.getByRole('button',{name:'Выбрать: Preview.wav',exact:true}).click();await page.getByRole('button',{name:'Прикрепить выбранный трек',exact:true}).click();
-    await waitState(page,saved=>saved.outgoingUpload?.status==='ready');await page.getByRole('button',{name:'Отправить',exact:true}).click();
+    await navigate(page,'underweb://social/community/makarevich-1');await page.getByRole('button',{name:'Подписаться',exact:true}).click();await screenshot(page,'social-group-'+suffix);await page.getByRole('button',{name:'Сдать трек',exact:true}).click();await page.getByRole('button',{name:'Прикрепить',exact:true}).click();await page.getByRole('button',{name:'Выбрать: Preview.wav',exact:true}).click();await page.getByRole('button',{name:'Прикрепить выбранный трек',exact:true}).click();
+    await waitState(page,saved=>saved.outgoingUpload?.status==='ready');await page.getByRole('button',{name:'Ответить',exact:true}).click();await page.getByRole('button',{name:'Отправить работу на баттл',exact:true}).click();await page.getByRole('button',{name:'Отправить',exact:true}).click();
     await waitState(page,saved=>saved.battleSubmissions.length===1,30000);await screenshot(page,'submission-dialog-'+suffix);
     await navigate(page,'underweb://social/audio');
     const plays=page.locator('[data-social-audio]');assert.ok(await plays.count());for(const play of await plays.all())assert.equal(await play.isDisabled(),true);assert.ok((await frame(page,'underweb').innerText()).includes(notice));await screenshot(page,'social-audio-disabled-'+suffix);
@@ -304,11 +322,11 @@ export async function verifyPublicPreview(options={}){
    }
   }
   const active=[...observed].filter(url=>/\.(?:js|css)(?:\?|$)/.test(url)&&!url.includes('/vendor/'));
-  assert.ok(active.some(url=>url.includes('apartment-app.js?rev=45')));assert.ok(active.some(url=>url.includes('.css?rev=45')));assert.ok(active.every(url=>new URL(url).searchParams.get('rev')==='45'),'all active first-party JS/CSS use canonical revision 45');
+  assert.ok(active.some(url=>url.includes('apartment-app.js?rev=57')));assert.ok(active.some(url=>url.includes('.css?rev=57')));assert.ok(active.every(url=>new URL(url).searchParams.get('rev')==='57'),'all active first-party JS/CSS use canonical revision 57');
   const workers=report.requests.filter(url=>new URL(url).origin===new URL(report.url).origin&&/\/[^/]*worker\.js(?:\?|$)/.test(url));
-  assert.ok(workers.every(url=>new URL(url).searchParams.get('rev')==='45'),'all real Worker entries use canonical revision 45');
-  if(!options.smoke)assert.ok(workers.some(url=>url.includes('social-worker.js?rev=45')),'real canonical social Worker requested');
-  check('prior module URL followed by canonical revision 45 entry, CSS and Worker',{priorRevision:43,canonicalRevision:45,workerRequired:!options.smoke,cacheScope:'isolated module URL warmup; local HTTP responses are no-store'});
+  assert.ok(workers.every(url=>new URL(url).searchParams.get('rev')==='57'),'all real Worker entries use canonical revision 57');
+  if(!options.smoke)assert.ok(workers.some(url=>url.includes('social-worker.js?rev=57')),'real canonical social Worker requested');
+  check('prior module URL followed by canonical revision 57 entry, CSS and Worker',{priorRevision:43,canonicalRevision:57,workerRequired:!options.smoke,cacheScope:'isolated module URL warmup; local HTTP responses are no-store'});
   report.completedGlbSignals=[];report.readyDocuments=[...readyDocuments];
   const rawFailures=report.unexpectedResponses;report.unexpectedResponses=[];
   for(const failure of rawFailures){
@@ -316,7 +334,9 @@ export async function verifyPublicPreview(options={}){
    if(failure.why==='net::ERR_ABORTED'){
     const url=new URL(failure.url),relative=url.pathname.startsWith(config.prefix)?url.pathname.slice(config.prefix.length):'',filename=path.resolve(config.root,relative);
     if(relative.startsWith('assets/')&&relative.endsWith('.glb')&&inside(config.root,filename)){
-     const expectedBytes=await fs.stat(filename).then(info=>info.size,()=>0),consumption=report.assetConsumptions.find(entry=>isCompletedGlbSignal(failure,entry,expectedBytes,readyDocuments.has(entry.documentTimeOrigin)));
+     const expectedBytes=await fs.stat(filename).then(info=>info.size,()=>0);
+     const expectedSha256=!failure.resourceTiming?.length&&expectedBytes>0?createHash('sha256').update(await fs.readFile(filename)).digest('hex'):undefined;
+     const consumption=report.assetConsumptions.find(entry=>isCompletedGlbSignal(failure,entry,expectedBytes,readyDocuments.has(entry.documentTimeOrigin),expectedSha256));
      if(consumption){matched=true;report.completedGlbSignals.push({...failure,expectedBytes,consumption,sceneReady:true});}
     }
    }

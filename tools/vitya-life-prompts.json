@@ -1,0 +1,22 @@
+{
+  "reference": "assets/social/photos/vitya-avatar.jpg",
+  "tool": "built-in imagegen",
+  "prompts": [
+    [
+      "school",
+      "Use case: identity-preserve. Create a fictional in-game social photo of Vitya, the exact low-poly man in the reference. Keep his broad square/rounded face, prominent nose, small dark simple eyes, brown angular side-swept hair, recognizable character proportions. This must look like an actual extremely low-polygon old 3D videogame screenshot, flat shaded giant polygon facets, solid color materials, simple blocky hands and environments, no photoreal skin, no smooth detailed illustration, no tiny triangles, no photographic textures or grain, no logos, no watermark, no text. Square framing, entire scene one picture, NOT a collage. School archive, 2004: age about 15, clean shaven, sitting sideways at a wooden school desk, leaning on one elbow, turning to the camera with a slightly stupid sleepy expression. Dark green sweater, simple blue trousers. Two low-poly classmates seated farther back and a chalkboard, muted Russian school classroom. Face clearly seen. Medium three-quarter shot, not a static standing portrait."
+    ],
+    [
+      "college",
+      "Use case: identity-preserve. Create a fictional in-game social photo of Vitya, the exact low-poly man in the reference. Keep his broad square/rounded face, prominent nose, small dark simple eyes, brown angular side-swept hair, recognizable character proportions. This must look like an actual extremely low-polygon old 3D videogame screenshot, flat shaded giant polygon facets, solid color materials, simple blocky hands and environments, no photoreal skin, no smooth detailed illustration, no tiny triangles, no photographic textures or grain, no logos, no watermark, no text. Square framing, entire scene one picture, NOT a collage. Technical college archive, 2007: age about 18, recognizable brown hair, little stubble, olive work jacket, sitting on a workshop stool at a simple metal workbench holding a small wrench, looking over his shoulder at a classmate. Simple vise and tool board. Candid awkward everyday moment, medium wide view with body pose clearly visible."
+    ],
+    [
+      "army",
+      "Use case: identity-preserve. Create a fictional in-game social photo of Vitya, the exact low-poly man in the reference. Keep his broad square/rounded face, prominent nose, small dark simple eyes, brown angular side-swept hair, recognizable character proportions. This must look like an actual extremely low-polygon old 3D videogame screenshot, flat shaded giant polygon facets, solid color materials, simple blocky hands and environments, no photoreal skin, no smooth detailed illustration, no tiny triangles, no photographic textures or grain, no logos, no watermark, no text. Square framing, entire scene one picture, NOT a collage. Army service archive, 2009: age about 20, recognizable face but very short buzzcut, no beard, generic olive camouflage uniform with no insignia. Sitting slumped on the edge of a barracks bunk, cheek resting on his fist, boots on floor, simple rows of bunk beds behind. Another seated soldier in far background. Bored everyday off-duty photo, no combat, no weapons."
+    ],
+    [
+      "work",
+      "Use case: identity-preserve. Create a fictional in-game social photo of Vitya, the exact low-poly man in the reference. Keep his broad square/rounded face, prominent nose, small dark simple eyes, brown angular side-swept hair, recognizable character proportions. This must look like an actual extremely low-polygon old 3D videogame screenshot, flat shaded giant polygon facets, solid color materials, simple blocky hands and environments, no photoreal skin, no smooth detailed illustration, no tiny triangles, no photographic textures or grain, no logos, no watermark, no text. Square framing, entire scene one picture, NOT a collage. Work photo, summer 2012: age about 23, same brown side-swept hair and short stubble, grey sleeveless undershirt and blue work trousers, carrying a bulky tan cement sack on one shoulder down from an open delivery truck. Torso leaning and knees bent under the sack, both hands supporting it, turning face toward camera. Low-poly hardware store loading yard, stacks of blocky sacks. Candid physical work, no labels, no vehicle plate text."
+    ]
+  ]
+}

@@ -1,7 +1,8 @@
-import {normalizeBeat} from './beat-production.js?rev=45';
-import {normalizeLyric} from './lyric-production.js?rev=45';
-import {resolveBeatPlayback} from './beat-playback.js?rev=45';
-import {lyricOutcomes,beatOutcomes,vocalOutcomes,combineProductionOutcomes} from './production-outcomes.js?rev=45';
+import {normalizeBeat} from './beat-production.js?rev=57';
+import {normalizeLyric} from './lyric-production.js?rev=57';
+import {resolveBeatPlayback} from './beat-playback.js?rev=57';
+import {lyricOutcomes,beatOutcomes,vocalOutcomes,combineProductionOutcomes} from './production-outcomes.js?rev=57';
+import {validBeatExecutionMix,validBeatExecutionDescriptor} from './beat-execution-snapshot.js?rev=57';
 export const TRACK_DSP_VERSION=1;
 const clone=value=>JSON.parse(JSON.stringify(value));
 const object=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
@@ -14,7 +15,7 @@ function digest(value){let h=2166136261;for(const c of value)h=Math.imul(h^c.cha
 export function normalizeTrackVersions(raw){
  const byId={},recovery=(Array.isArray(raw?.recovery)?raw.recovery:[]).map(clone);
  for(const [id,v]of Object.entries(object(raw?.byId)?raw.byId:{})){
-  if(v?.schemaVersion===1&&v.id===id&&typeof v.trackId==='string'&&typeof v.signature==='string'&&Number.isFinite(v.createdAtMinute)&&v.createdAtMinute>=0&&object(v.recipe)&&object(v.recipe.descriptor)&&Array.isArray(v.recipe.descriptor.parts)&&Array.isArray(v.facts)&&object(v.qualities)&&['text','performance','music','sound'].every(k=>v.qualities[k]===null||Number.isFinite(v.qualities[k])&&v.qualities[k]>=0&&v.qualities[k]<=10)){
+  if(v?.schemaVersion===1&&v.id===id&&typeof v.trackId==='string'&&typeof v.signature==='string'&&Number.isFinite(v.createdAtMinute)&&v.createdAtMinute>=0&&object(v.recipe)&&object(v.recipe.descriptor)&&Array.isArray(v.recipe.descriptor.parts)&&validBeatExecutionMix(v.recipe.beat?.mix)&&validBeatExecutionDescriptor(v.recipe.descriptor)&&Array.isArray(v.facts)&&object(v.qualities)&&['text','performance','music','sound'].every(k=>v.qualities[k]===null||Number.isFinite(v.qualities[k])&&v.qualities[k]>=0&&v.qualities[k]<=10)){
    // No migration may rerender, rescore, or replace an archived recipe.
    Object.defineProperty(byId,id,{value:clone(v),enumerable:true,writable:true,configurable:true});
   }else recovery.push({id,reason:'Неподдерживаемая или повреждённая версия. Исходные данные сохранены.',recoveryData:clone(v)});

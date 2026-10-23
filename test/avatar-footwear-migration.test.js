@@ -16,7 +16,7 @@ for(const failKey of [backup,SAVE_KEY])test('footwear migration preserves raw sa
  const raw=JSON.stringify(legacy(true)),s=storage(raw,failKey),result=loadProfile(s);assert.equal(result.ok,false);assert.match(result.error,/quota/);assert.equal(s.getItem(SAVE_KEY),raw);
 });
 test('version three aliases retain their shape and colors without novice reset',()=>{
- const p=legacy();p.version=3;delete p.noviceSchema;delete p.wardrobe;p.skills=Object.fromEntries(Object.keys(p.skills).map(k=>[k,10]));Object.assign(p.skills,{intelligence:50,writing:50,beatmaking:30});p.appearance.footwear='sandals';
+ const p=legacy();p.version=3;delete p.skillSchema;delete p.noviceSchema;delete p.wardrobe;p.skills=Object.fromEntries(Object.keys(p.skills).map(k=>[k,10]));Object.assign(p.skills,{intelligence:50,writing:50,beatmaking:30});p.appearance.footwear='sandals';
  const result=loadProfile(storage(JSON.stringify(p)));assert.equal(result.ok,true);assert.equal(result.profile.version,3);assert.equal(result.profile.appearance.footwear,'highcanvas');assert.deepEqual(result.profile.skills,p.skills);
 });
 test('appearance aliases resolve to selectable closed models',()=>{assert.equal(normalizeAppearance({footwear:'flipflops'}).footwear,'ankleboots');assert.equal(normalizeAppearance({footwear:'sandals'}).footwear,'highcanvas');assert.deepEqual(APPEARANCE_OPTIONS.footwear.options.map(x=>x.id),['sneakers','canvas','boots','ankleboots','highcanvas']);});

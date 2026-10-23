@@ -1,15 +1,17 @@
-import {communityById} from './social-catalog.js?rev=45';
-import {normalizeSocial} from './social-state.js?rev=45';
-import {ensureBattleWindow} from './battle-windows.js?rev=45';
-import {ACK_TEMPLATES,acknowledgementFor} from './social-submission.js?rev=45';
-import {validGameMinute} from './game-minute.js?rev=45';
-import {receivePhoneEvents} from './phone-notifications.js?rev=45';
-import {publishJudgeEvents} from './social-judging-events.js?rev=45';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=45';
-import {advancePersonalDialogs} from './social-personal.js?rev=45';
-import {advanceBattleLifecycle} from './battle-judging-clock.js?rev=45';
-import {ensureSocialReactionPlans} from './social-reactions.js?rev=45';
-import {ensureCommunityPublications,publishCommunityNotices} from './social-community-publications.js?rev=45';
+import {communityById} from './social-catalog.js?rev=57';
+import {normalizeSocial} from './social-state.js?rev=57';
+import {ensureBattleWindow} from './battle-windows.js?rev=57';
+import {ACK_TEMPLATES,acknowledgementFor} from './social-submission.js?rev=57';
+import {validGameMinute} from './game-minute.js?rev=57';
+import {receivePhoneEvents} from './phone-notifications.js?rev=57';
+import {publishJudgeEvents} from './social-judging-events.js?rev=57';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=57';
+import {advancePersonalDialogs} from './social-personal.js?rev=57';
+import {advanceBattleLifecycle} from './battle-judging-clock.js?rev=57';
+import {ensureSocialReactionPlans} from './social-reactions.js?rev=57';
+import {ensureCommunityPublications,publishCommunityNotices} from './social-community-publications.js?rev=57';
+import {advanceGoblin} from './goblin-mentor.js?rev=57';
+import {advanceFilya} from './filya-calendar.js?rev=57';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export function normalizeSocialRuntime(raw){
  const seen=new Set(),events=(Array.isArray(raw?.events)?raw.events:[]).filter(e=>e&&typeof e.id==='string'&&typeof e.type==='string'&&validGameMinute(e.dueAt)&&!seen.has(e.id)&&seen.add(e.id)).map(clone);
@@ -59,7 +61,10 @@ export function advanceSocial(input,nowMinute,options={}){
   }else communityAudio[e.communityId]=[...new Set([...(communityAudio[e.communityId]??[]),e.trackVersionId])];
  }
  state={...state,social,communityAudio,battleSubmissions:submissions,phone:receivePhoneEvents(state.phone,events.filter(e=>e.type==='submission-ack')),socialRuntime:{version:1,lastMinute:nowMinute,events:[...runtime.events,...personal.events,...events]}};
- const lifecycle=advanceBattleLifecycle(state,nowMinute,options);if(lifecycle.reason)return {state:input,events:[],domainChanged:false,reason:lifecycle.reason};state=lifecycle.state;
+ // Mail delivery is independent of tournament calculation. Preserve durable
+ // acknowledgements even when a saved judge/source prevents the next round
+ // calculation; the host displays the issue and can retry it next minute.
+ const lifecycle=advanceBattleLifecycle(state,nowMinute,options);state=lifecycle.state;
  const battleEvents=lifecycle.events.map(e=>({source:SOCIAL_IDENTITY.name,sender:'Макаревич Баттл',...e})),notices=[];
  for(const roundId of new Set(battleEvents.filter(e=>e.type==='judge-review').map(e=>e.roundId))){const batch=battleEvents.filter(e=>e.type==='judge-review'&&e.roundId===roundId),last=batch.at(-1);notices.push({...last,id:'reviews:'+batch.map(e=>e.id).join('|'),type:'judge-review-batch',resultIds:batch.map(e=>e.resultId),text:'Новых отзывов о твоей работе: '+batch.length+'. Прочитай их в сообществе.'});}
  notices.push(...battleEvents.filter(e=>['judge-panel-complete','round-result'].includes(e.type)));
@@ -68,5 +73,7 @@ export function advanceSocial(input,nowMinute,options={}){
  const judged=publishJudgeEvents(state,nowMinute);
  const reacted=ensureSocialReactionPlans(judged.state,nowMinute);
  const community=publishCommunityNotices(reacted.state,nowMinute);
- return {state:community.state,domainChanged:initialized.changed||lifecycle.changed||reacted.changed||community.changed,events:[...personal.events,...events,...battleEvents,...judged.events,...community.events].sort((a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id))};
+ const goblin=advanceGoblin(community.state,nowMinute);
+ const filya=advanceFilya(goblin.state,nowMinute);
+ return {state:filya.state,domainChanged:initialized.changed||lifecycle.changed||reacted.changed||community.changed||goblin.changed||filya.changed,events:[...personal.events,...events,...battleEvents,...judged.events,...community.events,...goblin.events].sort((a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id)),...(lifecycle.reason?{warning:lifecycle.reason}:{})};
 }

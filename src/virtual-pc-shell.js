@@ -1,8 +1,8 @@
-import {PC_IDENTITY} from './pc-identity.js?rev=45';
-import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=45';
-import {createPcIcon} from './virtual-pc-icons.js?rev=45';
-import {homeDateLabel} from './home-calendar.js?rev=45';
-import {mountPcCalendar} from './pc-calendar-view.js?rev=45';
+import {PC_IDENTITY} from './pc-identity.js?rev=57';
+import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=57';
+import {createPcIcon} from './virtual-pc-icons.js?rev=57';
+import {homeDateLabel} from './home-calendar.js?rev=57';
+import {mountPcCalendar} from './pc-calendar-view.js?rev=57';
 
 export function mountPcShell(root,{onCommand}) {
   const d=root.ownerDocument,win=d.defaultView??globalThis;

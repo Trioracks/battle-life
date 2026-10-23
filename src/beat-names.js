@@ -1,4 +1,4 @@
-import {homeDateLabel} from './home-calendar.js?rev=45';
+import {homeDateLabel} from './home-calendar.js?rev=57';
 
 // Two authored word tables, all masculine singular: every pairing agrees.
 const MOODS=['Пыльный','Тихий','Ночной','Осенний','Сонный','Ламповый','Сырой','Ржавый','Северный','Тёмный','Дальний','Тёплый','Поздний','Старый','Пустой','Хриплый'];

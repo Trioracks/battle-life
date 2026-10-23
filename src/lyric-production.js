@@ -1,15 +1,15 @@
 // Persisted, symbolic writing: no copyrighted lyrics or generated prose.
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=45';
-import {BEAT_RULES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=45';
-import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=45';
-import {softwareDiskBytes} from './pc-software.js?rev=45';
-import {homeDateLabel} from './home-calendar.js?rev=45';
-import {lyricOutcomes,normalizeProductionOutcome} from './production-outcomes.js?rev=45';
-import {chooseTrackReferences,STARTING_REFERENCE_TOPICS,REFERENCE_CATALOG} from './cultural-references.js?rev=45';
-import {normalizeContentMix,createAutomaticContentMix,redistributeContentMix,CONTENT_POLICY_VERSION} from './text-content-mix.js?rev=45';
-import {currentRoundTopic} from './round-topics.js?rev=45';
-import {ROUND_LABELS} from './battle-results-table.js?rev=45';
-import {distinctProjectName} from './beat-names.js?rev=45';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=57';
+import {BEAT_RULES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=57';
+import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=57';
+import {softwareDiskBytes} from './pc-software.js?rev=57';
+import {homeDateLabel} from './home-calendar.js?rev=57';
+import {lyricOutcomes,normalizeProductionOutcome} from './production-outcomes.js?rev=57';
+import {chooseTrackReferences,STARTING_REFERENCE_TOPICS,REFERENCE_CATALOG} from './cultural-references.js?rev=57';
+import {normalizeContentMix,createAutomaticContentMix,redistributeContentMix,CONTENT_POLICY_VERSION} from './text-content-mix.js?rev=57';
+import {currentRoundTopic} from './round-topics.js?rev=57';
+import {ROUND_LABELS} from './battle-results-table.js?rev=57';
+import {distinctProjectName} from './beat-names.js?rev=57';
 
 export const LYRIC_STAGES=Object.freeze([
  {name:'Общее создание',sliders:['Ясность мысли','Развитие темы','Личное отношение'],target:[8,7,6]},
@@ -58,7 +58,7 @@ export function normalizeWriting(value,projects=[]){
   ...(Array.isArray(w.knownReferenceTopics)?{knownReferenceTopics:[...new Set(w.knownReferenceTopics.filter(g=>REFERENCE_CATALOG.some(r=>r.group===g)))]}:{})};
 }
 function normalized(input){const projects=[...(input.projects??[])];return {...input,projects,music:normalizeMusic(input.music,projects),writing:normalizeWriting(input.writing,projects)};}
-export const effectiveWritingSkill=(state,skills={})=>clamp(number(skills.writing,10)+number(state.writing?.practice));
+export const effectiveWritingSkill=(state,skills={})=>clamp(number(skills.writing)+number(state.writing?.practice));
 // Resolve legacy contentSource chains only at selection/command boundaries.
 function lyricLineage(p,byId){const seen=new Set();while(p?.contentSource?.id&&!seen.has(p.id)){seen.add(p.id);const parent=byId.get(p.contentSource.id);if(!parent)return p.contentSource.id;p=parent;}return p?.id;}
 export function latestReadyLyrics(projects=[]){

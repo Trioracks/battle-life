@@ -1,6 +1,6 @@
-import { advanceCampaign } from './game-state.js?rev=45';
-import { buyFood } from './household.js?rev=45';
-import { completeShift } from './jobs.js?rev=45';
+import { advanceCampaign } from './game-state.js?rev=57';
+import { buyFood } from './household.js?rev=57';
+import { completeShift } from './jobs.js?rev=57';
 
 export const districts = Object.freeze([
   { id: 'north-sloboda', name: 'Северная Слобода', minutes: 0, role: 'дом и супермаркет' },

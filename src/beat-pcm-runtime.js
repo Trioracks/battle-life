@@ -1,7 +1,7 @@
-import {calibratedSourceBuffer} from './audio-levels.js?rev=45';
-import {transformBeatBuffer} from './beat-result-dsp.js?rev=45';
-import {transformVocalBuffer} from './vocal-result-dsp.js?rev=45';
-import {arrangeSongBuffer} from './beat-song-form.js?rev=45';
+import {calibratedSourceBuffer} from './audio-levels.js?rev=57';
+import {transformBeatBuffer} from './beat-result-dsp.js?rev=57';
+import {transformVocalBuffer} from './vocal-result-dsp.js?rev=57';
+import {arrangeSongBuffer} from './beat-song-form.js?rev=57';
 
 // The worker uses the very same DSP as exports/previews. No sample-rate or
 // quality reduction: only ownership of the CPU work changes.

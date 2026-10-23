@@ -4,7 +4,8 @@ import {creativeFixture} from './helpers/creative-fixtures.js';
 import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from '../src/creative-workflow.js';
 import {advanceCreativeWork,creativeWorkDescriptor} from '../src/home-creative-work.js';
 import {createVirtualPcState} from '../src/virtual-pc-state.js';
-const begin=kind=>{const f=creativeFixture(kind);return {...f,state:startCreativeChain(f.state,{kind,projectId:f.projectId},f.skills,()=>.4).state};};
+// Beat fixtures start at the agreed anchor 50: one full beat earns one point.
+const begin=kind=>{const f=creativeFixture(kind,kind==='beat'?{skill:50}:{});return {...f,state:startCreativeChain(f.state,{kind,projectId:f.projectId},f.skills,()=>.4).state};};
 for(const kind of ['beat','lyrics']){
  test(kind+' three stages one run and same outcome split delta',()=>{
   const f=begin(kind),one=advanceCreativeWork(f.state,24,{day:1,minutes:1400},f.skills);

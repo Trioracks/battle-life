@@ -1,9 +1,9 @@
-import {SOCIAL_COMMUNITIES,communityById} from './social-catalog.js?rev=45';
-import {publicRoundAnnouncements} from './round-topics.js?rev=45';
-import {judgeProfile} from './judge-profiles.js?rev=45';
-import {validGameMinute} from './game-minute.js?rev=45';
-import {receivePhoneEvents,retirePhoneNotices} from './phone-notifications.js?rev=45';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=45';
+import {SOCIAL_COMMUNITIES,communityById} from './social-catalog.js?rev=57';
+import {publicRoundAnnouncements} from './round-topics.js?rev=57';
+import {judgeProfile} from './judge-profiles.js?rev=57';
+import {validGameMinute} from './game-minute.js?rev=57';
+import {receivePhoneEvents,retirePhoneNotices} from './phone-notifications.js?rev=57';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=57';
 
 const record=v=>v&&typeof v==='object'&&!Array.isArray(v);
 const ordered=(a,b)=>a.at-b.at||a.id.localeCompare(b.id);

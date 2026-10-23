@@ -17,8 +17,8 @@ test('messages search names and history, folds case/yo, keeps input focus on tim
  input.value='вЕРНу';fire(input,'input');assert.ok(findButton(s.root,'Витя Кольцов'));s.view.update();assert.equal(s.d.activeElement,input);
  input.value='увидимся еще';fire(input,'input');assert.ok(findButton(s.root,'Анна Лесная'));findButton(s.root,'Анна Лесная').click();assert.equal(s.address,'underweb://social/dialog/anya');s.view.dispose();
 });
-test('personal histories have dates and no track submission or reply composer',()=>{
- for(const id of ['anya','dasha','vitya']){const s=setup('dialog/'+id);assert.ok(allPc(s.root).some(n=>n.textContent?.includes(id==='anya'?'2011':'2012')));assert.equal(findButton(s.root,'Прикрепить'),undefined);assert.equal(findButton(s.root,'Отправить'),undefined);assert.equal(allPc(s.root).some(n=>n.tagName==='TEXTAREA'),false);if(id==='vitya')assert.ok(findButton(s.root,'Заблокировать и удалить из друзей'));s.view.dispose();}
+test('personal histories keep dates and a disabled composer without inventing answers',()=>{
+ for(const id of ['anya','dasha','vitya']){const s=setup('dialog/'+id);assert.ok(allPc(s.root).some(n=>n.textContent?.includes(id==='anya'?'2011':'2012')));assert.equal(findButton(s.root,'Прикрепить'),undefined);assert.equal(findButton(s.root,'Отправить').disabled,true);assert.equal(findButton(s.root,'Ответить').disabled,true);const field=allPc(s.root).find(n=>n.tagName==='TEXTAREA');assert.equal(field.readOnly,true);assert.equal(field.disabled,true);if(id==='vitya')assert.ok(findButton(s.root,'Заблокировать и удалить из друзей'));s.view.dispose();}
 });
 test('the whole dialog row is a native keyboard button including avatar and preview',()=>{
  const s=setup(),row=allPc(s.root).find(n=>n.className?.split(' ').includes('sn-message-row')&&n.getAttribute('aria-label')==='Анна Лесная');assert.ok(row);assert.equal(row.tagName,'BUTTON');assert.ok(allPc(row).some(n=>n.className==='sn-avatar'));assert.ok(allPc(row).some(n=>n.tagName==='P'));assert.equal(allPc(row).filter(n=>n.tagName==='BUTTON').length,1);row.click();assert.equal(s.address,'underweb://social/dialog/anya');s.view.dispose();

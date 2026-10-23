@@ -54,7 +54,7 @@ export async function buildPreview({root=fileURLToPath(new URL('../',import.meta
     if((!relative&&['src','vendor','data','assets'].includes(entry.name))||relative&& !/^assets\/audio(?:\/|$)/.test(name))await walk(name);
     else if(name==='assets/audio')await walk(name);
     else if(name==='assets/audio/pc')await walk(name);
-    else if(name==='assets/audio/ft'||/^assets\/audio\/ft\/(?:npc-(?:jura|artem|gans|kapa)-v1|jura-experimental-v2)$/.test(name))await walk(name);
+    else if(name==='assets/audio/ft'||/^assets\/audio\/ft\/(?:npc-(?:jura|artem|gans|kapa)-v1|jura-experimental-v2|abstract-v1|experimental-leads-v1|npc-daniel-v1|npc-kapa-v2)$/.test(name))await walk(name);
    }else if(!publicationPathReason(name,'site')&&name!=='legacy.html'){
     if(entry.isSymbolicLink())throw Error(`Linked runtime input: ${name}`);
     const info=await fs.lstat(path.join(root,name));if(!info.isFile())throw Error(`Non-regular runtime input: ${name}`);inventory.set(name,info.size);

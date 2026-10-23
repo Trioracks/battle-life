@@ -1,7 +1,7 @@
-import {NPC_VOCAL_CATALOG} from './npc-vocal-catalog.js?rev=45';
-import {beginnerById} from './beat-beginner-bank.js?rev=45';
-import {drumById} from './beat-catalog.js?rev=45';
-export function npcPlaybackDescriptor(version,vocalCatalog=NPC_VOCAL_CATALOG){
+import {NPC_VOCAL_SOURCES} from './npc-vocal-catalog.js?rev=57';
+import {beginnerById} from './beat-beginner-bank.js?rev=57';
+import {drumById} from './beat-catalog.js?rev=57';
+export function npcPlaybackDescriptor(version,vocalCatalog=NPC_VOCAL_SOURCES){
  if(!version?.npc||!Array.isArray(version.npc.requiredAssets)||version.npc.requiredAssets.some(a=>!a||typeof a.id!=='string')||!Array.isArray(version.recipe?.descriptor?.parts)||version.recipe.descriptor.parts.some(p=>!p||typeof p.id!=='string'))return {ok:false,reason:'Версия NPC недоступна.',missingAssets:[]};
  const requirements=version.npc.requiredAssets.filter(a=>a.kind==='vocal'),descriptor=structuredClone(version.recipe.descriptor);
  const validInstrument=id=>['primitive','melody','bass'].includes(id)||Boolean(beginnerById(id)||drumById(id));

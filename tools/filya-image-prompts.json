@@ -1,0 +1,127 @@
+[
+  {
+    "id": "village",
+    "ref": "D:/Music/game/МЦ Филя/photo_2021-03-05_16-21-15.jpg",
+    "prompt": "Use case: style-transfer. Asset type: in-game social-network photo, square. Input image: edit target. Redraw the photograph completely as a coarse low-poly 3D PS1-era game scene, visibly faceted geometry, low-resolution textures and gentle dithering, muted lived-in Russian everyday life. Not a triangle mosaic filter over a photo, not photorealistic. Keep the man in olive parka crouching on the tiny board in snowy village; glasses and beard recognizable. Preserve composition and important subjects. Adapt visual era to 2012, no watermarks, no added captions. One image, not a collage."
+  },
+  {
+    "id": "snow",
+    "ref": "D:/Music/game/МЦ Филя/photo_2021-03-05_16-23-19.jpg",
+    "prompt": "Use case: style-transfer. Asset type: in-game social-network photo, square. Input image: edit target. Redraw the photograph completely as a coarse low-poly 3D PS1-era game scene, visibly faceted geometry, low-resolution textures and gentle dithering, muted lived-in Russian everyday life. Not a triangle mosaic filter over a photo, not photorealistic. Keep frozen river, snow, pine forest and blue winter sky. Preserve composition and important subjects. Adapt visual era to 2012, no watermarks, no added captions. One image, not a collage."
+  },
+  {
+    "id": "portrait",
+    "ref": "D:/Music/game/МЦ Филя/photo_2021-10-14_14-45-25.jpg",
+    "prompt": "Use case: style-transfer. Asset type: in-game social-network photo, square. Input image: edit target. Redraw the photograph completely as a coarse low-poly 3D PS1-era game scene, visibly faceted geometry, low-resolution textures and gentle dithering, muted lived-in Russian everyday life. Not a triangle mosaic filter over a photo, not photorealistic. Keep the expressive face, messy upward brown hair, rectangular glasses down nose, short beard, grey shirt. Close portrait usable as avatar. Preserve composition and important subjects. Adapt visual era to 2012, no watermarks, no added captions. One image, not a collage."
+  },
+  {
+    "id": "bass",
+    "ref": "D:/Music/game/МЦ Филя/photo_2022-08-16_11-49-55.jpg",
+    "prompt": "Use case: style-transfer. Asset type: in-game social-network photo, square. Input image: edit target. Redraw the photograph completely as a coarse low-poly 3D PS1-era game scene, visibly faceted geometry, low-resolution textures and gentle dithering, muted lived-in Russian everyday life. Not a triangle mosaic filter over a photo, not photorealistic. Keep the black four-string electric bass against wall and radiator, casual rehearsal-room photo. Preserve composition and important subjects. Adapt visual era to 2012, no watermarks, no added captions. One image, not a collage."
+  },
+  {
+    "id": "concert",
+    "ref": "D:/Music/game/МЦ Филя/photo_2023-08-01_01-47-31.jpg",
+    "prompt": "Use case: style-transfer. Asset type: in-game social-network photo, square. Input image: edit target. Redraw the photograph completely as a coarse low-poly 3D PS1-era game scene, visibly faceted geometry, low-resolution textures and gentle dithering, muted lived-in Russian everyday life. Not a triangle mosaic filter over a photo, not photorealistic. Keep the basement music gathering and recognizable group poses, microphone and decks, raised arm, red varsity jacket, shiny insulation. Preserve composition and important subjects. Adapt visual era to 2012, no watermarks, no added captions. One image, not a collage."
+  },
+  {
+    "id": "gym",
+    "ref": "D:/Music/game/МЦ Филя/photo_2023-08-01_23-25-43.jpg",
+    "prompt": "Use case: style-transfer. Asset type: in-game social-network photo, square. Input image: edit target. Redraw the photograph completely as a coarse low-poly 3D PS1-era game scene, visibly faceted geometry, low-resolution textures and gentle dithering, muted lived-in Russian everyday life. Not a triangle mosaic filter over a photo, not photorealistic. Keep gym mirror selfie framing, black sports clothes, bottle, squat rack and barbell. Preserve composition and important subjects. Adapt visual era to 2012, no watermarks, no added captions. One image, not a collage."
+  },
+  {
+    "id": "shoes",
+    "ref": "D:/Music/game/МЦ Филя/photo_2023-10-09_11-43-46.jpg",
+    "prompt": "Use case: style-transfer. Asset type: in-game social-network photo, square. Input image: edit target. Redraw the photograph completely as a coarse low-poly 3D PS1-era game scene, visibly faceted geometry, low-resolution textures and gentle dithering, muted lived-in Russian everyday life. Not a triangle mosaic filter over a photo, not photorealistic. Keep passenger viewpoint looking at shiny black shoes on worn bus floor, seat back and bag. Replace ad with indistinct colored shapes, no text. Preserve composition and important subjects. Adapt visual era to 2012, no watermarks, no added captions. One image, not a collage."
+  },
+  {
+    "id": "beard",
+    "ref": "D:/Music/game/МЦ Филя/photo_2023-10-09_11-43-47.jpg",
+    "prompt": "Use case: style-transfer. Asset type: in-game social-network photo, square. Input image: edit target. Redraw the photograph completely as a coarse low-poly 3D PS1-era game scene, visibly faceted geometry, low-resolution textures and gentle dithering, muted lived-in Russian everyday life. Not a triangle mosaic filter over a photo, not photorealistic. Keep close-up of grumpy mouth and graying beard, glasses rim and dark turtleneck. Preserve composition and important subjects. Adapt visual era to 2012, no watermarks, no added captions. One image, not a collage."
+  },
+  {
+    "id": "work",
+    "ref": "D:/Music/game/МЦ Филя/photo_2024-10-01_22-19-35.jpg",
+    "prompt": "Use case: style-transfer. Asset type: in-game social-network photo, square. Input image: edit target. Redraw the photograph completely as a coarse low-poly 3D PS1-era game scene, visibly faceted geometry, low-resolution textures and gentle dithering, muted lived-in Russian everyday life. Not a triangle mosaic filter over a photo, not photorealistic. Keep bespectacled bearded man in black hooded jacket taking mirror selfie by apartment door and old intercom. Make phone an ordinary early-2010s phone. Preserve composition and important subjects. Adapt visual era to 2012, no watermarks, no added captions. One image, not a collage."
+  },
+  {
+    "id": "mockumentary",
+    "ref": "D:/Music/game/МЦ Филя/photo_2025-06-30_02-59-31.jpg",
+    "prompt": "Use case: style-transfer. Asset type: in-game social-network photo, square. Input image: edit target. Redraw the photograph completely as a coarse low-poly 3D PS1-era game scene, visibly faceted geometry, low-resolution textures and gentle dithering, muted lived-in Russian everyday life. Not a triangle mosaic filter over a photo, not photorealistic. Reinterpret the blurry green night-vision movie still as low-poly found-footage scene: startled person clambering into dark window, absurdly mundane not gory. Remove source captions. Preserve composition and important subjects. Adapt visual era to 2012, no watermarks, no added captions. One image, not a collage."
+  },
+  {
+    "id": "knights",
+    "ref": "D:/Music/game/МЦ Филя/photo_2025-12-05_16-58-17.jpg",
+    "prompt": "Use case: style-transfer. Asset type: in-game social-network photo, square. Input image: edit target. Redraw the photograph completely as a coarse low-poly 3D PS1-era game scene, visibly faceted geometry, low-resolution textures and gentle dithering, muted lived-in Russian everyday life. Not a triangle mosaic filter over a photo, not photorealistic. Keep big long-haired electric guitarist at microphone and two enthusiastically singing men either side, especially shouting man on right. Remove captions. Preserve composition and important subjects. Adapt visual era to 2012, no watermarks, no added captions. One image, not a collage."
+  },
+  {
+    "id": "tribe",
+    "ref": "D:/Music/game/МЦ Филя/photo_2025-12-16_13-52-07.jpg",
+    "prompt": "Use case: style-transfer. Asset type: in-game social-network photo, square. Input image: edit target. Redraw the photograph completely as a coarse low-poly 3D PS1-era game scene, visibly faceted geometry, low-resolution textures and gentle dithering, muted lived-in Russian everyday life. Not a triangle mosaic filter over a photo, not photorealistic. Reinterpret the bearded bespectacled leader on a chair as a playful fictional prehistoric beatmaking club, friends drumming on pots around him. Warm orange sunset, angular rocks, absurd music lesson. No captions or stereotype emphasis. Preserve composition and important subjects. Adapt visual era to 2012, no watermarks, no added captions. One image, not a collage."
+  },
+  {
+    "id": "mask",
+    "ref": "D:/Music/game/МЦ Филя/photo_2026-03-01_21-55-05.jpg",
+    "prompt": "Use case: style-transfer. Asset type: in-game social-network photo, square. Input image: edit target. Redraw the photograph completely as a coarse low-poly 3D PS1-era game scene, visibly faceted geometry, low-resolution textures and gentle dithering, muted lived-in Russian everyday life. Not a triangle mosaic filter over a photo, not photorealistic. Keep homemade angular metal rap mask, grey knit cap, black hood and playful hands near camera. Preserve identity and candid pose. Preserve composition and important subjects. Adapt visual era to 2012, no watermarks, no added captions. One image, not a collage."
+  },
+  {
+    "id": "shirt",
+    "ref": "D:/Music/game/МЦ Филя/photo_2026-04-17_12-54-15.jpg",
+    "prompt": "Use case: style-transfer. Asset type: in-game social-network photo, square. Input image: edit target. Redraw the photograph completely as a coarse low-poly 3D PS1-era game scene, visibly faceted geometry, low-resolution textures and gentle dithering, muted lived-in Russian everyday life. Not a triangle mosaic filter over a photo, not photorealistic. Extract only the black Che Guevara graphic T-shirt concept and redraw as a low-poly shirt laid on a Soviet apartment sofa. No shopping UI, prices, text overlays. Preserve composition and important subjects. Adapt visual era to 2012, no watermarks, no added captions. One image, not a collage."
+  },
+  {
+    "id": "road",
+    "ref": "D:/Music/game/МЦ Филя/photo_2026-04-21_16-18-37.jpg",
+    "prompt": "Use case: style-transfer. Asset type: in-game social-network photo, square. Input image: edit target. Redraw the photograph completely as a coarse low-poly 3D PS1-era game scene, visibly faceted geometry, low-resolution textures and gentle dithering, muted lived-in Russian everyday life. Not a triangle mosaic filter over a photo, not photorealistic. Keep front view of dirty white compact car at night on wet road, two friends visible inside, headlights and street lamps. No readable plate. Preserve composition and important subjects. Adapt visual era to 2012, no watermarks, no added captions. One image, not a collage."
+  },
+  {
+    "id": "jeans",
+    "ref": "D:/Music/game/МЦ Филя/photo_2021-10-14_14-45-25.jpg",
+    "prompt": "Use case: stylized-concept. Asset type: square artwork for a 2012 in-game social-network post. Input image: character identity reference only, not composition. The bespectacled short-bearded young man from the reference at an old CRT computer in a cramped Soviet bedroom, oversized blue jeans drying on a line above his head, quietly making a beat. Warm desk lamp. Preserve recognizable brown hair, rectangular dark glasses and short brown beard from reference. Coarse low-poly 3D PS1-era game rendering, faceted simple geometry, low-res textures and gentle dithering, muted cream/olive/brown palette with natural scene colors, lived-in grounded everyday underground-music atmosphere. No photorealism, no triangle photo filter, no captions, logos or watermarks. One image, not a collage."
+  },
+  {
+    "id": "cloud",
+    "ref": "D:/Music/game/МЦ Филя/photo_2021-10-14_14-45-25.jpg",
+    "prompt": "Use case: stylized-concept. Asset type: square artwork for a 2012 in-game social-network post. Input image: character identity reference only, not composition. Same man in olive jacket and glasses standing under a dull bus shelter, one small cloud reflected in a puddle beside his shoes, concrete apartment blocks. Understated overcast afternoon. Preserve recognizable brown hair, rectangular dark glasses and short brown beard from reference. Coarse low-poly 3D PS1-era game rendering, faceted simple geometry, low-res textures and gentle dithering, muted cream/olive/brown palette with natural scene colors, lived-in grounded everyday underground-music atmosphere. No photorealism, no triangle photo filter, no captions, logos or watermarks. One image, not a collage."
+  },
+  {
+    "id": "cosmic",
+    "ref": "D:/Music/game/МЦ Филя/photo_2021-10-14_14-45-25.jpg",
+    "prompt": "Use case: stylized-concept. Asset type: square artwork for a 2012 in-game social-network post. Input image: character identity reference only, not composition. Same man with glasses and short beard at a kitchen window looking through a homemade cardboard telescope while a kettle steams, the tiny courtyard looks like his personal cosmos. Preserve recognizable brown hair, rectangular dark glasses and short brown beard from reference. Coarse low-poly 3D PS1-era game rendering, faceted simple geometry, low-res textures and gentle dithering, muted cream/olive/brown palette with natural scene colors, lived-in grounded everyday underground-music atmosphere. No photorealism, no triangle photo filter, no captions, logos or watermarks. One image, not a collage."
+  },
+  {
+    "id": "dance",
+    "ref": "D:/Music/game/МЦ Филя/photo_2021-10-14_14-45-25.jpg",
+    "prompt": "Use case: stylized-concept. Asset type: square artwork for a 2012 in-game social-network post. Input image: character identity reference only, not composition. Same man awkwardly trying one dance move alone in a small rehearsal room beside a battered speaker and winter boots. Quiet self-irony, not caricature. Preserve recognizable brown hair, rectangular dark glasses and short brown beard from reference. Coarse low-poly 3D PS1-era game rendering, faceted simple geometry, low-res textures and gentle dithering, muted cream/olive/brown palette with natural scene colors, lived-in grounded everyday underground-music atmosphere. No photorealism, no triangle photo filter, no captions, logos or watermarks. One image, not a collage."
+  },
+  {
+    "id": "jazz",
+    "ref": "D:/Music/game/МЦ Филя/photo_2021-10-14_14-45-25.jpg",
+    "prompt": "Use case: stylized-concept. Asset type: square artwork for a 2012 in-game social-network post. Input image: character identity reference only, not composition. Same man with glasses and short beard listening to records at a kitchen table, cheap headphones, scratched vinyl, tea and half-eaten sandwich. Late-night jazz feeling. Preserve recognizable brown hair, rectangular dark glasses and short brown beard from reference. Coarse low-poly 3D PS1-era game rendering, faceted simple geometry, low-res textures and gentle dithering, muted cream/olive/brown palette with natural scene colors, lived-in grounded everyday underground-music atmosphere. No photorealism, no triangle photo filter, no captions, logos or watermarks. One image, not a collage."
+  },
+  {
+    "id": "midwest",
+    "ref": "D:/Music/game/МЦ Филя/photo_2021-10-14_14-45-25.jpg",
+    "prompt": "Use case: stylized-concept. Asset type: square artwork for a 2012 in-game social-network post. Input image: character identity reference only, not composition. Same man carrying a guitar case beside old garages and railway tracks on a grey autumn evening, apartment blocks in background, grounded Russian suburb. Preserve recognizable brown hair, rectangular dark glasses and short brown beard from reference. Coarse low-poly 3D PS1-era game rendering, faceted simple geometry, low-res textures and gentle dithering, muted cream/olive/brown palette with natural scene colors, lived-in grounded everyday underground-music atmosphere. No photorealism, no triangle photo filter, no captions, logos or watermarks. One image, not a collage."
+  },
+  {
+    "id": "guitar",
+    "ref": "D:/Music/game/МЦ Филя/photo_2021-10-14_14-45-25.jpg",
+    "prompt": "Use case: stylized-concept. Asset type: square artwork for a 2012 in-game social-network post. Input image: character identity reference only, not composition. Same man quietly playing a cheap acoustic guitar by a rain-streaked apartment window, cat asleep on radiator, intimate dim light. Preserve recognizable brown hair, rectangular dark glasses and short brown beard from reference. Coarse low-poly 3D PS1-era game rendering, faceted simple geometry, low-res textures and gentle dithering, muted cream/olive/brown palette with natural scene colors, lived-in grounded everyday underground-music atmosphere. No photorealism, no triangle photo filter, no captions, logos or watermarks. One image, not a collage."
+  },
+  {
+    "id": "sea",
+    "ref": "D:/Music/game/МЦ Филя/photo_2021-10-14_14-45-25.jpg",
+    "prompt": "Use case: stylized-concept. Asset type: square artwork for a 2012 in-game social-network post. Input image: character identity reference only, not composition. Same man in glasses on the bank of an ordinary local river, plastic chair at water edge as if a seaside holiday, modest fishing boats in distance. Preserve recognizable brown hair, rectangular dark glasses and short brown beard from reference. Coarse low-poly 3D PS1-era game rendering, faceted simple geometry, low-res textures and gentle dithering, muted cream/olive/brown palette with natural scene colors, lived-in grounded everyday underground-music atmosphere. No photorealism, no triangle photo filter, no captions, logos or watermarks. One image, not a collage."
+  },
+  {
+    "id": "soviet",
+    "ref": "D:/Music/game/МЦ Филя/photo_2021-10-14_14-45-25.jpg",
+    "prompt": "Use case: stylized-concept. Asset type: square artwork for a 2012 in-game social-network post. Input image: character identity reference only, not composition. Same man testing a bass guitar next to a cast-iron radiator in a wallpapered Soviet living room, worn rug and CRT, cable tangled around one slipper. Preserve recognizable brown hair, rectangular dark glasses and short brown beard from reference. Coarse low-poly 3D PS1-era game rendering, faceted simple geometry, low-res textures and gentle dithering, muted cream/olive/brown palette with natural scene colors, lived-in grounded everyday underground-music atmosphere. No photorealism, no triangle photo filter, no captions, logos or watermarks. One image, not a collage."
+  },
+  {
+    "id": "drums",
+    "ref": "D:/Music/game/МЦ Филя/photo_2021-10-14_14-45-25.jpg",
+    "prompt": "Use case: stylized-concept. Asset type: square artwork for a 2012 in-game social-network post. Input image: character identity reference only, not composition. Same man in glasses practicing rhythms with two pencils on kitchen pots in evening light, headphones, ordinary small kitchen, a thoughtful rather than exaggerated expression. Preserve recognizable brown hair, rectangular dark glasses and short brown beard from reference. Coarse low-poly 3D PS1-era game rendering, faceted simple geometry, low-res textures and gentle dithering, muted cream/olive/brown palette with natural scene colors, lived-in grounded everyday underground-music atmosphere. No photorealism, no triangle photo filter, no captions, logos or watermarks. One image, not a collage."
+  }
+]
