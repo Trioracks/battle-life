@@ -37,11 +37,11 @@ test('Goblin answer selection types a durable draft and requires a separate send
  findButton(f.view.root,'Отправить').click();assert.equal(f.state.social.goblin.stage,'invite-wait');assert.equal(f.state.social.dialogs[GOBLIN_ID].messages.length,before+1);assert.equal(f.state.social.dialogs[GOBLIN_ID].replyDraft,null);f.view.dispose();
 });
 
-test('Goblin mood wait reports real queued game time and reveals the real invite choices',()=>{
+test('Goblin mood allows immediate questions and fallback still reveals the invitation',()=>{
  let state=advanceGoblin(advanceGoblin(createVirtualPcState({power:'on'}),0).state,20).state;
  state=advanceGoblin(replyToGoblin(state,'good',20).state,30).state;const f=goblin(state,30);
- assert.ok(allPc(f.view.root).some(n=>n.textContent?.includes('через 10 игровых минут')));
- assert.equal(findButton(f.view.root,'Ответить').disabled,true);
+ assert.equal(allPc(f.view.root).some(n=>n.textContent?.includes('через 10 игровых минут')),false);
+ assert.equal(findButton(f.view.root,'Ответить').disabled,false);findButton(f.view.root,'Ответить').click();assert.ok(findButton(f.view.root,'О, чё за музыка?'));
  f.state=advanceGoblin(f.state,60).state;f.setMinute(60);f.view.update();findButton(f.view.root,'Ответить').click();assert.ok(findButton(f.view.root,'О, круто! А чё дальше?'));f.view.dispose();
 });
 

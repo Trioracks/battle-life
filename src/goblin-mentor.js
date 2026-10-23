@@ -1,3 +1,4 @@
+import {goblinReplyContext,goblinContextResponse,deliverGoblinMessage,goblinFollowupPlan} from './goblin-conversation.js?rev=57';
 import {GOBLIN_ID,GOBLIN_NAME,GOBLIN_DIALOGUE,GOBLIN_RELEASES,GOBLIN_INITIAL_POSTS,normalizeGoblin} from './goblin-catalog.js?rev=57';
 import {receivePhoneEvents} from './phone-notifications.js?rev=57';
 import {validGameMinute} from './game-minute.js?rev=57';
@@ -10,7 +11,7 @@ const links={
  battle:{label:'Макаревич Battle',url:battle},
 };
 function hash(value){let h=2166136261;for(const c of String(value))h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0;}
-export const goblinPostChance=days=>Math.max(0,Math.min(100,(days-1)*5));
+export const goblinPostChance=days=>Number.isFinite(days)?Math.max(0,Math.min(100,(days-21)*5)):0;
 function writable(state){
  const g=normalizeGoblin(state.social?.goblin),dialog=structuredClone(state.social?.dialogs?.[GOBLIN_ID]??{peer:{kind:'person',id:GOBLIN_ID},messages:[],unread:false});
  return {state:{...state,social:{...state.social,goblin:g,dialogs:{...state.social?.dialogs,[GOBLIN_ID]:dialog}}},g,dialog};
@@ -20,12 +21,13 @@ export function advanceGoblin(input,now){
  if(!validGameMinute(now))return {state:input,events:[],changed:false};
  const old=input.social?.goblin;
  if(old?.startedAt!==null&&old?.startedAt!==undefined&&now<old.startedAt)return {state:input,events:[],changed:false};
- const needsInit=old?.startedAt==null;
+ const needsInit=old?.startedAt==null,followup=goblinFollowupPlan(input,now);
  const due=needsInit||old.pending.some(m=>m.at<=now)||(old.nextDay!==null&&old.nextDay*1440<=now)||(old.scheduled?.at<=now);
  const install=old?.stage==='client'&&input.software?.client?.installed||old?.stage==='software'&&input.software?.notebook?.installed;
  const ft=old?.ftPromptAt!==null&&old?.ftPromptAt!==undefined&&!old.ftReminder&&(input.software?.ft?.installed||now>=old.ftPromptAt+480);
- if(!due&&!install&&!ft)return {state:input,events:[],changed:false};
+ if(!due&&!install&&!ft&&!followup.changed)return {state:input,events:[],changed:false};
  const {state,g,dialog}=writable(input),events=[];
+ if(followup.changed){g.followupSeen=followup.seen;g.lastSmallTalkAt=followup.lastSmallTalkAt;for(const m of followup.messages){const {id,at,body,...extra}=m;queue(g,id,at,body,extra);}}
  if(needsInit){
   g.startedAt=now;g.nextDay=Math.floor(now/1440)+1;g.lastPostDay=Math.floor(now/1440);
   g.posts=structuredClone(GOBLIN_INITIAL_POSTS);
@@ -43,12 +45,7 @@ export function advanceGoblin(input,now){
  }
  if(ft){g.ftReminder=true;queue(g,'ft-check',now+10,input.software?.ft?.installed?GOBLIN_DIALOGUE['ft-ready']:GOBLIN_DIALOGUE['ft-check'],{links:[links.ft]});}
  for(const msg of g.pending.filter(m=>m.at<=now).sort((a,b)=>a.at-b.at)){
-  const id='goblin:'+msg.id;
-  if(!dialog.messages.some(m=>m.id===id)){
-   const {nextStage,...rest}=msg;dialog.messages.push({...rest,id,kind:'personal',sender:GOBLIN_ID});dialog.unread=true;
-   events.push({id,type:'personal-message',source:'В кругу',sender:GOBLIN_NAME,profileId:GOBLIN_ID,dialogId:GOBLIN_ID,dueAt:msg.at,text:msg.body});
-   if(nextStage)g.stage=nextStage;
-  }
+  const event=deliverGoblinMessage(g,dialog,msg,msg.at);if(event)events.push(event);
  }
  g.pending=g.pending.filter(m=>m.at>now);
  // Daily, bounded bookkeeping in the social worker. Never decode audio here.
@@ -78,20 +75,14 @@ export function advanceGoblin(input,now){
  state.phone=receivePhoneEvents(state.phone,events);
  return {state,events,changed:true};
 }
-export function goblinChoices(state){
- const g=state.social?.goblin;
- if(g?.stage==='hello')return [['good','Хорошо! Сам как?'],['normal','Нормально, сам как?'],['bad','Да так себе...']];
- if(g?.stage==='invite')return [['yes','О, круто! А чё дальше?'],['later','Я пока сам разберусь']];
- if(g?.stage==='subscribe')return [['subscribed','Я подписался, что дальше?']];
- if(g?.stage==='paused')return [['resume','Чувак, давай всё-таки попробуем']];
- return [];
-}
+export function goblinChoices(state){return goblinReplyContext(state).choices;}
 export function replyToGoblin(input,choice,now){
- const found=goblinChoices(input).find(([id])=>id===choice);
+ const found=goblinReplyContext(input,now).choices.find(([id])=>id===choice);
  if(!found||!validGameMinute(now))return {ok:false,state:input,reason:'Этот ответ уже недоступен.'};
  if(choice==='subscribed'&&!input.social?.subscriptions?.includes('makarevich-1'))return {ok:false,state:input,reason:'Сначала подпишись на Макаревич Battle по ссылке в чате.'};
  const {state,g,dialog}=writable(input);
- dialog.messages.push({id:'goblin:reply:'+g.stage+':'+choice,kind:'personal',sender:'player',at:now,body:found[1]});
+ g.replySequence=(g.replySequence??0)+1;
+ dialog.messages.push({id:'goblin:reply:'+g.stage+':'+choice+':'+g.replySequence,kind:'personal',sender:'player',at:now,body:found[1]});
  if(['good','normal','bad'].includes(choice)){
   g.stage='invite-wait';
   queue(g,'mood',now+10,choice==='bad'?GOBLIN_DIALOGUE['mood-bad']:GOBLIN_DIALOGUE.mood);
@@ -99,10 +90,17 @@ export function replyToGoblin(input,choice,now){
   queue(g,'company',now+30,GOBLIN_DIALOGUE['company']);
   queue(g,'invite',now+40,GOBLIN_DIALOGUE['invite'],{links:[links.battle],nextStage:'invite'});
  }else if(choice==='yes'||choice==='resume'){
+  g.pending=g.pending.filter(m=>!['biography','company','invite'].includes(m.id));
   g.stage='subscribe';queue(g,'subscribe-'+choice,now+10,GOBLIN_DIALOGUE.subscribe,{links:[links.battle]});
  }else if(choice==='later'){g.stage='paused';queue(g,'later',now+10,GOBLIN_DIALOGUE['later']);}
  else if(choice==='subscribed'){
   g.stage='client';queue(g,'client-link',now+10,GOBLIN_DIALOGUE['client-link'],{links:[links.client]});
+ }
+ if(!['good','normal','bad','yes','resume','later','subscribed'].includes(choice)){
+  const response=goblinContextResponse(input,choice,now);if(!response)return {ok:false,state:input,reason:'Этот ответ уже недоступен.'};
+  g.contextUsed=[...(g.contextUsed??[]),g.stage+':'+choice];if(response.cancel)g.pending=g.pending.filter(m=>!response.cancel.includes(m.id));
+  if(['music','old-band'].includes(choice)){const invite=g.pending.find(m=>m.id==='invite');if(invite){invite.at=now+2;invite.activeElapsedSeconds=0;}}
+  queue(g,'context:'+g.stage+':'+choice,now+1,response.body,{...(response.links?{links:response.links}:{})});if(response.clearFollowup)g.activeFollowup=null;
  }
  return {ok:true,state,reason:''};
 }

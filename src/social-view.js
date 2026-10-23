@@ -35,7 +35,7 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
   // The native full-length songs must not be rebuilt on unrelated deadline
   // ticks or incoming tutorial messages. Only visible profile data can change it.
   const s=getState(),now=metadataGameMinute(getMetadata());
-  if(route.section==='profile'&&route.profileId==='mak-npc-06')return JSON.stringify([s.social?.goblin?.posts,s.social?.goblin?.likes,(s.battleHistory?.entries??[]).filter(e=>e.participantId==='mak-npc-06'&&e.occurredAt<=now),Object.keys(s.trackVersions?.byId??{})]);
+  if(route.section==='profile'&&route.profileId==='mak-npc-06')return JSON.stringify([s.social?.goblin?.posts,s.social?.goblin?.likes,(s.socialRuntime?.events??[]).filter(e=>e.type==='round-result'&&e.dueAt<=now),(s.battleHistory?.entries??[]).filter(e=>e.participantId==='mak-npc-06'&&e.occurredAt<=now),Object.keys(s.trackVersions?.byId??{})]);
   if(route.section==='profile'&&route.profileId==='mc-filya')return JSON.stringify([s.social?.filya?.posts,s.social?.filya?.likes]);
   return JSON.stringify([publications().ids,publications().counts,reactionVisibilitySignature(s,now),Object.keys(s.rapAnalysis?.reports??{}),s.social,Object.keys(s.trackVersions?.byId??{}),s.communityAudio,s.battleSubmissions,s.battleApplications,s.socialRuntime?.events,s.battleKnowledge,getMetadata().playerName,getMetadata().portraitKey,(s.battleWindows??[]).map(w=>battleDeadlineLabel(w,now))]);
  };

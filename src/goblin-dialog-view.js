@@ -1,3 +1,4 @@
+import {advanceGoblinActiveChat,goblinReplyContext} from './goblin-conversation.js?rev=57';
 import {pcElement as el} from './virtual-pc-dom.js?rev=57';
 import {socialButton,socialHeading,socialPeerLink,socialLink} from './social-dom.js?rev=57';
 import {GOBLIN_ID,GOBLIN_PROFILE} from './goblin-catalog.js?rev=57';
@@ -16,7 +17,7 @@ export function mountGoblinDialog(d,{getState,getMetadata,navigate,commit,audio,
  const peer={kind:'person',id:GOBLIN_ID},heading=socialHeading(d,'Сообщения · ');heading.append(socialPeerLink(d,peer,GOBLIN_PROFILE.name,navigate));
  layout.head.append(heading,socialButton(d,'← Мои сообщения',()=>navigate('underweb://social/messages'),{className:'sn-link'}));
  const field=dialogMessageField(d),actions=el(d,'div',{className:'sn-actions'}),options=el(d,'div',{className:'sn-dialog-options'}),attachment=el(d,'div',{className:'sn-dialog-attachment'}),draftLabel=el(d,'p',{className:'sn-note'}),progress=el(d,'p',{className:'sn-note',attributes:{'aria-live':'polite'}}),guidance=el(d,'div',{className:'sn-dialog-guidance'}),keyboard=createLyricWorkAudio({volume:.014});
- let signature='',actionSignature='',guidanceStage='',readId='',disposed=false,blocked=false,error='',pendingSeconds=0,flushing=false;
+ let signature='',actionSignature='',guidanceStage='',readId='',disposed=false,blocked=false,error='',pendingSeconds=0,pendingChatSeconds=0,flushing=false;
  const now=()=>getMetadata().gameMinutes;
  const draft=()=>getState().social?.dialogs?.[GOBLIN_ID]?.replyDraft;
  const saveDraft=value=>commit({ok:true,state:withDraft(getState(),value)});
@@ -43,7 +44,12 @@ export function mountGoblinDialog(d,{getState,getMetadata,navigate,commit,audio,
  options.hidden=true;attachment.hidden=true;actions.append(send,answer,attach,cancel);layout.footer.append(draftLabel,field,actions,progress,options,attachment,guidance,notice);
  const run=result=>{if(commit(result)){error=result.reason??'';update(false);}else{error=result.reason??'Не удалось сохранить.';notice.textContent=error;}};
  function tickOutgoingMessage(activeSeconds=0,{paused=false}={}){
-  if(disposed)return;const current=draft();
+  if(disposed)return;
+  const chatting=isVisible()&&!paused&&getState().power==='on'&&getState().social?.goblin?.pending?.length;
+  if(chatting&&Number.isFinite(activeSeconds)&&activeSeconds>0)pendingChatSeconds+=activeSeconds;
+  if(!chatting)pendingChatSeconds=0;
+  if(pendingChatSeconds>=.5){const chat=advanceGoblinActiveChat(getState(),{nowMinute:now(),activeSeconds:pendingChatSeconds,visible:true,powered:true,paused:false});if(!chat.changed||commit({ok:true,state:chat.state})){pendingChatSeconds=0;update(false);}}
+  const current=draft();
   if(!current||blocked||!isVisible()||paused||getState().power!=='on'){flushProgress();keyboard.sync({phase:'idle'});return;}
   if(Number.isFinite(activeSeconds)&&activeSeconds>0)pendingSeconds=Math.min(TYPING_SECONDS-current.elapsedSeconds,pendingSeconds+activeSeconds);
   const elapsed=Math.min(TYPING_SECONDS,current.elapsedSeconds+pendingSeconds);if(pendingSeconds>=1||elapsed>=TYPING_SECONDS)flushProgress();
@@ -76,7 +82,7 @@ export function mountGoblinDialog(d,{getState,getMetadata,navigate,commit,audio,
    if(!dialog?.messages?.length)history.append(el(d,'p',{className:'sn-note',text:'Друг пока не написал. Занимайся своими делами — уведомление придёт на телефон.'}));
    });
   }
-  const choices=goblinChoices(state),kind={text:'lyrics',beat:'beat',vocal:'track'}[g?.stage],files=kind==='lyrics'?(g?.files??[]).filter(f=>f.kind==='lyrics'&&f.author==='player'):(state.audioExports?.files??[]).filter(f=>f.kind===kind);
+  const context=goblinReplyContext(state,now()),choices=context.choices,kind={text:'lyrics',beat:'beat',vocal:'track'}[g?.stage],files=kind==='lyrics'?(g?.files??[]).filter(f=>f.kind==='lyrics'&&f.author==='player'):(state.audioExports?.files??[]).filter(f=>f.kind===kind);
   const actionKey=JSON.stringify([choices,kind,files.map(f=>[f.id,f.filename])]);
   if(actionKey!==actionSignature){
    actionSignature=actionKey;options.replaceChildren();attachment.replaceChildren();
@@ -94,15 +100,7 @@ export function mountGoblinDialog(d,{getState,getMetadata,navigate,commit,audio,
   cancel.hidden=!selected;send.disabled=!selected||!blocked&&elapsed<TYPING_SECONDS;send.textContent=blocked?'Повторить отправку':'Отправить';
   progress.textContent=selected?(elapsed>=TYPING_SECONDS?'Текст готов. Нажми «Отправить».':'Набираем ответ · '+Math.floor(elapsed/TYPING_SECONDS*100)+'%'):'';
   if(error&&selected)progress.textContent=error;
-  const pending=(g?.pending??[]).filter(m=>Number.isFinite(m.at)).sort((a,b)=>a.at-b.at),next=pending[0];
-  let text='';
-  if(next){const minutes=Math.max(0,Math.ceil(next.at-now()));text=minutes?'Гоблин ещё пишет. Следующее сообщение через '+minutes+' игровых минут. Можно закрыть переписку и заняться делами — ответ придёт по игровым часам.':'Новое сообщение Гоблина ожидает обновления игровых часов.';}
-  else if(choices.length)text='Нажми «Ответить», выбери реплику и дождись набора. Затем нажми «Отправить».';
-  else if(g?.stage==='client')text='Скачай и установи torent. Гоблин увидит установку и продолжит разговор.';
-  else if(g?.stage==='software')text='Установи Рэпблокнот и FT Studio. После установки Рэпблокнота Гоблин расскажет про текст.';
-  else if(kind)text=kind==='lyrics'?'Закончи текст в Рэпблокноте и нажми «Экспорт текста». Зарегистрируйся на баттл; затем прикрепи текст сюда.':'В FT Studio экспортируй '+(kind==='beat'?'бит':'полный трек')+' в файл. Затем прикрепи сохранённую версию сюда.';
-  else if(g?.stage==='finished')text='Совместный трек готов. Сохрани сведённый WAV из сообщения и отправь его в сообщения баттла.';
-  notice.textContent=error||text;
+  notice.textContent=error||context.hint;
   if(guidanceStage!==g?.stage){guidanceStage=g?.stage;guidance.replaceChildren();
   if(g?.stage==='client')guidance.append(socialLink(d,'Скачать torent','underweb://dump/client',navigate));
   if(g?.stage==='software'){guidance.append(socialLink(d,'Скачать Рэпблокнот','underweb://dump/notebook',navigate),socialLink(d,'Скачать FT Studio','underweb://dump/ft-studio',navigate));}

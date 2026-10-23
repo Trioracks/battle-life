@@ -15,7 +15,7 @@ export const GOBLIN_DIALOGUE=Object.freeze({
  'client-done':'О, поставил. Теперь фл-ку качай, здесь она FT Studio называется. Я тоже пока тыкаюсь, не думай, что сильно разобрался)',
  'notebook-link':'И ещё Рэпблокнот возьми, пока студия качается. В нём текст писать будем. Удобнее, чем потом по всем бумажкам искать.',
  'text-instructions':'Ну вот. Если уже зарегался на баттл, открывай блокнот, там «Новый текст». Выбери Макаревича и тему, дальше три этапа. Пиши, что в голову придёт. С первого раза вряд ли охеренно будет, это нормально.',
- 'text-export':'Как допишешь, экспортни в «Мои документы» и пришли сюда файлом, если хочешь. Гляну. Я сам не мастер, но со стороны иногда понятнее.',
+ 'text-export':'Как допишешь, нажми «Сохранить», выбери папку для TXT и пришли сюда файлом, если хочешь. Гляну. Я сам не мастер, но со стороны иногда понятнее.',
  'ft-check':'Ну чё там, скачал фл-ку? Посмотри в загрузках, архив ещё установить надо. Потом «Новый проект», жанр экспериментальный. Попробуй собрать ударные, бас и мелодию. Как сделаешь, экспортни бит, скинь мне на зацен.',
  'ft-ready':'О, фл-ка уже стоит. Попробуй теперь бит: «Новый проект», экспериментальный, дальше ударные, бас и мелодия. Как получится, так и получится. Экспортни именно бит и скинь мне, послушаю.',
  'return:text':'Чувак, глянул. Есть прикольные места, но я бы пару строк по-другому сделал. Вот набросал свой вариант, твой не трогал. Когда бит будет, текст ещё под него адаптировать можно. Попробуй теперь минус собрать и скинь.',
@@ -78,7 +78,9 @@ export function normalizeGoblin(raw){
   sent:r.sent&&typeof r.sent==='object'?{...r.sent}:{},received:r.received&&typeof r.received==='object'?{...r.received}:{},
   posts:Array.isArray(r.posts)?r.posts.map(p=>structuredClone(GOBLIN_INITIAL_POSTS.find(initial=>initial.id===p.id)??p)):[],likes:Array.isArray(r.likes)?[...r.likes]:[],
   nextDay:Number.isSafeInteger(r.nextDay)?r.nextDay:null,lastPostDay:Number.isSafeInteger(r.lastPostDay)?r.lastPostDay:0,
-  scheduled:r.scheduled&&Number.isFinite(r.scheduled.at)?{...r.scheduled}:null,releaseIndex:Math.max(0,Math.min(GOBLIN_RELEASES.length,Math.floor(r.releaseIndex??0)||0)),
+  scheduled:r.scheduled&&Number.isFinite(r.scheduled.at)&&r.scheduled.day-(Number.isSafeInteger(r.lastPostDay)?r.lastPostDay:0)>=22?{...r.scheduled}:null,releaseIndex:Math.max(0,Math.min(GOBLIN_RELEASES.length,Math.floor(r.releaseIndex??0)||0)),
+  contextUsed:Array.isArray(r.contextUsed)?r.contextUsed.filter(v=>typeof v==='string'):[],replySequence:Number.isSafeInteger(r.replySequence)?Math.max(0,r.replySequence):0,
+  followupSeen:Array.isArray(r.followupSeen)?r.followupSeen.filter(v=>typeof v==='string'):[],lastSmallTalkAt:Number.isFinite(r.lastSmallTalkAt)?r.lastSmallTalkAt:null,activeFollowup:typeof r.activeFollowup==='string'?r.activeFollowup:null,
   ftPromptAt:Number.isFinite(r.ftPromptAt)?r.ftPromptAt:null,ftReminder:r.ftReminder===true,
  };
 }

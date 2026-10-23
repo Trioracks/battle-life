@@ -56,11 +56,11 @@ test('tutorial waits for each real install and subscription; FT reminder is once
 });
 
 test('wall calendar is deterministic across sleep and saves; release order is preserved',()=>{
- assert.deepEqual([1,2,3,4].map(goblinPostChance),[0,5,10,15]);
+ assert.deepEqual([21,22,23,24].map(goblinPostChance),[0,5,10,15]);
  let fine=advanceGoblin(createVirtualPcState(),480).state;
  const start=structuredClone(fine);
- for(let d=1;d<=40;d++)fine=advanceGoblin(restore(fine),d*1440+1439).state;
- const coarse=advanceGoblin(start,40*1440+1439).state;
+ for(let d=1;d<=80;d++)fine=advanceGoblin(restore(fine),d*1440+1439).state;
+ const coarse=advanceGoblin(start,80*1440+1439).state;
  assert.deepEqual(coarse.social.goblin.posts,fine.social.goblin.posts);
  assert.deepEqual(coarse.social.goblin.scheduled,fine.social.goblin.scheduled);
  assert.deepEqual(coarse.social.goblin.posts.filter(p=>p.releaseId).slice(2,4).map(p=>p.releaseId),['bitboy-demo','bitboy-soundgoodizer']);
@@ -131,7 +131,8 @@ test('profile starts with two songs and photos, lazy assets exist, future battle
  s.trackVersions.byId.test={id:'test',name:'Дождь на районе'};
  s.battleHistory.entries=[{id:'e',participantId:GOBLIN_ID,battleId:'makarevich-1',roundId:'selection',status:'submitted',trackVersionId:'test',occurredAt:600}];
  assert.equal(goblinPublicPosts(s,599).filter(p=>p.trackVersionId).length,0);
- assert.equal(goblinPublicPosts(s,600).find(p=>p.trackVersionId)?.art,'rain');
+ s.socialRuntime.events.push({id:'result',type:'round-result',battleId:'makarevich-1',roundId:'selection',dueAt:700});
+ assert.equal(goblinPublicPosts(s,699).filter(p=>p.trackVersionId).length,0);assert.equal(goblinPublicPosts(s,700).find(p=>p.trackVersionId)?.art,'rain');
 });
 
 test('historical dates replace old midnight posts without resetting the tutorial or wall',()=>{
