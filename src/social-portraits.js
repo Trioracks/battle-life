@@ -1,5 +1,5 @@
 import {normalizeAppearance} from './avatar-v3-profile.js?rev=57';
-export const portraitKey=appearance=>'portrait-v1:'+JSON.stringify(normalizeAppearance(appearance));
+export const portraitKey=appearance=>'portrait-v1:clothing-2:'+JSON.stringify(normalizeAppearance(appearance));
 const PREFIX='data:image/jpeg;base64,';
 export function normalizePlayerPortrait(raw,{size=256,maxBytes=96*1024}={}){
  if(!raw||typeof raw.key!=='string'||!raw.key.startsWith('portrait-v1:')||raw.key.length>800||typeof raw.url!=='string'||!raw.url.startsWith(PREFIX))return null;

@@ -37,7 +37,7 @@ export async function createApartmentScene(canvas,config){
   camera.position.copy(basePosition);camera.lookAt(baseTarget);
   const loader=new GLTFLoader();
   const [environment,model,staticModel]=await Promise.all([
-    loader.loadAsync(BASE+config.geometry+'?rev=40'),loader.loadAsync(BASE+config.rig+'?rev=56'),loader.loadAsync(BASE+config.staticGeometry+'?rev=21')
+    loader.loadAsync(BASE+config.geometry+'?rev=40'),loader.loadAsync(BASE+config.rig+'?rev=58'),loader.loadAsync(BASE+config.staticGeometry+'?rev=21')
   ]);
   const staticScene=staticModel.scene;
   staticScene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});

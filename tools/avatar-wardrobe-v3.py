@@ -162,6 +162,10 @@ for face,profile in face_profiles.items():
 for kind in ['tank','turtleneck']:
     start=len(meshes);prefix='look-top-'+kind
     obj=torso_garment(prefix,tee,-.002,kind)
+    if kind=='tank':
+        for side,s in [('L',1),('R',-1)]:
+            upper='upper_arm.'+side
+            rings(prefix+'-bare-shoulder-'+side,[((s*.190,0,1.400),.045,.051,{'chest':.5,upper:.5}),((s*.232,0,1.366),.056,.057,{upper:1}),((s*.241,0,1.25),.045,.044,{upper:1}),((s*.241,0,1.24),.045,.044,{upper:1})],skin)
     finish_group(prefix,start)
 
 # Skinny follows the same connected crotch; narrowing only below the upper thigh.

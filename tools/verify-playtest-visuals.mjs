@@ -5,6 +5,7 @@ import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {validateQaOptions,responseViolation} from './verify-public-preview.mjs';
 import {startPreviewServer} from './serve-preview.mjs';
+import {verifyShoulderCoverage} from './verify-shoulder-coverage.mjs';
 import {verifyNoBankJudging} from './verify-playtest-no-bank.mjs';
 import {verifyCameraHandoffs} from './verify-playtest-camera.mjs';
 export async function verifyPlaytestVisuals(options={}){
@@ -27,17 +28,18 @@ export async function verifyPlaytestVisuals(options={}){
    await page.evaluate(()=>{const p=window.qaViews.pc;p.presentTransition({phase:'desktop',progress:0,overlay:1,zoom:1,locked:false});p.open('underweb');if(p.windows.windows.find(w=>w.id==='underweb')?.mode!=='maximized')p.windowAction({type:'toggle-maximize',id:'underweb'});});
    for(const [name,route] of [['browser','underweb://iskra'],['profile','underweb://social/me'],['dialog','underweb://social/dialog/mak-npc-06']]){
     await page.evaluate(url=>window.qaViews.pc.navigateUnderweb(url),route);
-    if(name==='dialog'){await page.getByRole('button',{name:'Ответить',exact:true}).click();await page.getByRole('button',{name:'Хорошо! Сам как?',exact:true}).click();await page.locator('.uw-page').evaluate(n=>n.scrollTop=0);}
-    await page.evaluate(()=>document.fonts.ready);const file=name+'-'+width+'.png';await page.screenshot({path:path.join(outputDir,file)});shots.push(file);
+    if(name==='dialog'){await page.getByRole('button',{name:'Ответить',exact:true}).click();await page.getByRole('button',{name:'Хорошо! Сам как?',exact:true}).click();await page.evaluate(()=>window.qaViews.pc.tickOutgoingMessage(3,{paused:false}));await page.locator('.uw-page').evaluate(n=>n.scrollTop=0);}
+    await page.evaluate(()=>document.fonts.ready);await page.locator('.uw-page img').evaluateAll(images=>Promise.all(images.filter(img=>{const r=img.getBoundingClientRect();return r.width>0&&r.height>0&&r.top<innerHeight&&r.bottom>0;}).map(img=>img.decode())));const file=name+'-'+width+'.png';await page.screenshot({path:path.join(outputDir,file)});shots.push(file);
     assert.equal(await page.locator('.uw-browser').evaluate(n=>n.scrollWidth>n.clientWidth+2),false,'browser width overflow '+width);
    }
    await page.evaluate(()=>{document.querySelector('#virtual-pc').hidden=true;const host=document.querySelector('#work');host.hidden=false;const panel=window.qaViews.createBeatWorkPanel(document);host.append(panel.element);panel.update({beat:{name:'Макаревич · раунд 1'},job:{stage:1,elapsed:25,total:90,skill:1,genreSkill:2},chainProgress:{overall:.36,index:1,count:3},needs:{satiety:36,energy:91},skill:1.29,genreProgress:{name:'Экспериментальный',xp:2.58,cap:100},clockLabel:'01:25',audioNotice:'Музыка и вокал отключены в тестовой веб-версии'});});
    const file='production-'+width+'.png';await page.screenshot({path:path.join(outputDir,file)});shots.push(file);
   }
   if(options.camera)await verifyCameraHandoffs(page,{artifactUrl,outputDir:path.join(outputDir,'camera')});
+  if(options.shoulders)await verifyShoulderCoverage(page,{artifactUrl,outputDir:path.join(outputDir,'shoulders')});
   if(options.noBank)await verifyNoBankJudging(page,{artifactUrl,outputDir:path.join(outputDir,'no-bank')});
   assert.deepEqual(errors,[],'page errors');assert.deepEqual(violations,[],'network violations');
   const report={revision:qa.expectedRevision,shots,errors,violations};await fs.writeFile(path.join(outputDir,'visual-report.json'),JSON.stringify(report,null,2));return report;
  }finally{await context.close();await browser.close();await server.close();}
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){const args=process.argv.slice(2),options={};for(let i=0;i<args.length;i++){const key=args[i];if(key==='--camera')options.camera=true;else if(key==='--no-bank')options.noBank=true;else if(key==='--root')options.root=args[++i];else if(key==='--output-dir')options.outputDir=args[++i];else if(key==='--expected-revision')options.expectedRevision=args[++i];else throw Error('Unknown option '+key);}console.log(JSON.stringify(await verifyPlaytestVisuals(options)));}
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){const args=process.argv.slice(2),options={};for(let i=0;i<args.length;i++){const key=args[i];if(key==='--camera')options.camera=true;else if(key==='--no-bank')options.noBank=true;else if(key==='--shoulders')options.shoulders=true;else if(key==='--root')options.root=args[++i];else if(key==='--output-dir')options.outputDir=args[++i];else if(key==='--expected-revision')options.expectedRevision=args[++i];else throw Error('Unknown option '+key);}console.log(JSON.stringify(await verifyPlaytestVisuals(options)));}
