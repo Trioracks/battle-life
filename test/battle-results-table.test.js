@@ -46,7 +46,7 @@ test('community hero panel uses binary votes rather than out-of-ten grades in a 
 test('table pages preserve every score and local player position across remounts',()=>{
  const d=pcDocument(),table=publicRoundTable(tableFixture(),options),uiState={page:0,rowsPerPage:2};table.rows=[...table.rows.slice(1),table.rows[0]];const original=structuredClone(table);
  let root=createBattleResultsTableView(d,{table,navigate(){},uiState});const rows=()=>allPc(root).filter(n=>n.className?.startsWith('bt-row '));assert.equal(rows().length,2);assert.equal(allPc(rows()[0]).filter(n=>n.tagName==='TD').length,table.judges.length+3);
- findButton(root,'К моему месту').click();assert.equal(uiState.page,1);assert.ok(allPc(rows()[0]).some(n=>n.textContent==='Герой'));assert.deepEqual(allPc(rows()[0]).filter(n=>n.dataset?.judgeScore).map(n=>n.textContent),['8','8','8']);
+ findButton(root,'К моему месту').click();assert.equal(uiState.page,1);assert.ok(allPc(rows()[0]).some(n=>n.textContent==='Герой'));assert.deepEqual(allPc(rows()[0]).filter(n=>n.dataset?.judgeScore).map(n=>n.children[0]?.textContent??n.textContent),['8','8','8']);
  root.dispose?.();root=createBattleResultsTableView(d,{table,navigate(){},uiState});assert.equal(uiState.page,1);assert.equal(rows().length,1);findButton(root,'Предыдущая страница').click();assert.equal(uiState.page,0);assert.equal(rows().length,2);assert.deepEqual(table,original);root.dispose?.();
 });
 test('background social changes preserve focus on the player-place control',()=>{

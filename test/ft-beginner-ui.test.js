@@ -53,10 +53,10 @@ test('unrelated preview or project playback does not own this FT transport',()=>
  findButton(s.root,'Play').click();assert.equal(played,'a');s.view.dispose();
 });
 
-test('random title uses current game date, rerolls two words, remains editable and is saved once',()=>{
+test('random title uses current game date, rerolls one to three words, remains editable and is saved once',()=>{
  const metadata={skills:{beatmaking:10},gameDay:1},s=setup(undefined,metadata);findButton(s.root,'Новый проект').click();
  const name=allPc(s.root).find(n=>n.getAttribute('aria-label')==='Название бита'),random=findButton(s.root,'Случайное название');
- assert.ok(random);random.click();const first=name.value;assert.match(first,/^01\.09\.2012 — [А-Яа-яё]+ [А-Яа-яё]+$/u);
+ assert.ok(random);random.click();const first=name.value;assert.match(first,/^01\.09\.2012 — [А-Яа-яё,]+(?: [А-Яа-яё]+){0,2}$/u);
  random.click();assert.notEqual(name.value,first);metadata.gameDay=31;random.click();assert.match(name.value,/^01\.10\.2012 — /);
  name.value+=' демо';const final=name.value;findButton(s.root,'Начать проект').click();assert.equal(s.state.projects[0].name,final);
  metadata.gameDay=32;s.view.update();s.view.openProject(s.state.projects[0]);assert.equal(s.state.projects[0].name,final);s.view.dispose();

@@ -72,3 +72,12 @@
 .sn-network :is(.sn-results,.sn-review,.sn-community-audio){background:#23281f;border-color:var(--sn-line);color:#dedfce}
 .sn-network .sn-community-sidebar .sn-heading{font-size:15px;padding:8px}.sn-network .sn-member .sn-link{font-size:12px}
 @media(max-width:1000px){.sn-network .sn-community-columns{grid-template-columns:minmax(0,1fr) 160px;padding:8px;gap:10px}}
+.bt-results{position:relative}
+.sn-network .bt-table{background:#242920;color:#dedfce;font-size:14px}
+.sn-network .bt-table :is(td,th){border-color:#4b5040;background:#282e23}
+.sn-network .bt-table thead th{background:#353c2c;color:#e8e5d2}
+.sn-network .bt-table .bt-good :is(td,th){background:#31402b}.sn-network .bt-table .bt-danger :is(td,th){background:#4d332a}
+.sn-network .bt-table .bt-score-cell{width:100%;height:100%;min-height:34px;border:0;border-radius:0;background:transparent;color:#f0bd76;cursor:pointer;font:inherit;font-variant-numeric:tabular-nums}
+.sn-network .bt-table .bt-score-cell:hover,.sn-network .bt-table .bt-score-cell:focus-visible{background:#765a3355;outline:1px solid #c3904e;outline-offset:-2px}
+.bt-score-comment{position:absolute;z-index:40;box-sizing:border-box;max-width:calc(100% - 16px);max-height:240px;overflow:auto;padding:14px 16px;background:#343a29;color:#eee8d2;border:1px solid #b29c68;box-shadow:0 8px 24px #0009;font-size:14px;text-align:left;line-height:1.5}
+.bt-score-comment strong{display:block;color:#f0bc70;border-bottom:1px solid #6b6e49;padding-bottom:8px}.bt-score-comment p{margin:8px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
