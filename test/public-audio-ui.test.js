@@ -37,7 +37,7 @@ test('market and RIPLINE show public notice and disable only recorded listening'
 test('export player avoids autoplay and shows notice while export creation stays enabled',async()=>{
  const {audio,session,root,calls}=fixture(),state=submissionFixture(),result=createAudioExport(state,{id:'export',projectId:'beat',kind:'track',folderId:'exports',filename:'Трек.wav',nowMinute:600});assert.equal(result.ok,true);
  const view=mountAudioFilePlayer(root,{audio});view.open(result.state.audioExports.files[0]);view.update();await flush();assert.equal(findButton(root,'▶ Слушать файл').disabled,true);assert.equal(hasNotice(root),true);assert.equal(calls.play,0);
- const form=mountAudioExport(root,{getState:()=>state,projectId:'beat',onCommit:()=>true});assert.notEqual(findButton(root,'Сохранить аудиофайл').disabled,true);form.dispose();view.dispose();session.dispose();
+ const form=mountAudioExport(root,{getState:()=>state,projectId:'beat',onCommit:()=>true});assert.notEqual(findButton(root,'Экспортировать').disabled,true);form.dispose();view.dispose();session.dispose();
 });
 test('public work never starts or retries audio across hidden frames and reports contextual notice',async()=>{
  const {audio,session,d,calls}=fixture(),work=createBeatWorkAudio(audio),frame={phase:'working',hidden:false,beat:{id:'beat'},job:{beatId:'beat',stage:0,elapsed:5,total:10}};

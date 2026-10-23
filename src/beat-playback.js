@@ -18,7 +18,7 @@ export function resolveBeatPlayback(beat,{workStage=null,recordingPreview=null}=
  if(beat.audioBacking){
   const backing=normalizeAudioBacking(beat.audioBacking),recording=normalizeRecording(recordingPreview??beat.recording);
   if(!backing||workStage!==null||(recordingPreview||beat.recording)&&!recording)return fail('Не найдена сохранённая фонограмма.');
-  const descriptor=structuredClone(backing.descriptor);descriptor.owner='studio';descriptor.key=JSON.stringify([beat.id,backing,recording]);
+  const descriptor=structuredClone(backing.descriptor);descriptor.owner='studio';descriptor.key=JSON.stringify([beat.id,backing,recording]);descriptor.backingParts=descriptor.parts.length;
   if(recording){const source=vocalById(recording.sourceId);descriptor.parts.push({id:recording.sourceId,loopSeconds:32/3,...(recording.voiceId!==undefined?{voiceId:recording.voiceId}:{}),...(source.sourceGainDb!==undefined?{sourceGainDb:source.sourceGainDb}:{}),vocal:vocalPlaybackProfile(recording)});}
   return {ok:true,reason:'',descriptor};
  }

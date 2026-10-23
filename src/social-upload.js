@@ -32,8 +32,8 @@ export function startSubmissionUpload(state,{communityId,fileId,nowMinute}={}){
  if(attemptForWindow(state,window))return fail('Работа уже отправлена. Повторная сдача и замена недоступны.');
  if(nowMinute<window.opensAt||nowMinute>=window.closesAt)return fail('Приём заявок и треков закрыт.');
  if(!state.battleApplications?.some(a=>a.battleId===c.battleId))return fail('Сначала зарегистрируйся на этот баттл.');
- const file=normalizeAudioExports(state.audioExports,state.trackVersions).files.find(f=>f.id===fileId&&f.kind==='track');
- if(!file)return fail('Выбери экспортированный полный трек WAV. Бит, вокал и проект не подходят.');
+ const file=normalizeAudioExports(state.audioExports,state.trackVersions,{fileSystem:state.fileSystem}).files.find(f=>f.id===fileId&&f.kind==='track');
+ if(!file)return fail('Выбери экспортированный полный трек WAV или MP3. Бит, вокал и проект не подходят.');
  const versionId=file.trackVersionId,totalBytes=file.bytes;
  const social=normalizeSocial(state.social);social.dialogs[communityId]={messages:[],unread:false,...social.dialogs[communityId],peer:{kind:'community',id:communityId}};
  return {ok:true,state:{...state,social,outgoingUpload:{version:2,communityId,windowId:window.id,fileId,versionId,totalBytes,uploadedBytes:0,fractionalBytes:0,elapsedSeconds:0,totalSeconds:UPLOAD_TOTAL_SECONDS,status:'uploading'}},versionId,reason:''};

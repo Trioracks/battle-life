@@ -215,3 +215,7 @@
 .ft-lane[data-muted="true"] { opacity: .48; }
 .ft-lane[data-muted="true"] .ft-audio-clip { background: repeating-linear-gradient(135deg,#60645b 0 4px,#41473f 4px 8px); text-decoration: line-through; }
 .ft-lane-label small { font: 8px monospace; margin-left: auto; color: #c6bca5; }
+.ft-export-progress{padding:24px;background:linear-gradient(145deg,#353b3d,#232729);border:1px solid #626d70;color:#eee}
+.ft-export-progress progress{display:block;width:100%;height:24px;accent-color:#eeb33d;margin:20px 0}
+.ft-export-progress strong{display:block;margin-bottom:20px;color:#f0c36d;font-variant-numeric:tabular-nums}
+.ft-export-picker{position:absolute;inset:6%;z-index:3;background:#252c2a;border:1px solid #77827a;box-shadow:0 12px 35px #000a;overflow:auto}

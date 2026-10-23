@@ -90,7 +90,7 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
       });
       b.append(createPcIcon(d,entry.iconId,{size:nav.view==='details'?16:32}),el(d,'span',{className:'pc-file-name',text:entry.name}));
       if(entry.kind==='disk'){const info=el(d,'span');b.append(info);diskLabel=mountDiskUsage(info);diskLabel.update(diskUsage(state));}
-      if(nav.view==='details'){const size=el(d,'span',{text:entry.sizeMb?entry.sizeMb.toFixed(3)+' МБ':''});sizeLabels.set(entry.id,size);b.append(el(d,'span',{className:'pc-file-type',text:entry.kind==='project'?'Проект FT Studio':entry.kind==='audio'?'Аудиофайл WAV':entry.kind==='disk'?'Локальный диск':entry.kind==='folder'?'Папка':'Файл'}),size);}
+      if(nav.view==='details'){const size=el(d,'span',{text:entry.sizeMb?entry.sizeMb.toFixed(3)+' МБ':''});sizeLabels.set(entry.id,size);b.append(el(d,'span',{className:'pc-file-type',text:entry.kind==='project'?'Проект FT Studio':entry.kind==='audio'?'Аудиофайл '+(entry.format??'wav').toUpperCase():entry.kind==='disk'?'Локальный диск':entry.kind==='folder'?'Папка':'Файл'}),size);}
       b.addEventListener('dblclick',()=>openEntry(entry));
       const context=e=>{e.preventDefault();e.stopPropagation();nav={...nav,selection:entry.id};b.setAttribute('aria-pressed','true');menu(b,[{id:'open',label:'Открыть',onSelect:()=>openEntry(entry)},{id:'properties',label:'Свойства',onSelect:()=>properties(entry)}],e.type==='contextmenu'?e:undefined);};
       b.addEventListener('contextmenu',context);

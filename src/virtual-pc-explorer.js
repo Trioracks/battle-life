@@ -74,7 +74,7 @@ export function explorerEntries(pcState,path) {
   const savedProjects=new Set((pcState.fileSystem?.files??[]).filter(f=>['txt','flp'].includes(f.type)).map(f=>f.projectId));
   if(path==='projects')entries.push(...pcState.projects.filter(p=>!savedProjects.has(p.id)).map(p=>({id:'project:'+p.id,kind:'project',name:typeof p.name==='string'?p.name:p.id,iconId:'project',projectId:p.id,sizeMb:2})));
   for(const f of documents)entries.push({id:'document:'+f.id,kind:'document',name:f.filename,iconId:f.type==='txt'?'notebook':'project',fileId:f.id,projectId:f.projectId,sizeMb:f.bytes/1000000,action:'document-file'});
-  for(const file of pcState.audioExports?.files??[])if(file.folderId===path)entries.push({id:'audio:'+file.id,kind:'audio',name:file.filename,iconId:'microphone',fileId:file.id,sizeMb:file.bytes/1000000,createdAtMinute:file.createdAtMinute,trackVersionId:file.trackVersionId});
+  for(const file of pcState.audioExports?.files??[])if(file.folderId===path)entries.push({id:'audio:'+file.id,kind:'audio',format:file.format??'wav',name:file.filename,iconId:'microphone',fileId:file.id,sizeMb:file.bytes/1000000,createdAtMinute:file.createdAtMinute,trackVersionId:file.trackVersionId});
   for(const file of pcState.social?.goblin?.files??[])if(file.folderId===path&&file.createdAtMinute<=(pcState.socialRuntime?.lastMinute??pcState.lastGameMinute??0))entries.push({id:'mentor:'+file.id,kind:'artifact',name:file.filename,iconId:file.kind==='lyrics'?'notebook':'project',action:'mentor-file',fileId:file.id,sizeMb:(file.bytes??0)/1000000});
   const s=pcState.software;
   if(path==='downloads'&&s){
@@ -91,7 +91,7 @@ export function explorerEntries(pcState,path) {
 export function explorerProperties(state,entry) {
   if(entry?.kind==='audio'){
     const file=state.audioExports.files.find(f=>f.id===entry.fileId);
-    if(file)return {title:'Свойства: '+file.filename,rows:[{label:'Имя',value:file.filename},{label:'Тип',value:'Аудиофайл WAV · '+AUDIO_EXPORT_KINDS[file.kind].toLowerCase()},{label:'Размер',value:file.bytes+' байт'},{label:'Создан',value:gameDateTimeLabel(file.createdAtMinute)},{label:'Версия',value:file.trackVersionId??file.sourceRevision.beat},{label:'Папка',value:EXPLORER_PATHS[file.folderId].address}]};
+    if(file)return {title:'Свойства: '+file.filename,rows:[{label:'Имя',value:file.filename},{label:'Тип',value:'Аудиофайл '+(file.format??'wav').toUpperCase()+' · '+AUDIO_EXPORT_KINDS[file.kind].toLowerCase()},{label:'Размер',value:file.bytes+' байт'},{label:'Создан',value:gameDateTimeLabel(file.createdAtMinute)},{label:'Версия',value:file.trackVersionId??file.sourceRevision.beat},{label:'Папка',value:explorerPaths(state)[file.folderId]?.address??file.folderId}]};
   }
   if(entry?.kind==='disk'){
     const u=diskUsage(state);return {kind:'disk',title:'Свойства: Локальный диск (C:)',rows:[{label:'Тип',value:'Локальный игровой диск'},{label:'Ёмкость',value:formatDiskGb(u.capacityMb)},{label:'Занято',value:diskAmount(u.usedMb)},{label:'Свободно',value:diskAmount(u.freeMb)}]};

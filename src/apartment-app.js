@@ -1,3 +1,4 @@
+import {advanceExportJobDurably} from './pc-export-job.js?rev=57';
 import {ApartmentMotion} from './apartment-v3-motion.js?rev=57';
 import {sleepOptionsForActionMenu} from './apartment-actions.js?rev=57';
 import {ApartmentTime,loadHomeTime,saveHomeTime as saveHomeTimeRaw} from './apartment-v3-time.js?rev=57';
@@ -78,7 +79,7 @@ try{
   const migration=migrateNoviceSave(storage);let migrationReady=migration.ok;
   function saveHomeTime(_storage,clock){return migrationReady&&saveHomeTimeRaw(storage,clock);}
   const saved=loadProfile(storage);let profile=saved.profile;
-  let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lastInstallationSave=0,lastBrowserDownloadSave=0,lightPreview='game';
+  let homeTime=loadHomeTime(storage)??new ApartmentTime(),lastTimeSave=0,lastInstallationSave=0,lastBrowserDownloadSave=0,lastExportSave=0,lightPreview='game';
   const pcRoot=$('#virtual-pc'),savedPc=loadVirtualPcState(storage);let pcState=preparePcRuntimeState(savedPc.state);
   const motionPreference=window.matchMedia?.('(prefers-reduced-motion: reduce)');
   let pcStorageWarning=migration.ok?(savedPc.ok?'':'Сохранение виртуального ПК недоступно.'):migration.error;
@@ -348,6 +349,11 @@ try{
       if(browserDownload.completed.length||now-lastBrowserDownloadSave>=500){persistPc(browserDownload.state,{atomic:true});lastBrowserDownloadSave=now;}
       else pcState=browserDownload.state;
       virtualPc.syncState(pcState);
+    }
+    const rendering=advanceExportJobDurably(pcState,{activeSeconds:dt,visible:mode==='pc'&&virtualPc.window==='ft-studio',powered:pcState.power==='on',paused:browserPaused},next=>persistPc(next,{atomic:true}));
+    if(rendering.changed){
+      if(!rendering.completedFileId){if(now-lastExportSave>=500){persistPc(rendering.state,{atomic:true});lastExportSave=now;}else pcState=rendering.state;}
+      virtualPc.syncState(pcState);if(rendering.completedFileId)void pcSounds.play('export');
     }
     virtualPc.tickBrowserDownloads(dt,{paused:browserPaused||mode!=='pc',advance:false});
     advanceOutgoingTransfer(dt);

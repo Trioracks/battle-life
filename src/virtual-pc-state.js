@@ -34,6 +34,7 @@ import {normalizeHousehold} from './home-food.js?rev=57';
 import {normalizeSoftware,withSoftware,softwareDiskBytes,openMetadata,cancelTransfer,advanceInstaller} from './pc-software.js?rev=57';
 import {normalizeBrowserDownloads} from './pc-browser-downloads.js?rev=57';
 import {normalizePcFileSystem} from './pc-filesystem.js?rev=57';
+import {normalizeExportJob} from './pc-export-job.js?rev=57';
 import {normalizeDocumentSessions} from './pc-document-session.js?rev=57';
 export const VIRTUAL_PC_STORAGE_KEY = 'battle-life-virtual-pc-v1';
 export const VIRTUAL_DISK_MB = 16000;
@@ -135,8 +136,10 @@ function normalizeSnapshot(value,archiveCache=null) {
     const captured=captureTrackVersion({projects:[submission.track,...(submission.lyrics?[submission.lyrics]:[])],trackVersions},{projectId:submission.projectId,nowMinute:(submission.submittedDay-1)*1440});
     if(captured.ok){trackVersions=captured.state.trackVersions;submission.trackVersionId=captured.versionId;submission.timePrecision='day-only';}
   }
-  const audioExports=archive('audioExports',raw=>normalizeAudioExports(raw,trackVersions));
+  const exportFolders=source.fileSystem?normalizePcFileSystem({...source.fileSystem,files:[]},{projects}):null;
+  const audioExports=archive('audioExports',raw=>normalizeAudioExports(raw,trackVersions,{fileSystem:exportFolders}));
   const fileSystem=normalizePcFileSystem(source.fileSystem,{projects,audioExports,mentorFiles:source.social?.goblin?.files});
+  const exportJob=normalizeExportJob(source.exportJob,{trackVersions,audioExports,fileSystem});
   const documentSessions=normalizeDocumentSessions(source.documentSessions,{fileSystem,projects});
   const judging=archive('judging',normalizeJudging);
   const rapAnalysis=normalizeRapAnalysis(source.rapAnalysis),rapResearch=reconcileResearchFindings(normalizeRapResearch(source.rapResearch),rapAnalysis);
@@ -152,7 +155,7 @@ function normalizeSnapshot(value,archiveCache=null) {
     wallpaper: wallpaperIds.has(source.wallpaper) ? source.wallpaper : 'courtyard',
     desktopIcons: normalizeIcons(source.desktopIcons),
     download: normalizeDownload(source.download),
-    projects,fileSystem,documentSessions,
+    projects,fileSystem,documentSessions,exportJob,
     music,writing,recording,
     ...(retiredSourceWork.length?{retiredSourceWork}:{}),
     creativeWork:normalizeCreativeWork(source.creativeWork,projects),

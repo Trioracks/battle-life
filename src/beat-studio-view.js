@@ -39,7 +39,7 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onC
  const currentBeat=()=>{const s=getState(),source=sessionSelected?s.projects.find(p=>p.id===s.music.activeBeatId):null;if(source!==beatSource){beatSource=source;beatCache=normalizeBeat(source);}return beatCache;};
  // State has crossed load/command validation. Published project/plan references
  // change on commands; clock and needs updates retain those references.
- const stateSignature=()=>{const s=getState();return [s.projects,s.music.activeBeatId,s.music.job?.beatId,s.music.job?.stage,Math.floor(s.music.job?.elapsed??0),s.recording?.job?.beatId,s.recording?.job?.kind,s.creativeWork?.items,s.retiredSourceWork,s.music.genres,effectiveBeatSkill(s,getMetadata().skills),getMetadata().skills?.sound];};
+ const stateSignature=()=>{const s=getState();return [s.projects,s.music.activeBeatId,s.music.job?.beatId,s.music.job?.stage,Math.floor(s.music.job?.elapsed??0),s.recording?.job?.beatId,s.recording?.job?.kind,s.creativeWork?.items,s.exportJob,s.audioExports,s.retiredSourceWork,s.music.genres,effectiveBeatSkill(s,getMetadata().skills),getMetadata().skills?.sound];};
  const sameInputs=(a,b)=>a.length===b.length&&a.every((value,i)=>value===b[i]);
  let vocalDecisions;
  function startRecording(kind,textId,sliders){
