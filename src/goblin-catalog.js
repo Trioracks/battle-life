@@ -79,6 +79,7 @@ export function normalizeGoblin(raw){
   posts:Array.isArray(r.posts)?r.posts.map(p=>structuredClone(GOBLIN_INITIAL_POSTS.find(initial=>initial.id===p.id)??p)):[],likes:Array.isArray(r.likes)?[...r.likes]:[],
   nextDay:Number.isSafeInteger(r.nextDay)?r.nextDay:null,lastPostDay:Number.isSafeInteger(r.lastPostDay)?r.lastPostDay:0,
   scheduled:r.scheduled&&Number.isFinite(r.scheduled.at)&&r.scheduled.day-(Number.isSafeInteger(r.lastPostDay)?r.lastPostDay:0)>=22?{...r.scheduled}:null,releaseIndex:Math.max(0,Math.min(GOBLIN_RELEASES.length,Math.floor(r.releaseIndex??0)||0)),
+  downloaded:r.downloaded&&typeof r.downloaded==='object'?{...r.downloaded}:{},
   contextUsed:Array.isArray(r.contextUsed)?r.contextUsed.filter(v=>typeof v==='string'):[],replySequence:Number.isSafeInteger(r.replySequence)?Math.max(0,r.replySequence):0,
   followupSeen:Array.isArray(r.followupSeen)?r.followupSeen.filter(v=>typeof v==='string'):[],lastSmallTalkAt:Number.isFinite(r.lastSmallTalkAt)?r.lastSmallTalkAt:null,activeFollowup:typeof r.activeFollowup==='string'?r.activeFollowup:null,
   ftPromptAt:Number.isFinite(r.ftPromptAt)?r.ftPromptAt:null,ftReminder:r.ftReminder===true,

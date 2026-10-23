@@ -31,7 +31,7 @@ export function normalizePcFileSystem(raw,{projects=[],audioExports,mentorFiles=
    const safe=pcEntryName(p.name.replace(/[<>:"/\\|?*\x00-\x1f]/g,'_').replace(/[. ]+$/,''))??'Документ',folderId='projects';
    out.files.push({id:'legacy-project:'+p.id,type,filename:uniqueName(safe+'.'+type,folderId,out.files),folderId,projectId:p.id,snapshot:clone(snapshot),source:'legacy-project',bytes:2000000,createdAtMinute:0,modifiedAtMinute:0});
   }
-  for(const f of mentorFiles){if(!f?.project||!validPcId(f.id))continue;const type=projectType(f.project),snapshot=documentProject(f.project,type);if(!snapshot)continue;
+  for(const f of mentorFiles){if(f?.requiresDownload||!f?.project||!validPcId(f.id))continue;const type=projectType(f.project),snapshot=documentProject(f.project,type);if(!snapshot)continue;
    out.files.push({id:'legacy-mentor:'+f.id,type,filename:uniqueName((pcEntryName(f.project.name)??'Вложение')+'.'+type,f.folderId??'downloads',out.files),folderId:f.folderId??'downloads',projectId:f.project.id,snapshot:clone(snapshot),source:'mentor',mentorFileId:f.id,bytes:f.bytes??2000000,createdAtMinute:f.createdAtMinute??0,modifiedAtMinute:f.createdAtMinute??0});
   }
   return out;
@@ -47,6 +47,12 @@ export function normalizePcFileSystem(raw,{projects=[],audioExports,mentorFiles=
   const nk=f?.folderId+':'+key(f?.filename),snapshot=documentProject(f?.snapshot,f?.type),audio=['wav','mp3'].includes(f?.type)&&typeof f.audioExportId==='string'&&audioExports?.files?.some(a=>a.id===f.audioExportId);
   if(!validPcId(f?.id)||fileIds.has(f.id)||!ids.has(f.folderId)||pcDocumentFilename(f.filename,f.type)!==f.filename||names.has(nk)||!Number.isSafeInteger(f.bytes)||f.bytes<0||!validGameMinute(f.createdAtMinute)||!validGameMinute(f.modifiedAtMinute)||!snapshot&&!audio){out.recovery.push({reason:'Файл повреждён или имя занято.',recoveryData:clone(f)});continue;}
   fileIds.add(f.id);names.add(nk);out.files.push({...clone(f),...(snapshot?{snapshot:clone(snapshot)}:{})});
+ }
+ for(const f of mentorFiles){
+  if(f?.requiresDownload||out.files.some(existing=>existing.id===f?.id||existing.mentorFileId===f?.id))continue;
+  const type=projectType(f?.project),snapshot=documentProject(f?.project,type);if(!snapshot||!validPcId(f?.id)||!ids.has(f.folderId??'downloads'))continue;
+  const folderId=f.folderId??'downloads',filename=uniqueName(pcDocumentFilename(f.filename,type)??(pcEntryName(f.project.name)??'Вложение')+'.'+type,folderId,out.files);
+  out.files.push({id:'legacy-mentor:'+f.id,type,filename,folderId,projectId:f.project.id,snapshot:clone(snapshot),source:'mentor',mentorFileId:f.id,bytes:f.bytes??2000000,createdAtMinute:f.createdAtMinute??0,modifiedAtMinute:f.createdAtMinute??0});
  }
  return out;
 }

@@ -108,7 +108,7 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
   };
   files.addEventListener('contextmenu',backgroundMenu);
   render(true);
-  return {navigate,update(next){
+  return {navigate,openFile:fileId=>openEntry(entries().find(e=>e.fileId===fileId)),update(next){
     player.update();
     state=next;const previous=nav;nav=reconcileExplorerState(nav,state);const moved=previous.path!==nav.path,sig=structuralSignature();
     if(sig!==signature||nav!==previous){if(nav.selection&&!entries().some(e=>e.id===nav.selection))nav={...nav,selection:null};render(moved);}

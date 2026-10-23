@@ -7,6 +7,7 @@ import {attachSubmissionTrack,sendSubmission} from '../src/social-submission.js'
 import {advanceSubmissionUpload,uploadPresentation} from '../src/social-upload.js';
 import {createVirtualPcState} from '../src/virtual-pc-state.js';
 import {advanceSocial} from '../src/social-runtime.js';
+import {createPcFolder} from '../src/pc-filesystem.js';
 const options={communityId:'makarevich-1',fileId:'full',nowMinute:601};
 function fixture(){
  let s=ensureBattleWindow(submissionFixture({mixed:true}),{battleId:'makarevich-1',nowMinute:600}).state;
@@ -17,6 +18,12 @@ function fixture(){
  return s;
 }
 const tick=(s,t,extra={})=>advanceSubmissionUpload(s,{activeSeconds:t,powered:true,paused:false,...extra}).state;
+test('attachment rejects an immutable file associated with a different battle or round',()=>{
+ for(const change of [{battleId:'other-battle'},{roundId:'round-2'}]){
+  let s=submissionFixture();s.projects.find(p=>p.kind==='beat').recording.text.snapshot={...s.projects.find(p=>p.kind==='beat').recording.text.snapshot,...change};s=ensureBattleWindow(s,{battleId:'makarevich-1',nowMinute:600}).state;
+  const file=createAudioExport(s,{id:'wrong',projectId:'beat',kind:'track',folderId:'exports',filename:'Макаревич',nowMinute:600});assert.equal(file.ok,true,file.reason);const attached=attachSubmissionTrack(file.state,{...options,fileId:'wrong'});assert.equal(attached.ok,false);assert.match(attached.reason,/баттл|раунд|тем/i);
+ }
+});
 test('decimal active frame increments complete without a byte-rounding dead end',()=>{
  let s=attachSubmissionTrack(fixture(),options).state;for(let i=0;i<10;i++)s=tick(s,.2);
  assert.equal(s.outgoingUpload.status,'ready');assert.equal(s.outgoingUpload.elapsedSeconds,2);assert.equal(uploadPresentation(s).percent,100);

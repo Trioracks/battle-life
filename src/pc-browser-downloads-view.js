@@ -36,12 +36,12 @@ export function mountBrowserDownloads(root,{anchor,getState,onAction,getMessage=
   for(const entry of shown){
    if(!rows.has(entry.id)){
     const row=el(d,'div',{className:'uw-download-row'}),name=el(d,'span',{className:'uw-download-name',text:entry.name}),progress=el(d,'progress',{attributes:{max:'100','aria-label':'Загрузка '+entry.name}}),status=el(d,'small'),label=el(d,'span'),remaining=el(d,'span');
-    const open=button(d,'Открыть файл',{attributes:{'aria-label':'Открыть файл '+entry.name}},()=>onAction(entry.kind==='metadata'?'open-metadata':'installer',entry.appId));
-    status.append(label,remaining);row.append(name,progress,status,open);rows.set(entry.id,{row,progress,label,remaining,open});
+    const open=button(d,'Открыть файл',{attributes:{'aria-label':'Открыть файл '+entry.name}},()=>{const current=browserDownloadEntries(getState()).find(item=>item.id===entry.id);if(current)onAction(current.kind==='mentor'?'open-downloaded':current.kind==='metadata'?'open-metadata':'installer',current.kind==='mentor'?current.fileId:current.appId);});
+    const cancel=button(d,'Отменить',{attributes:{'aria-label':'Отменить загрузку '+entry.name}},()=>onAction('cancel-browser-download',entry.id));status.append(label,remaining);row.append(name,progress,status,open,cancel);rows.set(entry.id,{row,progress,label,remaining,open,cancel});
    }
    const view=rows.get(entry.id),percent=Math.floor(entry.receivedBytes/entry.totalBytes*100);
-   view.progress.value=percent;view.open.disabled=!entry.complete;
-   const text=entry.error?softwareMessage(entry.error):entry.complete?'Готово':percent+'%';
+   view.progress.value=percent;view.open.disabled=!entry.complete;view.cancel.hidden=entry.complete;
+   const text=entry.error?(entry.error==='attachment-unavailable'?'Вложение повреждено':softwareMessage(entry.error)):entry.complete?'Готово':percent+'%';
    if(view.label.textContent!==text)view.label.textContent=text;
    const remaining=!entry.error&&!entry.complete?' · Осталось '+Math.max(1,Math.ceil(1-entry.elapsedSeconds))+' с':'';
    if(view.remaining.textContent!==remaining)view.remaining.textContent=remaining;

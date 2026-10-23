@@ -1,3 +1,4 @@
+import {audioFileMatchesBattle} from './battle-file-match.js?rev=57';
 import {communityById} from './social-catalog.js?rev=57';
 import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow,isBattleWindowId} from './battle-windows.js?rev=57';
 import {validGameMinute} from './game-minute.js?rev=57';
@@ -34,6 +35,7 @@ export function startSubmissionUpload(state,{communityId,fileId,nowMinute}={}){
  if(!state.battleApplications?.some(a=>a.battleId===c.battleId))return fail('Сначала зарегистрируйся на этот баттл.');
  const file=normalizeAudioExports(state.audioExports,state.trackVersions,{fileSystem:state.fileSystem}).files.find(f=>f.id===fileId&&f.kind==='track');
  if(!file)return fail('Выбери экспортированный полный трек WAV или MP3. Бит, вокал и проект не подходят.');
+ if(!audioFileMatchesBattle(state,file,{battleId:c.battleId,roundId:window.roundId,themeId:state.roundThemes?.[c.battleId+':'+window.roundId]?.id}))return fail('Трек создан для другого баттла или раунда. Выбери работу для текущей темы.');
  const versionId=file.trackVersionId,totalBytes=file.bytes;
  const social=normalizeSocial(state.social);social.dialogs[communityId]={messages:[],unread:false,...social.dialogs[communityId],peer:{kind:'community',id:communityId}};
  return {ok:true,state:{...state,social,outgoingUpload:{version:2,communityId,windowId:window.id,fileId,versionId,totalBytes,uploadedBytes:0,fractionalBytes:0,elapsedSeconds:0,totalSeconds:UPLOAD_TOTAL_SECONDS,status:'uploading'}},versionId,reason:''};

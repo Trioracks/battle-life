@@ -1,3 +1,4 @@
+import {pcFileById,savePcDocument} from './pc-filesystem.js?rev=57';
 import {GOBLIN_ID,GOBLIN_SKILLS,GOBLIN_DIALOGUE,normalizeGoblin} from './goblin-catalog.js?rev=57';
 import {queueGoblinAttachment} from './goblin-mentor.js?rev=57';
 import {normalizeLyric,startLyricWork,advanceLyricWork} from './lyric-production.js?rev=57';
@@ -22,12 +23,12 @@ export function exportLyricFile(input,projectId,now){
  const p=normalizeLyric(input.projects?.find(p=>p.id===projectId));
  if(!validGameMinute(now)||!p||p.status!=='ready')return fail(input,'Для экспорта нужен готовый текст.');
  const g=normalizeGoblin(input.social?.goblin),id='text-file:'+p.id+':'+p.revision;
- if(g.files.some(f=>f.id===id))return {ok:true,state:input,fileId:id,reason:'Эта версия уже в «Моих документах».'};
+ const previous=g.files.find(f=>f.author==='player'&&f.kind==='lyrics'&&f.project?.id===p.id&&f.project?.revision===p.revision);
+ if(previous)return {ok:true,state:input,fileId:previous.id,reason:'Эта версия уже сохранена.'};
  const filename=p.name.replace(/[<>:"/\\|?*\x00-\x1f]/g,'_')+'.v'+p.revision+'.rap.txt';
- const file={id,kind:'lyrics',filename,folderId:'documents',createdAtMinute:now,author:'player',project:clone(p)};
- file.bytes=new TextEncoder().encode(JSON.stringify(p)).length;
- if(softwareDiskBytes(input).free<file.bytes)return fail(input,'На виртуальном диске недостаточно места.');
- g.files.push(file);return {ok:true,state:write(input,g),fileId:id,reason:'Текст экспортирован в «Мои документы». Можно отправить Гоблину.'};
+ const saved=savePcDocument(input,{projectId,folderId:'documents',filename:p.name.replace(/[<>:"/\\|?*]/g,'_')+'.txt',nowMinute:now});if(!saved.ok)return saved;
+ const file={id:saved.fileId,kind:'lyrics',filename:saved.state.fileSystem.files.find(f=>f.id===saved.fileId).filename,folderId:'documents',createdAtMinute:now,author:'player',project:clone(p),bytes:0};g.files.push(file);
+ return {ok:true,state:write(saved.state,g),fileId:saved.fileId,reason:'Текст сохранён. Можно отправить Гоблину.'};
 }
 function improvedText(input,p,now){
  const id='goblin-edit-'+p.id,skills={...GOBLIN_SKILLS};
@@ -48,24 +49,28 @@ function improvedText(input,p,now){
  const oldQuality=p.stages.reduce((sum,s)=>sum+s.quality,0),newQuality=text.stages.reduce((sum,s)=>sum+s.quality,0);
  return oldQuality>newQuality?normalizeLyric({...clone(p),id,name:base.name,revision:p.revision+1}):text;
 }
-function mentorBeat(input,now){
+function mentorBeat(input,now,source=null){
+ if(source?.audioBacking)return {...clone(source),id:'goblin-edit-'+source.id,name:(source.name+' · правки Гоблина').slice(0,64)};
  let s=studio(input),r=createBeat(s,{id:'goblin-first-beat',name:'Гоблин · первый совместный',genre:'experimental',gameDay:day(now)},GOBLIN_SKILLS,()=>.43);
  if(!r.ok)throw Error(r.reason);s=r.state;
+ if(source){s.projects=[normalizeBeat({...clone(source),id:'goblin-first-beat',name:(source.name+' · правки Гоблина').slice(0,64),stages:[],recording:null,songForm:undefined,mix:source.mix?.version===2?{...clone(source.mix),layers:[null,null,null]}:source.mix})];}
  for(let i=0;i<3;i++){
   s.music.practice=0;s.music.genres.xp.experimental=25;s.music.needs={satiety:100,energy:100};
   r=startBeatStage(s,'goblin-first-beat',[8,8,6],GOBLIN_SKILLS,()=>.43);
   if(!r.ok)throw Error(r.reason);s=advanceBeatWork(r.state,600).state;
  }
- return s.projects.find(p=>p.id==='goblin-first-beat');
+ const reworked=s.projects.find(p=>p.id==='goblin-first-beat');
+ if(source)for(let i=0;i<3;i++)if(source.stages[i].quality>reworked.stages[i].quality){reworked.stages[i]=clone(source.stages[i]);if(reworked.mix?.version===2&&source.mix?.version===2)reworked.mix.layers[i]=clone(source.mix.layers[i]);}
+ return reworked;
 }
 export function sendGoblinFile(input,fileId,now){
  if(!validGameMinute(now))return fail(input,'Не удалось определить игровое время.');
- const g=normalizeGoblin(input.social?.goblin),lyric=g.files.find(f=>f.id===fileId&&f.author==='player'&&f.kind==='lyrics');
+ const g=normalizeGoblin(input.social?.goblin),savedFile=pcFileById(input,fileId),lyric=savedFile?.type==='txt'?{project:savedFile.snapshot}:g.files.find(f=>f.id===fileId&&f.author==='player'&&f.kind==='lyrics');
  const audio=input.audioExports?.files?.find(f=>f.id===fileId&&['beat','track'].includes(f.kind));
- const kind=lyric?'text':audio?.kind;
+ const projectFile=savedFile?.type==='flp'?savedFile:null,kind=lyric?'text':projectFile?'project':audio?.kind;
  if(!kind)return fail(input,'Выбери экспортированный текст, бит или полный трек.');
  if(!input.battleApplications?.some(a=>a.battleId==='makarevich-1'))return fail(input,'Сначала зарегистрируйся на Макаревич Battle в сообщениях группы. Подписка и заявка — разные вещи.');
- const stages={text:['text'],beat:['beat'],track:['vocal']};
+ const stages={text:['text'],beat:['beat'],project:['beat-project'],track:['vocal']};
  if(!stages[kind].includes(g.stage)||g.sent[kind])return fail(input,'Сейчас друг ждёт другое вложение. Повторная помощь на этом этапе уже не нужна.');
  let project,exported=null,body;
  try{
@@ -74,8 +79,11 @@ export function sendGoblinFile(input,fileId,now){
    project=improvedText(input,p,now);
    body=GOBLIN_DIALOGUE['return:text'];
   }else if(kind==='beat'){
-   project=mentorBeat(input,now);
-   body=GOBLIN_DIALOGUE['return:beat'];
+   g.sent.beat=fileId;let state=queueGoblinAttachment(write(input,g),{key:'heard-beat',now,body:'Послушал. Хорошо, что начал) А скинь ещё FLP — сам проект. WAV или MP3 уже не разложить обратно на дорожки. В студии нажми «Сохранить» и прикрепи получившийся FLP.',nextStage:'waiting-beat'});state.social.goblin.pending.find(m=>m.id==='heard-beat').nextStage='beat-project';
+   const dialog=clone(state.social.dialogs[GOBLIN_ID]);dialog.messages.push({id:'goblin:sent:beat',sender:'player',kind:'personal',at:now,body:'Вот мой бит, зацени!',exportId:fileId});state.social.dialogs[GOBLIN_ID]=dialog;return {ok:true,state,reason:''};
+  }else if(kind==='project'){
+   const original=input.audioExports.files.find(f=>f.id===g.sent.beat),source=normalizeBeat(projectFile.snapshot);if(!source||source.status!=='ready'||source.audioIssue||source.id!==original?.projectId)return fail(input,'Нужен сохранённый FLP именно того бита, который ты прислал.');
+   project=mentorBeat(input,now,source);body=GOBLIN_DIALOGUE['return:beat'];
   }else{
    const version=input.trackVersions?.byId?.[audio.trackVersionId];
    project=normalizeBeat(version?.recipe?.beat);
@@ -92,23 +100,23 @@ export function sendGoblinFile(input,fileId,now){
   }
  }catch(e){return fail(input,e.message||'Не удалось подготовить ответ. Исходник сохранён.');}
  const id='goblin-return-'+kind;
- const response={id,kind:project.kind,filename:project.name+(project.kind==='lyrics'?'.rap.txt':'.ftproj'),folderId:'downloads',createdAtMinute:now+20,author:GOBLIN_ID,project,exported};
- response.bytes=new TextEncoder().encode(JSON.stringify(response)).length;
+ const response={id,kind:project.kind,requiresDownload:true,filename:project.name+(project.kind==='lyrics'?'.txt':'.flp'),folderId:'downloads',createdAtMinute:now+20,author:GOBLIN_ID,project,exported};
+ response.bytes=project.kind==='beat'&&!exported?2000000:new TextEncoder().encode(JSON.stringify(response)).length;
  if(softwareDiskBytes(input).free<response.bytes)return fail(input,'Недостаточно места для ответного вложения. Освободи виртуальный диск.');
  g.files.push(response);g.sent[kind]=fileId;
  const social={...input.social,goblin:g,dialogs:{...input.social?.dialogs}};
  const dialog=clone(social.dialogs[GOBLIN_ID]??{peer:{kind:'person',id:GOBLIN_ID},messages:[],unread:false});
- dialog.messages.push({id:'goblin:sent:'+kind,sender:'player',kind:'personal',at:now,body:kind==='text'?'Чувак, вот мой текст. Глянешь?':kind==='beat'?'Вот мой бит, зацени!':'Братан, вот с моим голосом получилось.',fileId,exportId:audio?.id});
+ dialog.messages.push({id:'goblin:sent:'+kind,sender:'player',kind:'personal',at:now,body:kind==='text'?'Чувак, вот мой текст. Глянешь?':kind==='beat'?'Вот мой бит, зацени!':'Братан, вот с моим голосом получилось.',fileId,exportId:audio?.id,...(savedFile?.snapshot?{attachmentSnapshot:{type:savedFile.type,filename:savedFile.filename,snapshot:clone(savedFile.snapshot)}}:{})});
  social.dialogs[GOBLIN_ID]=dialog;
  // Advance only when the reply arrives, not while it is still pending.
  let state=queueGoblinAttachment({...input,social},{key:'return:'+kind,now,body,fileId:id,nextStage:'waiting-'+kind});
- const next={text:'beat',beat:'vocal',track:'finished'}[kind];
+ const next={text:'beat',project:'vocal',track:'finished'}[kind];
  state.social.goblin.pending.find(m=>m.id==='return:'+kind).nextStage=next;
  return {ok:true,state,reason:''};
 }
 export function importGoblinFile(input,fileId,now){
  const g=normalizeGoblin(input.social?.goblin),f=g.files.find(f=>f.id===fileId);
- if(!f||!validGameMinute(now)||f.createdAtMinute>now)return fail(input,'Вложение ещё не получено.');
+ if(!f||!validGameMinute(now)||f.createdAtMinute>now||f.requiresDownload&&!g.downloaded?.[fileId])return fail(input,'Вложение ещё не получено.');
  const app=f.kind==='lyrics'?'notebook':'ft';
  if(!input.software?.[app]?.installed)return fail(input,'Сначала установи '+(app==='ft'?'FT Studio.':'Рэпблокнот.'));
  const p=f.kind==='lyrics'?normalizeLyric(f.project):normalizeBeat(f.project);

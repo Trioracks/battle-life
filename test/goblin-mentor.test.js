@@ -1,3 +1,5 @@
+import {startMentorDownload,advanceBrowserDownloads} from '../src/pc-browser-downloads.js';
+import {savePcDocument,openPcDocument} from '../src/pc-filesystem.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createVirtualPcState} from '../src/virtual-pc-state.js';
@@ -17,6 +19,7 @@ import {existsSync} from 'node:fs';
 const next=r=>{assert.equal(r.ok,true,r.reason);return r.state;};
 const restore=s=>createVirtualPcState(JSON.parse(JSON.stringify(s)));
 
+function downloadOpen(state,attachmentId,now){const started=startMentorDownload(state,{attachmentId,nowMinute:now});assert.equal(started.ok,true,started.reason);let s=advanceBrowserDownloads(started.state,{activeSeconds:1}).state;const fileId=s.social.goblin.downloaded[attachmentId];assert.ok(fileId);if(s.fileSystem.files.some(f=>f.id===fileId)){const opened=openPcDocument(s,{fileId});assert.equal(opened.ok,true,opened.reason);s=opened.state;}return {ok:true,state:s};}
 test('Goblin greets after twenty game minutes and does not duplicate on reload',()=>{
  let state=createVirtualPcState();
  state=advanceSocial(state,480).state;
@@ -82,13 +85,12 @@ test('mentor exchange preserves originals and player XP; final WAV survives save
  assert.equal(importGoblinFile(s,'goblin-return-text',519).ok,false);
  s=advanceGoblin(restore(s),520).state;
  const d=pcDocument(),dialog=mountGoblinDialog(d,{getState:()=>s,getMetadata:()=>({gameMinutes:520,playerName:'Герой'}),navigate:()=>{},commit:()=>true,audio:{releaseRows(){}}});
- assert.ok(findButton(dialog.root,'Сохранить и открыть текст'));dialog.dispose();
- s=next(importGoblinFile(s,'goblin-return-text',520));
+ assert.ok(allPc(dialog.root).some(n=>n.tagName==='BUTTON'&&n.textContent?.startsWith('Скачать ')));dialog.dispose();
+ s=next(downloadOpen(s,'goblin-return-text',520));
  const exportBeat=next(createAudioExport(s,{id:'test-beat',projectId:'beat',kind:'beat',folderId:'exports',filename:'Мой бит',nowMinute:530}));
  s=next(sendGoblinFile(exportBeat,'test-beat',530));
- s=advanceGoblin(restore(s),550).state;
- s=next(importGoblinFile(s,'goblin-return-beat',550));
- const beatId=s.social.goblin.received['goblin-return-beat'],textId=s.social.goblin.received['goblin-return-text'];
+ s=advanceGoblin(restore(s),550).state;const flp=savePcDocument(s,{projectId:'beat',folderId:'projects',filename:'Мой проект.flp',nowMinute:550});s=next(sendGoblinFile(flp.state,flp.fileId,550));s=advanceGoblin(s,570).state;s=next(downloadOpen(s,'goblin-return-project',570));
+ const beatId=s.music.activeBeatId,textId=s.writing.activeTextId;
  assert.ok(!s.projects.find(p=>p.id===beatId).recording);
  assert.deepEqual(practice(),before);
  s.music.needs={satiety:100,energy:100};
@@ -99,19 +101,19 @@ test('mentor exchange preserves originals and player XP; final WAV survives save
  s=next(createAudioExport(s,{id:'test-track',projectId:beatId,kind:'track',folderId:'exports',filename:'Мой голос',nowMinute:600}));
  s=next(sendGoblinFile(s,'test-track',600));
  s=advanceGoblin(restore(s),620).state;
- s=next(importGoblinFile(s,'goblin-return-track',620));
+ s=next(downloadOpen(s,'goblin-return-track',620));
  s=restore(s);
- const received=s.audioExports.files.find(f=>f.id==='received-goblin-return-track');
+ const received=s.audioExports.files.find(f=>f.id==='download:goblin-return-track');
  assert.ok(received);assert.equal(received.voiceId,voice.voiceId);
  assert.ok(s.trackVersions.byId[received.trackVersionId]);
  assert.equal(s.audioExports.recovery.length,0);
  assert.deepEqual(s.projects.filter(p=>original.some(o=>o.id===p.id)),original);
- const result=s.projects.find(p=>p.id===s.social.goblin.received['goblin-return-track']).recording;
+ const result=s.trackVersions.byId[received.trackVersionId].recipe.beat.recording;
  assert.deepEqual(result.clean,voice.clean);assert.deepEqual(result.text,voice.text);
  assert.equal(result.mix.skill,25);assert.equal(result.master.skill,25);
  assert.deepEqual(practice(),practiceBeforeMix);
  assert.equal(sendGoblinFile(s,'test-track',700).ok,false);
- assert.equal(next(importGoblinFile(s,'goblin-return-track',700)).projects.length,s.projects.length);
+ assert.equal(next(downloadOpen(s,'goblin-return-track',700)).projects.length,s.projects.length);
 });
 
 test('profile starts with two songs and photos, lazy assets exist, future battle work is hidden',()=>{

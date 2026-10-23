@@ -60,7 +60,7 @@ test('Goblin retries unread persistence after reopening instead of treating a fa
 
 test('Goblin attachment chooser prepares the actual exported text and sends only on request',()=>{
  let state=advanceGoblin(exportedSubmissionFixture(),0).state;state.social.goblin.stage='text';const exported=exportLyricFile(state,'lyrics',20);assert.equal(exported.ok,true);state=exported.state;
- const f=goblin(state),before=f.state.social.dialogs[GOBLIN_ID].messages.length;findButton(f.view.root,'Прикрепить').click();findButton(f.view.root,'Выбрать вложение').click();
+ const f=goblin(state),before=f.state.social.dialogs[GOBLIN_ID].messages.length;findButton(f.view.root,'Прикрепить').click();const picker=allPc(f.view.root).find(n=>n.className==='pc-file-picker');findButton(picker,'Выбрать: '+f.state.fileSystem.files.find(file=>file.id===exported.fileId).filename).click();findButton(picker,'Прикрепить').click();
  assert.equal(f.state.social.goblin.sent.text,undefined);assert.equal(f.state.social.dialogs[GOBLIN_ID].messages.length,before);f.tick(3);assert.equal(field(f.view.root).value,'Чувак, вот мой текст. Глянешь?');assert.equal(f.state.social.goblin.stage,'text');
  findButton(f.view.root,'Отправить').click();assert.equal(f.state.social.goblin.stage,'waiting-text');assert.equal(f.state.social.goblin.sent.text,exported.fileId);assert.equal(f.state.social.dialogs[GOBLIN_ID].messages.length,before+1);assert.equal(f.state.social.goblin.pending.find(m=>m.id==='return:text').at,40);f.view.dispose();
 });

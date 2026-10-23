@@ -2,12 +2,13 @@ import {GOBLIN_ID,GOBLIN_NAME,normalizeGoblin} from './goblin-catalog.js?rev=57'
 import {receivePhoneEvents} from './phone-notifications.js?rev=57';
 import {validGameMinute} from './game-minute.js?rev=57';
 import {battleStage,battleStageText} from './battle-stage.js?rev=57';
+import {SOFTWARE} from './pc-software-catalog.js?rev=57';
 const battleLink={label:'Макаревич Battle',url:'underweb://social/community/makarevich-1'};
 const hash=value=>{let h=2166136261;for(const c of String(value))h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0;};
 export function goblinReplyContext(state,nowMinute=state.socialRuntime?.lastMinute??state.lastGameMinute??0){
  const g=state.social?.goblin??{},stage=g.stage,choices=[],used=new Set(g.contextUsed??[]),messages=state.social?.dialogs?.[GOBLIN_ID]?.messages??[],seen=id=>messages.some(m=>m.id==='goblin:'+id);
  const add=(id,label,condition=true)=>{if(condition&&!used.has(stage+':'+id))choices.push([id,label]);};
- const specs=goblinContextResponses(state,nowMinute);let hint='Гоблин пока занят. Новые сообщения появятся здесь.',expectedFileTypes=[];
+ const specs=goblinContextResponses(state,nowMinute);let hint='Гоблин отвечает. Можно подождать здесь или заняться делами — сообщение сохранится в переписке.',expectedFileTypes=[];
  if(stage==='hello')choices.push(['good','Хорошо! Сам как?'],['normal','Нормально, сам как?'],['bad','Да так себе...']);
  if(stage==='invite-wait'&&seen('mood')){add('music','О, чё за музыка?');add('old-band','А как твоя старая группа?');if(seen('company'))choices.push(['yes','Давай попробуем. Что нужно сделать?']);hint='Можно спросить про музыку или подождать продолжения.';}
  if(stage==='invite')choices.push(['yes','О, круто! А чё дальше?'],['later','Я пока сам разберусь']);
@@ -26,7 +27,12 @@ export function goblinReplyContext(state,nowMinute=state.socialRuntime?.lastMinu
 }
 export function goblinContextResponses(state,nowMinute){
  const g=state.social?.goblin??{},stage=g.stage,s=state.software??{},allowed=ids=>ids.includes(stage),installing=id=>s.installer?.appId===id&&s.installer.step!=='finish';
- return {
+ const downloads={};for(const [id,name]of [['notebook','Рэпблокнот'],['ft','FT Studio']]){
+  const available=allowed(['software','text','beat'])&&!s[id]?.installed,bytes=s[id]?.receivedBytes??0;
+  downloads['downloading-'+id]={available:available&&bytes>0&&bytes<SOFTWARE[id].downloadBytes,label:name+' скачивается.',body:'Ага, пусть докачается. После загрузки открой установщик в «Загрузках», установи программу и закрой мастер кнопкой «Готово».'};
+  downloads['downloaded-'+id]={available:available&&bytes===SOFTWARE[id].downloadBytes,label:name+' скачал. Что дальше?',body:'Теперь установи. Открой «Мой компьютер» → «Загрузки», найди скачанный файл и запусти установщик. Пройди до «Готово», тогда можно будет работать.'};
+ }
+ return {...downloads,
   'downloading-client':{available:stage==='client'&&s.client?.receivedBytes>0&&!s.client.installed,label:'Качаю torent.',body:'Ага, дождись загрузки. Потом открой установщик из «Загрузок» и пройди до конца.'},
   'installing-client':{available:stage==='client'&&installing('client'),label:'Устанавливаю torent.',body:'Ну хорош) Дойди до кнопки «Готово», потом за программами пойдём.'},
   'help-client':{available:stage==='client',label:'Не понял, как установить torent.',body:'Открой ссылку из моего сообщения, скачай установщик. В «Моём компьютере» зайди в «Загрузки», открой его и нажимай «Далее», затем «Установить» и «Готово».'},
@@ -53,7 +59,7 @@ export function deliverGoblinMessage(g,dialog,msg,at){
  const id='goblin:'+msg.id;if(dialog.messages.some(m=>m.id===id))return null;
  const rank={new:0,'greeting-wait':1,hello:2,'invite-wait':3,invite:4,paused:4,subscribe:5,client:6,software:7,text:8,'waiting-text':8,beat:9,'waiting-beat':9,'beat-project':10,'waiting-project':10,vocal:11,'waiting-track':11,finished:12};
  if(msg.nextStage&&rank[msg.nextStage]<rank[g.stage])return null;
- const {nextStage,activeElapsedSeconds,chatSeconds,...rest}=msg;dialog.messages.push({...rest,id,at,kind:'personal',sender:GOBLIN_ID});dialog.unread=true;if(nextStage)g.stage=nextStage;if(msg.followupId)g.activeFollowup=msg.followupId;
+ const {nextStage,activeElapsedSeconds,chatSeconds,...rest}=msg;dialog.messages.push({...rest,id,at,kind:'personal',sender:GOBLIN_ID});dialog.unread=true;if(nextStage)g.stage=nextStage;if(msg.followupId)g.activeFollowup=msg.followupId;if(msg.fileId)g.files=g.files.map(f=>f.id===msg.fileId&&f.createdAtMinute>at?{...f,createdAtMinute:at}:f);
  return {id,type:'personal-message',source:'В кругу',sender:GOBLIN_NAME,profileId:GOBLIN_ID,dialogId:GOBLIN_ID,dueAt:at,text:msg.body};
 }
 export function advanceGoblinActiveChat(input,{nowMinute,activeSeconds,visible,powered,paused}={}){

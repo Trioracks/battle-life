@@ -35,13 +35,12 @@ test('PC-off catchup and stepped clocks preserve exact public events, recipes, r
  const relevant=s=>s.socialRuntime.events.filter(e=>!e.type.startsWith('personal'));assert.deepEqual(relevant(small),relevant(large));assert.ok(relevant(large).every(e=>e.dueAt<=end));
  const early=publicRoundTable(large,{battleId:'makarevich-1',roundId:'selection',nowMinute:10680});assert.ok(!JSON.stringify(early).includes('raw'));
 });
-test('old-round lyric may be submitted but is never labelled as the new round topic',()=>{
+test('a file from another round is rejected before upload and cannot consume an attempt',()=>{
  let s=ensureBattleWindow(submissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state;
  s.projects.find(p=>p.kind==='beat').recording.text.snapshot.roundId='round-2';
  s.projects.find(p=>p.kind==='beat').recording.text.snapshot.themeId='makarevich-1:round-2';
  s=exportSubmissionFile(s);
- s=completeSubmissionMessage(completeSubmissionUpload(attachSubmissionTrack(s,{communityId:'makarevich-1',fileId:'submission-file',nowMinute:601}).state));
- const sent=sendSubmission(s,{communityId:'makarevich-1',nowMinute:602});assert.equal(sent.ok,true,sent.reason);assert.equal(sent.state.battleSubmissions[0].topicMatch,false);
+ const uploaded=attachSubmissionTrack(s,{communityId:'makarevich-1',fileId:'submission-file',nowMinute:601});assert.equal(uploaded.ok,false);assert.match(uploaded.reason,/раунд/);assert.equal(uploaded.state.battleSubmissions.length,0);
 });
 test('damaged published theme is quarantined through reload; never silently rerolled',()=>{
  let s=ensureTournament(ensureBattleWindow(createVirtualPcState(),{battleId:'makarevich-1',nowMinute:600}).state,{nowMinute:600}).state;

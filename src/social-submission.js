@@ -29,7 +29,7 @@ export function sendSubmission(state,{communityId,nowMinute}={}){
  if(message?.issue)return fail(message.issue);
  if(!message||message.communityId!==communityId||message.windowId!==window.id||message.versionId!==version.id||message.elapsedSeconds<6)return fail('Сначала закончи набор сообщения.');
  const id=window.id+':player',row={version:2,id,windowId:window.id,battleId:c.battleId,communityId,roundId:window.roundId,playerId:'player',trackVersionId:version.id,sentAt:nowMinute,...acknowledgementFor(id,nowMinute,window.roundId),status:'pending',topicMatch:lyrics?lyrics.battleId===c.battleId&&(lyrics.roundId??'selection')===window.roundId&&(!lyrics.themeId||!state.roundThemes?.[c.battleId+':'+window.roundId]||lyrics.themeId===state.roundThemes[c.battleId+':'+window.roundId].id):null};
- social.dialogs[communityId]={...dialog,draftVersionId:null,messages:[...(dialog.messages??[]),{id:id+':sent',kind:'submission',sender:'player',at:nowMinute,trackVersionId:version.id,body:message.body}]};
+ social.dialogs[communityId]={...dialog,draftVersionId:null,messages:[...(dialog.messages??[]),{id:id+':sent',kind:'submission',sender:'player',at:nowMinute,trackVersionId:version.id,body:message.body,...(message.version===2&&message.textAttachment?{textAttachment:structuredClone(message.textAttachment)}:{})}]};
  return {ok:true,state:{...state,social,outgoingMessage:null,outgoingUpload:upload?.communityId===communityId?null:state.outgoingUpload,battleSubmissions:[...(state.battleSubmissions??[]),row]},reason:''};
 }
 export function dialogIsTyping(state,communityId,nowMinute){

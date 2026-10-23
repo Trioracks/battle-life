@@ -26,7 +26,7 @@ import {normalizeBeat} from './beat-production.js?rev=57';
 import {createBeatMarket} from './beat-market-view.js?rev=57';
 import * as software from './pc-software.js?rev=57';
 import {mountTorrent,mountInstaller,softwareMessage} from './pc-software-view.js?rev=57';
-import {startBrowserDownload,advanceBrowserDownloads,clearCompletedBrowserDownloadHistory} from './pc-browser-downloads.js?rev=57';
+import {startBrowserDownload,advanceBrowserDownloads,clearCompletedBrowserDownloadHistory,cancelBrowserDownload} from './pc-browser-downloads.js?rev=57';
 import {SOFTWARE} from './pc-software-catalog.js?rev=57';
 import {mountRapNotebook} from './rap-notebook-view.js?rev=57';
 import {mountRapDossier} from './rap-dossier-view.js?rev=57';
@@ -236,6 +236,8 @@ export function mountVirtualPc(root, callbacks = {}) {
   };
   pc.softwareAction = (action,id) => {
     let result;
+    if(action==='cancel-browser-download'){const r=cancelBrowserDownload(pc.state,id);if(r.ok)pc.persist(r.state,{atomic:true});pc.renderDesktop(false);return;}
+    if(action==='open-downloaded'){pc.message=pc.openDownloadedFile(id);return;}
     if(action==='clear-download-history'){pc.persist(clearCompletedBrowserDownloadHistory(pc.state).state,{atomic:true});pc.renderDesktop(false);return;}
     if(['download-client','download-metadata','download-notebook'].includes(action)){
       const appId=action==='download-client'?'client':action==='download-notebook'?'notebook':id??'ft';
@@ -375,7 +377,7 @@ export function mountVirtualPc(root, callbacks = {}) {
       pc.notebookView.update();return;
     }
     if(appId==='underweb'){
-      if(!pc.underwebView)pc.underwebView=mountUnderweb(target,{onWork:()=>callbacks.onWork?.()??false,onStudyTarget:target=>{pc.open('rap-dossier');pc.dossierView?.focusTarget(target);},getState:()=>pc.state,getMetadata:()=>({...pc.metadata,openMentorFile:pc.openMentorFile}),isVisible:()=>pc.phase==='desktop'&&!pc.locked&&!root.hidden&&!document.hidden&&(!root.dataset.pcTransition||root.dataset.pcTransition==='desktop')&&pc.windows.activeId==='underweb'&&pc.windows.windows.some(w=>w.id==='underweb'&&w.mode!=='minimized'),onApply:(id,name)=>pc.persist(applyToBattle(pc.state,id,name)),onSubmitTrack:id=>pc.showSubmission(id),onResultViewed:callbacks.onResultViewed,onSoftware:pc.softwareAction,getSoftwareMessage:()=>pc.message,onChange:next=>{const saved=pc.persist(next,{atomic:true});pc.renderDesktop(false);return saved;},audio:pc.audioSession.forOwner('underweb')});
+      if(!pc.underwebView)pc.underwebView=mountUnderweb(target,{onWork:()=>callbacks.onWork?.()??false,onStudyTarget:target=>{pc.open('rap-dossier');pc.dossierView?.focusTarget(target);},getState:()=>pc.state,getMetadata:()=>({...pc.metadata,openMentorFile:pc.openMentorFile,openDownloadedFile:pc.openDownloadedFile}),isVisible:()=>pc.phase==='desktop'&&!pc.locked&&!root.hidden&&!document.hidden&&(!root.dataset.pcTransition||root.dataset.pcTransition==='desktop')&&pc.windows.activeId==='underweb'&&pc.windows.windows.some(w=>w.id==='underweb'&&w.mode!=='minimized'),onApply:(id,name)=>pc.persist(applyToBattle(pc.state,id,name)),onSubmitTrack:id=>pc.showSubmission(id),onResultViewed:callbacks.onResultViewed,onSoftware:pc.softwareAction,getSoftwareMessage:()=>pc.message,onChange:next=>{const saved=pc.persist(next,{atomic:true});pc.renderDesktop(false);return saved;},audio:pc.audioSession.forOwner('underweb')});
       pc.underwebView.update();return;
     }
     if(appId==='ft-studio'){
@@ -485,6 +487,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     const open=()=>{const r=openPcDocument(pc.state,{fileId});if(!r.ok)return r.reason;if(!pc.persist(r.state,{atomic:true}))return 'Не удалось открыть файл.';pc.openProject(pc.state.projects.find(p=>p.id===r.projectId));return '';};
     if(view?.requestClose){view.requestClose({onClose:open});return '';}return open();
   };
+  pc.openDownloadedFile = fileId => {const file=pcFileById(pc.state,fileId);if(!file)return 'Файл недоступен.';if(file.snapshot)return pc.openDocumentFile(fileId);pc.open('computer');pc.openFolder(file.folderId);pc.explorer?.openFile(fileId);return '';};
   pc.openMentorFile = fileId => {
     const r=importGoblinFile(pc.state,fileId,pc.metadata.gameMinutes??pc.state.lastGameMinute??0);
     if(!r.ok)return r.reason;

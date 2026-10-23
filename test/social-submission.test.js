@@ -15,10 +15,10 @@ test('attach freezes personal audio without posting or consuming attempt; double
  assert.equal(attachSubmissionTrack(sent.state,options).ok,false);
  const copy=structuredClone(row);sent.state.projects[1].name='changed';assert.deepEqual(createVirtualPcState(sent.state).battleSubmissions[0],copy);
 });
-test('registration, playable vocal and open interval gate send, off-topic track is allowed',()=>{
+test('registration, playable vocal and open interval gate send, off-topic audio is rejected',()=>{
  assert.equal(attachSubmissionTrack(ready({vocal:false}),options).ok,false);
  let s=attachSubmissionTrack(ready({registered:false}),options).state;assert.equal(sendSubmission(s,options).ok,false);
- s=completeSubmissionMessage(completeSubmissionUpload(attachSubmissionTrack(ready({battleId:null}),options).state));assert.ok(sendSubmission(s,options).ok);assert.equal(sendSubmission(s,options).state.battleSubmissions[0].topicMatch,false);
+ assert.equal(attachSubmissionTrack(ready({battleId:null}),options).ok,false);s=completeSubmissionMessage(completeSubmissionUpload(attachSubmissionTrack(ready(),options).state));assert.ok(sendSubmission(s,options).ok);
  for(const nowMinute of [599,600+7*1440,NaN,Infinity])assert.equal(sendSubmission(s,{...options,nowMinute}).ok,false);
  assert.equal(ACK_TEMPLATES.length,10);assert.equal(new Set(ACK_TEMPLATES.map(t=>t.body)).size,10);
 });
