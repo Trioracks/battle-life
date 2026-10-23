@@ -2,9 +2,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {publicPreviewFixture} from '../test/helpers/public-preview-fixture.js';
+import {savePcDocument} from '../src/pc-filesystem.js';
 export async function verifyFilePicker(page,{artifactUrl,outputDir}){
  await fs.mkdir(outputDir,{recursive:true});const address=new URL('__qa-picker',artifactUrl).href,checks=[];
- await page.route(address,route=>route.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8"><link rel="icon" href="data:,">'+['virtual-pc','desktop-apps','rap-notebook-shell'].map(n=>'<link rel="stylesheet" href="'+artifactUrl+n+'.css">').join('')+'<style>body{margin:0}#root{position:fixed;inset:40px}</style><main id="root"></main>'}));
+ await page.route(address,route=>route.fulfill({contentType:'text/html',body:'<!doctype html><meta charset="utf-8"><link rel="icon" href="data:,">'+['virtual-pc','desktop-apps','rap-notebook','rap-notebook-shell'].map(n=>'<link rel="stylesheet" href="'+artifactUrl+n+'.css">').join('')+'<style>body{margin:0}#virtual-pc{position:fixed;inset:0}#root{position:absolute;inset:40px}</style><section id="virtual-pc"><main id="root"></main></section>'}));
  for(const width of [1280,1536,1920]){
   await page.setViewportSize({width,height:width===1280?720:1080});await page.goto(address);
   await page.evaluate(async({base,seed})=>{const {mountBeatStudio}=await import(base+'src/beat-studio-view.js');window.installPicker=()=>{window.pickerView?.dispose();let state=JSON.parse(seed['battle-life-virtual-pc-v1']);window.pickerView=mountBeatStudio(document.querySelector('#root'),{getState:()=>state,getMetadata:()=>({skills:{}}),onChange:s=>{state=s;return true;},audio:{stop(){},getSnapshot(){return {};},capabilities:{recordedPlayback:false}}});};window.installPicker();},{base:artifactUrl,seed:publicPreviewFixture('beat')});
@@ -14,5 +15,11 @@ export async function verifyFilePicker(page,{artifactUrl,outputDir}){
   await page.evaluate(()=>window.installPicker());await open();await row().dblclick({delay:100});await page.getByRole('button',{name:'Работать над битом',exact:true}).waitFor({state:'visible'});
   checks.push({width,firstClickShift:after.y-before.y,doubleClickDelay:100,opened:true});await page.screenshot({path:path.join(outputDir,'opened-'+width+'.png')});
  }
+ const filename='Long word '.repeat(10)+'.txt',seed=publicPreviewFixture('lyrics'),saved=savePcDocument(JSON.parse(seed['battle-life-virtual-pc-v1']),{projectId:'preview-lyrics',folderId:'downloads',filename,nowMinute:600});assert.equal(saved.ok,true);
+ await page.setViewportSize({width:1280,height:720});await page.goto(address);
+ await page.evaluate(async({base,state})=>{const {mountRapNotebook}=await import(base+'src/rap-notebook-view.js');window.pickerView=mountRapNotebook(document.querySelector('#root'),{getState:()=>state,getMetadata:()=>({skills:{},gameMinutes:600}),onChange:s=>{state=s;return true;}});},{base:artifactUrl,state:saved.state});
+ await page.getByRole('button',{name:'Открыть текст',exact:true}).click();await page.getByRole('button',{name:'Выбрать: '+filename,exact:true}).click();await page.keyboard.press('Tab');
+ const details=page.locator('.pc-picker-details'),info=await details.evaluate(n=>({focused:document.activeElement===n,height:n.clientHeight,scrollHeight:n.scrollHeight,lineHeight:getComputedStyle(n).lineHeight}));assert.equal(info.focused,true,'Selected details must join the keyboard cycle');assert.ok(info.scrollHeight<=info.height+1,'Two-line file details must fit without clipping');
+ await details.press('End');await page.screenshot({path:path.join(outputDir,'notebook-long-name.png')});checks.push({notebookLongName:true,...info});
  await fs.writeFile(path.join(outputDir,'file-picker-report.json'),JSON.stringify({checks},null,2));return checks;
 }
