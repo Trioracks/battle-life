@@ -68,6 +68,19 @@ jobs:
         run: npm run build:preview
       - name: Audit built runtime
         run: npm run audit:site > "$RUNNER_TEMP/site-audit.json"
+      - name: Bound Ubuntu package downloads on the hosted runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The Azure mirror stalled on font packages during release checks.
+          # Keep signed Ubuntu packages and all Playwright system dependencies.
+          if [[ -f /etc/apt/apt-mirrors.txt ]]; then
+            printf '%s\n' 'https://archive.ubuntu.com/ubuntu' | sudo tee /etc/apt/apt-mirrors.txt > /dev/null
+          fi
+          printf '%s\n' 'Acquire::http::Timeout "30";' 'Acquire::https::Timeout "30";' 'Acquire::Retries "2";' | sudo tee /etc/apt/apt.conf.d/zzzz-public-preview-timeouts > /dev/null
+          test "$(apt-config shell preview_http_timeout Acquire::http::Timeout)" = "preview_http_timeout='30'"
+          test "$(apt-config shell preview_https_timeout Acquire::https::Timeout)" = "preview_https_timeout='30'"
+          test "$(apt-config shell preview_retries Acquire::Retries)" = "preview_retries='2'"
       - name: Install Chromium on the hosted runner
         run: npx playwright install --with-deps chromium
       - name: Browser smoke against the isolated built artifact
