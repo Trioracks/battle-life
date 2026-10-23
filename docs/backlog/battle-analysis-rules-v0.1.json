@@ -1,0 +1,472 @@
+{
+  "schemaVersion": "0.1",
+  "date": "2026-10-12",
+  "status": "backlog_requirements_and_candidates_not_runtime_implementation",
+  "specRef": "2026-10-12-text-budget-noshow-and-judge-dossier.md",
+  "textMix": {
+    "confirmed": true,
+    "keys": [
+      "topic",
+      "diss",
+      "lyric"
+    ],
+    "eachRange": [
+      0,
+      100
+    ],
+    "requiredSum": 100,
+    "appliesTo": [
+      "submitted_track_content_mix",
+      "judge_preferred_content_mix"
+    ],
+    "validExamples": [
+      [
+        80,
+        10,
+        10
+      ],
+      [
+        80,
+        20,
+        0
+      ]
+    ],
+    "invalidExamples": [
+      [
+        80,
+        70,
+        40
+      ]
+    ],
+    "manualControlUnlock": {
+      "confirmedInputs": [
+        "writing"
+      ],
+      "thresholds": {
+        "writing": 25
+      },
+      "comparison": "writing >= 25",
+      "lockedMode": "system_generated_random_content_mix_no_player_choice",
+      "lockedBelowWriting": 25,
+      "manualAtOrAboveWriting": 25,
+      "confirmed": true,
+      "additionalBattleExperienceThreshold": null,
+      "additionalBattleExperienceGateConfirmed": false,
+      "lockedMixSum": 100,
+      "randomDistribution": null,
+      "randomGenerationMoment": null,
+      "persistenceRecommendation": "fix once per authored text version; no reroll on open/load; do not rewrite submitted versions after skill growth",
+      "heroReaction": "short_subjective_comment_about_resulting_mix",
+      "lockedSliderPresentation": null
+    },
+    "vectorPenaltyCandidate": {
+      "status": "proposal_not_approved_final_formula",
+      "distance": "sum(abs(submitted[k] - preferred[k])) / 200",
+      "retainedText": "1 - sensitivity * distance",
+      "sensitivityRange": [
+        0,
+        1
+      ],
+      "affectedQuality": "text_only",
+      "symmetric": true,
+      "avoidDoubleCountingScalarAndVector": true,
+      "examples": [
+        {
+          "preferred": [
+            50,
+            30,
+            20
+          ],
+          "submitted": [
+            40,
+            35,
+            25
+          ],
+          "sensitivity": 1,
+          "retainedText": 0.9
+        },
+        {
+          "preferred": [
+            50,
+            30,
+            20
+          ],
+          "submitted": [
+            60,
+            25,
+            15
+          ],
+          "sensitivity": 1,
+          "retainedText": 0.9
+        },
+        {
+          "preferred": [
+            50,
+            30,
+            20
+          ],
+          "submitted": [
+            0,
+            60,
+            40
+          ],
+          "sensitivity": 1,
+          "retainedText": 0.5
+        },
+        {
+          "preferred": [
+            90,
+            10,
+            0
+          ],
+          "submitted": [
+            0,
+            100,
+            0
+          ],
+          "sensitivity": 1,
+          "retainedText": 0.1
+        },
+        {
+          "preferred": [
+            50,
+            30,
+            20
+          ],
+          "submitted": [
+            50,
+            0,
+            50
+          ],
+          "sensitivity": 1,
+          "retainedText": 0.7
+        }
+      ]
+    }
+  },
+  "npcNoShow": {
+    "confirmedBaseRangePercent": [
+      5,
+      10
+    ],
+    "selectedBasePercent": null,
+    "ordinaryPairFormula": "basePercent + max(0, opponentMean - ownMean) / 2",
+    "incrementUnit": "percentage_points",
+    "meanSkillDefinition": null,
+    "usesOpponentSubmittedQuality": false,
+    "lateStages": {
+      "semifinalPercent": 0,
+      "finalPercent": 0,
+      "confirmed": true
+    },
+    "appliesTo": "NPC decisions including NPC-vs-NPC and NPC-vs-player; player submission stays under player control",
+    "persistenceRecommendation": "snapshot pair inputs and one decision before hero submission; do not reroll on load",
+    "examples": [
+      {
+        "basePercent": 5,
+        "ownMean": 12,
+        "opponentMean": 42,
+        "stage": "ordinary",
+        "expectedPercent": 20
+      },
+      {
+        "basePercent": 5,
+        "ownMean": 12,
+        "opponentMean": 45,
+        "stage": "ordinary",
+        "expectedPercent": 21.5
+      },
+      {
+        "basePercent": 5,
+        "ownMean": 45,
+        "opponentMean": 12,
+        "stage": "ordinary",
+        "expectedPercent": 5
+      },
+      {
+        "basePercent": 5,
+        "ownMean": 12,
+        "opponentMean": 12,
+        "stage": "ordinary",
+        "expectedPercent": 5
+      },
+      {
+        "basePercent": 10,
+        "ownMean": 12,
+        "opponentMean": 42,
+        "stage": "ordinary",
+        "expectedPercent": 25
+      },
+      {
+        "basePercent": 10,
+        "ownMean": 0,
+        "opponentMean": 100,
+        "stage": "semifinal",
+        "expectedPercent": 0
+      },
+      {
+        "basePercent": 10,
+        "ownMean": 0,
+        "opponentMean": 100,
+        "stage": "final",
+        "expectedPercent": 0
+      }
+    ],
+    "technicalOutcomes": {
+      "status": "confirmed_by_author",
+      "oneSubmitted": "technical_win_for_submitter",
+      "bothMissing": "both_eliminated",
+      "nextSlot": "empty",
+      "opponentOfEmptySlot": "automatic_advance",
+      "reseed": false,
+      "playerAndNpcSameRules": true,
+      "tableStatus": "Не сдал",
+      "tableTone": "red",
+      "dossierHistory": [
+        "battleId",
+        "roundId",
+        "participantId",
+        "participated",
+        "no_show"
+      ],
+      "missingTrackIsQualityZero": false
+    }
+  },
+  "pairedJudging": {
+    "confirmedOutcomeNoDraw": true,
+    "decisivePanelParity": "odd",
+    "everyDecisiveVote": "one_of_two",
+    "abstention": false,
+    "historicalPanelsPreserved": true,
+    "actualOddPanelMembers": null,
+    "collectiveVoteRole": null,
+    "qualificationRankOrdering": null,
+    "doubleNoShowOutcome": "both_eliminated_empty_branch_automatic_advance_no_reseed"
+  },
+  "judgeDossier": {
+    "cardConfirmed": true,
+    "backlogId": "BL-040",
+    "evidence": [
+      "track_version",
+      "published_judge_review_of_same_version",
+      "hero_analysis"
+    ],
+    "recognitionInputs": [
+      "intelligence",
+      "listening_experience",
+      "relevant_hero_skill",
+      "judge_domain_competence",
+      "diverse_observations"
+    ],
+    "lowSkillCanYieldNoInference": true,
+    "writing90IsIllustrationNotFixedThreshold": true,
+    "competenceSeparateFromPreferences": true,
+    "exactHiddenPreferencesAtEarlyStage": false,
+    "confirmedTextMixPreferences": true,
+    "recommendedRules": [
+      "separate_public_quote_from_hero_inference",
+      "preserve_report_versions",
+      "deduplicate_evidence",
+      "avoid_claiming_text_preference_from_general_win_vote",
+      "domain_specific_recognition",
+      "contradictions_reduce_confidence_not_randomly_replace_truth"
+    ],
+    "recognitionFormula": null,
+    "fullDisclosureThresholds": null,
+    "studyDurationPolicyRef": "#analysisStudy"
+  },
+  "analysisStudy": {
+    "confirmed": true,
+    "durationGameMinutes": [
+      30,
+      60
+    ],
+    "playerSelectableDepth": false,
+    "durationSelectionRule": null,
+    "studyBundlingPolicy": null,
+    "usesSharedGameClock": true,
+    "skillDependentAccuracyPreserved": true,
+    "proposalOf10_30_60DepthModesAccepted": false
+  },
+  "roundTiming": {
+    "confirmedPairPreparationAndSubmissionGameDays": 7,
+    "scope": "paired_rounds",
+    "includesPostDeadlineJudging": false,
+    "qualificationDurationGameDays": null,
+    "recommendedStartAnchor": "acceptance_open",
+    "startAnchorConfirmed": false,
+    "announcementToStartDelayGameMinutes": null,
+    "deadlineHour": null,
+    "usesSharedGameClock": true,
+    "playerAndNpcShareDeadline": true,
+    "judgingScheduleRef": "#judgingSchedule",
+    "nextRoundAfterAllJudgesGameHours": 24
+  },
+  "judgingSchedule": {
+    "confirmed": true,
+    "specRef": "2026-10-12-judging-schedule.md",
+    "anchor": "round_submission_deadline",
+    "quietGameHours": 6,
+    "firstCheckGameHoursAfterDeadline": 7,
+    "checkIntervalGameHours": 1,
+    "initialChancePercent": 3,
+    "increasePerCheckPercentagePoints": 3,
+    "chanceCapPercent": 100,
+    "chanceFormula": "min(100, 3 * k), k = 1,2,...",
+    "checkAtFormula": "deadline + (6 + k) game hours",
+    "checkOnlyPendingJudges": true,
+    "successfulJudgeStopsChecking": true,
+    "simultaneousCompletionsAllowed": true,
+    "randomTrialInterpretation": "one independent Bernoulli trial per pending judge per check",
+    "completionScopeRecommendation": "judge_by_round_batch",
+    "reviewAndJudgeStatementPublishedOnCompletion": true,
+    "nextRoundDelayAfterLastRequiredJudgeGameHours": 24,
+    "noNextRoundAfterFinal": true,
+    "approximatePriorWaitRangeGameDays": [
+      1,
+      3
+    ],
+    "priorRangeIsAdditionalDelay": false,
+    "enforceMinimum24Hours": false,
+    "derivedGuaranteedPanelCompleteGameHours": 40,
+    "derivedGuaranteedNextAnnouncementGameHours": 64,
+    "persistedScheduleRecommendation": true,
+    "rerollOnLoad": false,
+    "usesSharedGameClock": true,
+    "examples": [
+      {
+        "chancePercent": 0,
+        "checks": false,
+        "elapsedGameHours": 6
+      },
+      {
+        "chancePercent": 3,
+        "checks": true,
+        "elapsedGameHours": 7
+      },
+      {
+        "chancePercent": 6,
+        "checks": true,
+        "elapsedGameHours": 8
+      },
+      {
+        "chancePercent": 9,
+        "checks": true,
+        "elapsedGameHours": 9
+      },
+      {
+        "chancePercent": 30,
+        "checks": true,
+        "elapsedGameHours": 16
+      },
+      {
+        "chancePercent": 90,
+        "checks": true,
+        "elapsedGameHours": 36
+      },
+      {
+        "chancePercent": 99,
+        "checks": true,
+        "elapsedGameHours": 39
+      },
+      {
+        "chancePercent": 100,
+        "checks": true,
+        "elapsedGameHours": 40
+      }
+    ]
+  },
+  "roundBestTrack": {
+    "confirmed": true,
+    "backlogId": "BL-042",
+    "label": "LTR",
+    "meaning": "лучший трек раунда",
+    "awardsPerJudge": 1,
+    "candidateScope": "all_submitted_tracks_in_round",
+    "selectionMetric": "max_final_personal_unrounded_score_of_this_judge",
+    "usePairVote01AsScore": false,
+    "useNeutralTrackIndexAsScore": false,
+    "sameParticipantCanReceiveAllAwards": true,
+    "requiresDistinctRecipients": false,
+    "noShowTracksEligible": false,
+    "publishedAt": "judge_round_completion",
+    "affectsGameMechanics": false,
+    "persistedKey": [
+      "roundId",
+      "judgeId",
+      "participantId",
+      "trackVersionId"
+    ],
+    "tieRule": null,
+    "tieRuleRecommendation": "choose_and_persist_one_of_equal_maximizers",
+    "emptyCandidateSetRuleRecommendation": "no_fabricated_award",
+    "collectiveVoteAwardPolicy": null,
+    "qualificationMaskedRecipientDisplayRecommendation": "award_nickname_only_without_profile_access",
+    "specRef": "2026-10-12-judging-schedule.md#6-ltr--лучший-трек-раунда-bl-042",
+    "examples": [
+      {
+        "case": "same_recipient",
+        "scoresByJudge": [
+          [
+            9,
+            8,
+            7
+          ],
+          [
+            9,
+            7,
+            8
+          ],
+          [
+            9,
+            8,
+            6
+          ]
+        ],
+        "expectedWinnerIndices": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "case": "different_recipients",
+        "scoresByJudge": [
+          [
+            9,
+            8,
+            7
+          ],
+          [
+            7,
+            9,
+            8
+          ],
+          [
+            8,
+            7,
+            9
+          ]
+        ],
+        "expectedWinnerIndices": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "case": "compare_unrounded",
+        "scoresByJudge": [
+          [
+            8.51,
+            8.59,
+            7
+          ]
+        ],
+        "expectedWinnerIndices": [
+          1
+        ]
+      }
+    ]
+  }
+}

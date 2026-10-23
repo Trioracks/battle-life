@@ -1,0 +1,52 @@
+{
+  "verified": true,
+  "comments": 324,
+  "judges": [
+    {
+      "judgeId": "eparhiya",
+      "comments": 81,
+      "triggerFamilies": 62,
+      "positiveRhymes": 10,
+      "negativeRhymes": 10,
+      "table": "eparhiya.md"
+    },
+    {
+      "judgeId": "klim-propavshiy",
+      "comments": 81,
+      "triggerFamilies": 62,
+      "positiveRhymes": 10,
+      "negativeRhymes": 10,
+      "table": "klim-propavshiy.md"
+    },
+    {
+      "judgeId": "svinoferma",
+      "comments": 81,
+      "triggerFamilies": 62,
+      "positiveRhymes": 10,
+      "negativeRhymes": 10,
+      "table": "svinoferma.md"
+    },
+    {
+      "judgeId": "thirty-third",
+      "comments": 81,
+      "triggerFamilies": 62,
+      "positiveRhymes": 10,
+      "negativeRhymes": 10,
+      "table": "thirty-third.md"
+    }
+  ],
+  "registeredTriggers": 62,
+  "duplicateSubstantiveTextsAcrossJudges": 0,
+  "sharedMicroReactions": [
+    {
+      "text": "кайф.",
+      "count": 2
+    }
+  ],
+  "verificationScope": "Saved JSON schema, IDs, trigger coverage, rhyme counts, conditions/slots and rendered Markdown row counts; manual editorial review separately performed",
+  "gameIntegrationTested": false,
+  "fiftyTrackNoveltySimulationRun": false,
+  "localLinksChecked": 66,
+  "mathExamplesChecked": 6,
+  "contentBuildIdempotent": true
+}

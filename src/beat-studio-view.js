@@ -1,17 +1,17 @@
 import {pcElement as el,pcButton as button,pcFind,pcFocusable} from './virtual-pc-dom.js?rev=43';
-import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=47';
-import {BEAT_STAGES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=43';
+import {createStudioWorkspace,FT_TRACKS,renderStudioTracks} from './ft-studio-view.js?rev=49';
+import {BEAT_STAGES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=49';
 import {randomBeatName,distinctProjectName} from './beat-names.js?rev=43';
 import {mountProjectPicker} from './project-picker-view.js?rev=43';
-import {latestReadyLyrics} from './lyric-production.js?rev=47';
-import {resolveBeatPlayback} from './beat-playback.js?rev=47';
-import {describeBeatMix} from './beat-mix.js?rev=43';
-import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=47';
-import {startVocalWork} from './vocal-production.js?rev=47';
-import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=47';
-import {appendRecordingControls} from './recording-studio-view.js?rev=47';
-import {normalizeGenreProgression,genreOptions,genreById,genreCap,chooseGenre,chooseSpecialization} from './genre-progression.js?rev=43';
-import {mountAudioExport} from './pc-audio-export-view.js?rev=47';
+import {latestReadyLyrics} from './lyric-production.js?rev=57';
+import {resolveBeatPlayback} from './beat-playback.js?rev=49';
+import {describeBeatMix} from './beat-mix.js?rev=49';
+import {createBeat,startBeatStage,normalizeBeat,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=57';
+import {startVocalWork} from './vocal-production.js?rev=57';
+import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=57';
+import {appendRecordingControls} from './recording-studio-view.js?rev=57';
+import {normalizeGenreProgression,genreOptions,genreById,genreCap,chooseGenre,chooseSpecialization} from './genre-progression.js?rev=49';
+import {mountAudioExport} from './pc-audio-export-view.js?rev=57';
 
 export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onChange,onWork,audio,legacyName,initialProject}){
  const d=root.ownerDocument,workspace=createStudioWorkspace(d,{projectName:legacyName});root.replaceChildren(workspace);
@@ -63,10 +63,10 @@ export function mountBeatStudio(root,{getState,getMetadata,onChange,onCommit=onC
    for(const id of options.available)card.append(el(d,'p',{text:genreById(id).name+' · '+g.xp[id].toFixed(2)+' / '+genreCap(g,id)+(g.primary===id?' · главная специализация':'')}));
    if(options.remaining)for(const genre of options.candidates)card.append(button(d,'Выбрать: '+genre.name,{className:'ft-project-item'},()=>openDialog('genre-confirm',{id:genre.id,primary:false})));
    if(options.canSpecialize)for(const id of options.available)card.append(button(d,'Специализация: '+genreById(id).name,{className:'ft-project-item'},()=>openDialog('genre-confirm',{id,primary:true})));
-   card.append(el(d,'p',{className:'ft-production-note',text:'Пока все жанры используют общий банк 90 BPM. Меняются цели решений и экспериментальная обработка; отдельные жанровые стемы появятся позже.'}));
+   card.append(el(d,'p',{className:'ft-production-note',text:'Абстрактный хип-хоп использует связанные авторские стемы 90 BPM. Все открытые жанры развиваются до 100.'}));
   }else if(mode==='genre-confirm'){
    card.children[1].textContent=genreById(choice.id).name;dialog.setAttribute('aria-label','Подтверждение выбора жанра');
-   card.append(el(d,'p',{text:choice.primary?'Только этот жанр сможет вырасти до 100. Остальные останутся до 75. Выбор постоянный.':'Жанр займёт один из трёх дополнительных слотов навсегда. Новый опыт начнётся с нуля.'}));
+   card.append(el(d,'p',{text:choice.primary?'Главная специализация отмечает твой основной жанр. Все открытые жанры развиваются до 100. Выбор постоянный.':'Жанр займёт один из трёх дополнительных слотов навсегда. Новый опыт начнётся с нуля.'}));
    card.append(button(d,'Подтвердить выбор',{className:'ft-primary'},()=>{
     const state=getState(),skill=effectiveBeatSkill(state,getMetadata().skills),r=(choice.primary?chooseSpecialization:chooseGenre)(state.music.genres,choice.id,skill);
     message=r.reason;closeDialog({restore:false});if(r.ok)change({...state,music:{...state.music,genres:r.value}});else render();pcFocusable(actions)[0]?.focus();

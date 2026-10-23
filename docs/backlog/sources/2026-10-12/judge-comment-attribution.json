@@ -1,0 +1,215 @@
+{
+  "version": 1,
+  "generated": "2026-10-12",
+  "policy": "Source cells and numeric votes are immutable archival facts. A note's subject/scope is separate from its cell's row participant. The list below is verified but not claimed exhaustive.",
+  "verifiedCrossedNotes": [
+    {
+      "sourceRef": "ФИНАЛ!C3",
+      "judgeKey": "тридцать третий",
+      "rowParticipant": "НБПанда",
+      "rowVote": 1,
+      "textSubject": "Клинок Забузы",
+      "explicitSubjectVote": 0
+    },
+    {
+      "sourceRef": "ФИНАЛ!C4",
+      "judgeKey": "тридцать третий",
+      "rowParticipant": "Клинок Забузы",
+      "rowVote": 0,
+      "textSubject": "НБПанда",
+      "explicitSubjectVote": 1
+    },
+    {
+      "sourceRef": "ФИНАЛ!U3",
+      "judgeKey": "доббро",
+      "rowParticipant": "НБПанда",
+      "rowVote": 1,
+      "textSubject": "Клинок Забузы",
+      "explicitSubjectVote": null
+    },
+    {
+      "sourceRef": "ФИНАЛ!U4",
+      "judgeKey": "доббро",
+      "rowParticipant": "Клинок Забузы",
+      "rowVote": 0,
+      "textSubject": "НБПанда",
+      "explicitSubjectVote": 1
+    },
+    {
+      "sourceRef": "ФИНАЛ!V3",
+      "judgeKey": "мц варг пиночетский",
+      "rowParticipant": "НБПанда",
+      "rowVote": 0,
+      "textSubject": "Клинок Забузы",
+      "explicitSubjectVote": 1
+    },
+    {
+      "sourceRef": "ФИНАЛ!V4",
+      "judgeKey": "мц варг пиночетский",
+      "rowParticipant": "Клинок Забузы",
+      "rowVote": 1,
+      "textSubject": "НБПанда",
+      "explicitSubjectVote": 0
+    }
+  ],
+  "unresolvedExamples": [
+    {
+      "sourceRef": "3 РАУНД!N15",
+      "reason": "Резкая критика Black Phoenix сопровождается голосом 1. Отрицательный тон не доказывает ошибку атрибуции; явного другого адресата нет. Сохранить исходный факт."
+    },
+    {
+      "sourceRef": "4 РАУНД!B12",
+      "reason": "Чолито получает 1 при резкой критике; соседний B13 хвалит mногонационала и желает полуфинала при 0. Причина и возможная перестановка не доказаны; не использовать как чистое объяснение голоса."
+    },
+    {
+      "sourceRef": "4 РАУНД!B13",
+      "reason": "Восторженный текст и пожелание полуфинала сопровождают 0. Сохранить исходный голос, не исправлять и не переадресовывать автоматически."
+    },
+    {
+      "sourceRef": "1 РАУНД (СВОДНАЯ)!C12",
+      "reason": "Комментарий Клима говорит о 10, но числовое значение ячейки ТК — 8. Для архива сохранять оба факта; не вычислять оценку по тексту."
+    }
+  ],
+  "identicalPairTextGroups": [
+    {
+      "refs": [
+        "2 РАУНД!F45",
+        "2 РАУНД!F46"
+      ],
+      "judge": "свиноферма",
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "count": 2
+    },
+    {
+      "refs": [
+        "2 РАУНД!F6",
+        "2 РАУНД!F7"
+      ],
+      "judge": "свиноферма",
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "count": 2
+    },
+    {
+      "refs": [
+        "5 РАУНД!T3",
+        "5 РАУНД!T4"
+      ],
+      "judge": "гексмалыш",
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "5 РАУНД!T6",
+        "5 РАУНД!T7"
+      ],
+      "judge": "гексмалыш",
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "count": 2
+    },
+    {
+      "refs": [
+        "5 РАУНД!S3",
+        "5 РАУНД!S4"
+      ],
+      "judge": "охуенно культурный",
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "5 РАУНД!S6",
+        "5 РАУНД!S7"
+      ],
+      "judge": "охуенно культурный",
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "count": 2
+    },
+    {
+      "refs": [
+        "5 РАУНД!W3",
+        "5 РАУНД!W4"
+      ],
+      "judge": "zoo in space",
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "5 РАУНД!W6",
+        "5 РАУНД!W7"
+      ],
+      "judge": "zoo in space",
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "count": 2
+    },
+    {
+      "refs": [
+        "ФИНАЛ!O3",
+        "ФИНАЛ!O4"
+      ],
+      "judge": "гексмалыш",
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "ФИНАЛ!D3",
+        "ФИНАЛ!D4"
+      ],
+      "judge": "свиноферма",
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "ФИНАЛ!R3",
+        "ФИНАЛ!R4"
+      ],
+      "judge": "alx beats",
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "ФИНАЛ!L3",
+        "ФИНАЛ!L4"
+      ],
+      "judge": "dead rave",
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "ФИНАЛ!N3",
+        "ФИНАЛ!N4"
+      ],
+      "judge": "whitespruce",
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "ФИНАЛ!S3",
+        "ФИНАЛ!S4"
+      ],
+      "judge": "zoo in space",
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "count": 2
+    }
+  ]
+}

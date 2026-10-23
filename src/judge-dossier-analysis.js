@@ -1,7 +1,7 @@
 import config from '../data/analysis/demo-v2-policy.json' with {type:'json'};
 import {judgeProfile} from './judge-profiles.js?rev=43';
-import {startTrackStudy,publishedStudyReviews,studyInstallReason} from './rap-analysis.js?rev=47';
-import {beatResultSeed} from './beat-result.js?rev=43';
+import {startTrackStudy,publishedStudyReviews,studyInstallReason} from './rap-analysis.js?rev=57';
+import {beatResultSeed} from './beat-result.js?rev=49';
 import {validGameMinute} from './game-minute.js?rev=43';
 export const JUDGE_STUDY_POLICY=Object.freeze({...config.judgeStudy});
 const clone=v=>structuredClone(v),record=v=>v&&typeof v==='object'&&!Array.isArray(v),strings=v=>Array.isArray(v)&&v.every(x=>typeof x==='string');

@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-12",
+  "package": "Battle Life package 2",
+  "status": "prepared_for_author_review",
+  "implementationStartedByThisHandoff": false,
+  "spec": "docs/backlog/2026-10-12-implementation-handoff-v2.md",
+  "snapshot": "BACKLOG_V2.md",
+  "journal": "docs/backlog/implementation-v2-status.md",
+  "cardCount": 22,
+  "nextFreeCardId": "BL-043",
+  "cards": [
+    {
+      "id": "BL-018",
+      "delivery": "P2",
+      "primaryTask": "T1",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-tournament.md",
+      "scope": "Соперники: головная тема BL-024–BL-026",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-022",
+      "delivery": "P8",
+      "primaryTask": "S5",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-social-content.md",
+      "scope": "Сквозной цикл демо до вылета/финала",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-023",
+      "delivery": "P3",
+      "primaryTask": "T3",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-tournament.md",
+      "scope": "Почасовое судейство и отдельные результаты",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-024",
+      "delivery": "P2",
+      "primaryTask": "T1",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-tournament.md",
+      "scope": "Пул и место героя; T2 завершает реальный отбор",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-025",
+      "delivery": "P4",
+      "primaryTask": "R2",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-research.md",
+      "scope": "Доступ к профилям и истории",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-026",
+      "delivery": "P2",
+      "primaryTask": "T1",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-tournament.md",
+      "scope": "Стабильные работы NPC; звук зависит от S4",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-027",
+      "delivery": "P3",
+      "primaryTask": "T2",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-tournament.md",
+      "scope": "Несдачи/пустые ветки; T5/R4 показывают историю",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-028",
+      "delivery": "P6",
+      "primaryTask": "S3",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-social-content.md",
+      "scope": "Безопасная сцена и эмоциональный автопост",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-029",
+      "delivery": "P3",
+      "primaryTask": "T2",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-tournament.md",
+      "scope": "Три режима посева, сетка без пересева",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-030",
+      "delivery": "P6",
+      "primaryTask": "S2",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-social-content.md",
+      "scope": "Малые споры сообщества и форума",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-031",
+      "delivery": "P6",
+      "primaryTask": "S2",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-social-content.md",
+      "scope": "Ажиотаж, постоянные авторы и оценки",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-032",
+      "delivery": "P6",
+      "primaryTask": "S2",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-social-content.md",
+      "scope": "Банки реакций и два новых контекста",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-033",
+      "delivery": "P6",
+      "primaryTask": "S1",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-social-content.md",
+      "scope": "Тема, судья-автор и объявления",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-034",
+      "delivery": "P7",
+      "primaryTask": "S4",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-social-content.md",
+      "scope": "20 реальных обложек и манифест",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-035",
+      "delivery": "P4",
+      "primaryTask": "R2",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-research.md",
+      "scope": "Типы страниц; фотосеты завершает S4",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-036",
+      "delivery": "P5",
+      "primaryTask": "R3",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-research.md",
+      "scope": "Изучение 30–60 минут, субъективные версии отчёта",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-037",
+      "delivery": "P5",
+      "primaryTask": "R4",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-research.md",
+      "scope": "Устанавливаемое Рэп-досье",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-038",
+      "delivery": "P4",
+      "primaryTask": "T5",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-tournament.md",
+      "scope": "Игровая таблица/отзывы/LTR/несдачи",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-039",
+      "delivery": "P7",
+      "primaryTask": "S4",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-social-content.md",
+      "scope": "Отдельные реальные голоса NPC",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-040",
+      "delivery": "P5",
+      "primaryTask": "R5",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-research.md",
+      "scope": "Постепенные гипотезы о вкусах судьи",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-041",
+      "delivery": "P1",
+      "primaryTask": "R1",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-research.md",
+      "scope": "Бюджет 100%; случайно до Письма 25, вручную от 25",
+      "status": "planned_not_implemented_in_this_chat"
+    },
+    {
+      "id": "BL-042",
+      "delivery": "P3",
+      "primaryTask": "T4",
+      "plan": "docs/superpowers/plans/2026-10-12-package-two-tournament.md",
+      "scope": "Один LTR от каждого судьи, без бонусов",
+      "status": "planned_not_implemented_in_this_chat"
+    }
+  ],
+  "deferredIds": [
+    "BL-014",
+    "BL-015",
+    "BL-016",
+    "BL-017",
+    "BL-019",
+    "BL-020",
+    "BL-021"
+  ],
+  "materials": [
+    {
+      "id": "npc-voices",
+      "cards": [
+        "BL-026",
+        "BL-039"
+      ],
+      "status": "awaiting_author_recordings",
+      "useHeroVoicesAsReplacement": false
+    },
+    {
+      "id": "round-covers",
+      "cards": [
+        "BL-034"
+      ],
+      "status": "20_briefs_ready_images_not_created"
+    },
+    {
+      "id": "personal-photos",
+      "cards": [
+        "BL-035"
+      ],
+      "status": "components_available_photos_to_create"
+    },
+    {
+      "id": "social-bank",
+      "cards": [
+        "BL-032"
+      ],
+      "status": "240_reader_and_16_admin_ready_2_contexts_to_write"
+    },
+    {
+      "id": "own-loop-library",
+      "cards": [
+        "BL-002"
+      ],
+      "status": "package_one_external_dependency_do_not_restore_fl_assets"
+    }
+  ],
+  "verification": {
+    "kind": "documentation_only",
+    "runtimeTestsRunInThisHandoff": false,
+    "runtimeSuccessClaim": false
+  }
+}

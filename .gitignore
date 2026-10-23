@@ -16,3 +16,7 @@ __pycache__/
 .env.*
 !.env.example
 !.env.sample
+
+# Goblin's supplied recordings are local-only, like the full sound packs.
+/assets/audio/goblin/
+/assets/audio/filya/

@@ -23,7 +23,7 @@ for(const kind of ['beat','lyrics']){
  });
 }
 test('legacy job adoption preserves elapsed skill sliders and credits',()=>{
- const f=creativeFixture('beat');let s=startBeatStage(f.state,f.projectId,[2,3,4],f.skills).state;
+ const f=creativeFixture('beat');delete f.state.projects[0].practicePolicy;let s=startBeatStage(f.state,f.projectId,[2,3,4],f.skills).state;
  s.music.job.total=60;s=advanceBeatWork(s,30).state;const old=structuredClone(s.music);
  f.state=s;const r=start(f);assert.deepEqual(r.state.music,old);
  assert.equal(r.state.creativeWork.items[0].plans[0].total,60);

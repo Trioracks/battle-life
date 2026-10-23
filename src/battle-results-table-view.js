@@ -1,8 +1,8 @@
 import {pcElement as el} from './virtual-pc-dom.js?rev=43';
-import {socialButton,socialHeading} from './social-dom.js?rev=43';
+import {socialButton,socialHeading} from './social-dom.js?rev=57';
 import {gameDateTimeLabel} from './home-calendar.js?rev=43';
-import {requestResultReaction} from './social-result-reaction.js?rev=43';
-const statuses={accepting:'Приём работ',judging:'Ожидает итога',no_show:'Не сдал',bye:'Проход пустой ветки',empty:'Пустое место',hidden:'░░░░',qualified:'Прошёл',eliminated:'Выбыл',won:'Победа',technical_win:'Технический проход'};
+import {requestResultReaction} from './social-result-reaction.js?rev=57';
+const statuses={processing:'Обрабатываем сдачу',accepting:'Приём работ',judging:'Ожидает итога',no_show:'Не сдал',bye:'Проход пустой ветки',empty:'Пустое место',hidden:'░░░░',qualified:'Прошёл',eliminated:'Выбыл',won:'Победа',technical_win:'Технический проход'};
 export function createBattleResultsTableView(d,{table,navigate,onAnalyze,audio,getState,commit,onResultViewed=()=>{},uiState={},isVisible=()=>true}={}){
  const root=el(d,'section',{className:'bt-results'});root.append(socialButton(d,'← Группа',()=>navigate('underweb://social/community/'+table.battleId),{className:'sn-link'}),socialHeading(d,'Таблица судейства · '+table.title),el(d,'p',{className:'sn-note',text:table.message}));
  const nav=el(d,'nav',{className:'sn-actions',attributes:{'aria-label':'Раунды турнира'}});for(const r of table.availableRounds)nav.append(socialButton(d,r.title,()=>navigate('underweb://social/results/'+table.battleId+'/'+r.id),{attributes:r.id===table.roundId?{'aria-current':'page'}:{}}));root.append(nav);

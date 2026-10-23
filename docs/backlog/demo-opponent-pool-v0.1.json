@@ -1,0 +1,1729 @@
+{
+  "date": "2026-10-12",
+  "status": "research_candidate_pool_not_runtime_bracket",
+  "count": 32,
+  "selectionRule": "Participants on source 2 РАУНД; later appearances enrich history but do not predetermine new playthrough outcomes",
+  "runtimeIdentityPolicy": "workingId is a research key, not a confirmed canonical person ID",
+  "heroSlot": "unresolved; 32 source candidates are not 32 opponents plus the hero in a 32-slot bracket",
+  "proposedAliasCount": 4,
+  "opponents": [
+    {
+      "workingId": "demo-opponent-01",
+      "nickname": "Маста Витяй",
+      "poolSourceRef": "2 РАУНД!A3",
+      "qualification": {
+        "nickname": "Маста Витяй (Why-Fly)",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A2",
+        "mappingStatus": "proposed_alias",
+        "historicalTotal": 48.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B2"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C2"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D2"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E2"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F2"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "Маста Витяй",
+          "sourceRef": "2 РАУНД!A3",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "Маста Витяй",
+          "sourceRef": "3 РАУНД!A18",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "3 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-02",
+      "nickname": "ШАГ ВПРАВО",
+      "poolSourceRef": "2 РАУНД!A4",
+      "qualification": {
+        "nickname": "ШАГ ВПРАВО",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A32",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 34.5,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 7.5,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B32"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C32"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 6.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D32"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E32"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F32"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "ШАГ ВПРАВО",
+          "sourceRef": "2 РАУНД!A4",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-03",
+      "nickname": "НБПанда",
+      "poolSourceRef": "2 РАУНД!A6",
+      "qualification": {
+        "nickname": "НБПанда",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A3",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 48.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B3"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C3"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D3"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E3"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F3"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "НБПанда",
+          "sourceRef": "2 РАУНД!A6",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "НБПанда",
+          "sourceRef": "3 РАУНД!A3",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "4 РАУНД",
+          "nickname": "НБПанда",
+          "sourceRef": "4 РАУНД!A7",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "5 РАУНД",
+          "nickname": "НБПанда",
+          "sourceRef": "5 РАУНД!A6",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "ФИНАЛ",
+          "nickname": "НБПанда",
+          "sourceRef": "ФИНАЛ!A3",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "ФИНАЛ"
+    },
+    {
+      "workingId": "demo-opponent-04",
+      "nickname": "мц мьюту",
+      "poolSourceRef": "2 РАУНД!A7",
+      "qualification": {
+        "nickname": "мц мьюту",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A26",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 37.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B26"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C26"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D26"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E26"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F26"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "мц мьюту",
+          "sourceRef": "2 РАУНД!A7",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-05",
+      "nickname": "Помидор Анатолий",
+      "poolSourceRef": "2 РАУНД!A9",
+      "qualification": {
+        "nickname": "Помидор Анатолий",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A4",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 46.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B4"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C4"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 6.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D4"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E4"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F4"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "Помидор Анатолий",
+          "sourceRef": "2 РАУНД!A9",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-06",
+      "nickname": "Trioracks",
+      "poolSourceRef": "2 РАУНД!A10",
+      "qualification": {
+        "nickname": "Trioracks",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A30",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 36.5,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 8.5,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B30"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C30"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 2.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D30"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E30"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F30"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "Trioracks",
+          "sourceRef": "2 РАУНД!A10",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "Trioracks",
+          "sourceRef": "3 РАУНД!A9",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "3 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-07",
+      "nickname": "МЦ Гавно",
+      "poolSourceRef": "2 РАУНД!A12",
+      "qualification": {
+        "nickname": "МЦ Гавно",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A5",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 45.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B5"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C5"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 5.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D5"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E5"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F5"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "МЦ Гавно",
+          "sourceRef": "2 РАУНД!A12",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-08",
+      "nickname": "помесь героина",
+      "poolSourceRef": "2 РАУНД!A13",
+      "qualification": {
+        "nickname": "помесь героина",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A21",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 38.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B21"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C21"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D21"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E21"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F21"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "помесь героина",
+          "sourceRef": "2 РАУНД!A13",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "помесь героина",
+          "sourceRef": "3 РАУНД!A21",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "3 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-09",
+      "nickname": "крипер михаил",
+      "poolSourceRef": "2 РАУНД!A15",
+      "qualification": {
+        "nickname": "крипер михаил",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A6",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 45.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B6"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C6"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D6"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E6"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F6"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "крипер михаил",
+          "sourceRef": "2 РАУНД!A15",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-10",
+      "nickname": "Black Phoenix",
+      "poolSourceRef": "2 РАУНД!A16",
+      "qualification": {
+        "nickname": "Black Phoenix",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A23",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 38.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B23"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C23"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 4.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D23"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E23"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F23"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "Black Phoenix",
+          "sourceRef": "2 РАУНД!A16",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "Black Phoenix",
+          "sourceRef": "3 РАУНД!A15",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "4 РАУНД",
+          "nickname": "Black Phoenix",
+          "sourceRef": "4 РАУНД!A9",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "4 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-11",
+      "nickname": "чолито",
+      "poolSourceRef": "2 РАУНД!A18",
+      "qualification": {
+        "nickname": "чолито",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A7",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 45.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B7"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C7"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D7"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E7"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F7"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "чолито",
+          "sourceRef": "2 РАУНД!A18",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "чолито",
+          "sourceRef": "3 РАУНД!A19",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "4 РАУНД",
+          "nickname": "чолито",
+          "sourceRef": "4 РАУНД!A12",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "5 РАУНД",
+          "nickname": "чолито",
+          "sourceRef": "5 РАУНД!A7",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "5 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-12",
+      "nickname": "мц вафелька",
+      "poolSourceRef": "2 РАУНД!A19",
+      "qualification": {
+        "nickname": "мц вафелька",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A31",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 35.5,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B31"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C31"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 6.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D31"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E31"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 7.5,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F31"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "мц вафелька",
+          "sourceRef": "2 РАУНД!A19",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-13",
+      "nickname": "ИРСЛМ",
+      "poolSourceRef": "2 РАУНД!A21",
+      "qualification": {
+        "nickname": "РСЛМ",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A8",
+        "mappingStatus": "proposed_alias",
+        "historicalTotal": 43.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B8"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C8"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D8"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E8"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F8"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "ИРСЛМ",
+          "sourceRef": "2 РАУНД!A21",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "ИРСЛМ",
+          "sourceRef": "3 РАУНД!A6",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "3 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-14",
+      "nickname": "Арлекин",
+      "poolSourceRef": "2 РАУНД!A22",
+      "qualification": {
+        "nickname": "Арлекин",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A33",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 34.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B33"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C33"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 4.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D33"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 6.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E33"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F33"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "Арлекин",
+          "sourceRef": "2 РАУНД!A22",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-15",
+      "nickname": "Клинок Забузы",
+      "poolSourceRef": "2 РАУНД!A24",
+      "qualification": {
+        "nickname": "Клинок Забузы",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A9",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 43.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B9"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C9"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 4.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D9"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E9"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F9"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "Клинок Забузы",
+          "sourceRef": "2 РАУНД!A24",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "Клинок Забузы",
+          "sourceRef": "3 РАУНД!A25",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "4 РАУНД",
+          "nickname": "Клинок Забузы",
+          "sourceRef": "4 РАУНД!A10",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "5 РАУНД",
+          "nickname": "Клинок Забузы",
+          "sourceRef": "5 РАУНД!A4",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "ФИНАЛ",
+          "nickname": "Клинок Забузы",
+          "sourceRef": "ФИНАЛ!A4",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "ФИНАЛ"
+    },
+    {
+      "workingId": "demo-opponent-16",
+      "nickname": "партизанский шпион",
+      "poolSourceRef": "2 РАУНД!A25",
+      "qualification": {
+        "nickname": "партизанский шпион",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A25",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 37.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 8.5,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B25"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C25"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D25"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E25"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 6.5,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F25"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "партизанский шпион",
+          "sourceRef": "2 РАУНД!A25",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-17",
+      "nickname": "эмси чучь",
+      "poolSourceRef": "2 РАУНД!A27",
+      "qualification": {
+        "nickname": "эмси чучь",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A10",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 41.5,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B10"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C10"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D10"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E10"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 8.5,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F10"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "эмси чучь",
+          "sourceRef": "2 РАУНД!A27",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-18",
+      "nickname": "whales",
+      "poolSourceRef": "2 РАУНД!A28",
+      "qualification": {
+        "nickname": "whales",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A24",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 38.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B24"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C24"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 5.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D24"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E24"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F24"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "whales",
+          "sourceRef": "2 РАУНД!A28",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "whales",
+          "sourceRef": "3 РАУНД!A12",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "3 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-19",
+      "nickname": "православный мц",
+      "poolSourceRef": "2 РАУНД!A30",
+      "qualification": {
+        "nickname": "православный мц",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A11",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 41.5,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B11"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C11"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D11"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E11"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 8.5,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F11"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "православный мц",
+          "sourceRef": "2 РАУНД!A30",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "православный мц",
+          "sourceRef": "3 РАУНД!A10",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "4 РАУНД",
+          "nickname": "православный мц",
+          "sourceRef": "4 РАУНД!A3",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "5 РАУНД",
+          "nickname": "православный мц",
+          "sourceRef": "5 РАУНД!A3",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "5 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-20",
+      "nickname": "мц эпигон",
+      "poolSourceRef": "2 РАУНД!A31",
+      "qualification": {
+        "nickname": "мц эпигон",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A28",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 37.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B28"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C28"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 3.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D28"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 5.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E28"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F28"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "мц эпигон",
+          "sourceRef": "2 РАУНД!A31",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-21",
+      "nickname": "ТК",
+      "poolSourceRef": "2 РАУНД!A33",
+      "qualification": {
+        "nickname": "ТК",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A12",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 40.5,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B12"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C12"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D12"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E12"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 8.5,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F12"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "ТК",
+          "sourceRef": "2 РАУНД!A33",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-22",
+      "nickname": "mногонационал",
+      "poolSourceRef": "2 РАУНД!A34",
+      "qualification": {
+        "nickname": "mногонационал",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A18",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 39.5,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B18"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C18"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 6.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D18"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E18"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 7.5,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F18"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "mногонационал",
+          "sourceRef": "2 РАУНД!A34",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "mногонационал",
+          "sourceRef": "3 РАУНД!A7",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "4 РАУНД",
+          "nickname": "mногонационал",
+          "sourceRef": "4 РАУНД!A13",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "4 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-23",
+      "nickname": "северный юг",
+      "poolSourceRef": "2 РАУНД!A36",
+      "qualification": {
+        "nickname": "северный юг",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A13",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 40.5,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 8.5,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B13"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C13"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 4.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D13"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E13"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F13"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "северный юг",
+          "sourceRef": "2 РАУНД!A36",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-24",
+      "nickname": "МЦ Пажылая Шляпа",
+      "poolSourceRef": "2 РАУНД!A37",
+      "qualification": {
+        "nickname": "МЦ Пажылая Шляпа",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A22",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 38.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 8.5,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B22"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C22"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D22"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E22"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 6.5,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F22"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "МЦ Пажылая Шляпа",
+          "sourceRef": "2 РАУНД!A37",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "МЦ Пажылая Шляпа",
+          "sourceRef": "3 РАУНД!A16",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "3 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-25",
+      "nickname": "Аллахов†",
+      "poolSourceRef": "2 РАУНД!A39",
+      "qualification": {
+        "nickname": "Аллахов+",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A14",
+        "mappingStatus": "proposed_alias",
+        "historicalTotal": 40.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B14"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C14"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 5.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D14"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E14"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F14"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "Аллахов†",
+          "sourceRef": "2 РАУНД!A39",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "Аллахов✝",
+          "sourceRef": "3 РАУНД!A22",
+          "mappingStatus": "proposed_alias"
+        },
+        {
+          "stage": "4 РАУНД",
+          "nickname": "Аллахов †",
+          "sourceRef": "4 РАУНД!A6",
+          "mappingStatus": "proposed_alias"
+        }
+      ],
+      "furthestHistoricalStage": "4 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-26",
+      "nickname": "План \"Ди\"",
+      "poolSourceRef": "2 РАУНД!A40",
+      "qualification": {
+        "nickname": "План \"Ди\"",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A20",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 39.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B20"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C20"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 4.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D20"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E20"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F20"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "План \"Ди\"",
+          "sourceRef": "2 РАУНД!A40",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-27",
+      "nickname": "южный север",
+      "poolSourceRef": "2 РАУНД!A42",
+      "qualification": {
+        "nickname": "южный север",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A15",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 40.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B15"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C15"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 6.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D15"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E15"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F15"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "южный север",
+          "sourceRef": "2 РАУНД!A42",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "южный север",
+          "sourceRef": "3 РАУНД!A4",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "3 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-28",
+      "nickname": "говняный мальчик",
+      "poolSourceRef": "2 РАУНД!A43",
+      "qualification": {
+        "nickname": "говняный мальчик",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A29",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 36.5,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B29"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C29"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D29"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E29"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 6.5,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F29"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "говняный мальчик",
+          "sourceRef": "2 РАУНД!A43",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-29",
+      "nickname": "Мел В Гипсе",
+      "poolSourceRef": "2 РАУНД!A45",
+      "qualification": {
+        "nickname": "Мел В Гипсе",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A16",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 40.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B16"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C16"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 5.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D16"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E16"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F16"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "Мел В Гипсе",
+          "sourceRef": "2 РАУНД!A45",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "Мел В Гипсе",
+          "sourceRef": "3 РАУНД!A24",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "3 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-30",
+      "nickname": "МАИ ХАСЕГАВА",
+      "poolSourceRef": "2 РАУНД!A46",
+      "qualification": {
+        "nickname": "ТАМАРА ПЕТРОВНА КЛЕЩ | МАИ ХАСЕГАВА",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A27",
+        "mappingStatus": "proposed_alias",
+        "historicalTotal": 37.0,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B27"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C27"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 0.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D27"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E27"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F27"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "МАИ ХАСЕГАВА",
+          "sourceRef": "2 РАУНД!A46",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-31",
+      "nickname": "Калогерова",
+      "poolSourceRef": "2 РАУНД!A48",
+      "qualification": {
+        "nickname": "Калогерова",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A17",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 39.5,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 7.5,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B17"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 8.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C17"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 5.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D17"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 9.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E17"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F17"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "Калогерова",
+          "sourceRef": "2 РАУНД!A48",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "3 РАУНД",
+          "nickname": "Калогерова",
+          "sourceRef": "3 РАУНД!A13",
+          "mappingStatus": "exact_normalized_name"
+        },
+        {
+          "stage": "4 РАУНД",
+          "nickname": "Калогерова",
+          "sourceRef": "4 РАУНД!A4",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "4 РАУНД"
+    },
+    {
+      "workingId": "demo-opponent-32",
+      "nickname": "таёжный рёв",
+      "poolSourceRef": "2 РАУНД!A49",
+      "qualification": {
+        "nickname": "таёжный рёв",
+        "sourceRef": "1 РАУНД (СВОДНАЯ)!A19",
+        "mappingStatus": "exact_normalized_name",
+        "historicalTotal": 39.5,
+        "maximum": 50,
+        "grades": [
+          {
+            "judge": "епархия",
+            "value": 10.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!B19"
+          },
+          {
+            "judge": "клим пропавший",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!C19"
+          },
+          {
+            "judge": "атака трупа",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!D19"
+          },
+          {
+            "judge": "свиноферма",
+            "value": 7.0,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!E19"
+          },
+          {
+            "judge": "Тридцать Третий",
+            "value": 8.5,
+            "sourceRef": "1 РАУНД (СВОДНАЯ)!F19"
+          }
+        ]
+      },
+      "historicalAppearances": [
+        {
+          "stage": "2 РАУНД",
+          "nickname": "таёжный рёв",
+          "sourceRef": "2 РАУНД!A49",
+          "mappingStatus": "exact_normalized_name"
+        }
+      ],
+      "furthestHistoricalStage": "2 РАУНД"
+    }
+  ],
+  "historicalScoresAreRuntimeTargets": false,
+  "runtimeStrengthPolicyRef": "2026-10-12-pairing-and-community-timeline.md"
+}

@@ -1,12 +1,13 @@
 import {PC_IDENTITY} from './pc-identity.js?rev=43';
 import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=43';
 import {createPcIcon} from './virtual-pc-icons.js?rev=43';
-import {createExplorerState,reconcileExplorerState,navigateExplorer,explorerEntries,explorerProperties,explorerPaths} from './virtual-pc-explorer.js?rev=47';
-import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=47';
+import {createExplorerState,reconcileExplorerState,navigateExplorer,explorerEntries,explorerProperties,explorerPaths} from './virtual-pc-explorer.js?rev=57';
+import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=57';
 import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=43';
-import {normalizeStudioProject} from './ft-studio-project.js?rev=43';
-import {normalizeBeat} from './beat-production.js?rev=47';
-import {mountAudioFilePlayer} from './pc-audio-export-view.js?rev=47';
+import {normalizeStudioProject} from './ft-studio-project.js?rev=57';
+import {normalizeBeat} from './beat-production.js?rev=57';
+import {normalizeLyric} from './lyric-production.js?rev=57';
+import {mountAudioFilePlayer} from './pc-audio-export-view.js?rev=57';
 
 export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenProject,onProperties,onClose,onMenu,onNavigate,audio}) {
   const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',diskLabel=null,disposed=false;
@@ -34,7 +35,7 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
     }
     if(entry.kind==='application'){onOpenApp?.(entry.appId);return;}
     if(entry.kind==='file')return;
-    const raw=state.projects.find(p=>p.id===entry.projectId),p=normalizeBeat(raw)??normalizeStudioProject(raw);
+    const raw=state.projects.find(p=>p.id===entry.projectId),p=normalizeLyric(raw)??normalizeBeat(raw)??normalizeStudioProject(raw);
     if(!p){nav={...nav,error:'Этот проект повреждён и не может быть открыт.'};render(false);return;}
     onOpenProject(p);
   }

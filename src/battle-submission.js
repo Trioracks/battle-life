@@ -1,8 +1,8 @@
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=43';
-import {normalizeBeat} from './beat-production.js?rev=47';
-import {normalizeLyric} from './lyric-production.js?rev=47';
-import {resolveBeatPlayback} from './beat-playback.js?rev=47';
-import {RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=43';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=57';
+import {normalizeBeat} from './beat-production.js?rev=57';
+import {normalizeLyric} from './lyric-production.js?rev=57';
+import {resolveBeatPlayback} from './beat-playback.js?rev=49';
+import {RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=49';
 import {validGameMinute} from './game-minute.js?rev=43';
 import {BATTLE_ROUND_IDS} from './battle-roster.js?rev=43';
 const clone=value=>JSON.parse(JSON.stringify(value));

@@ -1,0 +1,245 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-12",
+  "status": "proposal_not_runtime_configuration",
+  "criteriaOrder": [
+    "text",
+    "performance",
+    "music",
+    "sound"
+  ],
+  "criteriaRange": [
+    0,
+    10
+  ],
+  "inputStatus": "four_separate_finished_track_criteria_require_production_changes",
+  "scoreFormula": "sum(weight[k] * quality[k]) / sum(weight)",
+  "neutralIndex40Formula": "sum(quality[k])",
+  "personalIndex40Formula": "4 * score",
+  "weightPolicy": "finite_strictly_positive_normalized_weights",
+  "gradePolicy": {
+    "range": [
+      0,
+      10
+    ],
+    "strictnessOffsetDefault": 0,
+    "proposedDisplayStep": 0.5,
+    "formula": "round_to_half(clamp(score + strictnessOffset, 0, 10))"
+  },
+  "pairPolicy": {
+    "decision": "compare_unrounded_unclamped_score_before_grade_transform",
+    "voteWinner": 1,
+    "voteLoser": 0,
+    "tieRule": null,
+    "noise": 0
+  },
+  "normalizationPolicy": {
+    "production100MapsTo": 10,
+    "beatOver100": "cap_to_10_in_base_model",
+    "vocal44MapsTo": 4.4,
+    "warning": "vocal_quality_is_a_merged_measure_not_a_pure_performance_or_sound_axis"
+  },
+  "profiles": [
+    {
+      "id": "eparhiya",
+      "name": "епархия",
+      "weights": {
+        "text": 0.4,
+        "performance": 0.25,
+        "music": 0.25,
+        "sound": 0.1
+      },
+      "strictnessOffset": 0,
+      "weightsStatus": "designer_starting_hypothesis_not_historically_fitted",
+      "researchProfileRef": "sources/2026-10-12/judge-profiles.json#eparhiya"
+    },
+    {
+      "id": "klim-propavshiy",
+      "name": "клим пропавший",
+      "weights": {
+        "text": 0.2,
+        "performance": 0.35,
+        "music": 0.35,
+        "sound": 0.1
+      },
+      "strictnessOffset": 0,
+      "weightsStatus": "designer_starting_hypothesis_not_historically_fitted",
+      "researchProfileRef": "sources/2026-10-12/judge-profiles.json#klim-propavshiy"
+    },
+    {
+      "id": "svinoferma",
+      "name": "свиноферма",
+      "weights": {
+        "text": 0.5,
+        "performance": 0.3,
+        "music": 0.1,
+        "sound": 0.1
+      },
+      "strictnessOffset": 0,
+      "weightsStatus": "designer_starting_hypothesis_not_historically_fitted",
+      "researchProfileRef": "sources/2026-10-12/judge-profiles.json#svinoferma"
+    },
+    {
+      "id": "thirty-third",
+      "name": "Тридцать Третий",
+      "weights": {
+        "text": 0.25,
+        "performance": 0.3,
+        "music": 0.3,
+        "sound": 0.15
+      },
+      "strictnessOffset": 0,
+      "weightsStatus": "designer_starting_hypothesis_not_historically_fitted",
+      "researchProfileRef": "sources/2026-10-12/judge-profiles.json#thirty-third"
+    }
+  ],
+  "examples": {
+    "tracks": {
+      "player": [
+        9,
+        5,
+        3,
+        2
+      ],
+      "opponent": [
+        4,
+        6,
+        6,
+        5
+      ]
+    },
+    "cases": [
+      {
+        "name": "Нейтральный",
+        "weights": [
+          0.25,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "player": 4.75,
+        "opponent": 5.25,
+        "playerIndex40": 19,
+        "opponentIndex40": 21
+      },
+      {
+        "name": "Текст в приоритете",
+        "weights": [
+          0.6,
+          0.2,
+          0.1,
+          0.1
+        ],
+        "player": 6.9,
+        "opponent": 4.7,
+        "playerIndex40": 27.6,
+        "opponentIndex40": 18.8
+      },
+      {
+        "name": "Музыка в приоритете",
+        "weights": [
+          0.1,
+          0.2,
+          0.6,
+          0.1
+        ],
+        "player": 3.9,
+        "opponent": 5.7,
+        "playerIndex40": 15.6,
+        "opponentIndex40": 22.8
+      },
+      {
+        "name": "Звук в приоритете",
+        "weights": [
+          0.1,
+          0.15,
+          0.15,
+          0.6
+        ],
+        "player": 3.3,
+        "opponent": 5.2,
+        "playerIndex40": 13.2,
+        "opponentIndex40": 20.8
+      },
+      {
+        "name": "епархия — стартовая гипотеза",
+        "weights": [
+          0.4,
+          0.25,
+          0.25,
+          0.1
+        ],
+        "player": 5.8,
+        "opponent": 5.1,
+        "playerIndex40": 23.2,
+        "opponentIndex40": 20.4
+      },
+      {
+        "name": "клим — стартовая гипотеза",
+        "weights": [
+          0.2,
+          0.35,
+          0.35,
+          0.1
+        ],
+        "player": 4.8,
+        "opponent": 5.5,
+        "playerIndex40": 19.2,
+        "opponentIndex40": 22
+      },
+      {
+        "name": "свиноферма — стартовая гипотеза",
+        "weights": [
+          0.5,
+          0.3,
+          0.1,
+          0.1
+        ],
+        "player": 6.5,
+        "opponent": 4.9,
+        "playerIndex40": 26,
+        "opponentIndex40": 19.6
+      },
+      {
+        "name": "Тридцать Третий — стартовая гипотеза",
+        "weights": [
+          0.25,
+          0.3,
+          0.3,
+          0.15
+        ],
+        "player": 4.95,
+        "opponent": 5.35,
+        "playerIndex40": 19.8,
+        "opponentIndex40": 21.4
+      }
+    ],
+    "checks": {
+      "monotonicChecks": 8,
+      "scaleChecks": 8,
+      "identicalChecks": 8,
+      "rounding": "compare unrounded scores before formatting; half-point grade is a display transform"
+    }
+  },
+  "limitations": [
+    "Numeric weights are game design hypotheses, not estimates recovered from source comments.",
+    "Judge research profiles and source observations remain unchanged.",
+    "Historical votes cannot validate numeric prediction without independent track-feature labels.",
+    "Strictness shifts grades and does not change pair decisions.",
+    "Specific lyrics, timestamps and audio defects cannot be invented from aggregate quality.",
+    "No random variation, culture modifier or conditional battle modifier is active in this proposal.",
+    "Example vectors are synthetic and do not describe currently saved game tracks."
+  ],
+  "verification": {
+    "verified": true,
+    "method": "Read saved draft JSON; recompute weighted means and invariants in PowerShell",
+    "checks": 207,
+    "syntheticCases": 8,
+    "draftJudgeProfiles": 4,
+    "localDocumentLinks": 38,
+    "gameBehaviorTested": false,
+    "predictiveAccuracyMeasured": false
+  },
+  "usageScope": "base_personal_quality_before_format_penalty",
+  "extensionPolicyRef": "judge-comment-policy-v0.2.json"
+}

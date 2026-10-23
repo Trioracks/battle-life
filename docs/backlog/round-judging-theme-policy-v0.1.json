@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "0.1",
+  "date": "2026-10-12",
+  "status": "backlog_calibration_proposal_not_runtime_implementation",
+  "confirmed": {
+    "direction": "absolute_deviation_both_sides",
+    "affectedQuality": "text_only",
+    "automaticRejection": false,
+    "automaticOpponentVote": false,
+    "judgeSpecificPreferredShare": true,
+    "smallDeviationSmallPenalty": true,
+    "exampleFiveStepsApproximatelyHalvesText": true,
+    "exampleNineStepsAlmostErasesText": true,
+    "contentMixBudget": 100,
+    "contentMixKeys": [
+      "topic",
+      "diss",
+      "lyric"
+    ],
+    "judgePreferredMixAlsoSumsTo100": true
+  },
+  "linearCandidate": {
+    "coverageScale": [
+      0,
+      100
+    ],
+    "preferenceScale": [
+      0,
+      100
+    ],
+    "sensitivityScale": [
+      0,
+      1
+    ],
+    "deviation": "abs(preferredShare - submittedShare) / 100",
+    "retainedTextMultiplier": "1 - sensitivity * deviation",
+    "compareBeforeDisplayRounding": true,
+    "baseTextIncludesWritingSkillAlready": true,
+    "doNotMultiplyMusicPerformanceSound": true,
+    "doNotApplySameThemePenaltyAgainAsBattleFormat": true
+  },
+  "examples": [
+    {
+      "preferredShare": 50,
+      "submittedShare": 50,
+      "sensitivity": 1,
+      "retainedTextMultiplier": 1
+    },
+    {
+      "preferredShare": 50,
+      "submittedShare": 40,
+      "sensitivity": 1,
+      "retainedTextMultiplier": 0.9
+    },
+    {
+      "preferredShare": 50,
+      "submittedShare": 60,
+      "sensitivity": 1,
+      "retainedTextMultiplier": 0.9
+    },
+    {
+      "preferredShare": 50,
+      "submittedShare": 0,
+      "sensitivity": 1,
+      "retainedTextMultiplier": 0.5
+    },
+    {
+      "preferredShare": 50,
+      "submittedShare": 90,
+      "sensitivity": 1,
+      "retainedTextMultiplier": 0.6
+    },
+    {
+      "preferredShare": 90,
+      "submittedShare": 0,
+      "sensitivity": 1,
+      "retainedTextMultiplier": 0.1
+    },
+    {
+      "preferredShare": 50,
+      "submittedShare": 0,
+      "sensitivity": 0,
+      "retainedTextMultiplier": 1
+    }
+  ],
+  "namedJudgeParameters": null,
+  "namedJudgeParametersReason": "Source analysis informs behavior; this clarification does not establish measured preferred slider values for named historical judges",
+  "codeMapping": {
+    "currentFile": "../../src/lyric-production.js",
+    "currentFirstStage": [
+      "Ясность мысли",
+      "Развитие темы",
+      "Личное отношение"
+    ],
+    "currentSliderScale": [
+      0,
+      10
+    ],
+    "semanticPercentMappingStatus": "requires_explicit_BL013_adapter",
+    "doNotInventExistingThreeWayPercentageBudget": true,
+    "requiredNewBehavior": "Shared 100% topic/diss/lyric budget confirmed by author; not already implemented by the current independent technical sliders",
+    "manualUnlockInputs": [
+      "writing"
+    ],
+    "manualUnlockWritingThreshold": 25,
+    "lockedContentMix": "random_system_generated_sum100_no_player_choice_below_writing25"
+  },
+  "specRef": "2026-10-12-round-topics-and-rap-dossier.md",
+  "fullMixPolicyRef": "battle-analysis-rules-v0.1.json#textMix",
+  "followupSpecRef": "2026-10-12-text-budget-noshow-and-judge-dossier.md"
+}

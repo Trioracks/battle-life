@@ -1,25 +1,28 @@
-import {normalizeAppearance} from './avatar-v3-profile.js?rev=43';
+import {normalizeAppearance} from './avatar-v3-profile.js?rev=49';
 export const portraitKey=appearance=>'portrait-v1:'+JSON.stringify(normalizeAppearance(appearance));
-const PREFIX='data:image/jpeg;base64,',MAX_BYTES=96*1024;
-export function normalizePlayerPortrait(raw){
+const PREFIX='data:image/jpeg;base64,';
+export function normalizePlayerPortrait(raw,{size=256,maxBytes=96*1024}={}){
  if(!raw||typeof raw.key!=='string'||!raw.key.startsWith('portrait-v1:')||raw.key.length>800||typeof raw.url!=='string'||!raw.url.startsWith(PREFIX))return null;
- const encoded=raw.url.slice(PREFIX.length);if(encoded.length>MAX_BYTES*4/3||encoded.length%4||!/^[A-Za-z0-9+/]+={0,2}$/.test(encoded))return null;
+ const encoded=raw.url.slice(PREFIX.length);if(encoded.length>maxBytes*4/3||encoded.length%4||!/^[A-Za-z0-9+/]+={0,2}$/.test(encoded))return null;
  let bytes;try{bytes=Uint8Array.from(atob(encoded),c=>c.charCodeAt(0));}catch{return null;}
- if(bytes.length>MAX_BYTES||bytes[0]!==255||bytes[1]!==216||bytes.at(-2)!==255||bytes.at(-1)!==217)return null;
+ if(bytes.length>maxBytes||bytes[0]!==255||bytes[1]!==216||bytes.at(-2)!==255||bytes.at(-1)!==217)return null;
  let dimensions=false;
  for(let i=2;i+3<bytes.length;){
   if(bytes[i++]!==255)return null;while(bytes[i]===255)i++;const marker=bytes[i++];if(marker===218||marker===217)break;
   const length=bytes[i]*256+bytes[i+1];if(length<2||i+length>bytes.length)return null;
-  if([192,193,194].includes(marker)){if(length<8||bytes[i+3]*256+bytes[i+4]!==256||bytes[i+5]*256+bytes[i+6]!==256)return null;dimensions=true;}
+  if([192,193,194].includes(marker)){if(length<8||bytes[i+3]*256+bytes[i+4]!==size||bytes[i+5]*256+bytes[i+6]!==size)return null;dimensions=true;}
   i+=length;
  }
  return dimensions?{key:raw.key,url:raw.url}:null;
 }
 export function socialPhotoSource(src){
  if(typeof src!=='string')return null;
+ if(/^\.\/assets\/social\/(goblin|filya)\/[a-z0-9-]+\.png$/.test(src))return src;
+ if(/^\.\/assets\/social\/life\/[a-z0-9-]+\.png$/.test(src))return src;
+ if(/^\.\/assets\/npc-photos\/life\/mak-npc-\d\d-(school|college|army|work|university|rehearsal|workshop)\.jpg$/.test(src))return src;
  if(/^\.\/assets\/social\/photos\/[a-z0-9-]+\.jpg$/.test(src))return src;
  if(/^\.\/assets\/npc-photos\/mak-npc-\d\d-(desk|courtyard|street|room)\.jpg$/.test(src))return src;
- return normalizePlayerPortrait({key:'portrait-v1:validated',url:src})?.url??null;
+ return normalizePlayerPortrait({key:'portrait-v1:validated',url:src})?.url??normalizePlayerPortrait({key:'portrait-v1:validated',url:src},{size:512,maxBytes:160*1024})?.url??null;
 }
 export function createPlayerPortraitController({getState,getAppearance,render,save}){
  const cache=new Map();let pending=null;

@@ -1,5 +1,5 @@
 import {pcElement as el} from './virtual-pc-dom.js?rev=43';
-import {socialHeading} from './social-dom.js?rev=43';
+import {socialHeading} from './social-dom.js?rev=57';
 import {gameDateTimeLabel} from './home-calendar.js?rev=43';
 const names={text:'Текст',performance:'Исполнение',music:'Музыка',sound:'Звук'};
 export function createPublicAnalysisReportView(d,p){

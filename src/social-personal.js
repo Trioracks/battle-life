@@ -1,5 +1,5 @@
-import {normalizeSocial} from './social-state.js?rev=43';
-import {profileById,communityById} from './social-catalog.js?rev=43';
+import {normalizeSocial} from './social-state.js?rev=57';
+import {profileById,communityById} from './social-catalog.js?rev=57';
 import {receivePhoneEvents} from './phone-notifications.js?rev=43';
 import {SOCIAL_IDENTITY} from './social-identity.js?rev=43';
 import {validGameMinute} from './game-minute.js?rev=43';

@@ -1,6 +1,6 @@
-import {advanceSocial} from './social-runtime.js?rev=47';
-import {preparePcSaveArchives} from './virtual-pc-state.js?rev=47';
-import {SOCIAL_DOMAIN_KEYS} from './social-background.js?rev=47';
+import {advanceSocial} from './social-runtime.js?rev=57';
+import {preparePcSaveArchives} from './virtual-pc-state.js?rev=57';
+import {SOCIAL_DOMAIN_KEYS} from './social-background.js?rev=57';
 
 // Lives in a Worker. All history traversal, validation and large compression
 // stays here; the main thread receives only changed sections and prepared saves.
@@ -30,7 +30,7 @@ export function createSocialWorkerRuntime(){
    }
    mirror={...result.state,...changed};
    const outputPatch={...changed};for(const {key}of archives)delete outputPatch[key];
-   return {id,patch:outputPatch,archives,durable:Boolean(result.events?.length||result.domainChanged||Object.hasOwn(changed,'battleSubmissions'))};
+   return {id,patch:outputPatch,archives,warning:result.warning??'',durable:Boolean(result.events?.length||result.domainChanged||Object.hasOwn(changed,'battleSubmissions'))};
   }catch(error){return {id,error:error.message||String(error)};}
  };
 }

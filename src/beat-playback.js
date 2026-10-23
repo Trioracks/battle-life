@@ -1,15 +1,18 @@
-import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=43';
-import {beginnerById} from './beat-beginner-bank.js?rev=47';
-import {normalizeBeatMix} from './beat-mix.js?rev=43';
-import {normalizeRecording,vocalPlaybackProfile} from './vocal-result.js?rev=43';
-import {createBeatSongForm,songPartWindows,normalizeSongForm} from './beat-song-form.js?rev=47';
-import {normalizeGenreSnapshot} from './genre-progression.js?rev=43';
-import {SOURCE_GAINS_DB} from './source-levels.js?rev=47';
+import {drumById,loopSeconds,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=49';
+import {beginnerById} from './beat-beginner-bank.js?rev=49';
+import {normalizeBeatMix} from './beat-mix.js?rev=49';
+import {normalizeRecording,vocalPlaybackProfile} from './vocal-result.js?rev=49';
+import {createBeatSongForm,songPartWindows,normalizeSongForm} from './beat-song-form.js?rev=49';
+import {normalizeGenreSnapshot} from './genre-progression.js?rev=49';
+import {SOURCE_GAINS_DB} from './source-levels.js?rev=49';
+import {vocalById} from './vocal-catalog.js?rev=49';
+import {validBeatExecutionMix} from './beat-execution-snapshot.js?rev=49';
 
 // A project has one musical clock, even when a legacy drum loop is shorter.
 export function resolveBeatPlayback(beat,{workStage=null,recordingPreview=null}={}){
  const fail=reason=>({ok:false,reason});
  if(!beat||![2,3].includes(beat.version)||!Array.isArray(beat.stages))return fail('Этот проект пока нельзя прослушать.');
+ if(!validBeatExecutionMix(beat.mix))return fail('Повреждён снимок исполнения. Проект сохранён.');
  if(workStage!==null&&(!Number.isInteger(workStage)||workStage<0||workStage>2))return fail('Неизвестный этап работы.');
  const modern=beat.version===3;
  if(beat.songForm!==undefined&&!normalizeSongForm(beat.songForm,beat))return fail('Не найдена сохранённая форма трека. Проект сохранён.');
@@ -40,7 +43,7 @@ export function resolveBeatPlayback(beat,{workStage=null,recordingPreview=null}=
   parts.push(part);
  }
  const genreProfile=normalizeGenreSnapshot(beat.genreProfile);
- if(recording&&workStage===null&&beat.stages.length===3){const performance=leveled?{...recording,mix:null,master:null}:recording;const vocal={id:recording.sourceId,loopSeconds:32/3,vocal:{...vocalPlaybackProfile(performance),...(genreProfile?{genreProfile}:{})}};if(form)vocal.windows=songPartWindows(form,3);parts.push(vocal);}
+ if(recording&&workStage===null&&beat.stages.length===3){const performance=leveled?{...recording,mix:null,master:null}:recording,sourceGainDb=vocalById(recording.sourceId).sourceGainDb;const vocal={id:recording.sourceId,loopSeconds:32/3,...(recording.voiceId!==undefined?{voiceId:recording.voiceId,...(leveled||sourceGainDb!==undefined?{sourceGainDb:sourceGainDb??0}:{})}:{}),vocal:{...vocalPlaybackProfile(performance),...(genreProfile?{genreProfile}:{})}};if(form)vocal.windows=songPartWindows(form,3);parts.push(vocal);}
  const gainDb=workStage===null&&!recordingPreview?(recording?.mix?3:0)+(recording?.master?1:0):0;
  const levels=leveled?{levelVersion:1,outputGain:.55*10**(gainDb/20)}:{};
  return {ok:true,reason:'',descriptor:{key:JSON.stringify([beat.id,owner,workStage,chosen,mix,recording,...(genreProfile?[genreProfile]:[]),...(leveled?[levels]:[]),...(form?.version?[form]:[])]),owner,durationSeconds,parts,mix,...levels}};

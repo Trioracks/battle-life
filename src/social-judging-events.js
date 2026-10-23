@@ -1,7 +1,7 @@
 import {judgeProfile} from './judge-profiles.js?rev=43';
 import {battleFormat} from './battle-format.js?rev=43';
-import {generateJudgeReview,normalizeJudging,finalizeJudgePanel} from './judge-comments.js?rev=43';
-import {communityById} from './social-catalog.js?rev=43';
+import {generateJudgeReview,normalizeJudging,finalizeJudgePanel} from './judge-comments.js?rev=49';
+import {communityById} from './social-catalog.js?rev=57';
 import {receivePhoneEvents} from './phone-notifications.js?rev=43';
 import {SOCIAL_IDENTITY} from './social-identity.js?rev=43';
 const clone=v=>JSON.parse(JSON.stringify(v));

@@ -1,0 +1,1848 @@
+{
+  "version": 1,
+  "batch": "abstract-20261020-v1",
+  "catalogVersion": 1,
+  "voice": "daniel",
+  "voiceId": "npc-voice:daniel-20261020",
+  "parts": [
+    {
+      "id": "npc-daniel-01",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_2.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_2.wav",
+      "sourceHash": "305860d2af5e0275683367d95e99851f11668ad94b8872809244701c451d2542",
+      "sha256": "305860d2af5e0275683367d95e99851f11668ad94b8872809244701c451d2542",
+      "bytes": 1084182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271000,
+      "seconds": 5.645833333333333,
+      "bpm": 90,
+      "sourceGainDb": -4.1444,
+      "rms": 0.07251576820946042,
+      "peak": 0.42193603515625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.01,
+          "endSeconds": 3.03
+        },
+        {
+          "startSeconds": 3.12,
+          "endSeconds": 3.63
+        },
+        {
+          "startSeconds": 4.04,
+          "endSeconds": 5.3
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-02",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_3.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_3.wav",
+      "sourceHash": "4816807b40e0b165969c0d63f9ef7ae97fa069ad95ffd7d21df7f9c724f8d498",
+      "sha256": "4816807b40e0b165969c0d63f9ef7ae97fa069ad95ffd7d21df7f9c724f8d498",
+      "bytes": 1085514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271333,
+      "seconds": 5.652770833333333,
+      "bpm": 90,
+      "sourceGainDb": -4.29711,
+      "rms": 0.07380198951791872,
+      "peak": 0.494293212890625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.33
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-03",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_4.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_4.wav",
+      "sourceHash": "88260338d4952ff01a6f95de71eee42251123e3ef076df4909c915fc816f297b",
+      "sha256": "88260338d4952ff01a6f95de71eee42251123e3ef076df4909c915fc816f297b",
+      "bytes": 1086850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271667,
+      "seconds": 5.659729166666667,
+      "bpm": 90,
+      "sourceGainDb": -4.57269,
+      "rms": 0.07618110038883145,
+      "peak": 0.3695068359375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 2.91
+        },
+        {
+          "startSeconds": 3,
+          "endSeconds": 4.24
+        },
+        {
+          "startSeconds": 4.34,
+          "endSeconds": 5.34
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-04",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_5.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_5.wav",
+      "sourceHash": "b3d92b5505b1977002166503768a00f021e119ca66f15bd35d9cf8a94c88940c",
+      "sha256": "b3d92b5505b1977002166503768a00f021e119ca66f15bd35d9cf8a94c88940c",
+      "bytes": 1076182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 269000,
+      "seconds": 5.604166666666667,
+      "bpm": 90,
+      "sourceGainDb": -1.2132,
+      "rms": 0.05174550844536876,
+      "peak": 0.47271728515625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.23,
+          "endSeconds": 1.5
+        },
+        {
+          "startSeconds": 2,
+          "endSeconds": 4
+        },
+        {
+          "startSeconds": 4.16,
+          "endSeconds": 4.33
+        },
+        {
+          "startSeconds": 4.5,
+          "endSeconds": 5.27
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-05",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_6.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_6.wav",
+      "sourceHash": "94846debae2f98b36c2340e4b3900f69809f5fcbba97e22e2f222ab260c620cd",
+      "sha256": "94846debae2f98b36c2340e4b3900f69809f5fcbba97e22e2f222ab260c620cd",
+      "bytes": 1046850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 261667,
+      "seconds": 5.451395833333334,
+      "bpm": 90,
+      "sourceGainDb": -4.6867,
+      "rms": 0.07718760801623417,
+      "peak": 0.4783935546875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.5,
+          "endSeconds": 5.14
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-06",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_7.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_7.wav",
+      "sourceHash": "4388bb794dda9ebb0595b7a67138e8741cd32eaa1c4612a9e5362345cd4b6d43",
+      "sha256": "4388bb794dda9ebb0595b7a67138e8741cd32eaa1c4612a9e5362345cd4b6d43",
+      "bytes": 908182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 227000,
+      "seconds": 4.729166666666667,
+      "bpm": 90,
+      "sourceGainDb": -5.98329,
+      "rms": 0.08961426336804346,
+      "peak": 0.41864013671875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 4.42
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-07",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_8.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_8.wav",
+      "sourceHash": "13542847a171492ef7195f03f8be3b9f732a3750d5c948ce2eac557a13fc942e",
+      "sha256": "13542847a171492ef7195f03f8be3b9f732a3750d5c948ce2eac557a13fc942e",
+      "bytes": 926850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 231667,
+      "seconds": 4.826395833333334,
+      "bpm": 90,
+      "sourceGainDb": -4.50393,
+      "rms": 0.07558040365198244,
+      "peak": 0.398223876953125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.55
+        },
+        {
+          "startSeconds": 0.7,
+          "endSeconds": 4.5
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-08",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_9.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_9.wav",
+      "sourceHash": "b1c63268f7f65c55951ec6a2ea7f87c8de6ab0932a4b68ec4ef6cb937c4cc60f",
+      "sha256": "b1c63268f7f65c55951ec6a2ea7f87c8de6ab0932a4b68ec4ef6cb937c4cc60f",
+      "bytes": 968182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 242000,
+      "seconds": 5.041666666666667,
+      "bpm": 90,
+      "sourceGainDb": -3.35491,
+      "rms": 0.06621523172624073,
+      "peak": 0.4381103515625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 3.19
+        },
+        {
+          "startSeconds": 3.6,
+          "endSeconds": 4.71
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-09",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_10.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_10.wav",
+      "sourceHash": "48cabef4e96e90977f2d7c6ea60813e42dd9bce9b7a82f796455bb2e85398b65",
+      "sha256": "48cabef4e96e90977f2d7c6ea60813e42dd9bce9b7a82f796455bb2e85398b65",
+      "bytes": 1089514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 272333,
+      "seconds": 5.673604166666666,
+      "bpm": 90,
+      "sourceGainDb": -4.8482,
+      "rms": 0.07863616396316214,
+      "peak": 0.4576416015625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.34
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-10",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_11.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_11.wav",
+      "sourceHash": "7c48a1655a8657f22bdeccd963320d79bda7bfece6013c953f03923be681ce45",
+      "sha256": "7c48a1655a8657f22bdeccd963320d79bda7bfece6013c953f03923be681ce45",
+      "bytes": 1086850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271667,
+      "seconds": 5.659729166666667,
+      "bpm": 90,
+      "sourceGainDb": -5.43982,
+      "rms": 0.08417898089821095,
+      "peak": 0.433990478515625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.33
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-11",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_12.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_12.wav",
+      "sourceHash": "4cc1799a36ee20c62a0b2cd079f2560ea045705a5a40cfe735b86d21af6ad839",
+      "sha256": "4cc1799a36ee20c62a0b2cd079f2560ea045705a5a40cfe735b86d21af6ad839",
+      "bytes": 1084182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271000,
+      "seconds": 5.645833333333333,
+      "bpm": 90,
+      "sourceGainDb": -4.53271,
+      "rms": 0.07583117485928985,
+      "peak": 0.42578125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.33
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-12",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_13.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_13.wav",
+      "sourceHash": "6275bca40cc7d53c8ccd26aafd112aef20847fc53ff920564fac6da69a7b0b56",
+      "sha256": "6275bca40cc7d53c8ccd26aafd112aef20847fc53ff920564fac6da69a7b0b56",
+      "bytes": 1076182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 269000,
+      "seconds": 5.604166666666667,
+      "bpm": 90,
+      "sourceGainDb": -5.32225,
+      "rms": 0.0830472478264361,
+      "peak": 0.451812744140625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.01,
+          "endSeconds": 5.28
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-13",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_14.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_14.wav",
+      "sourceHash": "26792535c84d1cc6813ed37c7dd494fcafb232e622add0a3899a7e3908e22ac2",
+      "sha256": "26792535c84d1cc6813ed37c7dd494fcafb232e622add0a3899a7e3908e22ac2",
+      "bytes": 1082850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 270667,
+      "seconds": 5.638895833333334,
+      "bpm": 90,
+      "sourceGainDb": -4.2665,
+      "rms": 0.07354236113092356,
+      "peak": 0.477783203125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.01,
+          "endSeconds": 5.31
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-14",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_15.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_15.wav",
+      "sourceHash": "5b94fc4e2e94c4c49b915a4d53bf788eb2615c60b6091102a6a5670cc626712a",
+      "sha256": "5b94fc4e2e94c4c49b915a4d53bf788eb2615c60b6091102a6a5670cc626712a",
+      "bytes": 1082850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 270667,
+      "seconds": 5.638895833333334,
+      "bpm": 90,
+      "sourceGainDb": -4.96904,
+      "rms": 0.07973783563146697,
+      "peak": 0.44537353515625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.44,
+          "endSeconds": 3.1
+        },
+        {
+          "startSeconds": 3.22,
+          "endSeconds": 5.34
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-15",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_16.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_16.wav",
+      "sourceHash": "f0ad97495cf689c253e102d8bb3be55a1a6777e4cdb30827bc094213db55f5f4",
+      "sha256": "f0ad97495cf689c253e102d8bb3be55a1a6777e4cdb30827bc094213db55f5f4",
+      "bytes": 1082850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 270667,
+      "seconds": 5.638895833333334,
+      "bpm": 90,
+      "sourceGainDb": -3.80791,
+      "rms": 0.06976024393476772,
+      "peak": 0.47064208984375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.08,
+          "endSeconds": 5.32
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-16",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_17.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_17.wav",
+      "sourceHash": "e9886955a16f94967cce9e9e729709189c7900612fa1ef7ff5cf709abcd741cf",
+      "sha256": "e9886955a16f94967cce9e9e729709189c7900612fa1ef7ff5cf709abcd741cf",
+      "bytes": 1084182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271000,
+      "seconds": 5.645833333333333,
+      "bpm": 90,
+      "sourceGainDb": -3.63836,
+      "rms": 0.0684117198115539,
+      "peak": 0.408599853515625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 4.94
+        },
+        {
+          "startSeconds": 5.03,
+          "endSeconds": 5.33
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-17",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_18.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC_18.wav",
+      "sourceHash": "2ba38d13535f7cf877bd7d18c34f7b647e21ff23efdd7dfdcec064feffaede84",
+      "sha256": "2ba38d13535f7cf877bd7d18c34f7b647e21ff23efdd7dfdcec064feffaede84",
+      "bytes": 1085514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271333,
+      "seconds": 5.652770833333333,
+      "bpm": 90,
+      "sourceGainDb": -5.46234,
+      "rms": 0.08439750035592267,
+      "peak": 0.490478515625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.34
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-18",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - REC.wav",
+      "sourceHash": "c008a924932ba9da31e6b5ab6c83d9ffa38cb35ce0183de0c8b5904049c633cf",
+      "sha256": "c008a924932ba9da31e6b5ab6c83d9ffa38cb35ce0183de0c8b5904049c633cf",
+      "bytes": 1049514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 262333,
+      "seconds": 5.465270833333333,
+      "bpm": 90,
+      "sourceGainDb": -3.44435,
+      "rms": 0.0669005738251743,
+      "peak": 0.379547119140625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.88
+        },
+        {
+          "startSeconds": 1.15,
+          "endSeconds": 4.28
+        },
+        {
+          "startSeconds": 4.39,
+          "endSeconds": 5.1
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-19",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 2.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 2.wav",
+      "sourceHash": "8bb489127b29d6e4ca58bdcffdd215d40feef984c4279b20226b2874070c4cc9",
+      "sha256": "8bb489127b29d6e4ca58bdcffdd215d40feef984c4279b20226b2874070c4cc9",
+      "bytes": 1073514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 268333,
+      "seconds": 5.590270833333333,
+      "bpm": 90,
+      "sourceGainDb": -2.54327,
+      "rms": 0.06030817614126674,
+      "peak": 0.438232421875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.27
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-20",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 3.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 3.wav",
+      "sourceHash": "eaf917c2baf0979521fc8c546295cb8493a841c157b6a66dbd4533528c73b31c",
+      "sha256": "eaf917c2baf0979521fc8c546295cb8493a841c157b6a66dbd4533528c73b31c",
+      "bytes": 1020182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 255000,
+      "seconds": 5.3125,
+      "bpm": 90,
+      "sourceGainDb": -3.56707,
+      "rms": 0.06785254150497698,
+      "peak": 0.502716064453125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.35,
+          "endSeconds": 2.3
+        },
+        {
+          "startSeconds": 2.51,
+          "endSeconds": 4.99
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-21",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 8.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 8.wav",
+      "sourceHash": "890446019fc44213e7c9a908dc8cc2f69612b2b141c2fdb1f1878dfa40371f8e",
+      "sha256": "890446019fc44213e7c9a908dc8cc2f69612b2b141c2fdb1f1878dfa40371f8e",
+      "bytes": 1088182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 272000,
+      "seconds": 5.666666666666667,
+      "bpm": 90,
+      "sourceGainDb": -4.36061,
+      "rms": 0.07434350322495131,
+      "peak": 0.495635986328125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 2.42
+        },
+        {
+          "startSeconds": 2.63,
+          "endSeconds": 3.83
+        },
+        {
+          "startSeconds": 3.92,
+          "endSeconds": 5.06
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-22",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 9.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 9.wav",
+      "sourceHash": "7faaf2381316fbfa69c8dd3e12da6ea949cdf5d24e6ce78a0ceab1ba4a85349f",
+      "sha256": "7faaf2381316fbfa69c8dd3e12da6ea949cdf5d24e6ce78a0ceab1ba4a85349f",
+      "bytes": 1085514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271333,
+      "seconds": 5.652770833333333,
+      "bpm": 90,
+      "sourceGainDb": -5.51111,
+      "rms": 0.08487267412076224,
+      "peak": 0.444091796875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.34
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-23",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 10.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 10.wav",
+      "sourceHash": "6c356dd6da4f44359268c0b3009b5300ea732f50ce3cbbe0bece6de510b5ce22",
+      "sha256": "6c356dd6da4f44359268c0b3009b5300ea732f50ce3cbbe0bece6de510b5ce22",
+      "bytes": 949514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 237333,
+      "seconds": 4.9444375,
+      "bpm": 90,
+      "sourceGainDb": -4.48622,
+      "rms": 0.07542643099687206,
+      "peak": 0.425933837890625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.08,
+          "endSeconds": 0.56
+        },
+        {
+          "startSeconds": 0.71,
+          "endSeconds": 3.21
+        },
+        {
+          "startSeconds": 3.33,
+          "endSeconds": 4.59
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-24",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 11.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 11.wav",
+      "sourceHash": "ee022b937d8f467544423d2e9fdf0295155f384c02c9ab70700ae0cfc4d23229",
+      "sha256": "ee022b937d8f467544423d2e9fdf0295155f384c02c9ab70700ae0cfc4d23229",
+      "bytes": 1084182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271000,
+      "seconds": 5.645833333333333,
+      "bpm": 90,
+      "sourceGainDb": -4.76546,
+      "rms": 0.07789065255498193,
+      "peak": 0.491119384765625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 1.23
+        },
+        {
+          "startSeconds": 1.33,
+          "endSeconds": 5.33
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-25",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 12.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 12.wav",
+      "sourceHash": "f46e332abf1eeff3bbd2093cc5b47946970318fd6919226acb7c8fad904f9cc3",
+      "sha256": "f46e332abf1eeff3bbd2093cc5b47946970318fd6919226acb7c8fad904f9cc3",
+      "bytes": 1084182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271000,
+      "seconds": 5.645833333333333,
+      "bpm": 90,
+      "sourceGainDb": -5.44168,
+      "rms": 0.08419695450641002,
+      "peak": 0.46429443359375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.53
+        },
+        {
+          "startSeconds": 0.62,
+          "endSeconds": 1.87
+        },
+        {
+          "startSeconds": 1.97,
+          "endSeconds": 5.34
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-26",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 13.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 13.wav",
+      "sourceHash": "3fc50d4b0edbf4b89ff9a665e714c76ca560f2b6084f06f104131a88082d0a71",
+      "sha256": "3fc50d4b0edbf4b89ff9a665e714c76ca560f2b6084f06f104131a88082d0a71",
+      "bytes": 1086850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271667,
+      "seconds": 5.659729166666667,
+      "bpm": 90,
+      "sourceGainDb": -5.41591,
+      "rms": 0.08394752977634824,
+      "peak": 0.4337158203125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.02,
+          "endSeconds": 2.6
+        },
+        {
+          "startSeconds": 2.72,
+          "endSeconds": 5.34
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-27",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 15.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 15.wav",
+      "sourceHash": "aca887c21fbab04c1dbc81c8c372d48f7ed5d4f28c681ce716775fe4afd90e33",
+      "sha256": "aca887c21fbab04c1dbc81c8c372d48f7ed5d4f28c681ce716775fe4afd90e33",
+      "bytes": 1076182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 269000,
+      "seconds": 5.604166666666667,
+      "bpm": 90,
+      "sourceGainDb": -4.98995,
+      "rms": 0.07993002840132639,
+      "peak": 0.4288330078125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.28
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-28",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 16.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 16.wav",
+      "sourceHash": "60070401db9936ecf22ee34333f41e9cdbdc80610fd806ee9d6b8be66bc6958a",
+      "sha256": "60070401db9936ecf22ee34333f41e9cdbdc80610fd806ee9d6b8be66bc6958a",
+      "bytes": 778850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 194667,
+      "seconds": 4.0555625,
+      "bpm": 90,
+      "sourceGainDb": -4.16091,
+      "rms": 0.07265374381169584,
+      "peak": 0.371734619140625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.28,
+          "endSeconds": 1.88
+        },
+        {
+          "startSeconds": 1.98,
+          "endSeconds": 3.74
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-29",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 17.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 17.wav",
+      "sourceHash": "1e906890728e9c4597e0bc039d2522fed636a341e198c438ea85ecc2e7d28ee9",
+      "sha256": "1e906890728e9c4597e0bc039d2522fed636a341e198c438ea85ecc2e7d28ee9",
+      "bytes": 1046850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 261667,
+      "seconds": 5.451395833333334,
+      "bpm": 90,
+      "sourceGainDb": -5.88778,
+      "rms": 0.08863426672549408,
+      "peak": 0.43377685546875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.1
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-30",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 19.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 19.wav",
+      "sourceHash": "66122fa05432d3e625cb3421b237ea58e95c467d2870033ccf6808c1cc251ed6",
+      "sha256": "66122fa05432d3e625cb3421b237ea58e95c467d2870033ccf6808c1cc251ed6",
+      "bytes": 984182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 246000,
+      "seconds": 5.125,
+      "bpm": 90,
+      "sourceGainDb": -4.87715,
+      "rms": 0.07889870625812492,
+      "peak": 0.425140380859375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.01,
+          "endSeconds": 1.76
+        },
+        {
+          "startSeconds": 1.85,
+          "endSeconds": 4.8
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-31",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 20.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 20.wav",
+      "sourceHash": "b8dc0c0ff91ed18cdb7cee597e39a08da0ace3b26087a214ed939dbda592c3cb",
+      "sha256": "b8dc0c0ff91ed18cdb7cee597e39a08da0ace3b26087a214ed939dbda592c3cb",
+      "bytes": 1073514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 268333,
+      "seconds": 5.590270833333333,
+      "bpm": 90,
+      "sourceGainDb": -4.1243,
+      "rms": 0.07234814403625518,
+      "peak": 0.402557373046875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.4,
+          "endSeconds": 4.49
+        },
+        {
+          "startSeconds": 4.6,
+          "endSeconds": 5.26
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-32",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 21.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 21.wav",
+      "sourceHash": "ede859f38ec71c8475507820b52e486643dd94ce429bf01c80f1894d32f2b6c5",
+      "sha256": "ede859f38ec71c8475507820b52e486643dd94ce429bf01c80f1894d32f2b6c5",
+      "bytes": 1041514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 260333,
+      "seconds": 5.423604166666666,
+      "bpm": 90,
+      "sourceGainDb": -4.19895,
+      "rms": 0.07297264652254251,
+      "peak": 0.43011474609375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.11
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-33",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 22.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 22.wav",
+      "sourceHash": "cff043784d2f3249c82978b6e3cca8ff64e235839643dfeb0e744c1c515b39ba",
+      "sha256": "cff043784d2f3249c82978b6e3cca8ff64e235839643dfeb0e744c1c515b39ba",
+      "bytes": 1014850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 253667,
+      "seconds": 5.284729166666667,
+      "bpm": 90,
+      "sourceGainDb": -2.06415,
+      "rms": 0.057071603115846734,
+      "peak": 0.36126708984375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 0.99
+        },
+        {
+          "startSeconds": 1.21,
+          "endSeconds": 2.29
+        },
+        {
+          "startSeconds": 2.59,
+          "endSeconds": 3.64
+        },
+        {
+          "startSeconds": 3.89,
+          "endSeconds": 4.94
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-34",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 25.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 25.wav",
+      "sourceHash": "797245d6e7e6a29dd9c4e542efe5ab52a1e853c39f1b17b5c094ab8018311a11",
+      "sha256": "797245d6e7e6a29dd9c4e542efe5ab52a1e853c39f1b17b5c094ab8018311a11",
+      "bytes": 1069514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 267333,
+      "seconds": 5.5694375,
+      "bpm": 90,
+      "sourceGainDb": -1.23098,
+      "rms": 0.05185153352276902,
+      "peak": 0.420745849609375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.21
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-35",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 26.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 26.wav",
+      "sourceHash": "515a4c0a897a0e67abffd3462aa9be9b1622b9f4b9664eae172284ddc0125f55",
+      "sha256": "515a4c0a897a0e67abffd3462aa9be9b1622b9f4b9664eae172284ddc0125f55",
+      "bytes": 1020182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 255000,
+      "seconds": 5.3125,
+      "bpm": 90,
+      "sourceGainDb": -3.78271,
+      "rms": 0.06955811058934414,
+      "peak": 0.43011474609375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.24,
+          "endSeconds": 2.98
+        },
+        {
+          "startSeconds": 3.26,
+          "endSeconds": 4.97
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-36",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 27.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 27.wav",
+      "sourceHash": "9703a27a17b7a06ded38800ea59811ccee27050c347a6ea19f4b474960c0f734",
+      "sha256": "9703a27a17b7a06ded38800ea59811ccee27050c347a6ea19f4b474960c0f734",
+      "bytes": 1068182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 267000,
+      "seconds": 5.5625,
+      "bpm": 90,
+      "sourceGainDb": -3.1146,
+      "rms": 0.06440842676199524,
+      "peak": 0.4677734375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 2.53
+        },
+        {
+          "startSeconds": 2.62,
+          "endSeconds": 5.23
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-37",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 29.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 29.wav",
+      "sourceHash": "7ce47a8e525c74918caf094d4268b9d87247911f2fc7294dd6a56256b5309ac7",
+      "sha256": "7ce47a8e525c74918caf094d4268b9d87247911f2fc7294dd6a56256b5309ac7",
+      "bytes": 1084182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271000,
+      "seconds": 5.645833333333333,
+      "bpm": 90,
+      "sourceGainDb": -4.10396,
+      "rms": 0.07217893371709326,
+      "peak": 0.412872314453125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.28
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-38",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 31.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 31.wav",
+      "sourceHash": "f68558165aa1db708734b6dadf81e11993f03e4fe061933b16118f276ef09f3f",
+      "sha256": "f68558165aa1db708734b6dadf81e11993f03e4fe061933b16118f276ef09f3f",
+      "bytes": 1028182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 257000,
+      "seconds": 5.354166666666667,
+      "bpm": 90,
+      "sourceGainDb": -5.23577,
+      "rms": 0.08222444710297103,
+      "peak": 0.410614013671875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.03
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-39",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 33.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 33.wav",
+      "sourceHash": "052cb73c56954b8d481acd5b82258e3ef4e22f974b390dc527e2c13f2398a3b9",
+      "sha256": "052cb73c56954b8d481acd5b82258e3ef4e22f974b390dc527e2c13f2398a3b9",
+      "bytes": 1085514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271333,
+      "seconds": 5.652770833333333,
+      "bpm": 90,
+      "sourceGainDb": -3.4634,
+      "rms": 0.06704751954844344,
+      "peak": 0.463836669921875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.04,
+          "endSeconds": 1.11
+        },
+        {
+          "startSeconds": 1.26,
+          "endSeconds": 2.51
+        },
+        {
+          "startSeconds": 2.63,
+          "endSeconds": 5.33
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-40",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 34.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 34.wav",
+      "sourceHash": "249c111623555949e73052f54eaab51cea139dd278a8dd6b9bc8bfb3236bdb39",
+      "sha256": "249c111623555949e73052f54eaab51cea139dd278a8dd6b9bc8bfb3236bdb39",
+      "bytes": 1072182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 268000,
+      "seconds": 5.583333333333333,
+      "bpm": 90,
+      "sourceGainDb": -5.11152,
+      "rms": 0.08105661573313298,
+      "peak": 0.44403076171875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 1.91
+        },
+        {
+          "startSeconds": 2,
+          "endSeconds": 4.21
+        },
+        {
+          "startSeconds": 4.3,
+          "endSeconds": 5.06
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-41",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 35.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 35.wav",
+      "sourceHash": "ec8cb42af54b2d74c7f65c16d543833fa649a9bbca5ad475e8f7bc9dd7eaeb0b",
+      "sha256": "ec8cb42af54b2d74c7f65c16d543833fa649a9bbca5ad475e8f7bc9dd7eaeb0b",
+      "bytes": 1082850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 270667,
+      "seconds": 5.638895833333334,
+      "bpm": 90,
+      "sourceGainDb": -3.2331,
+      "rms": 0.06529310741881374,
+      "peak": 0.349365234375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.02,
+          "endSeconds": 2.33
+        },
+        {
+          "startSeconds": 2.62,
+          "endSeconds": 5.32
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-42",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 37.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 37.wav",
+      "sourceHash": "c1af240175dda72525d25faf3f1d1c2c23c6587ba5b3406ca9b15850b74abdbd",
+      "sha256": "c1af240175dda72525d25faf3f1d1c2c23c6587ba5b3406ca9b15850b74abdbd",
+      "bytes": 1077514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 269333,
+      "seconds": 5.611104166666666,
+      "bpm": 90,
+      "sourceGainDb": -4.42702,
+      "rms": 0.07491408387328505,
+      "peak": 0.471099853515625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.3
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-43",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 39.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 39.wav",
+      "sourceHash": "ad2edb953362f28f5a7214da7f066d54530a33bf49118781d5c153ea638533b1",
+      "sha256": "ad2edb953362f28f5a7214da7f066d54530a33bf49118781d5c153ea638533b1",
+      "bytes": 1082850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 270667,
+      "seconds": 5.638895833333334,
+      "bpm": 90,
+      "sourceGainDb": -5.23331,
+      "rms": 0.08220113503421968,
+      "peak": 0.48663330078125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.04,
+          "endSeconds": 5.31
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-44",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 41.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 41.wav",
+      "sourceHash": "fb2f0f60938b0c6f8572ff9c283197b1226b6049f4e55639ba081f2a06e977d9",
+      "sha256": "fb2f0f60938b0c6f8572ff9c283197b1226b6049f4e55639ba081f2a06e977d9",
+      "bytes": 1080182,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 270000,
+      "seconds": 5.625,
+      "bpm": 90,
+      "sourceGainDb": -4.43798,
+      "rms": 0.07500869547919471,
+      "peak": 0.48046875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.32
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-45",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 42.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 42.wav",
+      "sourceHash": "dca403d64d2e99677ddd2c3c3c1570914f11867a52ed496f3b18d7788b2f825f",
+      "sha256": "dca403d64d2e99677ddd2c3c3c1570914f11867a52ed496f3b18d7788b2f825f",
+      "bytes": 1082850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 270667,
+      "seconds": 5.638895833333334,
+      "bpm": 90,
+      "sourceGainDb": -4.18405,
+      "rms": 0.07284754012093646,
+      "peak": 0.534515380859375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 4.24
+        },
+        {
+          "startSeconds": 4.37,
+          "endSeconds": 5.31
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-46",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 43.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 43.wav",
+      "sourceHash": "496e18f71f20c3945222ef8b7ab10c192d7dbb81a29026989e7db6389af26f4a",
+      "sha256": "496e18f71f20c3945222ef8b7ab10c192d7dbb81a29026989e7db6389af26f4a",
+      "bytes": 1074850,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 268667,
+      "seconds": 5.597229166666667,
+      "bpm": 90,
+      "sourceGainDb": -5.58355,
+      "rms": 0.08558345212633374,
+      "peak": 0.49700927734375,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 4.39
+        },
+        {
+          "startSeconds": 4.49,
+          "endSeconds": 5.24
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-47",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 45.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 45.wav",
+      "sourceHash": "97d579200553956bb33c16cf17cecddf3223ac916c512a52b76240f5ba4adaf5",
+      "sha256": "97d579200553956bb33c16cf17cecddf3223ac916c512a52b76240f5ba4adaf5",
+      "bytes": 1077514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 269333,
+      "seconds": 5.611104166666666,
+      "bpm": 90,
+      "sourceGainDb": -5.52514,
+      "rms": 0.08500992598877348,
+      "peak": 0.565887451171875,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.29
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-48",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 47.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 47.wav",
+      "sourceHash": "6a24ac5f6e0ec460de8de3e9df6e7d8fb6d8df4916e0f4dad3d1458434c0d4b3",
+      "sha256": "6a24ac5f6e0ec460de8de3e9df6e7d8fb6d8df4916e0f4dad3d1458434c0d4b3",
+      "bytes": 1085514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 271333,
+      "seconds": 5.652770833333333,
+      "bpm": 90,
+      "sourceGainDb": -3.6138,
+      "rms": 0.06821851628881616,
+      "peak": 0.441680908203125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.05,
+          "endSeconds": 5.34
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-49",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 48.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 48.wav",
+      "sourceHash": "51a91615001965c08d5a3bc21f42da797d400f41df82161f0da6a3a2f15f00b2",
+      "sha256": "51a91615001965c08d5a3bc21f42da797d400f41df82161f0da6a3a2f15f00b2",
+      "bytes": 977514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 244333,
+      "seconds": 5.090270833333333,
+      "bpm": 90,
+      "sourceGainDb": -4.50203,
+      "rms": 0.0755638513753032,
+      "peak": 0.4566650390625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0.01,
+          "endSeconds": 4.26
+        },
+        {
+          "startSeconds": 4.36,
+          "endSeconds": 4.77
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-50",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 51.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 51.wav",
+      "sourceHash": "9eb71821f0bbc70dfc6860881589299d693eb608875ce54cb88c0f9305a642e9",
+      "sha256": "9eb71821f0bbc70dfc6860881589299d693eb608875ce54cb88c0f9305a642e9",
+      "bytes": 1089514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 272333,
+      "seconds": 5.673604166666666,
+      "bpm": 90,
+      "sourceGainDb": -4.97549,
+      "rms": 0.07979705289177391,
+      "peak": 0.485626220703125,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 5.35
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    },
+    {
+      "id": "npc-daniel-51",
+      "voiceId": "npc-voice:daniel-20261020",
+      "catalogVersion": 1,
+      "usable": true,
+      "verified": true,
+      "path": "./stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 52.wav",
+      "source": "stems/source-library/voices/danya/abstract-20261020-v1/Даниил - Track 52.wav",
+      "sourceHash": "9b4d529ce11a97c7641e48b9c76033ea93c1479e029791e42b50a618fd02e6d6",
+      "sha256": "9b4d529ce11a97c7641e48b9c76033ea93c1479e029791e42b50a618fd02e6d6",
+      "bytes": 1065514,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 266333,
+      "seconds": 5.548604166666666,
+      "bpm": 90,
+      "sourceGainDb": -4.79871,
+      "rms": 0.07818943813729304,
+      "peak": 0.46929931640625,
+      "phraseSpans": [
+        {
+          "startSeconds": 0,
+          "endSeconds": 4.89
+        },
+        {
+          "startSeconds": 4.98,
+          "endSeconds": 5.14
+        }
+      ],
+      "selectedForDemo": false,
+      "initialSkillRange": {
+        "min": 0,
+        "max": 40
+      },
+      "tailPolicy": "Full original take referenced byte-for-byte; no speech trimming or repetition.",
+      "exclusionReason": null
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import {createResultPost,resultReactionContent} from './social-wall.js?rev=43';
+import {createResultPost,resultReactionContent} from './social-wall.js?rev=57';
 import {resolveResultOutcome} from './result-outcome.js?rev=43';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export function normalizeResultReactions(raw){

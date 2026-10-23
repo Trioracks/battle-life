@@ -1,0 +1,525 @@
+{
+  "schemaVersion": 2,
+  "date": "2026-10-12",
+  "status": "design_content_not_runtime_configuration",
+  "policyDocument": "2026-10-12-live-judge-comments.md",
+  "authorRequirements": {
+    "humanReaction": true,
+    "mandatoryComparison": false,
+    "mandatoryReasonExplanation": false,
+    "mandatoryAdvice": false,
+    "mandatoryVerdictInText": false,
+    "criterionSpecificTriggers": true,
+    "appliesToFutureJudges": true
+  },
+  "banks": [
+    {
+      "judgeId": "eparhiya",
+      "path": "comments/eparhiya.json",
+      "expectedRows": 81
+    },
+    {
+      "judgeId": "klim-propavshiy",
+      "path": "comments/klim-propavshiy.json",
+      "expectedRows": 81
+    },
+    {
+      "judgeId": "svinoferma",
+      "path": "comments/svinoferma.json",
+      "expectedRows": 81
+    },
+    {
+      "judgeId": "thirty-third",
+      "path": "comments/thirty-third.json",
+      "expectedRows": 81
+    }
+  ],
+  "triggerRegistry": [
+    {
+      "tag": "text.clarity.good",
+      "label": "Ясность мысли — удачно",
+      "source": "lyrics.stages[0].sliders[0]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.clarity.bad",
+      "label": "Ясность мысли — неудачно",
+      "source": "lyrics.stages[0].sliders[0]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.theme.good",
+      "label": "Развитие темы — удачно",
+      "source": "lyrics.stages[0].sliders[1]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.theme.bad",
+      "label": "Развитие темы — неудачно",
+      "source": "lyrics.stages[0].sliders[1]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.personal.good",
+      "label": "Личное отношение — удачно",
+      "source": "lyrics.stages[0].sliders[2]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.personal.bad",
+      "label": "Личное отношение — неудачно",
+      "source": "lyrics.stages[0].sliders[2]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.rhymes.good",
+      "label": "Точность рифм — удачно",
+      "source": "lyrics.stages[1].sliders[0]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.rhymes.bad",
+      "label": "Точность рифм — неудачно",
+      "source": "lyrics.stages[1].sliders[0]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.line_rhythm.good",
+      "label": "Ритм строк — удачно",
+      "source": "lyrics.stages[1].sliders[1]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.line_rhythm.bad",
+      "label": "Ритм строк — неудачно",
+      "source": "lyrics.stages[1].sliders[1]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.complexity.good",
+      "label": "Уместность сложности — удачно",
+      "source": "lyrics.stages[1].sliders[2]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.complexity.bad",
+      "label": "Уместность сложности — неудачно",
+      "source": "lyrics.stages[1].sliders[2]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.images.good",
+      "label": "Наглядность образов — удачно",
+      "source": "lyrics.stages[2].sliders[0]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.images.bad",
+      "label": "Наглядность образов — неудачно",
+      "source": "lyrics.stages[2].sliders[0]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.originality.good",
+      "label": "Оригинальность — удачно",
+      "source": "lyrics.stages[2].sliders[1]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.originality.bad",
+      "label": "Оригинальность — неудачно",
+      "source": "lyrics.stages[2].sliders[1]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.image_density.good",
+      "label": "Дозировка образов — удачно",
+      "source": "lyrics.stages[2].sliders[2]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.image_density.bad",
+      "label": "Дозировка образов — неудачно",
+      "source": "lyrics.stages[2].sliders[2]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.groove.good",
+      "label": "Ровный грув — удачно",
+      "source": "beat.stages[0].sliders[0]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.groove.bad",
+      "label": "Ровный грув — неудачно",
+      "source": "beat.stages[0].sliders[0]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.movement.good",
+      "label": "Подвижность — удачно",
+      "source": "beat.stages[0].sliders[1]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.movement.bad",
+      "label": "Подвижность — неудачно",
+      "source": "beat.stages[0].sliders[1]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.fills.good",
+      "label": "Сбивки — удачно",
+      "source": "beat.stages[0].sliders[2]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.fills.bad",
+      "label": "Сбивки — неудачно",
+      "source": "beat.stages[0].sliders[2]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.melody.good",
+      "label": "Мелодия — удачно",
+      "source": "beat.stages[1].sliders[0]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.melody.bad",
+      "label": "Мелодия — неудачно",
+      "source": "beat.stages[1].sliders[0]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.harmony.good",
+      "label": "Гармония — удачно",
+      "source": "beat.stages[1].sliders[1]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.harmony.bad",
+      "label": "Гармония — неудачно",
+      "source": "beat.stages[1].sliders[1]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.texture.good",
+      "label": "Фактура — удачно",
+      "source": "beat.stages[1].sliders[2]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.texture.bad",
+      "label": "Фактура — неудачно",
+      "source": "beat.stages[1].sliders[2]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.repetition.good",
+      "label": "Повторяемость — удачно",
+      "source": "beat.stages[2].sliders[0]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.repetition.bad",
+      "label": "Повторяемость — неудачно",
+      "source": "beat.stages[2].sliders[0]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.development.good",
+      "label": "Контраст и развитие — удачно",
+      "source": "beat.stages[2].sliders[1]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.development.bad",
+      "label": "Контраст и развитие — неудачно",
+      "source": "beat.stages[2].sliders[1]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.transitions.good",
+      "label": "Переходы — удачно",
+      "source": "beat.stages[2].sliders[2]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "music.transitions.bad",
+      "label": "Переходы — неудачно",
+      "source": "beat.stages[2].sliders[2]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "vocal.timing.good",
+      "label": "Попадание в ритм — удачно",
+      "source": "activeTake.sliders[0]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "vocal.timing.bad",
+      "label": "Попадание в ритм — неудачно",
+      "source": "activeTake.sliders[0]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "vocal.diction.good",
+      "label": "Дикция — удачно",
+      "source": "activeTake.sliders[1]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "vocal.diction.bad",
+      "label": "Дикция — неудачно",
+      "source": "activeTake.sliders[1]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "vocal.delivery.good",
+      "label": "Подача — удачно",
+      "source": "activeTake.sliders[2]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "vocal.delivery.bad",
+      "label": "Подача — неудачно",
+      "source": "activeTake.sliders[2]",
+      "availability": "saved_decision_exists_separate_result_adapter_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "sound.balance.good",
+      "label": "Баланс — удачно",
+      "source": "new_finished_version_diagnostic",
+      "availability": "additional_result_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "sound.balance.bad",
+      "label": "Баланс — неудачно",
+      "source": "new_finished_version_diagnostic",
+      "availability": "additional_result_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "sound.intelligibility.good",
+      "label": "Техническая разборчивость — удачно",
+      "source": "new_finished_version_diagnostic",
+      "availability": "additional_result_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "sound.intelligibility.bad",
+      "label": "Техническая разборчивость — неудачно",
+      "source": "new_finished_version_diagnostic",
+      "availability": "additional_result_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.story.good",
+      "label": "Повествование — удачно",
+      "source": "lyrics.sections + new_story_result",
+      "availability": "additional_result_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.story.bad",
+      "label": "Повествование — неудачно",
+      "source": "lyrics.sections + new_story_result",
+      "availability": "additional_result_needed",
+      "meaning": "judge_reaction_to_realized_feature_not_raw_slider_value"
+    },
+    {
+      "tag": "text.reference.recognized",
+      "label": "Понятая отсылка",
+      "availability": "explicit_context_and_row_requirements_needed"
+    },
+    {
+      "tag": "text.reference.forced",
+      "label": "Натянутая отсылка",
+      "availability": "explicit_context_and_row_requirements_needed"
+    },
+    {
+      "tag": "mixed.rhymes_good_rest_bad",
+      "label": "Рифмы сильные, остальное слабо",
+      "availability": "explicit_context_and_row_requirements_needed"
+    },
+    {
+      "tag": "mixed.rhymes_bad_music_good",
+      "label": "Слабые рифмы, удачная музыка",
+      "availability": "explicit_context_and_row_requirements_needed"
+    },
+    {
+      "tag": "mixed.images_good_sound_bad",
+      "label": "Сильные образы, слабый звук",
+      "availability": "explicit_context_and_row_requirements_needed"
+    },
+    {
+      "tag": "pair.close",
+      "label": "Близкий итог",
+      "availability": "explicit_context_and_row_requirements_needed"
+    },
+    {
+      "tag": "pair.clear_win",
+      "label": "Явная победа",
+      "availability": "explicit_context_and_row_requirements_needed"
+    },
+    {
+      "tag": "pair.crushing_loss",
+      "label": "Разгромное поражение",
+      "availability": "explicit_context_and_row_requirements_needed"
+    },
+    {
+      "tag": "reaction.micro",
+      "label": "Микрореакция",
+      "availability": "explicit_context_and_row_requirements_needed"
+    },
+    {
+      "tag": "format.diss.high_concern",
+      "label": "Отсутствие дисса критично",
+      "availability": "explicit_context_and_row_requirements_needed"
+    },
+    {
+      "tag": "format.diss.low_concern",
+      "label": "Лирика прощена",
+      "availability": "explicit_context_and_row_requirements_needed"
+    },
+    {
+      "tag": "format.genre.mismatch",
+      "label": "Жанровое несовпадение",
+      "availability": "explicit_context_and_row_requirements_needed"
+    },
+    {
+      "tag": "format.text.mismatch",
+      "label": "Текст вне ожиданий площадки",
+      "availability": "explicit_context_and_row_requirements_needed"
+    },
+    {
+      "tag": "format.sound.mismatch",
+      "label": "Несовпадение звуковой эстетики",
+      "availability": "explicit_context_and_row_requirements_needed"
+    }
+  ],
+  "requiredOutcomeLayers": [
+    "saved_decision",
+    "realized_feature",
+    "judge_reaction"
+  ],
+  "formatPolicy": {
+    "status": "author_requested_layer_numeric_cap_proposed",
+    "sequence": [
+      "personal_quality",
+      "format_penalty",
+      "final_raw_score",
+      "display_grade_or_pair_vote"
+    ],
+    "adherenceRange": [
+      0,
+      1
+    ],
+    "maxPenaltyProposed": 1.5,
+    "gradeScale": 10,
+    "mismatchRange": [
+      0,
+      1
+    ],
+    "formula": "penalty=adherence*maxPenalty*mismatch; finalRaw=personalQuality-penalty",
+    "axes": [
+      "diss_addressing",
+      "text_approach",
+      "genre_profile",
+      "sound_aesthetic"
+    ],
+    "numericAdherenceDefaults": null,
+    "hiddenProfileKnownByJudge": true,
+    "playerKnowledgeSeparate": true,
+    "prohibitDoubleCountingSameMismatch": true,
+    "examples": [
+      {
+        "adherence": 0,
+        "penalty": 0,
+        "finalRaw": 7.2
+      },
+      {
+        "adherence": 0.3,
+        "penalty": 0.36,
+        "finalRaw": 6.84
+      },
+      {
+        "adherence": 1,
+        "penalty": 1.2,
+        "finalRaw": 6
+      }
+    ]
+  },
+  "marginPolicy": {
+    "units": "4*finalRawScore_difference_before_clamp_rounding_and_grade_strictness",
+    "closeMaxProposed": 2,
+    "clearWinMinProposed": 10,
+    "crushingLossMinProposed": 20,
+    "tieRule": null
+  },
+  "noveltyPolicy": {
+    "historyPerJudge": true,
+    "avoidExactNonMicroRepeat": true,
+    "templateRecentWindowProposed": 12,
+    "maxSameFamilyConsecutiveProposed": 2,
+    "requirementsNeverBypassed": true,
+    "externalRuntimeModelAssumed": false,
+    "requires50TrackSimulationBeforeGameIntegration": true
+  },
+  "checksToRun": {
+    "rowsPerJudge": 81,
+    "rhymePositivePerJudge": 10,
+    "rhymeNegativePerJudge": 10,
+    "unresolvedRenderedSlotsAllowed": false
+  },
+  "notes": [
+    "These are newly authored examples, not historical quotes or installed game behavior.",
+    "Detailed causes and reference knowledge require saved simulated facts; no new player typing workflow is required.",
+    "High slider is not high quality; genre and skill influence the realized outcome.",
+    "Format concern templates are conditional alternatives; never randomize adherence just to use a phrase."
+  ]
+}

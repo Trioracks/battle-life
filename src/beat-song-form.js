@@ -1,5 +1,5 @@
-import {BEGINNER_BANK,USER_DRUM_BANK,beginnerById} from './beat-beginner-bank.js?rev=47';
-import {SOURCE_GAINS_DB} from './source-levels.js?rev=47';
+import {BEGINNER_BANK,USER_DRUM_BANK,beginnerById} from './beat-beginner-bank.js?rev=49';
+import {SOURCE_GAINS_DB} from './source-levels.js?rev=49';
 const BAR_SECONDS=8/3;
 const kinds=['drums','theme','arrangement'];
 const sourceIds=beat=>[beat.drumId,beat.audio?.themeId,beat.audio?.arrangementId];
@@ -27,7 +27,7 @@ export function chooseSongForm(beat,{pool=[...BEGINNER_BANK,...USER_DRUM_BANK],s
  const form={version:1,...base};
  for(const [section,startBar,sourceBar] of [['intro',0,0],['outro',6,2]]){
   const stage=form[section+'Stage'],current=ids[stage],tonal=beginnerById(ids[1]);
-  const candidates=pool.filter(p=>p&&p.id!==current&&p.available!==false&&beginnerById(p.id)&&p.path&&p.kind===kinds[stage]&&p.bpm===beat.bpm&&p.bars===4&&Number.isFinite(SOURCE_GAINS_DB[p.id])&&(stage===0||p.key&&p.key===tonal?.key));
+  const candidates=beat.audio?.abstractRecipe?[]:pool.filter(p=>p&&p.id!==current&&p.available!==false&&beginnerById(p.id)&&p.path&&p.kind===kinds[stage]&&p.bpm===beat.bpm&&p.bars===4&&Number.isFinite(SOURCE_GAINS_DB[p.id])&&(stage===0||p.key&&p.key===tonal?.key));
   const alternate=candidates.length&&choice(key+':'+section+':alternate')%2===0?candidates[choice(key+':'+section+':source')%candidates.length]:null;
   form[section+'SourceId']=alternate?.id??current;
   form[section+'Window']={startBar,bars:2,sourceBar:alternate?choice(key+':'+section+':window')%3:sourceBar};
@@ -41,6 +41,7 @@ export function normalizeSongForm(value,beat){
  for(const [section,startBar] of [['intro',0],['outro',6]]){
   const stage=value[section+'Stage'],id=value[section+'SourceId'],window=value[section+'Window'];
   if(!Number.isInteger(stage)||stage<0||stage>2||typeof id!=='string'||!id||id!==ids[stage]&&beginnerById(id)?.kind!==kinds[stage]||window?.startBar!==startBar||window.bars!==2||!Number.isInteger(window.sourceBar)||window.sourceBar<0||window.sourceBar>2)return null;
+  if(beat.audio?.abstractRecipe&&(id!==ids[stage]||window.sourceBar!==(section==='intro'?0:2)))return null;
   form[section+'Stage']=stage;form[section+'SourceId']=id;form[section+'Window']={startBar,bars:2,sourceBar:window.sourceBar};
  }
  form.vocalOutro=value.vocalOutro;return form;

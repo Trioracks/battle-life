@@ -1,0 +1,2919 @@
+{
+  "version": 1,
+  "generated": "2026-10-12",
+  "status": "research_profiles_not_runtime_game_configuration",
+  "sourceUrl": "https://docs.google.com/spreadsheets/d/169iocNcf92Ay2we8zweD-AkuxRYPRNMZxS1yhqwQmTo/edit?gid=215411653#gid=215411653",
+  "notes": [
+    "Qualitative hypotheses anchored in expressed source reasons; confidence does not measure prediction accuracy.",
+    "Numeric weights remain null. No audio listening, model fitting or predictive accuracy evaluation has been performed.",
+    "IDs are fixed research identities; append new IDs rather than renumbering. Confirm alias merges before production import.",
+    "ок remains separate pending confirmation; combining with охуенно культурный would leave 29 groups.",
+    "Comment subject may differ from row participant; consult judge-comment-attribution.json.",
+    "Do not invent unknown track facts, quoted lyrics, personal history or reasons based only on a vote."
+  ],
+  "rawJudgeNameVariants": 40,
+  "workingJudgeGroups": 30,
+  "profiles": [
+    {
+      "judgeKey": "атака трупа",
+      "confidence": "insufficient",
+      "observedPriorities": [],
+      "decisionPatterns": [],
+      "voice": "Письменной манеры в источнике нет. Любой будущий стиль реплик будет авторской игровой настройкой.",
+      "limitations": [
+        "100 баллов по общей сотне работ позволяют описать строгость шкалы, но не музыкальный вкус.",
+        "Нулевые оценки не объявляются неявками.",
+        "Нет оснований выводить личность, предпочтения и собственные музыкальные навыки."
+      ],
+      "evidenceRefs": [
+        "1 РАУНД (СВОДНАЯ)!D2",
+        "1 РАУНД (СВОДНАЯ)!D35",
+        "1 РАУНД (СВОДНАЯ)!D101"
+      ],
+      "id": "corpse-attack",
+      "sourceLabels": [
+        "атака трупа"
+      ],
+      "profileDocument": "docs/backlog/2026-10-12-judge-behavior-guide.md",
+      "rounds": [
+        "1 РАУНД",
+        "1 РАУНД (СВОДНАЯ)"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "атака трупа",
+        "labels": [
+          "атака трупа"
+        ],
+        "appearances": 101,
+        "numericValues": 101,
+        "reviewNotes": 0,
+        "generalNotes": 0,
+        "reviewChars": 0,
+        "rounds": [
+          "1 РАУНД",
+          "1 РАУНД (СВОДНАЯ)"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "атака трупа",
+        "reviewNotes": 0,
+        "medianReviewChars": null,
+        "minReviewChars": null,
+        "maxReviewChars": null,
+        "completePairComparisons": 0,
+        "agreesWithOtherJudgesMajority": 0,
+        "disagreesWithOtherJudgesMajority": 0,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [
+        {
+          "judgeKey": "атака трупа",
+          "n": 100,
+          "mean": 3.84,
+          "median": 4.0,
+          "min": 0.0,
+          "max": 10.0,
+          "zeroCount": 8,
+          "meanDifferenceFromOtherFour": -2.6525,
+          "distribution": [
+            {
+              "score": 0.0,
+              "count": 8
+            },
+            {
+              "score": 2.0,
+              "count": 26
+            },
+            {
+              "score": 3.0,
+              "count": 15
+            },
+            {
+              "score": 4.0,
+              "count": 18
+            },
+            {
+              "score": 5.0,
+              "count": 10
+            },
+            {
+              "score": 6.0,
+              "count": 7
+            },
+            {
+              "score": 7.0,
+              "count": 8
+            },
+            {
+              "score": 8.0,
+              "count": 6
+            },
+            {
+              "score": 9.0,
+              "count": 1
+            },
+            {
+              "score": 10.0,
+              "count": 1
+            }
+          ]
+        }
+      ],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "гексмалыш",
+      "confidence": "medium",
+      "observedPriorities": [
+        "Музыкальность и интересная подача; рифмам нужно живое преподнесение.",
+        "Эффективная агрессивная вторая часть.",
+        "Честно учитывает личный жанровый вкус и понятность слов."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Тяжёлая первая часть не понравилась, но вторая сильнее скучной подачи оппонента.",
+          "preference": "Может выбрать за второй блок.",
+          "sourceRefs": [
+            "4 РАУНД!U7",
+            "4 РАУНД!U6"
+          ]
+        }
+      ],
+      "voice": "Несколько дружеских предложений, дядька/старче/братцы, скобки или эмодзи, оговорка мне/на мой взгляд.",
+      "limitations": [
+        "Часть отзывов — общие тексты пары, не независимые индивидуальные разборы.",
+        "В финале прямо допускает иной исход при большем времени и настроении.",
+        "Неизвестные иностранные слова не оценивает."
+      ],
+      "evidenceRefs": [
+        "4 РАУНД!U6",
+        "4 РАУНД!U7",
+        "4 РАУНД!U12",
+        "5 РАУНД!T6",
+        "ФИНАЛ!O3"
+      ],
+      "id": "hexmalysh",
+      "sourceLabels": [
+        "гексмалыш"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "гексмалыш",
+        "labels": [
+          "гексмалыш"
+        ],
+        "appearances": 14,
+        "numericValues": 14,
+        "reviewNotes": 12,
+        "generalNotes": 1,
+        "reviewChars": 2650,
+        "rounds": [
+          "4 РАУНД",
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "гексмалыш",
+        "reviewNotes": 12,
+        "medianReviewChars": 172.5,
+        "minReviewChars": 117.0,
+        "maxReviewChars": 537.0,
+        "completePairComparisons": 7,
+        "agreesWithOtherJudgesMajority": 7,
+        "disagreesWithOtherJudgesMajority": 0,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "гешуль",
+      "confidence": "low",
+      "observedPriorities": [
+        "В данном финале защищает злое противостояние, рифмы, множество панчей и финальный масштаб.",
+        "Метафору/исполнение признаёт отдельно от близости посыла."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Эффектная баттловая работа имеет отдельную фактическую неточность.",
+          "preference": "В данном финале прощает неточность за рифмы и панчи.",
+          "sourceRefs": [
+            "ФИНАЛ!J4"
+          ]
+        }
+      ],
+      "voice": "Длинные заметки строками по частям, роль рэп-аналитика, цитаты, смех, бурный вердикт.",
+      "limitations": [
+        "Два длинных текста одной пары не дают устойчивость по раундам.",
+        "Личные оценки из15 не формальная турнирная шкала.",
+        "Провокационные заявления не переносить как факты или убеждения на новые ситуации."
+      ],
+      "evidenceRefs": [
+        "ФИНАЛ!J3",
+        "ФИНАЛ!J4"
+      ],
+      "id": "geshul",
+      "sourceLabels": [
+        "гешуль"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "гешуль",
+        "labels": [
+          "гешуль"
+        ],
+        "appearances": 2,
+        "numericValues": 2,
+        "reviewNotes": 2,
+        "generalNotes": 0,
+        "reviewChars": 2773,
+        "rounds": [
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "гешуль",
+        "reviewNotes": 2,
+        "medianReviewChars": 1386.5,
+        "minReviewChars": 1189.0,
+        "maxReviewChars": 1584.0,
+        "completePairComparisons": 1,
+        "agreesWithOtherJudgesMajority": 0,
+        "disagreesWithOtherJudgesMajority": 1,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "доббро",
+      "confidence": "low",
+      "observedPriorities": [
+        "В данном финале важны дикция, рифмы без глагольной простоты, отсутствие клише.",
+        "Отмечает интерес концепта и зрелость подхода к композиции."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Первая часть невнятна, но вторая и композиционный подход сильнее.",
+          "preference": "В данном финале выбирает более зрелое целое.",
+          "sourceRefs": [
+            "ФИНАЛ!U4"
+          ]
+        }
+      ],
+      "voice": "Имя с тире, мягкие конкретные слуховые замечания, что ли/не понравилось/отдельно хочется отметить.",
+      "limitations": [
+        "Только одна финальная пара.",
+        "U3 обсуждает Клинка, U4 Панду: тексты перекрёстны относительно строк.",
+        "Нельзя выводить постоянное отношение к политическим темам или сторителам."
+      ],
+      "evidenceRefs": [
+        "ФИНАЛ!U3",
+        "ФИНАЛ!U4"
+      ],
+      "id": "dobbro",
+      "sourceLabels": [
+        "доббро"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "доббро",
+        "labels": [
+          "доббро"
+        ],
+        "appearances": 2,
+        "numericValues": 2,
+        "reviewNotes": 2,
+        "generalNotes": 0,
+        "reviewChars": 471,
+        "rounds": [
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "доббро",
+        "reviewNotes": 2,
+        "medianReviewChars": 235.5,
+        "minReviewChars": 172.0,
+        "maxReviewChars": 299.0,
+        "completePairComparisons": 1,
+        "agreesWithOtherJudgesMajority": 1,
+        "disagreesWithOtherJudgesMajority": 0,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "епархия",
+      "confidence": "high",
+      "observedPriorities": [
+        "Цельность трека, понятный посыл и повествовательная линия",
+        "Образы, метафоры, яркие строки и оригинальное раскрытие",
+        "Атмосфера, музыкальное удовольствие, желание переслушивать",
+        "Флоу, харизма, уверенность и удобство прослушивания",
+        "Сравнение преимуществ частей в конкретной паре"
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "У одного сильнее текст, у другого приятнее вокал и атмосфера",
+          "preference": "Может выбрать атмосферу, признавая текстовое превосходство проигравшего",
+          "sourceRefs": [
+            "3 РАУНД!B12",
+            "3 РАУНД!B13"
+          ]
+        },
+        {
+          "condition": "История содержательна, но форма страдает",
+          "preference": "Может простить форму ради истории и раскрытия при сравнении с соперником",
+          "sourceRefs": [
+            "2 РАУНД!B33",
+            "2 РАУНД!B34"
+          ]
+        },
+        {
+          "condition": "Победитель по раскрытию уступает в диссе",
+          "preference": "Сопоставляет значимость перевеса частей; в этой паре дисс Клинка перевешивает",
+          "sourceRefs": [
+            "5 РАУНД!B3",
+            "5 РАУНД!B4"
+          ]
+        },
+        {
+          "condition": "Одна первая часть воспринимается как выдающаяся",
+          "preference": "Может выбрать её автора, хотя вторую часть предпочитает у соперника",
+          "sourceRefs": [
+            "5 РАУНД!B6",
+            "5 РАУНД!B7"
+          ]
+        },
+        {
+          "condition": "Участник улучшился относительно прошлого раунда",
+          "preference": "Отмечает рост, но сохраняет выбор более сильного текущего соперника",
+          "sourceRefs": [
+            "4 РАУНД!B6",
+            "4 РАУНД!B7"
+          ]
+        }
+      ],
+      "voice": "Разговорные строчные фразы, мат и уменьшительные названия элементов трека; пожалуй/имхо/по-моему, уважение обоим. От короткой реакции на отборе до сравнения частей позднее.",
+      "limitations": [
+        "Высокая уверенность относится к описанию корпуса, а не предсказанию голосов",
+        "Нет постоянного приоритета текста или музыкальности и нет числовых весов",
+        "4 РАУНД!B12 и B13 не раскрывают мотив голоса; положительный текст может сопровождать 0",
+        "Музыкальные замечания являются мнением судьи, аудио не проверялось",
+        "Первый раунд 0–10; позднее 0/1 означает выбор в паре"
+      ],
+      "evidenceRefs": [
+        "1 РАУНД (СВОДНАЯ)!B75",
+        "1 РАУНД (СВОДНАЯ)!B12",
+        "2 РАУНД!B33",
+        "3 РАУНД!B12",
+        "3 РАУНД!B13",
+        "3 РАУНД!B7",
+        "4 РАУНД!B4",
+        "5 РАУНД!B3",
+        "5 РАУНД!B6",
+        "ФИНАЛ!B4"
+      ],
+      "id": "eparhiya",
+      "sourceLabels": [
+        "епархия"
+      ],
+      "profileDocument": "docs/backlog/judges/core-judges.md",
+      "rounds": [
+        "1 РАУНД",
+        "1 РАУНД (СВОДНАЯ)",
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "епархия",
+        "labels": [
+          "епархия"
+        ],
+        "appearances": 163,
+        "numericValues": 157,
+        "reviewNotes": 155,
+        "generalNotes": 0,
+        "reviewChars": 17932,
+        "rounds": [
+          "1 РАУНД",
+          "1 РАУНД (СВОДНАЯ)",
+          "2 РАУНД",
+          "3 РАУНД",
+          "4 РАУНД",
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "епархия",
+        "reviewNotes": 155,
+        "medianReviewChars": 70,
+        "minReviewChars": 3.0,
+        "maxReviewChars": 694.0,
+        "completePairComparisons": 25,
+        "agreesWithOtherJudgesMajority": 16,
+        "disagreesWithOtherJudgesMajority": 7,
+        "otherJudgesTiedOrAbsent": 2
+      },
+      "firstRoundScale": [
+        {
+          "judgeKey": "епархия",
+          "n": 100,
+          "mean": 6.425,
+          "median": 7.0,
+          "min": 0.0,
+          "max": 10.0,
+          "zeroCount": 3,
+          "meanDifferenceFromOtherFour": 0.57875,
+          "distribution": [
+            {
+              "score": 0.0,
+              "count": 3
+            },
+            {
+              "score": 1.0,
+              "count": 2
+            },
+            {
+              "score": 2.0,
+              "count": 1
+            },
+            {
+              "score": 2.5,
+              "count": 2
+            },
+            {
+              "score": 3.0,
+              "count": 5
+            },
+            {
+              "score": 3.5,
+              "count": 1
+            },
+            {
+              "score": 4.0,
+              "count": 5
+            },
+            {
+              "score": 4.5,
+              "count": 5
+            },
+            {
+              "score": 5.0,
+              "count": 9
+            },
+            {
+              "score": 5.5,
+              "count": 7
+            },
+            {
+              "score": 6.0,
+              "count": 5
+            },
+            {
+              "score": 6.5,
+              "count": 1
+            },
+            {
+              "score": 7.0,
+              "count": 11
+            },
+            {
+              "score": 7.5,
+              "count": 9
+            },
+            {
+              "score": 8.0,
+              "count": 8
+            },
+            {
+              "score": 8.5,
+              "count": 6
+            },
+            {
+              "score": 9.0,
+              "count": 7
+            },
+            {
+              "score": 10.0,
+              "count": 13
+            }
+          ]
+        }
+      ],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "клим пропавший",
+      "confidence": "high",
+      "observedPriorities": [
+        "Ощущаемые душевность, атмосфера и убедительность эмоции",
+        "Неутомительность, интерес вместо скуки и чрезмерной длины",
+        "Уверенность, ровность читки и связь с битом",
+        "Текст и раскрытие, работающие в прослушивании",
+        "Прогресс и обновление знакомой манеры между раундами"
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Более слабое исполнение ощущается эмоционально убедительнее",
+          "preference": "Может выбрать текст и вайб вопреки технике соперника",
+          "sourceRefs": [
+            "2 РАУНД!C18",
+            "2 РАУНД!C19"
+          ]
+        },
+        {
+          "condition": "Техничный текст перегружен, соперник атмосфернее",
+          "preference": "Может предпочесть менее техничного соперника за атмосферу",
+          "sourceRefs": [
+            "2 РАУНД!C48",
+            "2 РАУНД!C49"
+          ]
+        },
+        {
+          "condition": "Трек не вызывает восторга, но прочитан ровнее",
+          "preference": "Сравнительная ровность способна дать голос даже знакомой и одноразовой работе",
+          "sourceRefs": [
+            "2 РАУНД!C21"
+          ]
+        },
+        {
+          "condition": "Очень близкая пара и яркий отдельный момент",
+          "preference": "Конкретный скрим может решить выбор без превращения приёма в постоянный бонус",
+          "sourceRefs": [
+            "3 РАУНД!C10",
+            "3 РАУНД!C9",
+            "3 РАУНД!C19"
+          ]
+        },
+        {
+          "condition": "Первая часть слабее соперника, дисс сильнее",
+          "preference": "Может отдать голос за перевес дисса",
+          "sourceRefs": [
+            "4 РАУНД!C3",
+            "4 РАУНД!C4"
+          ]
+        }
+      ],
+      "voice": "Короткие эмоциональные разговорные реплики, мат, братишка/хз/кайф/душевно; легко признаёт сомнение. В близкой паре объясняет небольшой перевес, иногда резко подкалывает.",
+      "limitations": [
+        "Высокая уверенность относится к наблюдаемой речи и мотивам, не точным будущим решениям",
+        "Шутливая шкала C1 не доказывает регламент, подкуп или личные связи",
+        "Нет финальных отзывов; нельзя восстановить финальное поведение",
+        "В 1 РАУНД (СВОДНАЯ)!C12 текст говорит о 10, клетка содержит 8",
+        "Эмоциональная реакция на гостя не задаёт вес гостевого участия",
+        "Первый раунд 0–10; позднее 0/1 означает выбор в паре"
+      ],
+      "evidenceRefs": [
+        "1 РАУНД (СВОДНАЯ)!C1",
+        "1 РАУНД (СВОДНАЯ)!C39",
+        "1 РАУНД (СВОДНАЯ)!C75",
+        "1 РАУНД (СВОДНАЯ)!C23",
+        "2 РАУНД!C19",
+        "2 РАУНД!C48",
+        "2 РАУНД!C21",
+        "3 РАУНД!C10",
+        "4 РАУНД!C3",
+        "5 РАУНД!C3"
+      ],
+      "id": "klim-propavshiy",
+      "sourceLabels": [
+        "клим пропавший"
+      ],
+      "profileDocument": "docs/backlog/judges/core-judges.md",
+      "rounds": [
+        "1 РАУНД",
+        "1 РАУНД (СВОДНАЯ)",
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "клим пропавший",
+        "labels": [
+          "клим пропавший"
+        ],
+        "appearances": 161,
+        "numericValues": 155,
+        "reviewNotes": 150,
+        "generalNotes": 1,
+        "reviewChars": 11850,
+        "rounds": [
+          "1 РАУНД",
+          "1 РАУНД (СВОДНАЯ)",
+          "2 РАУНД",
+          "3 РАУНД",
+          "4 РАУНД",
+          "5 РАУНД"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "клим пропавший",
+        "reviewNotes": 150,
+        "medianReviewChars": 57.5,
+        "minReviewChars": 5.0,
+        "maxReviewChars": 490.0,
+        "completePairComparisons": 24,
+        "agreesWithOtherJudgesMajority": 17,
+        "disagreesWithOtherJudgesMajority": 5,
+        "otherJudgesTiedOrAbsent": 2
+      },
+      "firstRoundScale": [
+        {
+          "judgeKey": "клим пропавший",
+          "n": 100,
+          "mean": 5.88,
+          "median": 6.0,
+          "min": 0.0,
+          "max": 10.0,
+          "zeroCount": 1,
+          "meanDifferenceFromOtherFour": -0.1025,
+          "distribution": [
+            {
+              "score": 0.0,
+              "count": 1
+            },
+            {
+              "score": 1.0,
+              "count": 6
+            },
+            {
+              "score": 2.0,
+              "count": 6
+            },
+            {
+              "score": 3.0,
+              "count": 8
+            },
+            {
+              "score": 4.0,
+              "count": 7
+            },
+            {
+              "score": 5.0,
+              "count": 10
+            },
+            {
+              "score": 6.0,
+              "count": 16
+            },
+            {
+              "score": 7.0,
+              "count": 22
+            },
+            {
+              "score": 8.0,
+              "count": 6
+            },
+            {
+              "score": 9.0,
+              "count": 10
+            },
+            {
+              "score": 10.0,
+              "count": 8
+            }
+          ]
+        }
+      ],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "козачок",
+      "confidence": "medium",
+      "observedPriorities": [
+        "Цельность, слушабельность, разнообразие, уверенная подача и подходящий минус.",
+        "Раскрытие и интересные строки/панчи при сравнении целого.",
+        "Отсутствие монотонности, затягивания и формального старания."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Трек цельный и приятно слушается, хотя раскрытие обычное и сильных строк мало.",
+          "preference": "Может стать лучшим треком раунда.",
+          "sourceRefs": [
+            "3 РАУНД!I9"
+          ]
+        },
+        {
+          "condition": "Первая часть неудачная, вторая сильнее монотонной работы соперника.",
+          "preference": "Может выбрать за удачный второй блок.",
+          "sourceRefs": [
+            "4 РАУНД!I7",
+            "4 РАУНД!I6"
+          ]
+        },
+        {
+          "condition": "Сохраняется влияние другого артиста, но текст в паре лучше.",
+          "preference": "Подражание не обязательно отменяет голос.",
+          "sourceRefs": [
+            "5 РАУНД!H3",
+            "5 РАУНД!H4"
+          ]
+        }
+      ],
+      "voice": "Короткие 1–2 предложения, скобки, раскрытие/подача/минус/по ОВ, иногда точная цитата и добрый совет.",
+      "limitations": [
+        "Много числовых клеток без объяснения, особенно второй раунд.",
+        "Тематические шутки иногда прямо не понимает; это ограничение слушателя.",
+        "Личное отступление про реслинг не постоянный музыкальный критерий."
+      ],
+      "evidenceRefs": [
+        "2 РАУНД!I6",
+        "2 РАУНД!I15",
+        "3 РАУНД!I9",
+        "4 РАУНД!I7",
+        "5 РАУНД!H3",
+        "ФИНАЛ!F3"
+      ],
+      "id": "kozachok",
+      "sourceLabels": [
+        "козачок"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "козачок",
+        "labels": [
+          "козачок"
+        ],
+        "appearances": 62,
+        "numericValues": 56,
+        "reviewNotes": 35,
+        "generalNotes": 0,
+        "reviewChars": 3707,
+        "rounds": [
+          "2 РАУНД",
+          "3 РАУНД",
+          "4 РАУНД",
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "козачок",
+        "reviewNotes": 35,
+        "medianReviewChars": 93,
+        "minReviewChars": 24.0,
+        "maxReviewChars": 235.0,
+        "completePairComparisons": 25,
+        "agreesWithOtherJudgesMajority": 19,
+        "disagreesWithOtherJudgesMajority": 4,
+        "otherJudgesTiedOrAbsent": 2
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "мц варг пиночетский",
+      "confidence": "low",
+      "observedPriorities": [
+        "В данном финале ценит атмосферное повествование, приятную читку и составные рифмы.",
+        "Смешные простые атаки могут соответствовать стилю без массы сложных панчей.",
+        "Длина мешает при скучном рэпе о рэпе и слабых напевах."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Дисс строится на смешных лёгких подъёбках с редкими панчами.",
+          "preference": "Принимает такую форму, если она уместна стилю.",
+          "sourceRefs": [
+            "ФИНАЛ!V3"
+          ]
+        }
+      ],
+      "voice": "Разбор частей со списком понравившихся строк, разговорное норм/наверн/панчуль при точных оговорках.",
+      "limitations": [
+        "Только одна пара финала.",
+        "V3 обсуждает Клинка, V4 Панду: тексты перекрёстны относительно строк.",
+        "Нельзя вывести общую любовь к маньячным сюжетам."
+      ],
+      "evidenceRefs": [
+        "ФИНАЛ!V3",
+        "ФИНАЛ!V4"
+      ],
+      "id": "mc-varg-pinochetskiy",
+      "sourceLabels": [
+        "мц варг пиночетский"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "мц варг пиночетский",
+        "labels": [
+          "мц варг пиночетский"
+        ],
+        "appearances": 2,
+        "numericValues": 2,
+        "reviewNotes": 2,
+        "generalNotes": 0,
+        "reviewChars": 1594,
+        "rounds": [
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "мц варг пиночетский",
+        "reviewNotes": 2,
+        "medianReviewChars": 797,
+        "minReviewChars": 493.0,
+        "maxReviewChars": 1101.0,
+        "completePairComparisons": 1,
+        "agreesWithOtherJudgesMajority": 0,
+        "disagreesWithOtherJudgesMajority": 1,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "мц онегин",
+      "confidence": "medium",
+      "observedPriorities": [
+        "Связь с баттлом, художественные строки, содержательные панчи и оригинальность.",
+        "Неприятие штампов, байта, самоповтора, пустословия и чрезмерного питча.",
+        "Функция текущего раунда и адресность дисса."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Очень сильный второй блок после провальной первой части.",
+          "preference": "Может выбрать трек за решающую вторую часть.",
+          "sourceRefs": [
+            "2 РАУНД!J15",
+            "ФИНАЛ!G3"
+          ]
+        },
+        {
+          "condition": "Хорошая песня слабо связана с онлайн-баттлом.",
+          "preference": "В конкретной паре может выбрать более баттловый рэп.",
+          "sourceRefs": [
+            "2 РАУНД!J27",
+            "2 РАУНД!J28"
+          ]
+        },
+        {
+          "condition": "Финальный дисс повторяет атаки на выбывших и не подводит итог.",
+          "preference": "Это может уступить более подходящему финальному высказыванию.",
+          "sourceRefs": [
+            "ФИНАЛ!G3",
+            "ФИНАЛ!G4"
+          ]
+        }
+      ],
+      "voice": "Обычно 1–3 собранных предложения; колкая ирония, грубые метафоры, поворот первая/вторая часть, редкая точная цитата.",
+      "limitations": [
+        "Жанровая уместность не абсолютное вето: постпанк и другие формы тоже выигрывают.",
+        "Короткая похвала красоты иногда не раскрывает полный баланс.",
+        "Шапка финала G1 только итог, не самостоятельный разбор."
+      ],
+      "evidenceRefs": [
+        "2 РАУНД!J15",
+        "2 РАУНД!J24",
+        "2 РАУНД!J28",
+        "4 РАУНД!J3",
+        "5 РАУНД!I3",
+        "ФИНАЛ!G4"
+      ],
+      "id": "mc-onegin",
+      "sourceLabels": [
+        "мц онегин"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "мц онегин",
+        "labels": [
+          "мц онегин"
+        ],
+        "appearances": 62,
+        "numericValues": 56,
+        "reviewNotes": 54,
+        "generalNotes": 1,
+        "reviewChars": 6708,
+        "rounds": [
+          "2 РАУНД",
+          "3 РАУНД",
+          "4 РАУНД",
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "мц онегин",
+        "reviewNotes": 54,
+        "medianReviewChars": 103,
+        "minReviewChars": 12.0,
+        "maxReviewChars": 425.0,
+        "completePairComparisons": 25,
+        "agreesWithOtherJudgesMajority": 15,
+        "disagreesWithOtherJudgesMajority": 9,
+        "otherJudgesTiedOrAbsent": 1
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "нагвальный",
+      "confidence": "medium",
+      "observedPriorities": [
+        "Цельность, интересный вайб, ирония и кеки вместо бессвязных красивых строк.",
+        "Рифма должна работать на мысль/сюжет; факты в диссе нуждаются в обосновании.",
+        "Доверие к лирическому герою и отсутствие вымученного кринжа."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Сильная атмосфера и цельная лирика против недостаточно разгромного дисса.",
+          "preference": "Может выбрать лирику даже без адресного дисса.",
+          "sourceRefs": [
+            "2 РАУНД!E19",
+            "2 РАУНД!E24",
+            "2 РАУНД!E25"
+          ]
+        },
+        {
+          "condition": "Отдельные сильные цитаты не складываются в связное целое.",
+          "preference": "Предпочитает более компактную и цельную работу.",
+          "sourceRefs": [
+            "2 РАУНД!E21",
+            "2 РАУНД!E22"
+          ]
+        },
+        {
+          "condition": "Длинный трек разнообразен и слушается легко.",
+          "preference": "Длина сама по себе не мешает голосу.",
+          "sourceRefs": [
+            "4 РАУНД!F7"
+          ]
+        }
+      ],
+      "voice": "Нижний регистр, шо/етот/каеф/риспек, кек/кринж; от одного слова до эссе с цитатами и бытовой аналогией.",
+      "limitations": [
+        "Основной подробный пласт — второй раунд; в третьем комментарии резко короче.",
+        "Нет письменных отзывов пятого раунда.",
+        "В финале прямо признаёт частичное прослушивание; психоаналитические шутки не достоверная психология."
+      ],
+      "evidenceRefs": [
+        "2 РАУНД!E19",
+        "2 РАУНД!E22",
+        "2 РАУНД!E24",
+        "3 РАУНД!F7",
+        "4 РАУНД!F7",
+        "ФИНАЛ!E3"
+      ],
+      "id": "nagvalny",
+      "sourceLabels": [
+        "нагвальный"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "нагвальный",
+        "labels": [
+          "нагвальный"
+        ],
+        "appearances": 58,
+        "numericValues": 52,
+        "reviewNotes": 44,
+        "generalNotes": 0,
+        "reviewChars": 18698,
+        "rounds": [
+          "2 РАУНД",
+          "3 РАУНД",
+          "4 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "нагвальный",
+        "reviewNotes": 44,
+        "medianReviewChars": 214.5,
+        "minReviewChars": 6.0,
+        "maxReviewChars": 2256.0,
+        "completePairComparisons": 23,
+        "agreesWithOtherJudgesMajority": 14,
+        "disagreesWithOtherJudgesMajority": 8,
+        "otherJudgesTiedOrAbsent": 1
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "ок",
+      "confidence": "low",
+      "observedPriorities": [
+        "В данном финале различает хороший обычный дисс и финальное высказывание.",
+        "Подведение итогов, финальный мотив и желание переслушать."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Зубастый дисс не звучит финально, а у соперника ощущается итог.",
+          "preference": "В данном финале предпочитает финальную функцию целого.",
+          "sourceRefs": [
+            "ФИНАЛ!P4",
+            "ФИНАЛ!P3"
+          ]
+        }
+      ],
+      "voice": "Связный рассудительный абзац, конкретное сравнение, пожалуй/охото/в целом, похвала обоим.",
+      "limitations": [
+        "Два текста только одной финальной пары.",
+        "Возможное совпадение личности с охуенно культурным не подтверждено.",
+        "Финальность нельзя объявлять приоритетом всех раундов."
+      ],
+      "evidenceRefs": [
+        "ФИНАЛ!P3",
+        "ФИНАЛ!P4"
+      ],
+      "id": "ok-unconfirmed",
+      "sourceLabels": [
+        "ок"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "ок",
+        "labels": [
+          "ок"
+        ],
+        "appearances": 2,
+        "numericValues": 2,
+        "reviewNotes": 2,
+        "generalNotes": 0,
+        "reviewChars": 736,
+        "rounds": [
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": "охуенно культурный"
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "ок",
+        "reviewNotes": 2,
+        "medianReviewChars": 368,
+        "minReviewChars": 358.0,
+        "maxReviewChars": 378.0,
+        "completePairComparisons": 1,
+        "agreesWithOtherJudgesMajority": 1,
+        "disagreesWithOtherJudgesMajority": 0,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": "ohuyenno-kulturny"
+    },
+    {
+      "judgeKey": "охуенно культурный",
+      "confidence": "medium",
+      "observedPriorities": [
+        "Интересный целый трек, хороший текст и исполнение.",
+        "Бодрый острый дисс; иногда решает только по вторым частям."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Обе первые части не нравятся.",
+          "preference": "Может явно сузить сравнение до диссов.",
+          "sourceRefs": [
+            "5 РАУНД!S3",
+            "5 РАУНД!S4"
+          ]
+        },
+        {
+          "condition": "Одна первая часть понравилась и вторая тоже интереснее.",
+          "preference": "Выбирает более сильное целое.",
+          "sourceRefs": [
+            "5 РАУНД!S6",
+            "5 РАУНД!S7"
+          ]
+        }
+      ],
+      "voice": "Имя с +/- и 1–3 простых предложения: братец/хорош/задорно/крутой.",
+      "limitations": [
+        "Доступны только четвёртый и пятый раунды.",
+        "Половина полуфинальных клеток — копии общих парных текстов.",
+        "Не объединять с ок до подтверждения личности."
+      ],
+      "evidenceRefs": [
+        "4 РАУНД!T3",
+        "4 РАУНД!T4",
+        "4 РАУНД!T10",
+        "5 РАУНД!S3",
+        "5 РАУНД!S6"
+      ],
+      "id": "ohuyenno-kulturny",
+      "sourceLabels": [
+        "охуенно культурный"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "4 РАУНД",
+        "5 РАУНД"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "охуенно культурный",
+        "labels": [
+          "охуенно культурный"
+        ],
+        "appearances": 12,
+        "numericValues": 12,
+        "reviewNotes": 10,
+        "generalNotes": 0,
+        "reviewChars": 989,
+        "rounds": [
+          "4 РАУНД",
+          "5 РАУНД"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "охуенно культурный",
+        "reviewNotes": 10,
+        "medianReviewChars": 95.5,
+        "minReviewChars": 49.0,
+        "maxReviewChars": 130.0,
+        "completePairComparisons": 6,
+        "agreesWithOtherJudgesMajority": 4,
+        "disagreesWithOtherJudgesMajority": 2,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "рыцарь таверны",
+      "confidence": "low",
+      "observedPriorities": [
+        "В двух парах ценит оригинальный контекст, остроумный адресный дисс и оригинальное звучание.",
+        "Технически сильные рифмы могут уступить банальному содержанию."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Соперник технически сильнее, но текст банален.",
+          "preference": "Может предпочесть оригинальность и остроумие другой работы.",
+          "sourceRefs": [
+            "4 РАУНД!S6",
+            "4 РАУНД!S7"
+          ]
+        }
+      ],
+      "voice": "Короткий абзац нижним регистром, по вайбу/оригинально/банальность/в цель; бывает одно слово.",
+      "limitations": [
+        "Всего шесть текстов одного раунда.",
+        "Нет письменных объяснений полуфинала.",
+        "Иностранная цитата не доказательство постоянной языковой манеры."
+      ],
+      "evidenceRefs": [
+        "4 РАУНД!S6",
+        "4 РАУНД!S7",
+        "4 РАУНД!S4"
+      ],
+      "id": "tavern-knight",
+      "sourceLabels": [
+        "рыцарь таверны"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "4 РАУНД",
+        "5 РАУНД"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "рыцарь таверны",
+        "labels": [
+          "рыцарь таверны"
+        ],
+        "appearances": 12,
+        "numericValues": 12,
+        "reviewNotes": 6,
+        "generalNotes": 0,
+        "reviewChars": 692,
+        "rounds": [
+          "4 РАУНД",
+          "5 РАУНД"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "рыцарь таверны",
+        "reviewNotes": 6,
+        "medianReviewChars": 110.5,
+        "minReviewChars": 10.0,
+        "maxReviewChars": 204.0,
+        "completePairComparisons": 6,
+        "agreesWithOtherJudgesMajority": 4,
+        "disagreesWithOtherJudgesMajority": 2,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "свиноферма",
+      "confidence": "high",
+      "observedPriorities": [
+        "Выраженное предпочтение диссов и батлового содержания с исключениями",
+        "Запоминающиеся панчи, сравнения, метафоры и ясный посыл",
+        "Напор, ритм, понятность и живость подачи",
+        "Рифмовка, сохраняющая суть повествования",
+        "Сравнительная сила текущей работы, отличаемая от личного удовольствия"
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Работа небатловая или лирическая, но убедительно сделана",
+          "preference": "Может отступить от предпочтения диссов ради сильной реализации",
+          "sourceRefs": [
+            "2 РАУНД!F33",
+            "3 РАУНД!E9"
+          ]
+        },
+        {
+          "condition": "Материал тривиален, но напор сильнее соперника",
+          "preference": "Может выбрать напор вопреки запросу на яркие строки",
+          "sourceRefs": [
+            "2 РАУНД!F45",
+            "2 РАУНД!F46"
+          ]
+        },
+        {
+          "condition": "Смысл не понравился, но заметны рифмы и исполнение",
+          "preference": "Может выбрать техническое преимущество даже против лично понравившегося трека",
+          "sourceRefs": [
+            "2 РАУНД!F48",
+            "2 РАУНД!F49"
+          ]
+        },
+        {
+          "condition": "Приятное звучание сопровождается пустым текстом",
+          "preference": "Может предпочесть менее приятную работу с более интересным содержанием",
+          "sourceRefs": [
+            "2 РАУНД!F18",
+            "2 РАУНД!F19"
+          ]
+        },
+        {
+          "condition": "Оба трека не особенно понравились",
+          "preference": "Выбирает сравнительно более сильный, не превращая 1 в похвалу",
+          "sourceRefs": [
+            "2 РАУНД!F27",
+            "2 РАУНД!F28",
+            "2 РАУНД!F15",
+            "2 РАУНД!F16"
+          ]
+        }
+      ],
+      "voice": "Имя, конкретное впечатление и прямой голос; грубая предметная речь с батловыми и телесными образами, оговорками вкуса. Редкие хрю/поросёнок поддерживают образ, есть уважение и пожелания удачи.",
+      "limitations": [
+        "Высокая уверенность относится к описанию корпуса, не числовым весам",
+        "Предпочтение диссов не означает запрет на лирику или политические темы",
+        "F6/F7, F45/F46 второго раунда и D3/D4 финала содержат общие тексты пары",
+        "Шутки об упоминании судьи не доказывают реальные бонусы",
+        "Финальный голос объяснён общим впечатлением, причины по частям не названы",
+        "Первый раунд 0–10; позднее 0/1 означает выбор в паре"
+      ],
+      "evidenceRefs": [
+        "1 РАУНД (СВОДНАЯ)!E41",
+        "1 РАУНД (СВОДНАЯ)!E5",
+        "1 РАУНД (СВОДНАЯ)!E49",
+        "2 РАУНД!F33",
+        "2 РАУНД!F45",
+        "2 РАУНД!F48",
+        "3 РАУНД!E9",
+        "3 РАУНД!E13",
+        "3 РАУНД!E25",
+        "ФИНАЛ!D3"
+      ],
+      "id": "svinoferma",
+      "sourceLabels": [
+        "свиноферма"
+      ],
+      "profileDocument": "docs/backlog/judges/core-judges.md",
+      "rounds": [
+        "1 РАУНД",
+        "1 РАУНД (СВОДНАЯ)",
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "свиноферма",
+        "labels": [
+          "свиноферма"
+        ],
+        "appearances": 163,
+        "numericValues": 157,
+        "reviewNotes": 148,
+        "generalNotes": 0,
+        "reviewChars": 14982,
+        "rounds": [
+          "1 РАУНД",
+          "1 РАУНД (СВОДНАЯ)",
+          "2 РАУНД",
+          "3 РАУНД",
+          "4 РАУНД",
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "свиноферма",
+        "reviewNotes": 148,
+        "medianReviewChars": 80.5,
+        "minReviewChars": 7.0,
+        "maxReviewChars": 342.0,
+        "completePairComparisons": 25,
+        "agreesWithOtherJudgesMajority": 16,
+        "disagreesWithOtherJudgesMajority": 6,
+        "otherJudgesTiedOrAbsent": 3
+      },
+      "firstRoundScale": [
+        {
+          "judgeKey": "свиноферма",
+          "n": 100,
+          "mean": 6.9,
+          "median": 7.0,
+          "min": 4.0,
+          "max": 10.0,
+          "zeroCount": 0,
+          "meanDifferenceFromOtherFour": 1.1725,
+          "distribution": [
+            {
+              "score": 4.0,
+              "count": 4
+            },
+            {
+              "score": 5.0,
+              "count": 12
+            },
+            {
+              "score": 6.0,
+              "count": 18
+            },
+            {
+              "score": 7.0,
+              "count": 38
+            },
+            {
+              "score": 8.0,
+              "count": 18
+            },
+            {
+              "score": 9.0,
+              "count": 4
+            },
+            {
+              "score": 10.0,
+              "count": 6
+            }
+          ]
+        }
+      ],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "тридцать третий",
+      "confidence": "high",
+      "observedPriorities": [
+        "Цельность музыкального трека и желание переслушать: текст, голос, бит и форма должны работать вместе.",
+        "Живая уверенная подача, уместные интонации, ритм и разборчивость; отсутствие ошибок само по себе не создаёт сильного впечатления.",
+        "Самобытный стиль и неожиданно удачная выразительность; сложность и скорость не самоценны.",
+        "Идея, ясный посыл, связная история, запоминающиеся образы и рифмы, которые музыкально реализованы.",
+        "Понятные адресные панчи, агрессия и ощущение состязания, особенно при близком уровне работ.",
+        "Работающие припевы, развитие частей, уместные переходы и завершение; лишняя длина и части ухудшают целое.",
+        "Сведение оценивается через слышимость и впечатление; хорошая запись не гарантирует победу, бытовая не исключает её.",
+        "Развитие относительно прежних раундов, ответственное участие и сохранение собственного художественного выбора."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Более содержательный текст музыкально реализован заметно хуже небольшого, но состоятельного замысла соперника.",
+          "preference": "Может выбрать цельность и исполнение, даже признавая превосходство проигравшего в смысле, рифмах и усилиях.",
+          "sourceRefs": [
+            "2 РАУНД!D18",
+            "2 РАУНД!D19",
+            "2 РАУНД!D27",
+            "2 РАУНД!D28"
+          ]
+        },
+        {
+          "condition": "Сырая запись даёт более убедительный батловый удар и кач, а сведённый соперник ошибается в интонациях и не создаёт текстового перевеса.",
+          "preference": "Может проголосовать за ван тейк без сведения, сохранив требование улучшить звук.",
+          "sourceRefs": [
+            "2 РАУНД!D42",
+            "2 РАУНД!D43"
+          ]
+        },
+        {
+          "condition": "У одной работы приятнее техника и флоу, у другой убедительнее адресные панчи и батловая часть.",
+          "preference": "Батловый текст способен перевесить музыкальное преимущество, особенно при повторении прежнего посыла соперником.",
+          "sourceRefs": [
+            "4 РАУНД!D3",
+            "4 РАУНД!D4",
+            "5 РАУНД!D3",
+            "5 РАУНД!D4"
+          ]
+        },
+        {
+          "condition": "Одна самостоятельная песня без панчей более цельна и выразительна, чем многосоставный раунд с диссом.",
+          "preference": "Может выбрать песню; панчи и две части не являются обязательными условиями победы.",
+          "sourceRefs": [
+            "3 РАУНД!D9",
+            "3 РАУНД!D10"
+          ]
+        },
+        {
+          "condition": "Новый стиль и разнообразие дают более яркий результат против аккуратной, но предсказуемой стабильности.",
+          "preference": "Может дать голос неидеальному эксперименту, точно ограничив причину перевеса и не объявляя результат безошибочным.",
+          "sourceRefs": [
+            "2 РАУНД!D30",
+            "2 РАУНД!D31",
+            "4 РАУНД!D6",
+            "4 РАУНД!D7"
+          ]
+        },
+        {
+          "condition": "Сложный текст сохраняет доступный общий посыл и хорошо ложится на музыку либо перестаёт быть понятным целиком.",
+          "preference": "Принимает сложность в первом случае; во втором рифмы и техника могут уступить более ясной работе.",
+          "sourceRefs": [
+            "2 РАУНД!D48",
+            "2 РАУНД!D49",
+            "3 РАУНД!D12",
+            "3 РАУНД!D13"
+          ]
+        },
+        {
+          "condition": "Питч основной дорожки занимает большую часть работы и скрывает слова или живую выразительность.",
+          "preference": "Часто предпочитает естественный голос; локальные гармоничные даблы и намеренно необычный припев оценивает по результату, без общего запрета эффектов.",
+          "sourceRefs": [
+            "2 РАУНД!D6",
+            "2 РАУНД!D7",
+            "2 РАУНД!D24",
+            "2 РАУНД!D10",
+            "5 РАУНД!D7"
+          ]
+        },
+        {
+          "condition": "Отборочная работа сильно цепляет подачей, хуком или стилем при простом тексте либо неидеальной записи.",
+          "preference": "Допускает послабление отбора, но требует развития и улучшения в следующих раундах.",
+          "sourceRefs": [
+            "1 РАУНД (СВОДНАЯ)!F5",
+            "1 РАУНД (СВОДНАЯ)!F49",
+            "1 РАУНД (СВОДНАЯ)!F64"
+          ]
+        },
+        {
+          "condition": "Дополнительная часть, длинный фит или фристайловое вступление не добавляют работающего содержания.",
+          "preference": "Учитывает лишний материал как недостаток всего трека; не даёт автоматический бонус за длину и число частей.",
+          "sourceRefs": [
+            "2 РАУНД!D36",
+            "2 РАУНД!D37",
+            "4 РАУНД!D12",
+            "ФИНАЛ!C4"
+          ]
+        },
+        {
+          "condition": "Оба трека не впечатляют, но нужно выбрать одного победителя.",
+          "preference": "Ищет узкий сравнительный перевес; голос 1 может сопровождаться отрицательной оценкой общего результата.",
+          "sourceRefs": [
+            "3 РАУНД!D12",
+            "3 РАУНД!D13",
+            "4 РАУНД!D6",
+            "4 РАУНД!D7"
+          ]
+        },
+        {
+          "condition": "В финале обоим не хватает прежней силы, панчей и духа победы.",
+          "preference": "Всё равно выбирает совокупность преимуществ: НБПанда побеждает за стиль, понятность, припевы и разнообразие при претензиях к длине и структуре.",
+          "sourceRefs": [
+            "ФИНАЛ!C3",
+            "ФИНАЛ!C4"
+          ]
+        }
+      ],
+      "voice": "Длинное разговорное обращение на ты: личное впечатление, плюсы и минусы частей, сравнение соперников, узкая причина голоса, конкретный совет и тёплая благодарность. Прямая критика и обсценная лексика сочетаются с самоиронией, оговорками субъективности и поддержкой самостоятельности автора. Порядок и длину следует варьировать; личные выпады не делать типовым приёмом.",
+      "limitations": [
+        "Высокая уверенность относится к повторяемым наблюдениям полного корпуса, а не к точному предсказанию каждого нового голоса.",
+        "Точные веса, внутренние мотивы и неизменные жанровые предпочтения не установлены; игровые коэффициенты будут отдельной гипотезой.",
+        "Первый раунд: оценки 0–10; далее 0/1: отсутствие или наличие голоса в паре. Пустые ячейки не означают нулевое мастерство.",
+        "ФИНАЛ!C3: строка НБПанды=1, текст в основном о Клинке=0; ФИНАЛ!C4: строка Клинка=0, текст в основном о НБПанде=1. Утверждения требуют явного субъекта.",
+        "Не выдумывать цитаты, услышанные дефекты, таймкоды, сравнения с артистами, бытовые прослушивания, биографию или память о прежних раундах без известных игровых фактов.",
+        "Нынешние общие quality, stage, навыки и наличие сведения не доказывают конкретных слуховых дефектов; символические lyrics не содержат реальных строк для цитирования.",
+        "Качество записи, подача, ритмика, разборчивость, текст, батловость и структура должны быть раздельными доказательными признаками.",
+        "Послабление отбора, поддержка потенциала, личное знакомство и похвала не гарантируют победу. Усилие и время работы не заменяют результат.",
+        "Часть отзывов содержит локальные оговорки и нестрогую словесную арифметику; авторитетная оценка берётся из ячейки, не вычисляется из парафраза.",
+        "При нехватке сведений отзыв сокращается и становится менее конкретным; причины отсутствующих отзывов не восстанавливаются."
+      ],
+      "evidenceRefs": [
+        "1 РАУНД (СВОДНАЯ)!F5",
+        "1 РАУНД (СВОДНАЯ)!F49",
+        "1 РАУНД (СВОДНАЯ)!F75",
+        "1 РАУНД (СВОДНАЯ)!F64",
+        "1 РАУНД (СВОДНАЯ)!F66",
+        "2 РАУНД!D21",
+        "2 РАУНД!D42",
+        "2 РАУНД!D43",
+        "2 РАУНД!D48",
+        "2 РАУНД!D31",
+        "3 РАУНД!D9",
+        "3 РАУНД!D7",
+        "4 РАУНД!D3",
+        "4 РАУНД!D7",
+        "ФИНАЛ!C4"
+      ],
+      "id": "thirty-third",
+      "sourceLabels": [
+        "тридцать третий"
+      ],
+      "profileDocument": "docs/backlog/judges/thirty-third.md",
+      "rounds": [
+        "1 РАУНД",
+        "1 РАУНД (СВОДНАЯ)",
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "тридцать третий",
+        "labels": [
+          "тридцать третий"
+        ],
+        "appearances": 163,
+        "numericValues": 157,
+        "reviewNotes": 154,
+        "generalNotes": 0,
+        "reviewChars": 135426,
+        "rounds": [
+          "1 РАУНД",
+          "1 РАУНД (СВОДНАЯ)",
+          "2 РАУНД",
+          "3 РАУНД",
+          "4 РАУНД",
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "тридцать третий",
+        "reviewNotes": 154,
+        "medianReviewChars": 798,
+        "minReviewChars": 42.0,
+        "maxReviewChars": 1767.0,
+        "completePairComparisons": 25,
+        "agreesWithOtherJudgesMajority": 19,
+        "disagreesWithOtherJudgesMajority": 4,
+        "otherJudgesTiedOrAbsent": 2
+      },
+      "firstRoundScale": [
+        {
+          "judgeKey": "тридцать третий",
+          "n": 100,
+          "mean": 6.765,
+          "median": 7.0,
+          "min": 0.0,
+          "max": 10.0,
+          "zeroCount": 1,
+          "meanDifferenceFromOtherFour": 1.00375,
+          "distribution": [
+            {
+              "score": 0.0,
+              "count": 1
+            },
+            {
+              "score": 1.0,
+              "count": 1
+            },
+            {
+              "score": 2.0,
+              "count": 3
+            },
+            {
+              "score": 2.5,
+              "count": 1
+            },
+            {
+              "score": 3.0,
+              "count": 1
+            },
+            {
+              "score": 3.5,
+              "count": 3
+            },
+            {
+              "score": 4.0,
+              "count": 4
+            },
+            {
+              "score": 4.5,
+              "count": 5
+            },
+            {
+              "score": 5.0,
+              "count": 3
+            },
+            {
+              "score": 5.5,
+              "count": 5
+            },
+            {
+              "score": 6.0,
+              "count": 7
+            },
+            {
+              "score": 6.5,
+              "count": 13
+            },
+            {
+              "score": 7.0,
+              "count": 10
+            },
+            {
+              "score": 7.5,
+              "count": 8
+            },
+            {
+              "score": 8.0,
+              "count": 7
+            },
+            {
+              "score": 8.5,
+              "count": 8
+            },
+            {
+              "score": 9.0,
+              "count": 8
+            },
+            {
+              "score": 10.0,
+              "count": 12
+            }
+          ]
+        }
+      ],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "херова жесть",
+      "confidence": "low",
+      "observedPriorities": [
+        "В данном финале сравнивает звучание и качество рифмовки.",
+        "Замечает затянутость, необычный концепт и недоработку."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Лучше звучащий трек чрезмерно длинен.",
+          "preference": "В данном финале лучший звук всё же даёт голос.",
+          "sourceRefs": [
+            "ФИНАЛ!T3"
+          ]
+        }
+      ],
+      "voice": "Имя с цифрой и один прямой разговорный абзац с конкретной претензией.",
+      "limitations": [
+        "Только два финальных текста; полуфинальные голоса без объяснений.",
+        "Условное мог бы выбрать при доработке не даёт общего правила.",
+        "Нет детального порядка текст/флоу/атмосфера."
+      ],
+      "evidenceRefs": [
+        "ФИНАЛ!T3",
+        "ФИНАЛ!T4"
+      ],
+      "id": "herova-zhest",
+      "sourceLabels": [
+        "Херова Жесть"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "херова жесть",
+        "labels": [
+          "Херова Жесть"
+        ],
+        "appearances": 6,
+        "numericValues": 6,
+        "reviewNotes": 2,
+        "generalNotes": 0,
+        "reviewChars": 297,
+        "rounds": [
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "херова жесть",
+        "reviewNotes": 2,
+        "medianReviewChars": 148.5,
+        "minReviewChars": 102.0,
+        "maxReviewChars": 195.0,
+        "completePairComparisons": 3,
+        "agreesWithOtherJudgesMajority": 3,
+        "disagreesWithOtherJudgesMajority": 0,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "abstract postmodern!",
+      "confidence": "insufficient",
+      "observedPriorities": [
+        "Доступны лишь три крайне короткие локальные реакции; устойчивые приоритеты не установлены."
+      ],
+      "decisionPatterns": [],
+      "voice": "Крайне короткая грубая реакция без объяснения.",
+      "limitations": [
+        "Много голосов без текста; общий полуфинальный note тоже не подробный разбор.",
+        "Рок говно стоит у победного голоса: нельзя вывести запрет на рок.",
+        "Любая нейтральная вкусовая модель — дизайнерский fallback, не вывод из корпуса."
+      ],
+      "evidenceRefs": [
+        "2 РАУНД!K49",
+        "2 РАУНД!K45",
+        "4 РАУНД!K7",
+        "5 РАУНД!J1"
+      ],
+      "id": "abstract-postmodern",
+      "sourceLabels": [
+        "abstract postmodern!"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "abstract postmodern!",
+        "labels": [
+          "abstract postmodern!"
+        ],
+        "appearances": 60,
+        "numericValues": 54,
+        "reviewNotes": 3,
+        "generalNotes": 1,
+        "reviewChars": 63,
+        "rounds": [
+          "2 РАУНД",
+          "3 РАУНД",
+          "4 РАУНД",
+          "5 РАУНД"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "abstract postmodern!",
+        "reviewNotes": 3,
+        "medianReviewChars": 18,
+        "minReviewChars": 9.0,
+        "maxReviewChars": 36.0,
+        "completePairComparisons": 24,
+        "agreesWithOtherJudgesMajority": 16,
+        "disagreesWithOtherJudgesMajority": 6,
+        "otherJudgesTiedOrAbsent": 2
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "alx beats",
+      "confidence": "low",
+      "observedPriorities": [
+        "В одном финальном вердикте сравнивает слушабельность второй части и текст.",
+        "Общее старое звучание этой пары воспринимает с раздражением."
+      ],
+      "decisionPatterns": [],
+      "voice": "Общий отстранённый абзац с итогами, комментировать особо не хочется, временная музыкальная ассоциация.",
+      "limitations": [
+        "Две одинаковые клетки дают одно самостоятельное свидетельство.",
+        "Широкий жанровый вкус, роль панчей/вокала и приоритеты не установлены.",
+        "Не выводить критерии из имени Beats; fallback — игровая настройка."
+      ],
+      "evidenceRefs": [
+        "ФИНАЛ!R3",
+        "ФИНАЛ!R4"
+      ],
+      "id": "alx-beats",
+      "sourceLabels": [
+        "алкс битс",
+        "Alx Beats"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "alx beats",
+        "labels": [
+          "алкс битс",
+          "Alx Beats"
+        ],
+        "appearances": 6,
+        "numericValues": 6,
+        "reviewNotes": 2,
+        "generalNotes": 0,
+        "reviewChars": 482,
+        "rounds": [
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "alx beats",
+        "reviewNotes": 2,
+        "medianReviewChars": 241,
+        "minReviewChars": 241.0,
+        "maxReviewChars": 241.0,
+        "completePairComparisons": 3,
+        "agreesWithOtherJudgesMajority": 2,
+        "disagreesWithOtherJudgesMajority": 1,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "provisional_alias_merge",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "benarfa",
+      "confidence": "low",
+      "observedPriorities": [
+        "В данном финале интерес сторитела и плотность дисса противопоставляет нудности/длительности.",
+        "Недостаток запоминающихся панчей допускает у победителя."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Личные пометки текста/исполнения равны, но целое ощущается разным.",
+          "preference": "В данном финале решает общее впечатление.",
+          "sourceRefs": [
+            "ФИНАЛ!Q3",
+            "ФИНАЛ!Q4"
+          ]
+        }
+      ],
+      "voice": "Краткая шапка Т/И/ОВ, имя, личная раскладка и 1–2 предложения.",
+      "limitations": [
+        "Только два финальных текста; полуфинальные голоса без объяснений.",
+        "Диапазоны и методика Т/И/ОВ неизвестны; это не числовые веса и не турнирная шкала.",
+        "Нельзя вывести широкие предпочтения по одному сторителу."
+      ],
+      "evidenceRefs": [
+        "ФИНАЛ!Q3",
+        "ФИНАЛ!Q4"
+      ],
+      "id": "benarfa",
+      "sourceLabels": [
+        "бен арфа",
+        "BenArfa"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "benarfa",
+        "labels": [
+          "бен арфа",
+          "BenArfa"
+        ],
+        "appearances": 6,
+        "numericValues": 6,
+        "reviewNotes": 2,
+        "generalNotes": 0,
+        "reviewChars": 205,
+        "rounds": [
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "benarfa",
+        "reviewNotes": 2,
+        "medianReviewChars": 102.5,
+        "minReviewChars": 43.0,
+        "maxReviewChars": 162.0,
+        "completePairComparisons": 3,
+        "agreesWithOtherJudgesMajority": 2,
+        "disagreesWithOtherJudgesMajority": 1,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "provisional_alias_merge",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "cenobite",
+      "confidence": "medium",
+      "observedPriorities": [
+        "Оригинальность своего стиля, искренность и серьёзный подход.",
+        "Увлекательный сторител, бодрая подача и работающие панчи.",
+        "Финальный масштаб и самостоятельная позиция."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Сильный второй блок, но первая часть — байт и гость кажется лишним.",
+          "preference": "Может предпочесть самостоятельное оригинальное высказывание соперника.",
+          "sourceRefs": [
+            "4 РАУНД!L3",
+            "4 РАУНД!L4"
+          ]
+        },
+        {
+          "condition": "Качественный сторител и весёлый токсичный дисс против менее сильного целого.",
+          "preference": "Выбирает работу, звучащую как трек победителя.",
+          "sourceRefs": [
+            "ФИНАЛ!H4",
+            "ФИНАЛ!H3"
+          ]
+        }
+      ],
+      "voice": "Несколько эмоциональных абзацев по частям, личный слуховой опыт, риторический вопрос, прямой вердикт.",
+      "limitations": [
+        "Письменный материал только четвёртого раунда и финала.",
+        "Указатели на подкаст не содержат самого разбора.",
+        "Обвинения судей в протаскивании друзей не установленный факт."
+      ],
+      "evidenceRefs": [
+        "4 РАУНД!L3",
+        "4 РАУНД!L4",
+        "4 РАУНД!L6",
+        "4 РАУНД!L10",
+        "ФИНАЛ!H4",
+        "5 РАУНД!K1"
+      ],
+      "id": "cenobite",
+      "sourceLabels": [
+        "сенобит",
+        "cenobite"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "cenobite",
+        "labels": [
+          "сенобит",
+          "cenobite"
+        ],
+        "appearances": 62,
+        "numericValues": 56,
+        "reviewNotes": 8,
+        "generalNotes": 2,
+        "reviewChars": 3304,
+        "rounds": [
+          "2 РАУНД",
+          "3 РАУНД",
+          "4 РАУНД",
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "cenobite",
+        "reviewNotes": 8,
+        "medianReviewChars": 417.5,
+        "minReviewChars": 164.0,
+        "maxReviewChars": 587.0,
+        "completePairComparisons": 25,
+        "agreesWithOtherJudgesMajority": 15,
+        "disagreesWithOtherJudgesMajority": 9,
+        "otherJudgesTiedOrAbsent": 1
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "provisional_alias_merge",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "cyber olegi",
+      "confidence": "medium",
+      "observedPriorities": [
+        "Живой стиль, смешные конкретные панчи/рофлы, харизма и отсутствие застоя.",
+        "Бодрый флоу, подходящий бит, краткая понятная мысль.",
+        "Маска нового против ретрограда; не абсолютный запрет на старую школу."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Материал старый или бумерский, но конкретные шутки и исполнение работают.",
+          "preference": "Может дать голос вопреки жанровому ярлыку.",
+          "sourceRefs": [
+            "3 РАУНД!N10",
+            "5 РАУНД!M4"
+          ]
+        },
+        {
+          "condition": "Отличный дисс соседствует с неприятным подражанием в первой части.",
+          "preference": "Неудачная первая часть может решить пару против автора.",
+          "sourceRefs": [
+            "5 РАУНД!M3",
+            "5 РАУНД!M4"
+          ]
+        },
+        {
+          "condition": "Жанр лично не близок, но читка и пение качественные.",
+          "preference": "Может признать более сильную работу.",
+          "sourceRefs": [
+            "2 РАУНД!N48"
+          ]
+        }
+      ],
+      "voice": "Чел/челобас, кек/орунах, почти непрерывные )); короткая реакция иногда разрастается в фантазию о киберпанке.",
+      "limitations": [
+        "Маска и личные выпады не устанавливают реальную биографию, политику или механизм предвзятости.",
+        "Бумерство не детерминирует ноль; ругань бывает у победителя.",
+        "Повторяемость речи надёжнее полной иерархии вкуса."
+      ],
+      "evidenceRefs": [
+        "2 РАУНД!N24",
+        "2 РАУНД!N45",
+        "2 РАУНД!N48",
+        "3 РАУНД!N10",
+        "5 РАУНД!M3",
+        "ФИНАЛ!I4"
+      ],
+      "id": "cyber-olegi",
+      "sourceLabels": [
+        "кибер олежа",
+        "cyber olegi"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "cyber olegi",
+        "labels": [
+          "кибер олежа",
+          "cyber olegi"
+        ],
+        "appearances": 62,
+        "numericValues": 56,
+        "reviewNotes": 49,
+        "generalNotes": 0,
+        "reviewChars": 8876,
+        "rounds": [
+          "2 РАУНД",
+          "3 РАУНД",
+          "4 РАУНД",
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "cyber olegi",
+        "reviewNotes": 49,
+        "medianReviewChars": 108,
+        "minReviewChars": 19.0,
+        "maxReviewChars": 734.0,
+        "completePairComparisons": 25,
+        "agreesWithOtherJudgesMajority": 18,
+        "disagreesWithOtherJudgesMajority": 6,
+        "otherJudgesTiedOrAbsent": 1
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "provisional_alias_merge",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "dead rave",
+      "confidence": "medium",
+      "observedPriorities": [
+        "Душевность, доверие, удобство слушания и сочетание элементов.",
+        "Уверенность и подходящий бит; оффбит и вымученные эмоции мешают."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Песня не вполне баттловая, но легче и убедительнее оппонента.",
+          "preference": "Может выбрать песню вопреки форматной оговорке.",
+          "sourceRefs": [
+            "2 РАУНД!O18",
+            "2 РАУНД!O19"
+          ]
+        },
+        {
+          "condition": "Работа подражательна, но лучше совпала с настроением.",
+          "preference": "Подражание не обязательно мешает голосу.",
+          "sourceRefs": [
+            "3 РАУНД!O10"
+          ]
+        }
+      ],
+      "voice": "Одна разговорная строчка: душевно/зашло/хорош/нормально, иногда смех или короткая причина.",
+      "limitations": [
+        "Много односложных реакций, нет полного порядка критериев.",
+        "В финале один общий текст пары, в полуфинале письменных объяснений нет.",
+        "Ссылка на мнение Козачка не переносит весь чужой профиль."
+      ],
+      "evidenceRefs": [
+        "2 РАУНД!O18",
+        "2 РАУНД!O19",
+        "3 РАУНД!O10",
+        "3 РАУНД!O6",
+        "ФИНАЛ!L3"
+      ],
+      "id": "dead-rave",
+      "sourceLabels": [
+        "дед рейв",
+        "dead rave"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "dead rave",
+        "labels": [
+          "дед рейв",
+          "dead rave"
+        ],
+        "appearances": 54,
+        "numericValues": 48,
+        "reviewNotes": 28,
+        "generalNotes": 0,
+        "reviewChars": 1160,
+        "rounds": [
+          "2 РАУНД",
+          "3 РАУНД",
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "dead rave",
+        "reviewNotes": 28,
+        "medianReviewChars": 33,
+        "minReviewChars": 7.0,
+        "maxReviewChars": 121.0,
+        "completePairComparisons": 21,
+        "agreesWithOtherJudgesMajority": 14,
+        "disagreesWithOtherJudgesMajority": 5,
+        "otherJudgesTiedOrAbsent": 2
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "provisional_alias_merge",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "jakorja",
+      "confidence": "medium",
+      "observedPriorities": [
+        "Музыкальная работа голоса с битом, интонации, ритмика, тональность тюна и читаемое сведение.",
+        "Свежая форма, реальное старание и развитие знакомого исполнителя.",
+        "Художественная обработка факта вместо голого перечисления."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Красиво сделанная песня с простыми рифмами против лучше рифмованного, но мёртво поданного текста.",
+          "preference": "Может выбрать более живое и свежее звучание.",
+          "sourceRefs": [
+            "2 РАУНД!G6",
+            "2 РАУНД!G7"
+          ]
+        },
+        {
+          "condition": "Не весь текст понятен, но голос на бите и динамика приятнее соперника.",
+          "preference": "Может решать по общему звучанию, признавая ограничение понимания.",
+          "sourceRefs": [
+            "2 РАУНД!G48",
+            "2 РАУНД!G49"
+          ]
+        }
+      ],
+      "voice": "Несколько разговорных абзацев, прямое обращение, сарказм, капс, цитаты и конкретные советы по записи/сведению.",
+      "limitations": [
+        "Все доступные письменные отзывы только второго раунда; поздние голоса не дают позднюю манеру.",
+        "Признаёт усталость, скип и выбор по ОВ в отдельных парах.",
+        "Нельзя придумывать знакомство с участником, его прошлые работы или свои пресеты."
+      ],
+      "evidenceRefs": [
+        "2 РАУНД!G18",
+        "2 РАУНД!G6",
+        "2 РАУНД!G7",
+        "2 РАУНД!G24",
+        "2 РАУНД!G46",
+        "2 РАУНД!G48"
+      ],
+      "id": "jakorja",
+      "sourceLabels": [
+        "jakorja"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "jakorja",
+        "labels": [
+          "jakorja"
+        ],
+        "appearances": 60,
+        "numericValues": 54,
+        "reviewNotes": 29,
+        "generalNotes": 0,
+        "reviewChars": 13881,
+        "rounds": [
+          "2 РАУНД",
+          "3 РАУНД",
+          "4 РАУНД",
+          "5 РАУНД"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "jakorja",
+        "reviewNotes": 29,
+        "medianReviewChars": 333,
+        "minReviewChars": 119.0,
+        "maxReviewChars": 1306.0,
+        "completePairComparisons": 24,
+        "agreesWithOtherJudgesMajority": 16,
+        "disagreesWithOtherJudgesMajority": 7,
+        "otherJudgesTiedOrAbsent": 1
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "kosh (spacecave)",
+      "confidence": "medium",
+      "observedPriorities": [
+        "Естественная живая читка, интерес, разнообразие и оригинальное звучание.",
+        "Техника и строки могут перевесить лично нелюбимую манеру.",
+        "Неприятие квадратности, мёртвых интонаций и натужного исполнения."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Личный стиль не близок, но техника и строки убедительнее.",
+          "preference": "Может выбрать качественно сделанную работу.",
+          "sourceRefs": [
+            "3 РАУНД!R13",
+            "3 РАУНД!R12"
+          ]
+        },
+        {
+          "condition": "Хочется поддержать проигрывающего, но соперник реально разнообразнее.",
+          "preference": "Выбирает более интересный трек.",
+          "sourceRefs": [
+            "3 РАУНД!R18",
+            "3 РАУНД!R19"
+          ]
+        }
+      ],
+      "voice": "Короткая колкая оценка, музыкальная/бытовая аналогия, скобки, нормас/хорош/ну тут.",
+      "limitations": [
+        "Неприятие гостей не абсолютное вето.",
+        "Шутка про рокера на Макаревич-баттле не общий музыкальный закон.",
+        "Предпочтение участника меняется от конкретной работы."
+      ],
+      "evidenceRefs": [
+        "3 РАУНД!R13",
+        "3 РАУНД!R18",
+        "3 РАУНД!R19",
+        "5 РАУНД!Q4",
+        "ФИНАЛ!M4",
+        "ФИНАЛ!M3"
+      ],
+      "id": "kosh-spacecave",
+      "sourceLabels": [
+        "кош",
+        "kosh (SpaceCave)"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "kosh (spacecave)",
+        "labels": [
+          "кош",
+          "kosh (SpaceCave)"
+        ],
+        "appearances": 30,
+        "numericValues": 27,
+        "reviewNotes": 22,
+        "generalNotes": 0,
+        "reviewChars": 2314,
+        "rounds": [
+          "3 РАУНД",
+          "4 РАУНД",
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "kosh (spacecave)",
+        "reviewNotes": 22,
+        "medianReviewChars": 78.5,
+        "minReviewChars": 5.0,
+        "maxReviewChars": 353.0,
+        "completePairComparisons": 12,
+        "agreesWithOtherJudgesMajority": 8,
+        "disagreesWithOtherJudgesMajority": 4,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "provisional_alias_merge",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "nedonebo",
+      "confidence": "medium",
+      "observedPriorities": [
+        "Убедительный собственный флоу, ритмический размер и интересный словарь.",
+        "Весёлый действенный дисс и эффект конкретной части.",
+        "Старание; приятный голос отделяет от навыка флоу."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Вторая часть заметно сильнее, хотя первая хуже и соперник технически лучше.",
+          "preference": "Может решить всю пару за второй парт.",
+          "sourceRefs": [
+            "5 РАУНД!G3",
+            "5 РАУНД!G4"
+          ]
+        },
+        {
+          "condition": "Собственный трек не понравился, но соперник совсем не старался.",
+          "preference": "Победа возможна как относительный выбор.",
+          "sourceRefs": [
+            "3 РАУНД!H15",
+            "3 РАУНД!H16"
+          ]
+        },
+        {
+          "condition": "Флоу подражателен, но текст лучше в паре.",
+          "preference": "Может дать голос и отдельно попросить индивидуальности.",
+          "sourceRefs": [
+            "3 РАУНД!H10",
+            "3 РАУНД!H9"
+          ]
+        }
+      ],
+      "voice": "Один-два разговорных абзаца, конкретная претензия и дружеское братик/риспек/обнять приподнять; много честных оговорок.",
+      "limitations": [
+        "Письменный материал только 3–5 раундов.",
+        "Приятный тембр не равен хорошему флоу.",
+        "Нельзя сделать собственный стиль абсолютным условием прохода."
+      ],
+      "evidenceRefs": [
+        "3 РАУНД!H10",
+        "3 РАУНД!H15",
+        "4 РАУНД!H4",
+        "4 РАУНД!H7",
+        "5 РАУНД!G4",
+        "5 РАУНД!G7"
+      ],
+      "id": "nedonebo",
+      "sourceLabels": [
+        "nedonebo"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "nedonebo",
+        "labels": [
+          "nedonebo"
+        ],
+        "appearances": 60,
+        "numericValues": 28,
+        "reviewNotes": 18,
+        "generalNotes": 0,
+        "reviewChars": 2149,
+        "rounds": [
+          "2 РАУНД",
+          "3 РАУНД",
+          "4 РАУНД",
+          "5 РАУНД"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "nedonebo",
+        "reviewNotes": 18,
+        "medianReviewChars": 106.5,
+        "minReviewChars": 32.0,
+        "maxReviewChars": 222.0,
+        "completePairComparisons": 11,
+        "agreesWithOtherJudgesMajority": 9,
+        "disagreesWithOtherJudgesMajority": 2,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "pavelunderground",
+      "confidence": "medium",
+      "observedPriorities": [
+        "Уверенное попадание в бит, нескучное исполнение, подходящий инструментал.",
+        "Хорошая баттловая часть и интерес целого.",
+        "Атмосферу и вокал различает; приятный текст не отменяет оффбит."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Посыл религиозно неприятен, но исполнение сильнее оппонента.",
+          "preference": "Может выбрать сильнее исполненную работу.",
+          "sourceRefs": [
+            "5 РАУНД!L4",
+            "5 РАУНД!L3"
+          ]
+        },
+        {
+          "condition": "Вокал неудачен, но вторая часть или атмосфера сильнее.",
+          "preference": "Претензия к вокалу не даёт автоматический ноль.",
+          "sourceRefs": [
+            "2 РАУНД!M6",
+            "2 РАУНД!M28"
+          ]
+        }
+      ],
+      "voice": "Одно-два коротких предложения: нормал/хорош/средненько/душно/не зашло/с проходом; чаще одна причина.",
+      "limitations": [
+        "Часто лишь относительный вердикт; сложный порядок смысловых критериев не восстановим.",
+        "Варианты имени объединены предварительно.",
+        "Финальные личные 2/5 в тексте не формальная турнирная шкала."
+      ],
+      "evidenceRefs": [
+        "2 РАУНД!M18",
+        "2 РАУНД!M6",
+        "3 РАУНД!M13",
+        "4 РАУНД!M6",
+        "5 РАУНД!L4",
+        "ФИНАЛ!K4"
+      ],
+      "id": "pavel-underground",
+      "sourceLabels": [
+        "павел андерграунд",
+        "PavelUndergeound",
+        "PavelUnderground"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "pavelunderground",
+        "labels": [
+          "павел андерграунд",
+          "PavelUndergeound",
+          "PavelUnderground"
+        ],
+        "appearances": 62,
+        "numericValues": 56,
+        "reviewNotes": 52,
+        "generalNotes": 0,
+        "reviewChars": 2459,
+        "rounds": [
+          "2 РАУНД",
+          "3 РАУНД",
+          "4 РАУНД",
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "pavelunderground",
+        "reviewNotes": 52,
+        "medianReviewChars": 48.5,
+        "minReviewChars": 6.0,
+        "maxReviewChars": 115.0,
+        "completePairComparisons": 25,
+        "agreesWithOtherJudgesMajority": 17,
+        "disagreesWithOtherJudgesMajority": 7,
+        "otherJudgesTiedOrAbsent": 1
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "provisional_alias_merge",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "prikol'chique",
+      "confidence": "low",
+      "observedPriorities": [
+        "Повторяемая жанровая претензия это рэп/не рэп.",
+        "Тексты часто заменяют музыкальную аргументацию провокационным личным оскорблением."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Нужно выбирать между работами, обе не нравятся.",
+          "preference": "Может прямо назвать лучший из двух плохих вариантов.",
+          "sourceRefs": [
+            "3 РАУНД!Q10",
+            "3 РАУНД!Q16"
+          ]
+        }
+      ],
+      "voice": "Крайне грубая однострочная реакция, оскорбление или редкая похвала, почти без анализа.",
+      "limitations": [
+        "Маска речи надёжнее восстановимого музыкального вкуса.",
+        "Сексистские/гомофобные реплики — источник риторики, не валидный критерий качества.",
+        "Пол, жанровая ругань и похвала пения не детерминируют голос."
+      ],
+      "evidenceRefs": [
+        "3 РАУНД!Q9",
+        "3 РАУНД!Q13",
+        "3 РАУНД!Q16",
+        "4 РАУНД!P3",
+        "4 РАУНД!P7",
+        "5 РАУНД!P6"
+      ],
+      "id": "prikolchique",
+      "sourceLabels": [
+        "prikol'chique"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "prikol'chique",
+        "labels": [
+          "prikol'chique"
+        ],
+        "appearances": 28,
+        "numericValues": 25,
+        "reviewNotes": 16,
+        "generalNotes": 0,
+        "reviewChars": 522,
+        "rounds": [
+          "3 РАУНД",
+          "4 РАУНД",
+          "5 РАУНД"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "prikol'chique",
+        "reviewNotes": 16,
+        "medianReviewChars": 30,
+        "minReviewChars": 5.0,
+        "maxReviewChars": 87.0,
+        "completePairComparisons": 11,
+        "agreesWithOtherJudgesMajority": 8,
+        "disagreesWithOtherJudgesMajority": 3,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "svetokron",
+      "confidence": "low",
+      "observedPriorities": [
+        "Атмосфера, цельность, раскрытие темы и уместность элементов.",
+        "Внимание к противоречиям посыла и перенасыщению сложным текстом."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Структуры работ сопоставимы, но раскрытие различается.",
+          "preference": "Может решить по раскрытию при похвале обеих.",
+          "sourceRefs": [
+            "4 РАУНД!R3",
+            "4 РАУНД!R4"
+          ]
+        }
+      ],
+      "voice": "Спокойные короткие абзацы, на мой взгляд/возможно/по итогу, конкретный смысловой вопрос и благодарность.",
+      "limitations": [
+        "Только четыре текста двух пар одного раунда.",
+        "Повторное прослушивание названо в конкретном случае, не постоянная процедура.",
+        "Нет основания выводить общую политическую позицию."
+      ],
+      "evidenceRefs": [
+        "4 РАУНД!R3",
+        "4 РАУНД!R4",
+        "4 РАУНД!R6",
+        "4 РАУНД!R7"
+      ],
+      "id": "svetokron",
+      "sourceLabels": [
+        "svetokron"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "4 РАУНД"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "svetokron",
+        "labels": [
+          "svetokron"
+        ],
+        "appearances": 8,
+        "numericValues": 8,
+        "reviewNotes": 4,
+        "generalNotes": 0,
+        "reviewChars": 1393,
+        "rounds": [
+          "4 РАУНД"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "svetokron",
+        "reviewNotes": 4,
+        "medianReviewChars": 337.5,
+        "minReviewChars": 264.0,
+        "maxReviewChars": 454.0,
+        "completePairComparisons": 4,
+        "agreesWithOtherJudgesMajority": 2,
+        "disagreesWithOtherJudgesMajority": 2,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "source_label_group",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "whitespruce",
+      "confidence": "low",
+      "observedPriorities": [
+        "В отдельных объяснениях важны разборчивость слов и уверенность текущего исполнения.",
+        "Построчный разбор прямо обесценивает; большинство текстов — сарказм."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Финальная работа выглядит увереннее соперника.",
+          "preference": "Даёт голос за локальный перевес уверенности.",
+          "sourceRefs": [
+            "ФИНАЛ!N3",
+            "ФИНАЛ!N4"
+          ]
+        }
+      ],
+      "voice": "Короткая грубая бытовая шутка или издевательская реплика нижним регистром, иногда абсурдная причина.",
+      "limitations": [
+        "Ругательство часто сопровождает победный голос; тональность не восстанавливает решение.",
+        "Шутки про оплату или один район не доказательство взятки/кумовства.",
+        "Нет письменного полуфинального пласта; широкий вкус неизвестен."
+      ],
+      "evidenceRefs": [
+        "3 РАУНД!P9",
+        "3 РАУНД!P7",
+        "4 РАУНД!O7",
+        "4 РАУНД!O4",
+        "ФИНАЛ!N3"
+      ],
+      "id": "whitespruce",
+      "sourceLabels": [
+        "вайтспрус",
+        "whitespruce"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "whitespruce",
+        "labels": [
+          "вайтспрус",
+          "whitespruce"
+        ],
+        "appearances": 30,
+        "numericValues": 27,
+        "reviewNotes": 14,
+        "generalNotes": 0,
+        "reviewChars": 983,
+        "rounds": [
+          "3 РАУНД",
+          "4 РАУНД",
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "whitespruce",
+        "reviewNotes": 14,
+        "medianReviewChars": 42.5,
+        "minReviewChars": 10.0,
+        "maxReviewChars": 251.0,
+        "completePairComparisons": 12,
+        "agreesWithOtherJudgesMajority": 6,
+        "disagreesWithOtherJudgesMajority": 6,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "provisional_alias_merge",
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "zoo in space",
+      "confidence": "low",
+      "observedPriorities": [
+        "Разборчивость звука, доступность текста и комфорт повторного слушания.",
+        "Понятная позиция и умеренное сочетание креатива с агрессией."
+      ],
+      "decisionPatterns": [
+        {
+          "condition": "Сильное содержание трудно разобрать из-за звука.",
+          "preference": "Может выбрать более понятный трек с менее конкретным диссом.",
+          "sourceRefs": [
+            "5 РАУНД!W6",
+            "5 РАУНД!W7"
+          ]
+        },
+        {
+          "condition": "Автор техничнее как МС, но текущая позиция непонятна.",
+          "preference": "Может выбрать умеренную интересную работу соперника.",
+          "sourceRefs": [
+            "ФИНАЛ!S3",
+            "ФИНАЛ!S4"
+          ]
+        }
+      ],
+      "voice": "Один разговорный парный абзац, явный голос, честная субъективность и ограничения компетенции, иногда шутка о себе.",
+      "limitations": [
+        "Шесть клеток дают всего три самостоятельных парных текста.",
+        "Сам признаёт чуждый стиль и ограниченную компетенцию.",
+        "Нет полного рейтинга критериев или широкого жанрового портрета."
+      ],
+      "evidenceRefs": [
+        "5 РАУНД!W3",
+        "5 РАУНД!W4",
+        "5 РАУНД!W6",
+        "ФИНАЛ!S3"
+      ],
+      "id": "zoo-in-space",
+      "sourceLabels": [
+        "зу ин спейс",
+        "zoo in space"
+      ],
+      "profileDocument": "docs/backlog/judges/later-judges.md",
+      "rounds": [
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "sourceCoverage": {
+        "judgeKey": "zoo in space",
+        "labels": [
+          "зу ин спейс",
+          "zoo in space"
+        ],
+        "appearances": 6,
+        "numericValues": 6,
+        "reviewNotes": 6,
+        "generalNotes": 0,
+        "reviewChars": 2664,
+        "rounds": [
+          "5 РАУНД",
+          "ФИНАЛ"
+        ],
+        "possibleAliasOf": null
+      },
+      "descriptiveMetrics": {
+        "judgeKey": "zoo in space",
+        "reviewNotes": 6,
+        "medianReviewChars": 474,
+        "minReviewChars": 384.0,
+        "maxReviewChars": 474.0,
+        "completePairComparisons": 3,
+        "agreesWithOtherJudgesMajority": 0,
+        "disagreesWithOtherJudgesMajority": 3,
+        "otherJudgesTiedOrAbsent": 0
+      },
+      "firstRoundScale": [],
+      "numericWeights": null,
+      "identityStatus": "provisional_alias_merge",
+      "possibleAliasOf": null
+    }
+  ]
+}

@@ -1,12 +1,12 @@
-import {beatResultSeed} from './beat-result.js?rev=43';
-import {battleRandom} from './battle-seeding.js?rev=43';
+import {beatResultSeed} from './beat-result.js?rev=49';
+import {battleRandom} from './battle-seeding.js?rev=49';
 import {validGameMinute} from './game-minute.js?rev=43';
-import {ensureTournament,advanceTournament,completeTournamentRound} from './battle-tournament.js?rev=47';
+import {ensureTournament,advanceTournament,completeTournamentRound} from './battle-tournament.js?rev=57';
 import {judgeProfile} from './judge-profiles.js?rev=43';
 import {battleFormat} from './battle-format.js?rev=43';
-import {generateJudgeReview} from './judge-comments.js?rev=43';
+import {generateJudgeReview} from './judge-comments.js?rev=49';
 import {SOCIAL_IDENTITY} from './social-identity.js?rev=43';
-import {selectRoundLtr} from './battle-round-awards.js?rev=43';
+import {selectRoundLtr} from './battle-round-awards.js?rev=49';
 const clone=v=>structuredClone(v),battleId='makarevich-1',order=(a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id);
 export function advanceJudgeClock(raw,{deadline,judgeIds,seed,nowMinute,roll,publishedAtByJudge={},notBefore=0}={}){
  const clock=raw?clone(raw):{policyVersion:2,checkedHour:6,completed:{}},ready=[];
@@ -27,7 +27,12 @@ function judgeBatch(input,round,judgeId,at){
  if(!judge||!format)throw Error('Не найден сохранённый состав судей.');
  for(const [participantId,versionId]of Object.entries(round.submissions).sort(([a],[b])=>a.localeCompare(b))){
   const version=input.trackVersions.byId[versionId],pair=round.pairs.find(p=>p.participantIds.includes(participantId)),opponentId=pair?.technical?.kind==='judged'?pair.participantIds.find(id=>id!==participantId):null,opponent=input.trackVersions.byId[round.submissions[opponentId]]??null;
-  const prior=Object.values(judging.results).find(r=>r.battleId===battleId&&r.roundId===round.roundId&&r.trackVersionId===versionId&&r.judgeId===judgeId);
+  let prior=Object.values(judging.results).find(r=>r.battleId===battleId&&r.roundId===round.roundId&&r.trackVersionId===versionId&&r.judgeId===judgeId);
+  // Recovering a missing side changes a technical pass into an actual pair.
+  // The old unopposed grade cannot serve as that opponent's binary vote.
+  if(prior&&(prior.opponentTrackVersionId??null)!==(opponent?.id??null)){
+   delete judging.results[prior.id];judging.history=judging.history.filter(r=>r.id!==prior.id);prior=null;
+  }
   const generated=prior?{result:prior,history:judging.history}:generateJudgeReview({version,judge,format,opponent,pairTieSeed:round.id},{seed:[round.id,judgeId,participantId].join(':'),history:judging.history,copyHistory:false});
   if(!generated.result||generated.diagnostics?.unsupportedClaims.length)throw Error('Не удалось сформировать подтверждённый отзыв: '+judgeId);
   const result=generated.result;judging.results[result.id]=result;judging.history=generated.history;resultIds.push(result.id);
@@ -39,12 +44,22 @@ export function advanceRoundJudging(input,{battleId:id=battleId,roundId,nowMinut
  const original=input.tournaments?.byId?.[id],source=original?.rounds?.[roundId],unchanged={state:input,events:[],changed:false};
  if(id!==battleId||source?.status!=='awaiting_judges')return unchanged;
  const submission=input.battleSubmissions?.find(s=>s.windowId===source.id),publishedAtByJudge=Object.fromEntries((input.socialRuntime?.events??[]).filter(e=>e.type==='judge-review'&&e.entityId===submission?.id).map(e=>[e.judgeId,e.dueAt]));
- const advanced=advanceJudgeClock(source.judgingClock,{deadline:source.closesAt,judgeIds:source.judgeIds,seed:original.seed+':'+roundId,nowMinute,roll,publishedAtByJudge,notBefore:source.judgingMigration?.activatedAt??0});if(!advanced.changed)return unchanged;
+ const advanced=advanceJudgeClock(source.judgingClock,{deadline:source.closesAt,judgeIds:source.judgeIds,seed:original.seed+':'+roundId,nowMinute,roll,publishedAtByJudge,notBefore:source.judgingMigration?.activatedAt??0});
+ // A recovered timely submission joins the existing judge batches at their
+ // original publication times. Reuse all prior reviews; do not reroll a panel.
+ const heroId=source.submissions.player,heroPair=source.pairs.find(p=>p.participantIds.includes('player')&&p.technical?.kind==='judged');
+ const affected=heroPair?heroPair.participantIds:['player'];
+ const backfill=heroId?Object.values(source.judgeBatches??{}).filter(b=>b.publishedAt<=nowMinute&&affected.some(id=>{
+  const versionId=source.submissions[id],opponentId=heroPair?source.submissions[heroPair.participantIds.find(other=>other!==id)]:null;
+  return !b.resultIds.some(key=>{const r=input.judging?.results?.[key];return r?.trackVersionId===versionId&&(r.opponentTrackVersionId??null)===(opponentId??null);});
+ })).map(b=>({judgeId:b.judgeId,completedAt:b.publishedAt})):[];
+ for(const batch of backfill)if(!advanced.ready.some(r=>r.judgeId===batch.judgeId))advanced.ready.push(batch);
+ if(!advanced.changed&&!backfill.length)return unchanged;
  const t=clone(original),round=t.rounds[roundId];round.judgingClock=advanced.clock;round.judgeBatches??={};let state={...input,tournaments:{...input.tournaments,byId:{...input.tournaments.byId,[id]:t}}};const events=[];
  try{
   for(const {judgeId,completedAt}of advanced.ready){
    const made=judgeBatch(state,round,judgeId,completedAt);state=made.state;round.judgeBatches[judgeId]=made.batch;
-   events.push(event(round,'battle-judge-complete',completedAt,judgeId,{judgeId,resultIds:made.batch.resultIds,ltr:made.batch.ltr,text:judgeProfile(judgeId).name+' закончил судейство раунда.'}));
+   if(!source.judgeBatches?.[judgeId])events.push(event(round,'battle-judge-complete',completedAt,judgeId,{judgeId,resultIds:made.batch.resultIds,ltr:made.batch.ltr,text:judgeProfile(judgeId).name+' закончил судейство раунда.'}));
    const hero=made.batch.resultIds.map(id=>state.judging.results[id]).find(r=>r.trackVersionId===round.submissions.player),submission=state.battleSubmissions?.find(s=>s.windowId===round.id);
    if(hero&&submission&&!(input.socialRuntime?.events??[]).some(e=>e.type==='judge-review'&&e.resultId===hero.id))events.push(event(round,'judge-review',completedAt,judgeId,{entityId:submission.id,trackVersionId:hero.trackVersionId,resultId:hero.id,judgeId,text:judgeProfile(judgeId).name+' оставил отзыв о твоей работе.'}));
   }

@@ -1,9 +1,12 @@
 import communities from '../data/social/communities.json' with {type:'json'};
 import profiles from '../data/social/profiles.json' with {type:'json'};
+import {GOBLIN_PROFILE} from './goblin-catalog.js?rev=57';
+import {FILYA_PROFILE} from './filya-catalog.js?rev=57';
+import {vityaLifeProfile} from './social-life-stories.js?rev=57';
 const copy=value=>JSON.parse(JSON.stringify(value));
 const freeze=value=>{if(value&&typeof value==='object'){Object.values(value).forEach(freeze);Object.freeze(value);}return value;};
 export const SOCIAL_COMMUNITIES=freeze(communities.map(c=>c.id==='makarevich-1'?{...c,avatar:{...c.avatar,src:'./assets/battle-covers/mak-cover-01.png'}}:c));
-export const SOCIAL_PROFILES=freeze(profiles);
+export const SOCIAL_PROFILES=freeze([...profiles.map(p=>p.id==='vitya'?vityaLifeProfile(p):p),GOBLIN_PROFILE,FILYA_PROFILE]);
 export const communityById=id=>{const c=SOCIAL_COMMUNITIES.find(c=>c.id===id);return c?copy(c):null;};
 export const profileById=id=>{const p=SOCIAL_PROFILES.find(p=>p.id===id);return p?copy(p):null;};
 export const SOCIAL_SECTIONS=freeze([['me','Моя страница'],['friends','Мои друзья'],['photos','Мои фотографии'],['audio','Мои аудиозаписи'],['messages','Мои сообщения'],['groups','Мои группы']]);

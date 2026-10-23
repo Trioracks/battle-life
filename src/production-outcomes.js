@@ -1,5 +1,5 @@
 // Realized production results. No current character skill is read during judging.
-import {creativeProfileAmount} from './audio-performance.js?rev=43';
+import {creativeProfileAmount} from './audio-performance.js?rev=49';
 import {normalizeContentMix} from './text-content-mix.js?rev=43';
 export const PRODUCTION_FAMILIES=Object.freeze([
  'text.clarity','text.theme','text.personal','text.rhymes','text.line_rhythm','text.complexity','text.images','text.originality','text.image_density',

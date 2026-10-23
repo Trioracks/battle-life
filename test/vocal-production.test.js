@@ -55,14 +55,14 @@ test('saved recording and post jobs on retired beats remain frozen without needs
 test('ready beat and ready text required; recording survives save and fixes one source',()=>{
  assert.equal(typeof v.startVocalWork,'function');let s=fixture();
  assert.equal(v.startVocalWork(s,{beatId:'b',kind:'draft',textId:'missing'}).ok,false);
- s=finish(s,'draft');const r=s.projects[0].recording;assert.ok(r.draft);assert.equal(r.clean,null);assert.equal(r.text.id,'t');assert.equal(r.sourceId,'vocal-11');
+ s=finish(s,'draft');const r=s.projects[0].recording;assert.ok(r.draft);assert.equal(r.clean,null);assert.equal(r.text.id,'t');assert.equal(r.sourceId,'vocal-36');
  assert.deepEqual(createVirtualPcState(JSON.parse(JSON.stringify(s))).projects[0].recording,r);
  s=finish(s,'clean');assert.equal(s.projects[0].recording.sourceId,r.sourceId);assert.ok(s.projects[0].recording.clean.quality>r.draft.quality);
  assert.equal(v.startVocalWork(s,{beatId:'b',kind:'draft'}).ok,false);assert.equal(v.startVocalWork(s,{beatId:'b',kind:'clean'}).ok,false);
 });
 
 test('new vocal exports can be selected and stay attached after saving and a clean take',()=>{
- let s=fixture();const started=v.startVocalWork(s,{beatId:'b',textId:'t',kind:'draft'},{},()=>.999999);
+ let s=fixture();const started=v.startVocalWork(s,{beatId:'b',textId:'t',kind:'draft'},{},()=>.05);
  assert.equal(started.ok,true);assert.equal(started.state.recording.job.output.sourceId,'vocal-54');
  s=v.advanceVocalWork(started.state,1000).state;
  s=createVirtualPcState(JSON.parse(JSON.stringify(s)));s=finish(s,'clean');

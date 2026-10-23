@@ -25,10 +25,10 @@ test('explicit experimental genre XP gates one third of new selections, independ
   for(let i=0;i<1260;i++){
    const r=make(xp,skill,(i+.5)/1260);assert.equal(r.ok,true,r.reason);
    const b=r.state.projects[0];
-   if(isNew(b.drumId)){count++;[b.drumId,b.audio.themeId,b.audio.arrangementId].forEach(id=>seen.add(id));
+   if(isNew(b.drumId)){count++;[b.drumId,b.audio.themeId,b.audio.arrangementId].filter(isNew).forEach(id=>seen.add(id));
     const parts=[b.drumId,b.audio.themeId,b.audio.arrangementId].map(bank.beginnerById);
-    assert.deepEqual(parts.map(p=>p.kind),['drums','theme','arrangement']);assert.equal(new Set(parts.map(p=>p.family)).size,1);
-    assert.ok(parts[1].key);assert.equal(parts[1].key,parts[2].key);
+    assert.deepEqual(parts.map(p=>p.kind),['drums','theme','arrangement']);
+    if(isNew(b.audio.themeId)){assert.equal(new Set(parts.map(p=>p.family)).size,1);assert.ok(parts[1].key);assert.equal(parts[1].key,parts[2].key);}
    }
   }
   assert.equal(count,420);

@@ -5,7 +5,8 @@ import {DRUMS} from '../src/beat-catalog.js';
 import {beginnerById} from '../src/beat-beginner-bank.js';
 import {createBeat,startBeatStage,advanceBeatWork,acquireDrum,restoreMusicNeeds,installRipline,cleanMusicVirus} from '../src/beat-production.js?rev=28';
 const seed=()=>createVirtualPcState({power:'on',download:{status:'installed'}});
-const make=(state=seed(),skill=10,assetId=null)=>createBeat(state,{id:'beat-1',name:'Ночной двор',assetId},{beatmaking:skill},()=>.4).state;
+// Explicit unmarked archive fixtures retain the original one-point reward policy.
+const make=(state=seed(),skill=10,assetId=null)=>{const s=createBeat(state,{id:'beat-1',name:'Ночной двор',assetId},{beatmaking:skill},()=>.4).state;delete s.projects.at(-1).practicePolicy;return s;};
 
 test('new beats default to experimental at every skill level, including practice alias',()=>{
  for(const skill of [0,25,26,40,100])for(const genre of [undefined,'practice','experimental']){
@@ -57,7 +58,7 @@ test('partial job survives normalization, resumes without reset and rewards once
 
 test('working half a stage awards one sixth practice immediately and preserves its quality snapshot',()=>{
  let s=make();s.projects[0].genre='boombap';s.music.practice=2.5;s.music.genrePractice.boombap=7.25;
- s=startBeatStage(s,'beat-1',[5,5,5],{beatmaking:10}).state;
+ s=startBeatStage(s,'beat-1',[5,5,5],{beatmaking:10,sound:10}).state;
  const snapshot=structuredClone(s.projects[0].mix);
  const r=advanceBeatWork(s,s.music.job.total/2);
  assert.ok(Math.abs(r.state.music.practice-2.6666666666666665)<1e-10);

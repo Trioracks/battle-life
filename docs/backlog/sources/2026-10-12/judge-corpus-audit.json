@@ -1,0 +1,1019 @@
+{
+  "generated": "2026-10-12",
+  "rawNotes": 1430,
+  "rawObservationCells": 2019,
+  "canonicalObservationCells": 1519,
+  "duplicateFirstRoundCells": 500,
+  "duplicateFirstRoundValueConflicts": [],
+  "duplicateFirstRoundTextConflicts": [],
+  "noteKinds": [
+    {
+      "kind": "judge_general_note",
+      "count": 7
+    },
+    {
+      "kind": "participant_review",
+      "count": 1423
+    }
+  ],
+  "canonicalNotes": 1037,
+  "canonicalParticipantReviewNotes": 1031,
+  "identicalPairTextGroups": [
+    {
+      "refs": [
+        "2 РАУНД!F45",
+        "2 РАУНД!F46"
+      ],
+      "judge": "свиноферма",
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "count": 2
+    },
+    {
+      "refs": [
+        "2 РАУНД!F6",
+        "2 РАУНД!F7"
+      ],
+      "judge": "свиноферма",
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "count": 2
+    },
+    {
+      "refs": [
+        "5 РАУНД!T3",
+        "5 РАУНД!T4"
+      ],
+      "judge": "гексмалыш",
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "5 РАУНД!T6",
+        "5 РАУНД!T7"
+      ],
+      "judge": "гексмалыш",
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "count": 2
+    },
+    {
+      "refs": [
+        "5 РАУНД!S3",
+        "5 РАУНД!S4"
+      ],
+      "judge": "охуенно культурный",
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "5 РАУНД!S6",
+        "5 РАУНД!S7"
+      ],
+      "judge": "охуенно культурный",
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "count": 2
+    },
+    {
+      "refs": [
+        "5 РАУНД!W3",
+        "5 РАУНД!W4"
+      ],
+      "judge": "zoo in space",
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "5 РАУНД!W6",
+        "5 РАУНД!W7"
+      ],
+      "judge": "zoo in space",
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "count": 2
+    },
+    {
+      "refs": [
+        "ФИНАЛ!O3",
+        "ФИНАЛ!O4"
+      ],
+      "judge": "гексмалыш",
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "ФИНАЛ!D3",
+        "ФИНАЛ!D4"
+      ],
+      "judge": "свиноферма",
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "ФИНАЛ!R3",
+        "ФИНАЛ!R4"
+      ],
+      "judge": "alx beats",
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "ФИНАЛ!L3",
+        "ФИНАЛ!L4"
+      ],
+      "judge": "dead rave",
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "ФИНАЛ!N3",
+        "ФИНАЛ!N4"
+      ],
+      "judge": "whitespruce",
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "count": 2
+    },
+    {
+      "refs": [
+        "ФИНАЛ!S3",
+        "ФИНАЛ!S4"
+      ],
+      "judge": "zoo in space",
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "count": 2
+    }
+  ],
+  "aliasPolicy": "Transliteration/typo merges are provisional. ок remains separate; possibleAliasOf=охуенно культурный.",
+  "coverage": [
+    {
+      "judgeKey": "атака трупа",
+      "labels": [
+        "атака трупа"
+      ],
+      "appearances": 101,
+      "numericValues": 101,
+      "reviewNotes": 0,
+      "generalNotes": 0,
+      "reviewChars": 0,
+      "rounds": [
+        "1 РАУНД",
+        "1 РАУНД (СВОДНАЯ)"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "гексмалыш",
+      "labels": [
+        "гексмалыш"
+      ],
+      "appearances": 14,
+      "numericValues": 14,
+      "reviewNotes": 12,
+      "generalNotes": 1,
+      "reviewChars": 2650,
+      "rounds": [
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "гешуль",
+      "labels": [
+        "гешуль"
+      ],
+      "appearances": 2,
+      "numericValues": 2,
+      "reviewNotes": 2,
+      "generalNotes": 0,
+      "reviewChars": 2773,
+      "rounds": [
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "доббро",
+      "labels": [
+        "доббро"
+      ],
+      "appearances": 2,
+      "numericValues": 2,
+      "reviewNotes": 2,
+      "generalNotes": 0,
+      "reviewChars": 471,
+      "rounds": [
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "епархия",
+      "labels": [
+        "епархия"
+      ],
+      "appearances": 163,
+      "numericValues": 157,
+      "reviewNotes": 155,
+      "generalNotes": 0,
+      "reviewChars": 17932,
+      "rounds": [
+        "1 РАУНД",
+        "1 РАУНД (СВОДНАЯ)",
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "клим пропавший",
+      "labels": [
+        "клим пропавший"
+      ],
+      "appearances": 161,
+      "numericValues": 155,
+      "reviewNotes": 150,
+      "generalNotes": 1,
+      "reviewChars": 11850,
+      "rounds": [
+        "1 РАУНД",
+        "1 РАУНД (СВОДНАЯ)",
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "козачок",
+      "labels": [
+        "козачок"
+      ],
+      "appearances": 62,
+      "numericValues": 56,
+      "reviewNotes": 35,
+      "generalNotes": 0,
+      "reviewChars": 3707,
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "мц варг пиночетский",
+      "labels": [
+        "мц варг пиночетский"
+      ],
+      "appearances": 2,
+      "numericValues": 2,
+      "reviewNotes": 2,
+      "generalNotes": 0,
+      "reviewChars": 1594,
+      "rounds": [
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "мц онегин",
+      "labels": [
+        "мц онегин"
+      ],
+      "appearances": 62,
+      "numericValues": 56,
+      "reviewNotes": 54,
+      "generalNotes": 1,
+      "reviewChars": 6708,
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "нагвальный",
+      "labels": [
+        "нагвальный"
+      ],
+      "appearances": 58,
+      "numericValues": 52,
+      "reviewNotes": 44,
+      "generalNotes": 0,
+      "reviewChars": 18698,
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "ок",
+      "labels": [
+        "ок"
+      ],
+      "appearances": 2,
+      "numericValues": 2,
+      "reviewNotes": 2,
+      "generalNotes": 0,
+      "reviewChars": 736,
+      "rounds": [
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": "охуенно культурный"
+    },
+    {
+      "judgeKey": "охуенно культурный",
+      "labels": [
+        "охуенно культурный"
+      ],
+      "appearances": 12,
+      "numericValues": 12,
+      "reviewNotes": 10,
+      "generalNotes": 0,
+      "reviewChars": 989,
+      "rounds": [
+        "4 РАУНД",
+        "5 РАУНД"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "рыцарь таверны",
+      "labels": [
+        "рыцарь таверны"
+      ],
+      "appearances": 12,
+      "numericValues": 12,
+      "reviewNotes": 6,
+      "generalNotes": 0,
+      "reviewChars": 692,
+      "rounds": [
+        "4 РАУНД",
+        "5 РАУНД"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "свиноферма",
+      "labels": [
+        "свиноферма"
+      ],
+      "appearances": 163,
+      "numericValues": 157,
+      "reviewNotes": 148,
+      "generalNotes": 0,
+      "reviewChars": 14982,
+      "rounds": [
+        "1 РАУНД",
+        "1 РАУНД (СВОДНАЯ)",
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "тридцать третий",
+      "labels": [
+        "тридцать третий"
+      ],
+      "appearances": 163,
+      "numericValues": 157,
+      "reviewNotes": 154,
+      "generalNotes": 0,
+      "reviewChars": 135426,
+      "rounds": [
+        "1 РАУНД",
+        "1 РАУНД (СВОДНАЯ)",
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "херова жесть",
+      "labels": [
+        "Херова Жесть"
+      ],
+      "appearances": 6,
+      "numericValues": 6,
+      "reviewNotes": 2,
+      "generalNotes": 0,
+      "reviewChars": 297,
+      "rounds": [
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "abstract postmodern!",
+      "labels": [
+        "abstract postmodern!"
+      ],
+      "appearances": 60,
+      "numericValues": 54,
+      "reviewNotes": 3,
+      "generalNotes": 1,
+      "reviewChars": 63,
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "alx beats",
+      "labels": [
+        "алкс битс",
+        "Alx Beats"
+      ],
+      "appearances": 6,
+      "numericValues": 6,
+      "reviewNotes": 2,
+      "generalNotes": 0,
+      "reviewChars": 482,
+      "rounds": [
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "benarfa",
+      "labels": [
+        "бен арфа",
+        "BenArfa"
+      ],
+      "appearances": 6,
+      "numericValues": 6,
+      "reviewNotes": 2,
+      "generalNotes": 0,
+      "reviewChars": 205,
+      "rounds": [
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "cenobite",
+      "labels": [
+        "сенобит",
+        "cenobite"
+      ],
+      "appearances": 62,
+      "numericValues": 56,
+      "reviewNotes": 8,
+      "generalNotes": 2,
+      "reviewChars": 3304,
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "cyber olegi",
+      "labels": [
+        "кибер олежа",
+        "cyber olegi"
+      ],
+      "appearances": 62,
+      "numericValues": 56,
+      "reviewNotes": 49,
+      "generalNotes": 0,
+      "reviewChars": 8876,
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "dead rave",
+      "labels": [
+        "дед рейв",
+        "dead rave"
+      ],
+      "appearances": 54,
+      "numericValues": 48,
+      "reviewNotes": 28,
+      "generalNotes": 0,
+      "reviewChars": 1160,
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "jakorja",
+      "labels": [
+        "jakorja"
+      ],
+      "appearances": 60,
+      "numericValues": 54,
+      "reviewNotes": 29,
+      "generalNotes": 0,
+      "reviewChars": 13881,
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "kosh (spacecave)",
+      "labels": [
+        "кош",
+        "kosh (SpaceCave)"
+      ],
+      "appearances": 30,
+      "numericValues": 27,
+      "reviewNotes": 22,
+      "generalNotes": 0,
+      "reviewChars": 2314,
+      "rounds": [
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "nedonebo",
+      "labels": [
+        "nedonebo"
+      ],
+      "appearances": 60,
+      "numericValues": 28,
+      "reviewNotes": 18,
+      "generalNotes": 0,
+      "reviewChars": 2149,
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "pavelunderground",
+      "labels": [
+        "павел андерграунд",
+        "PavelUndergeound",
+        "PavelUnderground"
+      ],
+      "appearances": 62,
+      "numericValues": 56,
+      "reviewNotes": 52,
+      "generalNotes": 0,
+      "reviewChars": 2459,
+      "rounds": [
+        "2 РАУНД",
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "prikol'chique",
+      "labels": [
+        "prikol'chique"
+      ],
+      "appearances": 28,
+      "numericValues": 25,
+      "reviewNotes": 16,
+      "generalNotes": 0,
+      "reviewChars": 522,
+      "rounds": [
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "svetokron",
+      "labels": [
+        "svetokron"
+      ],
+      "appearances": 8,
+      "numericValues": 8,
+      "reviewNotes": 4,
+      "generalNotes": 0,
+      "reviewChars": 1393,
+      "rounds": [
+        "4 РАУНД"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "whitespruce",
+      "labels": [
+        "вайтспрус",
+        "whitespruce"
+      ],
+      "appearances": 30,
+      "numericValues": 27,
+      "reviewNotes": 14,
+      "generalNotes": 0,
+      "reviewChars": 983,
+      "rounds": [
+        "3 РАУНД",
+        "4 РАУНД",
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    },
+    {
+      "judgeKey": "zoo in space",
+      "labels": [
+        "зу ин спейс",
+        "zoo in space"
+      ],
+      "appearances": 6,
+      "numericValues": 6,
+      "reviewNotes": 6,
+      "generalNotes": 0,
+      "reviewChars": 2664,
+      "rounds": [
+        "5 РАУНД",
+        "ФИНАЛ"
+      ],
+      "possibleAliasOf": null
+    }
+  ],
+  "firstRoundScoreStats": [
+    {
+      "judgeKey": "атака трупа",
+      "n": 100,
+      "mean": 3.84,
+      "median": 4.0,
+      "min": 0.0,
+      "max": 10.0,
+      "zeroCount": 8,
+      "meanDifferenceFromOtherFour": -2.6525,
+      "distribution": [
+        {
+          "score": 0.0,
+          "count": 8
+        },
+        {
+          "score": 2.0,
+          "count": 26
+        },
+        {
+          "score": 3.0,
+          "count": 15
+        },
+        {
+          "score": 4.0,
+          "count": 18
+        },
+        {
+          "score": 5.0,
+          "count": 10
+        },
+        {
+          "score": 6.0,
+          "count": 7
+        },
+        {
+          "score": 7.0,
+          "count": 8
+        },
+        {
+          "score": 8.0,
+          "count": 6
+        },
+        {
+          "score": 9.0,
+          "count": 1
+        },
+        {
+          "score": 10.0,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "judgeKey": "епархия",
+      "n": 100,
+      "mean": 6.425,
+      "median": 7.0,
+      "min": 0.0,
+      "max": 10.0,
+      "zeroCount": 3,
+      "meanDifferenceFromOtherFour": 0.57875,
+      "distribution": [
+        {
+          "score": 0.0,
+          "count": 3
+        },
+        {
+          "score": 1.0,
+          "count": 2
+        },
+        {
+          "score": 2.0,
+          "count": 1
+        },
+        {
+          "score": 2.5,
+          "count": 2
+        },
+        {
+          "score": 3.0,
+          "count": 5
+        },
+        {
+          "score": 3.5,
+          "count": 1
+        },
+        {
+          "score": 4.0,
+          "count": 5
+        },
+        {
+          "score": 4.5,
+          "count": 5
+        },
+        {
+          "score": 5.0,
+          "count": 9
+        },
+        {
+          "score": 5.5,
+          "count": 7
+        },
+        {
+          "score": 6.0,
+          "count": 5
+        },
+        {
+          "score": 6.5,
+          "count": 1
+        },
+        {
+          "score": 7.0,
+          "count": 11
+        },
+        {
+          "score": 7.5,
+          "count": 9
+        },
+        {
+          "score": 8.0,
+          "count": 8
+        },
+        {
+          "score": 8.5,
+          "count": 6
+        },
+        {
+          "score": 9.0,
+          "count": 7
+        },
+        {
+          "score": 10.0,
+          "count": 13
+        }
+      ]
+    },
+    {
+      "judgeKey": "клим пропавший",
+      "n": 100,
+      "mean": 5.88,
+      "median": 6.0,
+      "min": 0.0,
+      "max": 10.0,
+      "zeroCount": 1,
+      "meanDifferenceFromOtherFour": -0.1025,
+      "distribution": [
+        {
+          "score": 0.0,
+          "count": 1
+        },
+        {
+          "score": 1.0,
+          "count": 6
+        },
+        {
+          "score": 2.0,
+          "count": 6
+        },
+        {
+          "score": 3.0,
+          "count": 8
+        },
+        {
+          "score": 4.0,
+          "count": 7
+        },
+        {
+          "score": 5.0,
+          "count": 10
+        },
+        {
+          "score": 6.0,
+          "count": 16
+        },
+        {
+          "score": 7.0,
+          "count": 22
+        },
+        {
+          "score": 8.0,
+          "count": 6
+        },
+        {
+          "score": 9.0,
+          "count": 10
+        },
+        {
+          "score": 10.0,
+          "count": 8
+        }
+      ]
+    },
+    {
+      "judgeKey": "свиноферма",
+      "n": 100,
+      "mean": 6.9,
+      "median": 7.0,
+      "min": 4.0,
+      "max": 10.0,
+      "zeroCount": 0,
+      "meanDifferenceFromOtherFour": 1.1725,
+      "distribution": [
+        {
+          "score": 4.0,
+          "count": 4
+        },
+        {
+          "score": 5.0,
+          "count": 12
+        },
+        {
+          "score": 6.0,
+          "count": 18
+        },
+        {
+          "score": 7.0,
+          "count": 38
+        },
+        {
+          "score": 8.0,
+          "count": 18
+        },
+        {
+          "score": 9.0,
+          "count": 4
+        },
+        {
+          "score": 10.0,
+          "count": 6
+        }
+      ]
+    },
+    {
+      "judgeKey": "тридцать третий",
+      "n": 100,
+      "mean": 6.765,
+      "median": 7.0,
+      "min": 0.0,
+      "max": 10.0,
+      "zeroCount": 1,
+      "meanDifferenceFromOtherFour": 1.00375,
+      "distribution": [
+        {
+          "score": 0.0,
+          "count": 1
+        },
+        {
+          "score": 1.0,
+          "count": 1
+        },
+        {
+          "score": 2.0,
+          "count": 3
+        },
+        {
+          "score": 2.5,
+          "count": 1
+        },
+        {
+          "score": 3.0,
+          "count": 1
+        },
+        {
+          "score": 3.5,
+          "count": 3
+        },
+        {
+          "score": 4.0,
+          "count": 4
+        },
+        {
+          "score": 4.5,
+          "count": 5
+        },
+        {
+          "score": 5.0,
+          "count": 3
+        },
+        {
+          "score": 5.5,
+          "count": 5
+        },
+        {
+          "score": 6.0,
+          "count": 7
+        },
+        {
+          "score": 6.5,
+          "count": 13
+        },
+        {
+          "score": 7.0,
+          "count": 10
+        },
+        {
+          "score": 7.5,
+          "count": 8
+        },
+        {
+          "score": 8.0,
+          "count": 7
+        },
+        {
+          "score": 8.5,
+          "count": 8
+        },
+        {
+          "score": 9.0,
+          "count": 8
+        },
+        {
+          "score": 10.0,
+          "count": 12
+        }
+      ]
+    }
+  ]
+}

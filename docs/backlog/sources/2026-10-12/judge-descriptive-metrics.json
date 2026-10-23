@@ -1,0 +1,5974 @@
+{
+  "generated": "2026-10-12",
+  "methodology": "Only two observed complementary 0/1 values count as a comparison. Majority excludes current judge and collective НАРОД; a majority is not ground truth. Counts are descriptive; no preference weights inferred.",
+  "judges": [
+    {
+      "judgeKey": "атака трупа",
+      "reviewNotes": 0,
+      "medianReviewChars": null,
+      "minReviewChars": null,
+      "maxReviewChars": null,
+      "completePairComparisons": 0,
+      "agreesWithOtherJudgesMajority": 0,
+      "disagreesWithOtherJudgesMajority": 0,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "гексмалыш",
+      "reviewNotes": 12,
+      "medianReviewChars": 172.5,
+      "minReviewChars": 117.0,
+      "maxReviewChars": 537.0,
+      "completePairComparisons": 7,
+      "agreesWithOtherJudgesMajority": 7,
+      "disagreesWithOtherJudgesMajority": 0,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "гешуль",
+      "reviewNotes": 2,
+      "medianReviewChars": 1386.5,
+      "minReviewChars": 1189.0,
+      "maxReviewChars": 1584.0,
+      "completePairComparisons": 1,
+      "agreesWithOtherJudgesMajority": 0,
+      "disagreesWithOtherJudgesMajority": 1,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "доббро",
+      "reviewNotes": 2,
+      "medianReviewChars": 235.5,
+      "minReviewChars": 172.0,
+      "maxReviewChars": 299.0,
+      "completePairComparisons": 1,
+      "agreesWithOtherJudgesMajority": 1,
+      "disagreesWithOtherJudgesMajority": 0,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "епархия",
+      "reviewNotes": 155,
+      "medianReviewChars": 70,
+      "minReviewChars": 3.0,
+      "maxReviewChars": 694.0,
+      "completePairComparisons": 25,
+      "agreesWithOtherJudgesMajority": 16,
+      "disagreesWithOtherJudgesMajority": 7,
+      "otherJudgesTiedOrAbsent": 2
+    },
+    {
+      "judgeKey": "клим пропавший",
+      "reviewNotes": 150,
+      "medianReviewChars": 57.5,
+      "minReviewChars": 5.0,
+      "maxReviewChars": 490.0,
+      "completePairComparisons": 24,
+      "agreesWithOtherJudgesMajority": 17,
+      "disagreesWithOtherJudgesMajority": 5,
+      "otherJudgesTiedOrAbsent": 2
+    },
+    {
+      "judgeKey": "козачок",
+      "reviewNotes": 35,
+      "medianReviewChars": 93,
+      "minReviewChars": 24.0,
+      "maxReviewChars": 235.0,
+      "completePairComparisons": 25,
+      "agreesWithOtherJudgesMajority": 19,
+      "disagreesWithOtherJudgesMajority": 4,
+      "otherJudgesTiedOrAbsent": 2
+    },
+    {
+      "judgeKey": "мц варг пиночетский",
+      "reviewNotes": 2,
+      "medianReviewChars": 797,
+      "minReviewChars": 493.0,
+      "maxReviewChars": 1101.0,
+      "completePairComparisons": 1,
+      "agreesWithOtherJudgesMajority": 0,
+      "disagreesWithOtherJudgesMajority": 1,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "мц онегин",
+      "reviewNotes": 54,
+      "medianReviewChars": 103,
+      "minReviewChars": 12.0,
+      "maxReviewChars": 425.0,
+      "completePairComparisons": 25,
+      "agreesWithOtherJudgesMajority": 15,
+      "disagreesWithOtherJudgesMajority": 9,
+      "otherJudgesTiedOrAbsent": 1
+    },
+    {
+      "judgeKey": "нагвальный",
+      "reviewNotes": 44,
+      "medianReviewChars": 214.5,
+      "minReviewChars": 6.0,
+      "maxReviewChars": 2256.0,
+      "completePairComparisons": 23,
+      "agreesWithOtherJudgesMajority": 14,
+      "disagreesWithOtherJudgesMajority": 8,
+      "otherJudgesTiedOrAbsent": 1
+    },
+    {
+      "judgeKey": "ок",
+      "reviewNotes": 2,
+      "medianReviewChars": 368,
+      "minReviewChars": 358.0,
+      "maxReviewChars": 378.0,
+      "completePairComparisons": 1,
+      "agreesWithOtherJudgesMajority": 1,
+      "disagreesWithOtherJudgesMajority": 0,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "охуенно культурный",
+      "reviewNotes": 10,
+      "medianReviewChars": 95.5,
+      "minReviewChars": 49.0,
+      "maxReviewChars": 130.0,
+      "completePairComparisons": 6,
+      "agreesWithOtherJudgesMajority": 4,
+      "disagreesWithOtherJudgesMajority": 2,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "рыцарь таверны",
+      "reviewNotes": 6,
+      "medianReviewChars": 110.5,
+      "minReviewChars": 10.0,
+      "maxReviewChars": 204.0,
+      "completePairComparisons": 6,
+      "agreesWithOtherJudgesMajority": 4,
+      "disagreesWithOtherJudgesMajority": 2,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "свиноферма",
+      "reviewNotes": 148,
+      "medianReviewChars": 80.5,
+      "minReviewChars": 7.0,
+      "maxReviewChars": 342.0,
+      "completePairComparisons": 25,
+      "agreesWithOtherJudgesMajority": 16,
+      "disagreesWithOtherJudgesMajority": 6,
+      "otherJudgesTiedOrAbsent": 3
+    },
+    {
+      "judgeKey": "тридцать третий",
+      "reviewNotes": 154,
+      "medianReviewChars": 798,
+      "minReviewChars": 42.0,
+      "maxReviewChars": 1767.0,
+      "completePairComparisons": 25,
+      "agreesWithOtherJudgesMajority": 19,
+      "disagreesWithOtherJudgesMajority": 4,
+      "otherJudgesTiedOrAbsent": 2
+    },
+    {
+      "judgeKey": "херова жесть",
+      "reviewNotes": 2,
+      "medianReviewChars": 148.5,
+      "minReviewChars": 102.0,
+      "maxReviewChars": 195.0,
+      "completePairComparisons": 3,
+      "agreesWithOtherJudgesMajority": 3,
+      "disagreesWithOtherJudgesMajority": 0,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "abstract postmodern!",
+      "reviewNotes": 3,
+      "medianReviewChars": 18,
+      "minReviewChars": 9.0,
+      "maxReviewChars": 36.0,
+      "completePairComparisons": 24,
+      "agreesWithOtherJudgesMajority": 16,
+      "disagreesWithOtherJudgesMajority": 6,
+      "otherJudgesTiedOrAbsent": 2
+    },
+    {
+      "judgeKey": "alx beats",
+      "reviewNotes": 2,
+      "medianReviewChars": 241,
+      "minReviewChars": 241.0,
+      "maxReviewChars": 241.0,
+      "completePairComparisons": 3,
+      "agreesWithOtherJudgesMajority": 2,
+      "disagreesWithOtherJudgesMajority": 1,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "benarfa",
+      "reviewNotes": 2,
+      "medianReviewChars": 102.5,
+      "minReviewChars": 43.0,
+      "maxReviewChars": 162.0,
+      "completePairComparisons": 3,
+      "agreesWithOtherJudgesMajority": 2,
+      "disagreesWithOtherJudgesMajority": 1,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "cenobite",
+      "reviewNotes": 8,
+      "medianReviewChars": 417.5,
+      "minReviewChars": 164.0,
+      "maxReviewChars": 587.0,
+      "completePairComparisons": 25,
+      "agreesWithOtherJudgesMajority": 15,
+      "disagreesWithOtherJudgesMajority": 9,
+      "otherJudgesTiedOrAbsent": 1
+    },
+    {
+      "judgeKey": "cyber olegi",
+      "reviewNotes": 49,
+      "medianReviewChars": 108,
+      "minReviewChars": 19.0,
+      "maxReviewChars": 734.0,
+      "completePairComparisons": 25,
+      "agreesWithOtherJudgesMajority": 18,
+      "disagreesWithOtherJudgesMajority": 6,
+      "otherJudgesTiedOrAbsent": 1
+    },
+    {
+      "judgeKey": "dead rave",
+      "reviewNotes": 28,
+      "medianReviewChars": 33,
+      "minReviewChars": 7.0,
+      "maxReviewChars": 121.0,
+      "completePairComparisons": 21,
+      "agreesWithOtherJudgesMajority": 14,
+      "disagreesWithOtherJudgesMajority": 5,
+      "otherJudgesTiedOrAbsent": 2
+    },
+    {
+      "judgeKey": "jakorja",
+      "reviewNotes": 29,
+      "medianReviewChars": 333,
+      "minReviewChars": 119.0,
+      "maxReviewChars": 1306.0,
+      "completePairComparisons": 24,
+      "agreesWithOtherJudgesMajority": 16,
+      "disagreesWithOtherJudgesMajority": 7,
+      "otherJudgesTiedOrAbsent": 1
+    },
+    {
+      "judgeKey": "kosh (spacecave)",
+      "reviewNotes": 22,
+      "medianReviewChars": 78.5,
+      "minReviewChars": 5.0,
+      "maxReviewChars": 353.0,
+      "completePairComparisons": 12,
+      "agreesWithOtherJudgesMajority": 8,
+      "disagreesWithOtherJudgesMajority": 4,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "nedonebo",
+      "reviewNotes": 18,
+      "medianReviewChars": 106.5,
+      "minReviewChars": 32.0,
+      "maxReviewChars": 222.0,
+      "completePairComparisons": 11,
+      "agreesWithOtherJudgesMajority": 9,
+      "disagreesWithOtherJudgesMajority": 2,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "pavelunderground",
+      "reviewNotes": 52,
+      "medianReviewChars": 48.5,
+      "minReviewChars": 6.0,
+      "maxReviewChars": 115.0,
+      "completePairComparisons": 25,
+      "agreesWithOtherJudgesMajority": 17,
+      "disagreesWithOtherJudgesMajority": 7,
+      "otherJudgesTiedOrAbsent": 1
+    },
+    {
+      "judgeKey": "prikol'chique",
+      "reviewNotes": 16,
+      "medianReviewChars": 30,
+      "minReviewChars": 5.0,
+      "maxReviewChars": 87.0,
+      "completePairComparisons": 11,
+      "agreesWithOtherJudgesMajority": 8,
+      "disagreesWithOtherJudgesMajority": 3,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "svetokron",
+      "reviewNotes": 4,
+      "medianReviewChars": 337.5,
+      "minReviewChars": 264.0,
+      "maxReviewChars": 454.0,
+      "completePairComparisons": 4,
+      "agreesWithOtherJudgesMajority": 2,
+      "disagreesWithOtherJudgesMajority": 2,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "whitespruce",
+      "reviewNotes": 14,
+      "medianReviewChars": 42.5,
+      "minReviewChars": 10.0,
+      "maxReviewChars": 251.0,
+      "completePairComparisons": 12,
+      "agreesWithOtherJudgesMajority": 6,
+      "disagreesWithOtherJudgesMajority": 6,
+      "otherJudgesTiedOrAbsent": 0
+    },
+    {
+      "judgeKey": "zoo in space",
+      "reviewNotes": 6,
+      "medianReviewChars": 474,
+      "minReviewChars": 384.0,
+      "maxReviewChars": 474.0,
+      "completePairComparisons": 3,
+      "agreesWithOtherJudgesMajority": 0,
+      "disagreesWithOtherJudgesMajority": 3,
+      "otherJudgesTiedOrAbsent": 0
+    }
+  ],
+  "roundPairCoverage": [
+    {
+      "sheet": "2 РАУНД",
+      "statuses": [
+        {
+          "status": "complete_comparison",
+          "count": 169
+        },
+        {
+          "status": "no_values",
+          "count": 13
+        },
+        {
+          "status": "one_value_only",
+          "count": 42
+        }
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "statuses": [
+        {
+          "status": "complete_comparison",
+          "count": 85
+        },
+        {
+          "status": "one_value_only",
+          "count": 51
+        }
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "statuses": [
+        {
+          "status": "complete_comparison",
+          "count": 80
+        }
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "statuses": [
+        {
+          "status": "complete_comparison",
+          "count": 46
+        }
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "statuses": [
+        {
+          "status": "complete_comparison",
+          "count": 21
+        }
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "sheet": "2 РАУНД",
+      "pair": 1,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "Маста Витяй",
+      "refs": [
+        "2 РАУНД!B3",
+        "2 РАУНД!B4"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 1,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "Маста Витяй",
+      "refs": [
+        "2 РАУНД!C3",
+        "2 РАУНД!C4"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 1,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "Маста Витяй",
+      "refs": [
+        "2 РАУНД!I3",
+        "2 РАУНД!I4"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 1,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "Маста Витяй",
+      "refs": [
+        "2 РАУНД!J3",
+        "2 РАУНД!J4"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 1,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "ШАГ ВПРАВО",
+      "refs": [
+        "2 РАУНД!E3",
+        "2 РАУНД!E4"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 1,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "Маста Витяй",
+      "refs": [
+        "2 РАУНД!F3",
+        "2 РАУНД!F4"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 1,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "Маста Витяй",
+      "refs": [
+        "2 РАУНД!D3",
+        "2 РАУНД!D4"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 1,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "Маста Витяй",
+      "refs": [
+        "2 РАУНД!K3",
+        "2 РАУНД!K4"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 1,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "ШАГ ВПРАВО",
+      "refs": [
+        "2 РАУНД!L3",
+        "2 РАУНД!L4"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 1,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "ШАГ ВПРАВО",
+      "refs": [
+        "2 РАУНД!N3",
+        "2 РАУНД!N4"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 1,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "Маста Витяй",
+      "refs": [
+        "2 РАУНД!O3",
+        "2 РАУНД!O4"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 1,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "Маста Витяй",
+      "refs": [
+        "2 РАУНД!G3",
+        "2 РАУНД!G4"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 1,
+      "judgeKey": "nedonebo",
+      "status": "no_values",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H3",
+        "2 РАУНД!H4"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 1,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "Маста Витяй",
+      "refs": [
+        "2 РАУНД!M3",
+        "2 РАУНД!M4"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 10,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "2 РАУНД!B30",
+        "2 РАУНД!B31"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 10,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "2 РАУНД!C30",
+        "2 РАУНД!C31"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 10,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "2 РАУНД!I30",
+        "2 РАУНД!I31"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 10,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "2 РАУНД!J30",
+        "2 РАУНД!J31"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 10,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "2 РАУНД!E30",
+        "2 РАУНД!E31"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 10,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "2 РАУНД!F30",
+        "2 РАУНД!F31"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 10,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "мц эпигон",
+      "refs": [
+        "2 РАУНД!D30",
+        "2 РАУНД!D31"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 10,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "мц эпигон",
+      "refs": [
+        "2 РАУНД!K30",
+        "2 РАУНД!K31"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 10,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "мц эпигон",
+      "refs": [
+        "2 РАУНД!L30",
+        "2 РАУНД!L31"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 10,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "2 РАУНД!N30",
+        "2 РАУНД!N31"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 10,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "2 РАУНД!O30",
+        "2 РАУНД!O31"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 10,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "2 РАУНД!G30",
+        "2 РАУНД!G31"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 10,
+      "judgeKey": "nedonebo",
+      "status": "no_values",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H30",
+        "2 РАУНД!H31"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 10,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "2 РАУНД!M30",
+        "2 РАУНД!M31"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 11,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "ТК",
+      "refs": [
+        "2 РАУНД!B33",
+        "2 РАУНД!B34"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 11,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "2 РАУНД!C33",
+        "2 РАУНД!C34"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 11,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "ТК",
+      "refs": [
+        "2 РАУНД!I33",
+        "2 РАУНД!I34"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 11,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "2 РАУНД!J33",
+        "2 РАУНД!J34"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 11,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "2 РАУНД!E33",
+        "2 РАУНД!E34"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 11,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "ТК",
+      "refs": [
+        "2 РАУНД!F33",
+        "2 РАУНД!F34"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 11,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "2 РАУНД!D33",
+        "2 РАУНД!D34"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 11,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "2 РАУНД!K33",
+        "2 РАУНД!K34"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 11,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "2 РАУНД!L33",
+        "2 РАУНД!L34"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 11,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "2 РАУНД!N33",
+        "2 РАУНД!N34"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 11,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "2 РАУНД!O33",
+        "2 РАУНД!O34"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 11,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "2 РАУНД!G33",
+        "2 РАУНД!G34"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 11,
+      "judgeKey": "nedonebo",
+      "status": "no_values",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H33",
+        "2 РАУНД!H34"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 11,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "2 РАУНД!M33",
+        "2 РАУНД!M34"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 12,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "МЦ Пажылая Шляпа",
+      "refs": [
+        "2 РАУНД!B36",
+        "2 РАУНД!B37"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 12,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "северный юг",
+      "refs": [
+        "2 РАУНД!C36",
+        "2 РАУНД!C37"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 12,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "МЦ Пажылая Шляпа",
+      "refs": [
+        "2 РАУНД!I36",
+        "2 РАУНД!I37"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 12,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "северный юг",
+      "refs": [
+        "2 РАУНД!J36",
+        "2 РАУНД!J37"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 12,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "МЦ Пажылая Шляпа",
+      "refs": [
+        "2 РАУНД!E36",
+        "2 РАУНД!E37"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 12,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "МЦ Пажылая Шляпа",
+      "refs": [
+        "2 РАУНД!F36",
+        "2 РАУНД!F37"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 12,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "северный юг",
+      "refs": [
+        "2 РАУНД!D36",
+        "2 РАУНД!D37"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 12,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "МЦ Пажылая Шляпа",
+      "refs": [
+        "2 РАУНД!K36",
+        "2 РАУНД!K37"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 12,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "северный юг",
+      "refs": [
+        "2 РАУНД!L36",
+        "2 РАУНД!L37"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 12,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "МЦ Пажылая Шляпа",
+      "refs": [
+        "2 РАУНД!N36",
+        "2 РАУНД!N37"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 12,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "МЦ Пажылая Шляпа",
+      "refs": [
+        "2 РАУНД!O36",
+        "2 РАУНД!O37"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 12,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "северный юг",
+      "refs": [
+        "2 РАУНД!G36",
+        "2 РАУНД!G37"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 12,
+      "judgeKey": "nedonebo",
+      "status": "no_values",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H36",
+        "2 РАУНД!H37"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 12,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "северный юг",
+      "refs": [
+        "2 РАУНД!M36",
+        "2 РАУНД!M37"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 13,
+      "judgeKey": "епархия",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!B39",
+        "2 РАУНД!B40"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 13,
+      "judgeKey": "клим пропавший",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!C39",
+        "2 РАУНД!C40"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 13,
+      "judgeKey": "козачок",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!I39",
+        "2 РАУНД!I40"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 13,
+      "judgeKey": "мц онегин",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!J39",
+        "2 РАУНД!J40"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 13,
+      "judgeKey": "нагвальный",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!E39",
+        "2 РАУНД!E40"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 13,
+      "judgeKey": "свиноферма",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!F39",
+        "2 РАУНД!F40"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 13,
+      "judgeKey": "тридцать третий",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!D39",
+        "2 РАУНД!D40"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 13,
+      "judgeKey": "abstract postmodern!",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!K39",
+        "2 РАУНД!K40"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 13,
+      "judgeKey": "cenobite",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!L39",
+        "2 РАУНД!L40"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 13,
+      "judgeKey": "cyber olegi",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!N39",
+        "2 РАУНД!N40"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 13,
+      "judgeKey": "dead rave",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!O39",
+        "2 РАУНД!O40"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 13,
+      "judgeKey": "jakorja",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!G39",
+        "2 РАУНД!G40"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 13,
+      "judgeKey": "nedonebo",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H39",
+        "2 РАУНД!H40"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 13,
+      "judgeKey": "pavelunderground",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!M39",
+        "2 РАУНД!M40"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 14,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "южный север",
+      "refs": [
+        "2 РАУНД!B42",
+        "2 РАУНД!B43"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 14,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "южный север",
+      "refs": [
+        "2 РАУНД!C42",
+        "2 РАУНД!C43"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 14,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "говняный мальчик",
+      "refs": [
+        "2 РАУНД!I42",
+        "2 РАУНД!I43"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 14,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "южный север",
+      "refs": [
+        "2 РАУНД!J42",
+        "2 РАУНД!J43"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 14,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "говняный мальчик",
+      "refs": [
+        "2 РАУНД!E42",
+        "2 РАУНД!E43"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 14,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "южный север",
+      "refs": [
+        "2 РАУНД!F42",
+        "2 РАУНД!F43"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 14,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "южный север",
+      "refs": [
+        "2 РАУНД!D42",
+        "2 РАУНД!D43"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 14,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "говняный мальчик",
+      "refs": [
+        "2 РАУНД!K42",
+        "2 РАУНД!K43"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 14,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "южный север",
+      "refs": [
+        "2 РАУНД!L42",
+        "2 РАУНД!L43"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 14,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "говняный мальчик",
+      "refs": [
+        "2 РАУНД!N42",
+        "2 РАУНД!N43"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 14,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "говняный мальчик",
+      "refs": [
+        "2 РАУНД!O42",
+        "2 РАУНД!O43"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 14,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "южный север",
+      "refs": [
+        "2 РАУНД!G42",
+        "2 РАУНД!G43"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 14,
+      "judgeKey": "nedonebo",
+      "status": "no_values",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H42",
+        "2 РАУНД!H43"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 14,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "говняный мальчик",
+      "refs": [
+        "2 РАУНД!M42",
+        "2 РАУНД!M43"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "МАИ ХАСЕГАВА",
+      "refs": [
+        "2 РАУНД!B45",
+        "2 РАУНД!B46"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "Мел В Гипсе",
+      "refs": [
+        "2 РАУНД!C45",
+        "2 РАУНД!C46"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "Мел В Гипсе",
+      "refs": [
+        "2 РАУНД!I45",
+        "2 РАУНД!I46"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "МАИ ХАСЕГАВА",
+      "refs": [
+        "2 РАУНД!J45",
+        "2 РАУНД!J46"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "МАИ ХАСЕГАВА",
+      "refs": [
+        "2 РАУНД!E45",
+        "2 РАУНД!E46"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "Мел В Гипсе",
+      "refs": [
+        "2 РАУНД!F45",
+        "2 РАУНД!F46"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "Мел В Гипсе",
+      "refs": [
+        "2 РАУНД!D45",
+        "2 РАУНД!D46"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "Мел В Гипсе",
+      "refs": [
+        "2 РАУНД!K45",
+        "2 РАУНД!K46"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "МАИ ХАСЕГАВА",
+      "refs": [
+        "2 РАУНД!L45",
+        "2 РАУНД!L46"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "МАИ ХАСЕГАВА",
+      "refs": [
+        "2 РАУНД!N45",
+        "2 РАУНД!N46"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "Мел В Гипсе",
+      "refs": [
+        "2 РАУНД!O45",
+        "2 РАУНД!O46"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "МАИ ХАСЕГАВА",
+      "refs": [
+        "2 РАУНД!G45",
+        "2 РАУНД!G46"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "judgeKey": "nedonebo",
+      "status": "no_values",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H45",
+        "2 РАУНД!H46"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 15,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "Мел В Гипсе",
+      "refs": [
+        "2 РАУНД!M45",
+        "2 РАУНД!M46"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 16,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "таёжный рёв",
+      "refs": [
+        "2 РАУНД!B48",
+        "2 РАУНД!B49"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 16,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "таёжный рёв",
+      "refs": [
+        "2 РАУНД!C48",
+        "2 РАУНД!C49"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 16,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "2 РАУНД!I48",
+        "2 РАУНД!I49"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 16,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "2 РАУНД!J48",
+        "2 РАУНД!J49"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 16,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "таёжный рёв",
+      "refs": [
+        "2 РАУНД!E48",
+        "2 РАУНД!E49"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 16,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "2 РАУНД!F48",
+        "2 РАУНД!F49"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 16,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "2 РАУНД!D48",
+        "2 РАУНД!D49"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 16,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "таёжный рёв",
+      "refs": [
+        "2 РАУНД!K48",
+        "2 РАУНД!K49"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 16,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "таёжный рёв",
+      "refs": [
+        "2 РАУНД!L48",
+        "2 РАУНД!L49"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 16,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "2 РАУНД!N48",
+        "2 РАУНД!N49"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 16,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "2 РАУНД!O48",
+        "2 РАУНД!O49"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 16,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "2 РАУНД!G48",
+        "2 РАУНД!G49"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 16,
+      "judgeKey": "nedonebo",
+      "status": "no_values",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H48",
+        "2 РАУНД!H49"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 16,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "2 РАУНД!M48",
+        "2 РАУНД!M49"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "2 РАУНД!B6",
+        "2 РАУНД!B7"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "2 РАУНД!C6",
+        "2 РАУНД!C7"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "2 РАУНД!I6",
+        "2 РАУНД!I7"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "2 РАУНД!J6",
+        "2 РАУНД!J7"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "2 РАУНД!E6",
+        "2 РАУНД!E7"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "2 РАУНД!F6",
+        "2 РАУНД!F7"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "2 РАУНД!D6",
+        "2 РАУНД!D7"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "2 РАУНД!K6",
+        "2 РАУНД!K7"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "2 РАУНД!L6",
+        "2 РАУНД!L7"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "2 РАУНД!N6",
+        "2 РАУНД!N7"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "2 РАУНД!O6",
+        "2 РАУНД!O7"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "2 РАУНД!G6",
+        "2 РАУНД!G7"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "judgeKey": "nedonebo",
+      "status": "no_values",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H6",
+        "2 РАУНД!H7"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 2,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "2 РАУНД!M6",
+        "2 РАУНД!M7"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 3,
+      "judgeKey": "епархия",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!B10",
+        "2 РАУНД!B9"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 3,
+      "judgeKey": "клим пропавший",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!C10",
+        "2 РАУНД!C9"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 3,
+      "judgeKey": "козачок",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!I10",
+        "2 РАУНД!I9"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 3,
+      "judgeKey": "мц онегин",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!J10",
+        "2 РАУНД!J9"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 3,
+      "judgeKey": "нагвальный",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!E10",
+        "2 РАУНД!E9"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 3,
+      "judgeKey": "свиноферма",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!F10",
+        "2 РАУНД!F9"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 3,
+      "judgeKey": "тридцать третий",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!D10",
+        "2 РАУНД!D9"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 3,
+      "judgeKey": "abstract postmodern!",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!K10",
+        "2 РАУНД!K9"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 3,
+      "judgeKey": "cenobite",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!L10",
+        "2 РАУНД!L9"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 3,
+      "judgeKey": "cyber olegi",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!N10",
+        "2 РАУНД!N9"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 3,
+      "judgeKey": "dead rave",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!O10",
+        "2 РАУНД!O9"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 3,
+      "judgeKey": "jakorja",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!G10",
+        "2 РАУНД!G9"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 3,
+      "judgeKey": "nedonebo",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H10",
+        "2 РАУНД!H9"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 3,
+      "judgeKey": "pavelunderground",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!M10",
+        "2 РАУНД!M9"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 4,
+      "judgeKey": "епархия",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!B12",
+        "2 РАУНД!B13"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 4,
+      "judgeKey": "клим пропавший",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!C12",
+        "2 РАУНД!C13"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 4,
+      "judgeKey": "козачок",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!I12",
+        "2 РАУНД!I13"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 4,
+      "judgeKey": "мц онегин",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!J12",
+        "2 РАУНД!J13"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 4,
+      "judgeKey": "нагвальный",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!E12",
+        "2 РАУНД!E13"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 4,
+      "judgeKey": "свиноферма",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!F12",
+        "2 РАУНД!F13"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 4,
+      "judgeKey": "тридцать третий",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!D12",
+        "2 РАУНД!D13"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 4,
+      "judgeKey": "abstract postmodern!",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!K12",
+        "2 РАУНД!K13"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 4,
+      "judgeKey": "cenobite",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!L12",
+        "2 РАУНД!L13"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 4,
+      "judgeKey": "cyber olegi",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!N12",
+        "2 РАУНД!N13"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 4,
+      "judgeKey": "dead rave",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!O12",
+        "2 РАУНД!O13"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 4,
+      "judgeKey": "jakorja",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!G12",
+        "2 РАУНД!G13"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 4,
+      "judgeKey": "nedonebo",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H12",
+        "2 РАУНД!H13"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 4,
+      "judgeKey": "pavelunderground",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!M12",
+        "2 РАУНД!M13"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 5,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "2 РАУНД!B15",
+        "2 РАУНД!B16"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 5,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "крипер михаил",
+      "refs": [
+        "2 РАУНД!C15",
+        "2 РАУНД!C16"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 5,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "2 РАУНД!I15",
+        "2 РАУНД!I16"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 5,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "крипер михаил",
+      "refs": [
+        "2 РАУНД!J15",
+        "2 РАУНД!J16"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 5,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "2 РАУНД!E15",
+        "2 РАУНД!E16"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 5,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "крипер михаил",
+      "refs": [
+        "2 РАУНД!F15",
+        "2 РАУНД!F16"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 5,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "2 РАУНД!D15",
+        "2 РАУНД!D16"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 5,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "2 РАУНД!K15",
+        "2 РАУНД!K16"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 5,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "2 РАУНД!L15",
+        "2 РАУНД!L16"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 5,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "2 РАУНД!N15",
+        "2 РАУНД!N16"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 5,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "2 РАУНД!O15",
+        "2 РАУНД!O16"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 5,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "2 РАУНД!G15",
+        "2 РАУНД!G16"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 5,
+      "judgeKey": "nedonebo",
+      "status": "no_values",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H15",
+        "2 РАУНД!H16"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 5,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "крипер михаил",
+      "refs": [
+        "2 РАУНД!M15",
+        "2 РАУНД!M16"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 6,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "мц вафелька",
+      "refs": [
+        "2 РАУНД!B18",
+        "2 РАУНД!B19"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 6,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "мц вафелька",
+      "refs": [
+        "2 РАУНД!C18",
+        "2 РАУНД!C19"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 6,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "2 РАУНД!I18",
+        "2 РАУНД!I19"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 6,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "мц вафелька",
+      "refs": [
+        "2 РАУНД!J18",
+        "2 РАУНД!J19"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 6,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "мц вафелька",
+      "refs": [
+        "2 РАУНД!E18",
+        "2 РАУНД!E19"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 6,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "мц вафелька",
+      "refs": [
+        "2 РАУНД!F18",
+        "2 РАУНД!F19"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 6,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "2 РАУНД!D18",
+        "2 РАУНД!D19"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 6,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "2 РАУНД!K18",
+        "2 РАУНД!K19"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 6,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "2 РАУНД!L18",
+        "2 РАУНД!L19"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 6,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "2 РАУНД!N18",
+        "2 РАУНД!N19"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 6,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "2 РАУНД!O18",
+        "2 РАУНД!O19"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 6,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "2 РАУНД!G18",
+        "2 РАУНД!G19"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 6,
+      "judgeKey": "nedonebo",
+      "status": "no_values",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H18",
+        "2 РАУНД!H19"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 6,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "2 РАУНД!M18",
+        "2 РАУНД!M19"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 7,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "2 РАУНД!B21",
+        "2 РАУНД!B22"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 7,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "2 РАУНД!C21",
+        "2 РАУНД!C22"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 7,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "2 РАУНД!I21",
+        "2 РАУНД!I22"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 7,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "2 РАУНД!J21",
+        "2 РАУНД!J22"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 7,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "2 РАУНД!E21",
+        "2 РАУНД!E22"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 7,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "2 РАУНД!F21",
+        "2 РАУНД!F22"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 7,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "2 РАУНД!D21",
+        "2 РАУНД!D22"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 7,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "2 РАУНД!K21",
+        "2 РАУНД!K22"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 7,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "Арлекин",
+      "refs": [
+        "2 РАУНД!L21",
+        "2 РАУНД!L22"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 7,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "Арлекин",
+      "refs": [
+        "2 РАУНД!N21",
+        "2 РАУНД!N22"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 7,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "2 РАУНД!O21",
+        "2 РАУНД!O22"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 7,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "2 РАУНД!G21",
+        "2 РАУНД!G22"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 7,
+      "judgeKey": "nedonebo",
+      "status": "no_values",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H21",
+        "2 РАУНД!H22"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 7,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "2 РАУНД!M21",
+        "2 РАУНД!M22"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 8,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "2 РАУНД!B24",
+        "2 РАУНД!B25"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 8,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "2 РАУНД!C24",
+        "2 РАУНД!C25"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 8,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "2 РАУНД!I24",
+        "2 РАУНД!I25"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 8,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "2 РАУНД!J24",
+        "2 РАУНД!J25"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 8,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "партизанский шпион",
+      "refs": [
+        "2 РАУНД!E24",
+        "2 РАУНД!E25"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 8,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "2 РАУНД!F24",
+        "2 РАУНД!F25"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 8,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "2 РАУНД!D24",
+        "2 РАУНД!D25"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 8,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "2 РАУНД!K24",
+        "2 РАУНД!K25"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 8,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "2 РАУНД!L24",
+        "2 РАУНД!L25"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 8,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "2 РАУНД!N24",
+        "2 РАУНД!N25"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 8,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "партизанский шпион",
+      "refs": [
+        "2 РАУНД!O24",
+        "2 РАУНД!O25"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 8,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "партизанский шпион",
+      "refs": [
+        "2 РАУНД!G24",
+        "2 РАУНД!G25"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 8,
+      "judgeKey": "nedonebo",
+      "status": "no_values",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H24",
+        "2 РАУНД!H25"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 8,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "2 РАУНД!M24",
+        "2 РАУНД!M25"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 9,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "эмси чучь",
+      "refs": [
+        "2 РАУНД!B27",
+        "2 РАУНД!B28"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 9,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "whales",
+      "refs": [
+        "2 РАУНД!C27",
+        "2 РАУНД!C28"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 9,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "whales",
+      "refs": [
+        "2 РАУНД!I27",
+        "2 РАУНД!I28"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 9,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "эмси чучь",
+      "refs": [
+        "2 РАУНД!J27",
+        "2 РАУНД!J28"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 9,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "эмси чучь",
+      "refs": [
+        "2 РАУНД!E27",
+        "2 РАУНД!E28"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 9,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "whales",
+      "refs": [
+        "2 РАУНД!F27",
+        "2 РАУНД!F28"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 9,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "whales",
+      "refs": [
+        "2 РАУНД!D27",
+        "2 РАУНД!D28"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 9,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "эмси чучь",
+      "refs": [
+        "2 РАУНД!K27",
+        "2 РАУНД!K28"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 9,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "whales",
+      "refs": [
+        "2 РАУНД!L27",
+        "2 РАУНД!L28"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 9,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "whales",
+      "refs": [
+        "2 РАУНД!N27",
+        "2 РАУНД!N28"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 9,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "whales",
+      "refs": [
+        "2 РАУНД!O27",
+        "2 РАУНД!O28"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 9,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "whales",
+      "refs": [
+        "2 РАУНД!G27",
+        "2 РАУНД!G28"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 9,
+      "judgeKey": "nedonebo",
+      "status": "no_values",
+      "winner": null,
+      "refs": [
+        "2 РАУНД!H27",
+        "2 РАУНД!H28"
+      ]
+    },
+    {
+      "sheet": "2 РАУНД",
+      "pair": 9,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "whales",
+      "refs": [
+        "2 РАУНД!M27",
+        "2 РАУНД!M28"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "епархия",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!B3",
+        "3 РАУНД!B4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "клим пропавший",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!C3",
+        "3 РАУНД!C4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "козачок",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!I3",
+        "3 РАУНД!I4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "мц онегин",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!J3",
+        "3 РАУНД!J4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "нагвальный",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!F3",
+        "3 РАУНД!F4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "свиноферма",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!E3",
+        "3 РАУНД!E4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "тридцать третий",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!D3",
+        "3 РАУНД!D4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "abstract postmodern!",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!K3",
+        "3 РАУНД!K4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "cenobite",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!L3",
+        "3 РАУНД!L4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "cyber olegi",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!N3",
+        "3 РАУНД!N4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "dead rave",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!O3",
+        "3 РАУНД!O4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "jakorja",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!G3",
+        "3 РАУНД!G4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "kosh (spacecave)",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!R3",
+        "3 РАУНД!R4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "nedonebo",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!H3",
+        "3 РАУНД!H4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "pavelunderground",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!M3",
+        "3 РАУНД!M4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "prikol'chique",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!Q3",
+        "3 РАУНД!Q4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 1,
+      "judgeKey": "whitespruce",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!P3",
+        "3 РАУНД!P4"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "3 РАУНД!B6",
+        "3 РАУНД!B7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "3 РАУНД!C6",
+        "3 РАУНД!C7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "3 РАУНД!I6",
+        "3 РАУНД!I7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "3 РАУНД!J6",
+        "3 РАУНД!J7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "3 РАУНД!F6",
+        "3 РАУНД!F7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "3 РАУНД!E6",
+        "3 РАУНД!E7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "3 РАУНД!D6",
+        "3 РАУНД!D7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "3 РАУНД!K6",
+        "3 РАУНД!K7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "3 РАУНД!L6",
+        "3 РАУНД!L7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "3 РАУНД!N6",
+        "3 РАУНД!N7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "3 РАУНД!O6",
+        "3 РАУНД!O7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "3 РАУНД!G6",
+        "3 РАУНД!G7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "kosh (spacecave)",
+      "status": "complete_comparison",
+      "winner": "ИРСЛМ",
+      "refs": [
+        "3 РАУНД!R6",
+        "3 РАУНД!R7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "nedonebo",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "3 РАУНД!H6",
+        "3 РАУНД!H7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "3 РАУНД!M6",
+        "3 РАУНД!M7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "prikol'chique",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "3 РАУНД!Q6",
+        "3 РАУНД!Q7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 2,
+      "judgeKey": "whitespruce",
+      "status": "complete_comparison",
+      "winner": "mногонационал",
+      "refs": [
+        "3 РАУНД!P6",
+        "3 РАУНД!P7"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "3 РАУНД!B10",
+        "3 РАУНД!B9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "3 РАУНД!C10",
+        "3 РАУНД!C9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "Trioracks",
+      "refs": [
+        "3 РАУНД!I10",
+        "3 РАУНД!I9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "Trioracks",
+      "refs": [
+        "3 РАУНД!J10",
+        "3 РАУНД!J9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "3 РАУНД!F10",
+        "3 РАУНД!F9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "Trioracks",
+      "refs": [
+        "3 РАУНД!E10",
+        "3 РАУНД!E9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "Trioracks",
+      "refs": [
+        "3 РАУНД!D10",
+        "3 РАУНД!D9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "3 РАУНД!K10",
+        "3 РАУНД!K9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "3 РАУНД!L10",
+        "3 РАУНД!L9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "3 РАУНД!N10",
+        "3 РАУНД!N9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "3 РАУНД!O10",
+        "3 РАУНД!O9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "Trioracks",
+      "refs": [
+        "3 РАУНД!G10",
+        "3 РАУНД!G9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "kosh (spacecave)",
+      "status": "complete_comparison",
+      "winner": "Trioracks",
+      "refs": [
+        "3 РАУНД!R10",
+        "3 РАУНД!R9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "nedonebo",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "3 РАУНД!H10",
+        "3 РАУНД!H9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "3 РАУНД!M10",
+        "3 РАУНД!M9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "prikol'chique",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "3 РАУНД!Q10",
+        "3 РАУНД!Q9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 3,
+      "judgeKey": "whitespruce",
+      "status": "complete_comparison",
+      "winner": "Trioracks",
+      "refs": [
+        "3 РАУНД!P10",
+        "3 РАУНД!P9"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "whales",
+      "refs": [
+        "3 РАУНД!B12",
+        "3 РАУНД!B13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "3 РАУНД!C12",
+        "3 РАУНД!C13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "3 РАУНД!I12",
+        "3 РАУНД!I13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "3 РАУНД!J12",
+        "3 РАУНД!J13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "3 РАУНД!F12",
+        "3 РАУНД!F13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "3 РАУНД!E12",
+        "3 РАУНД!E13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "whales",
+      "refs": [
+        "3 РАУНД!D12",
+        "3 РАУНД!D13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "3 РАУНД!K12",
+        "3 РАУНД!K13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "3 РАУНД!L12",
+        "3 РАУНД!L13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "3 РАУНД!N12",
+        "3 РАУНД!N13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "3 РАУНД!O12",
+        "3 РАУНД!O13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "3 РАУНД!G12",
+        "3 РАУНД!G13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "kosh (spacecave)",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "3 РАУНД!R12",
+        "3 РАУНД!R13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "nedonebo",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "3 РАУНД!H12",
+        "3 РАУНД!H13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "whales",
+      "refs": [
+        "3 РАУНД!M12",
+        "3 РАУНД!M13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "prikol'chique",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "3 РАУНД!Q12",
+        "3 РАУНД!Q13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 4,
+      "judgeKey": "whitespruce",
+      "status": "complete_comparison",
+      "winner": "whales",
+      "refs": [
+        "3 РАУНД!P12",
+        "3 РАУНД!P13"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "3 РАУНД!B15",
+        "3 РАУНД!B16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "3 РАУНД!C15",
+        "3 РАУНД!C16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "3 РАУНД!I15",
+        "3 РАУНД!I16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "3 РАУНД!J15",
+        "3 РАУНД!J16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "3 РАУНД!F15",
+        "3 РАУНД!F16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "3 РАУНД!E15",
+        "3 РАУНД!E16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "3 РАУНД!D15",
+        "3 РАУНД!D16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "МЦ Пажылая Шляпа",
+      "refs": [
+        "3 РАУНД!K15",
+        "3 РАУНД!K16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "3 РАУНД!L15",
+        "3 РАУНД!L16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "3 РАУНД!N15",
+        "3 РАУНД!N16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "3 РАУНД!O15",
+        "3 РАУНД!O16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "3 РАУНД!G15",
+        "3 РАУНД!G16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "kosh (spacecave)",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "3 РАУНД!R15",
+        "3 РАУНД!R16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "nedonebo",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "3 РАУНД!H15",
+        "3 РАУНД!H16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "Black Phoenix",
+      "refs": [
+        "3 РАУНД!M15",
+        "3 РАУНД!M16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "prikol'chique",
+      "status": "complete_comparison",
+      "winner": "МЦ Пажылая Шляпа",
+      "refs": [
+        "3 РАУНД!Q15",
+        "3 РАУНД!Q16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 5,
+      "judgeKey": "whitespruce",
+      "status": "complete_comparison",
+      "winner": "МЦ Пажылая Шляпа",
+      "refs": [
+        "3 РАУНД!P15",
+        "3 РАУНД!P16"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!B18",
+        "3 РАУНД!B19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!C18",
+        "3 РАУНД!C19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!I18",
+        "3 РАУНД!I19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!J18",
+        "3 РАУНД!J19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!F18",
+        "3 РАУНД!F19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!E18",
+        "3 РАУНД!E19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!D18",
+        "3 РАУНД!D19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!K18",
+        "3 РАУНД!K19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!L18",
+        "3 РАУНД!L19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!N18",
+        "3 РАУНД!N19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!O18",
+        "3 РАУНД!O19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!G18",
+        "3 РАУНД!G19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "kosh (spacecave)",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!R18",
+        "3 РАУНД!R19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "nedonebo",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!H18",
+        "3 РАУНД!H19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!M18",
+        "3 РАУНД!M19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "prikol'chique",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!Q18",
+        "3 РАУНД!Q19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 6,
+      "judgeKey": "whitespruce",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "3 РАУНД!P18",
+        "3 РАУНД!P19"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "епархия",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!B21",
+        "3 РАУНД!B22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "клим пропавший",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!C21",
+        "3 РАУНД!C22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "козачок",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!I21",
+        "3 РАУНД!I22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "мц онегин",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!J21",
+        "3 РАУНД!J22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "нагвальный",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!F21",
+        "3 РАУНД!F22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "свиноферма",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!E21",
+        "3 РАУНД!E22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "тридцать третий",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!D21",
+        "3 РАУНД!D22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "abstract postmodern!",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!K21",
+        "3 РАУНД!K22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "cenobite",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!L21",
+        "3 РАУНД!L22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "cyber olegi",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!N21",
+        "3 РАУНД!N22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "dead rave",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!O21",
+        "3 РАУНД!O22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "jakorja",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!G21",
+        "3 РАУНД!G22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "kosh (spacecave)",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!R21",
+        "3 РАУНД!R22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "nedonebo",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!H21",
+        "3 РАУНД!H22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "pavelunderground",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!M21",
+        "3 РАУНД!M22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "prikol'chique",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!Q21",
+        "3 РАУНД!Q22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 7,
+      "judgeKey": "whitespruce",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!P21",
+        "3 РАУНД!P22"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "епархия",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!B24",
+        "3 РАУНД!B25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "клим пропавший",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!C24",
+        "3 РАУНД!C25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "козачок",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!I24",
+        "3 РАУНД!I25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "мц онегин",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!J24",
+        "3 РАУНД!J25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "нагвальный",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!F24",
+        "3 РАУНД!F25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "свиноферма",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!E24",
+        "3 РАУНД!E25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "тридцать третий",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!D24",
+        "3 РАУНД!D25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "abstract postmodern!",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!K24",
+        "3 РАУНД!K25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "cenobite",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!L24",
+        "3 РАУНД!L25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "cyber olegi",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!N24",
+        "3 РАУНД!N25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "dead rave",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!O24",
+        "3 РАУНД!O25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "jakorja",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!G24",
+        "3 РАУНД!G25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "kosh (spacecave)",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!R24",
+        "3 РАУНД!R25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "nedonebo",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!H24",
+        "3 РАУНД!H25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "pavelunderground",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!M24",
+        "3 РАУНД!M25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "prikol'chique",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!Q24",
+        "3 РАУНД!Q25"
+      ]
+    },
+    {
+      "sheet": "3 РАУНД",
+      "pair": 8,
+      "judgeKey": "whitespruce",
+      "status": "one_value_only",
+      "winner": null,
+      "refs": [
+        "3 РАУНД!P24",
+        "3 РАУНД!P25"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "гексмалыш",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "4 РАУНД!U3",
+        "4 РАУНД!U4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "4 РАУНД!B3",
+        "4 РАУНД!B4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "4 РАУНД!C3",
+        "4 РАУНД!C4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "4 РАУНД!I3",
+        "4 РАУНД!I4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "4 РАУНД!J3",
+        "4 РАУНД!J4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "4 РАУНД!F3",
+        "4 РАУНД!F4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "охуенно культурный",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "4 РАУНД!T3",
+        "4 РАУНД!T4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "рыцарь таверны",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "4 РАУНД!S3",
+        "4 РАУНД!S4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "4 РАУНД!E3",
+        "4 РАУНД!E4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "4 РАУНД!D3",
+        "4 РАУНД!D4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "4 РАУНД!K3",
+        "4 РАУНД!K4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "4 РАУНД!L3",
+        "4 РАУНД!L4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "4 РАУНД!N3",
+        "4 РАУНД!N4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "4 РАУНД!G3",
+        "4 РАУНД!G4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "kosh (spacecave)",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "4 РАУНД!Q3",
+        "4 РАУНД!Q4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "nedonebo",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "4 РАУНД!H3",
+        "4 РАУНД!H4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "4 РАУНД!M3",
+        "4 РАУНД!M4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "prikol'chique",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "4 РАУНД!P3",
+        "4 РАУНД!P4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "svetokron",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "4 РАУНД!R3",
+        "4 РАУНД!R4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 1,
+      "judgeKey": "whitespruce",
+      "status": "complete_comparison",
+      "winner": "Калогерова",
+      "refs": [
+        "4 РАУНД!O3",
+        "4 РАУНД!O4"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "гексмалыш",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "4 РАУНД!U6",
+        "4 РАУНД!U7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "4 РАУНД!B6",
+        "4 РАУНД!B7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "4 РАУНД!C6",
+        "4 РАУНД!C7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "4 РАУНД!I6",
+        "4 РАУНД!I7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "4 РАУНД!J6",
+        "4 РАУНД!J7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "4 РАУНД!F6",
+        "4 РАУНД!F7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "охуенно культурный",
+      "status": "complete_comparison",
+      "winner": "Аллахов †",
+      "refs": [
+        "4 РАУНД!T6",
+        "4 РАУНД!T7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "рыцарь таверны",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "4 РАУНД!S6",
+        "4 РАУНД!S7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "4 РАУНД!E6",
+        "4 РАУНД!E7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "4 РАУНД!D6",
+        "4 РАУНД!D7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "4 РАУНД!K6",
+        "4 РАУНД!K7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "Аллахов †",
+      "refs": [
+        "4 РАУНД!L6",
+        "4 РАУНД!L7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "Аллахов †",
+      "refs": [
+        "4 РАУНД!N6",
+        "4 РАУНД!N7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "Аллахов †",
+      "refs": [
+        "4 РАУНД!G6",
+        "4 РАУНД!G7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "kosh (spacecave)",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "4 РАУНД!Q6",
+        "4 РАУНД!Q7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "nedonebo",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "4 РАУНД!H6",
+        "4 РАУНД!H7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "Аллахов †",
+      "refs": [
+        "4 РАУНД!M6",
+        "4 РАУНД!M7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "prikol'chique",
+      "status": "complete_comparison",
+      "winner": "Аллахов †",
+      "refs": [
+        "4 РАУНД!P6",
+        "4 РАУНД!P7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "svetokron",
+      "status": "complete_comparison",
+      "winner": "Аллахов †",
+      "refs": [
+        "4 РАУНД!R6",
+        "4 РАУНД!R7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 2,
+      "judgeKey": "whitespruce",
+      "status": "complete_comparison",
+      "winner": "Аллахов †",
+      "refs": [
+        "4 РАУНД!O6",
+        "4 РАУНД!O7"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "гексмалыш",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!U10",
+        "4 РАУНД!U9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!B10",
+        "4 РАУНД!B9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!C10",
+        "4 РАУНД!C9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!I10",
+        "4 РАУНД!I9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!J10",
+        "4 РАУНД!J9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!F10",
+        "4 РАУНД!F9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "охуенно культурный",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!T10",
+        "4 РАУНД!T9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "рыцарь таверны",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!S10",
+        "4 РАУНД!S9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!E10",
+        "4 РАУНД!E9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!D10",
+        "4 РАУНД!D9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!K10",
+        "4 РАУНД!K9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!L10",
+        "4 РАУНД!L9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!N10",
+        "4 РАУНД!N9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!G10",
+        "4 РАУНД!G9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "kosh (spacecave)",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!Q10",
+        "4 РАУНД!Q9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "nedonebo",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!H10",
+        "4 РАУНД!H9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!M10",
+        "4 РАУНД!M9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "prikol'chique",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!P10",
+        "4 РАУНД!P9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "svetokron",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!R10",
+        "4 РАУНД!R9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 3,
+      "judgeKey": "whitespruce",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "4 РАУНД!O10",
+        "4 РАУНД!O9"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "гексмалыш",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!U12",
+        "4 РАУНД!U13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!B12",
+        "4 РАУНД!B13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!C12",
+        "4 РАУНД!C13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!I12",
+        "4 РАУНД!I13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!J12",
+        "4 РАУНД!J13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!F12",
+        "4 РАУНД!F13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "охуенно культурный",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!T12",
+        "4 РАУНД!T13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "рыцарь таверны",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!S12",
+        "4 РАУНД!S13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!E12",
+        "4 РАУНД!E13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!D12",
+        "4 РАУНД!D13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!K12",
+        "4 РАУНД!K13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!L12",
+        "4 РАУНД!L13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!N12",
+        "4 РАУНД!N13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!G12",
+        "4 РАУНД!G13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "kosh (spacecave)",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!Q12",
+        "4 РАУНД!Q13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "nedonebo",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!H12",
+        "4 РАУНД!H13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!M12",
+        "4 РАУНД!M13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "prikol'chique",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!P12",
+        "4 РАУНД!P13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "svetokron",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!R12",
+        "4 РАУНД!R13"
+      ]
+    },
+    {
+      "sheet": "4 РАУНД",
+      "pair": 4,
+      "judgeKey": "whitespruce",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "4 РАУНД!O12",
+        "4 РАУНД!O13"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "гексмалыш",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!T3",
+        "5 РАУНД!T4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!B3",
+        "5 РАУНД!B4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!C3",
+        "5 РАУНД!C4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "5 РАУНД!H3",
+        "5 РАУНД!H4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!I3",
+        "5 РАУНД!I4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "охуенно культурный",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!S3",
+        "5 РАУНД!S4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "рыцарь таверны",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "5 РАУНД!R3",
+        "5 РАУНД!R4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!E3",
+        "5 РАУНД!E4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!D3",
+        "5 РАУНД!D4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "херова жесть",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!X3",
+        "5 РАУНД!X4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!J3",
+        "5 РАУНД!J4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "alx beats",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "5 РАУНД!V3",
+        "5 РАУНД!V4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "benarfa",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!U3",
+        "5 РАУНД!U4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!K3",
+        "5 РАУНД!K4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!M3",
+        "5 РАУНД!M4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "5 РАУНД!N3",
+        "5 РАУНД!N4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "5 РАУНД!F3",
+        "5 РАУНД!F4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "kosh (spacecave)",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!Q3",
+        "5 РАУНД!Q4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "nedonebo",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "5 РАУНД!G3",
+        "5 РАУНД!G4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!L3",
+        "5 РАУНД!L4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "prikol'chique",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!P3",
+        "5 РАУНД!P4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "whitespruce",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "5 РАУНД!O3",
+        "5 РАУНД!O4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 1,
+      "judgeKey": "zoo in space",
+      "status": "complete_comparison",
+      "winner": "православный мц",
+      "refs": [
+        "5 РАУНД!W3",
+        "5 РАУНД!W4"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "гексмалыш",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!T6",
+        "5 РАУНД!T7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!B6",
+        "5 РАУНД!B7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "клим пропавший",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!C6",
+        "5 РАУНД!C7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!H6",
+        "5 РАУНД!H7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "5 РАУНД!I6",
+        "5 РАУНД!I7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "охуенно культурный",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!S6",
+        "5 РАУНД!S7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "рыцарь таверны",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!R6",
+        "5 РАУНД!R7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!E6",
+        "5 РАУНД!E7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!D6",
+        "5 РАУНД!D7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "херова жесть",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!X6",
+        "5 РАУНД!X7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "abstract postmodern!",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!J6",
+        "5 РАУНД!J7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "alx beats",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!V6",
+        "5 РАУНД!V7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "benarfa",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!U6",
+        "5 РАУНД!U7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!K6",
+        "5 РАУНД!K7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!M6",
+        "5 РАУНД!M7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "5 РАУНД!N6",
+        "5 РАУНД!N7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "jakorja",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!F6",
+        "5 РАУНД!F7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "kosh (spacecave)",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "5 РАУНД!Q6",
+        "5 РАУНД!Q7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "nedonebo",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "5 РАУНД!G6",
+        "5 РАУНД!G7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "5 РАУНД!L6",
+        "5 РАУНД!L7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "prikol'chique",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "5 РАУНД!P6",
+        "5 РАУНД!P7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "whitespruce",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "5 РАУНД!O6",
+        "5 РАУНД!O7"
+      ]
+    },
+    {
+      "sheet": "5 РАУНД",
+      "pair": 2,
+      "judgeKey": "zoo in space",
+      "status": "complete_comparison",
+      "winner": "чолито",
+      "refs": [
+        "5 РАУНД!W6",
+        "5 РАУНД!W7"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "гексмалыш",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "ФИНАЛ!O3",
+        "ФИНАЛ!O4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "гешуль",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "ФИНАЛ!J3",
+        "ФИНАЛ!J4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "доббро",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "ФИНАЛ!U3",
+        "ФИНАЛ!U4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "епархия",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "ФИНАЛ!B3",
+        "ФИНАЛ!B4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "козачок",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "ФИНАЛ!F3",
+        "ФИНАЛ!F4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "мц варг пиночетский",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "ФИНАЛ!V3",
+        "ФИНАЛ!V4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "мц онегин",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "ФИНАЛ!G3",
+        "ФИНАЛ!G4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "нагвальный",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "ФИНАЛ!E3",
+        "ФИНАЛ!E4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "ок",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "ФИНАЛ!P3",
+        "ФИНАЛ!P4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "свиноферма",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "ФИНАЛ!D3",
+        "ФИНАЛ!D4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "тридцать третий",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "ФИНАЛ!C3",
+        "ФИНАЛ!C4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "херова жесть",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "ФИНАЛ!T3",
+        "ФИНАЛ!T4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "alx beats",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "ФИНАЛ!R3",
+        "ФИНАЛ!R4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "benarfa",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "ФИНАЛ!Q3",
+        "ФИНАЛ!Q4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "cenobite",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "ФИНАЛ!H3",
+        "ФИНАЛ!H4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "cyber olegi",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "ФИНАЛ!I3",
+        "ФИНАЛ!I4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "dead rave",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "ФИНАЛ!L3",
+        "ФИНАЛ!L4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "kosh (spacecave)",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "ФИНАЛ!M3",
+        "ФИНАЛ!M4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "pavelunderground",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "ФИНАЛ!K3",
+        "ФИНАЛ!K4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "whitespruce",
+      "status": "complete_comparison",
+      "winner": "НБПанда",
+      "refs": [
+        "ФИНАЛ!N3",
+        "ФИНАЛ!N4"
+      ]
+    },
+    {
+      "sheet": "ФИНАЛ",
+      "pair": 1,
+      "judgeKey": "zoo in space",
+      "status": "complete_comparison",
+      "winner": "Клинок Забузы",
+      "refs": [
+        "ФИНАЛ!S3",
+        "ФИНАЛ!S4"
+      ]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import catalog from '../data/battles/round-topics-v1.json' with {type:'json'};
-import {beatResultSeed} from './beat-result.js?rev=43';
+import {beatResultSeed} from './beat-result.js?rev=49';
 import {judgeProfile} from './judge-profiles.js?rev=43';
 import {validGameMinute} from './game-minute.js?rev=43';
 import {gameDateTimeLabel} from './home-calendar.js?rev=43';

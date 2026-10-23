@@ -12,8 +12,10 @@ export const skillsAt=value=>Object.fromEntries(['intelligence','writing','music
 export const checked=r=>{if(r.ok===false||r.reason&&r.finished===undefined)throw Error(r.reason);return r.state;};
 export const tournament=s=>s.tournaments.byId[BATTLE];
 export function freshDemo({opensAt=600}={}){const s=checked(activateSocial(applyToBattle(createVirtualPcState({power:'on'}),BATTLE,'Тестовый герой'),opensAt));return advanceSocial(s,opensAt).state;}
-export function produceDemoTrack(input,{skill=100,seed=41,roundId='selection',nowMinute=600,clean=true}={}){
- let s=input;const skills=skillsAt(skill),random=battleRandom(seed),textId='demo-text:'+roundId+':'+seed,beatId='demo-beat:'+roundId+':'+seed,reset=()=>{s={...s,music:{...s.music,needs:{satiety:100,energy:100}}};};
+export function produceDemoTrack(input,{skill=100,genreSkill=skill,seed=41,roundId='selection',nowMinute=600,clean=true}={}){
+ // Fixture strength includes genre proficiency; callers can exercise a mismatch.
+ let s={...input,music:{...input.music,genres:{...input.music.genres,xp:{...input.music.genres.xp,experimental:genreSkill}}}};
+ const skills=skillsAt(skill),random=battleRandom(seed),textId='demo-text:'+roundId+':'+seed,beatId='demo-beat:'+roundId+':'+seed,reset=()=>{s={...s,music:{...s.music,needs:{satiety:100,energy:100}}};};
  reset();s=checked(createLyric(s,{id:textId,battleId:BATTLE,gameDay:Math.floor(nowMinute/1440)+1},skills,random));
  for(let i=0;i<3;i++){reset();s=checked(startLyricWork(s,{projectId:textId,sliders:LYRIC_STAGES[i].target},skills,random));s=advanceLyricWork(s,1000).state;}
  reset();s=checked(createBeat(s,{id:beatId,name:'Приёмка · '+roundId,genre:'experimental'},skills,random));

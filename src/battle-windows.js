@@ -1,4 +1,4 @@
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=43';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=57';
 import {battleRoster,BATTLE_ROUND_IDS} from './battle-roster.js?rev=43';
 import {validGameMinute} from './game-minute.js?rev=43';
 const clone=v=>JSON.parse(JSON.stringify(v)),ids=new Set(BATTLE_BRIEFS.map(b=>b.id));

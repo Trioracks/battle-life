@@ -1,5 +1,5 @@
-import {SOCIAL_COMMUNITIES,communityById} from './social-catalog.js?rev=43';
-import {publicRoundAnnouncements} from './round-topics.js?rev=43';
+import {SOCIAL_COMMUNITIES,communityById} from './social-catalog.js?rev=57';
+import {publicRoundAnnouncements} from './round-topics.js?rev=49';
 import {judgeProfile} from './judge-profiles.js?rev=43';
 import {validGameMinute} from './game-minute.js?rev=43';
 import {receivePhoneEvents,retirePhoneNotices} from './phone-notifications.js?rev=43';

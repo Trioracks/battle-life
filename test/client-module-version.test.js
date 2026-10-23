@@ -1,48 +1,33 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile,access} from 'node:fs/promises';
-import path from 'node:path';
+import {clientGraph,changedModules} from '../tools/abstract-client-revision.mjs';
+import {goblinClientGraph} from '../tools/goblin-client-revision.mjs';
 
-test('home integration invalidates every changed dependency and its importers with one canonical URL',async()=>{
- const read=path=>readFile(new URL('../'+path,import.meta.url),'utf8');
- const changed=new Set(`apartment-v3-animation beat-work-view virtual-pc-window-state virtual-pc-sounds apartment-app apartment-switch-style apartment-v3-creator-session apartment-v3-creator apartment-v3-new-game apartment-v3-runtime apartment-v3-scene apartment-v3-time avatar-v3-profile beat-names beat-production beat-studio-view character-speech ft-studio-view home-calendar home-food home-needs-view home-profile-migration home-wardrobe-view home-wardrobe pc-software-catalog pc-software-view pc-software sound-cues underweb-view virtual-pc-catalog virtual-pc-explorer-view virtual-pc-explorer virtual-pc-lifecycle virtual-pc-runtime virtual-pc-shell virtual-pc-state virtual-pc-ui`.split(' ').map(name=>'src/'+name+'.js'));
- const graph=new Map();
- for(const name of ['vocal-catalog','vocal-result','vocal-production','vocal-result-dsp','recording-studio-view','beat-beginner-bank','beat-work-audio'])changed.add('src/'+name+'.js');
- for(const name of ['beat-audio','beat-playback','beat-mix','beat-result','beat-result-dsp','apartment-v3-camera','apartment-v3-computer','virtual-pc-icons','home-creative-work','lyric-production','lyric-work-audio','rap-notebook-view','underweb-community','underweb-community-view','underweb-news','underweb-news-data','underweb-news-view'])changed.add('src/'+name+'.js');
- async function visit(file){
-  if(graph.has(file))return;
-  const imports=[...(await read(file)).matchAll(/(?:from\s*|import\s*\(\s*)['"](\.\.?\/[^'"]+\.js(?:\?[^'"]*)?)['"]/g)].map(match=>{
-   const [relative,query='']=match[1].split('?');
-   return {file:path.posix.normalize(path.posix.join(path.posix.dirname(file),relative)),query};
-  });
-  graph.set(file,imports);
-  for(const dependency of imports)await visit(dependency.file);
+test('abstract release invalidates changed modules and importer closure with one canonical browser URL',async()=>{
+ const {graph,affected}=await clientGraph(),latest=await goblinClientGraph(),canonical=new Map();
+ const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
+ assert.match(html,/apartment-app\.js\?rev=57/);assert.ok(html.includes('test-skills.css?rev=49'));
+ assert.ok(html.includes('creator-v12.css?rev=48'));
+ for(const style of ['apartment-v3','desktop-apps','rap-notebook','virtual-pc','phone-hud'])assert.ok(html.includes(style+'.css?rev=43'));
+ for(const style of ['social-network','social-dialogs','social-community','rap-notebook-shell'])assert.ok(html.includes(style+'.css?rev=57'));
+ for(const [file,{source,imports}]of graph){
+  assert.doesNotMatch(source,/(?:from\s*|import\s*\()\s*['"](?:node:|fs['"]|child_process['"])/,'no Node-only dependency in '+file);
+  for(const d of imports){
+   if(!d.file.startsWith('src/'))continue;
+   if(latest.affected.has(d.file))assert.equal(d.query,'rev=57',file+' invalidates latest '+d.file);
+   else if(affected.has(d.file))assert.equal(d.query,'rev=49',file+' retains Abstract '+d.file);
+   else assert.match(d.query,/^rev=(43|45|46|47|48|50|51|52|53|54|55|56)$/,file+' retains released '+d.file);
+   if(canonical.has(d.file))assert.equal(d.query,canonical.get(d.file),'one canonical URL: '+d.file);canonical.set(d.file,d.query);
+  }
  }
- await visit('src/apartment-app.js');
- const affected=new Set(changed);let size;
- do{size=affected.size;for(const [file,imports]of graph)if(imports.some(dependency=>affected.has(dependency.file)))affected.add(file);}while(affected.size!==size);
- const html=await read('index.html');
- assert.match(html,/apartment-app\.js\?rev=47/);
- for(const style of ['apartment-v3','creator-v12','desktop-apps','rap-notebook','virtual-pc','social-network','phone-hud'])assert.ok(html.includes(style+'.css?rev=43'),style+' must invalidate changed styles');
- assert.ok((await read('desktop-apps.css')).includes('underweb-world.css?rev=43'));
- const canonical=new Map();
- for(const [file,imports]of graph)for(const dependency of imports){
-  if(!dependency.file.startsWith('src/'))continue;
-  assert.match(dependency.query,/^rev=(43|45|46|47)$/,file+' must load a released canonical '+dependency.file);
-  const previous=canonical.get(dependency.file);if(previous)assert.equal(previous,dependency.query);canonical.set(dependency.file,dependency.query);
- }
- for(const file of changed)assert.ok(graph.has(file),file+' is covered by the live entry graph');
- for(const name of ['social-view','social-runtime','social-result-view','social-result-reaction','judge-comments','judge-evaluation','battle-knowledge','phone-hud','track-version'])assert.ok(graph.has('src/'+name+'.js'),name+' must be live');
- assert.ok(canonical.size>=120,'covers full application, not only new files');
+ for(const file of changedModules)assert.ok(graph.has(file),file+' reachable');
+ assert.ok(canonical.size>=120);
+ for(const file of ['src/audio-levels.js','src/beat-jura-experimental-bank.js','src/source-levels-user-experimental-v1.js'])assert.notEqual(canonical.get(file),'rev=49',file+' unchanged');
 });
 
-test('HTML loads the new versioned apartment entry; legacy campaign remains accessible',async()=>{
-  const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
-  assert.match(html,/src="\.\/src\/apartment-app\.js\?rev=[^"]+"/);
-  assert.match(html,/href="\.\/virtual-pc\.css\?rev=[^"]+"/);
-  assert.match(html,/<section id="virtual-pc" hidden/);
-  await access(new URL('../src/apartment-app.js?rev=40',import.meta.url));
-  const legacy=await readFile(new URL('../legacy.html',import.meta.url),'utf8');
-  assert.match(legacy,/id="creator-modal"/);
-  assert.match(legacy,/src="\.\/src\/main\.js\?rev=[^"]+"/);
+test('legacy campaign remains accessible beside the current apartment entry',async()=>{
+ await access(new URL('../src/apartment-app.js',import.meta.url));
+ const html=await readFile(new URL('../index.html',import.meta.url),'utf8');assert.match(html,/<section id="virtual-pc" hidden/);
+ const legacy=await readFile(new URL('../legacy.html',import.meta.url),'utf8');assert.match(legacy,/id="creator-modal"/);assert.match(legacy,/src="\.\/src\/main\.js\?rev=[^"]+"/);
 });

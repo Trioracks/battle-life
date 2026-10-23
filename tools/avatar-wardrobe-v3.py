@@ -162,12 +162,7 @@ for face,profile in face_profiles.items():
 for kind in ['tank','turtleneck']:
     start=len(meshes);prefix='look-top-'+kind
     obj=torso_garment(prefix,tee,-.002,kind)
-    if kind=='turtleneck':rings(prefix+'-neck',[((0,0,1.438),.064,.060,{'neck':1}),((0,0,1.51),.061,.057,{'neck':1})],tee,cap=False)
     finish_group(prefix,start)
-# Thick roll neck and knit ribs remain part of the sweater.
-start=len(meshes);original=bpy.data.objects.get('look-top-sweater');meshes.remove(original);meshes.append(original);start=len(meshes)-1
-rings('knitted-roll-neck',[((0,0,1.436),.078,.073,{'neck':1}),((0,0,1.505),.075,.070,{'neck':1}),((0,0,1.518),.069,.064,{'neck':1})],sweater,cap=False)
-finish_group('look-top-sweater',start)
 
 # Skinny follows the same connected crotch; narrowing only below the upper thigh.
 start=len(meshes);pants_surface('look-bottom-skinny-fabric',denim,'jeans');obj=finish_group('look-bottom-skinny',start)

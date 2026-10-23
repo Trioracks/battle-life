@@ -28,16 +28,17 @@ test('choices_survive_roundtrip_and_resume without hidden rerolls or duplicate p
  assert.equal(resumed.ok,true);assert.deepEqual(resumed.state.music.job,s.music.job);
  assert.deepEqual(resumed.state.projects[0],original);
  const done=advanceBeatWork(resumed.state,600);
- assert.equal(done.finished,true);assert.equal(done.state.music.practice,1/3);
+ assert.equal(done.finished,true);assert.ok(Math.abs(done.state.music.practice-Math.sqrt(3)/3)<1e-9);
  assert.equal(done.state.projects[0].productionMode,'automatic');
- assert.equal(advanceBeatWork(done.state,600).state.music.practice,1/3);
+ assert.ok(Math.abs(advanceBeatWork(done.state,600).state.music.practice-Math.sqrt(3)/3)<1e-9);
  assert.deepEqual(done.state.projects[0].audio,original.audio);
 });
 
 test('saved slider fit affects new result quality but cannot make a novice professional',()=>{
  const qualities=[];
  for(const values of [[0,0,0],[10,10,10],[5,5,5]]){
-  let s=createBeat(seed(),{id:'a',name:'Первый'},{beatmaking:25},()=>0).state;
+  const initial=seed();initial.music.genres.xp.experimental=100;
+  let s=createBeat(initial,{id:'a',name:'Первый'},{beatmaking:25},()=>0).state;
   s=startBeatStage(s,'a',values,{beatmaking:25}).state;
   s=advanceBeatWork(s,600).state;qualities.push(s.projects[0].stages[0].quality);
  }

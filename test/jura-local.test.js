@@ -6,11 +6,11 @@ import {ensureNpcRoundTrack,normalizeNpcTracks} from '../src/battle-npc.js';
 import {createVirtualPcState} from '../src/virtual-pc-state.js';
 import {npcPlaybackDescriptor} from '../src/battle-npc-audio.js';
 import {playTrackVersion} from '../src/track-version-audio.js';
-const args=(characterId='mak-npc-02',roundId='selection')=>({characterId,roundId,battleId:'makarevich-1',nowMinute:600});
-test('Jura assignment uses base flow boundaries and retains the assigned speaker after progression',()=>{
+const args=(characterId='mak-npc-10',roundId='selection')=>({characterId,roundId,battleId:'makarevich-1',nowMinute:600});
+test('seeded Jura assignment ignores Flow and retains the assigned speaker after progression',()=>{
  assert.equal(typeof voices.selectNpcVocal,'function');
  for(const flow of [0,9.99])assert.equal(voices.selectNpcVocal({}, {characterId:'npc',seed:71,flow}).asset.voiceId,'npc-voice:jura-20261018');
- assert.equal(voices.selectNpcVocal({}, {characterId:'npc',seed:71,flow:65.01}).asset,null);
+ assert.equal(voices.selectNpcVocal({}, {characterId:'npc',seed:71,flow:65.01}).asset.voiceId,'npc-voice:jura-20261018');
  const first=voices.selectNpcVocal({}, {characterId:'npc',seed:71,flow:0});
  assert.equal(voices.selectNpcVocal(first.state,{characterId:'npc',seed:999,flow:100}).asset.voiceId,first.asset.voiceId);
 });
@@ -36,13 +36,16 @@ test('malformed voice history blocks replay and normalization preserves the reco
  assert.equal(voices.selectNpcVocal(used,{characterId:'npc',seed:71,flow:0}).ok,false,'a reset cursor with an already used last entry cannot replay the first recording');
 });
 test('real NPC saved round includes only Jura vocal, social playback, idempotent reads and reload equality',async()=>{
- const first=ensureNpcRoundTrack(createVirtualPcState(),args());assert.equal(first.ok,true,first.reason);
+ // Freeze the pre-Daniel assignment; a fresh six-speaker draw is a different case.
+ const historical={voiceId:'npc-voice:jura-20261018',seed:3108368072,cycle:0,cursor:0,order:[3,38,26,41,40,18,32,20,13,12,42,15,31,4,23,10,9,47,14,43,24,35,11,48,2,25,16,7,37,22,45,27,34,33,21,49,19,36,39,44,8,28,30,6,5,29,17,1,46].map(n=>'npc-jura-'+String(n).padStart(2,'0')),lastId:null};
+ const initial=createVirtualPcState({npcTracks:{voices:{'mak-npc-10':historical}}});
+ const first=ensureNpcRoundTrack(initial,args());assert.equal(first.ok,true,first.reason);
  const v=first.state.trackVersions.byId[first.trackVersionId];assert.equal(v.npc.audioStatus,'complete');assert.equal(v.npc.voiceId,'npc-voice:jura-20261018');
  const vocal=v.recipe.descriptor.parts.filter(p=>p.vocal);assert.equal(vocal.length,1);assert.ok(vocal[0].id.startsWith('npc-jura-'));assert.equal(vocal[0].vocal.ceiling,44);
  assert.equal(npcPlaybackDescriptor(v).ok,true);let played;
  assert.equal((await playTrackVersion({playDescriptor:async d=>{played=d;return true;}},v)).ok,true);assert.equal(played.parts.at(-1).id,vocal[0].id);
  const again=ensureNpcRoundTrack(createVirtualPcState(JSON.parse(JSON.stringify(first.state))),args());assert.deepEqual(again.state.trackVersions.byId[first.trackVersionId],v);assert.deepEqual(again.state.npcTracks.voices,first.state.npcTracks.voices);
- const next=ensureNpcRoundTrack(again.state,args('mak-npc-02','round-2'));assert.equal(next.ok,true,next.reason);assert.notEqual(next.state.trackVersions.byId[next.trackVersionId].recipe.descriptor.parts.at(-1).id,vocal[0].id);
+ const next=ensureNpcRoundTrack(again.state,args('mak-npc-10','round-2'));assert.equal(next.ok,true,next.reason);assert.notEqual(next.state.trackVersions.byId[next.trackVersionId].recipe.descriptor.parts.at(-1).id,vocal[0].id);
  const bad=ensureNpcRoundTrack(next.state,{...args(),roundId:'invalid'});assert.equal(bad.ok,false);assert.deepEqual(bad.state.npcTracks.voices,next.state.npcTracks.voices);
 });
 test('six additive experimental sources are reachable only below 50 XP and preserve legacy selection',()=>{

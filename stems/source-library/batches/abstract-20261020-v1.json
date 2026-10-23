@@ -1,0 +1,2491 @@
+{
+  "version": 1,
+  "batch": "abstract-20261020-v1",
+  "abstractRoot": "D:\\Music\\game\\Абстракт",
+  "experimentalRoot": "D:\\Music\\game\\Эксперементал",
+  "libraryRoot": "D:\\Project\\Battle\\stems\\source-library",
+  "sources": [
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\bass 1.mp3",
+      "role": "bass",
+      "family": "Track 01",
+      "index": 1,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\bass\\bass 1.mp3",
+      "bytes": 134277,
+      "sha256": "e1a7503e09f6b784da37d02adc8e363a4b5d566fd24a914ccc9a166a9a7f0814"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\bass 2.mp3",
+      "role": "bass",
+      "family": "Track 01",
+      "index": 2,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\bass\\bass 2.mp3",
+      "bytes": 133701,
+      "sha256": "8bde3ab7b02bd210f6dd0c10dcecb2d8ee84d06bbb1969bee44b2c35ba07b110"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\bass 3.mp3",
+      "role": "bass",
+      "family": "Track 01",
+      "index": 3,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\bass\\bass 3.mp3",
+      "bytes": 134277,
+      "sha256": "a8d7147077dcc8cb17f2de344cea6f4d28b9ecc2f858ad5b1640541535305560"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\bass 4.mp3",
+      "role": "bass",
+      "family": "Track 01",
+      "index": 4,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\bass\\bass 4.mp3",
+      "bytes": 134277,
+      "sha256": "8d8a92fd3d686ae6bc94c76142214b478dcba78bea95efd4fdc0731dcba800c7"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\bass 5.mp3",
+      "role": "bass",
+      "family": "Track 01",
+      "index": 5,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\bass\\bass 5.mp3",
+      "bytes": 134277,
+      "sha256": "8e3a53afae684a67af35a52a3ca8846c690fc13beda62599a5a84ea85a090a96"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\bass 6.mp3",
+      "role": "bass",
+      "family": "Track 01",
+      "index": 6,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\bass\\bass 6.mp3",
+      "bytes": 133701,
+      "sha256": "67b379048c5c105876c488a34bbad3437ed4e33ff0fe42c71c2db83a8b07e053"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\bass 7.mp3",
+      "role": "bass",
+      "family": "Track 01",
+      "index": 7,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\bass\\bass 7.mp3",
+      "bytes": 134277,
+      "sha256": "c7fcaae024bf2ae92405fdcf5002fe772a88c8b17230fefda933cfedf0a53e48"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\bass 8.mp3",
+      "role": "bass",
+      "family": "Track 01",
+      "index": 8,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\bass\\bass 8.mp3",
+      "bytes": 134277,
+      "sha256": "74a5ac0960d3780a3d255e710fe200260fb9a0e64cfe063d41397185c51299d5"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\bass 9.mp3",
+      "role": "bass",
+      "family": "Track 01",
+      "index": 9,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\bass\\bass 9.mp3",
+      "bytes": 134277,
+      "sha256": "feda12cbf19a11e21d051dc28ea17aa3c1354fce6465668c4b8797a9fd64a893"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\Drum 1.mp3",
+      "role": "drums",
+      "family": "Track 01",
+      "index": 1,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\drums\\Drum 1.mp3",
+      "bytes": 134277,
+      "sha256": "5e3ddb759eeaa9c28cd0747a2b9b1cf9f433ea1174e6fa793b0ac1076e997b0f"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\drum 2.mp3",
+      "role": "drums",
+      "family": "Track 01",
+      "index": 2,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\drums\\drum 2.mp3",
+      "bytes": 133701,
+      "sha256": "130c7bd28fc3b65fe0d2fa48cec701167f62be0880e7a31525a6867abaef37a4"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\drum 3.mp3",
+      "role": "drums",
+      "family": "Track 01",
+      "index": 3,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\drums\\drum 3.mp3",
+      "bytes": 133701,
+      "sha256": "ac7b1a7a3168015f7cc5e0fc72114f6f5bfe96f1ecd877043cc93f643375a2ee"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\drum 4.mp3",
+      "role": "drums",
+      "family": "Track 01",
+      "index": 4,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\drums\\drum 4.mp3",
+      "bytes": 133701,
+      "sha256": "f340e84ea88311db949d3def6f9fe9227d68e77a47f69b565500c5d390c418d5"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\drum 5.mp3",
+      "role": "drums",
+      "family": "Track 01",
+      "index": 5,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\drums\\drum 5.mp3",
+      "bytes": 133701,
+      "sha256": "adb7905ff0d23dc1565c8e6c5f4c0309c7b9de40fb7a2546d6cad9356653d210"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\drum 6.mp3",
+      "role": "drums",
+      "family": "Track 01",
+      "index": 6,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\drums\\drum 6.mp3",
+      "bytes": 134277,
+      "sha256": "dfa298a71d01e0edb0e37dcc53e61e41ff4de4fa11486f575323dd1a957745a2"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\drum 7.mp3",
+      "role": "drums",
+      "family": "Track 01",
+      "index": 7,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\drums\\drum 7.mp3",
+      "bytes": 134277,
+      "sha256": "2068c27e98792d98605450a0373b4316f0f0dc0799ca5e60e9b2d60b2837265a"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\drum 8.mp3",
+      "role": "drums",
+      "family": "Track 01",
+      "index": 8,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\drums\\drum 8.mp3",
+      "bytes": 134277,
+      "sha256": "363e634e289f3f532297572bbae8dc65cd88f4b6d8d3dd1a660e8a3cb473b3da"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\drum 9.mp3",
+      "role": "drums",
+      "family": "Track 01",
+      "index": 9,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\drums\\drum 9.mp3",
+      "bytes": 133701,
+      "sha256": "6761cd769861a626fb3174b429c9ab6c3ba9d5282dd194d2f8199955db98a606"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\lead 1.mp3",
+      "role": "lead",
+      "family": "Track 01",
+      "index": 1,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\lead\\lead 1.mp3",
+      "bytes": 133701,
+      "sha256": "2aeed5e918397e78575118c7dba09669a162b41535eca1202d57794b34829fcf"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\lead 2.mp3",
+      "role": "lead",
+      "family": "Track 01",
+      "index": 2,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\lead\\lead 2.mp3",
+      "bytes": 133701,
+      "sha256": "f6060305f0eadc6ca29bf0272fe2565ccf3943cef88dbbd8d603cbcdb8f764cd"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\lead 3.mp3",
+      "role": "lead",
+      "family": "Track 01",
+      "index": 3,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\lead\\lead 3.mp3",
+      "bytes": 133701,
+      "sha256": "d40b319f56934c5e4f5380dda8929cc22dcc2e20f683d592fe99bc3b8ceaefd6"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\lead 4.mp3",
+      "role": "lead",
+      "family": "Track 01",
+      "index": 4,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\lead\\lead 4.mp3",
+      "bytes": 133125,
+      "sha256": "11b36ec648b2839a37a1039a60a064cbbb612bae83f8305fa8c4aa62378fc412"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\lead 5.mp3",
+      "role": "lead",
+      "family": "Track 01",
+      "index": 5,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\lead\\lead 5.mp3",
+      "bytes": 133701,
+      "sha256": "99e31e63f56238915def92f029a867d9d25b9633021fc6be80ac2fc02466e708"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\lead 6.mp3",
+      "role": "lead",
+      "family": "Track 01",
+      "index": 6,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\lead\\lead 6.mp3",
+      "bytes": 133701,
+      "sha256": "80130dbf6939b685f0bfa5f93df42de2cc4efafc23df2e8ec7160b9239c7b9ab"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\lead 7.mp3",
+      "role": "lead",
+      "family": "Track 01",
+      "index": 7,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\lead\\lead 7.mp3",
+      "bytes": 134277,
+      "sha256": "33eb691559d9d418b3e57b3ff04a8a0313775629a75064313e04c6e90ad17555"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\lead 8.mp3",
+      "role": "lead",
+      "family": "Track 01",
+      "index": 8,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\lead\\lead 8.mp3",
+      "bytes": 134277,
+      "sha256": "a9d3898dd0122e33602140265116e56808bcd13f54c100fec34480db17673c36"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 01\\lead 9.mp3",
+      "role": "lead",
+      "family": "Track 01",
+      "index": 9,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-01\\lead\\lead 9.mp3",
+      "bytes": 133701,
+      "sha256": "b803524c8f74503b9b171235cbee4ecea09cdc9da3a98e4d60ac79ab794b2c6b"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\bass 1.mp3",
+      "role": "bass",
+      "family": "Track 02",
+      "index": 1,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\bass\\bass 1.mp3",
+      "bytes": 134853,
+      "sha256": "978943fdcb51fbc1d5aa2fcd30432ab1a9eaee28a15ba0cf15ba1ce63b398d18"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\bass 2.mp3",
+      "role": "bass",
+      "family": "Track 02",
+      "index": 2,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\bass\\bass 2.mp3",
+      "bytes": 134277,
+      "sha256": "95f8bcea7589a2a3ee03a98c3827c17ce7296610e693bd590979de26ebc9ea1d"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\bass 3.mp3",
+      "role": "bass",
+      "family": "Track 02",
+      "index": 3,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\bass\\bass 3.mp3",
+      "bytes": 134277,
+      "sha256": "6b00487616a735c00c1edaa5bf4ffe3ff2fa3528f04a68ebb790d29b702bc995"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\bass 4.mp3",
+      "role": "bass",
+      "family": "Track 02",
+      "index": 4,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\bass\\bass 4.mp3",
+      "bytes": 133701,
+      "sha256": "5f45e1d70dfefc1c7b03c39fdd16c1388d5a6261c2861df3ae3465cf3fabda63"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\bass 5.mp3",
+      "role": "bass",
+      "family": "Track 02",
+      "index": 5,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\bass\\bass 5.mp3",
+      "bytes": 134853,
+      "sha256": "f568729cd61224c0ad9975213692f90118ea2720ab7a277a25a92b0abf8c2498"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\bass 6.mp3",
+      "role": "bass",
+      "family": "Track 02",
+      "index": 6,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\bass\\bass 6.mp3",
+      "bytes": 133701,
+      "sha256": "36ffa30ba7426a87c30061a9065f6d96f6a5c925ed5b4071a5f345213ed39e02"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\bass 7.mp3",
+      "role": "bass",
+      "family": "Track 02",
+      "index": 7,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\bass\\bass 7.mp3",
+      "bytes": 134277,
+      "sha256": "f86e1fdac10a8851ec6f203814cc3ca9a838a26927683d8196b9dce5667132d8"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\bass 8.mp3",
+      "role": "bass",
+      "family": "Track 02",
+      "index": 8,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\bass\\bass 8.mp3",
+      "bytes": 129093,
+      "sha256": "52f76057b4fd12ca0105c9fc2a488615f81fc9dcceb8de68e0dc8e79aa4c58ae"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\bass 9.mp3",
+      "role": "bass",
+      "family": "Track 02",
+      "index": 9,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\bass\\bass 9.mp3",
+      "bytes": 134277,
+      "sha256": "f305cb005d86e88d0bc1f0431764e15c1156e1fc3f9da5e5b8192906c6080ebd"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\bass 10.mp3",
+      "role": "bass",
+      "family": "Track 02",
+      "index": 10,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\bass\\bass 10.mp3",
+      "bytes": 134277,
+      "sha256": "1b7c5e0f6dcf7672ffc7447f8bfae7b813768fc6b55331c39bd1ac49a4876a2a"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\bass 11.mp3",
+      "role": "bass",
+      "family": "Track 02",
+      "index": 11,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\bass\\bass 11.mp3",
+      "bytes": 134277,
+      "sha256": "7e3d92a1b59614d9d4591fd75ef8d75f5bbfb7865e0e944d54831d34e9f4f635"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\drum 1.mp3",
+      "role": "drums",
+      "family": "Track 02",
+      "index": 1,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\drums\\drum 1.mp3",
+      "bytes": 134277,
+      "sha256": "be8d13a499114d3e94144aca725083ea97698de8032ff442202a8857e5b02b23"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\drum 2.mp3",
+      "role": "drums",
+      "family": "Track 02",
+      "index": 2,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\drums\\drum 2.mp3",
+      "bytes": 134277,
+      "sha256": "d8511f427b524753b0a33d2ef67efeb38f7896f8b8c5e92357ae306de5300a2c"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\drum 3.mp3",
+      "role": "drums",
+      "family": "Track 02",
+      "index": 3,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\drums\\drum 3.mp3",
+      "bytes": 133701,
+      "sha256": "91fb076432205a8bc3cc1ec2a1053a5c6b6eb1f9c426f92df5e693b6c00cd7d2"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\drum 4.mp3",
+      "role": "drums",
+      "family": "Track 02",
+      "index": 4,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\drums\\drum 4.mp3",
+      "bytes": 133125,
+      "sha256": "1b2c81f3c8b2176a50ce2d67de237f0694d3ca728da134a6f619349fc4b80b1e"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\drum 5.mp3",
+      "role": "drums",
+      "family": "Track 02",
+      "index": 5,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\drums\\drum 5.mp3",
+      "bytes": 134277,
+      "sha256": "5284ef2d5d2db6d3d93bb65fa05453673728c7c0033b5eb364b20002e66c25fe"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\drum 6.mp3",
+      "role": "drums",
+      "family": "Track 02",
+      "index": 6,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\drums\\drum 6.mp3",
+      "bytes": 133125,
+      "sha256": "1f5fe78f7dc74cd0587ebf49870f7beaf35a74bb07260032bdf90bd2a5d6d8eb"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\drum 7.mp3",
+      "role": "drums",
+      "family": "Track 02",
+      "index": 7,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\drums\\drum 7.mp3",
+      "bytes": 133125,
+      "sha256": "a5cedaa5c9fec6aef0feae822d9009bf64fada231571f81e18845b99ad17beff"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\drum 8.mp3",
+      "role": "drums",
+      "family": "Track 02",
+      "index": 8,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\drums\\drum 8.mp3",
+      "bytes": 133125,
+      "sha256": "b72eed84a61c6ae8064830d91d1471fa1af08223bf7af83d7560345a1dd27a0c"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\drum 9.mp3",
+      "role": "drums",
+      "family": "Track 02",
+      "index": 9,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\drums\\drum 9.mp3",
+      "bytes": 133125,
+      "sha256": "fb70750435590fea76106ac903178ff95ec10dd547f87955a4dd0de89a36fad5"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\drum 10.mp3",
+      "role": "drums",
+      "family": "Track 02",
+      "index": 10,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\drums\\drum 10.mp3",
+      "bytes": 133701,
+      "sha256": "29c1e22c995eb69d012cc82b9d02b53cab4eb8956e4c1d2d4bf3577a5e9752f6"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\drum 11.mp3",
+      "role": "drums",
+      "family": "Track 02",
+      "index": 11,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\drums\\drum 11.mp3",
+      "bytes": 133701,
+      "sha256": "959f47d3deee1c6ad13b853e1d100bb7941ba6af99e4b98c0aa102eb541d9f10"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\lead 1.mp3",
+      "role": "lead",
+      "family": "Track 02",
+      "index": 1,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\lead\\lead 1.mp3",
+      "bytes": 134277,
+      "sha256": "e0e6ee0709d499c3c7356a9dc74aa4edecab21bef3c74995f122dec03eec042d"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\lead 2.mp3",
+      "role": "lead",
+      "family": "Track 02",
+      "index": 2,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\lead\\lead 2.mp3",
+      "bytes": 133701,
+      "sha256": "1923f606e2b433c5ae89105f92b338b3b989a0d313b9ca3adba6099fb9f4abdd"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\lead 3.mp3",
+      "role": "lead",
+      "family": "Track 02",
+      "index": 3,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\lead\\lead 3.mp3",
+      "bytes": 133125,
+      "sha256": "38af3ba270a60bd233041622243a467d8b511b699722c83e88437fb0367fd149"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\lead 4.mp3",
+      "role": "lead",
+      "family": "Track 02",
+      "index": 4,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\lead\\lead 4.mp3",
+      "bytes": 133701,
+      "sha256": "051db1b5735d416348f9f8a5dbbd31ef3dd9ce6daa0a1b5d0c2fd8786d4d4fb9"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\lead 5.mp3",
+      "role": "lead",
+      "family": "Track 02",
+      "index": 5,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\lead\\lead 5.mp3",
+      "bytes": 134277,
+      "sha256": "dbf678d7ebe8c37478b8688a4e18a04fa58d9d4928e8ab5f7e20419bd67bbe2e"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\lead 6.mp3",
+      "role": "lead",
+      "family": "Track 02",
+      "index": 6,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\lead\\lead 6.mp3",
+      "bytes": 133701,
+      "sha256": "2a8c08788fbdb3567a1f0c4b0ce8405ed1372e07d29ff0a27cd5105942bb913f"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\lead 7.mp3",
+      "role": "lead",
+      "family": "Track 02",
+      "index": 7,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\lead\\lead 7.mp3",
+      "bytes": 134277,
+      "sha256": "479d7b8dade47490c755866bb9efbef3d70f79c36fb22025755a8739c8770148"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\lead 8.mp3",
+      "role": "lead",
+      "family": "Track 02",
+      "index": 8,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\lead\\lead 8.mp3",
+      "bytes": 133125,
+      "sha256": "c49e5e92937852f4b429d752865e0336057d0039a081b09693def6e21f6693b5"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\lead 9.mp3",
+      "role": "lead",
+      "family": "Track 02",
+      "index": 9,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\lead\\lead 9.mp3",
+      "bytes": 133125,
+      "sha256": "f22917c682e9b950a05e9201df6f11b451ef684dca00c758240c0e5a9bb5b506"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\lead 10.mp3",
+      "role": "lead",
+      "family": "Track 02",
+      "index": 10,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\lead\\lead 10.mp3",
+      "bytes": 134277,
+      "sha256": "c98ff5e3f10c501d7b9249f1840637bbc123050357a8c5955d37834d9b1ce8d3"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 02\\lead 11.mp3",
+      "role": "lead",
+      "family": "Track 02",
+      "index": 11,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-02\\lead\\lead 11.mp3",
+      "bytes": 133125,
+      "sha256": "a770a6b9183e87e36546122f9d9e528ae43679633f3654c9f56f0f271fdfbc3f"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\bass 1.mp3",
+      "role": "bass",
+      "family": "Track 03",
+      "index": 1,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\bass\\bass 1.mp3",
+      "bytes": 133125,
+      "sha256": "1a95c567044b4129b64b139f14ffd4eff3b4f50b70929a9586131ad7cff98aaf"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\bass 2.mp3",
+      "role": "bass",
+      "family": "Track 03",
+      "index": 2,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\bass\\bass 2.mp3",
+      "bytes": 134277,
+      "sha256": "27d15f21faa55f29417a54bd3f500b50660105564819719a3310cdf5e4a1c2c2"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\bass 3.mp3",
+      "role": "bass",
+      "family": "Track 03",
+      "index": 3,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\bass\\bass 3.mp3",
+      "bytes": 133701,
+      "sha256": "aa38d31b526bc0ec64f1d552010607341617eeffe83013ca3a63c77695b98e07"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\bass 4.mp3",
+      "role": "bass",
+      "family": "Track 03",
+      "index": 4,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\bass\\bass 4.mp3",
+      "bytes": 134277,
+      "sha256": "21c755090d0430a18bd3af15fa5c4f15646176d2cb55711aac1c0f4be2a8b5a0"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\bass 5.mp3",
+      "role": "bass",
+      "family": "Track 03",
+      "index": 5,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\bass\\bass 5.mp3",
+      "bytes": 134277,
+      "sha256": "fdb9cae9f3170b99708a9f739f7094a51cde47d699b1d1da2b934767060073c0"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\bass 6.mp3",
+      "role": "bass",
+      "family": "Track 03",
+      "index": 6,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\bass\\bass 6.mp3",
+      "bytes": 133125,
+      "sha256": "440517b895723767e20332441269d2ff8a34516324dc82da40cdfd8605b95ead"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\bass 7.mp3",
+      "role": "bass",
+      "family": "Track 03",
+      "index": 7,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\bass\\bass 7.mp3",
+      "bytes": 131973,
+      "sha256": "f3534a20238f881a89ac48fe5be7cc8e396a2563af94467a103b47ba8025b9cc"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\drumm 1.mp3",
+      "role": "drums",
+      "family": "Track 03",
+      "index": 1,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\drums\\drumm 1.mp3",
+      "bytes": 134277,
+      "sha256": "f01fe43a0b69d931db22f6387f180764290c746694a3f725904f3eaf4742d15f"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\drumm 2.mp3",
+      "role": "drums",
+      "family": "Track 03",
+      "index": 2,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\drums\\drumm 2.mp3",
+      "bytes": 134277,
+      "sha256": "cdfba181e4050441cf730af47b71ec26bcd5667de91566a6ec0c741ac1ac5dad"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\drumm 3.mp3",
+      "role": "drums",
+      "family": "Track 03",
+      "index": 3,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\drums\\drumm 3.mp3",
+      "bytes": 134277,
+      "sha256": "499acb57d5df527670c1f3be2d83a12567cdfa27d1b2669efdaea410d53a6cbf"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\drumm 4.mp3",
+      "role": "drums",
+      "family": "Track 03",
+      "index": 4,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\drums\\drumm 4.mp3",
+      "bytes": 134853,
+      "sha256": "3a654c6f203620d3439d1bd041c5b8f5e545cb16f1196e1effe32181f1935644"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\drumm 5.mp3",
+      "role": "drums",
+      "family": "Track 03",
+      "index": 5,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\drums\\drumm 5.mp3",
+      "bytes": 134853,
+      "sha256": "7cf7b53b40c2ebb67ecc91af55dab969922a264222513365559cf09347b0cb96"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\drumm 6.mp3",
+      "role": "drums",
+      "family": "Track 03",
+      "index": 6,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\drums\\drumm 6.mp3",
+      "bytes": 134277,
+      "sha256": "9ab903875810ee7a8c32adbfe672c55377495134196ac6b5b65b43997477c5ab"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\drumm 7.mp3",
+      "role": "drums",
+      "family": "Track 03",
+      "index": 7,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\drums\\drumm 7.mp3",
+      "bytes": 133701,
+      "sha256": "3d65ebb4684fb800af8175041ffe84a61328d0f2905f92d6cfa2372a1e47bc60"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\Lead 1.mp3",
+      "role": "lead",
+      "family": "Track 03",
+      "index": 1,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\lead\\Lead 1.mp3",
+      "bytes": 133701,
+      "sha256": "6698640e521c709c4121414fb602bfcab193b8856cdd1372b31a3d39c126f299"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\Lead 2.mp3",
+      "role": "lead",
+      "family": "Track 03",
+      "index": 2,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\lead\\Lead 2.mp3",
+      "bytes": 133125,
+      "sha256": "4b21911047f51b14573eb20c3c1de3cf6663f7c61b6ae1b3f17b9eb6a85fdbd4"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\Lead 3.mp3",
+      "role": "lead",
+      "family": "Track 03",
+      "index": 3,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\lead\\Lead 3.mp3",
+      "bytes": 133125,
+      "sha256": "c63d733a6b2422aac0eb7b0e0357151414ce238c8b70527d8fca35c0f33fc659"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\Lead 4.mp3",
+      "role": "lead",
+      "family": "Track 03",
+      "index": 4,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\lead\\Lead 4.mp3",
+      "bytes": 133125,
+      "sha256": "1210c950d9ed5a81bee00f0422fa936b5fd82fb1fdd84b679c0fa53b302d6d16"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\Lead 5.mp3",
+      "role": "lead",
+      "family": "Track 03",
+      "index": 5,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\lead\\Lead 5.mp3",
+      "bytes": 133125,
+      "sha256": "690c0d8f8cbf2057d7e6881102c684745d7a6e6ac0c9e941efabbf4b9f37a495"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\Lead 6.mp3",
+      "role": "lead",
+      "family": "Track 03",
+      "index": 6,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\lead\\Lead 6.mp3",
+      "bytes": 133701,
+      "sha256": "5093411fcc6a2b04230895600c43002a4397a99adfb85ad0e78c2eeed079ab11"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 03\\Lead 7.mp3",
+      "role": "lead",
+      "family": "Track 03",
+      "index": 7,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-03\\lead\\Lead 7.mp3",
+      "bytes": 133125,
+      "sha256": "f91dc9201d0652334a65c71fa7225c3267dd539feccdc61abc985099d13062d0"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 1.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 1,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 1.mp3",
+      "bytes": 133701,
+      "sha256": "fa25c2c57eba57b0c93017e9f5151176222fef3ea18c602b27ab8b96c53ccf10"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 2.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 2,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 2.mp3",
+      "bytes": 134277,
+      "sha256": "709b01fdbd6f227b62c296c19b769e14e8aa50a41d430769046021bec5fcb1d4"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 3.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 3,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 3.mp3",
+      "bytes": 133125,
+      "sha256": "9b37ec7a5d94df276c5cc52914a6b008fdf85f96f8998e01958cffb24c536ddc"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 4.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 4,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 4.mp3",
+      "bytes": 134277,
+      "sha256": "da332cc47bac9cbcafd2d1d433a15ed76e4732a8f93db36adff8f92785daa136"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 5.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 5,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 5.mp3",
+      "bytes": 133701,
+      "sha256": "8a6b04f90e39bbb81803f0db7f69732ebbdfd9ad4bd32556d373f0e13737e78f"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 6.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 6,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 6.mp3",
+      "bytes": 134277,
+      "sha256": "de87670fc107aca34cab2ce18cb494f72fd5c525f0ba29a1b7b602381d04c49c"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 7.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 7,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 7.mp3",
+      "bytes": 133701,
+      "sha256": "58646f7409a5dc664d01406dfdfe2b50a2829e017cc4addfb44f52735ea8ce89"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 8.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 8,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 8.mp3",
+      "bytes": 133701,
+      "sha256": "8a1b20591e19bf6571d383ce4fee89f4f74cfd6a5dbf370f4d703f757a7b9819"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 9.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 9,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 9.mp3",
+      "bytes": 134277,
+      "sha256": "9bfa40c1cf9eff63781fab6709e8ea41a7cae1d87b5609e21a33e6fb56f683d7"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 10.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 10,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 10.mp3",
+      "bytes": 134853,
+      "sha256": "8dcd782377a4a64f5562242e2c8beb0448d9c271645689f1e62c62aa88d97357"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 11.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 11,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 11.mp3",
+      "bytes": 133125,
+      "sha256": "e97ca4ed055238ecd2bf6605fbfde05eb2ebab3fc4229ceca5d28c1a039da527"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 12.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 12,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 12.mp3",
+      "bytes": 133701,
+      "sha256": "b5dd5c94df6fd824a0732be5179793f89984850962d4fc938afd347d76d2eb89"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 13.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 13,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 13.mp3",
+      "bytes": 134277,
+      "sha256": "39cbbd44b202022cb3efab71db68bfe8f9a09cb7b8a52badc340c98762a480d3"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 14.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 14,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 14.mp3",
+      "bytes": 134277,
+      "sha256": "4a85ba2954bc20fb587f5bbfce6d60aa53e6d0875bd38eb5914e976ebfb55643"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 15.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 15,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 15.mp3",
+      "bytes": 134277,
+      "sha256": "b785817d14499e3f94f903a13edc8e0537180cc83a1fe878912df1f0afa6e4a6"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 16.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 16,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 16.mp3",
+      "bytes": 134277,
+      "sha256": "a07eb04efef5583c3fed23de7fb5440657679676782b8fed202e251d65b13683"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 17.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 17,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 17.mp3",
+      "bytes": 134853,
+      "sha256": "480b1c2ae309f3829400b560a3f3cb74b0b807a57e5f39178a76c3b1e9b3bd35"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 18.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 18,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 18.mp3",
+      "bytes": 133701,
+      "sha256": "87e10f064b417a1b1aa06630de47bc0cf1ffbd0954dcc4724fb25028ee691f44"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 19.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 19,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 19.mp3",
+      "bytes": 134277,
+      "sha256": "c0f6227a3a28ab7f5f848177dbabe9520b997d517e777987a064d6df6d58338c"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\bass 20.mp3",
+      "role": "bass",
+      "family": "Track 04",
+      "index": 20,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\bass\\bass 20.mp3",
+      "bytes": 70341,
+      "sha256": "8b238ba12b609c0e4e0c2d23f35a4950d25dfb479b8df006458f746ddb347ff0"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 1.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 1,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 1.mp3",
+      "bytes": 133701,
+      "sha256": "6f3d74a6d0f326536310c680a31f90dea50934a94cfb1fe4e820aeb1f42867c6"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 2.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 2,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 2.mp3",
+      "bytes": 129093,
+      "sha256": "4d05b4f0bb0d93e7646110384d25f4497482db7446cbde1d697cca8cd7e9c969"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 3.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 3,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 3.mp3",
+      "bytes": 129669,
+      "sha256": "f1e13bc8b99fba5fcb22d354ba6a9d94797943f59431c9fe261883814664afa8"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 4.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 4,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 4.mp3",
+      "bytes": 134853,
+      "sha256": "8a2c36d797ab8a51c6efd6a8b77ba8baedc8285c4817a4b6fa9391c7ca5398df"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 5.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 5,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 5.mp3",
+      "bytes": 131397,
+      "sha256": "6ffb928c8580d322e2eb053893b0eb01189d6b1aad6fa8f9b16c82559c8c7845"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 6.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 6,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 6.mp3",
+      "bytes": 131397,
+      "sha256": "070fb457920ce60701dea0a9dc69f319d2c4e6a718f06aec89d661baa86c3797"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 7.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 7,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 7.mp3",
+      "bytes": 134277,
+      "sha256": "918ace0a8cca676ef26d6fead71f49fa3992e28d698a73b3f2566f29b59fbf34"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 8.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 8,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 8.mp3",
+      "bytes": 134277,
+      "sha256": "f5365888100b055803d690dc2dbd60f0764ca573a5339e10f1bb37b6cf9cadd8"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 9.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 9,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 9.mp3",
+      "bytes": 129669,
+      "sha256": "45a89506f1aa8fdc937cf883090a0cafd86476bda707dc72fec1642da444315b"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 10.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 10,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 10.mp3",
+      "bytes": 132549,
+      "sha256": "731af8913d9da79650983dd0b71e07fed93d97818a632fe47548a2afae4ade28"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 11.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 11,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 11.mp3",
+      "bytes": 130245,
+      "sha256": "8889b697a58ec9293edb5abfc9e537805ac6df8cba4b8cf625f2e6ae0226f3a1"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 12.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 12,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 12.mp3",
+      "bytes": 129669,
+      "sha256": "455a5d32ec121c1b6d1b5f3b80dabae6145af0842afae1f24df52b5dcc5bebcc"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 13.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 13,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 13.mp3",
+      "bytes": 129669,
+      "sha256": "61e944c83d69e64d2e90cab68f45a01932dc96d860032b76d2ca69db060a9ec9"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 14.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 14,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 14.mp3",
+      "bytes": 129669,
+      "sha256": "ec5db0c42c9190e702c696ddd4ee913cbd819a49f0ee82750568c93c3e945b72"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 15.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 15,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 15.mp3",
+      "bytes": 130245,
+      "sha256": "c85c5fb63433677ec971c28f19fa63544708d91871da3ea9810b7612d4c5a451"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 16.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 16,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 16.mp3",
+      "bytes": 129669,
+      "sha256": "310a57ab62f4590ce079fb21127b653b217930a9d2404bfe13f40cf5273d0e25"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 17.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 17,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 17.mp3",
+      "bytes": 129669,
+      "sha256": "8d15ce0779fa9f242619fafb478c39418758a29f2a93e917cea0a63f24171234"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 18.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 18,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 18.mp3",
+      "bytes": 131973,
+      "sha256": "aa8573e15496fcc3fcb108384800ce29651b6c27e81fcd0b9c7ca576c980fd8a"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 19.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 19,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 19.mp3",
+      "bytes": 133125,
+      "sha256": "a5436a3e755e7c11a648befb9302338cab358783364ee8efe5439219b12b3ccc"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\drum 20.mp3",
+      "role": "drums",
+      "family": "Track 04",
+      "index": 20,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\drums\\drum 20.mp3",
+      "bytes": 65733,
+      "sha256": "493e1abde367e50da3b49b8482b81476271f11ec5e7ed9208a4b9f8c8d51b7ff"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 1.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 1,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 1.mp3",
+      "bytes": 133125,
+      "sha256": "343a74cb190394794732bd38c79add9c296f9d16bdf4ef7268c5a4a10cdcb759"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 2.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 2,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 2.mp3",
+      "bytes": 133701,
+      "sha256": "f42e157bcd10345fa2914c0d628e1e59a5d71f72005d20f9e14fdb847876df71"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 3.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 3,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 3.mp3",
+      "bytes": 133125,
+      "sha256": "1dc709dc3fe317a7daa4c7dbfd6ed1e026130c6f3d38fde11b0591de3a6653b0"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 4.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 4,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 4.mp3",
+      "bytes": 133125,
+      "sha256": "2c8c6557d401f6e81ceee0d14e86d6f82fd3ecffe041e440a6a104d726e10447"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 5.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 5,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 5.mp3",
+      "bytes": 133125,
+      "sha256": "6f7b003ff006f63e820b2fd518a4403394c6b00c7cf0b27fa1c4b0c17c40668d"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 6.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 6,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 6.mp3",
+      "bytes": 133701,
+      "sha256": "7295477f60b2fed1c9b9014a7478754b0fd6ef3dbb3e91e5100e9a08ae37dc49"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 7.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 7,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 7.mp3",
+      "bytes": 133701,
+      "sha256": "94610bcc215f0d28441b4aa1cdd1d5444ced3de99e89071c513f1964201ec9f9"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 8.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 8,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 8.mp3",
+      "bytes": 133701,
+      "sha256": "27bfc528de5f02ef764c3a110637cd54264714c6d67b5bf0a538b28e3445814b"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 9.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 9,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 9.mp3",
+      "bytes": 133125,
+      "sha256": "9dbc2c6f3ede3fdb77a6666062026b2404e8d974f3e82dbb3d43ee1af30f090c"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 10.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 10,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 10.mp3",
+      "bytes": 133701,
+      "sha256": "0a56e344bcbb8ad9e6558351cc2605aceb7635817f0589fdf0bd287c734bad2f"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 11.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 11,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 11.mp3",
+      "bytes": 133125,
+      "sha256": "ebdb1849dbcbea266213db6f1556d96151a1cc8b77a15f705d040278927a8309"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 12.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 12,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 12.mp3",
+      "bytes": 133125,
+      "sha256": "f8bd006cc975db782e749f17c1a6a1fecbeb8866685d1991502314aea0bd41a2"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 13.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 13,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 13.mp3",
+      "bytes": 134277,
+      "sha256": "2eb661a6e7d2d1736aa15fabb71d3a4411dfad007eb4fcdf012c9aee4832140d"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 14.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 14,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 14.mp3",
+      "bytes": 133125,
+      "sha256": "651d72945a0d30e6fd0573bf240dce284f8063a903c7d5489a46ef0b44bb5126"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 15.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 15,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 15.mp3",
+      "bytes": 133125,
+      "sha256": "12c59b4b9803a80acf87319dca69e1143148be1c77b5bf37a08149cb2c48e494"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 16.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 16,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 16.mp3",
+      "bytes": 133701,
+      "sha256": "8909da6ef86bad78c09255c70ac7f07305608e51d5220f937e8fc576e9140e9f"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 17.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 17,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 17.mp3",
+      "bytes": 133125,
+      "sha256": "7438e87c413ecb4d37783e27c5100e8d10bd03ebf8b8f17cb3828ed68dfe6eb9"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 18.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 18,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 18.mp3",
+      "bytes": 133125,
+      "sha256": "39434c6b3681cb8094fa05cbc1aa01a8bf6192370bcf73537866ff5eb596987c"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 19.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 19,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 19.mp3",
+      "bytes": 133125,
+      "sha256": "181d0d492a83bbb7801eb30700de5908013ad5f3b4f775a327713a2680036d76"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Track 04\\lead 20.mp3",
+      "role": "lead",
+      "family": "Track 04",
+      "index": 20,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\track-04\\lead\\lead 20.mp3",
+      "bytes": 69189,
+      "sha256": "85c331a40580a94bab51630b7da7ff12a0c9d7eb5a49b6dc6c8df5b03213281d"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_2.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_2.wav",
+      "bytes": 1084182,
+      "sha256": "305860d2af5e0275683367d95e99851f11668ad94b8872809244701c451d2542"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_3.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_3.wav",
+      "bytes": 1085514,
+      "sha256": "4816807b40e0b165969c0d63f9ef7ae97fa069ad95ffd7d21df7f9c724f8d498"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_4.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_4.wav",
+      "bytes": 1086850,
+      "sha256": "88260338d4952ff01a6f95de71eee42251123e3ef076df4909c915fc816f297b"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_5.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_5.wav",
+      "bytes": 1076182,
+      "sha256": "b3d92b5505b1977002166503768a00f021e119ca66f15bd35d9cf8a94c88940c"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_6.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_6.wav",
+      "bytes": 1046850,
+      "sha256": "94846debae2f98b36c2340e4b3900f69809f5fcbba97e22e2f222ab260c620cd"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_7.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_7.wav",
+      "bytes": 908182,
+      "sha256": "4388bb794dda9ebb0595b7a67138e8741cd32eaa1c4612a9e5362345cd4b6d43"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_8.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_8.wav",
+      "bytes": 926850,
+      "sha256": "13542847a171492ef7195f03f8be3b9f732a3750d5c948ce2eac557a13fc942e"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_9.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_9.wav",
+      "bytes": 968182,
+      "sha256": "b1c63268f7f65c55951ec6a2ea7f87c8de6ab0932a4b68ec4ef6cb937c4cc60f"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_10.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_10.wav",
+      "bytes": 1089514,
+      "sha256": "48cabef4e96e90977f2d7c6ea60813e42dd9bce9b7a82f796455bb2e85398b65"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_11.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_11.wav",
+      "bytes": 1086850,
+      "sha256": "7c48a1655a8657f22bdeccd963320d79bda7bfece6013c953f03923be681ce45"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_12.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_12.wav",
+      "bytes": 1084182,
+      "sha256": "4cc1799a36ee20c62a0b2cd079f2560ea045705a5a40cfe735b86d21af6ad839"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_13.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_13.wav",
+      "bytes": 1076182,
+      "sha256": "6275bca40cc7d53c8ccd26aafd112aef20847fc53ff920564fac6da69a7b0b56"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_14.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_14.wav",
+      "bytes": 1082850,
+      "sha256": "26792535c84d1cc6813ed37c7dd494fcafb232e622add0a3899a7e3908e22ac2"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_15.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_15.wav",
+      "bytes": 1082850,
+      "sha256": "5b94fc4e2e94c4c49b915a4d53bf788eb2615c60b6091102a6a5670cc626712a"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_16.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_16.wav",
+      "bytes": 1082850,
+      "sha256": "f0ad97495cf689c253e102d8bb3be55a1a6777e4cdb30827bc094213db55f5f4"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_17.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_17.wav",
+      "bytes": 1084182,
+      "sha256": "e9886955a16f94967cce9e9e729709189c7900612fa1ef7ff5cf709abcd741cf"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC_18.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC_18.wav",
+      "bytes": 1085514,
+      "sha256": "2ba38d13535f7cf877bd7d18c34f7b647e21ff23efdd7dfdcec064feffaede84"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - REC.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - REC.wav",
+      "bytes": 1049514,
+      "sha256": "c008a924932ba9da31e6b5ab6c83d9ffa38cb35ce0183de0c8b5904049c633cf"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 2.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 2.wav",
+      "bytes": 1073514,
+      "sha256": "8bb489127b29d6e4ca58bdcffdd215d40feef984c4279b20226b2874070c4cc9"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 3.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 3.wav",
+      "bytes": 1020182,
+      "sha256": "eaf917c2baf0979521fc8c546295cb8493a841c157b6a66dbd4533528c73b31c"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 8.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 8.wav",
+      "bytes": 1088182,
+      "sha256": "890446019fc44213e7c9a908dc8cc2f69612b2b141c2fdb1f1878dfa40371f8e"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 9.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 9.wav",
+      "bytes": 1085514,
+      "sha256": "7faaf2381316fbfa69c8dd3e12da6ea949cdf5d24e6ce78a0ceab1ba4a85349f"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 10.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 10.wav",
+      "bytes": 949514,
+      "sha256": "6c356dd6da4f44359268c0b3009b5300ea732f50ce3cbbe0bece6de510b5ce22"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 11.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 11.wav",
+      "bytes": 1084182,
+      "sha256": "ee022b937d8f467544423d2e9fdf0295155f384c02c9ab70700ae0cfc4d23229"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 12.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 12.wav",
+      "bytes": 1084182,
+      "sha256": "f46e332abf1eeff3bbd2093cc5b47946970318fd6919226acb7c8fad904f9cc3"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 13.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 13.wav",
+      "bytes": 1086850,
+      "sha256": "3fc50d4b0edbf4b89ff9a665e714c76ca560f2b6084f06f104131a88082d0a71"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 15.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 15.wav",
+      "bytes": 1076182,
+      "sha256": "aca887c21fbab04c1dbc81c8c372d48f7ed5d4f28c681ce716775fe4afd90e33"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 16.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 16.wav",
+      "bytes": 778850,
+      "sha256": "60070401db9936ecf22ee34333f41e9cdbdc80610fd806ee9d6b8be66bc6958a"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 17.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 17.wav",
+      "bytes": 1046850,
+      "sha256": "1e906890728e9c4597e0bc039d2522fed636a341e198c438ea85ecc2e7d28ee9"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 19.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 19.wav",
+      "bytes": 984182,
+      "sha256": "66122fa05432d3e625cb3421b237ea58e95c467d2870033ccf6808c1cc251ed6"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 20.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 20.wav",
+      "bytes": 1073514,
+      "sha256": "b8dc0c0ff91ed18cdb7cee597e39a08da0ace3b26087a214ed939dbda592c3cb"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 21.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 21.wav",
+      "bytes": 1041514,
+      "sha256": "ede859f38ec71c8475507820b52e486643dd94ce429bf01c80f1894d32f2b6c5"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 22.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 22.wav",
+      "bytes": 1014850,
+      "sha256": "cff043784d2f3249c82978b6e3cca8ff64e235839643dfeb0e744c1c515b39ba"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 25.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 25.wav",
+      "bytes": 1069514,
+      "sha256": "797245d6e7e6a29dd9c4e542efe5ab52a1e853c39f1b17b5c094ab8018311a11"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 26.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 26.wav",
+      "bytes": 1020182,
+      "sha256": "515a4c0a897a0e67abffd3462aa9be9b1622b9f4b9664eae172284ddc0125f55"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 27.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 27.wav",
+      "bytes": 1068182,
+      "sha256": "9703a27a17b7a06ded38800ea59811ccee27050c347a6ea19f4b474960c0f734"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 29.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 29.wav",
+      "bytes": 1084182,
+      "sha256": "7ce47a8e525c74918caf094d4268b9d87247911f2fc7294dd6a56256b5309ac7"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 31.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 31.wav",
+      "bytes": 1028182,
+      "sha256": "f68558165aa1db708734b6dadf81e11993f03e4fe061933b16118f276ef09f3f"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 33.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 33.wav",
+      "bytes": 1085514,
+      "sha256": "052cb73c56954b8d481acd5b82258e3ef4e22f974b390dc527e2c13f2398a3b9"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 34.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 34.wav",
+      "bytes": 1072182,
+      "sha256": "249c111623555949e73052f54eaab51cea139dd278a8dd6b9bc8bfb3236bdb39"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 35.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 35.wav",
+      "bytes": 1082850,
+      "sha256": "ec8cb42af54b2d74c7f65c16d543833fa649a9bbca5ad475e8f7bc9dd7eaeb0b"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 37.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 37.wav",
+      "bytes": 1077514,
+      "sha256": "c1af240175dda72525d25faf3f1d1c2c23c6587ba5b3406ca9b15850b74abdbd"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 39.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 39.wav",
+      "bytes": 1082850,
+      "sha256": "ad2edb953362f28f5a7214da7f066d54530a33bf49118781d5c153ea638533b1"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 41.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 41.wav",
+      "bytes": 1080182,
+      "sha256": "fb2f0f60938b0c6f8572ff9c283197b1226b6049f4e55639ba081f2a06e977d9"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 42.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 42.wav",
+      "bytes": 1082850,
+      "sha256": "dca403d64d2e99677ddd2c3c3c1570914f11867a52ed496f3b18d7788b2f825f"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 43.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 43.wav",
+      "bytes": 1074850,
+      "sha256": "496e18f71f20c3945222ef8b7ab10c192d7dbb81a29026989e7db6389af26f4a"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 45.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 45.wav",
+      "bytes": 1077514,
+      "sha256": "97d579200553956bb33c16cf17cecddf3223ac916c512a52b76240f5ba4adaf5"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 47.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 47.wav",
+      "bytes": 1085514,
+      "sha256": "6a24ac5f6e0ec460de8de3e9df6e7d8fb6d8df4916e0f4dad3d1458434c0d4b3"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 48.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 48.wav",
+      "bytes": 977514,
+      "sha256": "51a91615001965c08d5a3bc21f42da797d400f41df82161f0da6a3a2f15f00b2"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 51.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 51.wav",
+      "bytes": 1089514,
+      "sha256": "9eb71821f0bbc70dfc6860881589299d693eb608875ce54cb88c0f9305a642e9"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Даня Войс\\Даниил - Track 52.wav",
+      "role": "voice-danya",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\danya\\abstract-20261020-v1\\Даниил - Track 52.wav",
+      "bytes": 1065514,
+      "sha256": "9b4d529ce11a97c7641e48b9c76033ea93c1479e029791e42b50a618fd02e6d6"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_2.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_2.wav",
+      "bytes": 1069514,
+      "sha256": "229a2f81a4a2ad6e34d4c7875c2f0cbb20dc35e22a9e3dc6ad52c9626b88cf09"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_3.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_3.wav",
+      "bytes": 1066850,
+      "sha256": "f7eb5b5926e8157e7e60bf66f87f105d1baf9930c1d6946006cab204e838be47"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_4.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_4.wav",
+      "bytes": 1090850,
+      "sha256": "17faa99c81832f79f1a1c794a17ea092546d905a6b451b7419f2d30f9e67044c"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_5.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_5.wav",
+      "bytes": 1077514,
+      "sha256": "68f35bcbed34c4f6f1def7c5f6d073e274b789dec454b4036e84b2e127d638c6"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_6.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_6.wav",
+      "bytes": 1062850,
+      "sha256": "5737bee344287d86334e379e8495a2fa68656178487370da0e0c0a733b6c6159"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_7.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_7.wav",
+      "bytes": 1064182,
+      "sha256": "45561e2d0060be32490d9bb956e2ca7859c7eb86ad4b05de68c9d7e92e08ed7b"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_8.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_8.wav",
+      "bytes": 1066850,
+      "sha256": "fb2293b7c01907d449ca08e16586a0eb31cf45aca19125377dc8b1c43b441482"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_9.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_9.wav",
+      "bytes": 1025514,
+      "sha256": "185a304c2fadcb168711e4a3286fba201e78c359d5a676eb67962a6b49a2c60e"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_10.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_10.wav",
+      "bytes": 1062850,
+      "sha256": "cbac24d5de3e3ec8e2d35f2d7e59cf6bab4b8cee1242184b6095f9e9bc956fcb"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_11.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_11.wav",
+      "bytes": 941514,
+      "sha256": "348ea2abfca71306dda0e5b711f0812d6e6719a8628d53c1e812c34f745398fa"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_12.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_12.wav",
+      "bytes": 1088182,
+      "sha256": "2a5e74ae5df9f4a6f17987f7fa921e95fa7d8ca267ab8988a8422878bc5cafe0"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_13.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_13.wav",
+      "bytes": 1089514,
+      "sha256": "0fda458ca0709514866fa67a7b48a782bb3e23f1f0e28870770e58d21fd0532d"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_14.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_14.wav",
+      "bytes": 1064182,
+      "sha256": "c958336f8f53ae6f1c4952cd6234a87d957f431856469b1d20d360273d58a772"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_15.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_15.wav",
+      "bytes": 1074850,
+      "sha256": "66509d7ef0ba3ba378c6ba8d936d8d4c1bd227eb2624bcfc44e38721a7696421"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_16.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_16.wav",
+      "bytes": 953514,
+      "sha256": "5fa7a0a7208900e8f6970f844156523dd50de9851880eb508c8802a94bd253d2"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_17.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_17.wav",
+      "bytes": 1084182,
+      "sha256": "5f036081d9d5532142a9056bbc01b51bf76ee7ebfaa775158bf00c5cd0e5048d"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_18.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_18.wav",
+      "bytes": 1060182,
+      "sha256": "9804e53bcc322ce3415eb21ca3ae43629f5dca9dcbb97423559ffb1bccb5ca57"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_19.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_19.wav",
+      "bytes": 1094850,
+      "sha256": "0b8a1c2ac732bfd5a74599a620ce3b18e3ec5e74c8fb7573bae44263f83f9817"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_20.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_20.wav",
+      "bytes": 1032182,
+      "sha256": "76ae35ab17f8a442958f85632474e3030f01210fc02f2feeb4478b4d7bbe7d52"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_21.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_21.wav",
+      "bytes": 1089514,
+      "sha256": "8f55f9c1d82440fc82f64aab5a0013b8dcf910964ad27c801dbb290e99dd1a97"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_22.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_22.wav",
+      "bytes": 937514,
+      "sha256": "52c8d9cc35fc29db05e59d062f5c6a38db13992b8400b66a5fe7a49cc4fb109e"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_23.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_23.wav",
+      "bytes": 1046850,
+      "sha256": "81a9ce9749bad5f43109e64376ded07cf442b73dd2b7b5f5dcb19515e3444d0e"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_24.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_24.wav",
+      "bytes": 1076182,
+      "sha256": "1c6d0673fc971fddc5a7aaa21e22dcd0fd35119ba00d6e11145a9e9ed4ba6cc7"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_25.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_25.wav",
+      "bytes": 1089514,
+      "sha256": "296157aab1d9794f5a0e5580fcf90aedee3f94ac00d96d56b07e88c7c97c1e56"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_26.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_26.wav",
+      "bytes": 1085514,
+      "sha256": "c8e31a005cb3f7ef662b6838ef36153234e1bb570973c21a2811cb4b33b0e963"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_27.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_27.wav",
+      "bytes": 1074850,
+      "sha256": "390de8564028dc2664e642f1cc11671f60dcc0dfb0d47249ad2d922f5305ddad"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_28.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_28.wav",
+      "bytes": 1058850,
+      "sha256": "ac4e4da8683746470ea93698c1889a21d216151284fdfb4023286589e7185899"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_29.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_29.wav",
+      "bytes": 1038850,
+      "sha256": "174d1c26d305ee38fdbfdb06777602f046d5b805512e561bb185f0cf05ee8f5e"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_30.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_30.wav",
+      "bytes": 1042850,
+      "sha256": "68b149708e17e7e20831bea949262152cde436da9f17b56d9011a8b28fcc5fc0"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_31.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_31.wav",
+      "bytes": 1044182,
+      "sha256": "5252e30afa0e3152c47e23ef1b89a9f02d73a52cf3aecee2bfea64f317370070"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_32.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_32.wav",
+      "bytes": 1034850,
+      "sha256": "444ac1fd3bb59e60ac9aacd8b88514317dbb5f1f1bae5ff5724f5051bd75c020"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_33.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_33.wav",
+      "bytes": 1036182,
+      "sha256": "e3bc267692408fd94ea555d02605dc1df4c6ccea601273e6cc82789e7841b583"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_34.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_34.wav",
+      "bytes": 902850,
+      "sha256": "77e75fa45f0b0bed565f8606b838e63bd958324912d60b1bc30fd3fa97fa2598"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_35.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_35.wav",
+      "bytes": 1018850,
+      "sha256": "9d967c1f9d03b0398cb32f15a05f0794a1828d918ef4aa6fc1e58e1a5a46c52c"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_36.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_36.wav",
+      "bytes": 1085514,
+      "sha256": "27c6976249518ce33febf24e592efe4109f2c2126b37739d5e114b922104e0cf"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_37.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_37.wav",
+      "bytes": 1058850,
+      "sha256": "93387b518686dec2e0e0058728b596c684fb6f8ac92198f5749ed0a5b22d4bf7"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_38.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_38.wav",
+      "bytes": 1073514,
+      "sha256": "24707deb4615fdd97ce11213273e2cdd0cbba7cb1eb67719c794093fd2e867e3"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_39.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_39.wav",
+      "bytes": 1056182,
+      "sha256": "193116f8c305386acf5767ceb6f5e1dba9ea4f88a5968e200a3b5ef4061971fe"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_40.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_40.wav",
+      "bytes": 1066850,
+      "sha256": "f7341d552322ed136d07ab98da327ec417527d781c7bff35189818e2221a35b7"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_41.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_41.wav",
+      "bytes": 1088182,
+      "sha256": "97b406028aff7bbe82d4e6cf642e4d47ddc7ccabeb0659dbc133aef16a0ad315"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_42.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_42.wav",
+      "bytes": 1089514,
+      "sha256": "9284eb6cdff71724b14e924f14c68d0f5d2447e2e45d76619e3f2e78c9c6e5bd"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_43.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_43.wav",
+      "bytes": 1073514,
+      "sha256": "0b5af5645837b9433cf0f9292ac0f224a1e975da5fb1aad53f347e406ba8fab1"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_44.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_44.wav",
+      "bytes": 1064182,
+      "sha256": "87fedc5d2a753fc461ec05f7567b8cae3a3b3e79aaf914de90f85575b2f9941b"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_45.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_45.wav",
+      "bytes": 977514,
+      "sha256": "c9173c7a98589bedb7267e988639517a528279cafb1f56f5899f5eaeab1b2bf2"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_46.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_46.wav",
+      "bytes": 1076182,
+      "sha256": "23e94e9c8eccfdaee64260228b033d61afea466fb6199696fca735433324ad1e"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_47.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_47.wav",
+      "bytes": 1054850,
+      "sha256": "262119af1604029a445aa1a13c33f6f2b90f0f64d19c77aa2d1ec756c4accfd5"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_48.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_48.wav",
+      "bytes": 960182,
+      "sha256": "6ff79504e878efbb6b0ca7a083299f6236c9e267662323fcd7a70f8007b71d07"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC_49.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC_49.wav",
+      "bytes": 1070850,
+      "sha256": "c98fac46d5cd7776ce1ae5d983ce27d1575b36bb21cd1a103ee90d09edff9e71"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - REC.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - REC.wav",
+      "bytes": 1074850,
+      "sha256": "b6dd18bddcb3653bbae7cf73b40b121e121f589b088812beea5c0e9e1ed3fd8e"
+    },
+    {
+      "source": "D:\\Music\\game\\Абстракт\\Капа Войс\\Капа - Track 1.wav",
+      "role": "voice-kapa",
+      "family": null,
+      "index": null,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\voices\\kapa\\abstract-20261020-v1\\Капа - Track 1.wav",
+      "bytes": 1025514,
+      "sha256": "185a304c2fadcb168711e4a3286fba201e78c359d5a676eb67962a6b49a2c60e"
+    },
+    {
+      "source": "D:\\Music\\game\\Эксперементал\\lead 1.mp3",
+      "role": "lead",
+      "family": "experimental",
+      "index": 1,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\experimental\\lead\\lead 1.mp3",
+      "bytes": 203973,
+      "sha256": "06b7bd4c72b8d756771710da2a58567f94c570750bd52342ce78e44e294adcd8"
+    },
+    {
+      "source": "D:\\Music\\game\\Эксперементал\\lead 2.mp3",
+      "role": "lead",
+      "family": "experimental",
+      "index": 2,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\experimental\\lead\\lead 2.mp3",
+      "bytes": 203397,
+      "sha256": "3d9af00158924234a1c0523a8b88e44dc2f6119d36f42843539dc2d94a668d68"
+    },
+    {
+      "source": "D:\\Music\\game\\Эксперементал\\lead 3.mp3",
+      "role": "lead",
+      "family": "experimental",
+      "index": 3,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\experimental\\lead\\lead 3.mp3",
+      "bytes": 209157,
+      "sha256": "225fbdecd2dd5b8ee53678eeea2579d59eb74d07aec1ade0eda0d62a723c95a0"
+    },
+    {
+      "source": "D:\\Music\\game\\Эксперементал\\lead 4.mp3",
+      "role": "lead",
+      "family": "experimental",
+      "index": 4,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\experimental\\lead\\lead 4.mp3",
+      "bytes": 214341,
+      "sha256": "11987bb7c7419a1be5ea26d9e7bd21da89e741d043ced2f6e6bde1d63ce5f330"
+    },
+    {
+      "source": "D:\\Music\\game\\Эксперементал\\lead 5.mp3",
+      "role": "lead",
+      "family": "experimental",
+      "index": 5,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\experimental\\lead\\lead 5.mp3",
+      "bytes": 331269,
+      "sha256": "62cbd739175a21ce2e8367c68e0841320a5e266ae5abd02755411c909a0265ee"
+    },
+    {
+      "source": "D:\\Music\\game\\Эксперементал\\lead 6.mp3",
+      "role": "lead",
+      "family": "experimental",
+      "index": 6,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\experimental\\lead\\lead 6.mp3",
+      "bytes": 318597,
+      "sha256": "e2f0cb20fa3e40a911d42f2a6908a774e64294bcc2d72e656be1f8c301ecab90"
+    },
+    {
+      "source": "D:\\Music\\game\\Эксперементал\\lead 7.mp3",
+      "role": "lead",
+      "family": "experimental",
+      "index": 7,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\experimental\\lead\\lead 7.mp3",
+      "bytes": 308805,
+      "sha256": "67c89dd5439b08f475ce08f4a2d581aadccded2803b417468801a4cd4dc89dbe"
+    },
+    {
+      "source": "D:\\Music\\game\\Эксперементал\\lead 8.mp3",
+      "role": "lead",
+      "family": "experimental",
+      "index": 8,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\experimental\\lead\\lead 8.mp3",
+      "bytes": 305349,
+      "sha256": "4fc2967b622025b73c68fbd6421c88515578ff32628c265190a654a9e3e627b8"
+    },
+    {
+      "source": "D:\\Music\\game\\Эксперементал\\lead 9.mp3",
+      "role": "lead",
+      "family": "experimental",
+      "index": 9,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\experimental\\lead\\lead 9.mp3",
+      "bytes": 224133,
+      "sha256": "a300c4796676baf665fb8c8521f0e35239e36757ea2ebb29d33a564b52e06054"
+    },
+    {
+      "source": "D:\\Music\\game\\Эксперементал\\lead 10.mp3",
+      "role": "lead",
+      "family": "experimental",
+      "index": 10,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\experimental\\lead\\lead 10.mp3",
+      "bytes": 224133,
+      "sha256": "ad27ae373ce227bc7a551f143afa18f2f027fc96bb668c7a9cc95b4199fc0a57"
+    },
+    {
+      "source": "D:\\Music\\game\\Эксперементал\\lead 11.mp3",
+      "role": "lead",
+      "family": "experimental",
+      "index": 11,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\experimental\\lead\\lead 11.mp3",
+      "bytes": 224133,
+      "sha256": "31a6e139eb938cd9b1c2a9b95d7ac3dfa34d47e3a602f3e993c294881a0b5b4f"
+    },
+    {
+      "source": "D:\\Music\\game\\Эксперементал\\lead 12.mp3",
+      "role": "lead",
+      "family": "experimental",
+      "index": 12,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\experimental\\lead\\lead 12.mp3",
+      "bytes": 224709,
+      "sha256": "ecf042fc1106a649c3d6fb026f538565da22980f1e22fad44432f65ea4133381"
+    },
+    {
+      "source": "D:\\Music\\game\\Эксперементал\\lead 13.mp3",
+      "role": "lead",
+      "family": "experimental",
+      "index": 13,
+      "destination": "D:\\Project\\Battle\\stems\\source-library\\instruments\\abstract-20261020-v1\\experimental\\lead\\lead 13.mp3",
+      "bytes": 250629,
+      "sha256": "5d1594a103c4ccb66100da129c940f9d75058069202204c10edb9a4ca7cf5edc"
+    }
+  ],
+  "excluded": [
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 02\\Архивные фрагменты Stems.zip",
+      "bytes": 32049163,
+      "sha256": "834291420ddfb6fa0c41de726520773a647d1baaccf8c05502c673de64b5baba"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 03\\Архивные фрагменты Stems (1).zip",
+      "bytes": 39822470,
+      "sha256": "c2ff9519a2b2f8a68eb998fc718de9aeb4873260bee455efc2a1c043f0c29ed7"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 04\\FL.flp",
+      "bytes": 149339,
+      "sha256": "e802f6ae2b352f98c9accc80009c950be496c8bb9464cc1209ec99f2a1b35060"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 04\\Архивные фрагменты Stems (1)\\0 Lead Vocals.mp3",
+      "bytes": 1835276,
+      "sha256": "1b07a6739dffcdfee3afe51f4520a08e3ff7bccf0fd00e6f186e9cfe63a57b46"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 04\\Архивные фрагменты Stems (1)\\1 Backing Vocals.mp3",
+      "bytes": 960812,
+      "sha256": "43daa4ac8f53e235134f88edefde307da8666e7a9eefcbc17e3d7efa756ff6a0"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 04\\Архивные фрагменты Stems (1)\\2 Drums.mp3",
+      "bytes": 3907652,
+      "sha256": "0687135518bbf5c569fdf71825d43c2d26e5c533658b9ea5725806109a6086bf"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 04\\Архивные фрагменты Stems (1)\\3 Bass.mp3",
+      "bytes": 3127460,
+      "sha256": "b55cce258aac25f956e65d84024305753a66672e1990e90f537df46830c68c02"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 04\\Архивные фрагменты Stems (1)\\4 Guitar.mp3",
+      "bytes": 3311708,
+      "sha256": "e1c0ebc3d422875caf191b53f7c65a0447c98fede0e359ffbc1b5ceb46d1f768"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 04\\Архивные фрагменты Stems (1)\\5 Keyboard.mp3",
+      "bytes": 4071404,
+      "sha256": "b6aa0576252fda5493dd5e3ff847bf961986f7c00970ab0f3806d3ac3c547220"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 04\\Архивные фрагменты Stems (1)\\6 Percussion.mp3",
+      "bytes": 3880220,
+      "sha256": "88ae066c9323e459b504b7dfbc03a04677da17d7fbfef5a9ac5102e80b9e60e4"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 04\\Архивные фрагменты Stems (1)\\7 Strings.mp3",
+      "bytes": 3192788,
+      "sha256": "b1be5d7e5fc2afba73c9529ab0b11e85f7f1144480dc1235d71687bf97fcd517"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 04\\Архивные фрагменты Stems (1)\\8 Synth.mp3",
+      "bytes": 4048316,
+      "sha256": "9525986c2bedc3a10384e740e3b3329179b125b83a5d3eee76195415468bc9c7"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 04\\Архивные фрагменты Stems (1)\\9 Other.mp3",
+      "bytes": 3143900,
+      "sha256": "3b47be90c85b704de076568e97be4e7b3abdabdc46182b326d5ad7b01f83051c"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 04\\Архивные фрагменты Stems (1)\\10 Brass.mp3",
+      "bytes": 2827460,
+      "sha256": "02b0fb7c09e798c57dc028dda7c0c4dc3277ba47fda7c9f607b6dcaded9d35eb"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 04\\Архивные фрагменты Stems (1)\\11 Woodwinds.mp3",
+      "bytes": 3023276,
+      "sha256": "5416a31f2f0038ae2647c7725a7902d72ac083ea46b637b08adf710f0e888d2a"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Track 04\\Архивные фрагменты Stems (1).zip",
+      "bytes": 35231486,
+      "sha256": "247f24e1ea9fd0b79910eb299401bc810efecd152829298a8a4d7c6228b192af"
+    },
+    {
+      "path": "D:\\Music\\game\\Абстракт\\Генерация минуса и голосов.mp3",
+      "bytes": 2619717,
+      "sha256": "b78776d03fc2d10b485c023aec36edcfdc1128e7520715d698ba648b23cafe70"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\bass 1.mp3",
+      "bytes": 131973,
+      "sha256": "9019a6747c4b211215dafcbc73fb3757b3fa03b9e7ac6fe19f467f2f4bb9f052"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\bass 2.mp3",
+      "bytes": 136005,
+      "sha256": "8bfc33db42a6efe8e9575570252b551b981f629c19b2ce968ae372b28933ebfe"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\bass 3.mp3",
+      "bytes": 131973,
+      "sha256": "cd83c15670e01564507737c6dba9693727f167c2f4dc972d0b1442ce3b1f840a"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\bass 4.mp3",
+      "bytes": 237381,
+      "sha256": "d216281d5f0174909f7755375df75b61f5de09cf397d6861cb420684820ca156"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\bass 5.mp3",
+      "bytes": 142917,
+      "sha256": "3d991ec51b549cfef7bb57dae932ff7e9d427359677f2262fba8f8167da58458"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\bass 6.mp3",
+      "bytes": 84741,
+      "sha256": "df9f4d11eb6094402ac42d79a510daf08b3346f15ffe44509ca035c1bca384d2"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\bass 7.mp3",
+      "bytes": 153285,
+      "sha256": "674aa238162c23eb377f035e80fc2bc27fdb1f79b14a7a8708a33652d2176e95"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\drums 1.mp3",
+      "bytes": 252933,
+      "sha256": "294d17108bbfd07e096bd6f1beedd92223144b026bc743647083957cbc9bee78"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\drums 2.mp3",
+      "bytes": 173445,
+      "sha256": "a326dda8e3bd34cb9c7135f522c6fdf3929d64a2dd0cd20485bbc8abe268ef21"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\drums 3.mp3",
+      "bytes": 150981,
+      "sha256": "84ba862725834443857e5d3c6531a25a0daa0ece82e2f6b6a3bedfa72d1a5420"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\drums 4.mp3",
+      "bytes": 197061,
+      "sha256": "e1ae23c13948c642442e77526c8cfa001355e44a085ea217a66f106cc80c7a80"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\drums 5.mp3",
+      "bytes": 391749,
+      "sha256": "b81f3629477d3049e7b0f77677fe4832d401ff5da562f3cdfc5b715f7e256447"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\drums 6.mp3",
+      "bytes": 369285,
+      "sha256": "e5b7bd9ee02e69feb1b1048f92a4e8391dcf5a1088a82943f19e1f63d0818fda"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\drums 7.mp3",
+      "bytes": 254661,
+      "sha256": "4bb9c63c9e8ac181995179a5cd6f7239c960d8733b4bd59402f81e05e6058910"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\drums 8.mp3",
+      "bytes": 243141,
+      "sha256": "ff19eccd68abc403c4fdc8f8f1873cccb342e096fa52429459390885598dfd6a"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\drums 9.mp3",
+      "bytes": 77829,
+      "sha256": "a9bb75ba8443f846587576d2c36c8a22b2d563d2148392ac205460830031f040"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\drums 10.mp3",
+      "bytes": 73221,
+      "sha256": "7b09183530827621f36e8b5d7e7eec3e912d85d873c185d21784e74688aefdd8"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\drums 11.mp3",
+      "bytes": 81285,
+      "sha256": "e94e0d04da2a5e184f82e6dd977bec4f799c767b3ebc6d5cd003c8c11ab2b300"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\drums 12.mp3",
+      "bytes": 84741,
+      "sha256": "d48d92c667f7b2f28d64662a16284d60b3371987abaed90f383b4c8137575c1c"
+    },
+    {
+      "path": "D:\\Music\\game\\Эксперементал\\drums 13.mp3",
+      "bytes": 137157,
+      "sha256": "8ad46d018070e2ba4bfe86184e8259d14ba040083229326acae068835f2b3c40"
+    }
+  ]
+}

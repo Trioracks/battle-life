@@ -1,15 +1,15 @@
-import {DEMO_BATTLE,DEMO_PARTICIPANTS} from './battle-demo-config.js?rev=43';
-import {ensureNpcRoundTrack,npcMeanSkill} from './battle-npc.js?rev=47';
-import {rankTournamentSelection,seedBracket} from './battle-seeding.js?rev=43';
-import {decideNoShow,resolveTechnicalPair} from './battle-no-show.js?rev=43';
+import {DEMO_BATTLE,DEMO_PARTICIPANTS} from './battle-demo-config.js?rev=57';
+import {ensureNpcRoundTrack,npcMeanSkill} from './battle-npc.js?rev=57';
+import {rankTournamentSelection,seedBracket} from './battle-seeding.js?rev=49';
+import {decideNoShow,resolveTechnicalPair} from './battle-no-show.js?rev=49';
 import {recordBattleHistory} from './battle-history.js?rev=43';
-import {beatResultSeed} from './beat-result.js?rev=43';
-import {effectiveWritingSkill} from './lyric-production.js?rev=47';
-import {effectiveBeatSkill} from './beat-production.js?rev=47';
-import {effectiveVocalSkill} from './vocal-production.js?rev=47';
+import {beatResultSeed} from './beat-result.js?rev=49';
+import {effectiveWritingSkill} from './lyric-production.js?rev=57';
+import {effectiveBeatSkill} from './beat-production.js?rev=57';
+import {effectiveVocalSkill} from './vocal-production.js?rev=57';
 import {validGameMinute} from './game-minute.js?rev=43';
-import {ensureRoundTheme} from './round-topics.js?rev=43';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=43';
+import {ensureRoundTheme} from './round-topics.js?rev=49';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=57';
 export const TOURNAMENT_ROUNDS=Object.freeze(['selection','round-2','round-3','round-4','round-5','final']);
 const clone=v=>structuredClone(v),record=v=>v!==null&&typeof v==='object'&&!Array.isArray(v),battleId=DEMO_BATTLE.battleId;
 function validRoundInternals(r){
@@ -77,6 +77,20 @@ export function advanceTournament(input,nowMinute,{heroSkills={}}={}){
  const tournaments=normalizeTournaments(input.tournaments),t=tournaments.byId[battleId];if(!t||t.status==='complete')return unchanged;
  let state={...input,tournaments},changed=false;const events=[];
  try{
+  // A saved closed snapshot may predate a durable outgoing submission. Repair
+  // only the still-judging round, from its canonical window and frozen version;
+  // never reopen a completed result or admit a late/recovery attachment.
+  const pendingRound=t.rounds[t.currentRoundId];
+  if(pendingRound.status==='awaiting_judges'&&!pendingRound.submissions.player){
+   const row=state.battleSubmissions?.find(s=>s.version===2&&s.playerId==='player'&&s.battleId===battleId&&s.communityId===battleId&&s.roundId===pendingRound.roundId&&s.windowId===pendingRound.id&&!s.issue&&['pending','accepted'].includes(s.status)&&state.trackVersions?.byId?.[s.trackVersionId]&&validGameMinute(s.sentAt)&&s.sentAt>=pendingRound.opensAt&&s.sentAt<pendingRound.closesAt);
+   const participates=pendingRound.roundId==='selection'?t.participantIds.includes('player'):pendingRound.pairs.some(p=>p.participantIds.includes('player'));
+   if(row&&participates){
+    pendingRound.submissions.player=row.trackVersionId;
+    for(const pair of pendingRound.pairs)pair.technical=resolveTechnicalPair({participantIds:pair.participantIds,submissionIds:pair.participantIds.map(id=>pendingRound.submissions[id]??null)});
+    const entries=(state.battleHistory?.entries??[]).filter(e=>!(e.battleId===battleId&&e.roundId===pendingRound.roundId&&e.participantId==='player'&&e.status==='no_show'));
+    state=recordBattleHistory({...state,battleHistory:{...state.battleHistory,entries}},[historyEntry(pendingRound,'player','submitted',pendingRound.closesAt,row.trackVersionId)]);changed=true;
+   }
+  }
   for(let steps=0;steps<TOURNAMENT_ROUNDS.length*2;steps++){
    let round=t.rounds[t.currentRoundId];
    if(round.status==='complete'&&t.nextRoundAt!==null&&t.nextRoundAt<=nowMinute){const next=announceNext(state,t,heroSkills);if(!next)break;state=next.state;round=next.round;changed=true;addEvent(t,eventFor(round,'round-announced',round.opensAt,{themeId:state.roundThemes?.[battleId+':'+round.roundId]?.id,publicationKind:'round-organized',text:'Объявлены новые пары. Приём работ открыт на семь дней.'}),events);}
