@@ -26,7 +26,7 @@ test('work routing advances recording, displays flow meter and no genre practice
  assert.equal(descriptor.performance,'rapping');
  const r=advanceCreativeWork(s,1);assert.ok(r.state.recording.job.elapsed>0);assert.ok(r.state.recording.practice.flow>0);
  const panel=createBeatWorkPanel(pcDocument());panel.update({beat:descriptor.project,job:descriptor.job,skill:10.04});
- assert.ok(allPc(panel.element).some(n=>n.textContent?.includes('Флоу 10.04')));assert.ok(allPc(panel.element).some(n=>n.textContent==='Черновая запись'));panel.dispose();
+ assert.ok(allPc(panel.element).some(n=>n.textContent?.replace(/\s+/g,' ').includes('Флоу 10.04')));assert.ok(allPc(panel.element).some(n=>n.textContent==='Черновая запись'));panel.dispose();
 });
 
 test('only draft and clean recording use a mic performance',()=>{

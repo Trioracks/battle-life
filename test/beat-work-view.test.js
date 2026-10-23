@@ -12,7 +12,7 @@ test('chain panel separates overall progress from current stage',()=>{
  panel.update({beat:{kind:'lyrics'},job:{stage:1,total:60,elapsed:30},chainProgress:{overall:.5,stage:.5,index:1,count:3}});
  const role=key=>allPc(panel.element).find(n=>n.dataset.workRole===key);
  assert.ok(role('overall'));assert.equal(role('overall').value,.5);assert.match(role('overall-label').textContent,/50%/);
- assert.equal(role('progress').value,.5);assert.match(role('stage').textContent,/2 \/ 3/);
+ assert.equal(role('progress').value,.5);assert.match(role('stage-index').textContent,/2 \/ 3/);
 });
 test('panel shows actual progress, needs, skill and reward only after completion',()=>{
  assert.equal(typeof module.createBeatWorkPanel,'function');let cancel=0,enable=0;
@@ -20,7 +20,7 @@ test('panel shows actual progress, needs, skill and reward only after completion
  const model={beat:{name:'Наш двор'},job:{stage:1,elapsed:25,total:100},needs:{satiety:60,energy:40},skill:14,clockLabel:'12:30',reward:0,audioError:''};
  panel.update(model);const role=key=>allPc(panel.element).find(n=>n.dataset.workRole===key);
  assert.equal(role('progress').value,.25);assert.equal(role('reward').hidden,true);assert.equal(role('satiety').value,60);assert.equal(role('energy').value,40);
- assert.match(role('stage').textContent,/2 \/ 3/);assert.match(role('skill').textContent,/14/);
+ assert.match(role('stage-index').textContent,/2 \/ 3/);assert.match(role('skill').textContent,/14/);
  panel.update({...model,job:{...model.job,elapsed:100},reward:1/3});panel.update({...model,job:{...model.job,elapsed:100},reward:1/3});
  assert.equal(allPc(panel.element).filter(n=>n.dataset.workRole==='reward').length,1);assert.equal(role('reward').hidden,false);assert.match(role('reward').textContent,/\+0\.33\b/);
  panel.update({...model,audioError:'Звук выключен',needsGesture:true});assert.equal(role('reward').hidden,true);

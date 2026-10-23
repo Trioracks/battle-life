@@ -6,6 +6,6 @@ export function pcPresentation(snapshot,power,playerName='Игрок'){
  if(['loading','welcome','shutdown','desktop'].includes(phase))screen=phase;
  if(phase==='fade-out'){screen='shutdown';brightness=1-progress;}
  else if(screen!=='off')brightness=1;
- const labels={off:['',''],bios:['SLOBODA BIOS','Memory test… OK'],loading:[PC_IDENTITY.name,'Загрузка системы'],welcome:['Добро пожаловать',playerName],desktop:[PC_IDENTITY.name,playerName],shutdown:['Завершение работы','Сохранение параметров…']};
+ const labels={off:['',''],bios:['Запуск Слобода OS…',''],loading:[PC_IDENTITY.name,'Загрузка системы'],welcome:['Добро пожаловать',playerName],desktop:[PC_IDENTITY.name,playerName],shutdown:['Завершение работы','Сохранение параметров…']};
  return {screen,title:labels[screen][0],subtitle:labels[screen][1],progress,brightness};
 }

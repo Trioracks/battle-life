@@ -17,7 +17,7 @@ import {createSmoke} from './apartment-v3-smoke.js?rev=57';
 import {createRetroPass} from './apartment-v3-retro.js?rev=57';
 import {createComputerView} from './apartment-v3-computer.js?rev=57';
 import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=57';
-import {pcPresentation} from './virtual-pc-presentation.js?rev=57';
+import {pcMonitorPresentation} from './pc-monitor-presentation.js?rev=57';
 import {createWardrobeFurniture} from './home-wardrobe.js?rev=57';
 import {applySwitchStyle} from './apartment-switch-style.js?rev=57';
 
@@ -113,7 +113,7 @@ export async function createApartmentScene(canvas,config){
     const pose=getHeadCameraPose();headViewCamera.position.fromArray(pose.position);headViewCamera.quaternion.fromArray(pose.quaternion);headViewCamera.aspect=camera.aspect;headViewCamera.updateProjectionMatrix();headViewCamera.updateMatrixWorld(true);
     computer.begin(computerCameraSource({mode:modes.mode,overview:camera,firstPerson:firstCamera,head:headViewCamera,fromHead}));computerActive=true;
   }
-  function setComputerPresentation(snapshot,pcState,playerName){computerSnapshot=snapshot;computer?.update(snapshot,pcPresentation(snapshot,pcState.power,playerName));}
+  function setComputerPresentation(snapshot,pcState,playerName,context={}){computerSnapshot=snapshot;computer?.update(snapshot,pcMonitorPresentation(pcState,{...context,snapshot,playerName}));}
   function endComputerView(){computerActive=false;computer?.end();transitionQuad.visible=false;}
   function applyCamera(state){
     modes.onMotionState(state);

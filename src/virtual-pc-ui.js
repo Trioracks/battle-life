@@ -14,6 +14,7 @@ import { normalizeStudioProject } from './ft-studio-project.js?rev=57';
 import { BATTLE_BRIEFS, WALLPAPERS, desktopApps, resolveUnderweb } from './virtual-pc-catalog.js?rev=57';
 import { createVirtualPcState, diskUsage, saveStudioProject } from './virtual-pc-state.js?rev=57';
 import {diskAmount} from './virtual-pc-disk-view.js?rev=57';
+import {createSlobodaBrand} from './pc-brand-view.js?rev=57';
 import {pcPresentation} from './virtual-pc-presentation.js?rev=57';
 import {createStudioWorkspace,presentRecordingWorkspace} from './ft-studio-view.js?rev=57';
 import {mountUnderweb} from './underweb-view.js?rev=57';
@@ -166,6 +167,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     bootStep: 0,
   };
 
+  pc.monitorContext=()=>({activeAppId:pc.windows.windows.find(w=>w.id===pc.windows.activeId&&w.mode!=='minimized')?.appId,address:pc.underwebView?.snapshot.route.url??pc.address});
   pc.audioSession=createPcAudioSession(pc.beatAudio);
   pc.persist = (state = pc.state,options={}) => {
     const next=createVirtualPcState(state);
@@ -291,7 +293,7 @@ export function mountVirtualPc(root, callbacks = {}) {
     if (pc.phase === 'desktop') pc.refreshDynamicState();
   };
 
-  let transitionLayer=null,transitionTitle=null,transitionSubtitle=null,transitionProgress=null,recordingLayer=null;
+  let transitionLayer=null,transitionTitle=null,transitionSubtitle=null,transitionProgress=null,transitionChecks=null,transitionSegments=null,transitionBrand=null,recordingLayer=null;
   pc.presentTransition = (snapshot,recording=null) => {
     pc.desktopVisible=(snapshot.overlay??0)>0;
     if(!pc.desktopVisible)pc.studioView?.setVisible(false);
@@ -304,13 +306,16 @@ export function mountVirtualPc(root, callbacks = {}) {
     for(const child of root.children)if(child!==transitionLayer)child.inert=Boolean(snapshot.locked);
     if(!transitionLayer||transitionLayer.parentElement!==root){
       transitionLayer=el(document,'section',{className:'pc-transition',attributes:{'aria-live':'polite'}});
-      add(transitionLayer,createPcIcon(document,'start',{size:72}));
+      transitionBrand=add(transitionLayer,createSlobodaBrand(document));
+      transitionChecks=add(transitionLayer,el(document,'pre',{className:'pc-bios-checks',text:'Оперативная память ........ OK\nНакопитель ............... OK\nКлавиатура ............... OK'}));
+      transitionSegments=add(transitionLayer,el(document,'div',{className:'pc-boot-segments',attributes:{'aria-hidden':'true'}}));for(let i=0;i<10;i++)transitionSegments.append(el(document,'i'));
       transitionTitle=add(transitionLayer,el(document,'h2'));transitionSubtitle=add(transitionLayer,el(document,'p'));
       transitionProgress=add(transitionLayer,el(document,'progress',{attributes:{max:'1','aria-label':'Загрузка '+PC_IDENTITY.name}}));root.append(transitionLayer);
     }
     transitionLayer.hidden=p.screen==='desktop'||(p.screen==='off'&&snapshot.phase==='room');transitionLayer.dataset.screen=p.screen;
-    transitionLayer.style.opacity='1';transitionLayer.style.filter=`brightness(${p.brightness})`;transitionTitle.textContent=p.title;transitionSubtitle.textContent=p.subtitle;
+    transitionLayer.style.opacity='1';transitionLayer.style.filter=`brightness(${p.brightness})`;transitionTitle.textContent=p.screen==='loading'?'Загрузка системы':p.title;transitionSubtitle.textContent=p.screen==='loading'?'Подготовка рабочего стола…':p.subtitle;
     transitionProgress.hidden=p.screen!=='loading';transitionProgress.value=p.progress;
+    transitionChecks.hidden=p.screen!=='bios';transitionBrand.children[2].textContent=p.screen==='bios'?'BIOS':'OS';transitionSegments.hidden=p.screen!=='loading';for(const [i,segment] of [...transitionSegments.children].entries())segment.dataset.state=i<Math.floor(p.progress*10)?'done':i===Math.floor(p.progress*10)?'active':'pending';
     const screenRecording=snapshot.phase==='working'&&recording?.shot?.phase==='screen'&&recording?.job;
     if(screenRecording&&!recordingLayer){
       recordingLayer=createStudioWorkspace(document,{projectName:recording.beat?.name});recordingLayer.dataset.pcRole='recording-screen';recordingLayer.inert=true;

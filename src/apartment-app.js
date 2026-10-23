@@ -361,7 +361,7 @@ try{
     if(mode!=='game'||cameraFade||document.hidden||(paused&&!step)||homeModalOpen())footsteps.reset();
     if(mode!=='game'||cameraFade||document.hidden){speech.tick(0,{present:false});speechView.update(speech.snapshot);}
     cameraLabel();
-    view.setComputerPresentation(pcLifecycle.snapshot,pcState,profile?.name??'Игрок');
+    view.setComputerPresentation(pcLifecycle.snapshot,pcState,profile?.name??'Игрок',{...virtualPc.monitorContext(),job:creativeWorkDescriptor(pcState,profile?.skills).job,paused:paused||document.hidden});
     if(cameraFade){tickInstallation();view.render(motion,0,{paused:true});return;}
     view.setRoomLights(homeTime.lights);
     if(mode==='creator'){
@@ -449,7 +449,7 @@ try{
       else failedReactionId=resultEpisode.reaction.id;
       resultEpisode.ui.restore();resultEpisode=null;
     }
-    view.setComputerPresentation(pcLifecycle.snapshot,pcState,profile?.name??'Игрок');
+    view.setComputerPresentation(pcLifecycle.snapshot,pcState,profile?.name??'Игрок',{...virtualPc.monitorContext(),job:creativeWorkDescriptor(pcState,profile?.skills).job,paused:paused||document.hidden});
     if(cameraWork)lastWorkCamera=cameraWork;else if(workFinished&&lastWorkCamera)lastWorkCamera={...lastWorkCamera,progress:1};
     view.setWorkCamera(['work-reveal','working','work-cover'].includes(workPhase)?lastWorkCamera:null);
     if(footsteps.update({clip:motion.clip,walkDistance:motion.walkDistance,paused:mode!=='game'||(paused&&!step)||document.hidden||homeModalOpen()}))cue('footstep');
