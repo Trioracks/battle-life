@@ -249,7 +249,7 @@ export async function verifyPublicPreview(options={}){
    assert.equal(await page.evaluate(()=>typeof window.__cacheProbe),'undefined');assert.equal(await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--preview-cache-probe').trim()),'');
    await screenshot(page,'stale-http-cache-to-current-1280');
    report.cacheEvidence={syntheticPriorRevision:43,priorHits:{...cacheProbe.priorHits},cachedResponses:hits.map(({text,...hit})=>hit),currentResources:resources,scope:'Controlled synthetic old JS/CSS/Worker cached with immutable max-age, then unchanged current artifact on the same owned origin. Not an old gameplay migration test.'};
-   check('stale HTTP-cached JS/CSS/Worker cohort cannot replace canonical 58 entry',{cacheHits:3,syntheticPriorRevision:43});await close(context,page,'stale-http-cache');await cacheProbe.close();cacheProbe=null;
+   check('stale HTTP-cached JS/CSS/Worker cohort cannot replace canonical 59 entry',{cacheHits:3,syntheticPriorRevision:43});await close(context,page,'stale-http-cache');await cacheProbe.close();cacheProbe=null;
   }
   for(const viewport of report.viewports){
    const suffix=String(viewport.width);
