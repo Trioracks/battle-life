@@ -1,9 +1,9 @@
-import {judgeProfile} from './judge-profiles.js?rev=59';
-import {battleFormat} from './battle-format.js?rev=59';
-import {generateJudgeReview,normalizeJudging,finalizeJudgePanel} from './judge-comments.js?rev=59';
-import {communityById} from './social-catalog.js?rev=59';
-import {receivePhoneEvents} from './phone-notifications.js?rev=59';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=59';
+import {judgeProfile} from './judge-profiles.js?rev=60';
+import {battleFormat} from './battle-format.js?rev=60';
+import {generateJudgeReview,normalizeJudging,finalizeJudgePanel} from './judge-comments.js?rev=60';
+import {communityById} from './social-catalog.js?rev=60';
+import {receivePhoneEvents} from './phone-notifications.js?rev=60';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=60';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export function normalizeJudgingSchedule(raw){
  const result={};for(const [id,s]of Object.entries(raw??{})){

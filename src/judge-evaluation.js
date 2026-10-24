@@ -1,6 +1,6 @@
-import {formatMismatch,checkHardRules} from './battle-format.js?rev=59';
-import {normalizeContentMix,textMixRetention} from './text-content-mix.js?rev=59';
-import {seededLottery} from './battle-seeding.js?rev=59';
+import {formatMismatch,checkHardRules} from './battle-format.js?rev=60';
+import {normalizeContentMix,textMixRetention} from './text-content-mix.js?rev=60';
+import {seededLottery} from './battle-seeding.js?rev=60';
 const axes=['text','performance','music','sound'],clamp=(v,max=1)=>Math.max(0,Math.min(max,v));
 /** JudgeResult: decision is fixed from raw quality; display rounding and comments never decide a pair. */
 export function evaluateTrack(version,judge,format,{opponent=null,tieSeed}={}){

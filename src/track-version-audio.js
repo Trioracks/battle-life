@@ -1,9 +1,9 @@
-import {TRACK_DSP_VERSION} from './track-version.js?rev=59';
-import {beginnerById} from './beat-beginner-bank.js?rev=59';
-import {drumById,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=59';
-import {vocalById,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=59';
-import {npcPlaybackDescriptor} from './battle-npc-audio.js?rev=59';
-import {npcVocalById} from './npc-vocal-catalog.js?rev=59';
+import {TRACK_DSP_VERSION} from './track-version.js?rev=60';
+import {beginnerById} from './beat-beginner-bank.js?rev=60';
+import {drumById,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=60';
+import {vocalById,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=60';
+import {npcPlaybackDescriptor} from './battle-npc-audio.js?rev=60';
+import {npcVocalById} from './npc-vocal-catalog.js?rev=60';
 export async function playTrackVersion(audio,version){
  const fail=reason=>{audio?.stop?.();return {ok:false,reason};};
  if(version?.schemaVersion!==1||version.recipe?.dspVersion!==TRACK_DSP_VERSION)return fail('Эта версия обработки пока не поддерживается. Работа сохранена без изменений.');

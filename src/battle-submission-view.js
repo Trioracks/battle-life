@@ -1,7 +1,7 @@
-import {audioFileMatchesBattle} from './battle-file-match.js?rev=59';
-import {currentBattleWindow} from './battle-windows.js?rev=59';
-import {mountAudioFilePicker} from './pc-audio-file-picker.js?rev=59';
-import {attachSubmissionTrack} from './social-submission.js?rev=59';
+import {audioFileMatchesBattle} from './battle-file-match.js?rev=60';
+import {currentBattleWindow} from './battle-windows.js?rev=60';
+import {mountAudioFilePicker} from './pc-audio-file-picker.js?rev=60';
+import {attachSubmissionTrack} from './social-submission.js?rev=60';
 
 export function mountBattleSubmissionPicker(root,{getState,battleId,communityId=battleId,getGameMinute=()=>null,onChange,onClose=()=>{}}){
  return mountAudioFilePicker(root,{getState,onClose,filter:file=>{const s=getState(),w=currentBattleWindow(s,battleId,getGameMinute());return Boolean(w)&&audioFileMatchesBattle(s,file,{battleId,roundId:w.roundId,themeId:s.roundThemes?.[battleId+':'+w.roundId]?.id});},onSelect:fileId=>{

@@ -1,10 +1,10 @@
-import {audioFileMatchesBattle} from './battle-file-match.js?rev=59';
-import {communityById} from './social-catalog.js?rev=59';
-import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow,isBattleWindowId} from './battle-windows.js?rev=59';
-import {validGameMinute} from './game-minute.js?rev=59';
-import {TRACK_DSP_VERSION} from './track-version.js?rev=59';
-import {normalizeAudioExports} from './pc-audio-exports.js?rev=59';
-import {normalizeSocial} from './social-state.js?rev=59';
+import {audioFileMatchesBattle} from './battle-file-match.js?rev=60';
+import {communityById} from './social-catalog.js?rev=60';
+import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow,isBattleWindowId} from './battle-windows.js?rev=60';
+import {validGameMinute} from './game-minute.js?rev=60';
+import {TRACK_DSP_VERSION} from './track-version.js?rev=60';
+import {normalizeAudioExports} from './pc-audio-exports.js?rev=60';
+import {normalizeSocial} from './social-state.js?rev=60';
 export const UPLOAD_TOTAL_SECONDS=2;
 const clone=v=>JSON.parse(JSON.stringify(v));
 const fileBytes=version=>{const seconds=version?.recipe?.descriptor?.durationSeconds;return Number.isFinite(seconds)&&seconds>0&&seconds<=3600?Math.ceil(seconds*192000/8):null;};

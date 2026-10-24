@@ -1,4 +1,4 @@
-import {normalizePlayerPortrait,generatedPortraitKey as portraitKey} from './social-portraits.js?rev=59';
+import {normalizePlayerPortrait,generatedPortraitKey as portraitKey} from './social-portraits.js?rev=60';
 export const PLAYER_LIFE_SCENES=Object.freeze([
  {id:'player-school',stage:'school-group',title:'За последней партой',date:'2005-05-20'},
  {id:'player-barbecue',stage:'barbecue',title:'Шашлыки с ребятами',date:'2012-08-25'},

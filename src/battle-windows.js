@@ -1,6 +1,6 @@
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=59';
-import {battleRoster,BATTLE_ROUND_IDS} from './battle-roster.js?rev=59';
-import {validGameMinute} from './game-minute.js?rev=59';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=60';
+import {battleRoster,BATTLE_ROUND_IDS} from './battle-roster.js?rev=60';
+import {validGameMinute} from './game-minute.js?rev=60';
 const clone=v=>JSON.parse(JSON.stringify(v)),ids=new Set(BATTLE_BRIEFS.map(b=>b.id));
 export const isBattleWindowId=(id,battleId)=>BATTLE_ROUND_IDS.some(round=>id===battleId+':'+round+':1');
 export const battleDeadlineAtMidnight=(opensAt,days=7)=>Math.floor(opensAt/1440)*1440+days*1440;

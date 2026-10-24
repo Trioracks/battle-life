@@ -1,4 +1,4 @@
-import {testSkillRows} from './test-skills.js?rev=59';
+import {testSkillRows} from './test-skills.js?rev=60';
 
 export function mountTestSkills(root,{getProfile,getState,onRaise,onClose=()=>{},returnFocus}={}){
  const doc=root.ownerDocument,make=(tag,text)=>{const node=doc.createElement(tag);if(text)node.textContent=text;return node;};
