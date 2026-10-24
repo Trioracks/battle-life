@@ -1,7 +1,7 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=59';
-import {socialButton,socialThumbCount,socialComment} from './social-dom.js?rev=59';
-import {publicPostReactions,setPostVote} from './social-reactions.js?rev=59';
-import {gameDateTimeLabel} from './home-calendar.js?rev=59';
+import {pcElement as el} from './virtual-pc-dom.js?rev=60';
+import {socialButton,socialThumbCount,socialComment} from './social-dom.js?rev=60';
+import {publicPostReactions,setPostVote} from './social-reactions.js?rev=60';
+import {gameDateTimeLabel} from './home-calendar.js?rev=60';
 export function createPostReactionsView(d,{postId,state,getState=()=>state,nowMinute,commit,collapseComments=false,hideComments=false,commentCount}={}){
  const plan=state.socialReactions?.plans?.[postId],root=el(d,'section',{className:'sn-live-reactions',dataset:{reactionPost:postId}});if(!plan)return root;
  const r=publicPostReactions(plan,nowMinute,state.socialReactions.votes[postId]),meta=el(d,'div',{className:'sn-post-reactions'});

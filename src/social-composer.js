@@ -1,7 +1,7 @@
-import {communityById} from './social-catalog.js?rev=59';
-import {TRACK_DSP_VERSION,canonicalTrackSignature} from './track-version.js?rev=59';
-import {submissionSendContext} from './social-submission-validation.js?rev=59';
-import {isBattleWindowId} from './battle-windows.js?rev=59';
+import {communityById} from './social-catalog.js?rev=60';
+import {TRACK_DSP_VERSION,canonicalTrackSignature} from './track-version.js?rev=60';
+import {submissionSendContext} from './social-submission-validation.js?rev=60';
+import {isBattleWindowId} from './battle-windows.js?rev=60';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export const SUBMISSION_MESSAGE_SECONDS=6;
 export function legacySubmissionMessageBody(version){

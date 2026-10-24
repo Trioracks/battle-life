@@ -1,4 +1,4 @@
-import {pcFileById,openPcDocument} from './pc-filesystem.js?rev=59';
+import {pcFileById,openPcDocument} from './pc-filesystem.js?rev=60';
 const appIds=['rap-notebook','ft-studio'];
 export function normalizeDocumentSessions(raw,{fileSystem,projects=[]}={}){
  const out={version:1,byApp:{},recovery:Array.isArray(raw?.recovery)?structuredClone(raw.recovery):[]};

@@ -1,8 +1,8 @@
-import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=59';
-import {explorerPaths,navigateExplorer,createExplorerState} from './virtual-pc-explorer.js?rev=59';
-import {pcFileEntries,pcDocumentFilename,createPcFolder,nextPcFolderName} from './pc-filesystem.js?rev=59';
-import {createPcIcon} from './virtual-pc-icons.js?rev=59';
-import {mountFolderRename} from './pc-folder-rename-view.js?rev=59';
+import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=60';
+import {explorerPaths,navigateExplorer,createExplorerState} from './virtual-pc-explorer.js?rev=60';
+import {pcFileEntries,pcDocumentFilename,createPcFolder,nextPcFolderName} from './pc-filesystem.js?rev=60';
+import {createPcIcon} from './virtual-pc-icons.js?rev=60';
+import {mountFolderRename} from './pc-folder-rename-view.js?rev=60';
 export function mountPcFilePicker(root,{getState,mode='open',types,initialFolderId='documents',suggestedName='',filter=()=>true,emptyText='Подходящих файлов нет.',onSelect,onCancel=()=>{},onChange}={}){
  const d=root.ownerDocument,save=['save','export'].includes(mode),label=save?'Сохранить':mode==='attach'?'Прикрепить':'Открыть';
  const box=el(d,'section',{className:'pc-file-picker pc-explorer',attributes:{role:'dialog','aria-modal':'true','aria-label':save?'Сохранить как':'Выбор файла'}}),folder=el(d,'select',{attributes:{'aria-label':'Папка файла'}}),address=el(d,'input',{attributes:{'aria-label':'Адрес папки файла'}}),list=el(d,'div',{className:'pc-picker-files pc-file-area',attributes:{'aria-label':'Содержимое папки'}}),name=el(d,'input',{value:suggestedName,attributes:{'aria-label':'Имя файла',maxlength:'120'}}),notice=el(d,'p',{attributes:{role:'status'}});

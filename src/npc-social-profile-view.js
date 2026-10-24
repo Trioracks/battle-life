@@ -1,12 +1,12 @@
-import {discussionForPost} from './social-discussion.js?rev=59';
-import {profileById} from './social-catalog.js?rev=59';
-import {pcElement as el} from './virtual-pc-dom.js?rev=59';
-import {publicCharacterProfile} from './npc-social-profiles.js?rev=59';
-import {metadataGameMinute} from './social-registration.js?rev=59';
-import {socialAvatar,socialButton,socialHeading,socialPhoto,socialPost} from './social-dom.js?rev=59';
-import {gameDateTimeLabel} from './home-calendar.js?rev=59';
-import {createPostReactionsView} from './social-reactions-view.js?rev=59';
-import {profilePhoto} from './social-photo-view.js?rev=59';
+import {discussionForPost} from './social-discussion.js?rev=60';
+import {profileById} from './social-catalog.js?rev=60';
+import {pcElement as el} from './virtual-pc-dom.js?rev=60';
+import {publicCharacterProfile} from './npc-social-profiles.js?rev=60';
+import {metadataGameMinute} from './social-registration.js?rev=60';
+import {socialAvatar,socialButton,socialHeading,socialPhoto,socialPost} from './social-dom.js?rev=60';
+import {gameDateTimeLabel} from './home-calendar.js?rev=60';
+import {createPostReactionsView} from './social-reactions-view.js?rev=60';
+import {profilePhoto} from './social-photo-view.js?rev=60';
 const statuses={submitted:'Сдал работу',no_show:'Не сдал',won:'Победа',lost:'Поражение',technical_win:'Технический проход',bye:'Проход пустой ветки',eliminated:'Выбыл'};
 export function createNpcSocialProfileView(d,{id,view='page',getState,getMetadata,navigate,audio,commit,onAnalyze,onPhotoClose,uiState={}}){
  const root=el(d,'section',{className:'sn-profile'}),p=publicCharacterProfile(getState(),{characterId:id,nowMinute:metadataGameMinute(getMetadata())});

@@ -3,9 +3,13 @@
 export const SOCIAL_DOMAIN_KEYS=Object.freeze(['social','phone','socialRuntime','communityAudio','battleSubmissions','battleWindows','tournaments','trackVersions','judging','judgingSchedule','npcTracks','battleHistory','roundThemes','roundThemeRecovery','socialReactions']);
 const READ_KEYS=[...SOCIAL_DOMAIN_KEYS,'battleApplications','software'];
 const captured=state=>Object.fromEntries(READ_KEYS.map(key=>[key,state[key]]));
-const unchanged=(state,base)=>READ_KEYS.every(key=>state[key]===base[key]);
+// Social progression reads installation flags. Powered host frames normalize
+// software every frame, and downloads keep changing its progress; neither may
+// starve a completed worker result. Software itself is never merged back.
+const sameInstallations=(a,b)=>['client','ft','notebook','dossier'].every(id=>Boolean(a?.[id]?.installed)===Boolean(b?.[id]?.installed));
+const unchanged=(state,base)=>READ_KEYS.every(key=>key==='software'?sameInstallations(state[key],base[key]):state[key]===base[key]);
 
-export function createSocialBackground({createWorker=()=>new Worker(new URL('./social-worker.js?rev=59',import.meta.url),{type:'module'}),getState,getGoblinOnline,persist,onState,onError=()=>{}}){
+export function createSocialBackground({createWorker=()=>new Worker(new URL('./social-worker.js?rev=60',import.meta.url),{type:'module'}),getState,getGoblinOnline,persist,onState,onError=()=>{}}){
  let worker=null,pending=null,mirror={},lastInput=null,lastMinute=null,lastDispatch=-Infinity,sequence=0,epoch=0,failed='',warning='',disposed=false,jobsStarted=0,commits=0,online=false,lastOnline=null;
  function stop(){if(worker)worker.terminate();worker=null;pending=null;mirror={};epoch++;}
  function fail(reason){stop();failed=reason||'Не удалось обработать события баттла.';onError(failed);}

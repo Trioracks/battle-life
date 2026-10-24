@@ -1,16 +1,16 @@
 // Notepad-style view of the persisted symbolic lyric projects.
-import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=59';
-import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill,canEditLyricContentMix,setLyricContentMix,lyricRefinementReason} from './lyric-production.js?rev=59';
-import {randomBeatName} from './beat-names.js?rev=59';
-import {mountProjectPicker} from './project-picker-view.js?rev=59';
-import {normalizeBeat} from './beat-production.js?rev=59';
-import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=59';
-import {savePcDocument,openPcDocument,pcFileById} from './pc-filesystem.js?rev=59';
-import {documentSession,documentIsDirty} from './pc-document-session.js?rev=59';
-import {mountPcFilePicker} from './pc-file-picker-view.js?rev=59';
-import {explorerPaths} from './virtual-pc-explorer.js?rev=59';
-import {createDocumentGuard} from './pc-document-guard.js?rev=59';
-import {battleDocumentName} from './battle-document-name.js?rev=59';
+import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=60';
+import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill,canEditLyricContentMix,setLyricContentMix,lyricRefinementReason} from './lyric-production.js?rev=60';
+import {randomBeatName} from './beat-names.js?rev=60';
+import {mountProjectPicker} from './project-picker-view.js?rev=60';
+import {normalizeBeat} from './beat-production.js?rev=60';
+import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=60';
+import {savePcDocument,openPcDocument,pcFileById} from './pc-filesystem.js?rev=60';
+import {documentSession,documentIsDirty} from './pc-document-session.js?rev=60';
+import {mountPcFilePicker} from './pc-file-picker-view.js?rev=60';
+import {explorerPaths} from './virtual-pc-explorer.js?rev=60';
+import {createDocumentGuard} from './pc-document-guard.js?rev=60';
+import {battleDocumentName} from './battle-document-name.js?rev=60';
 
 export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,onCommit=onChange,onWork=()=>false}={}){
  const d=root.ownerDocument;let panel=null,modal=null,filePicker=null,returnFocusLabel='',message='',saveMessage='Черновик не сохранён в файл',saveFailed=false,signature=[],disposed=false,controls=[],needsLabel=null;

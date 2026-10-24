@@ -1,6 +1,6 @@
-import {SOCIAL_SECTIONS,communityById,profileById} from './social-catalog.js?rev=59';
-import {BATTLE_ROUND_IDS} from './battle-roster.js?rev=59';
-import {battleCharacter} from './battle-demo-config.js?rev=59';
+import {SOCIAL_SECTIONS,communityById,profileById} from './social-catalog.js?rev=60';
+import {BATTLE_ROUND_IDS} from './battle-roster.js?rev=60';
+import {battleCharacter} from './battle-demo-config.js?rev=60';
 export function resolveSocialRoute(address){
  if(typeof address!=='string')return null;
  let u;try{u=new URL(address);}catch{return null;}

@@ -1,6 +1,6 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=59';
-import {socialAvatar,socialButton} from './social-dom.js?rev=59';
-import {searchDialogs} from './social-personal.js?rev=59';
+import {pcElement as el} from './virtual-pc-dom.js?rev=60';
+import {socialAvatar,socialButton} from './social-dom.js?rev=60';
+import {searchDialogs} from './social-personal.js?rev=60';
 
 // Avatar retries are buttons on profile pages. A dialog row is itself a native
 // button, so its avatar uses a noninteractive fallback rather than nesting one.

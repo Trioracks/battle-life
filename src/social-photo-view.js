@@ -1,11 +1,11 @@
-import {discussionForPhoto,addDiscussionComment} from './social-discussion.js?rev=59';
-import {profileById} from './social-catalog.js?rev=59';
-import {pcElement as el,pcFocusable} from './virtual-pc-dom.js?rev=59';
-import {socialPhoto,socialButton,socialComment} from './social-dom.js?rev=59';
-import {socialPhotoSource} from './social-portraits.js?rev=59';
-import {photoFeedbackKey,changePhotoFeedback} from './social-photo-feedback.js?rev=59';
-import {gameDateTimeLabel} from './home-calendar.js?rev=59';
-import {socialImageUrl} from './social-image.js?rev=59';
+import {discussionForPhoto,addDiscussionComment} from './social-discussion.js?rev=60';
+import {profileById} from './social-catalog.js?rev=60';
+import {pcElement as el,pcFocusable} from './virtual-pc-dom.js?rev=60';
+import {socialPhoto,socialButton,socialComment} from './social-dom.js?rev=60';
+import {socialPhotoSource} from './social-portraits.js?rev=60';
+import {photoFeedbackKey,changePhotoFeedback} from './social-photo-feedback.js?rev=60';
+import {gameDateTimeLabel} from './home-calendar.js?rev=60';
+import {socialImageUrl} from './social-image.js?rev=60';
 export function profilePhoto(d,photo,options){
  const figure=socialPhoto(d,photo),src=socialPhotoSource(photo.src);if(!src)return figure;
  const image=figure.children[0],opener=socialButton(d,'',()=>openPhoto(d,photo,options,opener),{className:'sn-photo-open',attributes:{'aria-label':'Открыть фотографию: '+photo.title,'aria-haspopup':'dialog'}});

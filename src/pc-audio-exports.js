@@ -1,12 +1,12 @@
-import {pcFolderExists,pcFileEntries,pcFolderNameTaken} from './pc-filesystem.js?rev=59';
-import {normalizeBeat} from './beat-production.js?rev=59';
-import {resolveBeatPlayback} from './beat-playback.js?rev=59';
-import {captureTrackVersion,canonicalTrackSignature} from './track-version.js?rev=59';
-import {softwareDiskBytes} from './pc-software.js?rev=59';
-import {drumById} from './beat-catalog.js?rev=59';
-import {beginnerById} from './beat-beginner-bank.js?rev=59';
-import {vocalById,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=59';
-import {validBeatExecutionDescriptor} from './beat-execution-snapshot.js?rev=59';
+import {pcFolderExists,pcFileEntries,pcFolderNameTaken} from './pc-filesystem.js?rev=60';
+import {normalizeBeat} from './beat-production.js?rev=60';
+import {resolveBeatPlayback} from './beat-playback.js?rev=60';
+import {captureTrackVersion,canonicalTrackSignature} from './track-version.js?rev=60';
+import {softwareDiskBytes} from './pc-software.js?rev=60';
+import {drumById} from './beat-catalog.js?rev=60';
+import {beginnerById} from './beat-beginner-bank.js?rev=60';
+import {vocalById,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=60';
+import {validBeatExecutionDescriptor} from './beat-execution-snapshot.js?rev=60';
 
 export const AUDIO_EXPORT_FOLDERS=Object.freeze(['documents','music','exports','downloads','projects']);
 export const AUDIO_EXPORT_KINDS=Object.freeze({beat:'Бит',vocal:'Вокал',track:'Полный трек'});
