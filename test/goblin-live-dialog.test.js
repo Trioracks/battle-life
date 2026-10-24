@@ -5,10 +5,18 @@ import {advanceGoblin,replyToGoblin,goblinChoices} from '../src/goblin-mentor.js
 import {advanceGoblinActiveChat,goblinReplyContext,goblinTypingSeconds} from '../src/goblin-conversation.js';
 import {GOBLIN_ID} from '../src/goblin-catalog.js';
 import {mountGoblinDialog} from '../src/goblin-dialog-view.js';
-import {pcDocument} from './helpers/virtual-pc-dom.js';
+import {pcDocument,allPc} from './helpers/virtual-pc-dom.js';
 const tick=(state,activeSeconds=state.social.goblin.pending[0]?goblinTypingSeconds(state.social.goblin.pending[0]):1,extra={})=>advanceGoblinActiveChat(state,{nowMinute:500,activeSeconds,visible:true,powered:true,paused:false,...extra});
 const messages=s=>s.social.dialogs[GOBLIN_ID]?.messages??[];
 function invitation(){let s=advanceGoblin(createVirtualPcState(),480).state;s=advanceGoblin(s,500).state;return replyToGoblin(s,'normal',500).state;}
+
+test('an arriving portrait refreshes existing outgoing messages without reopening the chat',()=>{
+ let state=invitation();const view=mountGoblinDialog(pcDocument(),{getState:()=>state,getMetadata:()=>({gameMinutes:500,playerName:'Игрок'}),navigate(){},commit:()=>true});
+ const avatars=()=>allPc(view.root).filter(n=>n.tagName==='IMG'&&n.getAttribute('alt')==='Аватар: Игрок');
+ assert.equal(avatars().length,0);
+ state={...state,social:{...state.social,playerPortrait:{url:'data:image/jpeg;base64,'+Buffer.from([255,216,255,192,0,11,8,1,0,1,0,1,1,17,0,255,217]).toString('base64')}}};view.update();
+ assert.equal(avatars().length,1);assert.equal(avatars()[0].getAttribute('src'),state.social.playerPortrait.url);view.dispose();
+});
 test('online delivery uses the same stable message IDs as fallback and pauses when not visible',()=>{
  let s=invitation();assert.equal(tick(s,3,{visible:false}).state,s);assert.equal(tick(s,.1).events.length,0);s=tick(s).state;assert.ok(messages(s).some(m=>m.id==='goblin:mood'));
  s=createVirtualPcState(JSON.parse(JSON.stringify(s)));s=advanceGoblin(s,600).state;assert.equal(messages(s).filter(m=>m.id==='goblin:mood').length,1);

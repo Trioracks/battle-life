@@ -21,7 +21,7 @@ export function mountGoblinDialog(d,{getState,getMetadata,navigate,commit,audio,
  const incoming=el(d,'p',{className:'sn-typing',attributes:{role:'status','aria-live':'polite'}});
  const peer={kind:'person',id:GOBLIN_ID},heading=socialHeading(d,'Сообщения · ');heading.append(socialPeerLink(d,peer,GOBLIN_PROFILE.name,navigate));
  layout.head.append(heading,socialButton(d,'← Мои сообщения',()=>navigate('underweb://social/messages'),{className:'sn-link'}));
- const field=dialogMessageField(d),actions=el(d,'div',{className:'sn-actions'}),options=el(d,'div',{className:'sn-reply-host'}),attachment=el(d,'div',{className:'sn-dialog-attachment'}),draftLabel=el(d,'p',{className:'sn-note'}),progress=el(d,'p',{className:'sn-note',attributes:{'aria-live':'polite'}}),keyboard=createLyricWorkAudio({volume:.014});
+ const field=dialogMessageField(d),actions=el(d,'div',{className:'sn-actions'}),options=el(d,'div',{className:'sn-reply-host'}),attachment=el(d,'div',{className:'sn-dialog-attachment'}),draftLabel=el(d,'p',{className:'sn-note'}),progress=el(d,'p',{className:'sn-note sn-draft-progress',attributes:{'aria-live':'polite'}}),keyboard=createLyricWorkAudio({volume:.014});
  let filePicker=null;
  let signature='',readId='',disposed=false,blocked=false,error='',pendingSeconds=0,pendingChatSeconds=0,flushing=false,lastUpdate=null,incomingBody=null,incomingDuration=0;
  const now=()=>getMetadata().gameMinutes;
@@ -75,7 +75,7 @@ export function mountGoblinDialog(d,{getState,getMetadata,navigate,commit,audio,
   if(lastUpdate&&inputs.every((value,i)=>value===lastUpdate[i]))return;lastUpdate=inputs;
   const typing=Boolean(isVisible()&&state.power==='on'&&g?.pending?.length);incoming.hidden=!typing;
   const typingText=typing?'Гоблин Ссаблей печатает…':'';if(incoming.textContent!==typingText)incoming.textContent=typingText;
-  const key=JSON.stringify([dialog?.messages,g?.received,g?.downloaded,state.browserDownloads?.items.map(i=>[i.id,i.error])]);
+  const key=JSON.stringify([dialog?.messages,state.social?.playerPortrait?.url,getMetadata().playerName,g?.received,g?.downloaded,state.browserDownloads?.items.map(i=>[i.id,i.error])]);
   if(key!==signature){
    signature=key;layout.scroller.render(dialog?.messages??[],()=>{audio?.releaseRows?.(history);history.replaceChildren();
    for(const msg of dialog?.messages??[]){
