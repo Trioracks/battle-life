@@ -52,7 +52,7 @@ export function mountGoblinDialog(d,{getState,getMetadata,navigate,commit,audio,
   keyboard.sync({phase:'idle'});update(false);
  });
  const replyPanel=mountReplyPanel(options,{getContext:()=>goblinReplyContext(getState(),now()),onChoose:(choiceId,body)=>prepare({kind:'choice',choiceId,body})});answer=replyPanel.answer;
- options.hidden=false;attachment.hidden=true;actions.append(send,answer,attach,cancel);layout.footer.append(incoming,options,draftLabel,field,actions,progress,attachment,notice);
+ options.hidden=false;attachment.hidden=true;actions.append(send,answer,attach,cancel,progress);layout.footer.append(incoming,options,draftLabel,field,actions,attachment,notice);
  const run=result=>{if(commit(result)){error=result.reason??'';update(false);}else{error=result.reason??'Не удалось сохранить.';notice.textContent=error;}};
  function tickOutgoingMessage(activeSeconds=0,{paused=false}={}){
   if(disposed)return;
