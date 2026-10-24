@@ -1,4 +1,4 @@
-import { advanceCampaign } from './game-state.js?rev=60';
+import { advanceCampaign } from './game-state.js?rev=61';
 
 const jobs = Object.freeze({
   cashier: { id: 'cashier', label: 'Продавец-кассир', district: 'old-center', duration: 480, pay: 1050, minEnergy: 18, effects: { energy: -13, health: -1, leisure: -2 } },

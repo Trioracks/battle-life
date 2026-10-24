@@ -1,11 +1,11 @@
-import {publicAnalysisReport,publishedStudyReviews} from './rap-analysis.js?rev=60';
-import {profileAccess} from './social-profile-policy.js?rev=60';
-import {battleCharacter} from './battle-demo-config.js?rev=60';
-import {publicBattleHistory} from './battle-history.js?rev=60';
-import {validGameMinute} from './game-minute.js?rev=60';
-import {publicCharacterProfile} from './npc-social-profiles.js?rev=60';
-import {publicJudgeHypotheses} from './judge-dossier-analysis.js?rev=60';
-import {validRapReport} from './rap-report-schema.js?rev=60';
+import {publicAnalysisReport,publishedStudyReviews} from './rap-analysis.js?rev=61';
+import {profileAccess} from './social-profile-policy.js?rev=61';
+import {battleCharacter} from './battle-demo-config.js?rev=61';
+import {publicBattleHistory} from './battle-history.js?rev=61';
+import {validGameMinute} from './game-minute.js?rev=61';
+import {publicCharacterProfile} from './npc-social-profiles.js?rev=61';
+import {publicJudgeHypotheses} from './judge-dossier-analysis.js?rev=61';
+import {validRapReport} from './rap-report-schema.js?rev=61';
 const clone=v=>structuredClone(v),record=v=>v&&typeof v==='object'&&!Array.isArray(v),strings=v=>Array.isArray(v)&&v.every(x=>typeof x==='string');
 export function normalizeDossier(raw){const cards={},recovery=Array.isArray(raw?.recovery)?clone(raw.recovery):[];for(const [id,c]of Object.entries(record(raw?.cards)?raw.cards:{})){if(c?.characterId===id&&strings(c.reportIds)&&Array.isArray(c.quotes)&&c.quotes.every(q=>record(q)&&typeof q.id==='string'&&typeof q.judgeId==='string'&&typeof q.trackVersionId==='string'&&typeof q.comment==='string'&&validGameMinute(q.publishedAt))){Object.defineProperty(cards,id,{value:{characterId:id,firstRecordedAt:validGameMinute(c.firstRecordedAt)?c.firstRecordedAt:0,reportIds:[...new Set(c.reportIds)],quotes:clone(c.quotes)},enumerable:true,writable:true});}else recovery.push({id,recoveryData:clone(c),reason:'Карточка сохранена отдельно: повреждён формат.'});}return {version:1,cards,recovery};}
 export function saveAnalysisToDossier(state,reportId){

@@ -1,7 +1,14 @@
-import {PcTransition} from './virtual-pc-transition.js?rev=60';
+import {PcTransition} from './virtual-pc-transition.js?rev=61';
+import {cameraAllowsFirstPerson} from './apartment-v3-camera.js?rev=61';
 export const pcNeedsSceneFrame=(snapshot,mode)=>mode!=='pc'||snapshot.overlay<1;
-export function beginPcCutscene(motion){
- if(motion.busy||!motion.config.actions.computer)return false;
+export function beginPcCutscene(motion,{firstPerson=false}={}){
+ if(motion.busy||!motion.config.actions.computer||motion.actionId==='computer'&&motion.phase==='perform')return false;
+ if(firstPerson&&cameraAllowsFirstPerson(motion)){
+  // The monitor flight owns the visible camera; stage the actor without a cut.
+  const action=motion.config.actions.computer;
+  motion.actionId='computer';motion.position=[...action.pose];motion.yaw=motion.targetYaw=action.yaw;
+  motion.targetX=action.approach[0];motion.pending=null;motion.sleepOptions=null;motion.fade=0;motion.startPerform();return true;
+ }
  return motion.interact('computer');
 }
 export function pcActorVisible(motion,computerActive,workActor=false){
@@ -30,8 +37,8 @@ export class PcLifecycle{
   if(this.entering||!this.pending)return false;this.entering=true;const generation=this.generation;
   const ready=await this.pending;if(generation!==this.generation)return false;
   this.pending=null;this.entering=false;
-  if(!ready.ok){this.onError(ready.error);this.onRoom();return false;}
-  try{this.view.beginComputerView();}catch(error){this.onError(error);this.onRoom();return false;}
+  if(!ready.ok){this.restore('room');this.view.endComputerView();this.onError(ready.error);this.onRoom();return false;}
+  try{this.view.beginComputerView();}catch(error){this.restore('room');this.view.endComputerView();this.onError(error);this.onRoom();return false;}
   this.transition.enter({alreadyOn:this.getState().power==='on'});this.consume();return true;
  }
  leave(){const result=this.transition.leave();this.consume();return result;}
@@ -49,8 +56,8 @@ export class PcLifecycle{
   else if(event.type==='work-camera')this.view.beginComputerView({fromHead:true});
   else if(event.type==='reaction-scene'){this.view.endComputerView();this.view.modes.mode='2D';this.view.modes.revision++;}
   else if(event.type==='reaction-camera'){if(this.reactionLook)Object.assign(this.view.modes,this.reactionLook);this.view.modes.revision++;this.reactionLook=null;this.view.beginComputerView({fromHead:true});}
-  else if(event.type==='room-ready'){this.view.endComputerView();this.onRoom();}
+  else if(event.type==='room-ready'){this.restore('room');this.view.endComputerView();this.onRoom();}
  }}
- restore(phase){if(phase!=='return-in'||!this.savedLook)return;Object.assign(this.view.modes,this.savedLook);this.view.modes.revision++;this.savedLook=null;}
+ restore(phase){if(!['room','return-in'].includes(phase)||!this.savedLook)return;Object.assign(this.view.modes,this.savedLook);this.view.modes.revision++;this.savedLook=null;}
  reset(){this.generation++;this.pending=null;this.entering=false;this.savedLook=null;this.reactionLook=null;this.transition.cancel();this.view.endComputerView();this.sounds?.stop?.();}
 }

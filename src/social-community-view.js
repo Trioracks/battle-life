@@ -1,19 +1,19 @@
-import {mountSocialFeed} from './social-feed-page.js?rev=60';
-import {pcElement as el} from './virtual-pc-dom.js?rev=60';
-import {communityById,profileById} from './social-catalog.js?rev=60';
-import {normalizeSocial,subscribeCommunity} from './social-state.js?rev=60';
-import {socialAvatar,socialButton,socialHeading,socialPost,socialLink} from './social-dom.js?rev=60';
-import {socialImageUrl,recoverableSocialImage} from './social-image.js?rev=60';
-import {createSocialResultView} from './social-result-view.js?rev=60';
-import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=60';
-import {currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=60';
-import {publicTournamentTrackIds,publicRoundTable} from './battle-results-table.js?rev=60';
-import {publicRoundAnnouncements} from './round-topics.js?rev=60';
-import {createRoundAnnouncementView} from './round-announcement-view.js?rev=60';
-import {publicCommunityPosts,publicAnnouncedJudges} from './social-community-publications.js?rev=60';
-import {gameDateTimeLabel} from './home-calendar.js?rev=60';
-import {createPostReactionsView} from './social-reactions-view.js?rev=60';
-import {battleStage,battleStageText} from './battle-stage.js?rev=60';
+import {mountSocialFeed} from './social-feed-page.js?rev=61';
+import {pcElement as el} from './virtual-pc-dom.js?rev=61';
+import {communityById,profileById} from './social-catalog.js?rev=61';
+import {normalizeSocial,subscribeCommunity} from './social-state.js?rev=61';
+import {socialAvatar,socialButton,socialHeading,socialPost,socialLink} from './social-dom.js?rev=61';
+import {socialImageUrl,recoverableSocialImage} from './social-image.js?rev=61';
+import {createSocialResultView} from './social-result-view.js?rev=61';
+import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=61';
+import {currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=61';
+import {publicTournamentTrackIds,publicRoundTable} from './battle-results-table.js?rev=61';
+import {publicRoundAnnouncements} from './round-topics.js?rev=61';
+import {createRoundAnnouncementView} from './round-announcement-view.js?rev=61';
+import {publicCommunityPosts,publicAnnouncedJudges} from './social-community-publications.js?rev=61';
+import {gameDateTimeLabel} from './home-calendar.js?rev=61';
+import {createPostReactionsView} from './social-reactions-view.js?rev=61';
+import {battleStage,battleStageText} from './battle-stage.js?rev=61';
 
 export function createSocialCommunityView(d,{id,getState,getMetadata=()=>({}),navigate,commit,audio,expandedResults=new Set(),onResultViewed,onRegistered=()=>{},uiState={}}){
  const c=communityById(id),root=el(d,'section',{className:'sn-community'});if(!c)return root;

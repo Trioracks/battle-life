@@ -1,11 +1,11 @@
-import {audioFileMatchesBattle} from './battle-file-match.js?rev=60';
-import {communityById} from './social-catalog.js?rev=60';
-import {normalizeSocial} from './social-state.js?rev=60';
-import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=60';
-import {validGameMinute} from './game-minute.js?rev=60';
-import {TRACK_DSP_VERSION} from './track-version.js?rev=60';
-import {submissionCandidates} from './battle-submission.js?rev=60';
-import {normalizeOutgoingUpload} from './social-upload.js?rev=60';
+import {audioFileMatchesBattle} from './battle-file-match.js?rev=61';
+import {communityById} from './social-catalog.js?rev=61';
+import {normalizeSocial} from './social-state.js?rev=61';
+import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=61';
+import {validGameMinute} from './game-minute.js?rev=61';
+import {TRACK_DSP_VERSION} from './track-version.js?rev=61';
+import {submissionCandidates} from './battle-submission.js?rev=61';
+import {normalizeOutgoingUpload} from './social-upload.js?rev=61';
 export function submissionSendContext(state,{communityId,nowMinute}={}){
  const fail=reason=>({ok:false,state,reason}),c=communityById(communityId),window=currentBattleWindow(state,c?.battleId,nowMinute),upload=normalizeOutgoingUpload(state.outgoingUpload,state.trackVersions,state.audioExports);
  if(upload?.issue)return fail(upload.issue);

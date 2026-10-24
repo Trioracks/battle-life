@@ -1,20 +1,20 @@
-import {pcFileById,savePcDocument} from './pc-filesystem.js?rev=60';
-import {GOBLIN_ID,GOBLIN_SKILLS,GOBLIN_DIALOGUE,normalizeGoblin} from './goblin-catalog.js?rev=60';
-import {queueGoblinAttachment} from './goblin-mentor.js?rev=60';
-import {normalizeLyric,startLyricWork,advanceLyricWork} from './lyric-production.js?rev=60';
-import {normalizeBeat,createBeat,startBeatStage,advanceBeatWork} from './beat-production.js?rev=60';
-import {normalizeRecording} from './vocal-result.js?rev=60';
-import {chooseSongForm} from './beat-song-form.js?rev=60';
-import {createAudioExport} from './pc-audio-exports.js?rev=60';
-import {softwareDiskBytes} from './pc-software.js?rev=60';
-import {validGameMinute} from './game-minute.js?rev=60';
+import {pcFileById,savePcDocument} from './pc-filesystem.js?rev=61';
+import {GOBLIN_ID,GOBLIN_SKILLS,GOBLIN_DIALOGUE,normalizeGoblin} from './goblin-catalog.js?rev=61';
+import {queueGoblinAttachment} from './goblin-mentor.js?rev=61';
+import {normalizeLyric,startLyricWork,advanceLyricWork} from './lyric-production.js?rev=61';
+import {normalizeBeat,createBeat,startBeatStage,advanceBeatWork} from './beat-production.js?rev=61';
+import {normalizeRecording} from './vocal-result.js?rev=61';
+import {chooseSongForm} from './beat-song-form.js?rev=61';
+import {createAudioExport} from './pc-audio-exports.js?rev=61';
+import {softwareDiskBytes} from './pc-software.js?rev=61';
+import {validGameMinute} from './game-minute.js?rev=61';
 const clone=structuredClone;
 const fail=(state,reason)=>({ok:false,state,reason});
 function write(state,g){return {...state,social:{...state.social,goblin:g}};}
 const busy=state=>state.music?.job||state.writing?.job||state.recording?.job;
 const day=now=>Math.floor(now/1440)+1;
 function studio(state){
- return {...state,projects:[],audioExports:{version:1,files:[],recovery:[]},trackVersions:{byId:{},recovery:[]},
+ return {...state,projects:[],fileSystem:{version:1,folders:[],files:[],recovery:[]},audioExports:{version:1,files:[],recovery:[]},trackVersions:{byId:{},recovery:[]},
   creativeWork:null,rapAnalysis:null,rapResearch:null,
   music:{...state.music,practice:0,job:null,needs:{satiety:100,energy:100},genres:{version:1,chosen:[],primary:null,xp:{experimental:25}}},
   writing:{practice:0,job:null,activeTextId:null},recording:{practice:{flow:0,sound:0},job:null}};

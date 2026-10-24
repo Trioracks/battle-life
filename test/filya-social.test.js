@@ -6,10 +6,23 @@ import {FILYA_ID,FILYA_CARDS,FILYA_RELEASES} from '../src/filya-catalog.js';
 import {GOBLIN_ID} from '../src/goblin-catalog.js';
 import {battleCharacter} from '../src/battle-demo-config.js';
 import {profileById} from '../src/social-catalog.js';
+import {normalizeSocial,profileAccess,addSocialFriend} from '../src/social-state.js';
 import {createSocialProfileView} from '../src/social-profile-view.js';
 import {pcDocument,allPc,findButton} from './helpers/virtual-pc-dom.js';
 
 const start=()=>advanceFilya(createVirtualPcState(),480,{random:()=>.42}).state;
+test('Filya stays accessible through Goblin without becoming the player friend on new or saved games',()=>{
+ const state=start();assert.equal(state.social.friends.includes(FILYA_ID),false);assert.equal(profileAccess(state,FILYA_ID).allowed,true);
+ const old=structuredClone(state);old.social.friends.push(FILYA_ID);old.social.filya.likes=[old.social.filya.posts[0].id];const before=structuredClone(old);
+ const restored=createVirtualPcState(JSON.parse(JSON.stringify(old)));assert.equal(restored.social.friends.includes(FILYA_ID),false);assert.deepEqual(restored.social.filya,old.social.filya);assert.deepEqual(restored.social.friends,old.social.friends.filter(id=>id!==FILYA_ID));assert.deepEqual(old,before);
+ assert.deepEqual(normalizeSocial(restored.social),restored.social);assert.equal(addSocialFriend(restored,FILYA_ID).ok,false);assert.equal(profileAccess(restored,FILYA_ID).allowed,true);assert.ok(profileById(GOBLIN_ID).friends.includes(FILYA_ID));
+});
+test('Filya profile has no identity note below its avatar and remains linked in Goblin friends',()=>{
+ const state=start(),d=pcDocument(),visited=[],options={getState:()=>state,getMetadata:()=>({gameMinutes:480}),navigate:url=>visited.push(url),commit(){},audio:{stop(){}}};
+ const profile=createSocialProfileView(d,{...options,id:FILYA_ID}),aside=profile.children[0];assert.equal(aside.children.some(n=>n.tagName==='P'),false);assert.equal(aside.children[0].getAttribute('aria-label'),'Аватар: МЦ Филя');
+ const playerFriends=createSocialProfileView(d,{...options,id:'me',view:'friends'});assert.equal(findButton(playerFriends,'МЦ Филя'),undefined);
+ const goblinFriends=createSocialProfileView(d,{...options,id:GOBLIN_ID,view:'friends'}),link=findButton(goblinFriends,'МЦ Филя');assert.ok(link);link.click();assert.deepEqual(visited,['underweb://social/profile/mc-filya']);assert.ok(allPc(goblinFriends.children[0]).some(n=>n.tagName==='P'&&n.textContent));
+});
 test('Filya starts with two distinct random historical photos; save and clock do not reroll',()=>{
  const s=start(),f=s.social.filya;
  assert.equal(f.posts.length,2);assert.equal(new Set(f.posts.map(p=>p.cardId)).size,2);

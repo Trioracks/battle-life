@@ -1,8 +1,8 @@
 import communities from '../data/social/communities.json' with {type:'json'};
 import profiles from '../data/social/profiles.json' with {type:'json'};
-import {GOBLIN_PROFILE} from './goblin-catalog.js?rev=60';
-import {FILYA_PROFILE} from './filya-catalog.js?rev=60';
-import {vityaLifeProfile} from './social-life-stories.js?rev=60';
+import {GOBLIN_PROFILE} from './goblin-catalog.js?rev=61';
+import {FILYA_PROFILE} from './filya-catalog.js?rev=61';
+import {vityaLifeProfile} from './social-life-stories.js?rev=61';
 const copy=value=>JSON.parse(JSON.stringify(value));
 const freeze=value=>{if(value&&typeof value==='object'){Object.values(value).forEach(freeze);Object.freeze(value);}return value;};
 export const SOCIAL_COMMUNITIES=freeze(communities.map(c=>c.id==='makarevich-1'?{...c,avatar:{...c.avatar,src:'./assets/battle-covers/mak-cover-01.png'}}:c));

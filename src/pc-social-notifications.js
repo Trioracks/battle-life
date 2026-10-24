@@ -1,4 +1,4 @@
-import {createPcRoomOutput} from './pc-room-audio.js?rev=60';
+import {createPcRoomOutput} from './pc-room-audio.js?rev=61';
 
 // A separate voice through the apartment's existing speaker acoustics. It never
 // takes ownership of, stops or queues behind a song playing on the computer.

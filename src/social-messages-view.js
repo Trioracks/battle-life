@@ -1,9 +1,9 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=60';
-import {socialButton,socialHeading,socialPeerLink} from './social-dom.js?rev=60';
-import {searchDialogs,blockAndRemoveFriend} from './social-personal.js?rev=60';
-import {profileById} from './social-catalog.js?rev=60';
-import {gameDateTimeLabel as gameMinuteLabel} from './home-calendar.js?rev=60';
-import {createDialogLayout,dialogMessageField,dialogListAvatar} from './social-dialog-layout.js?rev=60';
+import {pcElement as el} from './virtual-pc-dom.js?rev=61';
+import {socialButton,socialHeading,socialPeerLink} from './social-dom.js?rev=61';
+import {searchDialogs,blockAndRemoveFriend} from './social-personal.js?rev=61';
+import {profileById} from './social-catalog.js?rev=61';
+import {gameDateTimeLabel as gameMinuteLabel} from './home-calendar.js?rev=61';
+import {createDialogLayout,dialogMessageField,dialogListAvatar} from './social-dialog-layout.js?rev=61';
 export function mountSocialMessages(d,{getState,navigate}){
  const root=el(d,'section',{className:'sn-messages'}),input=el(d,'input',{className:'sn-search',attributes:{'aria-label':'Поиск по сообщениям',placeholder:'Имя или фраза из переписки…'}}),list=el(d,'div');let last='',disposed=false;
  root.append(socialHeading(d,'Мои сообщения'),input,list);

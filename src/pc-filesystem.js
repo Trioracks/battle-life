@@ -1,10 +1,11 @@
-import {normalizeLyric} from './lyric-production.js?rev=60';
-import {normalizeBeat} from './beat-production.js?rev=60';
-import {normalizeStudioProject} from './ft-studio-project.js?rev=60';
-import {softwareDiskBytes} from './pc-software.js?rev=60';
-import {validGameMinute} from './game-minute.js?rev=60';
+import {normalizeLyric} from './lyric-production.js?rev=61';
+import {normalizeBeat} from './beat-production.js?rev=61';
+import {normalizeStudioProject} from './ft-studio-project.js?rev=61';
+import {softwareDiskBytes} from './pc-software.js?rev=61';
+import {validGameMinute} from './game-minute.js?rev=61';
 
 export const PC_USER_FOLDERS=Object.freeze(['disk','documents','projects','music','exports','downloads']);
+export const PC_FOLDER_PARENTS=Object.freeze({disk:'computer',documents:'disk',projects:'documents',music:'documents',exports:'music',downloads:'disk'});
 const base=new Set(PC_USER_FOLDERS),reserved=new Set([...PC_USER_FOLDERS,'computer','windows']),types=new Set(['txt','flp','wav','mp3']),clone=structuredClone;
 const key=s=>String(s).normalize('NFC').toLocaleLowerCase('ru');
 export const validPcId=id=>typeof id==='string'&&id.length>0&&id.length<=160&&!/[\\/\x00-\x1f]/.test(id)&&!['__proto__','prototype','constructor','.','..'].includes(id);
@@ -18,7 +19,15 @@ export function pcDocumentFilename(value,type){
 }
 const documentProject=(p,type)=>type==='txt'?normalizeLyric(p):type==='flp'?(normalizeBeat(p)??normalizeStudioProject(p)):null;
 const projectType=p=>p?.kind==='lyrics'?'txt':'flp';
-export function pcFolderExists(state,id){return base.has(id)||(state.fileSystem?.folders??[]).some(f=>f.id===id);}
+export function pcFolderExists(state,id){
+ const seen=new Set();let current=id;
+ while(current&&!seen.has(current)){
+  if(state.fileSystem?.deletedFolders?.includes(current))return false;
+  if(current==='disk')return true;
+  seen.add(current);current=base.has(current)?PC_FOLDER_PARENTS[current]:(state.fileSystem?.folders??[]).find(folder=>folder.id===current)?.parentId;
+ }
+ return false;
+}
 function uniqueName(filename,folderId,files,folders=[]){
  const exists=name=>files.some(f=>f.folderId===folderId&&key(f.filename)===key(name))||folders.some(f=>f.parentId===folderId&&key(f.name)===key(name));if(!exists(filename))return filename;
  const dot=filename.lastIndexOf('.'),stem=filename.slice(0,dot),ext=filename.slice(dot);
@@ -37,7 +46,11 @@ export function normalizePcFileSystem(raw,{projects=[],audioExports,mentorFiles=
   return out;
  }
  if(raw.version!==1||!Array.isArray(raw.folders)||!Array.isArray(raw.files)){out.recovery.push({reason:'Файловая система повреждена. Исходник сохранён.',recoveryData:clone(raw)});return out;}
- const pending=[...raw.folders],ids=new Set(base),names=new Set();
+ const deleted=new Set((Array.isArray(raw.deletedFolders)?raw.deletedFolders:[]).filter(id=>base.has(id)&&id!=='disk'));
+ for(const id of base){let parent=PC_FOLDER_PARENTS[id];while(parent){if(deleted.has(parent)){deleted.add(id);break;}parent=PC_FOLDER_PARENTS[parent];}}
+ if(deleted.size)out.deletedFolders=[...deleted];
+ if(Array.isArray(raw.deletedProjectIds)){const ids=[...new Set(raw.deletedProjectIds.filter(validPcId))];if(ids.length)out.deletedProjectIds=ids;}
+ const pending=[...raw.folders],ids=new Set([...base].filter(id=>!deleted.has(id))),names=new Set();
  for(let pass=0;pass<12&&pending.length;pass++)for(let i=0;i<pending.length;){const f=pending[i],name=pcEntryName(f?.name),id=f?.id,nk=f?.parentId+':'+key(name);
   if(validPcId(id)&&!reserved.has(id)&&!ids.has(id)&&name&&ids.has(f.parentId)&&!names.has(nk)){out.folders.push({id,parentId:f.parentId,name,createdAtMinute:validGameMinute(f.createdAtMinute)?f.createdAtMinute:0});ids.add(id);names.add(nk);pending.splice(i,1);}else i++;
  }
@@ -98,7 +111,7 @@ export function savePcDocument(state,{projectId,fileId,folderId,filename,nowMinu
  if(softwareDiskBytes(state).free<Math.max(0,bytes-(replaced?.bytes??0)))return fail('Недостаточно места на игровом диске.');
  const id=replaced?.id??'document:'+(globalThis.crypto?.randomUUID?.()??Date.now().toString(36)),file={id,type,folderId,filename,projectId,snapshot:clone(snapshot),source:'document',bytes,createdAtMinute:replaced?.createdAtMinute??nowMinute,modifiedAtMinute:nowMinute};
  const files=replaced?fs.files.map(f=>f.id===replaced.id?file:f):[...fs.files,file],appId=type==='txt'?'rap-notebook':'ft-studio';
- return {ok:true,state:{...state,fileSystem:{...fs,files},documentSessions:{version:1,...state.documentSessions,byApp:{...state.documentSessions?.byApp,[appId]:{projectId,fileId:id}}}},fileId:id,reason:''};
+ return {ok:true,state:{...state,fileSystem:{...fs,files,...(fs.deletedProjectIds?{deletedProjectIds:fs.deletedProjectIds.filter(id=>id!==projectId)}:{})},documentSessions:{version:1,...state.documentSessions,byApp:{...state.documentSessions?.byApp,[appId]:{projectId,fileId:id}}}},fileId:id,reason:''};
 }
 export function openPcDocument(state,{fileId,appId}={}){
  const fail=reason=>({ok:false,state,projectId:null,reason}),file=pcFileById(state,fileId),expected=appId==='rap-notebook'?'txt':appId==='ft-studio'?'flp':null;

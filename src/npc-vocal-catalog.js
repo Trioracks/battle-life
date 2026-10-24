@@ -1,7 +1,7 @@
 // Choice uses current packs; source resolution retains historical takes.
 import voices from '../data/audio/npc-voices.json?rev=47' with {type:'json'};
-import {VOICE_PACKS,ALL_VOCALS,DEFAULT_VOICE_ID,voicePackById,voiceCatalog,vocalById} from './vocal-catalog.js?rev=60';
-import {voiceBagSeed,shuffledVoiceOrder,validVoiceBag,migrateVoiceBag} from './voice-bank-migration.js?rev=60';
+import {VOICE_PACKS,ALL_VOCALS,DEFAULT_VOICE_ID,voicePackById,voiceCatalog,vocalById} from './vocal-catalog.js?rev=61';
+import {voiceBagSeed,shuffledVoiceOrder,validVoiceBag,migrateVoiceBag} from './voice-bank-migration.js?rev=61';
 export const NPC_VOICE_REGISTRY=Object.freeze({...voices,voices:VOICE_PACKS.map(v=>Object.freeze({...v,name:v.label}))});
 export const NPC_VOCAL_CATALOG=Object.freeze(NPC_VOICE_REGISTRY.voices.flatMap(v=>v.parts));
 export const NPC_VOCAL_SOURCES=ALL_VOCALS;

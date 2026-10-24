@@ -1,4 +1,5 @@
-import {SOFTWARE,METADATA_BYTES,DISK_BYTES,SYSTEM_BYTES} from './pc-software-catalog.js?rev=60';
+import {SOFTWARE,METADATA_BYTES,DISK_BYTES,SYSTEM_BYTES} from './pc-software-catalog.js?rev=61';
+import {restorePcDownloadFolder} from './pc-download-folder.js?rev=61';
 const bytes=(n,max)=>Number.isFinite(n)?Math.max(0,Math.min(max,n)):0;
 export function normalizeInstallPath(value){
  if(typeof value!=='string')return null;
@@ -45,7 +46,7 @@ export function downloadClient(input){
  if(soft.client.installed||soft.client.receivedBytes===2000000)return result(s);
  if(soft.transfers.client)return result(s);
  if(softwareDiskBytes(s).free<2000000-soft.client.receivedBytes)return result(s,false,'insufficient-space');
- soft.transfers.client={appId:'client',paused:false,error:''};return result(withSoftware(s,soft));
+ soft.transfers.client={appId:'client',paused:false,error:''};return result(restorePcDownloadFolder(withSoftware(s,soft)));
 }
 export function downloadNotebook(input){
  return downloadMetadata(input,'notebook');
@@ -53,7 +54,7 @@ export function downloadNotebook(input){
 export function downloadMetadata(input,id='ft'){
  const s=copy(input),key=SOFTWARE[id]?.metadataKey;if(!key)return result(s,false,'unknown-app');
  if(s.power!=='on')return result(s,false,'pc-off');if(s.software[key])return result(s);
- if(softwareDiskBytes(s).free<METADATA_BYTES)return result(s,false,'insufficient-space');s.software[key]=true;return result(withSoftware(s,s.software));
+ if(softwareDiskBytes(s).free<METADATA_BYTES)return result(s,false,'insufficient-space');s.software[key]=true;return result(restorePcDownloadFolder(withSoftware(s,s.software)));
 }
 export function openMetadata(input,id='ft'){
  const s=copy(input),soft=s.software,app=SOFTWARE[id];if(!app?.metadataKey)return result(s,false,'unknown-app');
@@ -69,7 +70,7 @@ export function openInstaller(input,appId){
  const s=copy(input),app=SOFTWARE[appId];if(!app)return result(s,false,'unknown-app');
  if(s.software[appId].installed)return result(s,false,'already-installed');if(s.software[appId].receivedBytes!==app.downloadBytes)return result(s,false,'archive-required');
  if(s.software.installer&&s.software.installer.appId!==appId)return result(s,false,'installer-active');
- s.software.installer??={appId,openAfterInstall:true,step:'welcome',path:app.path,elapsedSeconds:0,error:''};return result(s);
+ s.software.installer??={appId,openAfterInstall:true,step:'welcome',path:s.software[appId].path,elapsedSeconds:0,error:''};return result(s);
 }
 export function setInstallerPath(input,path){const s=copy(input),valid=normalizeInstallPath(path);if(!s.software.installer)return result(s,false,'installer-required');if(!valid)return result(s,false,'invalid-path');s.software.installer.path=valid;return result(s);}
 export function cancelInstaller(input){const s=copy(input);s.software.installer=null;return result(s);}

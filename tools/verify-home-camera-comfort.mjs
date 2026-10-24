@@ -57,7 +57,7 @@ try{
  const sleeps=[];
  if(!process.env.CAMERA_BASELINE)for(const mode of ['2D','3D'])for(const wake of ['early','clock']){
   const result=await page.evaluate(options=>cameraComfort.sleep(options),{mode,wake});assert.equal(result.sleeping.mode,'2D');assert.equal(result.sleeping.blanket,true);assert.equal(result.sleeping.cover,false);
-  assert.equal(result.standingUp.mode,'2D');assert.equal(result.standing.mode,mode);assert.equal(result.standing.clip,'idle');assert.equal(result.standing.blanket,false);assert.equal(result.standing.cover,true);sleeps.push({mode,wake,result:Object.fromEntries(Object.entries(result).map(([phase,snapshot])=>[phase,compactSnapshot(snapshot)]))});
+  assert.equal(result.standingUp.mode,mode);assert.equal(result.standing.mode,mode);assert.equal(result.standing.clip,'idle');assert.equal(result.standing.blanket,false);assert.equal(result.standing.cover,true);sleeps.push({mode,wake,result:Object.fromEntries(Object.entries(result).map(([phase,snapshot])=>[phase,compactSnapshot(snapshot)]))});
  }
  const ui=[];
  if(!process.env.CAMERA_BASELINE){

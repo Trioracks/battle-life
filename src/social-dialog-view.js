@@ -1,30 +1,32 @@
-import {mountReplyPanel} from './social-reply-panel.js?rev=60';
-import {pcElement as el} from './virtual-pc-dom.js?rev=60';
-import {communityById} from './social-catalog.js?rev=60';
-import {socialButton,socialPeerLink,socialHeading} from './social-dom.js?rev=60';
-import {sendSubmission,dialogIsTyping,markDialogRead} from './social-submission.js?rev=60';
-import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=60';
-import {gameDateTimeLabel} from './home-calendar.js?rev=60';
-import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=60';
-import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=60';
-import {mountPersonalDialog,visibleDialogReader} from './social-messages-view.js?rev=60';
-import {uploadPresentation,cancelSubmissionUpload} from './social-upload.js?rev=60';
-import {startSubmissionMessage,advanceSubmissionMessage,cancelSubmissionMessage} from './social-composer.js?rev=60';
-import {createLyricWorkAudio} from './lyric-work-audio.js?rev=60';
-import {mountGoblinDialog} from './goblin-dialog-view.js?rev=60';
-import {createDialogLayout,dialogMessageField} from './social-dialog-layout.js?rev=60';
-import {battleStage,battleStageText} from './battle-stage.js?rev=60';
+import {mountReplyPanel} from './social-reply-panel.js?rev=61';
+import {pcElement as el} from './virtual-pc-dom.js?rev=61';
+import {communityById} from './social-catalog.js?rev=61';
+import {socialButton,socialPeerLink,socialHeading} from './social-dom.js?rev=61';
+import {sendSubmission,dialogIsTyping,markDialogRead} from './social-submission.js?rev=61';
+import {attemptForWindow,currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=61';
+import {gameDateTimeLabel} from './home-calendar.js?rev=61';
+import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=61';
+import {mountBattleSubmissionPicker} from './battle-submission-view.js?rev=61';
+import {mountPersonalDialog,visibleDialogReader} from './social-messages-view.js?rev=61';
+import {uploadPresentation,cancelSubmissionUpload} from './social-upload.js?rev=61';
+import {startSubmissionMessage,advanceSubmissionMessage,cancelSubmissionMessage} from './social-composer.js?rev=61';
+import {createLyricWorkAudio} from './lyric-work-audio.js?rev=61';
+import {mountGoblinDialog} from './goblin-dialog-view.js?rev=61';
+import {createDialogLayout,dialogMessageField} from './social-dialog-layout.js?rev=61';
+import {battleStage,battleStageText} from './battle-stage.js?rev=61';
 export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commit,audio,isVisible=()=>true,onRegistered=()=>{},onRead=id=>commit(markDialogRead(getState(),id))}){
  if(id==='mak-npc-06')return mountGoblinDialog(d,{getState,getMetadata,navigate,commit,audio,isVisible,onRead});
  if(peer?.kind==='person')return mountPersonalDialog(d,{id,getState,getMetadata,navigate,commit,isVisible,onRead});
- const c=communityById(id),layout=createDialogLayout(d,{id,getState,navigate}),{root,history,notice}=layout,typing=el(d,'p',{className:'sn-typing',attributes:{'aria-live':'polite'}}),draft=el(d,'div',{className:'sn-dialog-draft'}),actions=el(d,'div',{className:'sn-actions'}),pickerHost=el(d,'div',{className:'sn-file-picker'}),replyOptions=el(d,'div',{className:'sn-reply-host'});replyOptions.hidden=false;
+ const c=communityById(id),layout=createDialogLayout(d,{id,getState,navigate}),{root,history,notice}=layout,typing=el(d,'p',{className:'sn-typing',attributes:{'aria-live':'polite'}}),draft=el(d,'div',{className:'sn-dialog-draft'}),actions=el(d,'div',{className:'sn-actions'}),pickerHost=el(d,'dialog',{className:'sn-attachment-modal',attributes:{'aria-label':'Прикрепить файл'}}),replyOptions=el(d,'div',{className:'sn-reply-host'});replyOptions.hidden=false;
  let picker=null,lastMessages='',lastDraft='',disposed=false;
  let pendingSeconds=0,flushing=false,blocked=false,composerError='';
  const keyboard=createLyricWorkAudio({volume:.014}),composerBox=el(d,'div',{className:'sn-composer'}),composerText=dialogMessageField(d),composerStatus=el(d,'p',{className:'sn-note',attributes:{role:'status'}}),cancelMessage=socialButton(d,'Отменить набор',()=>{if(commit(cancelSubmissionMessage(getState()))){pendingSeconds=0;blocked=false;composerError='';update();}});composerBox.append(composerText,composerStatus);
  const uploadBox=el(d,'div',{className:'sn-upload'}),uploadLabel=el(d,'p'),uploadBar=el(d,'progress',{attributes:{max:'100','aria-label':'Загрузка вложения'}}),uploadCancel=socialButton(d,'Отменить загрузку',()=>commit(cancelSubmissionUpload(getState())));uploadBox.append(uploadLabel,uploadBar,uploadCancel);
- const closePicker=()=>{picker?.dispose();picker=null;attach.focus();};
+ const closePicker=()=>{picker?.dispose();picker=null;pickerHost.close?.();if(!disposed)(attach.disabled?composerText:attach).focus({preventScroll:true});};
+ const cancelPicker=e=>{e.preventDefault();closePicker();};pickerHost.addEventListener('cancel',cancelPicker);
  const attach=socialButton(d,'Прикрепить',()=>{
   if(picker||attach.disabled)return;
+  replyPanel.close();pickerHost.showModal?.();
   picker=mountBattleSubmissionPicker(pickerHost,{getState,battleId:c.battleId,communityId:id,getGameMinute:()=>getMetadata().gameMinutes,onChange:state=>commit({ok:true,state}),onClose:closePicker});
  });
  const prepare=socialButton(d,'Отправить работу на баттл',()=>{if(prepare.disabled)return;const result=startSubmissionMessage(getState(),{communityId:id,nowMinute:getMetadata().gameMinutes});if(!result.ok){commit(result);return;}if(result.state!==getState()&&!commit(result))return;blocked=false;composerError='';replyPanel.close();void keyboard.unlock();composerText.focus({preventScroll:true});update();});
@@ -35,7 +37,7 @@ export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commi
  const register=socialButton(d,'Зарегистрироваться',()=>{const result=registerBattle(getState(),{battleId:c.battleId,playerName:getMetadata().playerName,nowMinute:metadataGameMinute(getMetadata())});if(commit(result))onRegistered(c.battleId);});
  const communityPeer={kind:'community',id},heading=socialHeading(d,'Сообщения · ');heading.append(socialPeerLink(d,communityPeer,c.name,navigate));
  const stageHeader=el(d,'p',{className:'sn-battle-stage'}),stageLink=socialButton(d,'Таблица раунда',()=>navigate(battleStage(getState(),{battleId:c.battleId,nowMinute:metadataGameMinute(getMetadata())}).tableUrl),{className:'sn-link'});
- layout.head.append(heading,socialButton(d,'← Сообщество',()=>navigate('underweb://social/community/'+id),{className:'sn-link'}),stageHeader,stageLink);actions.append(send,answer,register,attach,cancelMessage,read);layout.footer.append(replyOptions,draft,uploadBox,composerBox,actions,typing,notice,pickerHost);
+ layout.head.append(heading,socialButton(d,'← Сообщество',()=>navigate('underweb://social/community/'+id),{className:'sn-link'}),stageHeader,stageLink);actions.append(send,answer,register,attach,cancelMessage,read);layout.footer.append(replyOptions,draft,uploadBox,composerBox,actions,typing,notice);root.append(pickerHost);
  const message=()=>{const m=getState().outgoingMessage;return m&&(m.issue||m.communityId===id)?m:null;};
  function flushProgress(){
   if(blocked)return false;
@@ -89,5 +91,5 @@ export function mountSocialDialog(d,{id,peer,getState,getMetadata,navigate,commi
   notice.hidden=true;replyPanel.update();picker?.update();layout.update();
   if(markRead)autoRead();
  }
- update(false);return {root,update,tickOutgoingMessage,dispose(){disposed=true;replyPanel.dispose();flushProgress();keyboard.dispose();layout.dispose();picker?.dispose();audio.releaseRows?.(root);root.replaceChildren();}};
+ update(false);return {root,update,tickOutgoingMessage,dispose(){disposed=true;closePicker();pickerHost.removeEventListener('cancel',cancelPicker);replyPanel.dispose();flushProgress();keyboard.dispose();layout.dispose();audio.releaseRows?.(root);root.replaceChildren();}};
 }

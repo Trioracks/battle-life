@@ -1,5 +1,5 @@
-import {profileById} from './social-catalog.js?rev=60';
-import {playerLifePosts,PLAYER_LIFE_SCENES} from './player-life-photos.js?rev=60';
+import {profileById} from './social-catalog.js?rev=61';
+import {playerLifePosts,PLAYER_LIFE_SCENES} from './player-life-photos.js?rev=61';
 const hash=value=>{let h=2166136261;for(const c of String(value))h=Math.imul(h^c.charCodeAt(0),16777619);return (h>>>0).toString(16);};
 const validThread=id=>typeof id==='string'&&!['__proto__','constructor','prototype'].includes(id)&&/^[a-zA-Z0-9:._-]{1,200}$/.test(id);
 export function normalizeDiscussions(raw){

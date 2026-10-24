@@ -1,8 +1,8 @@
-import {pcFileById} from './pc-filesystem.js?rev=60';
-import {normalizeAudioBacking} from './pc-audio-backing.js?rev=60';
-import {normalizeBeat} from './beat-production.js?rev=60';
-import {createBeatMix} from './beat-mix.js?rev=60';
-import {softwareDiskBytes} from './pc-software.js?rev=60';
+import {pcFileById} from './pc-filesystem.js?rev=61';
+import {normalizeAudioBacking} from './pc-audio-backing.js?rev=61';
+import {normalizeBeat} from './beat-production.js?rev=61';
+import {createBeatMix} from './beat-mix.js?rev=61';
+import {softwareDiskBytes} from './pc-software.js?rev=61';
 export function importAudioBacking(state,{fileId,projectId,name,nowMinute}={}){
  const fail=reason=>({ok:false,state,projectId:null,reason}),entry=pcFileById(state,fileId),file=state.audioExports?.files.find(f=>f.id===(entry?.audioExportId??fileId));
  if(!file||!['wav','mp3'].includes(entry?.type))return fail('Выбери сохранённый WAV или MP3.');

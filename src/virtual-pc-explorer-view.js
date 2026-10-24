@@ -1,18 +1,18 @@
-import {mountFolderRename} from './pc-folder-rename-view.js?rev=60';
-import {PC_IDENTITY} from './pc-identity.js?rev=60';
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=60';
-import {createPcIcon} from './virtual-pc-icons.js?rev=60';
-import {createExplorerState,reconcileExplorerState,navigateExplorer,explorerEntries,explorerProperties,explorerPaths} from './virtual-pc-explorer.js?rev=60';
-import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=60';
-import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=60';
-import {normalizeStudioProject} from './ft-studio-project.js?rev=60';
-import {normalizeBeat} from './beat-production.js?rev=60';
-import {normalizeLyric} from './lyric-production.js?rev=60';
-import {mountAudioFilePlayer} from './pc-audio-export-view.js?rev=60';
-import {pcFileById,createPcFolder,nextPcFolderName} from './pc-filesystem.js?rev=60';
+import {mountFolderRename} from './pc-folder-rename-view.js?rev=61';
+import {PC_IDENTITY} from './pc-identity.js?rev=61';
+import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=61';
+import {createPcIcon} from './virtual-pc-icons.js?rev=61';
+import {createExplorerState,reconcileExplorerState,navigateExplorer,explorerEntries,explorerProperties,explorerPaths,deleteExplorerFolder} from './virtual-pc-explorer.js?rev=61';
+import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=61';
+import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=61';
+import {normalizeStudioProject} from './ft-studio-project.js?rev=61';
+import {normalizeBeat} from './beat-production.js?rev=61';
+import {normalizeLyric} from './lyric-production.js?rev=61';
+import {mountAudioFilePlayer} from './pc-audio-export-view.js?rev=61';
+import {pcFileById,createPcFolder,nextPcFolderName} from './pc-filesystem.js?rev=61';
 
-export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenProject,onProperties,onClose,onMenu,onNavigate,onChange,audio}) {
-  const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',diskLabel=null,disposed=false,renaming=null;
+export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenProject,onProperties,onClose,onMenu,onNavigate,onChange,onModal,audio}) {
+  const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',diskLabel=null,disposed=false,renaming=null,deletion=null;
   const wrap=el(d,'div',{className:'pc-explorer'}),menubar=el(d,'div',{className:'pc-menubar'});
   const tools=el(d,'div',{className:'pc-explorer-tools'}),form=el(d,'form',{className:'pc-address'});
   const address=el(d,'input',{attributes:{'aria-label':'Адрес папки'},value:'Мой компьютер'});
@@ -53,8 +53,27 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
     if(!onChange)return;const result=createPcFolder(state,{id:'folder:'+(globalThis.crypto?.randomUUID?.()??Date.now()),parentId:nav.path,name:nextPcFolderName(state,nav.path),nowMinute:state.lastGameMinute??0});
     if(!result.ok){status.textContent=result.reason;return;}if(onChange(result.state)===false){status.textContent='Не удалось сохранить папку.';return;}state=result.state;renaming=result.folderId;nav={...nav,selection:result.folderId};render(false);
   }
+  const canDelete=entry=>!!onChange&&entry?.kind==='folder'&&!['computer','disk','windows'].includes(entry.targetPath);
+  function closeDelete(){
+    if(!deletion)return;const {node,origin}=deletion;deletion=null;node.remove();for(const item of [menubar,tools,form,main])item.inert=false;
+    onModal?.(null,origin);if(!onModal&&origin?.isConnected)origin.focus();
+  }
+  function requestDelete(entry=selected()){
+    if(!onChange||entry?.kind!=='folder'||deletion)return;
+    const check=deleteExplorerFolder(state,{folderId:entry.targetPath});if(!check.ok){status.textContent=check.reason;return;}
+    const node=el(d,'section',{className:'pc-system-content pc-dialog pc-uninstall-confirm',attributes:{role:'dialog','aria-modal':'true','aria-label':'Удаление папки'}}),notice=el(d,'p',{attributes:{role:'status'}});
+    node.append(createPcIcon(d,entry.iconId,{size:40}),el(d,'h3',{text:'Удалить папку «'+entry.name+'»?'}),el(d,'p',{text:'Папка и все файлы внутри будут удалены с игрового диска. Программы из этой папки потребуется установить заново.'}),notice);
+    const remove=button(d,'Удалить папку',{},()=>{
+      const result=deleteExplorerFolder(state,{folderId:entry.targetPath});if(!result.ok){notice.textContent=result.reason;return;}
+      if(onChange(result.state)===false){notice.textContent='Не удалось сохранить удаление папки.';return;}
+      state=result.state;closeDelete();nav=reconcileExplorerState({...nav,selection:null},state);render(true);onNavigate?.(explorerPaths(state)[nav.path]);
+    });
+    node.append(remove,button(d,'Отмена',{},closeDelete));
+    node.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeDelete();}else if(e.key==='Tab'){const controls=pcFocusable(node),index=controls.indexOf(d.activeElement);e.preventDefault();e.stopPropagation();controls[(index+(e.shiftKey?-1:1)+controls.length)%controls.length]?.focus();}});
+    deletion={node,origin:d.activeElement};if(onModal)onModal(node);else{for(const item of [menubar,tools,form,main])item.inert=true;wrap.append(node);}remove.focus();
+  }
   for(const [label,items]of [
-    ['Файл',()=>[{id:'open',label:'Открыть',disabled:!selected(),onSelect:()=>openEntry(selected())},{id:'new-folder',label:'Создать папку',disabled:!onChange||['computer','windows'].includes(nav.path),onSelect:newFolder},{id:'properties',label:'Свойства',disabled:!selected(),onSelect:()=>properties()},{id:'close',label:'Закрыть',onSelect:onClose}]],
+    ['Файл',()=>[{id:'open',label:'Открыть',disabled:!selected(),onSelect:()=>openEntry(selected())},{id:'new-folder',label:'Создать папку',disabled:!onChange||['computer','windows'].includes(nav.path),onSelect:newFolder},{id:'delete',label:'Удалить',disabled:!canDelete(selected()),onSelect:()=>requestDelete()},{id:'properties',label:'Свойства',disabled:!selected(),onSelect:()=>properties()},{id:'close',label:'Закрыть',onSelect:onClose}]],
     ['Вид',viewItems],
     ['Переход',()=>[{id:'back',label:'Назад',disabled:nav.index===0,onSelect:()=>change({type:'back'})},{id:'forward',label:'Вперёд',disabled:nav.index===nav.history.length-1,onSelect:()=>change({type:'forward'})},{id:'up',label:'Вверх',disabled:nav.path==='computer',onSelect:()=>change({type:'up'})}]],
   ]) {const b=button(d,label,{className:'pc-menu-trigger'},()=>menu(b,items()));menubar.append(b);}
@@ -92,9 +111,9 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
       if(entry.kind==='disk'){const info=el(d,'span');b.append(info);diskLabel=mountDiskUsage(info);diskLabel.update(diskUsage(state));}
       if(nav.view==='details'){const size=el(d,'span',{text:entry.sizeMb?entry.sizeMb.toFixed(3)+' МБ':''});sizeLabels.set(entry.id,size);b.append(el(d,'span',{className:'pc-file-type',text:entry.kind==='project'?'Проект FT Studio':entry.kind==='audio'?'Аудиофайл '+(entry.format??'wav').toUpperCase():entry.kind==='disk'?'Локальный диск':entry.kind==='folder'?'Папка':'Файл'}),size);}
       b.addEventListener('dblclick',()=>openEntry(entry));
-      const context=e=>{e.preventDefault();e.stopPropagation();nav={...nav,selection:entry.id};b.setAttribute('aria-pressed','true');menu(b,[{id:'open',label:'Открыть',onSelect:()=>openEntry(entry)},{id:'properties',label:'Свойства',onSelect:()=>properties(entry)}],e.type==='contextmenu'?e:undefined);};
+      const context=e=>{e.preventDefault();e.stopPropagation();nav={...nav,selection:entry.id};b.setAttribute('aria-pressed','true');menu(b,[{id:'open',label:'Открыть',onSelect:()=>openEntry(entry)},...(entry.kind==='folder'?[{id:'delete',label:'Удалить',disabled:!canDelete(entry),onSelect:()=>requestDelete(entry)}]:[]),{id:'properties',label:'Свойства',onSelect:()=>properties(entry)}],e.type==='contextmenu'?e:undefined);};
       b.addEventListener('contextmenu',context);
-      b.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();openEntry(entry);}if(e.key==='F10'&&e.shiftKey)context(e);});
+      b.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();openEntry(entry);}if(e.key==='Delete'&&entry.kind==='folder'){e.preventDefault();e.stopPropagation();requestDelete(entry);}if(e.key==='F10'&&e.shiftKey)context(e);});
       files.append(b);
       if(entry.id===renaming){renaming=null;const label=b.children[1];mountFolderRename(label,{folderId:entry.id,getState:()=>state,onChange:next=>{if(onChange(next)===false)return false;state=next;return true;},onError:message=>status.textContent=message,onDone:()=>render(true)});}
     }
@@ -109,11 +128,11 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
   };
   files.addEventListener('contextmenu',backgroundMenu);
   render(true);
-  return {navigate,openFile:fileId=>openEntry(entries().find(e=>e.fileId===fileId)),update(next){
+  return {navigate,closeDelete,getModal:()=>deletion?.node??null,openFile:fileId=>openEntry(entries().find(e=>e.fileId===fileId)),update(next){
     player.update();
     state=next;const previous=nav;nav=reconcileExplorerState(nav,state);const moved=previous.path!==nav.path,sig=structuralSignature();
     if(sig!==signature||nav!==previous){if(nav.selection&&!entries().some(e=>e.id===nav.selection))nav={...nav,selection:null};render(moved);}
     else {updateInstall();diskLabel?.update(diskUsage(state));for(const entry of entries()){const label=sizeLabels.get(entry.id);if(label)label.textContent=entry.sizeMb?entry.sizeMb.toFixed(3)+' МБ':'';}}
     if(moved)onNavigate?.(explorerPaths(state)[nav.path]);
-  },dispose(){disposed=true;player.dispose();diskLabel?.dispose();form.removeEventListener('submit',submit);files.removeEventListener('contextmenu',backgroundMenu);root.replaceChildren();}};
+  },dispose(){disposed=true;closeDelete();player.dispose();diskLabel?.dispose();form.removeEventListener('submit',submit);files.removeEventListener('contextmenu',backgroundMenu);root.replaceChildren();}};
 }

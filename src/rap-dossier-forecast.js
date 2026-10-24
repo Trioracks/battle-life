@@ -1,6 +1,6 @@
 // Only completed subjective reports and already-public learned hypotheses enter
 // this module. It has no state, audio, version-quality or judging dependency.
-import {validRapReport} from './rap-report-schema.js?rev=60';
+import {validRapReport} from './rap-report-schema.js?rev=61';
 const axes=['text','performance','music','sound'];
 const strings=v=>Array.isArray(v)&&v.every(x=>typeof x==='string');
 const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));

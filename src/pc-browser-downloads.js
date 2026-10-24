@@ -1,7 +1,8 @@
-import {mentorDownloadBytes,completeMentorDownload} from './pc-mentor-downloads.js?rev=60';
-import {GOBLIN_ID} from './goblin-catalog.js?rev=60';
-import {SOFTWARE,METADATA_BYTES} from './pc-software-catalog.js?rev=60';
-import {normalizeSoftware,withSoftware,softwareDiskBytes} from './pc-software.js?rev=60';
+import {mentorDownloadBytes,completeMentorDownload} from './pc-mentor-downloads.js?rev=61';
+import {GOBLIN_ID} from './goblin-catalog.js?rev=61';
+import {SOFTWARE,METADATA_BYTES} from './pc-software-catalog.js?rev=61';
+import {normalizeSoftware,withSoftware,softwareDiskBytes} from './pc-software.js?rev=61';
+import {restorePcDownloadFolder} from './pc-download-folder.js?rev=61';
 const seconds=n=>Number.isFinite(n)?Math.max(0,Math.min(1,n)):0;
 export function normalizeBrowserDownloads(value){
  const seen=new Set(),items=[],hiddenHistoryIds=[],recovery=(Array.isArray(value?.recovery)?value.recovery:[]).map(item=>structuredClone(item));
@@ -50,30 +51,30 @@ export function startBrowserDownload(state,{appId,kind}={}){
  const id=appId+':'+kind,existing=queue.items.find(item=>item.id===id);
  if(existing){
   const complete=kind==='metadata'?soft[app.metadataKey]:soft[appId].receivedBytes===app.downloadBytes;
-  if(!queue.hiddenHistoryIds.includes(id)&&(!complete||queue.items.at(-1)===existing))return {ok:true,state,reason:''};
+  if(!queue.hiddenHistoryIds.includes(id)&&(!complete||queue.items.at(-1)===existing))return {ok:true,state:restorePcDownloadFolder(state),reason:''};
   queue.hiddenHistoryIds=queue.hiddenHistoryIds.filter(value=>value!==id);
   queue.items=[...queue.items.filter(item=>item.id!==id),existing];
-  return {ok:true,state:{...state,browserDownloads:queue},reason:''};
+  return {ok:true,state:restorePcDownloadFolder({...state,browserDownloads:queue}),reason:''};
  }
  if(kind==='metadata'&&soft[app.metadataKey]||kind==='installer'&&soft[appId].receivedBytes===app.downloadBytes){
   queue.items.push({id,appId,kind,elapsedSeconds:1,error:''});
-  return {ok:true,state:{...state,browserDownloads:queue},reason:''};
+  return {ok:true,state:restorePcDownloadFolder({...state,browserDownloads:queue}),reason:''};
  }
  const needed=kind==='metadata'?METADATA_BYTES:app.downloadBytes-soft[appId].receivedBytes;
  if(softwareDiskBytes(state).free<needed)return fail('insufficient-space');
  // A legacy client transfer becomes a browser transfer without losing bytes.
  if(kind==='installer')delete soft.transfers[appId];
  queue.items.push({id:appId+':'+kind,appId,kind,elapsedSeconds:kind==='installer'?soft[appId].receivedBytes/app.downloadBytes:0,error:''});
- return {ok:true,state:withSoftware({...state,browserDownloads:queue},soft),reason:''};
+ return {ok:true,state:restorePcDownloadFolder(withSoftware({...state,browserDownloads:queue},soft)),reason:''};
 }
 export function startMentorDownload(state,{attachmentId,nowMinute}={}){
  const file=state.social?.goblin?.files.find(f=>f.id===attachmentId),fail=reason=>({ok:false,state,reason});
  if(state.power!=='on')return fail('Компьютер выключен.');
  if(!file||!Number.isFinite(nowMinute)||nowMinute<0||file.createdAtMinute>nowMinute||!state.social?.dialogs?.[GOBLIN_ID]?.messages.some(m=>m.sender===GOBLIN_ID&&m.fileId===attachmentId))return fail('Вложение ещё не получено.');
  const queue=normalizeBrowserDownloads(state.browserDownloads),id='mentor:'+attachmentId;
- if(queue.items.some(i=>i.id===id))return {ok:true,state:{...state,browserDownloads:{...queue,hiddenHistoryIds:queue.hiddenHistoryIds.filter(value=>value!==id)}},downloadId:id,reason:''};
+ if(queue.items.some(i=>i.id===id))return {ok:true,state:restorePcDownloadFolder({...state,browserDownloads:{...queue,hiddenHistoryIds:queue.hiddenHistoryIds.filter(value=>value!==id)}}),downloadId:id,reason:''};
  const bytes=mentorDownloadBytes(file);if(!Number.isSafeInteger(bytes)||bytes<=0)return fail('Вложение повреждено.');if(softwareDiskBytes(state).free<bytes)return fail('Недостаточно места на диске.');
- queue.items.push({id,kind:'mentor',attachmentId,startedAtMinute:nowMinute,elapsedSeconds:0,error:''});return {ok:true,state:{...state,browserDownloads:queue},downloadId:id,reason:''};
+ queue.items.push({id,kind:'mentor',attachmentId,startedAtMinute:nowMinute,elapsedSeconds:0,error:''});return {ok:true,state:restorePcDownloadFolder({...state,browserDownloads:queue}),downloadId:id,reason:''};
 }
 export function cancelBrowserDownload(state,id){
  const queue=normalizeBrowserDownloads(state.browserDownloads),item=queue.items.find(i=>i.id===id),entry=browserDownloadEntries(state,{includeHidden:true}).find(i=>i.id===id);if(!item||entry?.complete)return {ok:false,state,reason:'Загрузка уже завершена или недоступна.'};

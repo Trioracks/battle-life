@@ -1,9 +1,9 @@
-import {PC_IDENTITY} from './pc-identity.js?rev=60';
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=60';
-import {createPcIcon} from './virtual-pc-icons.js?rev=60';
-import {WALLPAPERS} from './virtual-pc-catalog.js?rev=60';
-import {setWallpaper,diskUsage} from './virtual-pc-state.js?rev=60';
-import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=60';
+import {PC_IDENTITY} from './pc-identity.js?rev=61';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=61';
+import {createPcIcon} from './virtual-pc-icons.js?rev=61';
+import {WALLPAPERS} from './virtual-pc-catalog.js?rev=61';
+import {setWallpaper,diskUsage} from './virtual-pc-state.js?rev=61';
+import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=61';
 export function mountSystemWindow(root,{kind,getState,onPersist,onOpen,onClose,onConfirmShutdown,properties}) {
   const d=root.ownerDocument,wrap=el(d,'div',{className:'pc-system-content pc-dialog'});
   const status=el(d,'p',{className:'pc-system-status',dataset:{pcRole:'system-status'},attributes:{'aria-live':'polite'}});
@@ -35,7 +35,7 @@ export function mountSystemWindow(root,{kind,getState,onPersist,onOpen,onClose,o
     const header=el(d,'h3',{text:'Выключение компьютера'});wrap.append(header,createPcIcon(d,'power',{size:48}),el(d,'p',{text:'Завершить работу '+PC_IDENTITY.name+'?'}));
     const actions=el(d,'footer',{className:'pc-dialog-actions'});actions.append(button(d,'Выключить',{},onConfirmShutdown),button(d,'Отмена',{},onClose));wrap.append(actions);
   }else{
-    wrap.append(createPcIcon(d,'settings',{size:32}),el(d,'h3',{text:properties?.title??'Свойства'}));
+    wrap.append(createPcIcon(d,properties?.iconId??'settings',{size:32}),el(d,'h3',{text:properties?.title??'Свойства'}));
     const rows=el(d,'dl',{className:'pc-property-rows'});
     for(const row of properties?.rows??[])if(properties?.kind!=='disk'||row.label==='Тип')rows.append(el(d,'dt',{text:row.label}),el(d,'dd',{text:String(row.value)}));
     if(properties?.kind==='disk'){const info=el(d,'div');diskView=mountDiskUsage(info);diskView.update(diskUsage(getState()));wrap.append(info);}

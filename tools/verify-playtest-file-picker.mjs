@@ -30,8 +30,8 @@ export async function verifyFilePicker(page,{artifactUrl,outputDir}){
   for(const mode of ['maximized','normal',...(width===1280?['narrow']:[])]){
    if(mode==='normal')await page.locator('.pc-window[data-window-id="rap-notebook"]').getByRole('button',{name:'Восстановить окно',exact:true}).click();
    if(mode==='narrow')await page.evaluate(()=>window.qaPickerPc.windowAction({type:'geometry',id:'rap-notebook',rect:{x:100,y:0,width:500,height:650}}));
-   const actions=await page.locator('.rn-actions button').evaluateAll(nodes=>nodes.map(n=>{const a=n.getBoundingClientRect(),b=n.closest('.rn-work').getBoundingClientRect();return {label:n.getAttribute('aria-label'),width:a.width,height:a.height,left:a.left,right:a.right,sideLeft:b.left,sideRight:b.right};}));
-   await page.screenshot({path:path.join(outputDir,'notebook-actions-'+width+'-'+mode+'.png')});assert.equal(actions.length,2);assert.ok(actions.every(a=>a.height<=34&&a.width<170&&a.left>=a.sideLeft&&a.right<=a.sideRight),'Notebook actions must remain compact and inside the right panel: '+JSON.stringify(actions));checks.push({width,mode,notebookActions:actions});
+   const actions=await page.locator('.rn-actions button').evaluateAll(nodes=>nodes.map(n=>{const a=n.getBoundingClientRect(),b=n.closest('.rn-editor').getBoundingClientRect();return {label:n.getAttribute('aria-label'),width:a.width,height:a.height,left:a.left,right:a.right,editorLeft:b.left,editorRight:b.right};}));
+   await page.screenshot({path:path.join(outputDir,'notebook-actions-'+width+'-'+mode+'.png')});assert.equal(actions.length,2);assert.ok(actions.every(a=>a.height>=38&&a.height<=65&&a.left>=a.editorLeft&&a.right<=a.editorRight),'Notebook work actions must fit below the paper: '+JSON.stringify(actions));checks.push({width,mode,notebookActions:actions});
   }
  }
  await fs.writeFile(path.join(outputDir,'file-picker-report.json'),JSON.stringify({checks},null,2));return checks;

@@ -10,6 +10,17 @@ const tick=(state,activeSeconds=state.social.goblin.pending[0]?goblinTypingSecon
 const messages=s=>s.social.dialogs[GOBLIN_ID]?.messages??[];
 function invitation(){let s=advanceGoblin(createVirtualPcState(),480).state;s=advanceGoblin(s,500).state;return replyToGoblin(s,'normal',500).state;}
 
+test('installation replies wait for the actual tutorial message, including across a saved typing delay',()=>{
+ let s=advanceGoblin(invitation(),540).state;s=replyToGoblin(s,'yes',540).state;s.social.subscriptions.push('makarevich-1');s=replyToGoblin(s,'subscribed',550).state;
+ assert.equal(goblinReplyContext(s,550).choices.length,0,'the torent prompt has not arrived');assert.equal(replyToGoblin(s,'help-client',550).ok,false);
+ s=createVirtualPcState(JSON.parse(JSON.stringify(s)));s=tick(s,.1).state;assert.equal(goblinReplyContext(s,550).choices.length,0);
+ for(let i=0;i<3&&!messages(s).some(m=>m.id==='goblin:client-link');i++)s=tick(s,undefined,{nowMinute:550}).state;assert.ok(messages(s).some(m=>m.id==='goblin:client-link'));assert.ok(goblinReplyContext(s,550).choices.some(([id])=>id==='help-client'));
+ s.software.client.installed=true;s=advanceGoblin(s,551,{online:true}).state;assert.equal(goblinReplyContext(s,551).choices.length,0);
+ s=advanceGoblin(s,580).state;assert.ok(goblinReplyContext(s,580).choices.length===0,'no installation claim without actual progress');
+ s.software.notebook.installed=true;s=advanceGoblin(s,581,{online:true}).state;assert.deepEqual(goblinReplyContext(s,581).expectedFileTypes,[]);assert.equal(goblinReplyContext(s,581).choices.length,0);
+ s=advanceGoblin(s,620).state;assert.deepEqual(goblinReplyContext(s,620).expectedFileTypes,['txt']);assert.ok(goblinReplyContext(s,620).choices.some(([id])=>id==='help-text'));
+});
+
 test('an arriving portrait refreshes existing outgoing messages without reopening the chat',()=>{
  let state=invitation();const view=mountGoblinDialog(pcDocument(),{getState:()=>state,getMetadata:()=>({gameMinutes:500,playerName:'Игрок'}),navigate(){},commit:()=>true});
  const avatars=()=>allPc(view.root).filter(n=>n.tagName==='IMG'&&n.getAttribute('alt')==='Аватар: Игрок');

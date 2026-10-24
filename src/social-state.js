@@ -1,13 +1,13 @@
-import {normalizeDiscussions} from './social-discussion.js?rev=60';
-import {SOCIAL_COMMUNITIES,SOCIAL_PROFILES,profileById} from './social-catalog.js?rev=60';
-import {normalizePlayerPortrait} from './social-portraits.js?rev=60';
-import {normalizeCommunityPublicationState,ensureCommunityPublications,baselineCommunityRead,communityUnreadCounts,publicCommunityPosts} from './social-community-publications.js?rev=60';
-import {validGameMinute} from './game-minute.js?rev=60';
+import {normalizeDiscussions} from './social-discussion.js?rev=61';
+import {SOCIAL_COMMUNITIES,SOCIAL_PROFILES,profileById} from './social-catalog.js?rev=61';
+import {normalizePlayerPortrait} from './social-portraits.js?rev=61';
+import {normalizeCommunityPublicationState,ensureCommunityPublications,baselineCommunityRead,communityUnreadCounts,publicCommunityPosts} from './social-community-publications.js?rev=61';
+import {validGameMinute} from './game-minute.js?rev=61';
 import conversations from '../data/social/conversations.json' with {type:'json'};
-import {GOBLIN_ID,normalizeGoblin,refreshGoblinMessage} from './goblin-catalog.js?rev=60';
-import {normalizeFilya} from './filya-catalog.js?rev=60';
-import {normalizePhotoFeedback} from './social-photo-feedback.js?rev=60';
-import {normalizePlayerAlbum} from './player-life-photos.js?rev=60';
+import {GOBLIN_ID,normalizeGoblin,refreshGoblinMessage} from './goblin-catalog.js?rev=61';
+import {FILYA_ID,normalizeFilya} from './filya-catalog.js?rev=61';
+import {normalizePhotoFeedback} from './social-photo-feedback.js?rev=61';
+import {normalizePlayerAlbum} from './player-life-photos.js?rev=61';
 const copy=value=>JSON.parse(JSON.stringify(value));
 const record=v=>v&&typeof v==='object'&&!Array.isArray(v);
 const ids=(v,allow=()=>true)=>[...new Set((Array.isArray(v)?v:[]).filter(id=>typeof id==='string'&&id.length>0&&id.length<180&&allow(id)))];
@@ -20,7 +20,7 @@ export function normalizeSocial(raw){
  const dialogs=Object.fromEntries(Object.entries(record(s.dialogs)?s.dialogs:{}).filter(([id,v])=>(communities.has(id)||people.has(id))&&record(v)).map(([id,v])=>[id,{...copy(v),peer:{kind:people.has(id)?'person':'community',id}}]));
  for(const [id,messages]of Object.entries(conversations))if(!dialogs[id])dialogs[id]={peer:{kind:'person',id},messages:messages.map(m=>({...m,kind:'personal',at:null,archived:true})),unread:false};
  if(dialogs[GOBLIN_ID])dialogs[GOBLIN_ID].messages=(dialogs[GOBLIN_ID].messages??[]).map(refreshGoblinMessage);
- return {schemaVersion:2,goblin:normalizeGoblin(s.goblin),filya:normalizeFilya(s.filya),...normalizeCommunityPublicationState(s),subscriptions:ids(s.subscriptions,id=>communities.has(id)),friends:ids([...(s.friends??known),GOBLIN_ID],id=>accessibleProfiles.includes(id)&&!blockedProfileIds.includes(id)),blockedProfileIds,
+ return {schemaVersion:2,goblin:normalizeGoblin(s.goblin),filya:normalizeFilya(s.filya),...normalizeCommunityPublicationState(s),subscriptions:ids(s.subscriptions,id=>communities.has(id)),friends:ids([...(s.friends??known),GOBLIN_ID],id=>id!==FILYA_ID&&accessibleProfiles.includes(id)&&!blockedProfileIds.includes(id)),blockedProfileIds,
   accessibleProfiles,personalAudioFiles:Object.fromEntries(Object.entries(record(s.personalAudioFiles)?s.personalAudioFiles:{}).filter(([id,file])=>typeof file==='string'&&file.length<=160)),personalAudioIds:ids(s.personalAudioIds),dialogs,discussions:normalizeDiscussions(s.discussions),photoFeedback:normalizePhotoFeedback(s.photoFeedback),
   playerPortrait:normalizePlayerPortrait(s.playerPortrait),playerAlbum:normalizePlayerAlbum(s.playerAlbum),posts:records(s.posts),reactions:records(s.reactions),audienceCount:Number.isFinite(s.audienceCount)?Math.max(0,Math.min(1e7,Math.floor(s.audienceCount))):12};
 }
@@ -45,6 +45,7 @@ export function profileAccess(state,id){
  return {allowed,reason:allowed?'':'Закрытый профиль. Сначала познакомьтесь с человеком или встретьтесь в баттле.'};
 }
 export function addSocialFriend(state,id){
+ if(id===FILYA_ID)return {ok:false,state,reason:'Нельзя добавить этого пользователя в друзья.'};
  if(id==='me'||!profileAccess(state,id).allowed)return {ok:false,state,reason:'Нельзя добавить незнакомого человека из закрытого профиля.'};
  const social=normalizeSocial(state.social);social.friends=ids([...social.friends,id]);
  if(social.blockedProfileIds.includes(id))return {ok:false,state,reason:'Этот человек заблокирован.'};

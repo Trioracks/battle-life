@@ -1,6 +1,6 @@
-import {GOBLIN_ID,GOBLIN_PROFILE,GOBLIN_RELEASES,GOBLIN_PHOTOS,goblinArt} from './goblin-catalog.js?rev=60';
-import {publicBattleHistory} from './battle-history.js?rev=60';
-import {createMusicianProfileView} from './musician-profile-view.js?rev=60';
+import {GOBLIN_ID,GOBLIN_PROFILE,GOBLIN_RELEASES,GOBLIN_PHOTOS,goblinArt} from './goblin-catalog.js?rev=61';
+import {publicBattleHistory} from './battle-history.js?rev=61';
+import {createMusicianProfileView} from './musician-profile-view.js?rev=61';
 const diaries=[
  ['Соседи попросили потише. Записал тишину. Теперь жалуются на бас в тишине.','МЦ Филя: вырежи у тишины низ.'],
  ['Продал педаль, купил продукты. Теперь дисторшн только у чайника...','МЦ Филя: хлеб через овердрайв не пропускай.'],

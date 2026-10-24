@@ -1,2 +1,2 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=60';
+import {pcElement as el} from './virtual-pc-dom.js?rev=61';
 export function createSlobodaBrand(d){const root=el(d,'div',{className:'sloboda-brand',attributes:{'aria-label':'Слобода OS'}});root.append(el(d,'img',{className:'sloboda-mark',attributes:{src:'./assets/ui/virtual-pc/sloboda-mark.svg',alt:''}}),el(d,'strong',{text:'СЛОБОДА'}),el(d,'b',{className:'sloboda-edition',text:'OS'}));return root;}

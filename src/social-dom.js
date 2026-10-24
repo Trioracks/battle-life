@@ -1,7 +1,7 @@
-import {gameDateTimeLabel} from './home-calendar.js?rev=60';
-import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=60';
-import {socialPhotoSource} from './social-portraits.js?rev=60';
-import {socialImageUrl,recoverableSocialImage} from './social-image.js?rev=60';
+import {gameDateTimeLabel} from './home-calendar.js?rev=61';
+import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=61';
+import {socialPhotoSource} from './social-portraits.js?rev=61';
+import {socialImageUrl,recoverableSocialImage} from './social-image.js?rev=61';
 export const socialButton=(d,text,fn,extra={})=>pcButton(d,text,{className:'sn-button',...extra},fn);
 export function socialLink(d,text,url,navigate){const link=el(d,'a',{className:'sn-link',text,dataset:{focusId:text},attributes:{href:url}});link.addEventListener('click',e=>{e.preventDefault();navigate(url);});return link;}
 export function socialPeerLink(d,peer,name,navigate,avatar){

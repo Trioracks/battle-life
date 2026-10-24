@@ -1,4 +1,8 @@
 .sn-dialog{container-type:inline-size}.sn-dialog-layout{display:grid;grid-template-columns:minmax(0,1fr) 196px;gap:14px;align-items:start}
+/* A native modal reaches the top layer above the browser's clipped page. */
+#virtual-pc .sn-attachment-modal{width:min(760px,calc(100vw - 32px));max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);margin:auto;padding:0;border:0;background:#ece9d8;color:#182439;box-shadow:0 15px 60px #0008;overflow:auto;color-scheme:light}
+#virtual-pc .sn-attachment-modal::backdrop{background:#101b18aa;backdrop-filter:blur(2px)}
+#virtual-pc .sn-attachment-modal .pc-file-picker.pc-explorer{width:100%;max-height:none;margin:0;box-sizing:border-box}
 .sn-dialog-main{min-width:0;display:flex;flex-direction:column}
 .sn-dialog .sn-dialog-history{height:clamp(230px,45vh,440px);min-height:230px;max-height:440px;margin:0;border:1px solid #dbe3ea;background:#fff;overflow:auto;overflow-anchor:none;scrollbar-gutter:stable}
 .sn-dialog-message{padding:13px 10px}.sn-dialog-message small{font-size:10px;color:#8a98a4;margin:3px 0 7px}.sn-dialog-message p{margin:5px 0;line-height:1.5}.sn-dialog-message .sn-avatar{width:46px;height:46px;min-width:46px;flex-basis:46px}

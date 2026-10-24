@@ -16,10 +16,12 @@ export function pcButton(document,text,options={},handler=()=>{}) {
 export function pcFocusable(root,out=[]) {
   if(!root||root.hidden||root.inert)return out;
   const tabindex=root.getAttribute?.('tabindex');
-  const native=['BUTTON','INPUT','SELECT','TEXTAREA'].includes(root.tagName);
+  const summary=root.tagName==='SUMMARY'&&root.parentElement?.tagName==='DETAILS'&&[...root.parentElement.children].find(n=>n.tagName==='SUMMARY')===root;
+  const native=['BUTTON','INPUT','SELECT','TEXTAREA'].includes(root.tagName)||summary;
   const explicit=tabindex!==null&&tabindex!==undefined&&Number(tabindex)>=0;
   if((native||explicit)&&!root.disabled&&root.tabIndex!==-1&&tabindex!=='-1')out.push(root);
-  for(const child of root.children??[])pcFocusable(child,out);
+  const children=root.tagName==='DETAILS'&&!root.open?[...root.children??[]].filter(n=>n.tagName==='SUMMARY').slice(0,1):root.children??[];
+  for(const child of children)pcFocusable(child,out);
   return out;
 }
 export function pcFind(root,predicate) {
