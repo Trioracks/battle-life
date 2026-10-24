@@ -1,6 +1,6 @@
-import {BEAT_RULES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=58';
-import {normalizeMusic,normalizeBeat,startBeatStage,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=58';
-import {normalizeWriting,startLyricWork,effectiveWritingSkill} from './lyric-production.js?rev=58';
+import {BEAT_RULES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=59';
+import {normalizeMusic,normalizeBeat,startBeatStage,effectiveBeatSkill,workBlockReason} from './beat-production.js?rev=59';
+import {normalizeWriting,startLyricWork,effectiveWritingSkill} from './lyric-production.js?rev=59';
 const owner=kind=>kind==='beat'?'music':'writing';
 const jobId=j=>j?.beatId??j?.projectId;
 const triple=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite)?v.map(x=>Math.max(0,Math.min(10,Math.round(x)))):null;

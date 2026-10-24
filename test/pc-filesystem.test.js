@@ -45,7 +45,7 @@ test('Explorer creates a folder through its context menu and opens that persiste
  const view=mountExplorer(root,{onChange:next=>{state=next;return true;},onMenu:value=>{menu=value;},onProperties(){},onOpenProject(){},onClose(){}});
  view.update(state);view.navigate('documents');const area=allPc(root).find(n=>n.getAttribute?.('aria-label')==='Содержимое папки');
  fire(area,'contextmenu',{clientX:0,clientY:0});menu.items.find(i=>i.id==='new-folder').onSelect();
- const input=allPc(root).find(n=>n.getAttribute?.('aria-label')==='Имя новой папки');input.value='Мой отбор';findButton(root,'Создать папку').click();
+ const input=allPc(root).find(n=>n.getAttribute?.('aria-label')==='Имя новой папки');assert.equal(state.fileSystem.folders[0].name,'Новая папка');assert.equal(d.activeElement,input);input.value='Мой отбор';fire(input,'keydown',{key:'Enter'});
  assert.equal(state.fileSystem.folders[0].name,'Мой отбор');fire(findButton(root,'Открыть папку Мой отбор'),'dblclick');
  assert.equal(allPc(root).find(n=>n.getAttribute?.('aria-label')==='Адрес папки').value,'C:\\Мои документы\\Мой отбор');view.dispose();
 });

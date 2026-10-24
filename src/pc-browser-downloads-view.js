@@ -1,7 +1,7 @@
-import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=58';
-import {browserDownloadEntries} from './pc-browser-downloads.js?rev=58';
-import {softwareMessage} from './pc-software-view.js?rev=58';
-import {createPcIcon} from './virtual-pc-icons.js?rev=58';
+import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=59';
+import {browserDownloadEntries} from './pc-browser-downloads.js?rev=59';
+import {softwareMessage} from './pc-software-view.js?rev=59';
+import {createPcIcon} from './virtual-pc-icons.js?rev=59';
 const button=(d,text,options,fn)=>pcButton(d,text,{...options,className:'uw-control'},fn);
 
 export function mountBrowserDownloads(root,{anchor,getState,onAction,getMessage=()=>''}){

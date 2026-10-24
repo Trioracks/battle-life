@@ -1,4 +1,4 @@
-import {PC_IDENTITY} from './pc-identity.js?rev=58';
+import {PC_IDENTITY} from './pc-identity.js?rev=59';
 function brand(c,badge='OS'){c.fillStyle='#efe6d2';c.fillRect(165,115,70,12);c.fillRect(155,125,12,75);c.fillRect(165,197,70,12);c.fillRect(178,140,57,10);c.fillRect(176,149,10,25);c.fillRect(178,174,57,10);c.fillStyle='#dc762d';c.fillRect(211,151,24,21);c.font='bold 64px Impact,Arial';c.fillStyle='#efe6d2';c.fillText('СЛОБОДА',260,185);c.font='bold 22px monospace';c.fillStyle='#dc762d';c.fillRect(618,139,badge==='BIOS'?85:48,33);c.fillStyle='#10181c';c.fillText(badge,625,163);}
 export function drawPcMonitor(c,p){
  c.fillStyle=p.screen==='off'?'#101818':p.screen==='bios'?'#030504':['loading','welcome','shutdown'].includes(p.screen)?'#101d23':'#70a490';c.fillRect(0,0,768,520);

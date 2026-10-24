@@ -1,13 +1,13 @@
-import {pcFileById,savePcDocument} from './pc-filesystem.js?rev=58';
-import {GOBLIN_ID,GOBLIN_SKILLS,GOBLIN_DIALOGUE,normalizeGoblin} from './goblin-catalog.js?rev=58';
-import {queueGoblinAttachment} from './goblin-mentor.js?rev=58';
-import {normalizeLyric,startLyricWork,advanceLyricWork} from './lyric-production.js?rev=58';
-import {normalizeBeat,createBeat,startBeatStage,advanceBeatWork} from './beat-production.js?rev=58';
-import {normalizeRecording} from './vocal-result.js?rev=58';
-import {chooseSongForm} from './beat-song-form.js?rev=58';
-import {createAudioExport} from './pc-audio-exports.js?rev=58';
-import {softwareDiskBytes} from './pc-software.js?rev=58';
-import {validGameMinute} from './game-minute.js?rev=58';
+import {pcFileById,savePcDocument} from './pc-filesystem.js?rev=59';
+import {GOBLIN_ID,GOBLIN_SKILLS,GOBLIN_DIALOGUE,normalizeGoblin} from './goblin-catalog.js?rev=59';
+import {queueGoblinAttachment} from './goblin-mentor.js?rev=59';
+import {normalizeLyric,startLyricWork,advanceLyricWork} from './lyric-production.js?rev=59';
+import {normalizeBeat,createBeat,startBeatStage,advanceBeatWork} from './beat-production.js?rev=59';
+import {normalizeRecording} from './vocal-result.js?rev=59';
+import {chooseSongForm} from './beat-song-form.js?rev=59';
+import {createAudioExport} from './pc-audio-exports.js?rev=59';
+import {softwareDiskBytes} from './pc-software.js?rev=59';
+import {validGameMinute} from './game-minute.js?rev=59';
 const clone=structuredClone;
 const fail=(state,reason)=>({ok:false,state,reason});
 function write(state,g){return {...state,social:{...state.social,goblin:g}};}

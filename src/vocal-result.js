@@ -1,5 +1,5 @@
-import {vocalById,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=58';
-import {vocalOutcomes,normalizeProductionOutcome} from './production-outcomes.js?rev=58';
+import {vocalById,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=59';
+import {vocalOutcomes,normalizeProductionOutcome} from './production-outcomes.js?rev=59';
 export const clampV=(v,lo=0,hi=100)=>Math.max(lo,Math.min(hi,Number.isFinite(v)?v:lo));
 const text=(v,n=100)=>typeof v==='string'?v.trim().slice(0,n):'';
 export const VOCAL_EQUIPMENT=Object.freeze({microphone:'desk-mic',interface:'onboard'});

@@ -27,3 +27,18 @@ test('save-as asks before replacing an existing file and preserves input across 
  findButton(root,'Сохранить').click();assert.equal(target,null);findButton(root,'Заменить файл').click();assert.equal(target.overwriteFileId,saved.fileId);
  picker.dispose();
 });
+
+test('new folder appears immediately in the file list with its name selected for inline rename',()=>{
+ const f=creativeFixture('lyrics'),d=pcDocument(),root=d.createElement('div');let state=f.state;
+ const picker=mountPcFilePicker(root,{getState:()=>state,mode:'save',types:['txt'],onChange:s=>{state=s;return true;},onSelect(){}});
+ findButton(root,'Создать папку').click();assert.equal(state.fileSystem.folders.length,1);
+ const input=allPc(root).find(n=>n.getAttribute?.('aria-label')==='Имя новой папки');assert.ok(input);assert.equal(d.activeElement,input);assert.equal(input.value,'Новая папка');
+ input.value='Тексты';fire(input,'keydown',{key:'Enter',preventDefault(){},stopPropagation(){}});assert.equal(state.fileSystem.folders[0].name,'Тексты');
+ assert.equal(allPc(root).some(n=>n.className==='pc-folder-dialog'),false);picker.dispose();
+});
+test('escaping inline rename retains the new default folder and the picker, with unique next names',()=>{
+ const f=creativeFixture('lyrics'),d=pcDocument(),root=d.createElement('div');let state=f.state,cancelled=0;
+ const picker=mountPcFilePicker(root,{getState:()=>state,mode:'save',types:['txt'],onChange:s=>{state=s;return true;},onCancel:()=>cancelled++});
+ findButton(root,'Создать папку').click();let input=allPc(root).find(n=>n.getAttribute?.('aria-label')==='Имя новой папки');input.value='Отменённое имя';fire(input,'keydown',{key:'Escape'});assert.equal(cancelled,0);assert.equal(state.fileSystem.folders[0].name,'Новая папка');
+ findButton(root,'Создать папку').click();input=allPc(root).find(n=>n.getAttribute?.('aria-label')==='Имя новой папки');assert.equal(input.value,'Новая папка (2)');input.value='Новая папка';fire(input,'keydown',{key:'Enter'});assert.equal(state.fileSystem.folders[1].name,'Новая папка (2)');assert.equal(d.activeElement,input);picker.dispose();
+});

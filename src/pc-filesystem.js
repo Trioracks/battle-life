@@ -1,8 +1,8 @@
-import {normalizeLyric} from './lyric-production.js?rev=58';
-import {normalizeBeat} from './beat-production.js?rev=58';
-import {normalizeStudioProject} from './ft-studio-project.js?rev=58';
-import {softwareDiskBytes} from './pc-software.js?rev=58';
-import {validGameMinute} from './game-minute.js?rev=58';
+import {normalizeLyric} from './lyric-production.js?rev=59';
+import {normalizeBeat} from './beat-production.js?rev=59';
+import {normalizeStudioProject} from './ft-studio-project.js?rev=59';
+import {softwareDiskBytes} from './pc-software.js?rev=59';
+import {validGameMinute} from './game-minute.js?rev=59';
 
 export const PC_USER_FOLDERS=Object.freeze(['disk','documents','projects','music','exports','downloads']);
 const base=new Set(PC_USER_FOLDERS),reserved=new Set([...PC_USER_FOLDERS,'computer','windows']),types=new Set(['txt','flp','wav','mp3']),clone=structuredClone;
@@ -63,6 +63,16 @@ export function pcFileEntries(state,{folderId,types:allowed,filter=()=>true}={})
 }
 export const pcFileById=(state,id)=>pcFileEntries(state,{}).find(f=>f.id===id)??null;
 export const pcFolderNameTaken=(state,folderId,name)=>(state.fileSystem?.folders??[]).some(f=>f.parentId===folderId&&key(f.name)===key(name));
+export function nextPcFolderName(state,parentId){
+ const taken=name=>pcFolderNameTaken(state,parentId,name)||pcFileEntries(state,{folderId:parentId}).some(f=>key(f.filename)===key(name));
+ let name='Новая папка',index=2;while(taken(name))name='Новая папка ('+(index++)+')';return name;
+}
+export function renamePcFolder(state,{folderId,name}={}){
+ const folder=state.fileSystem?.folders.find(f=>f.id===folderId),safe=pcEntryName(name),fail=reason=>({ok:false,state,reason});
+ if(!folder||!safe)return fail('Укажи корректное имя папки.');
+ if(state.fileSystem.folders.some(f=>f.id!==folderId&&f.parentId===folder.parentId&&key(f.name)===key(safe))||pcFileEntries(state,{folderId:folder.parentId}).some(f=>key(f.filename)===key(safe)))return fail('Такое имя в этой папке уже занято.');
+ return {ok:true,state:{...state,fileSystem:{...state.fileSystem,folders:state.fileSystem.folders.map(f=>f===folder?{...f,name:safe}:f)}},reason:''};
+}
 export function createPcFolder(state,{id,parentId,name,nowMinute}={}){
  const fail=reason=>({ok:false,state,folderId:null,reason}),safe=pcEntryName(name);
  if(!validPcId(id)||reserved.has(id)||state.fileSystem?.folders?.some(f=>f.id===id)||!safe||!validGameMinute(nowMinute))return fail('Укажи корректное имя новой папки.');

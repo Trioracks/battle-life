@@ -11,11 +11,11 @@ import {advanceSocial} from '../src/social-runtime.js';
 import {exportedSubmissionFixture,completeSubmissionUpload,completeSubmissionMessage} from './helpers/submission-fixtures.js';
 import {pcDocument,allPc,findButton} from './helpers/virtual-pc-dom.js';
 test('V krugu identity is shared by header, search and new notifications',()=>{
- assert.deepEqual(SOCIAL_IDENTITY,{name:'В кругу',mark:'V',year:2012});
+ assert.deepEqual(SOCIAL_IDENTITY,{name:'В кругу',mark:'В',year:2012});
  const d=pcDocument(),root=d.createElement('main');let state=ensureBattleWindow(exportedSubmissionFixture(),{battleId:'makarevich-1',nowMinute:600}).state;
  mountSocial(root,{route:resolveSocialRoute('underweb://social/me'),getState:()=>state,onChange(){},navigate(){}});
  assert.equal(root.children[0].getAttribute('aria-label'),'В кругу');
- assert.ok(allPc(root).some(n=>n.className==='sn-brandmark'&&n.textContent==='V'));
+ assert.ok(allPc(root).some(n=>n.className==='sn-brandmark'&&n.textContent==='В'));
  assert.ok(resolveUnderweb('В кругу').results.some(r=>r.url==='underweb://social/me'&&r.title.includes('друзья')));
  state=attachSubmissionTrack(state,{communityId:'makarevich-1',fileId:'submission-file',nowMinute:601}).state;
  state=sendSubmission(completeSubmissionMessage(completeSubmissionUpload(state)),{communityId:'makarevich-1',nowMinute:601}).state;

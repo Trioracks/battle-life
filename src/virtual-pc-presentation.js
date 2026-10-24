@@ -1,4 +1,4 @@
-import {PC_IDENTITY} from './pc-identity.js?rev=58';
+import {PC_IDENTITY} from './pc-identity.js?rev=59';
 export function pcPresentation(snapshot,power,playerName='Игрок'){
  const {phase='room',progress=0,coldStart=false}=snapshot;
  let screen=power==='on'?'desktop':'off',brightness=screen==='off'?0:1;

@@ -61,7 +61,7 @@ test('empty notebook keeps New and Open available and cannot save an absent docu
 test('Save reports a rejected file commit and retries the same selected destination',()=>{
  const d=pcDocument(),root=d.createElement('main');let s=createLyric(createVirtualPcState(),{id:'save',name:'Сохрани мысль'}).state,accepted=false,calls=0;
  const mounted=view.mountRapNotebook(root,{getState:()=>s,onChange:next=>{calls++;if(!accepted)return false;s=next;return true;}});
- findButton(root,'Сохранить').click();let picker=allPc(root).find(n=>n.className==='pc-file-picker');findButton(picker,'Сохранить').click();
+ findButton(root,'Сохранить').click();let picker=allPc(root).find(n=>n.className?.split(' ').includes('pc-file-picker'));findButton(picker,'Сохранить').click();
  assert.equal(calls,1);assert.equal(s.fileSystem.files.length,0);assert.ok(allPc(picker).some(n=>/Не удалось сохранить файл/.test(n.textContent)));
  accepted=true;findButton(picker,'Сохранить').click();assert.equal(calls,2);assert.equal(s.fileSystem.files[0].snapshot.name,'Сохрани мысль');
  assert.ok(allPc(root).some(n=>n.textContent==='Файл сохранён'));mounted.dispose();
@@ -79,7 +79,7 @@ test('ready document keeps compact refinement actions and saves a TXT through th
  const f=fixture(readyState()),actions=allPc(f.root).find(n=>n.className==='rn-actions');
  assert.ok(actions?.contains(findButton(f.root,'Доработать')));assert.ok(actions.contains(findButton(f.root,'Адаптировать под бит')));
  assert.ok(findButton(f.root,'Добавить'));assert.equal(findButton(f.root,'Экспорт текста'),undefined);
- findButton(f.root,'Сохранить').click();findButton(allPc(f.root).find(n=>n.className==='pc-file-picker'),'Сохранить').click();
+ findButton(f.root,'Сохранить').click();findButton(allPc(f.root).find(n=>n.className?.split(' ').includes('pc-file-picker')),'Сохранить').click();
  assert.equal(f.state.fileSystem.files.at(-1).type,'txt');assert.equal(f.state.fileSystem.files.at(-1).snapshot.id,'ready');
 });
 
@@ -105,7 +105,7 @@ test('opening, refinement and beat adaptation still run the real persisted proje
  s.music.needs={satiety:100,energy:100};s=createLyric(s,{id:'other',name:'Другой текст'}).state;
  s=savePcDocument(s,{projectId:'ready',folderId:'downloads',filename:'Готовый текст.txt',nowMinute:1}).state;
  const f=fixture(s);fire(findButton(f.root,'Открыть текст'),'click');findButton(allPc(f.root).find(n=>n.getAttribute?.('aria-label')==='Сохранить изменения?'),'Не сохранять').click();
- const picker=allPc(f.root).find(n=>n.className==='pc-file-picker');findButton(picker,'Выбрать: Готовый текст.txt').click();findButton(picker,'Открыть').click();assert.equal(f.state.writing.activeTextId,'ready');
+ const picker=allPc(f.root).find(n=>n.className?.split(' ').includes('pc-file-picker'));findButton(picker,'Выбрать: Готовый текст.txt').click();findButton(picker,'Открыть').click();assert.equal(f.state.writing.activeTextId,'ready');
  fire(findButton(f.root,'Доработать'),'click');assert.equal(f.state.writing.job.kind,'refine');assert.equal(f.works,1);
  f.state=advanceLyricWork(f.state,1000).state;f.state.music.needs={satiety:100,energy:100};f.mounted.update();
  fire(findButton(f.root,'Адаптировать под бит'),'click');fire(allPc(f.root).find(n=>n.dataset.projectId==='beat'),'click');

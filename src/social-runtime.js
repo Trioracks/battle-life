@@ -1,17 +1,17 @@
-import {communityById} from './social-catalog.js?rev=58';
-import {normalizeSocial} from './social-state.js?rev=58';
-import {ensureBattleWindow,migrateBattleDeadlines} from './battle-windows.js?rev=58';
-import {acknowledgementBodyFor,acknowledgementFor} from './social-submission.js?rev=58';
-import {validGameMinute} from './game-minute.js?rev=58';
-import {receivePhoneEvents} from './phone-notifications.js?rev=58';
-import {publishJudgeEvents} from './social-judging-events.js?rev=58';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=58';
-import {advancePersonalDialogs} from './social-personal.js?rev=58';
-import {advanceBattleLifecycle} from './battle-judging-clock.js?rev=58';
-import {ensureSocialReactionPlans} from './social-reactions.js?rev=58';
-import {ensureCommunityPublications,publishCommunityNotices} from './social-community-publications.js?rev=58';
-import {advanceGoblin} from './goblin-mentor.js?rev=58';
-import {advanceFilya} from './filya-calendar.js?rev=58';
+import {communityById} from './social-catalog.js?rev=59';
+import {normalizeSocial} from './social-state.js?rev=59';
+import {ensureBattleWindow,migrateBattleDeadlines} from './battle-windows.js?rev=59';
+import {acknowledgementBodyFor,acknowledgementFor} from './social-submission.js?rev=59';
+import {validGameMinute} from './game-minute.js?rev=59';
+import {receivePhoneEvents} from './phone-notifications.js?rev=59';
+import {publishJudgeEvents} from './social-judging-events.js?rev=59';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=59';
+import {advancePersonalDialogs} from './social-personal.js?rev=59';
+import {advanceBattleLifecycle} from './battle-judging-clock.js?rev=59';
+import {ensureSocialReactionPlans} from './social-reactions.js?rev=59';
+import {ensureCommunityPublications,publishCommunityNotices} from './social-community-publications.js?rev=59';
+import {advanceGoblin} from './goblin-mentor.js?rev=59';
+import {advanceFilya} from './filya-calendar.js?rev=59';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export function normalizeSocialRuntime(raw){
  const seen=new Set(),events=(Array.isArray(raw?.events)?raw.events:[]).filter(e=>e&&typeof e.id==='string'&&typeof e.type==='string'&&validGameMinute(e.dueAt)&&!seen.has(e.id)&&seen.add(e.id)).map(clone);
@@ -73,7 +73,7 @@ export function advanceSocial(input,nowMinute,options={}){
  const judged=publishJudgeEvents(state,nowMinute);
  const reacted=ensureSocialReactionPlans(judged.state,nowMinute);
  const community=publishCommunityNotices(reacted.state,nowMinute);
- const goblin=advanceGoblin(community.state,nowMinute);
+ const goblin=advanceGoblin(community.state,nowMinute,{online:options.goblinOnline===true});
  const filya=advanceFilya(goblin.state,nowMinute);
  return {state:filya.state,domainChanged:initialized.changed||lifecycle.changed||reacted.changed||community.changed||goblin.changed||filya.changed,events:[...personal.events,...events,...battleEvents,...judged.events,...community.events,...goblin.events].sort((a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id)),...(lifecycle.reason?{warning:lifecycle.reason}:{})};
 }

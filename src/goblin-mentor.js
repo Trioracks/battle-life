@@ -1,7 +1,7 @@
-import {goblinReplyContext,goblinContextResponse,deliverGoblinMessage,goblinFollowupPlan} from './goblin-conversation.js?rev=58';
-import {GOBLIN_ID,GOBLIN_NAME,GOBLIN_DIALOGUE,GOBLIN_RELEASES,GOBLIN_INITIAL_POSTS,normalizeGoblin} from './goblin-catalog.js?rev=58';
-import {receivePhoneEvents} from './phone-notifications.js?rev=58';
-import {validGameMinute} from './game-minute.js?rev=58';
+import {goblinReplyContext,goblinContextResponse,deliverGoblinMessage,goblinFollowupPlan} from './goblin-conversation.js?rev=59';
+import {GOBLIN_ID,GOBLIN_NAME,GOBLIN_DIALOGUE,GOBLIN_RELEASES,GOBLIN_INITIAL_POSTS,normalizeGoblin} from './goblin-catalog.js?rev=59';
+import {receivePhoneEvents} from './phone-notifications.js?rev=59';
+import {validGameMinute} from './game-minute.js?rev=59';
 
 const battle='underweb://social/community/makarevich-1';
 const links={
@@ -17,12 +17,12 @@ function writable(state){
  return {state:{...state,social:{...state.social,goblin:g,dialogs:{...state.social?.dialogs,[GOBLIN_ID]:dialog}}},g,dialog};
 }
 function queue(g,key,at,body,extra={}){if(!g.pending.some(m=>m.id===key))g.pending.push({id:key,at,body,...extra});}
-export function advanceGoblin(input,now){
+export function advanceGoblin(input,now,{online=false}={}){
  if(!validGameMinute(now))return {state:input,events:[],changed:false};
  const old=input.social?.goblin;
  if(old?.startedAt!==null&&old?.startedAt!==undefined&&now<old.startedAt)return {state:input,events:[],changed:false};
  const needsInit=old?.startedAt==null,followup=goblinFollowupPlan(input,now);
- const due=needsInit||old.pending.some(m=>m.at<=now)||(old.nextDay!==null&&old.nextDay*1440<=now)||(old.scheduled?.at<=now);
+ const due=needsInit||!online&&old.pending.some(m=>m.at<=now)||(old.nextDay!==null&&old.nextDay*1440<=now)||(old.scheduled?.at<=now);
  const install=old?.stage==='client'&&input.software?.client?.installed||old?.stage==='software'&&input.software?.notebook?.installed;
  const ft=old?.ftPromptAt!==null&&old?.ftPromptAt!==undefined&&!old.ftReminder&&(input.software?.ft?.installed||now>=old.ftPromptAt+480);
  if(!due&&!install&&!ft&&!followup.changed)return {state:input,events:[],changed:false};
@@ -44,10 +44,10 @@ export function advanceGoblin(input,now){
   queue(g,'text-export',now+20,GOBLIN_DIALOGUE['text-export']);
  }
  if(ft){g.ftReminder=true;queue(g,'ft-check',now+10,input.software?.ft?.installed?GOBLIN_DIALOGUE['ft-ready']:GOBLIN_DIALOGUE['ft-check'],{links:[links.ft]});}
- for(const msg of g.pending.filter(m=>m.at<=now).sort((a,b)=>a.at-b.at)){
-  const event=deliverGoblinMessage(g,dialog,msg,msg.at);if(event)events.push(event);
+ for(const msg of g.pending.filter(m=>!online&&m.at<=now).sort((a,b)=>a.at-b.at)){
+  const event=deliverGoblinMessage(g,dialog,msg,Math.max(msg.at,dialog.messages.at(-1)?.at??0));if(event)events.push(event);
  }
- g.pending=g.pending.filter(m=>m.at>now);
+ if(!online)g.pending=g.pending.filter(m=>m.at>now);
  // Daily, bounded bookkeeping in the social worker. Never decode audio here.
  let checked=0;
  const publish=()=>{

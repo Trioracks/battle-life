@@ -1,5 +1,5 @@
-import {FILYA_CARDS,FILYA_RELEASES,normalizeFilya} from './filya-catalog.js?rev=58';
-import {validGameMinute} from './game-minute.js?rev=58';
+import {FILYA_CARDS,FILYA_RELEASES,normalizeFilya} from './filya-catalog.js?rev=59';
+import {validGameMinute} from './game-minute.js?rev=59';
 const day=1440;
 function hash(value){let h=2166136261;for(const c of String(value))h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0;}
 const order=(cards,seed)=>[...cards].sort((a,b)=>hash(seed+':'+a.id)-hash(seed+':'+b.id)||a.id.localeCompare(b.id));

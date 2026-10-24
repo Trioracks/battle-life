@@ -1,4 +1,4 @@
-import {drawPcMonitor} from './pc-monitor-canvas.js?rev=58';
+import {drawPcMonitor} from './pc-monitor-canvas.js?rev=59';
 // Owns only its camera, canvas texture and cloned materials; authored meshes stay owned by the scene.
 export function createComputerView({THREE,screen,indicator,viewport}){
  if(!screen?.geometry||!indicator)throw Error('Missing live CRT surfaces');
@@ -10,15 +10,16 @@ export function createComputerView({THREE,screen,indicator,viewport}){
  screen.material=new THREE.MeshBasicMaterial({map:texture,color:0xffffff,toneMapped:false});
  indicator.material=new THREE.MeshBasicMaterial({color:0x171a10,toneMapped:false});
  const startPosition=new THREE.Vector3(),startRotation=new THREE.Quaternion();
- let active=false,zoom=0,startFov=48,lastKey='',disposed=false;
+ let active=false,zoom=0,startFov=48,lastKey='',disposed=false,lastZoom=null,lastAspect=null;
  function geometry(){
-  screen.updateWorldMatrix(true,false);screen.geometry.computeBoundingBox();
+  screen.updateWorldMatrix(true,false);if(!screen.geometry.boundingBox)screen.geometry.computeBoundingBox();
   const box=screen.geometry.boundingBox,center=box.getCenter(new THREE.Vector3()).applyMatrix4(screen.matrixWorld),scale=screen.getWorldScale(new THREE.Vector3()),size=box.getSize(new THREE.Vector3()).multiply(scale);
   const normal=new THREE.Vector3(0,0,1).transformDirection(screen.matrixWorld),up=new THREE.Vector3(0,1,0).transformDirection(screen.matrixWorld);
   return {center,normal,up,width:size.x,height:size.y};
  }
  function frame(){
-  if(!active)return;
+  if(!active||zoom===lastZoom&&camera.aspect===lastAspect)return;
+  lastZoom=zoom;lastAspect=camera.aspect;
   const g=geometry(),t=zoom*zoom*(3-2*zoom),tan=Math.tan(48*Math.PI/360);
   camera.fov=THREE.MathUtils.lerp(startFov,48,t);
   const distance=Math.min(g.height/(2*tan),g.width/(2*tan*camera.aspect))*.94;
@@ -35,6 +36,6 @@ export function createComputerView({THREE,screen,indicator,viewport}){
  return {camera,get active(){return active;},begin(source){
   if(disposed)return;source.updateMatrixWorld();startPosition.copy(source.position);startRotation.copy(source.quaternion);startFov=source.isPerspectiveCamera?source.fov:48;
   if(source.isOrthographicCamera){const g=geometry(),forward=new THREE.Vector3(0,0,-1).applyQuaternion(source.quaternion),depth=g.center.clone().sub(source.position).dot(forward),height=(source.top-source.bottom)/source.zoom;startPosition.addScaledVector(forward,depth-height/(2*Math.tan(startFov*Math.PI/360)));}
-  active=true;zoom=0;frame();
+  active=true;zoom=0;lastZoom=null;frame();
  },update(snapshot,presentation){if(disposed)return;zoom=THREE.MathUtils.clamp(snapshot.zoom??0,0,1);frame();draw(presentation);},resize(width,height){camera.aspect=Math.max(1,width)/Math.max(1,height);frame();},end(){active=false;},dispose(){if(disposed)return;disposed=true;active=false;screen.material.dispose();indicator.material.dispose();texture?.dispose();screen.material=original[0];indicator.material=original[1];}};
 }

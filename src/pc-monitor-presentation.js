@@ -1,4 +1,4 @@
-import {pcPresentation} from './virtual-pc-presentation.js?rev=58';
+import {pcPresentation} from './virtual-pc-presentation.js?rev=59';
 // A small read-only projection. It owns neither clocks, audio nor application state.
 export function pcMonitorPresentation(state,{activeAppId,address='',projectId,job,snapshot={phase:'room'},paused=false,playerName='Игрок'}={}){
  const base=pcPresentation(snapshot,state.power,playerName);if(base.screen!=='desktop')return base;

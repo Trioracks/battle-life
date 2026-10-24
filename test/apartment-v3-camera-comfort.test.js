@@ -59,7 +59,7 @@ test('tall portrait sleep prioritizes the hero and room bounds over the entire b
 test('new game defaults to 3D, temporarily sleeps in 2D and restores after standing',()=>{
  const camera=new CameraModes();assert.equal(camera.mode,'3D');
  camera.onMotionEvent({type:'started',id:'bed'});assert.equal(camera.mode,'2D');
- camera.onMotionState({clip:'idle',phase:'return-in'});assert.equal(camera.mode,'2D');
+ camera.onMotionState({clip:'idle',phase:'return-in'});assert.equal(camera.mode,'3D');
  camera.onMotionState({clip:'idle',phase:'idle'});assert.equal(camera.mode,'3D');
  camera.reset({initialMode:'2D'});assert.equal(camera.mode,'2D');
  camera.onMotionEvent({type:'started',id:'bed'});camera.onMotionState({clip:'idle',phase:'idle'});assert.equal(camera.mode,'2D');
@@ -87,7 +87,7 @@ for(const initial of ['2D','3D'])for(const wake of ['clock','early'])test(`${ini
  f.until(()=>f.motion.sleeping&&f.motion.phase==='perform');assert.equal(f.camera.mode,'2D');
  assert.equal(f.camera.yaw,.4);assert.equal(f.camera.pitch,-.2);
  if(wake==='early')assert.equal(f.motion.wakeUp(),true);
- f.until(()=>f.motion.phase==='return-in');assert.equal(f.camera.mode,'2D','completed is earlier than standing');
+ f.until(()=>f.motion.phase==='return-in');assert.equal(f.camera.mode,initial,'standing pose restores under blackout');
  f.until(()=>f.motion.phase==='idle');assert.equal(f.camera.mode,initial);
  f.motion.interact('computer');f.until(()=>f.motion.phase==='perform');assert.equal(f.camera.mode,'2D','computer retains its existing forced 2D behavior');
  f.motion.move(f.motion.position[0]-.1);f.until(()=>f.motion.phase==='idle');assert.equal(f.camera.mode,'2D','the consumed sleep mode cannot leak into later actions');

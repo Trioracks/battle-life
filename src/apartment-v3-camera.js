@@ -53,9 +53,8 @@ export function pickVisible(targets,blockers,floor){
  if(hit&&hit.distance<=wall+.025)return {id:hit.id};
  if(floor&&floor.distance<=wall+.025)return {x:floor.x};return {};
 }
-// Entry/exit must preserve the actual room framing. Only a production return
-// starts at the authored head pose, where that cinematic finishes.
-export function computerCameraSource({mode,overview,firstPerson,head,fromHead=false}){return fromHead?head:mode==='3D'?firstPerson:overview;}
+// Every monitor flight starts at the actor's head, independent of room framing.
+export function computerCameraSource({head}){return head;}
 export class CameraModes{
  constructor({initialMode='3D'}={}){this.mode=initialMode==='2D'?'2D':'3D';this.yaw=0;this.pitch=0;this.loading=false;this.error=null;this.loaded=new Set(['2D']);this.revision=0;this.sleepCamera=null;}
  reset({initialMode='3D'}={}){this.mode=initialMode==='2D'?'2D':'3D';this.yaw=0;this.pitch=0;this.sleepCamera=null;this.error=null;this.revision++;}
@@ -67,9 +66,10 @@ export class CameraModes{
   }else if(event.type==='swap'&&['computer','dining'].includes(event.id)){this.sleepCamera=null;this.mode='2D';this.revision++;}
  }
  onMotionState(state){
-  // completed is emitted as waking begins. Restore after the return fade has
-  // finished and the actor is standing, including a queued walk to another action.
-  if(this.sleepCamera===null||['bed','computer'].includes(state.actionId)||state.pending?.id==='computer'||!cameraAllowsFirstPerson(state))return;
+  // The actor has already moved to the standing pose under full blackout.
+  // Restore before return-in reveals its first frame, avoiding a 2D flash.
+  const standingUnderBlack=state.phase==='return-in'&&state.clip==='idle';
+  if(this.sleepCamera===null||['bed','computer'].includes(state.actionId)||state.pending?.id==='computer'||!standingUnderBlack&&!cameraAllowsFirstPerson(state))return;
   this.mode=this.sleepCamera;this.sleepCamera=null;this.revision++;
  }
  async cycle(state,load,transition=async apply=>apply()){

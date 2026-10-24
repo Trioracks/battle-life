@@ -139,16 +139,40 @@
   #virtual-pc .rn-action-group+ .rn-action-group { border-top:0; border-left:1px solid var(--rn-border); padding:0 0 0 10px; }
   #virtual-pc .rn-status { align-items:flex-start; gap:8px; }
 }
-.rap-notebook .rn-work .rn-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:12px 0; padding:0; border:0; }
-.rap-notebook .rn-work .rn-action-group { display:flex; flex-direction:column; gap:5px; padding:0; min-width:0; }
-.rap-notebook .rn-work .rn-actions button { width:auto; min-height:27px; padding:4px 7px; font-size:11px; line-height:1.25; border-radius:1px; }
-.rap-notebook .rn-work .rn-actions small { font-size:10px; }
-.pc-file-picker { min-width:0; max-width:100%; color:inherit; }
-.pc-picker-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin:10px 0; }
-.pc-picker-toolbar input { flex:1; min-width:100px; }
-.pc-picker-files { min-height:180px; max-height:40vh; overflow:auto; display:flex; flex-direction:column; gap:3px; padding:7px; border:1px solid #6c7871; background:#19231f; }
-.pc-picker-files button { text-align:left; }
-.pc-picker-files [aria-pressed="true"] { background:#556b5b; color:#fff9e8; }
-.pc-picker-details, #virtual-pc .rap-notebook .rn-dialog .pc-picker-details { height:2.8em; line-height:1.4; margin:8px 0; overflow:auto; }
+#virtual-pc .rap-notebook .rn-work .rn-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; min-height:0; margin:12px 0; padding:0; border:0; }
+#virtual-pc .rap-notebook .rn-work .rn-action-group { display:flex; flex-direction:column; gap:5px; align-items:flex-start; justify-content:flex-start; padding:0; min-width:0; }
+#virtual-pc .rap-notebook .rn-work .rn-actions button { width:auto; min-height:27px; padding:4px 7px; font-size:11px; line-height:1.25; border-radius:1px; }
+#virtual-pc .rap-notebook .rn-work .rn-actions small { font-size:10px; }
+#virtual-pc .pc-file-picker.pc-explorer{position:relative;display:flex;flex-direction:column;width:min(760px,100%);height:auto;min-width:0;max-width:100%;max-height:100%;margin:auto;padding:0;background:#ece9d8;color:#182439;border:1px solid #7b8789;font:12px/1.4 Tahoma,Arial,sans-serif;color-scheme:light;text-shadow:none}
+#virtual-pc .pc-file-picker.pc-explorer .pc-picker-title{margin:0;padding:8px 12px;background:linear-gradient(#567581,#3d5b67);color:#fff;font:700 14px Tahoma,sans-serif}
+#virtual-pc .pc-file-picker.pc-explorer :is(button,input,select){font:12px Tahoma,Arial,sans-serif;min-height:24px;color:#182439;text-shadow:none;border-radius:0;box-sizing:border-box}
+#virtual-pc .pc-file-picker.pc-explorer :is(input,select){border:1px solid #8299ad;background:white;padding:3px 5px}
+#virtual-pc .pc-file-picker.pc-explorer button{border:1px solid #a6a79b;background:linear-gradient(#fffef7,#e0ddce);padding:4px 9px;cursor:pointer;box-shadow:none}
+#virtual-pc .pc-file-picker.pc-explorer button:disabled{opacity:.5;background:#ece9d8;color:#777;text-shadow:none}
+#virtual-pc .pc-file-picker.pc-explorer .pc-picker-toolbar{display:flex;gap:6px;padding:6px;flex-wrap:wrap;margin:0}
+#virtual-pc .pc-file-picker.pc-explorer .pc-address{margin:0;padding:5px 8px}
+#virtual-pc .pc-file-picker.pc-explorer .pc-picker-location{display:flex;align-items:center;gap:8px;padding:7px 8px;border-bottom:1px solid #aaa99c}
+#virtual-pc .pc-file-picker.pc-explorer .pc-picker-location select{flex:1;min-width:0;width:0}
+#virtual-pc .pc-file-picker.pc-explorer .pc-picker-location input{width:150px;max-width:30%}
+#virtual-pc .pc-file-picker.pc-explorer .pc-explorer-main{height:240px;min-height:140px;flex:none;background:white;border-bottom:1px solid #a7a79c}
+#virtual-pc .pc-file-picker.pc-explorer .pc-folder-tree{flex-basis:160px}
+#virtual-pc .pc-file-picker.pc-explorer .pc-tree-item{display:flex;align-items:center;justify-content:flex-start;gap:4px;width:100%;background:white;border:0;padding:4px 6px;text-align:left;white-space:nowrap}
+#virtual-pc .pc-file-picker.pc-explorer .pc-picker-files{min-height:0;max-height:none;overflow:auto;display:flex;flex-direction:row;align-content:flex-start;align-items:flex-start;gap:8px;flex-wrap:wrap;flex:1;padding:12px;background:white;border:0}
+#virtual-pc .pc-file-picker.pc-explorer .pc-file{display:flex;flex-direction:column;width:100px;padding:5px 3px;background:white;border:1px solid transparent;text-align:center;gap:7px}
+#virtual-pc .pc-file-picker.pc-explorer .pc-file[aria-pressed=true]{background:#d9e7f7;border:1px dotted #557a9d}
+#virtual-pc .pc-file-picker.pc-explorer .pc-file-name{max-width:100%;overflow-wrap:anywhere;color:#182439;font:12px/1.4 Tahoma,sans-serif}
+#virtual-pc .pc-folder-rename{width:100%;min-width:40px;max-width:110px;margin:0;padding:1px 2px!important;background:#fff!important;border:1px solid #456b8b!important;color:#111!important;font:12px Tahoma!important;text-align:center}
+#virtual-pc .pc-file-picker.pc-explorer .pc-picker-footer{padding:8px 10px}
+#virtual-pc .pc-file-picker.pc-explorer .pc-picker-footer>label{display:flex;align-items:center;gap:10px}
+#virtual-pc .pc-file-picker.pc-explorer .pc-picker-footer>label input{flex:1;min-width:0}
+#virtual-pc .pc-file-picker.pc-explorer .pc-picker-details{height:2.8em;line-height:1.4;margin:6px 0;overflow:auto;padding:0;background:none;border:0;color:#596477;font-size:11px}
+#virtual-pc .pc-file-picker.pc-explorer [role=status]{color:#973c25;margin:4px 0}
+#virtual-pc .pc-file-picker.pc-explorer .pc-picker-actions{display:flex;justify-content:flex-end;gap:8px}
+#virtual-pc .pc-file-picker.pc-explorer .pc-picker-actions button{min-width:88px}
+#virtual-pc .pc-file-picker.pc-explorer .pc-picker-context{position:absolute;z-index:4;padding:3px;background:#fff;border:1px solid #7b8d9d;box-shadow:2px 3px 6px #0005}
+#virtual-pc .pc-file-picker.pc-explorer [hidden]{display:none!important}
+@media(max-width:700px){#virtual-pc .pc-file-picker.pc-explorer .pc-folder-tree{flex-basis:125px}#virtual-pc .pc-file-picker.pc-explorer .pc-explorer-main{height:190px}}
 .pc-document-guard{position:absolute;z-index:110;top:50%;left:50%;transform:translate(-50%,-50%);width:min(480px,90%);padding:22px;background:#242c29;color:#f0ede2;border:1px solid #b7ae83;box-shadow:0 0 0 120vmax #0009,0 16px 45px #000a}
 .pc-document-guard button{margin:10px 8px 0 0;padding:8px 14px}
+
+#virtual-pc .rn-dialog:has(.pc-file-picker){width:min(760px,100%);padding:0;border:0;background:#ece9d8;border-radius:0}

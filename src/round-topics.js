@@ -1,9 +1,9 @@
 import catalog from '../data/battles/round-topics-v1.json' with {type:'json'};
-import {beatResultSeed} from './beat-result.js?rev=58';
-import {judgeProfile} from './judge-profiles.js?rev=58';
-import {validGameMinute} from './game-minute.js?rev=58';
-import {gameDateTimeLabel} from './home-calendar.js?rev=58';
-import {battleDeadlineAtMidnight} from './battle-windows.js?rev=58';
+import {beatResultSeed} from './beat-result.js?rev=59';
+import {judgeProfile} from './judge-profiles.js?rev=59';
+import {validGameMinute} from './game-minute.js?rev=59';
+import {gameDateTimeLabel} from './home-calendar.js?rev=59';
+import {battleDeadlineAtMidnight} from './battle-windows.js?rev=59';
 export const ROUND_TOPIC_CATALOG=Object.freeze(catalog);
 export function normalizeRoundThemeState(source){
  const roundThemes=normalizeRoundThemes(source.roundThemes),roundThemeRecovery=Array.isArray(source.roundThemeRecovery)?structuredClone(source.roundThemeRecovery):[];

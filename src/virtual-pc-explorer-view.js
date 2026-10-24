@@ -1,17 +1,18 @@
-import {PC_IDENTITY} from './pc-identity.js?rev=58';
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=58';
-import {createPcIcon} from './virtual-pc-icons.js?rev=58';
-import {createExplorerState,reconcileExplorerState,navigateExplorer,explorerEntries,explorerProperties,explorerPaths} from './virtual-pc-explorer.js?rev=58';
-import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=58';
-import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=58';
-import {normalizeStudioProject} from './ft-studio-project.js?rev=58';
-import {normalizeBeat} from './beat-production.js?rev=58';
-import {normalizeLyric} from './lyric-production.js?rev=58';
-import {mountAudioFilePlayer} from './pc-audio-export-view.js?rev=58';
-import {pcFileById,createPcFolder} from './pc-filesystem.js?rev=58';
+import {mountFolderRename} from './pc-folder-rename-view.js?rev=59';
+import {PC_IDENTITY} from './pc-identity.js?rev=59';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=59';
+import {createPcIcon} from './virtual-pc-icons.js?rev=59';
+import {createExplorerState,reconcileExplorerState,navigateExplorer,explorerEntries,explorerProperties,explorerPaths} from './virtual-pc-explorer.js?rev=59';
+import {createVirtualPcState,diskUsage} from './virtual-pc-state.js?rev=59';
+import {mountDiskUsage} from './virtual-pc-disk-view.js?rev=59';
+import {normalizeStudioProject} from './ft-studio-project.js?rev=59';
+import {normalizeBeat} from './beat-production.js?rev=59';
+import {normalizeLyric} from './lyric-production.js?rev=59';
+import {mountAudioFilePlayer} from './pc-audio-export-view.js?rev=59';
+import {pcFileById,createPcFolder,nextPcFolderName} from './pc-filesystem.js?rev=59';
 
 export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenProject,onProperties,onClose,onMenu,onNavigate,onChange,audio}) {
-  const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',diskLabel=null,disposed=false;
+  const d=root.ownerDocument;let state=createVirtualPcState(),nav=createExplorerState(),signature='',diskLabel=null,disposed=false,renaming=null;
   const wrap=el(d,'div',{className:'pc-explorer'}),menubar=el(d,'div',{className:'pc-menubar'});
   const tools=el(d,'div',{className:'pc-explorer-tools'}),form=el(d,'form',{className:'pc-address'});
   const address=el(d,'input',{attributes:{'aria-label':'Адрес папки'},value:'Мой компьютер'});
@@ -49,9 +50,8 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
   ];
   function menu(anchor,items,e) {const r=anchor.getBoundingClientRect();onMenu?.({anchor,items,x:e?.clientX??r.left,y:e?.clientY??r.bottom});}
   function newFolder(){
-    const box=el(d,'section',{className:'pc-folder-dialog',attributes:{role:'dialog','aria-label':'Новая папка','aria-modal':'true'}}),input=el(d,'input',{value:'Новая папка',attributes:{'aria-label':'Имя новой папки'}}),message=el(d,'p',{attributes:{role:'status'}}),close=()=>{box.remove();address.focus();};
-    box.append(el(d,'h2',{text:'Новая папка'}),input,message,button(d,'Создать папку',{},()=>{const r=createPcFolder(state,{id:'folder:'+(globalThis.crypto?.randomUUID?.()??Date.now()),parentId:nav.path,name:input.value,nowMinute:state.lastGameMinute??0});if(!r.ok){message.textContent=r.reason;return;}if(!onChange||onChange(r.state)===false){message.textContent='Не удалось сохранить папку.';return;}state=r.state;close();render(false);}),button(d,'Отмена',{},close));
-    box.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close();}});wrap.append(box);input.focus();
+    if(!onChange)return;const result=createPcFolder(state,{id:'folder:'+(globalThis.crypto?.randomUUID?.()??Date.now()),parentId:nav.path,name:nextPcFolderName(state,nav.path),nowMinute:state.lastGameMinute??0});
+    if(!result.ok){status.textContent=result.reason;return;}if(onChange(result.state)===false){status.textContent='Не удалось сохранить папку.';return;}state=result.state;renaming=result.folderId;nav={...nav,selection:result.folderId};render(false);
   }
   for(const [label,items]of [
     ['Файл',()=>[{id:'open',label:'Открыть',disabled:!selected(),onSelect:()=>openEntry(selected())},{id:'new-folder',label:'Создать папку',disabled:!onChange||['computer','windows'].includes(nav.path),onSelect:newFolder},{id:'properties',label:'Свойства',disabled:!selected(),onSelect:()=>properties()},{id:'close',label:'Закрыть',onSelect:onClose}]],
@@ -96,6 +96,7 @@ export function mountExplorer(root,{onOpenArtifact,onSoftware,onOpenApp,onOpenPr
       b.addEventListener('contextmenu',context);
       b.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();openEntry(entry);}if(e.key==='F10'&&e.shiftKey)context(e);});
       files.append(b);
+      if(entry.id===renaming){renaming=null;const label=b.children[1];mountFolderRename(label,{folderId:entry.id,getState:()=>state,onChange:next=>{if(onChange(next)===false)return false;state=next;return true;},onError:message=>status.textContent=message,onDone:()=>render(true)});}
     }
     status.textContent=nav.error||'Объектов: '+entries().length;
     status.dataset.error=String(!!nav.error);

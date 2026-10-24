@@ -1,22 +1,22 @@
-import {underwebIcon} from './underweb-icons.js?rev=58';
-import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=58';
-import {resolveUnderweb,BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=58';
-import {createBeatMarket} from './beat-market-view.js?rev=58';
-import {softwareForum,softwareMessage} from './pc-software-view.js?rev=58';
-import {downloadPresentation} from './virtual-pc-runtime.js?rev=58';
-import {mountBrowserDownloads} from './pc-browser-downloads-view.js?rev=58';
-import {createCommunityView} from './underweb-community-view.js?rev=58';
-import {communityDay} from './underweb-community.js?rev=58';
-import {homeDateLabel} from './home-calendar.js?rev=58';
-import {newsForDay} from './underweb-news.js?rev=58';
-import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=58';
-import {mountSocial} from './social-view.js?rev=58';
-import {activateSocial} from './social-runtime.js?rev=58';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=58';
-import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=58';
-import {ensureBattleWindow,currentBattleWindow,attemptForWindow} from './battle-windows.js?rev=58';
-import {showRegistrationNotice} from './social-dom.js?rev=58';
-import {publicRoundTable,ROUND_LABELS} from './battle-results-table.js?rev=58';
+import {underwebIcon} from './underweb-icons.js?rev=59';
+import {pcElement as el,pcButton,pcFind} from './virtual-pc-dom.js?rev=59';
+import {resolveUnderweb,BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=59';
+import {createBeatMarket} from './beat-market-view.js?rev=59';
+import {softwareForum,softwareMessage} from './pc-software-view.js?rev=59';
+import {downloadPresentation} from './virtual-pc-runtime.js?rev=59';
+import {mountBrowserDownloads} from './pc-browser-downloads-view.js?rev=59';
+import {createCommunityView} from './underweb-community-view.js?rev=59';
+import {communityDay} from './underweb-community.js?rev=59';
+import {homeDateLabel} from './home-calendar.js?rev=59';
+import {newsForDay} from './underweb-news.js?rev=59';
+import {createNewsPanel,createNewsPage} from './underweb-news-view.js?rev=59';
+import {mountSocial} from './social-view.js?rev=59';
+import {activateSocial} from './social-runtime.js?rev=59';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=59';
+import {registerBattle,battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=59';
+import {ensureBattleWindow,currentBattleWindow,attemptForWindow} from './battle-windows.js?rev=59';
+import {showRegistrationNotice} from './social-dom.js?rev=59';
+import {publicRoundTable,ROUND_LABELS} from './battle-results-table.js?rev=59';
 const button=(d,text,options={},fn)=>pcButton(d,text,{...options,className:'uw-control '+(options.className??'')},fn);
 
 export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onChange,audio,onWork=()=>false,onStudyTarget=()=>{},onSubmitTrack=()=>{},onResultViewed=()=>{},getSoftwareMessage=()=>'',isVisible=()=>true}){
@@ -142,9 +142,10 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   const scrollTop=resetScroll?0:page.scrollTop;applicationFocus=null;
   lastDay=JSON.stringify([getMetadata().gameDay]);
   if(!preserveInputs)address.value=route.url;back.disabled=index===0;forward.disabled=index===history.length-1;
+  page.className='uw-page'+(route.type==='social'?' uw-page-social':'');
   socialView?.dispose();socialView=null;
   if(route.type==='social'){
-   const host=el(d,'div');page.replaceChildren(host);
+   const host=el(d,'div',{className:'uw-social-host'});page.replaceChildren(host);
    socialView=mountSocial(host,{route,getState,getMetadata,onChange,navigate,audio,onStudyTarget,onResultViewed,isVisible});
   }else
   page.replaceChildren(route.type.startsWith('news')?createNewsPage(d,{route,navigate}):route.type.startsWith('forum')?createCommunityView(d,{route,getState,getMetadata,onChange,navigate}):['samples','ripline'].includes(route.type)?createBeatMarket(d,{getState,onChange,audio,navigate,ripline:route.type==='ripline'}):route.type==='home'?homePage():route.type==='search'?resultsPage():route.type==='battles'?catalogPage():route.type==='battle'?detailPage():route.type==='dump'?softwareForum(d,{topic:route.topic,state:getState(),navigate,onAction:onSoftware,message:getSoftwareMessage()}):el(d,'p',{className:'uw-error',text:route.message}));
@@ -160,7 +161,7 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
  }
  function navigate(input){closeRegistration?.();closeRegistration=null;const next=resolveUnderweb(input,getMetadata());activateRoute(next);route=next;history.splice(index+1);history.push(route.url);index=history.length-1;applicationOpen=false;render();}
  function travel(delta){const next=index+delta;if(next<0||next>=history.length)return;closeRegistration?.();closeRegistration=null;index=next;const resolved=resolveUnderweb(history[index],getMetadata());activateRoute(resolved);route=resolved;applicationOpen=false;render();}
- render();return {navigate,tickOutgoingMessage:(dt,options)=>socialView?.tickOutgoingMessage(dt,options),get snapshot(){return {route,index,history:[...history]};},update(){
+ render();return {navigate,isGoblinChatOnline:()=>isVisible()&&route.type==='social'&&route.section==='dialog'&&route.profileId==='mak-npc-06',tickOutgoingMessage:(dt,options)=>socialView?.tickOutgoingMessage(dt,options),get snapshot(){return {route,index,history:[...history]};},update(){
   downloadsView.update();
   if(route.type==='social'){socialView?.update();return;}
   if(lastDay!==JSON.stringify([getMetadata().gameDay])){route=resolveUnderweb(history[index],getMetadata());render({resetScroll:false,preserveInputs:true});}
@@ -169,5 +170,5 @@ export function mountUnderweb(root,{getState,getMetadata,onApply,onSoftware,onCh
   else if(route.type==='dump'){const node=pcFind(page,n=>n.dataset?.pcRole==='forum-transfer');if(node){const p=downloadPresentation(getState(),'client');node.textContent=`Загрузка: ${p.receivedMb.toFixed(2)} / ${p.totalMb} МБ · ${p.speedKbPerSecond} КБ/с${p.error?' · '+softwareMessage(p.error):''}`;}}
  },dispose(){closeRegistration?.();socialView?.dispose();downloadsView.dispose();root.replaceChildren();}};
 }
-import {currentRoundTopic} from './round-topics.js?rev=58';
-import {reactionVisibilitySignature} from './social-reactions-view.js?rev=58';
+import {currentRoundTopic} from './round-topics.js?rev=59';
+import {reactionVisibilitySignature} from './social-reactions-view.js?rev=59';

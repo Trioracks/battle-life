@@ -46,6 +46,13 @@ test('damaged or not-yet-open rounds cannot offer submission or fabricate a dead
  assert.equal(battleStage(state,{battleId,nowMinute:50}).canSubmit,false);
  assert.equal(battleStage(state,{battleId,nowMinute:50}).kind,'recovery');
 });
+test('single-round battles show their actual 72-hour judging limit and published completion',()=>{
+ const battleId='concrete-echo',s=ensureBattleWindow(createVirtualPcState(),{battleId,nowMinute:37}).state,w=s.battleWindows[0];
+ assert.equal(battleStage(s,{battleId,nowMinute:w.closesAt}).deadlineMinute,w.closesAt+Math.max(...w.judgingOffsets));
+ s.battleSubmissions=[{id:'own',windowId:w.id,battleId,roundId:'selection'}];s.socialRuntime.events=[{id:'done',type:'judge-panel-complete',entityId:'own',dueAt:w.closesAt+4320}];
+ assert.equal(battleStage(s,{battleId,nowMinute:w.closesAt+4319}).kind,'judging');
+ const done=battleStage(s,{battleId,nowMinute:w.closesAt+4320});assert.equal(done.kind,'complete');assert.match(done.heading,/Итоги отбора опубликованы/);assert.equal(done.deadlineMinute,null);
+});
 test('an open community chat updates its header when reception turns into judging',()=>{
  const d=pcDocument();let now=10079;
  const state=ensureBattleWindow(createVirtualPcState(),{battleId,nowMinute:37,judgingPolicyVersion:2}).state;

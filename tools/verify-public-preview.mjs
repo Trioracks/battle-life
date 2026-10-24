@@ -243,9 +243,9 @@ export async function verifyPublicPreview(options={}){
    const currentRequests=[];context.on('request',request=>currentRequests.push(request.url()));
    await page.goto(cacheProbe.url,{timeout:60000});await page.locator('#loading').waitFor({state:'hidden'});await page.locator('#continue-game').click();await phase(page,'room');
    await page.waitForFunction(()=>document.body.dataset.mode==='game');
-   const until=Date.now()+30000;while(!currentRequests.some(url=>url.includes('social-worker.js?rev=58'))&&Date.now()<until)await page.waitForTimeout(100);
+   const until=Date.now()+30000;while(!currentRequests.some(url=>url.includes('social-worker.js?rev=59'))&&Date.now()<until)await page.waitForTimeout(100);
    const resources=currentRequests.filter(url=>/\.(?:js|css)(?:\?|$)/.test(url)&&!url.includes('/vendor/'));
-   assert.ok(resources.some(url=>url.includes('apartment-app.js?rev=58')));assert.ok(resources.some(url=>url.includes('.css?rev=58')));assert.ok(resources.some(url=>url.includes('social-worker.js?rev=58')));assert.ok(resources.every(url=>new URL(url).searchParams.get('rev')==='58'));
+   assert.ok(resources.some(url=>url.includes('apartment-app.js?rev=59')));assert.ok(resources.some(url=>url.includes('.css?rev=59')));assert.ok(resources.some(url=>url.includes('social-worker.js?rev=59')));assert.ok(resources.every(url=>new URL(url).searchParams.get('rev')==='59'));
    assert.equal(await page.evaluate(()=>typeof window.__cacheProbe),'undefined');assert.equal(await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--preview-cache-probe').trim()),'');
    await screenshot(page,'stale-http-cache-to-current-1280');
    report.cacheEvidence={syntheticPriorRevision:43,priorHits:{...cacheProbe.priorHits},cachedResponses:hits.map(({text,...hit})=>hit),currentResources:resources,scope:'Controlled synthetic old JS/CSS/Worker cached with immutable max-age, then unchanged current artifact on the same owned origin. Not an old gameplay migration test.'};
@@ -322,11 +322,11 @@ export async function verifyPublicPreview(options={}){
    }
   }
   const active=[...observed].filter(url=>/\.(?:js|css)(?:\?|$)/.test(url)&&!url.includes('/vendor/'));
-  assert.ok(active.some(url=>url.includes('apartment-app.js?rev=58')));assert.ok(active.some(url=>url.includes('.css?rev=58')));assert.ok(active.every(url=>new URL(url).searchParams.get('rev')==='58'),'all active first-party JS/CSS use canonical revision 58');
+  assert.ok(active.some(url=>url.includes('apartment-app.js?rev=59')));assert.ok(active.some(url=>url.includes('.css?rev=59')));assert.ok(active.every(url=>new URL(url).searchParams.get('rev')==='59'),'all active first-party JS/CSS use canonical revision 59');
   const workers=report.requests.filter(url=>new URL(url).origin===new URL(report.url).origin&&/\/[^/]*worker\.js(?:\?|$)/.test(url));
-  assert.ok(workers.every(url=>new URL(url).searchParams.get('rev')==='58'),'all real Worker entries use canonical revision 58');
-  if(!options.smoke)assert.ok(workers.some(url=>url.includes('social-worker.js?rev=58')),'real canonical social Worker requested');
-  check('prior module URL followed by canonical revision 58 entry, CSS and Worker',{priorRevision:43,canonicalRevision:58,workerRequired:!options.smoke,cacheScope:'isolated module URL warmup; local HTTP responses are no-store'});
+  assert.ok(workers.every(url=>new URL(url).searchParams.get('rev')==='59'),'all real Worker entries use canonical revision 59');
+  if(!options.smoke)assert.ok(workers.some(url=>url.includes('social-worker.js?rev=59')),'real canonical social Worker requested');
+  check('prior module URL followed by canonical revision 59 entry, CSS and Worker',{priorRevision:43,canonicalRevision:59,workerRequired:!options.smoke,cacheScope:'isolated module URL warmup; local HTTP responses are no-store'});
   report.completedGlbSignals=[];report.readyDocuments=[...readyDocuments];
   const rawFailures=report.unexpectedResponses;report.unexpectedResponses=[];
   for(const failure of rawFailures){

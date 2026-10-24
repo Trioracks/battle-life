@@ -1,9 +1,14 @@
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=58';
-import {BEAT_STAGES} from './beat-catalog.js?rev=58';
-import {LYRIC_STAGES} from './lyric-production.js?rev=58';
-import {VOCAL_STAGES} from './vocal-production.js?rev=58';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=59';
+import {BEAT_STAGES} from './beat-catalog.js?rev=59';
+import {LYRIC_STAGES} from './lyric-production.js?rev=59';
+import {VOCAL_STAGES} from './vocal-production.js?rev=59';
 const trainingLevel=value=>Math.max(0,Math.min(100,Number.isFinite(value)?value:0));
 const formatLevel=value=>trainingLevel(value).toFixed(2);
+function workIcon(d,id){
+ const paths={satiety:'M3 1v8m3-8v8M0 1v6q0 5 6 5v13m-3-13V1m12 0q-5 4-5 12h5V1Zm0 12v12',energy:'m13 0-11 15h9l-2 11 13-16h-10Z',audio:'M1 10h5l7-6v20l-7-6H1Zm17-1 9 12m0-12-9 12'};
+ return el(d,'img',{className:'beat-work-icon',attributes:{src:'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 32 32"><path d="'+paths[id]+'" fill="'+(id==='energy'?'#8bd7b2':'none')+'" stroke="'+(id==='satiety'?'#edbd61':'#a8c5a7')+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'),alt:'','aria-hidden':'true',width:'28',height:'28'}});
+}
+function setProgress(node,value){node.value=value;node.setAttribute('aria-valuenow',String(Math.round(value*100)));node.children[0].style.width=(value*100).toFixed(2)+'%';}
 
 export function createBeatWorkPanel(document,{onCancel=()=>{},onEnableAudio=()=>{}}={}){
  const root=el(document,'section',{className:'beat-work-hud',attributes:{'aria-label':'Работа над битом'}}),nodes={};
@@ -11,9 +16,10 @@ export function createBeatWorkPanel(document,{onCancel=()=>{},onEnableAudio=()=>
  const head=el(document,'div',{className:'beat-work-head'}),title=node('title','h2'),stage=node('stage','span','beat-work-stage'),time=node('time','span','beat-work-time');
  const kindLabel=node('kind','span','beat-work-kind');head.append(kindLabel,time,title);
  const stageCard=el(document,'div',{className:'beat-work-stage-card'}),stageHead=el(document,'div',{className:'beat-work-stage-head'}),stageIndex=node('stage-index','span');stageHead.append(el(document,'span',{text:'ТЕКУЩИЙ ЭТАП'}),stageIndex);stageCard.append(stageHead,stage);
- const overall=node('overall','progress');overall.max=1;overall.setAttribute('aria-label','Общая готовность');
- const overallLabel=node('overall-label','span','beat-work-overall-label');
- const progress=node('progress','progress');progress.max=1;progress.setAttribute('aria-label','Работа над битом');
+ const progressNode=role=>{const n=node(role,'div','beat-work-progress');n.append(el(document,'span',{className:'beat-work-progress-fill'}));n.setAttribute('role','progressbar');n.setAttribute('aria-valuemin','0');n.setAttribute('aria-valuemax','100');return n;};
+ const overall=progressNode('overall');overall.max=1;overall.setAttribute('aria-label','Общая готовность');
+ const overallLabel=node('overall-label','div','beat-work-overall-label'),overallNumber=node('overall-number','strong');overallLabel.append(el(document,'span',{text:'Общая готовность'}),overallNumber);
+ const progress=progressNode('progress');progress.max=1;progress.setAttribute('aria-label','Работа над битом');
  const details=el(document,'div',{className:'beat-work-details'}),skill=node('skill','span'),reward=node('reward','strong','beat-work-reward');reward.hidden=true;
  const minutes=node('minutes','span');details.append(reward);const progressLabel=el(document,'div',{className:'beat-work-progress-label'});progressLabel.append(el(document,'span',{text:'Прогресс этапа'}),minutes);stageCard.append(progressLabel,progress);
  const training=el(document,'div',{className:'beat-work-training'});
@@ -24,36 +30,36 @@ export function createBeatWorkPanel(document,{onCancel=()=>{},onEnableAudio=()=>
  const needs=el(document,'div',{className:'beat-work-needs'});
  for(const [key,label]of [['satiety','Сытость'],['energy','Энергия']]){
   const row=el(document,'label'),bar=node(key,'meter');bar.min=0;bar.max=100;bar.low=25;bar.high=70;bar.optimum=100;bar.setAttribute('aria-label',label);
-  row.append(el(document,'span',{text:label}),bar,node(key+'-value','span'));needs.append(row);
+  const text=el(document,'span',{className:'beat-work-need-label'});text.append(workIcon(document,key),el(document,'span',{text:label}));row.append(text,bar,node(key+'-value','span'));needs.append(row);
  }
  const foot=el(document,'div',{className:'beat-work-foot'}),audioStatus=node('audio','span','beat-work-audio'),enable=button(document,'Включить звук',{},onEnableAudio),cancel=button(document,'Прервать работу',{},onCancel);
- foot.append(audioStatus,enable,cancel);root.append(head,stageCard,overallLabel,overall,details,training,needs,foot);
+ foot.append(workIcon(document,'audio'),audioStatus,enable,cancel);root.append(head,stageCard,overallLabel,overall,details,training,needs,foot);
  return {element:root,update({beat,job,recordingShot,chainProgress,needs:values={},skill:level=0,genreProgress,clockLabel='',reward:earned=0,finished=false,audioError='',audioNotice='',needsGesture=false}={}){
   const recordingScreen=recordingShot?.phase==='screen';
   root.dataset.recordingPhase=recordingShot?.phase??'';
   root.style.zIndex=recordingScreen?'45':'';root.style.left=recordingScreen?'auto':'';root.style.right=recordingScreen?'24px':'';
   details.hidden=needs.hidden=recordingScreen;
-  overall.hidden=overallLabel.hidden=!chainProgress;overall.value=chainProgress?.overall??0;
-  overallLabel.textContent='Общая готовность · '+Math.round(overall.value*100)+'% · '+((chainProgress?.index??0)+1)+' / 3';
+  overall.hidden=overallLabel.hidden=!chainProgress;setProgress(overall,chainProgress?.overall??0);
+  overallNumber.textContent=Math.round(overall.value*100)+'%';
   const writing=beat?.kind==='lyrics',stages=writing?LYRIC_STAGES:BEAT_STAGES,extra=writing&&job?.kind!=='stage'?({diss:'Диссовая часть',story:'Сюжетный куплет',chorus:'Припев',adapt:'Адаптация под бит',refine:'Доработка текста'})[job?.kind]:null;
   const vocal=job?.output?.draft?VOCAL_STAGES[job.kind]:null;
   title.textContent=beat?.name??'Работа над битом';stage.textContent=vocal?.name??extra??(stages[job?.stage??0]?.name??'Работа');stageIndex.textContent=((job?.stage??chainProgress?.index??0)+1)+' / 3';kindLabel.textContent=writing?'РАБОТА НАД ТЕКСТОМ':vocal?'ЗАПИСЬ И СВЕДЕНИЕ':'РАБОТА НАД ТРЕКОМ';
   root.setAttribute('aria-label',writing?'Работа над текстом':'Работа над битом');progress.setAttribute('aria-label',writing?'Работа над текстом':'Работа над битом');
   if(vocal){root.setAttribute('aria-label',vocal.name);progress.setAttribute('aria-label',vocal.name);}
-  time.textContent=clockLabel;progress.value=Math.min(1,Math.max(0,(job?.elapsed??0)/(job?.total||1)));
+  time.textContent=clockLabel;setProgress(progress,Math.min(1,Math.max(0,(job?.elapsed??0)/(job?.total||1))));
   const complete=finished||earned>0,label=writing?'Письмо':vocal?(vocal.skill==='flow'?'Флоу':'Звук'):'Битмейкинг';
   const value=trainingLevel(level),next=Math.min(100,Math.floor(value)+1),hint=value===100?'максимум':'до '+next;
   bar.min=Math.min(99,Math.floor(value));bar.max=next;bar.value=value;
   bar.setAttribute('aria-label',label);bar.setAttribute('aria-valuetext','Уровень '+formatLevel(value)+' из 100 · '+hint);
-  skill.textContent=label+' \n'+formatLevel(value)+' → '+(value===100?'максимум':next)+' · '+hint;
-  nodes['skill-gain'].textContent='+'+formatLevel(value-trainingLevel(job?.skill??level))+' за этап';
+  skill.textContent=label+'\n'+formatLevel(value)+' → '+(value===100?'максимум':next);
+  nodes['skill-gain'].textContent='+'+formatLevel(value-trainingLevel(job?.skill??level))+'\nза этап';
   if(genreProgress&&!writing&&!vocal){
    if(!genreRow.parentNode)training.append(genreRow);
    const xp=trainingLevel(genreProgress.xp),cap=genreProgress.cap===100?100:75;
    genreBar.min=Math.min(cap-1,Math.floor(xp));genreBar.max=Math.min(cap,Math.floor(xp)+1);genreBar.value=xp;
    genreBar.setAttribute('aria-label','Жанр '+genreProgress.name);genreBar.setAttribute('aria-valuetext',xp.toFixed(2)+' из '+cap);
-   genreLabel.textContent=genreProgress.name+' '+xp.toFixed(2)+' / '+cap;
-   genreGain.textContent='+'+formatLevel(xp-trainingLevel(job?.genreSkill??xp))+' за этап';
+   genreLabel.textContent=genreProgress.name+'\n'+xp.toFixed(2)+' / '+cap;
+   genreGain.textContent='+'+formatLevel(xp-trainingLevel(job?.genreSkill??xp))+'\nза этап';
   }else genreRow.remove();
   reward.hidden=!complete;reward.textContent=complete?(earned>0?'Практика +'+formatLevel(earned)+' · этап завершён':'Этап завершён · навык на максимуме'):'';
   nodes.minutes.textContent=Math.floor(job?.elapsed??0)+' / '+(job?.total??0)+' мин';

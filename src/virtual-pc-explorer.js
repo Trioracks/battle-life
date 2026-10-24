@@ -1,11 +1,11 @@
-import {PC_IDENTITY} from './pc-identity.js?rev=58';
-import {diskUsage} from './virtual-pc-state.js?rev=58';
-import {formatDiskGb,diskAmount} from './virtual-pc-disk-view.js?rev=58';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=58';
-import {SOFTWARE} from './pc-software-catalog.js?rev=58';
-import {AUDIO_EXPORT_KINDS} from './pc-audio-exports.js?rev=58';
-import {gameDateTimeLabel} from './home-calendar.js?rev=58';
-import {pcFileEntries} from './pc-filesystem.js?rev=58';
+import {PC_IDENTITY} from './pc-identity.js?rev=59';
+import {diskUsage} from './virtual-pc-state.js?rev=59';
+import {formatDiskGb,diskAmount} from './virtual-pc-disk-view.js?rev=59';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=59';
+import {SOFTWARE} from './pc-software-catalog.js?rev=59';
+import {AUDIO_EXPORT_KINDS} from './pc-audio-exports.js?rev=59';
+import {gameDateTimeLabel} from './home-calendar.js?rev=59';
+import {pcFileEntries} from './pc-filesystem.js?rev=59';
 export const EXPLORER_PATHS=Object.freeze({
   computer:{label:'Мой компьютер',address:'Мой компьютер',parent:null,iconId:'computer'},
   disk:{label:'Локальный диск (C:)',address:'C:\\',parent:'computer',iconId:'disk'},

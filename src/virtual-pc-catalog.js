@@ -1,9 +1,9 @@
-import {COMMUNITY_BOARDS,COMMUNITY_TOPICS,communityDay} from './underweb-community.js?rev=58';
-import {newsIssue,archiveForDay} from './underweb-news.js?rev=58';
-import {resolveSocialRoute} from './social-routing.js?rev=58';
-import {SOCIAL_COMMUNITIES} from './social-catalog.js?rev=58';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=58';
-import {FORUM_ARCHIVE_BOARDS,archiveTopicsForDay,archiveTopicForDay} from './underweb-forum-archive.js?rev=58';
+import {COMMUNITY_BOARDS,COMMUNITY_TOPICS,communityDay} from './underweb-community.js?rev=59';
+import {newsIssue,archiveForDay} from './underweb-news.js?rev=59';
+import {resolveSocialRoute} from './social-routing.js?rev=59';
+import {SOCIAL_COMMUNITIES} from './social-catalog.js?rev=59';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=59';
+import {FORUM_ARCHIVE_BOARDS,archiveTopicsForDay,archiveTopicForDay} from './underweb-forum-archive.js?rev=59';
 const apps = Object.freeze([
   {id:'rap-dossier',label:'Рэп-досье',iconId:'dossier',description:'Карточки людей, источники и наблюдения'},
   { id: 'computer', label: 'Мой компьютер', iconId: 'computer', description: 'Диск C: и Мои проекты' },
