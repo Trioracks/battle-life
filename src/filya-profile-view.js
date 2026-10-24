@@ -1,6 +1,6 @@
-import {FILYA_PROFILE,FILYA_CARDS} from './filya-catalog.js?rev=58';
-import {filyaPublicPosts} from './filya-calendar.js?rev=58';
-import {createMusicianProfileView} from './musician-profile-view.js?rev=58';
+import {FILYA_PROFILE,FILYA_CARDS} from './filya-catalog.js?rev=59';
+import {filyaPublicPosts} from './filya-calendar.js?rev=59';
+import {createMusicianProfileView} from './musician-profile-view.js?rev=59';
 export function createFilyaProfileView(d,options){
  const state=options.getState(),now=options.getMetadata().gameMinutes??state.socialRuntime?.lastMinute??0;
  const posts=filyaPublicPosts(state,now),ids=new Set(posts.map(p=>p.cardId));

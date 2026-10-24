@@ -1,9 +1,9 @@
-import { STAT_KEYS, validateAllocations } from './creator.js?rev=58';
-import {normalizeVoiceId} from './vocal-catalog.js?rev=58';
-import {createWardrobe,validWardrobe,canWear} from './home-wardrobe.js?rev=58';
-import {closedFootwearId,migrateClosedFootwear,reserveFootwearBackup} from './avatar-footwear-migration.js?rev=58';
+import { STAT_KEYS, validateAllocations } from './creator.js?rev=59';
+import {normalizeVoiceId} from './vocal-catalog.js?rev=59';
+import {createWardrobe,validWardrobe,canWear} from './home-wardrobe.js?rev=59';
+import {closedFootwearId,migrateClosedFootwear,reserveFootwearBackup} from './avatar-footwear-migration.js?rev=59';
 
-export { STAT_KEYS, statLabels as STAT_LABELS } from './creator.js?rev=58';
+export { STAT_KEYS, statLabels as STAT_LABELS } from './creator.js?rev=59';
 
 function category(label, options) {
   return Object.freeze({

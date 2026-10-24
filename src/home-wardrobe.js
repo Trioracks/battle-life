@@ -1,4 +1,4 @@
-import {APPEARANCE_OPTIONS,normalizeAppearance} from './avatar-v3-profile.js?rev=58';
+import {APPEARANCE_OPTIONS,normalizeAppearance} from './avatar-v3-profile.js?rev=59';
 
 export const WARDROBE_STYLES=Object.freeze(['hair','beard','mustache']);
 export const WARDROBE_CLOTHING=Object.freeze(['top','bottom','footwear']);

@@ -1,9 +1,9 @@
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=58';
-import {AUDIO_EXPORT_KINDS} from './pc-audio-exports.js?rev=58';
-import {mountPcFilePicker} from './pc-file-picker-view.js?rev=58';
-import {startExportJob,cancelExportJob} from './pc-export-job.js?rev=58';
-import {EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=58';
-import {gameDateTimeLabel} from './home-calendar.js?rev=58';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=59';
+import {AUDIO_EXPORT_KINDS} from './pc-audio-exports.js?rev=59';
+import {mountPcFilePicker} from './pc-file-picker-view.js?rev=59';
+import {startExportJob,cancelExportJob} from './pc-export-job.js?rev=59';
+import {EXPLORER_PATHS} from './virtual-pc-explorer.js?rev=59';
+import {gameDateTimeLabel} from './home-calendar.js?rev=59';
 
 export function mountAudioExport(root,{getState,projectId,getMetadata=()=>({}),onCommit,onClose=()=>{}}){
  const d=root.ownerDocument,form=el(d,'form'),kind=el(d,'select',{attributes:{'aria-label':'Вид аудиофайла'}}),format=el(d,'select',{attributes:{'aria-label':'Формат аудиофайла'}}),notice=el(d,'p',{className:'ft-warning',attributes:{role:'status'}}),facts=el(d,'p',{className:'ft-production-note'}),progress=el(d,'section',{className:'ft-export-progress',attributes:{'aria-label':'Экспорт аудио'}}),bar=el(d,'progress'),percent=el(d,'strong'),filename=el(d,'p');

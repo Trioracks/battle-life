@@ -20,7 +20,7 @@ function setup(state=createVirtualPcState(),metadata={skills:{beatmaking:10},gam
 test('FT project picker excludes notebook documents while keeping legacy music projects',()=>{
  let state=createLyric(createVirtualPcState({projects:[createStudioProject({id:'legacy',name:'Старый бит',battleId:'concrete-echo'}).project]}),{id:'text',name:'Не музыка'}).state;
  const s=setup(state);findButton(s.root,'Открыть проект').click();
- const picker=allPc(s.root).find(n=>n.className==='pc-file-picker'),rows=allPc(picker).filter(n=>n.dataset.fileId),labels=rows.map(n=>n.textContent);
+ const picker=allPc(s.root).find(n=>n.className?.split(' ').includes('pc-file-picker')),rows=allPc(picker).filter(n=>n.dataset.fileId),labels=rows.map(n=>n.getAttribute('aria-label'));
  assert.equal(rows.length,1);assert.match(labels[0],/Старый бит.flp/);assert.ok(labels.every(x=>!x.includes('Не музыка')));rows[0].click();findButton(picker,'Открыть').click();assert.ok(allPc(s.root).some(n=>n.textContent==='Старый бит'));s.view.dispose();
 });
 test('manual duplicate beat names offer a new variant and the searchable picker keeps input across state updates',()=>{
@@ -112,7 +112,7 @@ test('project menu reads fresh state, Escape closes dialog and traps Tab',()=>{
  const buttons=allPc(dialog).filter(n=>n.tagName==='BUTTON');buttons.at(-1).focus();fire(dialog,'keydown',{key:'Tab'});assert.equal(s.d.activeElement,buttons[0]);
  s.state={...s.state,music:{...s.state.music,cash:1234,needs:{satiety:91,energy:82}}};findButton(s.root,'Открыть проект').click();
  assert.equal(s.state.music.cash,1234);assert.equal(s.state.music.needs.energy,82);
- fire(allPc(s.root).find(n=>n.className==='pc-file-picker'),'keydown',{key:'Escape'});assert.equal(allPc(s.root).some(n=>n.className==='pc-file-picker'),false);s.view.dispose();
+ fire(allPc(s.root).find(n=>n.className?.split(' ').includes('pc-file-picker')),'keydown',{key:'Escape'});assert.equal(allPc(s.root).some(n=>n.className?.split(' ').includes('pc-file-picker')),false);s.view.dispose();
 });
 test('Explorer selection survives delayed launch and a later normal launch still shows menu',()=>{
  const d=pcDocument(),root=d.createElement('section');let launch;

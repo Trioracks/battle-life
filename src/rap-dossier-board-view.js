@@ -1,5 +1,5 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=58';
-import {socialButton} from './social-dom.js?rev=58';
+import {pcElement as el} from './virtual-pc-dom.js?rev=59';
+import {socialButton} from './social-dom.js?rev=59';
 const labels={battle:'ДЕЛО',round:'РАУНД',judge:'СУДЬЯ',opponent:'СОПЕРНИК',track:'ЗАПИСЬ',forecast:'ПРЕДПОЛОЖЕНИЕ',person:'ЧЕЛОВЕК'};
 export function forecastText(f){return f?.range?f.range.map(n=>Math.round(n)).join('–')+' · ориентир':f?.comparison?.text??'Пока не хватает наблюдений';}
 // Fixed columns, ordered rows, and a dedicated note under its recording. This

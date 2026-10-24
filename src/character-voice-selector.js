@@ -1,4 +1,4 @@
-import {VOICE_PACKS,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=58';
+import {VOICE_PACKS,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=59';
 
 // Native select supplies keyboard and screen-reader interaction. Selection is silent.
 export function mountVoiceSelector(select){

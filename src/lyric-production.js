@@ -1,15 +1,15 @@
 // Persisted, symbolic writing: no copyrighted lyrics or generated prose.
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=58';
-import {BEAT_RULES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=58';
-import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=58';
-import {softwareDiskBytes} from './pc-software.js?rev=58';
-import {homeDateLabel} from './home-calendar.js?rev=58';
-import {lyricOutcomes,normalizeProductionOutcome} from './production-outcomes.js?rev=58';
-import {chooseTrackReferences,STARTING_REFERENCE_TOPICS,REFERENCE_CATALOG} from './cultural-references.js?rev=58';
-import {normalizeContentMix,createAutomaticContentMix,redistributeContentMix,CONTENT_POLICY_VERSION} from './text-content-mix.js?rev=58';
-import {currentRoundTopic} from './round-topics.js?rev=58';
-import {ROUND_LABELS} from './battle-results-table.js?rev=58';
-import {distinctProjectName} from './beat-names.js?rev=58';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=59';
+import {BEAT_RULES,RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=59';
+import {normalizeBeat,normalizeMusic,workBlockReason} from './beat-production.js?rev=59';
+import {softwareDiskBytes} from './pc-software.js?rev=59';
+import {homeDateLabel} from './home-calendar.js?rev=59';
+import {lyricOutcomes,normalizeProductionOutcome} from './production-outcomes.js?rev=59';
+import {chooseTrackReferences,STARTING_REFERENCE_TOPICS,REFERENCE_CATALOG} from './cultural-references.js?rev=59';
+import {normalizeContentMix,createAutomaticContentMix,redistributeContentMix,CONTENT_POLICY_VERSION} from './text-content-mix.js?rev=59';
+import {currentRoundTopic} from './round-topics.js?rev=59';
+import {ROUND_LABELS} from './battle-results-table.js?rev=59';
+import {distinctProjectName} from './beat-names.js?rev=59';
 
 export const LYRIC_STAGES=Object.freeze([
  {name:'Общее создание',sliders:['Ясность мысли','Развитие темы','Личное отношение'],target:[8,7,6]},

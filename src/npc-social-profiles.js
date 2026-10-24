@@ -1,13 +1,13 @@
-import {DEMO_PARTICIPANTS,battleCharacter} from './battle-demo-config.js?rev=58';
-import {JUDGE_PROFILES} from './judge-profiles.js?rev=58';
-import {APPEARANCE_OPTIONS,normalizeAppearance} from './avatar-v3-profile.js?rev=58';
-import {seededLottery,battleRandom} from './battle-seeding.js?rev=58';
-import {beatResultSeed} from './beat-result.js?rev=58';
-import {publicBattleHistory} from './battle-history.js?rev=58';
-import {profileAccess} from './social-profile-policy.js?rev=58';
-import {publicRoundAnnouncements} from './round-topics.js?rev=58';
-import {npcPhoto,npcLifePhoto} from './battle-content-assets.js?rev=58';
-import {npcLifeStory} from './social-life-stories.js?rev=58';
+import {DEMO_PARTICIPANTS,battleCharacter} from './battle-demo-config.js?rev=59';
+import {JUDGE_PROFILES} from './judge-profiles.js?rev=59';
+import {APPEARANCE_OPTIONS,normalizeAppearance} from './avatar-v3-profile.js?rev=59';
+import {seededLottery,battleRandom} from './battle-seeding.js?rev=59';
+import {beatResultSeed} from './beat-result.js?rev=59';
+import {publicBattleHistory} from './battle-history.js?rev=59';
+import {profileAccess} from './social-profile-policy.js?rev=59';
+import {publicRoundAnnouncements} from './round-topics.js?rev=59';
+import {npcPhoto,npcLifePhoto} from './battle-content-assets.js?rev=59';
+import {npcLifeStory} from './social-life-stories.js?rev=59';
 const clone=v=>structuredClone(v),record=v=>v&&typeof v==='object'&&!Array.isArray(v);
 const personalIds=new Set(seededLottery(DEMO_PARTICIPANTS.map(p=>p.characterId),'social-personal-v2').slice(0,6)),judgeIds=new Set(JUDGE_PROFILES.map(j=>j.id)),participantIds=new Set(DEMO_PARTICIPANTS.map(p=>p.characterId));
 function createTemplate(characterId){

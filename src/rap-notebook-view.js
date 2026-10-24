@@ -1,16 +1,16 @@
 // Notepad-style view of the persisted symbolic lyric projects.
-import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=58';
-import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill,canEditLyricContentMix,setLyricContentMix,lyricRefinementReason} from './lyric-production.js?rev=58';
-import {randomBeatName} from './beat-names.js?rev=58';
-import {mountProjectPicker} from './project-picker-view.js?rev=58';
-import {normalizeBeat} from './beat-production.js?rev=58';
-import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=58';
-import {savePcDocument,openPcDocument,pcFileById} from './pc-filesystem.js?rev=58';
-import {documentSession,documentIsDirty} from './pc-document-session.js?rev=58';
-import {mountPcFilePicker} from './pc-file-picker-view.js?rev=58';
-import {explorerPaths} from './virtual-pc-explorer.js?rev=58';
-import {createDocumentGuard} from './pc-document-guard.js?rev=58';
-import {battleDocumentName} from './battle-document-name.js?rev=58';
+import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=59';
+import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill,canEditLyricContentMix,setLyricContentMix,lyricRefinementReason} from './lyric-production.js?rev=59';
+import {randomBeatName} from './beat-names.js?rev=59';
+import {mountProjectPicker} from './project-picker-view.js?rev=59';
+import {normalizeBeat} from './beat-production.js?rev=59';
+import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=59';
+import {savePcDocument,openPcDocument,pcFileById} from './pc-filesystem.js?rev=59';
+import {documentSession,documentIsDirty} from './pc-document-session.js?rev=59';
+import {mountPcFilePicker} from './pc-file-picker-view.js?rev=59';
+import {explorerPaths} from './virtual-pc-explorer.js?rev=59';
+import {createDocumentGuard} from './pc-document-guard.js?rev=59';
+import {battleDocumentName} from './battle-document-name.js?rev=59';
 
 export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,onCommit=onChange,onWork=()=>false}={}){
  const d=root.ownerDocument;let panel=null,modal=null,filePicker=null,returnFocusLabel='',message='',saveMessage='Черновик не сохранён в файл',saveFailed=false,signature=[],disposed=false,controls=[],needsLabel=null;
@@ -128,7 +128,7 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
    }else {
     const actions=el(d,'section',{className:'rn-actions',attributes:{'aria-label':'Доработка текста'}}),refinement=el(d,'div',{className:'rn-action-group'}),adaptation=el(d,'div',{className:'rn-action-group'}),reason=lyricRefinementReason(s,p,getMetadata().skills),busy=Boolean(job||s.music.job||s.recording?.job),refine=button(d,'Доработать текст',{className:'rn-primary rn-refine-button',attributes:{'aria-label':'Доработать'}},()=>start('refine')),adapt=button(d,'Адаптировать под бит',{className:'rn-adapt-button',attributes:{'aria-label':'Адаптировать под бит'}},()=>openPanel('adapt'));
     refine.disabled=Boolean(reason||busy);adapt.disabled=busy||p.adaptationCount>=3;if(reason)refine.setAttribute('title',reason);
-    refinement.append(el(d,'small',{text:'60 мин · до +2 к качеству'}),refine,el(d,'small',{text:'Использовано '+p.refinementCount+' из 3 доработок'}));if(reason)refinement.append(el(d,'small',{className:'rn-action-reason',text:reason}));adaptation.append(el(d,'small',{text:'Ритм и подача'}),adapt,el(d,'small',{text:'Использовано '+p.adaptationCount+' из 3 адаптаций'}));actions.append(refinement,adaptation);side.append(actions);
+    refinement.append(el(d,'small',{text:'60 мин · до +2 к качеству'}),refine,el(d,'small',{text:'Использовано '+p.refinementCount+' из 3 доработок'}));if(reason)refinement.append(el(d,'small',{className:'rn-action-reason',text:reason}));adaptation.append(el(d,'small',{text:'Ритм и подача'}),adapt,el(d,'small',{text:'Использовано '+p.adaptationCount+' из 3 адаптаций'}));actions.append(refinement,adaptation);side.append(actions,beat,facts,budget);
     const extras=el(d,'div',{className:'rn-extra-actions'}),add=button(d,'Добавить',{className:'rn-add-button'},()=>openPanel('add'));add.disabled=busy;
     extras.append(add);
     if(job?.projectId===p.id)extras.append(button(d,'Продолжить работу',{},()=>start(job.kind,{beatId:job.beatId})));side.append(extras);

@@ -1,10 +1,10 @@
-import {GOBLIN_ID,GOBLIN_NAME,normalizeGoblin} from './goblin-catalog.js?rev=58';
-import {receivePhoneEvents} from './phone-notifications.js?rev=58';
-import {validGameMinute} from './game-minute.js?rev=58';
-import {battleStage,battleStageText} from './battle-stage.js?rev=58';
-import {SOFTWARE} from './pc-software-catalog.js?rev=58';
+import {GOBLIN_ID,GOBLIN_NAME,normalizeGoblin} from './goblin-catalog.js?rev=59';
+import {receivePhoneEvents} from './phone-notifications.js?rev=59';
+import {validGameMinute} from './game-minute.js?rev=59';
+import {battleStage,battleStageText} from './battle-stage.js?rev=59';
+import {SOFTWARE} from './pc-software-catalog.js?rev=59';
 const battleLink={label:'Макаревич Battle',url:'underweb://social/community/makarevich-1'};
-const hash=value=>{let h=2166136261;for(const c of String(value))h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0;};
+export const goblinTypingSeconds=message=>Math.max(1,Array.from(message.body??'').length)/3;
 export function goblinReplyContext(state,nowMinute=state.socialRuntime?.lastMinute??state.lastGameMinute??0){
  const g=state.social?.goblin??{},stage=g.stage,choices=[],used=new Set(g.contextUsed??[]),messages=state.social?.dialogs?.[GOBLIN_ID]?.messages??[],seen=id=>messages.some(m=>m.id==='goblin:'+id);
  const add=(id,label,condition=true)=>{if(condition&&!used.has(stage+':'+id))choices.push([id,label]);};
@@ -64,9 +64,10 @@ export function deliverGoblinMessage(g,dialog,msg,at){
 }
 export function advanceGoblinActiveChat(input,{nowMinute,activeSeconds,visible,powered,paused}={}){
  if(!validGameMinute(nowMinute)||!Number.isFinite(activeSeconds)||activeSeconds<=0||!visible||!powered||paused||!input.social?.goblin?.pending?.length)return {state:input,events:[],changed:false};
- const g=normalizeGoblin(input.social.goblin),dialog=structuredClone(input.social.dialogs?.[GOBLIN_ID]??{peer:{kind:'person',id:GOBLIN_ID},messages:[],unread:false}),events=[];let budget=Math.min(3,activeSeconds);
+ const g=normalizeGoblin(input.social.goblin),dialog=structuredClone(input.social.dialogs?.[GOBLIN_ID]??{peer:{kind:'person',id:GOBLIN_ID},messages:[],unread:false}),events=[];let budget=activeSeconds;
+ g.pending.sort((a,b)=>a.at-b.at);
  for(let count=0;count<16&&budget>0&&g.pending.length;count++){
-  const msg=g.pending.sort((a,b)=>a.at-b.at)[0],total=1+hash(msg.id)%3,elapsed=Math.max(0,Math.min(total,Number.isFinite(msg.activeElapsedSeconds)?msg.activeElapsedSeconds:0)),spent=Math.min(budget,total-elapsed);msg.activeElapsedSeconds=elapsed+spent;budget-=spent;
+  const msg=g.pending[0],total=goblinTypingSeconds(msg),elapsed=Math.max(0,Math.min(total,Number.isFinite(msg.activeElapsedSeconds)?msg.activeElapsedSeconds:0)),spent=Math.min(budget,total-elapsed);msg.activeElapsedSeconds=elapsed+spent;budget-=spent;
   if(msg.activeElapsedSeconds<total-1e-8)break;g.pending=g.pending.filter(m=>m.id!==msg.id);const event=deliverGoblinMessage(g,dialog,msg,nowMinute);if(event)events.push(event);
  }
  return {state:{...input,social:{...input.social,goblin:g,dialogs:{...input.social.dialogs,[GOBLIN_ID]:dialog}},phone:receivePhoneEvents(input.phone,events)},events,changed:true};
@@ -74,9 +75,13 @@ export function advanceGoblinActiveChat(input,{nowMinute,activeSeconds,visible,p
 export function goblinFollowupPlan(state,now){
  const g=state.social?.goblin;if(g?.startedAt==null||['new','greeting-wait','hello','invite-wait','invite','subscribe','client','software','paused'].includes(g.stage))return {messages:[],seen:g?.followupSeen??[],lastSmallTalkAt:g?.lastSmallTalkAt??null,changed:false};
  const seen=new Set(g.followupSeen??[]),messages=[],applications=new Set(state.battleApplications?.map(a=>a.battleId)),candidate=[];
- for(const s of state.battleSubmissions??[])if(!s.issue&&s.id&&Number.isFinite(s.sentAt)&&s.sentAt<=now)candidate.push({id:'submitted:'+s.id,at:s.sentAt,body:'Ну что, сдал? Вижу, работа ушла. Выдыхай пока) Когда судьи закончат, посмотрим оценки и подумаем, что подтянуть.',links:[battleLink]});
+ const communityLink=id=>({label:'Сообщество баттла',url:'underweb://social/community/'+id});
+ for(const s of state.battleSubmissions??[])if(!s.issue&&s.id&&Number.isFinite(s.sentAt)&&s.sentAt<=now)candidate.push({id:'submitted:'+s.id,at:s.sentAt,body:'Ну что, сдал? Вижу, работа ушла. Выдыхай пока) Когда судьи закончат, посмотрим оценки и подумаем, что подтянуть.',links:[communityLink(s.battleId)]});
  for(const e of state.socialRuntime?.events??[])if(applications.has(e.battleId)&&e.dueAt<=now&&e.type==='round-result')candidate.push({id:e.id,at:e.dueAt,mandatory:true,body:'О, оценки уже выложили. Смотрел свои? Открой таблицу раунда, там у судей ещё комментарии бывают.',links:[{label:'Таблица раунда',url:'underweb://social/results/'+e.battleId+'/'+e.roundId}]});
- for(const w of state.battleWindows??[])if(applications.has(w.battleId)&&now>=w.closesAt-4320&&now<w.closesAt-2880)candidate.push({id:'deadline:'+w.id,at:w.closesAt-4320,body:'Чувак, через три дня приём закроется. Как твой трек? Если уже сдал — хорошо, если ещё пишешь, оставь время на экспорт и отправку.',links:[battleLink]});
+ for(const w of state.battleWindows??[])if(applications.has(w.battleId)){
+  if(now>=w.closesAt-4320&&now<w.closesAt-2880)candidate.push({id:'deadline:'+w.id,at:w.closesAt-4320,body:'Чувак, через три дня приём закроется. Как твой трек? Если уже сдал — хорошо, если ещё пишешь, оставь время на экспорт и отправку.',links:[communityLink(w.battleId)]});
+  if(now>=w.closesAt&&now<w.closesAt+2880){const stage=battleStage(state,{battleId:w.battleId,roundId:w.roundId,nowMinute:now});if(stage.kind==='judging')candidate.push({id:'judging:'+w.id,at:w.closesAt,body:'Всё, приём закрыли. '+battleStageText(stage)+'. Теперь ждём судей. Как сам оцениваешь свой трек?',links:[{label:'Таблица раунда',url:stage.tableUrl}]});}
+ }
  let changed=false;for(const e of candidate.filter(e=>!seen.has(e.id)).sort((a,b)=>Number(Boolean(b.mandatory))-Number(Boolean(a.mandatory))||b.at-a.at)){
   if(e.mandatory&&(messages.length||g.pending.some(m=>m.at>now&&m.followupId&&!m.followupId.startsWith('chat:'))))continue;
   seen.add(e.id);changed=true;if(!messages.length&&(e.mandatory||now-e.at<2880))messages.push({id:'follow:'+e.id,at:now+10,body:e.body,links:e.links,followupId:e.id});

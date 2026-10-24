@@ -1,4 +1,4 @@
-import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=58';
+import {pcElement as el,pcButton as button} from './virtual-pc-dom.js?rev=59';
 export function socialFeedPage(posts,{visibleCount=3,increment=10,pinnedId}={}){
  const available=posts.filter(p=>p.id!==pinnedId),count=Number.isSafeInteger(visibleCount)&&visibleCount>0?visibleCount:3,step=Number.isSafeInteger(increment)&&increment>0?increment:10;
  return {items:available.slice(0,count),hasMore:available.length>count,nextVisibleCount:Math.min(available.length,count+step)};

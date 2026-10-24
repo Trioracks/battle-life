@@ -1,4 +1,4 @@
-import {battleFormat} from './battle-format.js?rev=58';
+import {battleFormat} from './battle-format.js?rev=59';
 const clone=v=>JSON.parse(JSON.stringify(v));
 export function normalizeBattleKnowledge(raw){
  const byRound={};

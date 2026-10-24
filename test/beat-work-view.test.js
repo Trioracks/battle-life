@@ -11,7 +11,7 @@ test('chain panel separates overall progress from current stage',()=>{
  const panel=module.createBeatWorkPanel(pcDocument());
  panel.update({beat:{kind:'lyrics'},job:{stage:1,total:60,elapsed:30},chainProgress:{overall:.5,stage:.5,index:1,count:3}});
  const role=key=>allPc(panel.element).find(n=>n.dataset.workRole===key);
- assert.ok(role('overall'));assert.equal(role('overall').value,.5);assert.match(role('overall-label').textContent,/50%/);
+ assert.ok(role('overall'));assert.equal(role('overall').value,.5);assert.match(role('overall-number').textContent,/50%/);
  assert.equal(role('progress').value,.5);assert.match(role('stage-index').textContent,/2 \/ 3/);
 });
 test('panel shows actual progress, needs, skill and reward only after completion',()=>{
@@ -31,7 +31,7 @@ test('training exposes fractional beatmaking and stage gains without a genre met
  const panel=module.createBeatWorkPanel(pcDocument());
  const model={beat:{name:'Наш двор',genre:'boombap'},job:{stage:0,elapsed:30,total:60,skill:10,genreSkill:2},skill:10+1/6,genrePractice:2+1/6};
  panel.update(model);const role=key=>allPc(panel.element).find(n=>n.dataset.workRole===key);
- assert.match(role('skill').textContent,/10\.17.*до 11/);
+ assert.match(role('skill').textContent,/10\.17.*→ 11/);
  assert.equal(role('skill-progress').value,10+1/6);assert.equal(role('skill-progress').min,10);assert.equal(role('skill-progress').max,11);
  assert.equal(role('skill-progress').getAttribute('aria-label'),'Битмейкинг');
  assert.match(role('skill-progress').getAttribute('aria-valuetext'),/10\.17.*до 11/);
@@ -64,7 +64,7 @@ test('crossing a whole skill level starts the next interval while keeping the ac
  const role=key=>allPc(panel.element).find(n=>n.dataset.workRole===key);
  assert.equal(role('skill-progress').min,11);assert.equal(role('skill-progress').max,12);assert.equal(role('skill-progress').value,11.1);
  assert.ok(!role('genre-progress'));
- assert.match(role('skill').textContent,/11\.10.*до 12/);
+ assert.match(role('skill').textContent,/11\.10.*→ 12/);
  assert.match(role('skill-gain').textContent,/\+0\.20/);
 });
 

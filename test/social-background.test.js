@@ -6,10 +6,10 @@ import {createVirtualPcState,preparePcRuntimeState,preparePcSaveArchives,primePc
 import {advanceSocial,activateSocial} from '../src/social-runtime.js';
 import {blockAndRemoveFriend} from '../src/social-personal.js';
 
-function harness(initial=createVirtualPcState()){
+function harness(initial=createVirtualPcState(),getGoblinOnline){
  let state=preparePcRuntimeState(initial),saveOk=true,saves=0;const workers=[],errors=[];
  const storage={data:new Map(),getItem(k){return this.data.get(k)??null;},setItem(k,v){this.data.set(k,v);}};
- const runtime=createSocialBackground({getState:()=>state,createWorker:()=>{
+ const runtime=createSocialBackground({getState:()=>state,getGoblinOnline,createWorker:()=>{
   const calculate=createSocialWorkerRuntime(),worker={sent:[],terminated:false,postMessage(m){this.sent.push(structuredClone(m));},terminate(){this.terminated=true;},deliver(){const request=this.sent.shift();const response=structuredClone(calculate(request));this.onmessage?.({data:response});return response;}};workers.push(worker);return worker;
  },persist:(next,archives)=>{saves++;assert.equal(state.socialRuntime.events.some(e=>e.id==='personal:vitya:day1'),false,'events cannot appear optimistically');if(!saveOk)return false;primePcSaveArchives(storage,archives);return saveVirtualPcState(storage,next);},onState:next=>state=preparePcRuntimeState(next),onError:e=>errors.push(e)});
  return {runtime,workers,errors,storage,get state(){return state;},set state(v){state=v;},get saves(){return saves;},set saveOk(v){saveOk=v;},tick(t=600,ms=0,options={}){runtime.tick(t,options,ms);},deliver(){return workers.at(-1).deliver();}};
@@ -21,6 +21,18 @@ test('fractional walking frames queue one background job and coalesce unchanged 
  h.deliver();assert.equal(h.saves,1);assert.equal(h.state.socialRuntime.events.filter(e=>e.id==='personal:vitya:day1').length,1);
  h.tick(600.9,1000);assert.equal(h.workers[0].sent.length,0);
  h.tick(601.1,1001);assert.equal(h.workers[0].sent.length,1);assert.equal('trackVersions' in h.workers[0].sent[0].patch,false,'archives are not resent on each minute');
+});
+
+test('a presence change rejects an in-flight result and recalculates within the same minute',()=>{
+ for(const first of [true,false]){
+  const h=harness();h.tick(600,0,{goblinOnline:first});h.tick(600,10,{goblinOnline:!first});h.deliver();assert.equal(h.saves,0);
+  h.tick(600,300,{goblinOnline:!first});assert.equal(h.workers[0].sent.length,1);h.deliver();assert.equal(h.saves,1);
+  h.tick(600,600,{goblinOnline:first});assert.equal(h.workers[0].sent.length,1);h.runtime.dispose();
+ }
+});
+test('opening the chat between dispatch and the next frame invalidates offline delivery immediately',()=>{
+ let online=false;const h=harness(undefined,()=>online);h.tick(600,0);online=true;h.deliver();assert.equal(h.saves,0);
+ h.tick(600,300);assert.equal(h.workers[0].sent[0].options.goblinOnline,true);h.deliver();assert.equal(h.saves,1);h.runtime.dispose();
 });
 
 test('failed persistence latches without recalculation or publication until explicit retry',()=>{

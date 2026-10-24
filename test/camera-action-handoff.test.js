@@ -14,11 +14,17 @@ for(const dt of [1/24,1/60,1/144])for(const initial of ['2D','3D'])test(`bed to 
  until(()=>motion.phase==='return-in');let frames=0;
  until(()=>{if(motion.fade<1){assert.equal(camera.mode,'2D',motion.phase);frames++;}return motion.actionId==='computer'&&motion.phase==='perform';});assert.ok(frames>10);
 });
-test('computer entry uses the currently framed room camera; work return deliberately uses head camera',()=>{
+test('computer flights originate at the hero head in either room camera mode',()=>{
  assert.equal(typeof cameras.computerCameraSource,'function');const overview={},firstPerson={},head={};
- assert.equal(cameras.computerCameraSource({mode:'2D',overview,firstPerson,head}),overview);
- assert.equal(cameras.computerCameraSource({mode:'3D',overview,firstPerson,head}),firstPerson);
+ assert.equal(cameras.computerCameraSource({mode:'2D',overview,firstPerson,head}),head);
+ assert.equal(cameras.computerCameraSource({mode:'3D',overview,firstPerson,head}),head);
  assert.equal(cameras.computerCameraSource({mode:'2D',overview,firstPerson,head,fromHead:true}),head);
+});
+
+for(const dt of [1/24,1/60,1/144])test(`3D wake restores before the first visible standing frame at ${1/dt}fps`,()=>{
+ const motion=new ApartmentMotion(config),camera=new cameras.CameraModes();motion.startSleeping();for(const e of motion.drainEvents())camera.onMotionEvent(e);motion.wakeUp();
+ for(let n=0;n<100&&motion.phase!=='idle';n++){motion.tick(dt,true);for(const e of motion.drainEvents())camera.onMotionEvent(e);camera.onMotionState(motion);if(motion.clip==='idle'&&motion.phase==='return-in')assert.equal(camera.mode,'3D');}
+ assert.equal(camera.mode,'3D');
 });
 test('queued computer remembers the original room preference and restores it only under return blackout',async()=>{
  const modes=new cameras.CameraModes({initialMode:'3D'});modes.onMotionEvent({id:'bed',type:'started'});

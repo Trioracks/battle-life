@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createVirtualPcState} from '../src/virtual-pc-state.js';
 import {advanceGoblin} from '../src/goblin-mentor.js';
-import {goblinReplyContext} from '../src/goblin-conversation.js';
+import {goblinReplyContext,goblinFollowupPlan} from '../src/goblin-conversation.js';
 import {GOBLIN_ID} from '../src/goblin-catalog.js';
 import {applyToBattle} from '../src/virtual-pc-state.js';
 test('small talk is bounded to one message per 48 hours and never catches up a backlog after sleep',()=>{
@@ -19,4 +19,9 @@ test('mandatory round results survive a long sleep and deliver each result exact
  for(const [id,at]of [['selection',600],['round-1',700]])s.socialRuntime.events.push({id:'result:'+id,type:'round-result',battleId:'makarevich-1',roundId:id,dueAt:at});
  s=advanceGoblin(s,600+4320).state;s=advanceGoblin(createVirtualPcState(JSON.parse(JSON.stringify(s))),600+4440).state;s=advanceGoblin(s,600+4560).state;
  for(const id of ['selection','round-1'])assert.equal(s.social.dialogs[GOBLIN_ID].messages.filter(m=>m.followupId==='result:'+id).length,1);
+});
+test('judging starts produce one contextual follow-up linked to the corresponding battle',()=>{
+ let s=advanceGoblin(createVirtualPcState(),480).state;s.social.goblin.stage='finished';s.social.goblin.pending=[];s.social.goblin.lastSmallTalkAt=1000;s.battleApplications=[{battleId:'concrete-echo'}];s.battleWindows=[{id:'other-selection',battleId:'concrete-echo',roundId:'selection',opensAt:0,closesAt:1000,judgingOffsets:[4320]}];
+ const plan=goblinFollowupPlan(s,1000);assert.equal(plan.messages.length,1);assert.match(plan.messages[0].body,/Судейство отбора/);assert.equal(plan.messages[0].links[0].url,'underweb://social/results/concrete-echo/selection');
+ s=advanceGoblin(s,1000).state;s=advanceGoblin(s,1020).state;assert.equal(s.social.dialogs[GOBLIN_ID].messages.filter(m=>m.followupId==='judging:other-selection').length,1);assert.equal(goblinFollowupPlan(s,1030).messages.length,0);
 });

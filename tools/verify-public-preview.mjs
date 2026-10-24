@@ -1,44 +1,14 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import fs from 'node:fs/promises';
-import os from 'node:os';
 import path from 'node:path';
-import {fileURLToPath,pathToFileURL} from 'node:url';
-import {execFileSync} from 'node:child_process';
+import {pathToFileURL} from 'node:url';
 import {createServer} from 'node:http';
+import {validateQaOptions,inside,noLinks} from './public-preview-qa-options.mjs';
+export {validateQaOptions};
 import {startPreviewServer} from './serve-preview.mjs';
 import {decodePcSave} from '../src/pc-save-codec.js';
 
-const sourceRoot=fileURLToPath(new URL('../',import.meta.url));
-const inside=(base,target)=>{const relative=path.relative(base,target);return !relative||relative!=='..'&&!relative.startsWith('..'+path.sep)&&!path.isAbsolute(relative);};
-async function noLinks(target){
- let current=path.parse(target).root;
- for(const part of target.slice(current.length).split(path.sep).filter(Boolean)){
-  current=path.join(current,part);try{if((await fs.lstat(current)).isSymbolicLink())throw Error('Linked QA path: '+current);}catch(error){if(error.code!=='ENOENT')throw error;}
- }
-}
-export async function validateQaOptions(options={}){
- const {live=false,url,prefix='/battle-life/'}=options;
- if(['userDataDir','storageState','context','browser'].some(key=>key in options))throw Error('QA requires a fresh isolated context; profile reuse is forbidden');
- if(!/^\/(?:[a-zA-Z0-9_-]+\/)+$/.test(prefix))throw Error('Invalid QA prefix');
- if(url&&!live)throw Error('A supplied URL requires --live');
- if(live){const parsed=new URL(url);if(parsed.port==='4173')throw Error('Player port 4173 is forbidden');if(parsed.protocol!=='https:'||parsed.username||parsed.password||parsed.search||parsed.hash||parsed.pathname!==prefix)throw Error('Live QA requires an HTTPS URL with the exact prefix');}
- const root=path.resolve(options.root??path.join(sourceRoot,'dist/public-preview'));
- await noLinks(root);
- let manifest;
- try{
-  if(await fs.stat(path.join(root,'package.json')).then(()=>true,()=>false))throw Error('source');
-  await fs.access(path.join(root,'.nojekyll'));await fs.access(path.join(root,'index.html'));
-  manifest=JSON.parse(await fs.readFile(path.join(root,'release.json'),'utf8'));
- }catch{throw Error('QA root must be a built artifact, never the source root');}
- const expectedRevision=options.expectedRevision??execFileSync('git',['rev-parse','HEAD'],{cwd:sourceRoot,encoding:'utf8',windowsHide:true}).trim();
- if(!/^[a-f0-9]{40}$/.test(expectedRevision)||manifest.revision!==expectedRevision)throw Error('Artifact revision differs from expected revision');
- if(manifest.version!=='0.1.0-preview.1'||manifest.profile!=='public-preview')throw Error('Unexpected preview release metadata');
- const outputDir=path.resolve(options.outputDir??(process.platform==='win32'?'D:/Codex/Builds/Battle/public-preview-qa':path.join(os.tmpdir(),'battle-public-preview-qa')));
- if(inside(root,outputDir)||inside(sourceRoot,outputDir)||inside(outputDir,root)||inside(outputDir,sourceRoot))throw Error('QA output must be outside source and built artifact');
- await noLinks(outputDir);
- return {root,outputDir,manifest,expectedRevision,prefix,live,url};
-}
 export function responseViolation({url,status=200,contentType=''}){
  const pathname=decodeURIComponent(new URL(url).pathname);
  if(/\.(?:wav|wave|mp3|ogg|flac|m4a|aac|opus|aiff?|aifc|wma|midi?)(?:$|[?#])/i.test(pathname)||/^audio\//i.test(contentType))return 'binary audio';
@@ -243,13 +213,13 @@ export async function verifyPublicPreview(options={}){
    const currentRequests=[];context.on('request',request=>currentRequests.push(request.url()));
    await page.goto(cacheProbe.url,{timeout:60000});await page.locator('#loading').waitFor({state:'hidden'});await page.locator('#continue-game').click();await phase(page,'room');
    await page.waitForFunction(()=>document.body.dataset.mode==='game');
-   const until=Date.now()+30000;while(!currentRequests.some(url=>url.includes('social-worker.js?rev=58'))&&Date.now()<until)await page.waitForTimeout(100);
+   const until=Date.now()+30000;while(!currentRequests.some(url=>url.includes('social-worker.js?rev=59'))&&Date.now()<until)await page.waitForTimeout(100);
    const resources=currentRequests.filter(url=>/\.(?:js|css)(?:\?|$)/.test(url)&&!url.includes('/vendor/'));
-   assert.ok(resources.some(url=>url.includes('apartment-app.js?rev=58')));assert.ok(resources.some(url=>url.includes('.css?rev=58')));assert.ok(resources.some(url=>url.includes('social-worker.js?rev=58')));assert.ok(resources.every(url=>new URL(url).searchParams.get('rev')==='58'));
+   assert.ok(resources.some(url=>url.includes('apartment-app.js?rev=59')));assert.ok(resources.some(url=>url.includes('.css?rev=59')));assert.ok(resources.some(url=>url.includes('social-worker.js?rev=59')));assert.ok(resources.every(url=>new URL(url).searchParams.get('rev')==='59'));
    assert.equal(await page.evaluate(()=>typeof window.__cacheProbe),'undefined');assert.equal(await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--preview-cache-probe').trim()),'');
    await screenshot(page,'stale-http-cache-to-current-1280');
    report.cacheEvidence={syntheticPriorRevision:43,priorHits:{...cacheProbe.priorHits},cachedResponses:hits.map(({text,...hit})=>hit),currentResources:resources,scope:'Controlled synthetic old JS/CSS/Worker cached with immutable max-age, then unchanged current artifact on the same owned origin. Not an old gameplay migration test.'};
-   check('stale HTTP-cached JS/CSS/Worker cohort cannot replace canonical 58 entry',{cacheHits:3,syntheticPriorRevision:43});await close(context,page,'stale-http-cache');await cacheProbe.close();cacheProbe=null;
+   check('stale HTTP-cached JS/CSS/Worker cohort cannot replace canonical 59 entry',{cacheHits:3,syntheticPriorRevision:43});await close(context,page,'stale-http-cache');await cacheProbe.close();cacheProbe=null;
   }
   for(const viewport of report.viewports){
    const suffix=String(viewport.width);
@@ -322,12 +292,13 @@ export async function verifyPublicPreview(options={}){
    }
   }
   const active=[...observed].filter(url=>/\.(?:js|css)(?:\?|$)/.test(url)&&!url.includes('/vendor/'));
-  assert.ok(active.some(url=>url.includes('apartment-app.js?rev=58')));assert.ok(active.some(url=>url.includes('.css?rev=58')));assert.ok(active.every(url=>new URL(url).searchParams.get('rev')==='58'),'all active first-party JS/CSS use canonical revision 58');
+  assert.ok(active.some(url=>url.includes('apartment-app.js?rev=59')));assert.ok(active.some(url=>url.includes('.css?rev=59')));assert.ok(active.every(url=>new URL(url).searchParams.get('rev')==='59'),'all active first-party JS/CSS use canonical revision 59');
   const workers=report.requests.filter(url=>new URL(url).origin===new URL(report.url).origin&&/\/[^/]*worker\.js(?:\?|$)/.test(url));
-  assert.ok(workers.every(url=>new URL(url).searchParams.get('rev')==='58'),'all real Worker entries use canonical revision 58');
-  if(!options.smoke)assert.ok(workers.some(url=>url.includes('social-worker.js?rev=58')),'real canonical social Worker requested');
-  check('prior module URL followed by canonical revision 58 entry, CSS and Worker',{priorRevision:43,canonicalRevision:58,workerRequired:!options.smoke,cacheScope:'isolated module URL warmup; local HTTP responses are no-store'});
+  assert.ok(workers.every(url=>new URL(url).searchParams.get('rev')==='59'),'all real Worker entries use canonical revision 59');
+  if(!options.smoke)assert.ok(workers.some(url=>url.includes('social-worker.js?rev=59')),'real canonical social Worker requested');
+  check('prior module URL followed by canonical revision 59 entry, CSS and Worker',{priorRevision:43,canonicalRevision:59,workerRequired:!options.smoke,cacheScope:'isolated module URL warmup; local HTTP responses are no-store'});
   report.completedGlbSignals=[];report.readyDocuments=[...readyDocuments];
+  if(!config.live){const {verifyDialogLayout}=await import('./verify-dialog-layout.mjs');const result=await verifyDialogLayout({root:config.root,outputDir:path.join(out,'dialog-layout'),expectedRevision:config.manifest.revision});check('dialog history stays tall and keeps scroll position through answer selection',result);}
   const rawFailures=report.unexpectedResponses;report.unexpectedResponses=[];
   for(const failure of rawFailures){
    let matched=false;

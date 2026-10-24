@@ -1,25 +1,25 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {ApartmentAnimation} from './apartment-v3-animation.js?rev=58';
-import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=58';
-import {headCameraPose} from './apartment-head-pose.js?rev=58';
-import {segmentIntersectsBox} from './pc-room-audio.js?rev=58';
-import {workCameraPose} from './work-camera.js?rev=58';
-import {renderAvatarPortrait} from './avatar-portrait-renderer.js?rev=58';
-import {homeLight} from './apartment-v3-time.js?rev=58';
-import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=58';
-import {createLandingReveal} from './apartment-v3-landing.js?rev=58';
-import {CameraModes,cameraPose,computerCameraSource,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=58';
-import {createInteractionTargets,pickInteraction} from './apartment-interaction.js?rev=58';
-import {createHoverOutline} from './apartment-hover-outline.js?rev=58';
-import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=58';
-import {createSmoke} from './apartment-v3-smoke.js?rev=58';
-import {createRetroPass} from './apartment-v3-retro.js?rev=58';
-import {createComputerView} from './apartment-v3-computer.js?rev=58';
-import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=58';
-import {pcMonitorPresentation} from './pc-monitor-presentation.js?rev=58';
-import {createWardrobeFurniture} from './home-wardrobe.js?rev=58';
-import {applySwitchStyle} from './apartment-switch-style.js?rev=58';
+import {ApartmentAnimation} from './apartment-v3-animation.js?rev=59';
+import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=59';
+import {headCameraPose} from './apartment-head-pose.js?rev=59';
+import {segmentIntersectsBox} from './pc-room-audio.js?rev=59';
+import {workCameraPose} from './work-camera.js?rev=59';
+import {renderAvatarPortrait} from './avatar-portrait-renderer.js?rev=59';
+import {homeLight} from './apartment-v3-time.js?rev=59';
+import {sceneTimeState,createPracticalLighting} from './apartment-v3-lighting.js?rev=59';
+import {createLandingReveal} from './apartment-v3-landing.js?rev=59';
+import {CameraModes,cameraPose,computerCameraSource,createSharedSceneVisibility} from './apartment-v3-camera.js?rev=59';
+import {createInteractionTargets,pickInteraction} from './apartment-interaction.js?rev=59';
+import {createHoverOutline} from './apartment-hover-outline.js?rev=59';
+import {createOutsideLighting,createCourtyardLighting} from './apartment-v3-outside.js?rev=59';
+import {createSmoke} from './apartment-v3-smoke.js?rev=59';
+import {createRetroPass} from './apartment-v3-retro.js?rev=59';
+import {createComputerView} from './apartment-v3-computer.js?rev=59';
+import {pcActorVisible} from './virtual-pc-lifecycle.js?rev=59';
+import {pcMonitorPresentation} from './pc-monitor-presentation.js?rev=59';
+import {createWardrobeFurniture} from './home-wardrobe.js?rev=59';
+import {applySwitchStyle} from './apartment-switch-style.js?rev=59';
 
 export async function createApartmentScene(canvas,config){
   const BASE=config.assetBase??'./assets/apartment/v3/';
@@ -37,7 +37,7 @@ export async function createApartmentScene(canvas,config){
   camera.position.copy(basePosition);camera.lookAt(baseTarget);
   const loader=new GLTFLoader();
   const [environment,model,staticModel]=await Promise.all([
-    loader.loadAsync(BASE+config.geometry+'?rev=40'),loader.loadAsync(BASE+config.rig+'?rev=58'),loader.loadAsync(BASE+config.staticGeometry+'?rev=21')
+    loader.loadAsync(BASE+config.geometry+'?rev=40'),loader.loadAsync(BASE+config.rig+'?rev=59'),loader.loadAsync(BASE+config.staticGeometry+'?rev=21')
   ]);
   const staticScene=staticModel.scene;
   staticScene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
@@ -85,7 +85,8 @@ export async function createApartmentScene(canvas,config){
   transitionFrame.texture.colorSpace=THREE.SRGBColorSpace;
   const transitionBackdrop=new THREE.ShaderMaterial({uniforms:{frame:{value:transitionFrame.texture},pcBlend:{value:1}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:'uniform sampler2D frame;uniform float pcBlend;varying vec2 vUv;void main(){gl_FragColor=vec4(texture2D(frame,vUv).rgb,pcBlend);}',transparent:true,depthTest:false,depthWrite:false,toneMapped:false});
   const transitionQuad=new THREE.Mesh(new THREE.PlaneGeometry(2,2),transitionBackdrop);transitionQuad.frustumCulled=false;transitionQuad.renderOrder=1000;transitionQuad.visible=false;scene.add(transitionQuad);
-  async function prepareComputerView(){if(!computer)throw Error('Computer surfaces are missing');await loadMode('3D');if(disposed)throw Error('Scene disposed');}
+  let entryHeadPose=null;
+  async function prepareComputerView(){if(!computer)throw Error('Computer surfaces are missing');entryHeadPose=getHeadCameraPose();await loadMode('3D');if(disposed)throw Error('Scene disposed');}
   const headViewCamera=new THREE.PerspectiveCamera(60,rect.width/rect.height,.03,far);
   const workViewCamera=new THREE.PerspectiveCamera(55,rect.width/rect.height,.03,far);let workCamera=null;
   function setWorkCamera(value){workCamera=value?{...value}:null;}
@@ -110,7 +111,7 @@ export async function createApartmentScene(canvas,config){
   }
   function beginComputerView({fromHead=false}={}){
     if(!staticScene||!computer||disposed)throw Error('Computer view is not prepared');
-    const pose=getHeadCameraPose();headViewCamera.position.fromArray(pose.position);headViewCamera.quaternion.fromArray(pose.quaternion);headViewCamera.aspect=camera.aspect;headViewCamera.updateProjectionMatrix();headViewCamera.updateMatrixWorld(true);
+    const pose=!fromHead&&entryHeadPose?entryHeadPose:getHeadCameraPose();entryHeadPose=null;headViewCamera.position.fromArray(pose.position);headViewCamera.quaternion.fromArray(pose.quaternion);headViewCamera.aspect=camera.aspect;headViewCamera.updateProjectionMatrix();headViewCamera.updateMatrixWorld(true);
     computer.begin(computerCameraSource({mode:modes.mode,overview:camera,firstPerson:firstCamera,head:headViewCamera,fromHead}));computerActive=true;
   }
   function setComputerPresentation(snapshot,pcState,playerName,context={}){computerSnapshot=snapshot;computer?.update(snapshot,pcMonitorPresentation(pcState,{...context,snapshot,playerName}));}

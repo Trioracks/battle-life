@@ -1,5 +1,5 @@
-import {BeatAudio} from './beat-audio.js?rev=58';
-import {BUILD_INFO} from './build-info.js?rev=58';
+import {BeatAudio} from './beat-audio.js?rev=59';
+import {BUILD_INFO} from './build-info.js?rev=59';
 
 export const PUBLIC_AUDIO_NOTICE='Музыка и вокал отключены в тестовой веб-версии';
 const stopped=()=>({status:'stopped',key:'',owner:null,positionSeconds:0,durationSeconds:0,error:''});

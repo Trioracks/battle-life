@@ -1,20 +1,20 @@
-import {pcElement as el,pcFind} from './virtual-pc-dom.js?rev=58';
-import {SOCIAL_SECTIONS} from './social-catalog.js?rev=58';
-import {listCommunities} from './social-state.js?rev=58';
-import {socialAvatar,socialButton,socialHeading,showRegistrationNotice} from './social-dom.js?rev=58';
-import {createSocialAudio} from './social-audio-view.js?rev=58';
-import {createSocialProfileView} from './social-profile-view.js?rev=58';
-import {createSocialCommunityView} from './social-community-view.js?rev=58';
-import {mountSocialDialog} from './social-dialog-view.js?rev=58';
-import {SOCIAL_IDENTITY} from './social-identity.js?rev=58';
-import {mountSocialMessages} from './social-messages-view.js?rev=58';
-import {unreadDialogCount} from './social-personal.js?rev=58';
-import {markDialogRead} from './social-submission.js?rev=58';
-import {battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=58';
-import {publicRoundTable} from './battle-results-table.js?rev=58';
-import {createBattleResultsTableView} from './battle-results-table-view.js?rev=58';
-import {reactionVisibilitySignature} from './social-reactions-view.js?rev=58';
-import {communityUnreadCounts,publicCommunityPosts,markCommunitySeen} from './social-community-publications.js?rev=58';
+import {pcElement as el,pcFind} from './virtual-pc-dom.js?rev=59';
+import {SOCIAL_SECTIONS} from './social-catalog.js?rev=59';
+import {listCommunities} from './social-state.js?rev=59';
+import {socialAvatar,socialButton,socialHeading,showRegistrationNotice} from './social-dom.js?rev=59';
+import {createSocialAudio} from './social-audio-view.js?rev=59';
+import {createSocialProfileView} from './social-profile-view.js?rev=59';
+import {createSocialCommunityView} from './social-community-view.js?rev=59';
+import {mountSocialDialog} from './social-dialog-view.js?rev=59';
+import {SOCIAL_IDENTITY} from './social-identity.js?rev=59';
+import {mountSocialMessages} from './social-messages-view.js?rev=59';
+import {unreadDialogCount} from './social-personal.js?rev=59';
+import {markDialogRead} from './social-submission.js?rev=59';
+import {battleDeadlineLabel,metadataGameMinute} from './social-registration.js?rev=59';
+import {publicRoundTable} from './battle-results-table.js?rev=59';
+import {createBattleResultsTableView} from './battle-results-table-view.js?rev=59';
+import {reactionVisibilitySignature} from './social-reactions-view.js?rev=59';
+import {communityUnreadCounts,publicCommunityPosts,markCommunitySeen} from './social-community-publications.js?rev=59';
 export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,navigate,audio,onStudyTarget=()=>{},onResultViewed=()=>{},isVisible=()=>true}){
  const d=root.ownerDocument,shell=el(d,'section',{className:'sn-network',attributes:{'aria-label':SOCIAL_IDENTITY.name}}),head=el(d,'header',{className:'sn-top'});
  const brand=el(d,'strong',{className:'sn-brand'});brand.append(el(d,'span',{className:'sn-brandmark',text:SOCIAL_IDENTITY.mark}),el(d,'b',{text:SOCIAL_IDENTITY.name}));
@@ -31,7 +31,8 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
  }
  function updateBadge(){for(const [section,title,count,previous]of [['messages','Мои сообщения',unreadDialogCount(getState()),lastUnread],['groups','Мои группы',publications().counts.total,lastGroups]]){if(count===previous)continue;if(section==='messages')lastUnread=count;else lastGroups=count;const link=pcFind(nav,n=>n.dataset?.socialSection===section);link.replaceChildren();link.textContent=title;link.setAttribute('aria-label',title);link.setAttribute('title',(section==='groups'?'Непрочитанных публикаций: ':'Непрочитанных диалогов: ')+count);if(count)link.append(el(d,'span',{className:'sn-unread-badge',text:'+'+count}));}}
  function readVisibleCommunity(){if(route.section!=='community')return;if(!isVisible()){readAttempt='';return;}const token=publications().ids;if(token===readAttempt)return;readAttempt=token;const result=markCommunitySeen(getState(),{communityId:route.communityId,nowMinute:metadataGameMinute(getMetadata())});if(result.state===getState())return;let saved;try{saved=onChange(result.state);}catch{saved=false;}if(saved===false||saved?.ok===false)message.textContent='Не удалось сохранить прочтение. Открой группу ещё раз.';updateBadge();}
- const signature=()=>{
+ let signatureCache=null;
+ const computeSignature=()=>{
   // The native full-length songs must not be rebuilt on unrelated deadline
   // ticks or incoming tutorial messages. Only visible profile data can change it.
   const s=getState(),now=metadataGameMinute(getMetadata());
@@ -39,6 +40,11 @@ export function mountSocial(root,{route,getState,getMetadata=()=>({}),onChange,n
   if(route.section==='profile'&&route.profileId==='mc-filya')return JSON.stringify([s.social?.filya?.posts,s.social?.filya?.likes]);
   return JSON.stringify([publications().ids,publications().counts,reactionVisibilitySignature(s,now),Object.keys(s.rapAnalysis?.reports??{}),s.social,Object.keys(s.trackVersions?.byId??{}),s.communityAudio,s.battleSubmissions,s.battleApplications,s.socialRuntime?.events,s.battleKnowledge,getMetadata().playerName,getMetadata().portraitKey,(s.battleWindows??[]).map(w=>battleDeadlineLabel(w,now))]);
  };
+ function signature(){
+  const s=getState(),meta=getMetadata(),inputs=[s.social,s.social?.subscriptions?.length,s.tournaments,s.roundThemes,s.socialReactions,s.rapAnalysis,s.trackVersions,s.communityAudio,s.battleSubmissions,s.battleApplications,s.socialRuntime,s.battleKnowledge,s.battleWindows,Math.floor(metadataGameMinute(meta)),meta.playerName,meta.portraitKey];
+  if(signatureCache&&inputs.every((v,i)=>v===signatureCache.inputs[i]))return signatureCache.value;
+  const value=computeSignature();signatureCache={inputs,value};return value;
+ }
  function commit(result,{refresh=true}={}){
   if(!result?.ok){message.textContent=result?.reason??'Не удалось выполнить действие.';return false;}
   let saved;try{saved=onChange(result.state);}catch{saved=false;}
