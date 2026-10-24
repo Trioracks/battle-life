@@ -54,7 +54,7 @@ test('novice draft renders flowing prose without notes or verse headings',()=>{
 
 test('empty notebook keeps New and Open available and cannot save an absent document',()=>{
  const f=fixture(),toolbar=allPc(f.root).find(n=>n.className==='rn-toolbar');
- assert.deepEqual(allPc(toolbar).filter(n=>n.tagName==='BUTTON').map(n=>n.textContent),['Новый','Открыть','Сохранить','Сохранить как']);
+ assert.deepEqual(allPc(toolbar).filter(n=>n.tagName==='BUTTON').map(n=>n.getAttribute('aria-label')),['Новый текст','Открыть текст','Сохранить','Сохранить текст как']);
  assert.equal(findButton(f.root,'Сохранить').disabled,true);
 });
 
@@ -72,7 +72,7 @@ test('automatic game saves leave a modified TXT dirty and preserve its previous 
  s=savePcDocument(s,{projectId:'auto',folderId:'documents',filename:'Текст.txt',nowMinute:0}).state;
  const mounted=view.mountRapNotebook(root,{getState:()=>s,onChange:next=>{s=next;return true;}});
  s={...s,projects:s.projects.map(p=>({...p,name:'Несохранённое изменение'}))};mounted.openProject(s.projects[0]);
- assert.ok(allPc(root).some(n=>n.textContent==='Черновик не сохранён в файл'));assert.equal(s.fileSystem.files[0].snapshot.name,'Автосохранение');mounted.dispose();
+ assert.ok(allPc(root).some(n=>n.className==='rn-save-state'&&n.textContent==='Не сохранено'));assert.equal(s.fileSystem.files[0].snapshot.name,'Автосохранение');mounted.dispose();
 });
 
 test('ready document keeps compact refinement actions and saves a TXT through the file picker',()=>{
@@ -91,6 +91,17 @@ test('ready actions update their busy state when another studio job starts or st
   f.state={...f.state,[owner]:{...f.state[owner],job:null}};f.mounted.update();
   assert.equal(findButton(f.root,'Адаптировать под бит').disabled,false);
  }
+});
+
+test('the notebook keeps file status in its toolbar and work actions below the paper',()=>{
+ const f=fixture(readyState()),nodes=allPc(f.root),editor=nodes.find(n=>n.className==='rn-editor'),actions=nodes.find(n=>n.className==='rn-actions'),toolbar=nodes.find(n=>n.className==='rn-toolbar');
+ assert.ok(actions.parentElement===editor);assert.equal(editor.children[0].className,'rn-sheet');assert.ok(allPc(toolbar).some(n=>n.className==='rn-file-label'));assert.ok(nodes.some(n=>n.className==='rn-document-hint'));assert.ok(nodes.filter(n=>n.className==='rn-glyph').length>=5);assert.ok(nodes.some(n=>n.className==='rn-save-menu'&&n.tagName==='DETAILS'));f.mounted.dispose();
+});
+
+test('split Save is keyboard reachable without hidden menu items and cancel restores the split arrow',()=>{
+ const f=fixture(readyState()),menu=allPc(f.root).find(n=>n.className==='rn-save-menu'),toggle=menu.children[0],saveAs=findButton(menu,'Сохранить текст как');
+ assert.ok(pcFocusable(f.root).includes(toggle));assert.ok(!pcFocusable(f.root).includes(saveAs));menu.open=true;assert.ok(pcFocusable(f.root).includes(saveAs));saveAs.focus();saveAs.click();fire(allPc(f.root).find(n=>n.className==='rn-cover'),'keydown',{key:'Escape'});
+ assert.equal(f.root.ownerDocument.activeElement?.getAttribute('aria-label'),'Другие варианты сохранения');f.mounted.dispose();
 });
 
 test('closing the beat picker returns focus to the relocated adaptation action',()=>{

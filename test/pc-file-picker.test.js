@@ -5,6 +5,18 @@ import {savePcDocument} from '../src/pc-filesystem.js';
 import {creativeFixture} from './helpers/creative-fixtures.js';
 import {pcDocument,findButton,allPc,fire} from './helpers/virtual-pc-dom.js';
 import {pcFocusable} from '../src/virtual-pc-dom.js';
+import {deleteExplorerFolder} from '../src/virtual-pc-explorer.js';
+test('a picker opened after its default folder was deleted starts in the nearest available parent',()=>{
+ const f=creativeFixture('lyrics'),deleted=deleteExplorerFolder(f.state,{folderId:'exports'});assert.equal(deleted.ok,true,deleted.reason);const d=pcDocument(),root=d.createElement('div');
+ const picker=mountPcFilePicker(root,{getState:()=>deleted.state,mode:'attach',initialFolderId:'exports',types:['txt']}),folder=allPc(root).find(n=>n.getAttribute('aria-label')==='Папка файла'),address=allPc(root).find(n=>n.getAttribute('aria-label')==='Адрес папки файла');
+ assert.equal(folder.value,'music');assert.equal(address.value,'C:\\Мои документы\\Музыка');assert.equal(findButton(root,'Прикрепить').disabled,true);picker.dispose();
+});
+test('deleting the open folder moves the picker to its surviving ancestor and clears the file selection',()=>{
+ const f=creativeFixture('lyrics'),saved=savePcDocument(f.state,{projectId:f.projectId,folderId:'documents',filename:'Текст.txt',nowMinute:1}),d=pcDocument(),root=d.createElement('div');let state=saved.state,selected=null;
+ const picker=mountPcFilePicker(root,{getState:()=>state,mode:'attach',types:['txt'],onSelect:id=>{selected=id;}});findButton(root,'Выбрать: Текст.txt').click();assert.equal(findButton(root,'Прикрепить').disabled,false);
+ const deleted=deleteExplorerFolder(state,{folderId:'documents'});assert.equal(deleted.ok,true,deleted.reason);state=deleted.state;picker.update();
+ assert.equal(allPc(root).find(n=>n.getAttribute('aria-label')==='Папка файла').value,'disk');assert.equal(allPc(root).find(n=>n.getAttribute('aria-label')==='Адрес папки файла').value,'C:\\');assert.equal(findButton(root,'Выбрать: Текст.txt'),undefined);assert.equal(findButton(root,'Прикрепить').disabled,true);assert.equal(selected,null);picker.dispose();
+});
 test('one picker filters files, navigates folders and returns a stable file ID only on explicit open',()=>{
  const {state,projectId}=creativeFixture('lyrics'),saved=savePcDocument(state,{projectId,folderId:'downloads',filename:'Правки.txt',nowMinute:1});
  const d=pcDocument(),root=d.createElement('div');let selected=null;

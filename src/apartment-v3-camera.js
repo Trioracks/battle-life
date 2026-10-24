@@ -53,8 +53,8 @@ export function pickVisible(targets,blockers,floor){
  if(hit&&hit.distance<=wall+.025)return {id:hit.id};
  if(floor&&floor.distance<=wall+.025)return {x:floor.x};return {};
 }
-// Every monitor flight starts at the actor's head, independent of room framing.
-export function computerCameraSource({head}){return head;}
+// First-person entry preserves the lens the player was actually looking through.
+export function computerCameraSource({mode,firstPerson,head,fromHead=false}){return mode==='3D'&&!fromHead?firstPerson:head;}
 export class CameraModes{
  constructor({initialMode='3D'}={}){this.mode=initialMode==='2D'?'2D':'3D';this.yaw=0;this.pitch=0;this.loading=false;this.error=null;this.loaded=new Set(['2D']);this.revision=0;this.sleepCamera=null;}
  reset({initialMode='3D'}={}){this.mode=initialMode==='2D'?'2D':'3D';this.yaw=0;this.pitch=0;this.sleepCamera=null;this.error=null;this.revision++;}

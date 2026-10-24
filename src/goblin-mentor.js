@@ -1,7 +1,7 @@
-import {goblinReplyContext,goblinContextResponse,deliverGoblinMessage,goblinFollowupPlan} from './goblin-conversation.js?rev=60';
-import {GOBLIN_ID,GOBLIN_NAME,GOBLIN_DIALOGUE,GOBLIN_RELEASES,GOBLIN_INITIAL_POSTS,normalizeGoblin} from './goblin-catalog.js?rev=60';
-import {receivePhoneEvents} from './phone-notifications.js?rev=60';
-import {validGameMinute} from './game-minute.js?rev=60';
+import {goblinReplyContext,goblinContextResponse,deliverGoblinMessage,goblinFollowupPlan} from './goblin-conversation.js?rev=61';
+import {GOBLIN_ID,GOBLIN_NAME,GOBLIN_DIALOGUE,GOBLIN_RELEASES,GOBLIN_INITIAL_POSTS,normalizeGoblin} from './goblin-catalog.js?rev=61';
+import {receivePhoneEvents} from './phone-notifications.js?rev=61';
+import {validGameMinute} from './game-minute.js?rev=61';
 
 const battle='underweb://social/community/makarevich-1';
 const links={

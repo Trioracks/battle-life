@@ -1,11 +1,11 @@
 import acknowledgementTemplates from '../data/social/acknowledgement-templates.json' with {type:'json'};
-import {gameDateTimeLabel} from './home-calendar.js?rev=60';
-import {battleCharacter} from './battle-demo-config.js?rev=60';
-import {normalizeSocial} from './social-state.js?rev=60';
-import {validGameMinute} from './game-minute.js?rev=60';
-import {startSubmissionUpload} from './social-upload.js?rev=60';
-import {normalizeOutgoingMessage} from './social-composer.js?rev=60';
-import {submissionSendContext} from './social-submission-validation.js?rev=60';
+import {gameDateTimeLabel} from './home-calendar.js?rev=61';
+import {battleCharacter} from './battle-demo-config.js?rev=61';
+import {normalizeSocial} from './social-state.js?rev=61';
+import {validGameMinute} from './game-minute.js?rev=61';
+import {startSubmissionUpload} from './social-upload.js?rev=61';
+import {normalizeOutgoingMessage} from './social-composer.js?rev=61';
+import {submissionSendContext} from './social-submission-validation.js?rev=61';
 export const ACK_TEMPLATES=Object.freeze(acknowledgementTemplates.map(t=>Object.freeze({...t,roundKinds:Object.freeze([...t.roundKinds])})));
 export function resolveAcknowledgementTemplate(id){return ACK_TEMPLATES.find(t=>t.id===id)??(/^ack-([1-9]|10)$/.test(id)?ACK_TEMPLATES[Number(id.slice(4))-1]:null);}
 export function acknowledgementFor(id,sentAt,roundId='selection',{tone='friendly'}={}){

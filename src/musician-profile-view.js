@@ -1,17 +1,17 @@
-import {discussionForPost} from './social-discussion.js?rev=60';
-import {mountSocialFeed} from './social-feed-page.js?rev=60';
-import {pcElement as el} from './virtual-pc-dom.js?rev=60';
-import {socialAvatar,socialButton,socialHeading,socialPhoto,socialComment} from './social-dom.js?rev=60';
-import {profileById} from './social-catalog.js?rev=60';
-import {gameDateTimeLabel} from './home-calendar.js?rev=60';
-import {profilePhoto} from './social-photo-view.js?rev=60';
+import {discussionForPost} from './social-discussion.js?rev=61';
+import {mountSocialFeed} from './social-feed-page.js?rev=61';
+import {pcElement as el} from './virtual-pc-dom.js?rev=61';
+import {socialAvatar,socialButton,socialHeading,socialPhoto,socialComment} from './social-dom.js?rev=61';
+import {profileById} from './social-catalog.js?rev=61';
+import {gameDateTimeLabel} from './home-calendar.js?rev=61';
+import {profilePhoto} from './social-photo-view.js?rev=61';
 export function createMusicianProfileView(d,{profile,posts,photos,stateKey,subtitle,historyLabel,view='page',getState,getMetadata,navigate,commit,audio,onAnalyze,onPhotoClose,uiState={}}){
  const state=getState(),tracks=posts.filter(p=>p.release||p.trackVersionId);
  const root=el(d,'section',{className:'sn-profile sn-goblin-profile'}),aside=el(d,'aside',{className:'sn-profile-aside'}),main=el(d,'div',{className:'sn-profile-main'});
  const url=kind=>'underweb://social/profile/'+profile.id+(kind==='page'?'':'?view='+kind);
  const personLink=(id,name)=>socialButton(d,name,()=>navigate('underweb://social/profile/'+id),{className:'sn-link'});
  const photoCard=(p,post)=>{post??=posts.find(item=>(item.cardId??item.art??item.id)===p.id);return profilePhoto(d,p,{host:root,profileId:profile.id,post:post?discussionPost(post):undefined,postId:post?.id,getState,getMetadata,commit,onClose:onPhotoClose});};
- aside.append(socialAvatar(d,profile.avatar,profile.name,true),el(d,'p',{className:'sn-note',text:subtitle}));
+ aside.append(socialAvatar(d,profile.avatar,profile.name,true));if(subtitle)aside.append(el(d,'p',{className:'sn-note',text:subtitle}));
  if(stateKey==='goblin')aside.append(socialButton(d,'Написать сообщение',()=>navigate('underweb://social/dialog/'+profile.id)));
  for(const [id,name]of [['page','Страница'],['photos','Фотографии ('+photos.length+')'],['audio','Аудиозаписи ('+tracks.length+')'],['friends','Друзья ('+(profile.friendCount??profile.friends.length)+')'],...(historyLabel?[['history','Баттлы']]:[])]){
   const button=socialButton(d,name,()=>navigate(url(id)),{attributes:id===view?{'aria-current':'page'}:{}});button.disabled=id===view;aside.append(button);
@@ -34,7 +34,7 @@ export function createMusicianProfileView(d,{profile,posts,photos,stateKey,subti
  const comments=post=>{const thread=el(d,'section',{className:'sn-comments',attributes:{'aria-label':'Комментарии'}}),discussion=discussionForPost(state,{profileId:profile.id,post:discussionPost(post)});for(const comment of discussion.comments){const author=comment.authorId==='me'?{name:getMetadata().playerName??'Игрок',avatar:{mark:'Я',src:state.social?.playerPortrait?.url}}:profileById(comment.authorId)??{name:comment.authorName??'Читатель'};thread.append(socialComment(d,{author,body:comment.body,date:comment.date??(Number.isFinite(comment.at)?gameDateTimeLabel(comment.at):post.dateLabel??'')},navigate));}return thread;};
  if(view==='photos'){const gallery=el(d,'div',{className:'sn-photos'});for(const p of photos)gallery.append(photoCard({...p,date:''}));main.append(gallery);}
  else if(view==='audio'){for(const p of tracks)main.append(player(p));if(!tracks.length)main.append(el(d,'p',{text:'Пока только фотографии. Новую музыку выложу позже.'}));}
- else if(view==='friends'){const mutual=profile.friends.filter(id=>state.social?.friends?.includes(id));main.append(socialHeading(d,'Общие друзья',mutual.length));for(const id of mutual){const f=profileById(id);if(!f)continue;const card=el(d,'article',{className:'sn-person'});card.append(socialAvatar(d,f.avatar,f.name),personLink(id,f.name));main.append(card);}if(!mutual.length)main.append(el(d,'p',{className:'sn-empty',text:'Общих друзей пока нет.'}));}
+ else if(view==='friends'){const friends=stateKey==='goblin'?profile.friends:profile.friends.filter(id=>state.social?.friends?.includes(id));main.append(socialHeading(d,stateKey==='goblin'?'Друзья':'Общие друзья',friends.length));for(const id of friends){const f=profileById(id);if(!f)continue;const card=el(d,'article',{className:'sn-person'});card.append(socialAvatar(d,f.avatar,f.name),personLink(id,f.name));main.append(card);}if(!friends.length)main.append(el(d,'p',{className:'sn-empty',text:'Общих друзей пока нет.'}));}
  else if(view==='history'){
   for(const p of posts.filter(p=>p.trackVersionId))main.append(el(d,'p',{text:p.body}),player(p));
   if(!posts.some(p=>p.trackVersionId))main.append(el(d,'p',{text:historyLabel??'Пока нет публичных баттловых работ.'}));

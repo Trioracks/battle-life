@@ -27,8 +27,8 @@ test('downloads starts closed and a new transfer opens the toolbar popover with 
  const s=setup();assert.equal(s.root.hidden,true);assert.equal(s.anchor.getAttribute('aria-expanded'),'false');
  s.start('client','installer');assert.equal(s.root.hidden,false);assert.equal(s.anchor.getAttribute('aria-expanded'),'true');
  assert.match(allPc(rows(s)[0]).map(n=>n.textContent??'').join(' '),/1 с/);
- const open=findButton(s.root,'Открыть файл torent-setup.exe');assert.equal(open.disabled,true);
- s.tick(1);assert.equal(open.disabled,false);assert.deepEqual(s.actions,[],'download completion never opens the installer');
+ const open=findButton(s.root,'Открыть файл torent-setup.exe'),cancel=findButton(s.root,'Отменить загрузку torent-setup.exe');assert.equal(open.disabled,true);assert.equal(open.hidden,true);assert.equal(cancel.hidden,false);
+ s.tick(1);assert.equal(open.disabled,false);assert.equal(open.hidden,false);assert.equal(cancel.hidden,true);assert.deepEqual(s.actions,[],'download completion never opens the installer');
  open.click();assert.deepEqual(s.actions,[['installer','client']]);s.view.dispose();
 });
 

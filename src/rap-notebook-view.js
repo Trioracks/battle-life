@@ -1,26 +1,27 @@
 // Notepad-style view of the persisted symbolic lyric projects.
-import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=60';
-import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill,canEditLyricContentMix,setLyricContentMix,lyricRefinementReason} from './lyric-production.js?rev=60';
-import {randomBeatName} from './beat-names.js?rev=60';
-import {mountProjectPicker} from './project-picker-view.js?rev=60';
-import {normalizeBeat} from './beat-production.js?rev=60';
-import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=60';
-import {savePcDocument,openPcDocument,pcFileById} from './pc-filesystem.js?rev=60';
-import {documentSession,documentIsDirty} from './pc-document-session.js?rev=60';
-import {mountPcFilePicker} from './pc-file-picker-view.js?rev=60';
-import {explorerPaths} from './virtual-pc-explorer.js?rev=60';
-import {createDocumentGuard} from './pc-document-guard.js?rev=60';
-import {battleDocumentName} from './battle-document-name.js?rev=60';
+import {pcElement as el,pcButton as button,pcFocusable} from './virtual-pc-dom.js?rev=61';
+import {LYRIC_STAGES,normalizeLyric,createLyric,startLyricWork,lyricBattleOptions,effectiveWritingSkill,canEditLyricContentMix,setLyricContentMix,lyricRefinementReason} from './lyric-production.js?rev=61';
+import {randomBeatName} from './beat-names.js?rev=61';
+import {mountProjectPicker} from './project-picker-view.js?rev=61';
+import {normalizeBeat} from './beat-production.js?rev=61';
+import {startCreativeChain,pauseCreativeChain,creativeChainProgress} from './creative-workflow.js?rev=61';
+import {savePcDocument,openPcDocument,pcFileById} from './pc-filesystem.js?rev=61';
+import {documentSession,documentIsDirty} from './pc-document-session.js?rev=61';
+import {mountPcFilePicker} from './pc-file-picker-view.js?rev=61';
+import {explorerPaths} from './virtual-pc-explorer.js?rev=61';
+import {createDocumentGuard} from './pc-document-guard.js?rev=61';
+import {battleDocumentName} from './battle-document-name.js?rev=61';
+import {notebookIcon} from './rap-notebook-icons.js?rev=61';
 
 export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,onCommit=onChange,onWork=()=>false}={}){
  const d=root.ownerDocument;let panel=null,modal=null,filePicker=null,returnFocusLabel='',message='',saveMessage='Черновик не сохранён в файл',saveFailed=false,signature=[],disposed=false,controls=[],needsLabel=null;
  let saveContinuation=null;const guard=createDocumentGuard(root,{appId:'rap-notebook',getState,onCommit,onSave:save});
  function replaceDocument(mode){guard.request({onClose:()=>openPanel(mode)});}
- function openPanel(mode){returnFocusLabel=d.activeElement?.textContent??'';panel=mode;message='';render();}
+ function openPanel(mode){returnFocusLabel=d.activeElement?.getAttribute('aria-label')??d.activeElement?.textContent??'';panel=mode;message='';render();}
  const active=()=>normalizeLyric(getState().projects.find(p=>p.id===getState().writing.activeTextId));
  const fingerprint=()=>{const s=getState(),selected=s.projects.find(p=>p.id===s.writing.activeTextId);return [s.writing.activeTextId,s.projects,selected?.stages,selected?.stages?.length,s.battleApplications,s.writing.job?.projectId,s.writing.job?.kind,s.writing.job?.stage,Math.floor(s.writing.job?.elapsed??0),Boolean(s.music.job),Boolean(s.recording?.job),s.writing.practice,s.creativeWork?.items,effectiveWritingSkill(s,getMetadata().skills)];};
  const sameInputs=(a,b)=>a.length===b.length&&a.every((value,i)=>value===b[i]);
- function updateNeeds(){const needs=getState().music.needs;if(needsLabel)needsLabel.textContent='Сытость '+Math.round(needs.satiety)+' · энергия '+Math.round(needs.energy);}
+ function updateNeeds(){const needs=getState().music.needs,text='Сытость '+Math.round(needs.satiety)+' · энергия '+Math.round(needs.energy);if(needsLabel&&needsLabel.textContent!==text)needsLabel.textContent=text;}
  function choose(id){const s=pauseCreativeChain(getState());persist({...s,writing:{...s.writing,activeTextId:id}});panel=null;message='';render();}
  function persist(next){saveFailed=onChange(next)===false;saveMessage=saveFailed?'Ошибка сохранения':'Изменения в черновике';return !saveFailed;}
  const boundFile=()=>{const s=documentSession(getState(),'rap-notebook');return s.projectId===active()?.id?pcFileById(getState(),s.fileId):null;};
@@ -73,19 +74,20 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
  }
  function render(){
   if(disposed)return;filePicker?.dispose();filePicker=null;const p=active(),s=getState(),skill=effectiveWritingSkill(s,getMetadata().skills),job=s.writing.job??s.creativeWork?.items.find(i=>i.projectId===p?.id)?.pausedJob;
-  const wrap=el(d,'section',{className:'rap-notebook',attributes:{'aria-label':'Рэпблокнот'}}),header=el(d,'header',{className:'rn-app-header'}),brand=el(d,'div',{className:'rn-brand'}),toolbar=el(d,'nav',{className:'rn-toolbar',attributes:{'aria-label':'Файл текста'}});
-  brand.append(el(d,'span',{className:'rn-brand-icon',text:'▤',attributes:{'aria-hidden':'true'}}),el(d,'strong',{text:'РэпБлокнот'}));
+  const wrap=el(d,'section',{className:'rap-notebook',attributes:{'aria-label':'Рэпблокнот'}}),header=el(d,'header',{className:'rn-app-header'}),toolbar=el(d,'nav',{className:'rn-toolbar',attributes:{'aria-label':'Файл текста'}});
   const saveButton=button(d,'Сохранить',{className:'rn-save-button',attributes:{'aria-label':'Сохранить'}},save);saveButton.disabled=!p;
-  const saveAs=button(d,'Сохранить как',{attributes:{'aria-label':'Сохранить текст как'}},()=>openPanel('save'));saveAs.disabled=!p;
-  toolbar.append(button(d,'Новый',{className:'rn-new-button',attributes:{'aria-label':'Новый текст'}},()=>replaceDocument('new')),button(d,'Открыть',{className:'rn-open-button',attributes:{'aria-label':'Открыть текст'}},()=>replaceDocument('open')),saveButton,saveAs);header.append(brand,toolbar);
+  const saveAs=button(d,'Сохранить как',{attributes:{'aria-label':'Сохранить текст как'}},()=>{saveToggle.focus();openPanel('save');});saveAs.disabled=!p;
+  const newButton=button(d,'Новый текст',{className:'rn-new-button',attributes:{'aria-label':'Новый текст'}},()=>replaceDocument('new')),openButton=button(d,'Открыть',{className:'rn-open-button',attributes:{'aria-label':'Открыть текст'}},()=>replaceDocument('open'));
+  newButton.append(notebookIcon(d,'new'));openButton.append(notebookIcon(d,'open'));
   const tab=el(d,'div',{className:'rn-tab'}),body=el(d,'div',{className:'rn-body'}),editor=el(d,'div',{className:'rn-editor'}),sheet=el(d,'article',{className:'rn-sheet',dataset:{lyricRole:'document'},attributes:{'aria-label':'Документ текста'}}),side=el(d,'aside',{className:'rn-work',attributes:{'aria-label':'О тексте'}});
-  const file=boundFile(),dirty=documentIsDirty(s,'rap-notebook');tab.append(el(d,'span',{className:'rn-file-label',text:p?(file?.filename??p.name+'.txt')+(dirty?' *':''):'Нет открытого текста'}),el(d,'span',{className:'rn-save-state'+(saveFailed?' rn-save-error':''),text:p?saveFailed?saveMessage:dirty?'Черновик не сохранён в файл':'Файл сохранён':'Создай или открой текст'}));
+  const file=boundFile(),dirty=documentIsDirty(s,'rap-notebook');tab.append(el(d,'span',{className:'rn-file-label',text:p?(file?.filename??p.name+'.txt'):'Нет открытого текста'}),el(d,'span',{className:'rn-save-state'+(saveFailed?' rn-save-error':''),text:p?saveFailed?saveMessage:dirty?'Не сохранено':'Файл сохранён':'Создай или открой текст'}));
+  const saveGroup=el(d,'div',{className:'rn-save-group'}),saveMenu=el(d,'details',{className:'rn-save-menu'}),saveToggle=el(d,'summary',{attributes:{'aria-label':'Другие варианты сохранения',title:'Сохранить как'}});saveToggle.append(notebookIcon(d,'chevron','#18231d'));saveMenu.append(saveToggle,saveAs);saveMenu.hidden=!p;saveMenu.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();saveMenu.open=false;saveToggle.focus();}});saveGroup.append(saveButton,saveMenu);toolbar.append(newButton,openButton,tab,saveGroup);header.append(toolbar);editor.append(sheet);
   controls=[];
   if(p){
-   const meta=el(d,'header',{className:'rn-meta'});meta.append(el(d,'small',{className:'rn-eyebrow',text:'ТЕКСТ · ВЕРСИЯ '+String(p.revision).padStart(2,'0')}),el(d,'h1',{text:p.name}),el(d,'p',{text:p.battleName+(p.battleId?'  /  '+(p.round==='Отбор'?'Отборочный раунд':p.round):'  /  Свободная тема')}));sheet.append(meta);
+   const meta=el(d,'header',{className:'rn-meta'});meta.append(el(d,'small',{className:'rn-eyebrow',text:'ТЕКСТ · ВЕРСИЯ '+String(p.revision).padStart(2,'0')}),el(d,'h1',{text:p.name}),el(d,'p',{text:p.battleName+(p.battleId?'  /  '+(p.round==='Отбор'?'Отборочный раунд':p.round):'  /  Свободная тема')}),el(d,'p',{className:'rn-document-hint',text:'Герой пишет сам. Символы показывают ритм текста.'}));sheet.append(meta);
    let number=1;
    for(const section of p.sections){const part=el(d,'section',{className:'rn-section'});if(section.title)part.append(el(d,'h2',{text:section.title}));
-    if(section.presentation==='prose'){
+    if(section.presentation==='prose'&&p.status!=='ready'){
      let paragraph=el(d,'p',{className:'rn-prose'});part.append(paragraph);
      for(const line of section.lines){if(line.gapBefore){paragraph=el(d,'p',{className:'rn-prose'});part.append(paragraph);}
       for(const w of line.words)paragraph.append(el(d,'span',{className:'rn-word'+(w.error?' rn-error':''),text:w.text+' ',attributes:w.error?{title:'Неточное слово: персонаж ещё учится писать'}:{}}));
@@ -99,16 +101,16 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
     }sheet.append(part);
    }
    if(!p.sections.length)sheet.append(el(d,'p',{className:'rn-empty',text:'|  Здесь появятся первые строки…'}));
-   const documentInfo=el(d,'div',{className:'rn-document-info'});documentInfo.append(el(d,'span',{text:'Строк: '+p.sections.reduce((total,section)=>total+section.lines.length,0)}),el(d,'time',{text:p.updatedDate}));sheet.append(documentInfo);
+   const documentInfo=el(d,'div',{className:'rn-document-info'});documentInfo.append(el(d,'span',{text:'Строк: '+p.sections.reduce((total,section)=>total+section.lines.length,0)}));sheet.append(documentInfo);
    side.append(el(d,'small',{className:'rn-eyebrow',text:'О ТЕКСТЕ'}));
    const summary=el(d,'section',{className:'rn-stage-summary'}),summaryText=el(d,'div');summaryText.append(el(d,'h2',{text:p.status==='ready'?'Основа готова':LYRIC_STAGES[p.stages.length].name}),el(d,'p',{text:p.status==='ready'?'3 этапа завершены':p.stages.length+' из 3 этапов завершено'}));summary.append(el(d,'span',{className:'rn-stage-badge',text:p.status==='ready'?'✓':String(p.stages.length),attributes:{'aria-hidden':'true'}}),summaryText);side.append(summary);
    const stages=el(d,'ol',{className:'rn-stages',attributes:{'aria-label':'Этапы текста'}});
    for(let i=0;i<3;i++){const row=el(d,'li',{className:i<p.stages.length?'rn-done':'',attributes:{title:LYRIC_STAGES[i].name}});row.append(el(d,'span',{className:'rn-stage-number',text:'0'+(i+1),attributes:{'aria-hidden':'true'}}),el(d,'span',{text:['Набросок','Рифмы','Образы'][i]}),el(d,'span',{className:'rn-stage-mark',text:i<p.stages.length?'✓':'○',attributes:{'aria-label':i<p.stages.length?'Завершён':'Не завершён'}}));stages.append(row);}side.append(stages);
-   const beat=el(d,'section',{className:'rn-beat'});beat.append(el(d,'small',{text:'◎  Привязка к биту'}),el(d,'h3',{text:p.adaptation?p.adaptation.beatName:'Бит не выбран'}),el(d,'p',{text:p.adaptation?p.adaptation.bpm+' BPM · строки адаптированы':'Выбери готовый бит, чтобы подогнать под него строки.'}));side.append(beat);
+   const beat=el(d,'section',{className:'rn-beat'});beat.append(el(d,'small',{text:'ПРИВЯЗКА К БИТУ'}),el(d,'h3',{text:p.adaptation?p.adaptation.beatName:'Бит не выбран'}),el(d,'p',{text:p.adaptation?p.adaptation.bpm+' BPM · строки адаптированы':'Выбери готовый бит, чтобы подогнать под него строки.'}));side.append(beat);
    const facts=el(d,'dl',{className:'rn-facts'});for(const [label,value]of [['Создан',p.createdDate],['Обновлён',p.updatedDate],['Оппонент',p.battleId?p.opponent:'Не назначен']])facts.append(el(d,'dt',{text:label}),el(d,'dd',{text:value}));side.append(facts);
    const planned=s.creativeWork?.items.some(i=>i.projectId===p.id);
    const budget=el(d,'details',{className:'rn-content-budget',attributes:{'aria-label':'Содержание текста'}});
-   budget.append(el(d,'summary',{text:'Содержание · 100%'}));
+   const budgetSummary=el(d,'summary');budgetSummary.append(el(d,'span',{text:'Содержание'}),el(d,'span',{text:'100%'}));budget.append(budgetSummary);
    if(skill>=25&&canEditLyricContentMix(s,p)){
     budget.open=true;
     for(const [key,label]of [['topic','Тема'],['diss','Дисс'],['lyric','Лирика']]){
@@ -128,15 +130,16 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
    }else {
     const actions=el(d,'section',{className:'rn-actions',attributes:{'aria-label':'Доработка текста'}}),refinement=el(d,'div',{className:'rn-action-group'}),adaptation=el(d,'div',{className:'rn-action-group'}),reason=lyricRefinementReason(s,p,getMetadata().skills),busy=Boolean(job||s.music.job||s.recording?.job),refine=button(d,'Доработать текст',{className:'rn-primary rn-refine-button',attributes:{'aria-label':'Доработать'}},()=>start('refine')),adapt=button(d,'Адаптировать под бит',{className:'rn-adapt-button',attributes:{'aria-label':'Адаптировать под бит'}},()=>openPanel('adapt'));
     refine.disabled=Boolean(reason||busy);adapt.disabled=busy||p.adaptationCount>=3;if(reason)refine.setAttribute('title',reason);
-    refinement.append(el(d,'small',{text:'60 мин · до +2 к качеству'}),refine,el(d,'small',{text:'Использовано '+p.refinementCount+' из 3 доработок'}));if(reason)refinement.append(el(d,'small',{className:'rn-action-reason',text:reason}));adaptation.append(el(d,'small',{text:'Ритм и подача'}),adapt,el(d,'small',{text:'Использовано '+p.adaptationCount+' из 3 адаптаций'}));actions.append(refinement,adaptation);side.append(actions,beat,facts,budget);
+    refine.append(notebookIcon(d,'pencil'));adapt.append(notebookIcon(d,'wave'));
+    const refineCopy=el(d,'div',{className:'rn-action-copy'}),adaptCopy=el(d,'div',{className:'rn-action-copy'});refineCopy.append(el(d,'small',{text:'60 мин · до +2 к качеству'}),el(d,'small',{text:'Использовано '+p.refinementCount+' из 3 доработок'}));if(reason)refineCopy.append(el(d,'small',{className:'rn-action-reason',text:reason}));adaptCopy.append(el(d,'small',{text:'Ритм и подача'}),el(d,'small',{text:'Использовано '+p.adaptationCount+' из 3 адаптаций'}));refinement.append(refine,refineCopy);adaptation.append(adapt,adaptCopy);actions.append(el(d,'small',{className:'rn-action-heading',text:'Работа с текстом'}),refinement,adaptation);editor.append(actions);
     const extras=el(d,'div',{className:'rn-extra-actions'}),add=button(d,'Добавить',{className:'rn-add-button'},()=>openPanel('add'));add.disabled=busy;
     extras.append(add);
     if(job?.projectId===p.id)extras.append(button(d,'Продолжить работу',{},()=>start(job.kind,{beatId:job.beatId})));side.append(extras);
    }
   }else {sheet.append(el(d,'div',{className:'rn-welcome',text:'Рэпблокнот'}),el(d,'p',{className:'rn-empty',text:'Тема. Первая мысль. Первая строка. Создай текст для баттла или сохрани собственную идею.'}));side.append(el(d,'h2',{text:'Твой черновик'}),el(d,'p',{text:'Здесь герой пишет сам. Ты выбираешь направление работы; символы показывают ритм и стройность текста.'}));}
-  const condition=el(d,'details',{className:'rn-condition'});needsLabel=el(d,'p');updateNeeds();condition.append(el(d,'summary',{text:'Письмо '+skill.toFixed(2)+' / 100'}),needsLabel);side.append(condition);
+  const condition=el(d,'details',{className:'rn-condition'}),conditionSummary=el(d,'summary',{attributes:{'aria-label':'Письмо '+skill.toFixed(2)+' / 100'}});conditionSummary.append(notebookIcon(d,'bars','#8bb39d'),el(d,'span',{text:'Письмо'}),el(d,'span',{text:skill.toFixed(2)+' / 100'}));needsLabel=el(d,'p');updateNeeds();condition.append(conditionSummary,needsLabel);side.append(condition);
   if(!editor.contains(sheet))editor.append(sheet);body.append(editor,side);
-  const status=el(d,'footer',{className:'rn-status',attributes:{role:'status'}});status.append(el(d,'span',{className:'rn-status-path',text:file?(explorerPaths(s)[file.folderId]?.address??file.folderId)+'\\'+file.filename:'Не сохранён в файл'}),el(d,'span',{className:'rn-status-message',text:message||(job?'Работа идёт · можно прервать':p?.status==='ready'?'Готов к доработке':p?'Символический текст · UTF-8':'Создай свой первый текст')}));wrap.append(header,tab,body,status);
+  const status=el(d,'footer',{className:'rn-status',attributes:{role:'status'}});status.append(el(d,'span',{className:'rn-status-path',text:p?'Версия '+String(p.revision).padStart(2,'0')+' · '+p.sections.reduce((total,section)=>total+section.lines.length,0)+' строк':'Нет открытого текста',attributes:{title:file?(explorerPaths(s)[file.folderId]?.address??file.folderId)+'\\'+file.filename:'Не сохранён в файл'}}),el(d,'span',{className:'rn-status-message',text:message||(job?'Работа идёт · можно прервать':p?.status==='ready'?'Готов к доработке':p?'Символический текст · UTF-8':'Создай свой первый текст')}));wrap.append(header,body,status);
   const hadModal=Boolean(modal);modal=null;
   if(panel){
    for(const child of wrap.children)child.inert=true;toolbar.inert=true;
@@ -148,7 +151,7 @@ export function mountRapNotebook(root,{getState,getMetadata=()=>({}),onChange,on
   }
   root.replaceChildren(wrap);guard.update();signature=fingerprint();
   if(modal)pcFocusable(modal)[0]?.focus();
-  else if(hadModal){const items=pcFocusable(wrap);(items.find(n=>n.textContent===returnFocusLabel)??items[0])?.focus();}
+  else if(hadModal){const items=pcFocusable(wrap);(items.find(n=>n.getAttribute('aria-label')===returnFocusLabel||n.textContent===returnFocusLabel)??items[0])?.focus();}
  }
  render();return {requestClose:options=>guard.request(options),save,update(){if(disposed)return;if(!panel&&!sameInputs(signature,fingerprint()))render();else{filePicker?.update();updateNeeds();}},openProject(p){if(normalizeLyric(p))choose(p.id);},focus(){if(modal)pcFocusable(modal)[0]?.focus();},dispose(){guard.dispose();disposed=true;filePicker?.dispose();modal=null;root.replaceChildren();}};
 }

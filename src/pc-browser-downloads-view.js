@@ -1,7 +1,7 @@
-import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=60';
-import {browserDownloadEntries} from './pc-browser-downloads.js?rev=60';
-import {softwareMessage} from './pc-software-view.js?rev=60';
-import {createPcIcon} from './virtual-pc-icons.js?rev=60';
+import {pcElement as el,pcButton} from './virtual-pc-dom.js?rev=61';
+import {browserDownloadEntries} from './pc-browser-downloads.js?rev=61';
+import {softwareMessage} from './pc-software-view.js?rev=61';
+import {createPcIcon} from './virtual-pc-icons.js?rev=61';
 const button=(d,text,options,fn)=>pcButton(d,text,{...options,className:'uw-control'},fn);
 
 export function mountBrowserDownloads(root,{anchor,getState,onAction,getMessage=()=>''}){
@@ -40,7 +40,7 @@ export function mountBrowserDownloads(root,{anchor,getState,onAction,getMessage=
     const cancel=button(d,'Отменить',{attributes:{'aria-label':'Отменить загрузку '+entry.name}},()=>onAction('cancel-browser-download',entry.id));status.append(label,remaining);row.append(name,progress,status,open,cancel);rows.set(entry.id,{row,progress,label,remaining,open,cancel});
    }
    const view=rows.get(entry.id),percent=Math.floor(entry.receivedBytes/entry.totalBytes*100);
-   view.progress.value=percent;view.open.disabled=!entry.complete;view.cancel.hidden=entry.complete;
+   view.progress.value=percent;view.open.disabled=!entry.complete;view.open.hidden=!entry.complete;view.cancel.hidden=entry.complete;
    const text=entry.error?(entry.error==='attachment-unavailable'?'Вложение повреждено':softwareMessage(entry.error)):entry.complete?'Готово':percent+'%';
    if(view.label.textContent!==text)view.label.textContent=text;
    const remaining=!entry.error&&!entry.complete?' · Осталось '+Math.max(1,Math.ceil(1-entry.elapsedSeconds))+' с':'';

@@ -1,16 +1,16 @@
-import {mountReplyPanel} from './social-reply-panel.js?rev=60';
-import {mountPcFilePicker} from './pc-file-picker-view.js?rev=60';
-import {pcFileById} from './pc-filesystem.js?rev=60';
-import {startMentorDownload} from './pc-browser-downloads.js?rev=60';
-import {advanceGoblinActiveChat,goblinReplyContext,goblinTypingSeconds} from './goblin-conversation.js?rev=60';
-import {pcElement as el} from './virtual-pc-dom.js?rev=60';
-import {socialButton,socialHeading,socialPeerLink,socialLink} from './social-dom.js?rev=60';
-import {GOBLIN_ID,GOBLIN_PROFILE} from './goblin-catalog.js?rev=60';
-import {replyToGoblin} from './goblin-mentor.js?rev=60';
-import {sendGoblinFile} from './goblin-exchange.js?rev=60';
-import {gameDateTimeLabel} from './home-calendar.js?rev=60';
-import {createDialogLayout,dialogMessageField} from './social-dialog-layout.js?rev=60';
-import {createLyricWorkAudio} from './lyric-work-audio.js?rev=60';
+import {mountReplyPanel} from './social-reply-panel.js?rev=61';
+import {mountPcFilePicker} from './pc-file-picker-view.js?rev=61';
+import {pcFileById} from './pc-filesystem.js?rev=61';
+import {startMentorDownload} from './pc-browser-downloads.js?rev=61';
+import {advanceGoblinActiveChat,goblinReplyContext,goblinTypingSeconds} from './goblin-conversation.js?rev=61';
+import {pcElement as el} from './virtual-pc-dom.js?rev=61';
+import {socialButton,socialHeading,socialPeerLink,socialLink} from './social-dom.js?rev=61';
+import {GOBLIN_ID,GOBLIN_PROFILE} from './goblin-catalog.js?rev=61';
+import {replyToGoblin} from './goblin-mentor.js?rev=61';
+import {sendGoblinFile} from './goblin-exchange.js?rev=61';
+import {gameDateTimeLabel} from './home-calendar.js?rev=61';
+import {createDialogLayout,dialogMessageField} from './social-dialog-layout.js?rev=61';
+import {createLyricWorkAudio} from './lyric-work-audio.js?rev=61';
 
 const TYPING_SECONDS=3;
 const fileBody=kind=>kind==='project'?'Вот проект бита, который ты попросил.':kind==='lyrics'?'Чувак, вот мой текст. Глянешь?':kind==='beat'?'Вот мой бит, зацени!':'Братан, вот с моим голосом получилось.';
@@ -21,7 +21,7 @@ export function mountGoblinDialog(d,{getState,getMetadata,navigate,commit,audio,
  const incoming=el(d,'p',{className:'sn-typing',attributes:{role:'status','aria-live':'polite'}});
  const peer={kind:'person',id:GOBLIN_ID},heading=socialHeading(d,'Сообщения · ');heading.append(socialPeerLink(d,peer,GOBLIN_PROFILE.name,navigate));
  layout.head.append(heading,socialButton(d,'← Мои сообщения',()=>navigate('underweb://social/messages'),{className:'sn-link'}));
- const field=dialogMessageField(d),actions=el(d,'div',{className:'sn-actions'}),options=el(d,'div',{className:'sn-reply-host'}),attachment=el(d,'div',{className:'sn-dialog-attachment'}),draftLabel=el(d,'p',{className:'sn-note'}),progress=el(d,'p',{className:'sn-note sn-draft-progress',attributes:{'aria-live':'polite'}}),keyboard=createLyricWorkAudio({volume:.014});
+ const field=dialogMessageField(d),actions=el(d,'div',{className:'sn-actions'}),options=el(d,'div',{className:'sn-reply-host'}),attachment=el(d,'dialog',{className:'sn-attachment-modal',attributes:{'aria-label':'Прикрепить файл'}}),draftLabel=el(d,'p',{className:'sn-note'}),progress=el(d,'p',{className:'sn-note sn-draft-progress',attributes:{'aria-live':'polite'}}),keyboard=createLyricWorkAudio({volume:.014});
  let filePicker=null;
  let signature='',readId='',disposed=false,blocked=false,error='',pendingSeconds=0,pendingChatSeconds=0,flushing=false,lastUpdate=null,incomingBody=null,incomingDuration=0;
  const now=()=>getMetadata().gameMinutes;
@@ -33,14 +33,15 @@ export function mountGoblinDialog(d,{getState,getMetadata,navigate,commit,audio,
   if(!ok){pendingSeconds=delta;blocked=true;error='Не удалось сохранить набор. Нажми «Повторить отправку».';}return ok;
  }
  function prepare(value){
-  const previous=pendingSeconds;pendingSeconds=0;if(!saveDraft({...value,elapsedSeconds:0,totalSeconds:TYPING_SECONDS})){pendingSeconds=previous;return;}
-  blocked=false;error='';replyPanel.close();attachment.hidden=true;void keyboard.unlock();field.focus({preventScroll:true});update(false);
+  const previous=pendingSeconds;pendingSeconds=0;if(!saveDraft({...value,elapsedSeconds:0,totalSeconds:TYPING_SECONDS})){pendingSeconds=previous;return false;}
+  blocked=false;error='';replyPanel.close();closeAttachment(false);void keyboard.unlock();field.focus({preventScroll:true});update(false);return true;
  }
  let answer;
- function closeAttachment(){filePicker?.dispose();filePicker=null;attachment.hidden=true;}
+ function closeAttachment(returnFocus=true){filePicker?.dispose();filePicker=null;attachment.close?.();if(returnFocus&&!disposed)attach.focus({preventScroll:true});}
+ const cancelAttachment=e=>{e.preventDefault();closeAttachment();};attachment.addEventListener('cancel',cancelAttachment);
  const attach=socialButton(d,'Прикрепить',()=>{
-  if(attach.disabled)return;replyPanel.close();if(filePicker){closeAttachment();return;}const context=goblinReplyContext(getState(),now()),kind={text:'lyrics',beat:'beat','beat-project':'project',vocal:'track'}[getState().social.goblin.stage];attachment.hidden=false;
-  filePicker=mountPcFilePicker(attachment,{getState,mode:'attach',types:context.expectedFileTypes,initialFolderId:kind==='lyrics'?'documents':kind==='project'?'projects':'exports',filter:file=>kind==='lyrics'?file.type==='txt'&&file.snapshot?.status==='ready':kind==='project'?file.type==='flp':file.kind===kind,onCancel:closeAttachment,onSelect:fileId=>{const file=pcFileById(getState(),fileId);if(!file)return {ok:false,reason:'Файл недоступен.'};prepare({kind:'attachment',fileId,filename:file.filename,body:fileBody(kind)});closeAttachment();return {ok:true};}});
+  if(attach.disabled)return;replyPanel.close();if(filePicker){closeAttachment();return;}const context=goblinReplyContext(getState(),now()),kind={text:'lyrics',beat:'beat','beat-project':'project',vocal:'track'}[getState().social.goblin.stage];attachment.showModal?.();
+  filePicker=mountPcFilePicker(attachment,{getState,mode:'attach',types:context.expectedFileTypes,initialFolderId:kind==='lyrics'?'documents':kind==='project'?'projects':'exports',filter:file=>kind==='lyrics'?file.type==='txt'&&file.snapshot?.status==='ready':kind==='project'?file.type==='flp':file.kind===kind,onCancel:()=>closeAttachment(),onSelect:fileId=>{const file=pcFileById(getState(),fileId);if(!file)return {ok:false,reason:'Файл недоступен.'};return prepare({kind:'attachment',fileId,filename:file.filename,body:fileBody(kind)})?{ok:true}:{ok:false,reason:'Не удалось сохранить вложение. Попробуй снова.'};}});
  });
  const cancel=socialButton(d,'Отменить набор',()=>{const previous=pendingSeconds;pendingSeconds=0;if(saveDraft(null)){error='';blocked=false;keyboard.sync({phase:'idle'});update(false);}else pendingSeconds=previous;});
  const send=socialButton(d,'Отправить',()=>{
@@ -52,7 +53,7 @@ export function mountGoblinDialog(d,{getState,getMetadata,navigate,commit,audio,
   keyboard.sync({phase:'idle'});update(false);
  });
  const replyPanel=mountReplyPanel(options,{getContext:()=>goblinReplyContext(getState(),now()),onChoose:(choiceId,body)=>prepare({kind:'choice',choiceId,body})});answer=replyPanel.answer;
- options.hidden=false;attachment.hidden=true;actions.append(send,answer,attach,cancel,progress);layout.footer.append(incoming,options,draftLabel,field,actions,attachment,notice);
+ options.hidden=false;actions.append(send,answer,attach,cancel,progress);layout.footer.append(incoming,options,draftLabel,field,actions,notice);root.append(attachment);
  const run=result=>{if(commit(result)){error=result.reason??'';update(false);}else{error=result.reason??'Не удалось сохранить.';notice.textContent=error;}};
  function tickOutgoingMessage(activeSeconds=0,{paused=false}={}){
   if(disposed)return;
@@ -113,5 +114,5 @@ export function mountGoblinDialog(d,{getState,getMetadata,navigate,commit,audio,
   if(!isVisible())keyboard.sync({phase:'idle'});layout.update();
   const lastId=dialog?.messages?.at(-1)?.id;if(markRead&&dialog?.unread&&isVisible()&&lastId!==readId){readId=lastId;onRead(GOBLIN_ID);}
  }
- update(false);return {root,update,tickOutgoingMessage,dispose(){disposed=true;filePicker?.dispose();replyPanel.dispose();flushProgress();keyboard.dispose();layout.dispose();audio?.releaseRows?.(root);root.replaceChildren();}};
+ update(false);return {root,update,tickOutgoingMessage,dispose(){disposed=true;closeAttachment(false);attachment.removeEventListener('cancel',cancelAttachment);replyPanel.dispose();flushProgress();keyboard.dispose();layout.dispose();audio?.releaseRows?.(root);root.replaceChildren();}};
 }

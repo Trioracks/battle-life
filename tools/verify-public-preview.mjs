@@ -213,13 +213,13 @@ export async function verifyPublicPreview(options={}){
    const currentRequests=[];context.on('request',request=>currentRequests.push(request.url()));
    await page.goto(cacheProbe.url,{timeout:60000});await page.locator('#loading').waitFor({state:'hidden'});await page.locator('#continue-game').click();await phase(page,'room');
    await page.waitForFunction(()=>document.body.dataset.mode==='game');
-   const until=Date.now()+30000;while(!currentRequests.some(url=>url.includes('social-worker.js?rev=60'))&&Date.now()<until)await page.waitForTimeout(100);
+   const until=Date.now()+30000;while(!currentRequests.some(url=>url.includes('social-worker.js?rev=61'))&&Date.now()<until)await page.waitForTimeout(100);
    const resources=currentRequests.filter(url=>/\.(?:js|css)(?:\?|$)/.test(url)&&!url.includes('/vendor/'));
-   assert.ok(resources.some(url=>url.includes('apartment-app.js?rev=60')));assert.ok(resources.some(url=>url.includes('.css?rev=60')));assert.ok(resources.some(url=>url.includes('social-worker.js?rev=60')));assert.ok(resources.every(url=>new URL(url).searchParams.get('rev')==='60'));
+   assert.ok(resources.some(url=>url.includes('apartment-app.js?rev=61')));assert.ok(resources.some(url=>url.includes('.css?rev=61')));assert.ok(resources.some(url=>url.includes('social-worker.js?rev=61')));assert.ok(resources.every(url=>new URL(url).searchParams.get('rev')==='61'));
    assert.equal(await page.evaluate(()=>typeof window.__cacheProbe),'undefined');assert.equal(await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--preview-cache-probe').trim()),'');
    await screenshot(page,'stale-http-cache-to-current-1280');
    report.cacheEvidence={syntheticPriorRevision:43,priorHits:{...cacheProbe.priorHits},cachedResponses:hits.map(({text,...hit})=>hit),currentResources:resources,scope:'Controlled synthetic old JS/CSS/Worker cached with immutable max-age, then unchanged current artifact on the same owned origin. Not an old gameplay migration test.'};
-   check('stale HTTP-cached JS/CSS/Worker cohort cannot replace canonical 60 entry',{cacheHits:3,syntheticPriorRevision:43});await close(context,page,'stale-http-cache');await cacheProbe.close();cacheProbe=null;
+   check('stale HTTP-cached JS/CSS/Worker cohort cannot replace canonical 61 entry',{cacheHits:3,syntheticPriorRevision:43});await close(context,page,'stale-http-cache');await cacheProbe.close();cacheProbe=null;
   }
   for(const viewport of report.viewports){
    const suffix=String(viewport.width);
@@ -292,11 +292,11 @@ export async function verifyPublicPreview(options={}){
    }
   }
   const active=[...observed].filter(url=>/\.(?:js|css)(?:\?|$)/.test(url)&&!url.includes('/vendor/'));
-  assert.ok(active.some(url=>url.includes('apartment-app.js?rev=60')));assert.ok(active.some(url=>url.includes('.css?rev=60')));assert.ok(active.every(url=>new URL(url).searchParams.get('rev')==='60'),'all active first-party JS/CSS use canonical revision 60');
+  assert.ok(active.some(url=>url.includes('apartment-app.js?rev=61')));assert.ok(active.some(url=>url.includes('.css?rev=61')));assert.ok(active.every(url=>new URL(url).searchParams.get('rev')==='61'),'all active first-party JS/CSS use canonical revision 61');
   const workers=report.requests.filter(url=>new URL(url).origin===new URL(report.url).origin&&/\/[^/]*worker\.js(?:\?|$)/.test(url));
-  assert.ok(workers.every(url=>new URL(url).searchParams.get('rev')==='60'),'all real Worker entries use canonical revision 60');
-  if(!options.smoke)assert.ok(workers.some(url=>url.includes('social-worker.js?rev=60')),'real canonical social Worker requested');
-  check('prior module URL followed by canonical revision 60 entry, CSS and Worker',{priorRevision:43,canonicalRevision:60,workerRequired:!options.smoke,cacheScope:'isolated module URL warmup; local HTTP responses are no-store'});
+  assert.ok(workers.every(url=>new URL(url).searchParams.get('rev')==='61'),'all real Worker entries use canonical revision 61');
+  if(!options.smoke)assert.ok(workers.some(url=>url.includes('social-worker.js?rev=61')),'real canonical social Worker requested');
+  check('prior module URL followed by canonical revision 61 entry, CSS and Worker',{priorRevision:43,canonicalRevision:61,workerRequired:!options.smoke,cacheScope:'isolated module URL warmup; local HTTP responses are no-store'});
   report.completedGlbSignals=[];report.readyDocuments=[...readyDocuments];
   if(!config.live){const {verifyDialogLayout}=await import('./verify-dialog-layout.mjs');const result=await verifyDialogLayout({root:config.root,outputDir:path.join(out,'dialog-layout'),expectedRevision:config.manifest.revision});check('dialog history stays tall and keeps scroll position through answer selection',result);}
   const rawFailures=report.unexpectedResponses;report.unexpectedResponses=[];

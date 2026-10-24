@@ -1,7 +1,7 @@
-import {npcSocialProfile} from './npc-social-profiles.js?rev=60';
-import {profileAccess as legacyAccess} from './social-state.js?rev=60';
-import {validGameMinute} from './game-minute.js?rev=60';
-import {publicAnnouncedJudges} from './social-community-publications.js?rev=60';
+import {npcSocialProfile} from './npc-social-profiles.js?rev=61';
+import {profileAccess as legacyAccess} from './social-state.js?rev=61';
+import {validGameMinute} from './game-minute.js?rev=61';
+import {publicAnnouncedJudges} from './social-community-publications.js?rev=61';
 export function profileAccess(state,{viewerId='player',characterId,nowMinute}={}){
  if(characterId==='mak-npc-06')return {canView:true,canAddFriend:false,reason:'Твой старый знакомый Гоблин Ссаблей · Плата Гоблина на баттлах.'};
  if(characterId===viewerId||characterId==='me')return {canView:true,canAddFriend:false,reason:''};

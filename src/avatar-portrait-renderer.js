@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=60';
-import {LIFE_STAGES,lifeAppearance,addLifeScene} from './avatar-life-scene.js?rev=60';
+import {applyAppearance,DEFAULT_APPEARANCE} from './avatar-v3-profile.js?rev=61';
+import {LIFE_STAGES,lifeAppearance,addLifeScene} from './avatar-life-scene.js?rev=61';
 
 function cloneSkeleton(root){
  const copy=root.clone(true),mapping=new Map();

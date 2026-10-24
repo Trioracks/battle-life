@@ -1,4 +1,4 @@
-import {normalizeAppearance} from './avatar-v3-profile.js?rev=60';
+import {normalizeAppearance} from './avatar-v3-profile.js?rev=61';
 // Static NPC photographs use appearance identity; generated player renders also
 // carry a geometry revision. Never invalidate an authored NPC photo manifest.
 export const portraitKey=appearance=>'portrait-v1:'+JSON.stringify(normalizeAppearance(appearance));

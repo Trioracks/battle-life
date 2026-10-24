@@ -1,11 +1,12 @@
-import {PC_IDENTITY} from './pc-identity.js?rev=60';
-import {diskUsage} from './virtual-pc-state.js?rev=60';
-import {formatDiskGb,diskAmount} from './virtual-pc-disk-view.js?rev=60';
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=60';
-import {SOFTWARE} from './pc-software-catalog.js?rev=60';
-import {AUDIO_EXPORT_KINDS} from './pc-audio-exports.js?rev=60';
-import {gameDateTimeLabel} from './home-calendar.js?rev=60';
-import {pcFileEntries} from './pc-filesystem.js?rev=60';
+import {PC_IDENTITY} from './pc-identity.js?rev=61';
+import {diskUsage} from './virtual-pc-state.js?rev=61';
+import {formatDiskGb,diskAmount} from './virtual-pc-disk-view.js?rev=61';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=61';
+import {SOFTWARE} from './pc-software-catalog.js?rev=61';
+import {AUDIO_EXPORT_KINDS} from './pc-audio-exports.js?rev=61';
+import {gameDateTimeLabel} from './home-calendar.js?rev=61';
+import {pcFileEntries,pcFolderExists,normalizePcFileSystem,PC_FOLDER_PARENTS,PC_USER_FOLDERS} from './pc-filesystem.js?rev=61';
+import {uninstallSoftware,normalizeSoftware,withSoftware} from './pc-software.js?rev=61';
 export const EXPLORER_PATHS=Object.freeze({
   computer:{label:'Мой компьютер',address:'Мой компьютер',parent:null,iconId:'computer'},
   disk:{label:'Локальный диск (C:)',address:'C:\\',parent:'computer',iconId:'disk'},
@@ -17,7 +18,7 @@ export const EXPLORER_PATHS=Object.freeze({
   downloads:{label:'Загрузки',address:'C:\\Загрузки',parent:'disk',iconId:'folder'},
 });
 export function explorerPaths(state={}){
- const paths={...EXPLORER_PATHS};
+ const paths=Object.fromEntries(Object.entries(EXPLORER_PATHS).filter(([id])=>!PC_USER_FOLDERS.includes(id)||pcFolderExists(state,id)));
  for(let pass=0;pass<12;pass++)for(const f of state.fileSystem?.folders??[]){if(!Object.hasOwn(paths,f.id)&&Object.hasOwn(paths,f.parentId))paths[f.id]={label:f.name,address:paths[f.parentId].address.replace(/\\$/,'')+'\\'+f.name,parent:f.parentId,iconId:'folder'};}
  for(const [id,app]of Object.entries(state.software??{})){
   if(!SOFTWARE[id]||!app.installed)continue;
@@ -42,6 +43,7 @@ export function reconcileExplorerState(s,pcState={}) {
     let candidate=value;
     while(candidate){
       const found=resolvePath(candidate,paths);if(found)return found;
+      if(PC_FOLDER_PARENTS[candidate]){candidate=PC_FOLDER_PARENTS[candidate];continue;}
       const end=candidate.lastIndexOf('\\');if(end<0)break;
       candidate=candidate.slice(0,end);
     }
@@ -69,13 +71,14 @@ export function navigateExplorer(s,a,pcState={}) {
   return {...s,path,history,index:history.length-1,selection:null,error:''};
 }
 export function explorerEntries(pcState,path) {
-  const paths=explorerPaths(pcState),entries=Object.entries(paths).filter(([,p])=>p.parent===path).map(([id,p])=>({id,kind:id==='disk'?'disk':'folder',name:p.label,iconId:p.iconId,targetPath:id}));
+  const paths=explorerPaths(pcState);if(!paths[path])return [];
+  const entries=Object.entries(paths).filter(([,p])=>p.parent===path).map(([id,p])=>({id,kind:id==='disk'?'disk':'folder',name:p.label,iconId:p.iconId,targetPath:id}));
   const documents=pcFileEntries(pcState,{folderId:path,types:['txt','flp']});
   const savedProjects=new Set((pcState.fileSystem?.files??[]).filter(f=>['txt','flp'].includes(f.type)).map(f=>f.projectId));
-  if(path==='projects')entries.push(...pcState.projects.filter(p=>!savedProjects.has(p.id)).map(p=>({id:'project:'+p.id,kind:'project',name:typeof p.name==='string'?p.name:p.id,iconId:'project',projectId:p.id,sizeMb:2})));
-  for(const f of documents)entries.push({id:'document:'+f.id,kind:'document',name:f.filename,iconId:f.type==='txt'?'notebook':'project',fileId:f.id,projectId:f.projectId,sizeMb:f.bytes/1000000,action:'document-file'});
+  if(path==='projects')entries.push(...pcState.projects.filter(p=>!savedProjects.has(p.id)&&!pcState.fileSystem?.deletedProjectIds?.includes(p.id)).map(p=>({id:'project:'+p.id,kind:'project',name:typeof p.name==='string'?p.name:p.id,iconId:p.kind==='lyrics'?'txt':'project',projectId:p.id,sizeMb:2})));
+  for(const f of documents)entries.push({id:'document:'+f.id,kind:'document',name:f.filename,iconId:f.type==='txt'?'txt':'project',fileId:f.id,projectId:f.projectId,sizeMb:f.bytes/1000000,action:'document-file'});
   for(const file of pcState.audioExports?.files??[])if(file.folderId===path)entries.push({id:'audio:'+file.id,kind:'audio',format:file.format??'wav',name:file.filename,iconId:'microphone',fileId:file.id,sizeMb:file.bytes/1000000,createdAtMinute:file.createdAtMinute,trackVersionId:file.trackVersionId});
-  for(const file of pcState.social?.goblin?.files??[])if(!file.requiresDownload&&!documents.some(f=>f.mentorFileId===file.id||f.id===file.id)&&file.folderId===path&&file.createdAtMinute<=(pcState.socialRuntime?.lastMinute??pcState.lastGameMinute??0))entries.push({id:'mentor:'+file.id,kind:'artifact',name:file.filename,iconId:file.kind==='lyrics'?'notebook':'project',action:'mentor-file',fileId:file.id,sizeMb:(file.bytes??0)/1000000});
+  for(const file of pcState.social?.goblin?.files??[])if(!file.requiresDownload&&!documents.some(f=>f.mentorFileId===file.id||f.id===file.id)&&file.folderId===path&&file.createdAtMinute<=(pcState.socialRuntime?.lastMinute??pcState.lastGameMinute??0))entries.push({id:'mentor:'+file.id,kind:'artifact',name:file.filename,iconId:file.kind==='lyrics'?'txt':'project',action:'mentor-file',fileId:file.id,sizeMb:(file.bytes??0)/1000000});
   const s=pcState.software;
   if(path==='downloads'&&s){
    for(const item of pcState.browserDownloads?.items??[])if(item.kind==='metadata'&&!s[SOFTWARE[item.appId].metadataKey])entries.push({id:item.appId+'-metadata',kind:'artifact',name:SOFTWARE[item.appId].torrent+'.part',iconId:'torent',sizeMb:Math.floor(12000*item.elapsedSeconds)/1000000});
@@ -87,6 +90,27 @@ export function explorerEntries(pcState,path) {
    if(id==='client')entries.push({id:'config:client',kind:'file',name:'settings.dat',iconId:'project'});
   }
   return entries;
+}
+export function deleteExplorerFolder(state,{folderId}={}){
+ const fail=reason=>({ok:false,state,reason}),paths=explorerPaths(state),folder=paths[folderId];
+ if(['computer','disk','windows'].includes(folderId))return fail('Системную папку и корень игрового диска удалять нельзя.');
+ if(!folder)return fail('Папка уже удалена или недоступна.');
+ const removed=new Set([folderId]);for(let pass=0;pass<12;pass++)for(const [id,p]of Object.entries(paths))if(removed.has(p.parent))removed.add(id);
+ let next=state;const address=folder.address.toLowerCase(),blocked={'work-in-progress':'Сначала заверши текущую работу в программе.','recording-in-progress':'Сначала заверши запись, сведение или мастеринг.','downloads-in-progress':'Сначала заверши или отмени загрузки в torent.','installer-active':'Сначала закрой мастер установки.'};
+ for(const [id,app]of Object.entries(state.software??{}))if(SOFTWARE[id]&&app.installed){const path=app.path.toLowerCase();if(path===address||path.startsWith(address+'\\')||address.startsWith(path+'\\')){const result=uninstallSoftware(next,id);if(!result.ok)return fail(blocked[result.reason]??'Сначала закрой программу и заверши её работу.');next=result.state;}}
+ if(removed.has('downloads')){
+  if(next.software?.installer)return fail('Сначала закрой мастер установки.');
+  const software=normalizeSoftware(next.software,next.download);for(const [id,app]of Object.entries(SOFTWARE)){software[id].receivedBytes=0;if(app.metadataKey)software[app.metadataKey]=false;}software.transfers={};
+  next=withSoftware({...next,browserDownloads:{...next.browserDownloads,items:[],hiddenHistoryIds:[]}},software);
+ }
+ const fs=next.fileSystem??normalizePcFileSystem(null,next),deletedFiles=fs.files.filter(file=>removed.has(file.folderId)),files=fs.files.filter(file=>!removed.has(file.folderId));
+ const deletedIds=new Set([...deletedFiles.map(file=>file.id),...(next.audioExports?.files??[]).filter(file=>removed.has(file.folderId)).map(file=>file.id)]);
+ const deletedProjectIds=new Set([...(fs.deletedProjectIds??[]),...deletedFiles.map(file=>file.projectId).filter(Boolean),...(removed.has('projects')?(next.projects??[]).map(project=>project.id):[])]);
+ const fileSystem={...fs,folders:fs.folders.filter(folder=>!removed.has(folder.id)),files,deletedFolders:[...new Set([...(fs.deletedFolders??[]),...[...removed].filter(id=>PC_USER_FOLDERS.includes(id))])],deletedProjectIds:[...deletedProjectIds]};
+ const byApp=Object.fromEntries(Object.entries(next.documentSessions?.byApp??{}).map(([app,session])=>[app,deletedIds.has(session.fileId)?{...session,fileId:null}:session]));
+ next={...next,fileSystem,documentSessions:{...next.documentSessions,byApp},audioExports:{...next.audioExports,files:(next.audioExports?.files??[]).filter(file=>!removed.has(file.folderId))},...(removed.has(next.exportJob?.file?.folderId)?{exportJob:null}:{})};
+ const goblin=next.social?.goblin;if(goblin){const local= new Set(deletedFiles.map(file=>file.mentorFileId).filter(Boolean));next={...next,social:{...next.social,goblin:{...goblin,files:goblin.files.map(file=>!file.requiresDownload&&(removed.has(file.folderId)||local.has(file.id))?{...file,requiresDownload:true}:file),downloaded:Object.fromEntries(Object.entries(goblin.downloaded??{}).filter(([,id])=>!deletedIds.has(id)))}}};}
+ return {ok:true,state:next,reason:''};
 }
 export function explorerProperties(state,entry) {
   if(entry?.kind==='audio'){
@@ -100,5 +124,5 @@ export function explorerProperties(state,entry) {
   let type=({project:'Проект FT Studio',folder:'Папка',application:'Приложение',file:'Файл конфигурации'})[entry?.kind]??'Файл';
   if(p?.kind==='lyrics')type='Документ Рэпблокнота';
   if(entry?.kind==='artifact')type=({part:'Незавершённая загрузка',torrent:'Файл метаданных BitTorrent',zip:'Архив ZIP',exe:'Приложение'})[entry.name.split('.').pop().toLowerCase()]??'Файл';
-  return {title:'Свойства: '+(entry?.name??'Объект'),rows:[{label:'Имя',value:entry?.name??''},{label:'Тип',value:type},...(p?[{label:'Размер',value:'2 МБ'},{label:'Баттл',value:BATTLE_BRIEFS.find(b=>b.id===p.battleId)?.title??'Не указан'}]:[])]};
+  return {title:'Свойства: '+(entry?.name??'Объект'),iconId:entry?.iconId,rows:[{label:'Имя',value:entry?.name??''},{label:'Тип',value:type},...(p?[{label:'Размер',value:'2 МБ'},{label:'Баттл',value:BATTLE_BRIEFS.find(b=>b.id===p.battleId)?.title??'Не указан'}]:[])]};
 }

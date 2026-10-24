@@ -1,8 +1,8 @@
-import {battleCharacter} from './battle-demo-config.js?rev=60';
-import {judgeProfile} from './judge-profiles.js?rev=60';
-import {validGameMinute} from './game-minute.js?rev=60';
-import {profileAccess} from './social-profile-policy.js?rev=60';
-import {BATTLE_PUBLIC_SCORING} from './virtual-pc-catalog.js?rev=60';
+import {battleCharacter} from './battle-demo-config.js?rev=61';
+import {judgeProfile} from './judge-profiles.js?rev=61';
+import {validGameMinute} from './game-minute.js?rev=61';
+import {profileAccess} from './social-profile-policy.js?rev=61';
+import {BATTLE_PUBLIC_SCORING} from './virtual-pc-catalog.js?rev=61';
 export const ROUND_LABELS=Object.freeze({selection:'Отбор','round-2':'1/16 финала','round-3':'1/8 финала','round-4':'Четвертьфинал','round-5':'Полуфинал',final:'Финал'});
 export function publicTournamentTrackIds(state,{battleId='makarevich-1',nowMinute}={}){return new Set(Object.keys(state.tournaments?.byId?.[battleId]?.rounds??{}).flatMap(roundId=>publicRoundTable(state,{battleId,roundId,nowMinute}).rows.map(r=>r.trackVersionId).filter(Boolean)));}
 export function publicRoundTable(state,{battleId='makarevich-1',roundId='selection',nowMinute,viewerId='player'}={}){

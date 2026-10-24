@@ -1,5 +1,5 @@
-import {pcElement as el} from './virtual-pc-dom.js?rev=60';
-import {renamePcFolder} from './pc-filesystem.js?rev=60';
+import {pcElement as el} from './virtual-pc-dom.js?rev=61';
+import {renamePcFolder} from './pc-filesystem.js?rev=61';
 // The folder already exists. Escape keeps its default name, as in Explorer.
 export function mountFolderRename(label,{folderId,getState,onChange,onDone=()=>{},onError=()=>{}}){
  const folder=getState().fileSystem.folders.find(f=>f.id===folderId);if(!folder)return;

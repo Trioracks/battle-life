@@ -64,5 +64,5 @@ test('syncHost detects a host skill mutation even when the host retains its skil
  const d=pcDocument(),root=d.createElement('main'),pc=mountVirtualPc(root),skills={writing:10};
  pc.showDesktop(createVirtualPcState({software:{notebook:{installed:true}}}));pc.openNow('rap-notebook');pc.syncHost({...pc.metadata,skills});
  skills.writing=30;pc.syncHost({...pc.metadata,skills});
- assert.ok(allPc(root).some(n=>n.textContent==='Письмо 30.00 / 100'));pc.dispose();
+ assert.ok(allPc(root).some(n=>n.getAttribute('aria-label')==='Письмо 30.00 / 100'));pc.dispose();
 });

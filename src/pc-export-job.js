@@ -1,7 +1,7 @@
-import {createAudioExport,normalizeAudioExports} from './pc-audio-exports.js?rev=60';
-import {softwareDiskBytes} from './pc-software.js?rev=60';
-import {canonicalTrackSignature,normalizeTrackVersions} from './track-version.js?rev=60';
-import {pcFileEntries,pcFolderNameTaken} from './pc-filesystem.js?rev=60';
+import {createAudioExport,normalizeAudioExports} from './pc-audio-exports.js?rev=61';
+import {softwareDiskBytes} from './pc-software.js?rev=61';
+import {canonicalTrackSignature,normalizeTrackVersions} from './track-version.js?rev=61';
+import {pcFileEntries,pcFolderNameTaken} from './pc-filesystem.js?rev=61';
 export function normalizeExportJob(raw,{trackVersions,audioExports,fileSystem}={}){
  if(raw==null)return null;
  if(raw.version!==1||typeof raw.id!=='string'||!raw.id||raw.id.length>100||!Number.isFinite(raw.elapsedSeconds)||raw.elapsedSeconds<0||raw.elapsedSeconds>5||raw.totalSeconds!==5)return null;

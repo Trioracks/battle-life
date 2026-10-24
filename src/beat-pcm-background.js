@@ -1,5 +1,5 @@
-import {prepareBeatPcm} from './beat-pcm-runtime.js?rev=60';
-export function createBeatPcmProcessor({createWorker=typeof Worker==='undefined'?null:()=>new Worker(new URL('./beat-pcm-worker.js?rev=60',import.meta.url),{type:'module'})}={}){
+import {prepareBeatPcm} from './beat-pcm-runtime.js?rev=61';
+export function createBeatPcmProcessor({createWorker=typeof Worker==='undefined'?null:()=>new Worker(new URL('./beat-pcm-worker.js?rev=61',import.meta.url),{type:'module'})}={}){
  let worker=null,sequence=0,disposed=false;const pending=new Map();
  function cancel(reason='PCM cancelled'){
   const previous=worker;worker=null;previous?.terminate();

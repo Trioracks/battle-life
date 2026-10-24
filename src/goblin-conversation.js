@@ -1,12 +1,14 @@
-import {GOBLIN_ID,GOBLIN_NAME,normalizeGoblin} from './goblin-catalog.js?rev=60';
-import {receivePhoneEvents} from './phone-notifications.js?rev=60';
-import {validGameMinute} from './game-minute.js?rev=60';
-import {battleStage,battleStageText} from './battle-stage.js?rev=60';
-import {SOFTWARE} from './pc-software-catalog.js?rev=60';
+import {GOBLIN_ID,GOBLIN_NAME,normalizeGoblin} from './goblin-catalog.js?rev=61';
+import {receivePhoneEvents} from './phone-notifications.js?rev=61';
+import {validGameMinute} from './game-minute.js?rev=61';
+import {battleStage,battleStageText} from './battle-stage.js?rev=61';
+import {SOFTWARE} from './pc-software-catalog.js?rev=61';
 const battleLink={label:'Макаревич Battle',url:'underweb://social/community/makarevich-1'};
 export const goblinTypingSeconds=message=>Math.max(1,Array.from(message.body??'').length)/3;
 export function goblinReplyContext(state,nowMinute=state.socialRuntime?.lastMinute??state.lastGameMinute??0){
  const g=state.social?.goblin??{},stage=g.stage,choices=[],used=new Set(g.contextUsed??[]),messages=state.social?.dialogs?.[GOBLIN_ID]?.messages??[],seen=id=>messages.some(m=>m.id==='goblin:'+id);
+ const prompts={client:['client-link'],software:['client-done','notebook-link'],text:['text-instructions','text-export']}[stage];
+ if(prompts?.some(id=>g.pending?.some(m=>m.id===id)))return {choices:[],hint:'Гоблин печатает продолжение. Ответы появятся после его сообщения.',expectedFileTypes:[]};
  const add=(id,label,condition=true)=>{if(condition&&!used.has(stage+':'+id))choices.push([id,label]);};
  const specs=goblinContextResponses(state,nowMinute);let hint='Гоблин отвечает. Можно подождать здесь или заняться делами — сообщение сохранится в переписке.',expectedFileTypes=[];
  if(stage==='hello')choices.push(['good','Хорошо! Сам как?'],['normal','Нормально, сам как?'],['bad','Да так себе...']);

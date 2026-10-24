@@ -1,6 +1,6 @@
-import {currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=60';
-import {gameDateTimeLabel} from './home-calendar.js?rev=60';
-import {validGameMinute} from './game-minute.js?rev=60';
+import {currentBattleWindow,canSubmitToBattleWindow} from './battle-windows.js?rev=61';
+import {gameDateTimeLabel} from './home-calendar.js?rev=61';
+import {validGameMinute} from './game-minute.js?rev=61';
 const names={selection:'отбора','round-2':'1/16 финала','round-3':'1/8 финала','round-4':'четвертьфинала','round-5':'полуфинала',final:'финала'};
 export function battleStage(state,{battleId,roundId,nowMinute}={}){
  const t=state.tournaments?.byId?.[battleId],window=roundId?(state.battleWindows??[]).find(w=>w.battleId===battleId&&w.roundId===roundId):currentBattleWindow(state,battleId,nowMinute);

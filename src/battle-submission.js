@@ -1,10 +1,10 @@
-import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=60';
-import {normalizeBeat} from './beat-production.js?rev=60';
-import {normalizeLyric} from './lyric-production.js?rev=60';
-import {resolveBeatPlayback} from './beat-playback.js?rev=60';
-import {RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=60';
-import {validGameMinute} from './game-minute.js?rev=60';
-import {BATTLE_ROUND_IDS} from './battle-roster.js?rev=60';
+import {BATTLE_BRIEFS} from './virtual-pc-catalog.js?rev=61';
+import {normalizeBeat} from './beat-production.js?rev=61';
+import {normalizeLyric} from './lyric-production.js?rev=61';
+import {resolveBeatPlayback} from './beat-playback.js?rev=61';
+import {RETIRED_DRUM_MESSAGE} from './beat-catalog.js?rev=61';
+import {validGameMinute} from './game-minute.js?rev=61';
+import {BATTLE_ROUND_IDS} from './battle-roster.js?rev=61';
 const clone=value=>JSON.parse(JSON.stringify(value));
 const day=value=>Number.isSafeInteger(value)&&value>0&&value<100000;
 const battle=id=>BATTLE_BRIEFS.some(b=>b.id===id);

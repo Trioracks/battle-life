@@ -119,7 +119,7 @@ test('stem normalization quarantines unknown or retired sources and preserves su
 });
 
 test('failed export persistence leaves saved bytes, files and versions unchanged and permits retry',()=>{
- const storage=memory(),initial=submissionFixture();assert.equal(saveVirtualPcState(storage,initial),true);
+ const storage=memory(),initial=submissionFixture();initial.software.ft.installed=true;assert.equal(saveVirtualPcState(storage,initial),true);
  const previousSavedBytes=structuredClone([...storage.data]),document=pcDocument(),root=document.createElement('section');let reject=true;
  const write=storage.setItem.bind(storage);storage.setItem=(k,v)=>{if(reject)throw Error('quota');write(k,v);};
  const pc=mountVirtualPc(root,{onPersist:(next,options)=>saveVirtualPcState(storage,next)});

@@ -1,8 +1,8 @@
-import {advanceApartmentFrame} from './apartment-v3-frame.js?rev=60';
-import {wardrobeAction} from './home-wardrobe.js?rev=60';
-import {consumeFood} from './home-food.js?rev=60';
+import {advanceApartmentFrame} from './apartment-v3-frame.js?rev=61';
+import {wardrobeAction} from './home-wardrobe.js?rev=61';
+import {consumeFood} from './home-food.js?rev=61';
 
-import {advanceVirtualPc,advanceVirtualPcDurably} from './virtual-pc-runtime.js?rev=60';
+import {advanceVirtualPc,advanceVirtualPcDurably} from './virtual-pc-runtime.js?rev=61';
 
 export function canStartHomeAction(id,clock){
   return id==='dining'&&!clock.mealReady?{allowed:false,reason:'Сначала приготовь еду на плите'}:{allowed:true,reason:''};

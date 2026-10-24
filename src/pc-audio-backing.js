@@ -1,7 +1,7 @@
-import {drumById} from './beat-catalog.js?rev=60';
-import {beginnerById} from './beat-beginner-bank.js?rev=60';
-import {vocalById,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=60';
-import {validBeatExecutionDescriptor} from './beat-execution-snapshot.js?rev=60';
+import {drumById} from './beat-catalog.js?rev=61';
+import {beginnerById} from './beat-beginner-bank.js?rev=61';
+import {vocalById,DEFAULT_VOICE_ID} from './vocal-catalog.js?rev=61';
+import {validBeatExecutionDescriptor} from './beat-execution-snapshot.js?rev=61';
 const finiteJson=v=>typeof v==='number'?Number.isFinite(v):Array.isArray(v)?v.every(finiteJson):v&&typeof v==='object'?Object.values(v).every(finiteJson):true;
 export function normalizeAudioBacking(raw){
  const d=raw?.descriptor;
